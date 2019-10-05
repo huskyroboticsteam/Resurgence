@@ -9,7 +9,6 @@
 
 namespace Mapping
 {
-
 // euclidean distance between p1 and p2
 float Dist(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2)
 {
