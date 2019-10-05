@@ -54,7 +54,7 @@ double TimeShortestPath(std::shared_ptr<Map2D> map, int num_iterations)
         }
 
         auto start = std::chrono::system_clock::now();
-        ComputePath(map, map->vertices.at(start_ind), map->vertices.at(target_ind));
+        ComputePath(map, map->vertices[start_ind], map->vertices[target_ind]);
         auto end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
         avg += elapsed_seconds.count() / num_iterations;

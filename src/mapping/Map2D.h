@@ -5,21 +5,31 @@
 
 namespace Mapping
 {
-    typedef struct Point2D
-    {
-        int id;
-        float x;
-        float y;
-        std::vector<std::shared_ptr<Point2D>> neighbors;
-    } Point2D;
+struct Edge;
+struct Point2D;
 
-    typedef struct Map2D
-    {
-        std::vector<std::shared_ptr<Point2D>> vertices;
-    } Map2D;
+typedef struct Edge
+{
+    std::shared_ptr<Point2D> target;
+    float dist;
+} Edge;
 
-    float Dist(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2);
-    void Connect(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2);
-    std::vector<std::shared_ptr<Point2D>> ComputePath(std::shared_ptr<Map2D> map,
-        std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2); 
+typedef struct Point2D
+{
+    int id;
+    float x;
+    float y;
+    std::vector<Edge> neighbors;
+} Point2D;
+
+typedef struct Map2D
+{
+    std::vector<std::shared_ptr<Point2D>> vertices;
+} Map2D;
+
+float Dist(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2);
+void Connect(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2);
+std::vector<std::shared_ptr<Point2D>> ComputePath(std::shared_ptr<Map2D> map,
+    std::shared_ptr<Point2D> start, std::shared_ptr<Point2D> target);
+
 }

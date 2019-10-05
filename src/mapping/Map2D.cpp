@@ -9,38 +9,39 @@
 
 namespace Mapping
 {
-// euclidean distance between p1 and p2
 float Dist(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2)
 {
     return sqrtf(powf(p1->x - p2->x, 2) + powf(p1->y - p2->y, 2));
 }
 
-// adds p1 to p2's neighbors and p2 to p1's neighbors
 void Connect(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2)
 {
-    p1->neighbors.push_back(p2);
-    p2->neighbors.push_back(p1);
+    float dist = Dist(p1, p2);
+    Edge e1;
+    e1.target = p2;
+    e1.dist = dist;
+    p1->neighbors.push_back(e1);
+    Edge e2;
+    e2.target = p1;
+    e2.dist = dist;
+    p2->neighbors.push_back(e2);
 }
 
-// computes the shortest path between the start and target points and returns path as a vector
-// if there is no path from start to target, returns an empty vector
 std::vector<std::shared_ptr<Point2D>> ComputePath(std::shared_ptr<Map2D> map,
     std::shared_ptr<Point2D> start, std::shared_ptr<Point2D> target)
 {
-    std::vector<std::shared_ptr<Point2D>> shortest_path;
-    std::map<std::shared_ptr<Point2D>, float> distances;
-    std::map<std::shared_ptr<Point2D>, std::shared_ptr<Point2D>> previous;
+    std::map<int, int> prev;
+
+    std::vector<float> distances(map->vertices.size(), std::numeric_limits<float>::infinity());
+    distances[start->id] = 0;
+
     auto cmp = [start](std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2) {
         return Dist(p1, start) > Dist(p2, start);
     };
-    std::priority_queue<std::shared_ptr<Point2D>, std::vector<std::shared_ptr<Point2D>>,
+    std::priority_queue<std::shared_ptr<Point2D>, std::vector<std::shared_ptr<Point2D>>, 
         decltype(cmp)> vq(cmp);
-
-    distances.emplace(start, 0);
     for (std::shared_ptr<Point2D> p: map->vertices)
     {
-        distances.insert(std::pair<std::shared_ptr<Point2D>, float>(p,
-            std::numeric_limits<float>::infinity()));
         vq.push(p);
     }
 
@@ -48,30 +49,28 @@ std::vector<std::shared_ptr<Point2D>> ComputePath(std::shared_ptr<Map2D> map,
     {
         std::shared_ptr<Point2D> curr = vq.top();
         vq.pop();
-
-        for (std::shared_ptr<Point2D> p: curr->neighbors)
+        for (Edge e: curr->neighbors)
         {
-            float dist = distances.find(curr)->second + Dist(p, curr);
-            if (dist < distances.at(p)) 
+            float dist = distances[curr->id] + e.dist;
+            if (dist < distances[e.target->id])
             {
-                distances[p] = dist;
-                previous.insert(std::pair<std::shared_ptr<Point2D>, std::shared_ptr<Point2D>>(p,
-                    curr));
+                distances[e.target->id] = dist;
+                prev.insert(std::pair<int, int>(e.target->id, curr->id));
             }
         }
     }
 
-    bool found = false;
-    std::shared_ptr<Point2D> retrace = target;
-    while (!found)
+    std::vector<std::shared_ptr<Point2D>> path;
+    int retrace = target->id;
+    bool found_target = false;
+    while (!found_target)
     {
-        shortest_path.push_back(retrace);
-        std::map<std::shared_ptr<Point2D>, std::shared_ptr<Point2D>>::iterator itr =
-            previous.find(retrace);
-        if (itr != previous.end())
+        path.push_back(map->vertices[retrace]);
+        std::map<int, int>::iterator itr = prev.find(retrace);
+        if (itr != prev.end())
         {
             retrace = itr->second;
-            found = retrace == start;
+            found_target = retrace == start->id;
         }
         else
         {
@@ -79,7 +78,7 @@ std::vector<std::shared_ptr<Point2D>> ComputePath(std::shared_ptr<Map2D> map,
         }
     }
 
-    std::reverse(shortest_path.begin(), shortest_path.end());
-    return shortest_path;
+    std::reverse(path.begin(), path.end());
+    return path;
 }
 } // namespace Mapping
