@@ -30,18 +30,16 @@ void Connect(std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2)
 std::vector<std::shared_ptr<Point2D>> ComputePath(std::shared_ptr<Map2D> map,
     std::shared_ptr<Point2D> start, std::shared_ptr<Point2D> target)
 {
-    std::map<int, int> prev;
-
-    std::vector<float> distances(map->vertices.size(), std::numeric_limits<float>::infinity());
-    distances[start->id] = 0;
-
-    auto cmp = [start](std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2) {
-        return Dist(p1, start) > Dist(p2, start);
+    auto cmp = [](std::shared_ptr<Point2D> p1, std::shared_ptr<Point2D> p2) {
+        return p1->cost > p2->cost;
     };
     std::priority_queue<std::shared_ptr<Point2D>, std::vector<std::shared_ptr<Point2D>>, 
         decltype(cmp)> vq(cmp);
+
     for (std::shared_ptr<Point2D> p: map->vertices)
     {
+        p == start ? p->cost = 0 : p->cost = std::numeric_limits<float>::infinity();
+        p->prev = nullptr;
         vq.push(p);
     }
 
@@ -51,26 +49,24 @@ std::vector<std::shared_ptr<Point2D>> ComputePath(std::shared_ptr<Map2D> map,
         vq.pop();
         for (Edge e: curr->neighbors)
         {
-            float dist = distances[curr->id] + e.dist;
-            if (dist < distances[e.target->id])
+            float dist = curr->cost + e.dist;
+            if (dist < e.target->cost)
             {
-                distances[e.target->id] = dist;
-                prev.insert(std::pair<int, int>(e.target->id, curr->id));
+                e.target->cost = dist;
+                e.target->prev = curr;
             }
         }
     }
 
     std::vector<std::shared_ptr<Point2D>> path;
-    int retrace = target->id;
-    bool found_target = false;
-    while (!found_target)
+    std::shared_ptr<Point2D> retrace = target;
+    bool found = false;
+    while (!found)
     {
-        path.push_back(map->vertices[retrace]);
-        std::map<int, int>::iterator itr = prev.find(retrace);
-        if (itr != prev.end())
+        if (retrace->prev != nullptr)
         {
-            retrace = itr->second;
-            found_target = retrace == start->id;
+            path.push_back(retrace);
+            retrace = retrace->prev;
         }
         else
         {

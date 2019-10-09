@@ -19,6 +19,8 @@ typedef struct Point2D
     int id;
     float x;
     float y;
+    float cost;
+    std::shared_ptr<Point2D> prev;
     std::vector<Edge> neighbors;
 } Point2D;
 
