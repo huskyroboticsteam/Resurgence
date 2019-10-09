@@ -1,11 +1,9 @@
 #include "Map2D.h"
 
-#include <map>
 #include <cmath>
 #include <limits>
 #include <queue>
 #include <algorithm>
-#include <iostream>
 
 namespace Mapping
 {
