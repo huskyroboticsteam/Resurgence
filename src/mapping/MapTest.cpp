@@ -76,11 +76,15 @@ void verifyCorrectPath()
         p.x = x_pts[i];
         p.y = y_pts[i];
         map.vertices.push_back(std::make_shared<Point2D>(p));
+        if (i > 0)
+        {
+            Connect(map.vertices[i], map.vertices[i - 1]);
+        }
     }
-    Connect(map.vertices[9], map.vertices[0]);
+    Connect(map.vertices[9], map.vertices[2]);
     std::vector<std::shared_ptr<Point2D>> actual = ComputePath(std::make_shared<Map2D>(map),
                                                                map.vertices[9], map.vertices[0]);
-    int expected[1] = {0};
+    int expected[3] = {0, 1, 2};
     for (int i = 0; i < actual.size(); i++)
     {
         assert(expected[i] == actual[i]->id);
