@@ -7,7 +7,7 @@ CMake is a tool we use that helps us compile our project with the libraries we u
 If you are using Windows, type this into your Ubuntu terminal and hit "return" to install the necessary files:
   ```sudo apt install cmake g++ git```
 
-If you are using MacOS, replace apt with brew in the above line.
+If you are using MacOS, replace ```sudo apt``` with ```brew``` in the above line.
 
 The terminal will prompt you for a password and confirmation; proceed.
 
