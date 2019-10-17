@@ -4,8 +4,10 @@ PY2020 Jetson TX2 Codebase [Untitled Rover]
 # Setup CMake
 CMake is a tool we use that helps us compile our project with the libraries we use. This assumes that you have Ubuntu installed and configured.
 
-Type this into your Ubuntu terminal and hit "return" to install the necessary files:
+If you are using Windows, type this into your Ubuntu terminal and hit "return" to install the necessary files:
   ```sudo apt install cmake g++ git```
+
+If you are using MacOS, replace apt with brew in the above line.
 
 The terminal will prompt you for a password and confirmation; proceed.
 
