@@ -75,7 +75,9 @@ void verifyCorrectPath()
         p.id = i;
         p.x = x_pts[i];
         p.y = y_pts[i];
-        map.vertices.push_back(std::make_shared<Point2D>(p));
+        std::shared_ptr<Point2D> p_ptr = std::make_shared<Point2D>(p);
+        std::cout << &p << " " << p_ptr << std::endl;
+        map.vertices.push_back(p_ptr);
         if (i > 0)
         {
             Connect(map.vertices[i], map.vertices[i - 1]);
