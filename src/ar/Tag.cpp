@@ -1,3 +1,6 @@
-namespace AR {
+#include "Tag.h"
+
+namespace AR
+{
   
 }
