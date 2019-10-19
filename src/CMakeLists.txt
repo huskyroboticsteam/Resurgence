@@ -5,7 +5,7 @@ project(Rover LANGUAGES CXX)
 #find_package(OpenCV CONFIG REQUIRED)
 add_subdirectory(ar)
 
-add_subdirectory(Simulator)
+add_subdirectory(ObstacleSim)
 
 add_executable(Rover
         Rover.cpp
