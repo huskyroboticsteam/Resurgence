@@ -10,4 +10,5 @@ add_executable(Rover
         Globals.cpp
         Network.cpp)
 
-target_link_libraries(Rover ${OpenCV_LIBS})
+#target_link_libraries(Rover ${OpenCV_LIBS})
+set_property(TARGET Rover PROPERTY CXX_STANDARD 11)
