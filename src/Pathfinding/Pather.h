@@ -1,11 +1,12 @@
 #pragma once
 class Pather {
     public:
-        struct Node
+
+    private:
+            struct Node
         {
             /* data */
         };
         Node shortestPath();
-        
-    private:
-}
+
+};
