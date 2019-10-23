@@ -2,9 +2,17 @@
 
 #include <vector>
 #include <set>
+#include <memory>
 
 namespace Lidar
 {
-void clusterPoints(std::vector<std::pair<float, float>> pts,
-                   std::vector<std::set<std::pair<float, float>>> clusters);
+
+typedef struct PointXY
+{
+    float x;
+    float y;
+} PointXY;
+
+std::vector<std::set<std::shared_ptr<PointXY>>> clusterPoints(
+    std::vector<std::shared_ptr<PointXY>> pts, float sepThreshold);
 }; // namespace Lidar
