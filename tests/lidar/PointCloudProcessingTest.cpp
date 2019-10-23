@@ -4,7 +4,12 @@
 
 #include <catch2/catch.hpp>
 
-namespace Lidar
+TEST_CASE("cluster many nearby points into 1 cluster")
 {
-    
+    using namespace Lidar;
+}
+
+TEST_CASE("cluster many points into separate clusters")
+{
+
 }

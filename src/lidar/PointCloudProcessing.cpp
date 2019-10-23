@@ -15,8 +15,8 @@ float distance(std::pair<float, float> p1, std::pair<float, float> p2)
 }
 
 // pts should all be as x, y pairs
-void clusterPoints(std::vector<std::pair<float, float>> pts,
-    std::vector<std::set<std::pair<float, float>>> clusters)
+void clusterPoints(std::vector<std::pair<float, float>> &pts,
+    std::vector<std::set<std::pair<float, float>>> &clusters)
 {
     while (!pts.empty())
     {
