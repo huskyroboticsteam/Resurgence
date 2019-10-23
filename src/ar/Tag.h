@@ -8,7 +8,7 @@ namespace AR
 {
 	struct Corner
 	{
-		float angle;
+		double angle;
 		cv::Point point;
 	};
 
@@ -23,6 +23,7 @@ namespace AR
 	{
 	private:
 		std::vector<Corner> corners;
+		double findAngle(cv::Point a, cv::Point b, cv::Point c);
 	public:
 		Tag(cv::Point top_left,
 			cv::Point top_right,

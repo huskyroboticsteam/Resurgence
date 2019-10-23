@@ -15,12 +15,12 @@ namespace AR
 	cv::Mat PrepImage(cv::Mat input, int thresh_val, int thresh_val2)
     {
         cv::Mat gray;
-        cv::Mat thresh;
+        cv::Mat edges;
 		
         cv::cvtColor(RemoveNoise(input), gray, cv::COLOR_RGB2GRAY);
-        cv::Canny(gray, thresh, thresh_val, thresh_val2);
-		cv::dilate(thresh, thresh, cv::Mat(), cv::Point(-1,-1));
-        return thresh;
+        cv::Canny(gray, edges, thresh_val, thresh_val2);
+		cv::dilate(edges, edges, cv::Mat(), cv::Point(-1,-1));
+        return edges;
     }
 
 	vector<vector<cv::Point>> FindCandidates(cv::Mat input)
