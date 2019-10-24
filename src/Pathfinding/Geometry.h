@@ -12,8 +12,6 @@ struct Node
     node_ptr east;
     node_ptr west;
 
-    //Node(Point p, node_ptr north = nullptr, node_ptr south = nullptr, node_ptr east = nullptr, node_ptr west = nullptr, bool is_blocked = false);
-
     //when creating node, give null values to unknown parts
 };
 

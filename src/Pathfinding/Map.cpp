@@ -1,4 +1,5 @@
-#include"Map.h"
+#include "Map.h"
+#include <cmath>
 
 void updateRobotLocation(Node& location)
 {
@@ -7,8 +8,11 @@ void updateRobotLocation(Node& location)
 
 void createNode(Point p)
 {
-    Map::map.push_back(new Node(p,false));
+    Map::map.push_back(Node{p, false});
 }
 
-double distanceBetweenNodes(Node& a, Node b);
+double distanceBetweenNodes(Node& a, Node b)
+{
+    return
+}
 
