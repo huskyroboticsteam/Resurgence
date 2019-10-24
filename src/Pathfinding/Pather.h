@@ -1,18 +1,14 @@
 #pragma once
-
+#include "Geometry.h"
 class Pather {
     public:
         
 
         
         
-    private:
-<<<<<<< HEAD
-    
+    private:   
     Node getTheClosestLocation();
-    double distanceToTarget(Node currentLocation, Node target);
+    double distanceToTarget(node_ptr currentLocation, node_ptr target);
+    bool isShorterDistance(double distanceA, double distanceB);
 
 };
-=======
-}
->>>>>>> 2077c6e4b601b267b851263d7424f90fad6abc9d
