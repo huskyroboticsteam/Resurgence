@@ -7,7 +7,7 @@ void updateRobotLocation(Node& location)
 
 void createNode(Point p)
 {
-    Map::map.push_back(new Node(p,nullptr,nullptr,nullptr,nullptr,false));
+    Map::map.push_back(new Node(p,false));
 }
 
 double distanceBetweenNodes(Node& a, Node b);

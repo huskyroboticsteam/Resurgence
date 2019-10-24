@@ -8,8 +8,8 @@ class Map
         std::vector<Node> map;
         Node& robot_current_location;
 
-    void updateRobotLocation(Node& location);
+    void updateRobotLocation(node_ptr location);
     void createNode(Point p);
-    double distanceBetweenNodes(Node& a, Node b);
+    double distanceBetweenNodes(node_ptr a, node_ptr b);
 
 };
