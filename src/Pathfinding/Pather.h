@@ -1,12 +1,11 @@
 #pragma once
+
 class Pather {
     public:
 
     private:
-            struct Node
-        {
-            /* data */
-        };
-        Node shortestPath();
+    
+    Node getTheClosestLocation();
+    double distanceToTarget(Node currentLocation, Node target);
 
 };
