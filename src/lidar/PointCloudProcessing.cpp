@@ -1,33 +1,27 @@
 #include "PointCloudProcessing.h"
 
-#include <iostream>
 #include <cmath>
-#include <set>
-
-constexpr float obstDistThreshold = 0.25;
+#include <limits>
 
 namespace Lidar
 {
 
-float distance(std::pair<float, float> p1, std::pair<float, float> p2)
+float distance(std::shared_ptr<PointXY> p1, std::shared_ptr<PointXY> p2)
 {
-    return sqrtf(powf(p1.first - p2.first, 2) + powf(p1.second - p2.second, 2));
+    return sqrtf(powf(p1->x - p2->x, 2) + powf(p1->y - p2->y, 2));
 }
 
-// pts should all be as x, y pairs
-void clusterPoints(std::vector<std::pair<float, float>> pts,
-    std::vector<std::set<std::pair<float, float>>> clusters)
+std::vector<std::set<std::shared_ptr<PointXY>>> clusterPoints(
+    std::vector<std::shared_ptr<PointXY>> pts, float sepThreshold)
 {
-    while (!pts.empty())
+    std::vector<std::set<std::shared_ptr<PointXY>>> clusters;
+    for (std::shared_ptr<PointXY> curr : pts)
     {
-        std::pair<float, float> curr = pts[0];
-        pts.erase(pts.begin());
-
         int nearestCluster = -1;
         float minDist = std::numeric_limits<float>::infinity();
         for (int i = 0; i < clusters.size(); i++)
         {
-            for (std::pair<float, float> xyPoint: clusters[i])
+            for (std::shared_ptr<PointXY> xyPoint : clusters[i])
             {
                 float dist = distance(curr, xyPoint);
                 if (dist < minDist)
@@ -37,17 +31,17 @@ void clusterPoints(std::vector<std::pair<float, float>> pts,
                 }
             }
         }
-        if (minDist < obstDistThreshold)
+        if (minDist < sepThreshold)
         {
             clusters[nearestCluster].insert(curr);
         }
         else
         {
-            clusters.push_back(std::set<std::pair<float, float>>());
+            clusters.push_back(std::set<std::shared_ptr<PointXY>>());
             clusters.back().insert(curr);
         }
     }
+    return clusters;
 }
 
 } // namespace Lidar
- 
