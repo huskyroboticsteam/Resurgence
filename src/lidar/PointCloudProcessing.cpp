@@ -12,28 +12,28 @@ float distance(std::shared_ptr<PointXY> p1, std::shared_ptr<PointXY> p2)
 }
 
 std::vector<std::set<std::shared_ptr<PointXY>>> clusterPoints(
-    std::vector<std::shared_ptr<PointXY>> pts, float sepThreshold)
+    std::vector<std::shared_ptr<PointXY>> pts, float sep_threshold)
 {
     std::vector<std::set<std::shared_ptr<PointXY>>> clusters;
     for (std::shared_ptr<PointXY> curr : pts)
     {
-        int nearestCluster = -1;
-        float minDist = std::numeric_limits<float>::infinity();
+        int nearest_cluster = -1;
+        float min_dist = std::numeric_limits<float>::infinity();
         for (int i = 0; i < clusters.size(); i++)
         {
             for (std::shared_ptr<PointXY> xyPoint : clusters[i])
             {
                 float dist = distance(curr, xyPoint);
-                if (dist < minDist)
+                if (dist < min_dist)
                 {
-                    minDist = dist;
-                    nearestCluster = i;
+                    min_dist = dist;
+                    nearest_cluster = i;
                 }
             }
         }
-        if (minDist < sepThreshold)
+        if (min_dist < sep_threshold)
         {
-            clusters[nearestCluster].insert(curr);
+            clusters[nearest_cluster].insert(curr);
         }
         else
         {
@@ -42,6 +42,14 @@ std::vector<std::set<std::shared_ptr<PointXY>>> clusterPoints(
         }
     }
     return clusters;
+}
+
+void getBoundingBoxes(std::vector<std::set<std::shared_ptr<PointXY>>> clusters)
+{
+    for (std::set<std::shared_ptr<PointXY>> cluster: clusters)
+    {
+        
+    }
 }
 
 } // namespace Lidar
