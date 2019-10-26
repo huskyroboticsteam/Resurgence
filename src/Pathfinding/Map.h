@@ -1,13 +1,13 @@
 #pragma once
 #include<vector>
 #include "Geometry.h"
+using node_ptr = std::shared_ptr<Node>;
 
 class Map
 {
     public:
         int radius = 20;
         int step = 1;
-
         std::vector<Node> map;
         node_ptr robot_current_location;
         void updateRobotLocation(node_ptr location);
@@ -16,5 +16,4 @@ class Map
 
         Map();
         node_ptr getNode(Point p);
-        
 };
