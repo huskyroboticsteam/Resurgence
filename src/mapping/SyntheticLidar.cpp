@@ -1,5 +1,7 @@
 #include "SyntheticLidar.h"
 
+#include <iostream>
+
 auto last = std::chrono::steady_clock::now();
 double lastAngle(0.0f);
 std::vector<std::shared_ptr<Polar2D>> lastFrame;
@@ -15,6 +17,7 @@ std::shared_ptr<Polar2D> SyntheticLidar::nextPolarCircle(double radius) {
     Polar2D pd{radius, actingAngle()};
     if(frame) createFrame();
     std::shared_ptr<Polar2D> spd = std::make_shared<Polar2D>(pd);
+    std::cout << spd->r << ", " << spd->theta << std::endl;
     currentFrame.push_back(spd);
     return spd;
 }
