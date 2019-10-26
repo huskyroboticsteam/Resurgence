@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 
-using node_ptr = std::shared_ptr<Node>;
 
 struct Node
 {
@@ -14,11 +13,14 @@ struct Node
 
     //when creating node, give null values to unknown parts
 };
+using node_ptr = std::shared_ptr<Node>;
 
 struct Point
 {
     double x; //float?
     double y; //float?
+
+    bool equals(Point p);
 };
 
 double distance(Point a, Point b);
