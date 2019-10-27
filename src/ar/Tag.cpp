@@ -2,7 +2,7 @@
 
 namespace AR
 {
-	double Tag::findAngle(cv::Point a, cv::Point b, cv::Point c)
+	double Tag::findAngle(cv::Point a, cv::Point b, cv::Point c) const
 	{
 		a = a - b;  // shift vectors so that B is at the origin
 		b = b - b;
