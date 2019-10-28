@@ -15,6 +15,10 @@ typedef struct Polar2D
 class SyntheticLidar {
 private:
     const float PI = 3.14159265;
+    std::shared_ptr<Polar2D> completeNext(bool frame, Polar2D pd);
+    bool updateAngle();
+    double actingAngle();
+    void createFrame();
 
 public:
     SyntheticLidar();
@@ -25,7 +29,3 @@ public:
     auto getLastFrameTime();
 
 };
-
-bool updateAngle();
-double actingAngle();
-void createFrame();
