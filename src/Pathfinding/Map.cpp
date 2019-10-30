@@ -18,26 +18,26 @@ double distanceBetweenNodes(Node a, Node b)
     return distance(a.location, b.location);
 }
 
-node_ptr getNode(Point p)
+node_ptr Map::getNode(Point p)
 {
     int i = 0;
-    while(i < Map::map.size)
+    while(i < map.size())
     {
-        if(Map::map.get(i).location.equals(p)){
-            return *Map::map.get(i);
+        if(this->map.at(i).location.equals(p)){
+            return this->map.at(i);
         }
     }
     return nullptr;
 }
 
-Map()
+Map::Map()
 {
     for(int i = -1 * Map::radius; i <= Map::radius; i += Map::step)
     {
         for(int j = -1 * Map::radius; j <= Map::radius; j += Map::step)
         {
-            createNode(Point{i, j});
+            createNode(Point{(double)i, (double)j});
         }
     }
-    robot_current_location = *Map.get(Point{0,0});
+    robot_current_location = *Map::getNode(Point{0,0});
 }

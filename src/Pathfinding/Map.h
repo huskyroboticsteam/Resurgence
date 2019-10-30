@@ -14,6 +14,6 @@ class Map
         void createNode(Point p);
         double distanceBetweenNodes(node_ptr a, node_ptr b);
 
-        Map();
         node_ptr getNode(Point p);
+        Map();
 };
