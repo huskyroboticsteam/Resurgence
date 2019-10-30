@@ -11,10 +11,9 @@ using namespace std;
 
 namespace AR
 {
-	const int CONTOUR_AREA_THRESH = 1000;
-	cv::Mat PrepImage(cv::Mat input, int thresh_val=0, int thresh_val2=128);
-	vector<vector<cv::Point>> FindCandidates(cv::Mat input);
-
 	//new functions
-	std::vector<Tag> findTags(cv::Mat input);
+	std::vector<Tag> findTags(cv::Mat input,
+							  int canny_thresh_1 = 50,
+							  int canny_thresh_2 = 50,
+							  int blur_size = 5);
 }

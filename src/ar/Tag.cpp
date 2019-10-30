@@ -12,4 +12,10 @@ namespace AR
 		double c_mag = sqrt((c.x * c.x) + (c.y * c.y));
 		return acos(dot_product / (a_mag * c_mag));
 	}
+
+	Tag::Tag(cv::Point top_left, cv::Point top_right,
+			 cv::Point bottom_right, cv::Point bottom_left)
+	{
+		
+	}
 }

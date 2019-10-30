@@ -9,9 +9,9 @@
 using namespace std;
 
 const string ORIG_WINDOW_NAME = "Image (Original)";
-const string FILTER_WINDOW_NAME = "Image (Filtered)";
 const string THRESH_TRACKBAR_NAME = "Threshold";
 const string THRESH2_TRACKBAR_NAME = "Threshold 2";
+const string BLUR_TRACKBAR_NAME = "Blur";
 
 int main()
 {
@@ -23,6 +23,7 @@ int main()
 
 	int thresh_val = 128;
 	int thresh2_val = 128;
+	int blur_val = 2;
 
     cout << "Opening camera..." << endl;
 
@@ -39,9 +40,9 @@ int main()
 	cout << "Opening image window, press Q to quit" << endl;
 
 	cv::namedWindow(ORIG_WINDOW_NAME);
-	cv::namedWindow(FILTER_WINDOW_NAME);
-	cv::createTrackbar(THRESH_TRACKBAR_NAME, FILTER_WINDOW_NAME, &thresh_val, 256);
-	cv::createTrackbar(THRESH2_TRACKBAR_NAME, FILTER_WINDOW_NAME, &thresh2_val, 256);
+	cv::createTrackbar(THRESH_TRACKBAR_NAME, ORIG_WINDOW_NAME, &thresh_val, 256);
+	cv::createTrackbar(THRESH2_TRACKBAR_NAME, ORIG_WINDOW_NAME, &thresh2_val, 256);
+	cv::createTrackbar(BLUR_TRACKBAR_NAME, ORIG_WINDOW_NAME, &blur_val, 10);
 	
     while(true)
 	{
@@ -51,12 +52,13 @@ int main()
 			cerr << "ERROR! Blank frame grabbed" << endl;
 			break;
 		}
+
+		// pass frame to detector here
+		std::vector<AR::Tag> tags = AR::findTags(frame, thresh_val, thresh2_val, blur_val);
+
+		// show locations of tags in window
+		std::cout << "Found " << tags.size() << " tags" << std::endl;
 		
-		cv::Mat new_frame = AR::PrepImage(frame, thresh_val, thresh2_val);
-		vector<vector<cv::Point>> detected = AR::FindCandidates(new_frame);
-		cv::drawContours(frame, detected, -1, cv::Scalar(0,0,255), 3);
-		
-		cv::imshow(FILTER_WINDOW_NAME, new_frame);
 		cv::imshow(ORIG_WINDOW_NAME, frame);
 
 		if(cv::waitKey(5) == 'q')
