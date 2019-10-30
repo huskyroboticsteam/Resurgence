@@ -9,11 +9,11 @@ class Map
         int radius = 20;
         int step = 1;
         std::vector<Node> map;
-        node_ptr robot_current_location;
-        void updateRobotLocation(node_ptr location);
+        Node robot_current_location;
+        void updateRobotLocation(Node newPoint);
         void createNode(Point p);
         double distanceBetweenNodes(node_ptr a, node_ptr b);
 
-        node_ptr getNode(Point p);
+        Node getNode(Point p);
         Map();
 };

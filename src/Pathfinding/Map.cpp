@@ -2,32 +2,33 @@
 #include <cmath>
 #include<vector>
 #include "Geometry.h"
+#include<iostream>
 
-void updateRobotLocation(node_ptr location)
+void Map::updateRobotLocation(Node newPoint)
 {
-    Map::robot_current_location = location;
+    robot_current_location = newPoint;
 }
 
-void createNode(Point p)
+void Map::createNode(Point p)
 {
-    Map::map.push_back(Node{p, false});
+    map.push_back(Node{p, false});
 }
 
-double distanceBetweenNodes(Node a, Node b)
+double Map::distanceBetweenNodes(node_ptr a, node_ptr b)
 {
-    return distance(a.location, b.location);
+    return distance(a->location, b->location);
 }
 
-node_ptr Map::getNode(Point p)
+Node Map::getNode(Point p)
 {
     int i = 0;
     while(i < map.size())
     {
-        if(this->map.at(i).location.equals(p)){
-            return this->map.at(i);
+        if(map.at(i).location.equals(p)){
+            return map.at(i);
         }
+        i++;
     }
-    return nullptr;
 }
 
 Map::Map()
@@ -39,5 +40,10 @@ Map::Map()
             createNode(Point{(double)i, (double)j});
         }
     }
-    robot_current_location = *Map::getNode(Point{0,0});
+    robot_current_location = getNode(Point{0,0});
+}
+
+int main(){
+    Map map;
+    std::cout << "it finished?"<<std::endl;
 }
