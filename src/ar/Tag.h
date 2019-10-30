@@ -65,6 +65,7 @@ namespace AR
 	{
 	private:
 		std::vector<Corner> corners;
+		double pitch;
 		double findAngle(cv::Point a, cv::Point b, cv::Point c) const;
 	public:
 		Tag(cv::Point top_left,
