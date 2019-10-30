@@ -72,6 +72,7 @@ namespace AR
 			cv::Point bottom_right,
 			cv::Point bottom_left);
 		cv::Point getCenter() const;
+		cv::vector<Corner> getCorners() const;
 		float getPitch() const;
 		float getYaw() const;
 		float getRoll() const;
