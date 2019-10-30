@@ -2,6 +2,8 @@
 
 #include "Globals.h"
 #include "Constants.h"
+#include "Json.hpp"
+#include "Data.h"
 
 #include <cstdint>
 
