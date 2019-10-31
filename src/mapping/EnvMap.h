@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <vector>
-#include <set>
+#include <unordered_set>
 
 constexpr float ChunkDimensionMeters = 1.0f;
 
@@ -16,11 +16,19 @@ struct Vec2I {
     }
 };
 
+namespace std {
+    template<> struct hash<Vec2I> {
+        std::size_t operator()(const Vec2I & v) const noexcept {
+            return (size_t) (0x10000 * v.y + v.x);
+        }
+    };
+}
+
 struct MapObstacle {
     // global position relative to start position
     float x, y;
     // the set of chunks this obstacle is currently "in"
-    std::set<Vec2I>;
+    std::unordered_set<Vec2I> containing_chunks;
     // obstacle data...
 };
 
@@ -74,10 +82,12 @@ public:
     size_t getWidth();
     size_t getHeight();
     
-    MapChunk & get_chunk(int x_offset, int y_offset, bool & in_bounds);
-    const MapChunk & get_chunk(int x_offset, int y_offset, bool & in_bounds) const;
+    MapChunk & getChunk(const Vec2I & xy_offset, bool & in_bounds);
+    const MapChunk & getChunk(const Vec2I & xy_offset, int y_offset, bool & in_bounds) const;
 
-    MapChunk & create_or_get(int x_offset, int y_offset);
+    static MapChunk & getDummyChunk();
+
+    MapChunk & createOrGet(int x_offset, int y_offset, bool & in_bounds);
 
 private:
     // the dummy chunk is a default reference to return if we can't give a valid chunk. (check in_bounds!!!!)
@@ -86,7 +96,9 @@ private:
     size_t width;
     size_t height;
     // actual array
-    std::shared_ptr<MapChunk> * array_internal;
+    std::shared_ptr<MapChunk> * array;
+
+    void resize(int new_width, int new_height);
     
 };
 
@@ -131,5 +143,3 @@ private:
     float robot_x;
     float robot_y;
 };
-
-struct 
