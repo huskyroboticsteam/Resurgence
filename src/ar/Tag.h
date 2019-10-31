@@ -10,7 +10,7 @@
 #define ZED_CAMERA_PARAMS 3
 
 // Change to select which set of intrinsic camera parameters to use.
-#define USE_CAMERA_PARAMS EVAN_WEBCAM_PARAMS
+#define USE_CAMERA_PARAMS EVAN_LAPTOP_CAMERA_PARAMS
 
 namespace AR
 {
@@ -65,15 +65,15 @@ namespace AR
 	{
 	private:
 		std::vector<Corner> corners;
-		double pitch;
-		double findAngle(cv::Point a, cv::Point b, cv::Point c) const;
+		cv::Vec3d orientation;
+		cv::Vec3d calcOrientation();
 	public:
 		Tag(cv::Point top_left,
 			cv::Point top_right,
 			cv::Point bottom_right,
 			cv::Point bottom_left);
 		cv::Point getCenter() const;
-		cv::vector<Corner> getCorners() const;
+		std::vector<Corner> getCorners() const;
 		float getPitch() const;
 		float getYaw() const;
 		float getRoll() const;
