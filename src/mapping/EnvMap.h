@@ -116,15 +116,20 @@ public:
     // transforms a quadrant into an index
     static int quadToMapArray(Quadrant quad);
     // do we have *any* map data for a given world coordinate's containing chunk?
-    bool has_contianing_chunk(float x, float y);
+    bool hasContainingChunk(float x, float y);
     // gets a reference to the containing chunk for a given world coordinate point
-    MapChunk & get_containing_chunk(float x, float y, bool & in_bounds);
-    
+    MapChunk & getContainingChunk(float x, float y, bool & in_bounds);
+
     // gets the size of a quadrant
-    Vec2I get_quadrant_size(Quadrant q);
+    Vec2I getQuadrantSize(Quadrant q);
+
+    void getRobotPosition(float & x, float & y);
+    void setRobotPosition(float x, float y);
 
 private:
     MapChunkArray quadrants[4];
+    float robot_x;
+    float robot_y;
 };
 
 struct 
