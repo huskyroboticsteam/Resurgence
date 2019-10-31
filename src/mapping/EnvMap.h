@@ -6,6 +6,7 @@
 
 constexpr float ChunkDimensionMeters = 1.0f;
 
+// basic representation of an integer {x, y} pair
 struct Vec2I {
     int x;
     int y;
@@ -51,10 +52,20 @@ struct MapChunkObject {
     std::shared_ptr<MapObstacle> obstacle;
 };
 
+/*
+Represents a chunk on the map
+*/
 struct MapChunk {
+    // the list of all the objects in this chunk
     std::vector<std::shared_ptr<MapChunkObject>> objects;
 };
 
+/*
+MapChunkArray:
+stores a growable 2D array of MapChunks.
+
+NOTE: this is mostly internal to EnvMap.
+*/
 class MapChunkArray {
 public:
     MapChunkArray();
@@ -81,6 +92,7 @@ private:
 
 class EnvMap {
 public:
+    // which quadrant array
     enum class Quadrant : int {
         NorthEast = 0,
         NorthWest = 1,
@@ -90,23 +102,25 @@ public:
 
     EnvMap();
     ~EnvMap();
-
+    // these methods perform a spacial query of the map (global map coords in meters).
     std::vector<std::shared_ptr<MapObstacle>> findObjectsWithinRadius(float radius, float x, float y) const;
     std::vector<std::shared_ptr<MapObstacle>> findObjectsWithinSquare(float half_width, float x, float y) const;
     std::vector<std::shared_ptr<MapObstacle>> findObjectsWithinRect(float x_lower_left, float y_lower_left, float x_upper_right, float y_upper_right) const;
-    
+    // represents an index into the map arrays.
     struct XYQ {
-        int x_offset, y_offset;
+        Vec2I xy;
         Quadrant quad;
     };
-
-    XYQ xyToQuadrantOffset(float x, float y);
-
-    MapChunk & get_chunk(int x_offset, int y_offset);
-    const MapChunk & get_chunk(int x_offset, int y_offset) const;
-    
+    // transforms a point in global coords (meters)
+    static XYQ xyToQuadrantOffset(float x, float y);
+    // transforms a quadrant into an index
+    static int quadToMapArray(Quadrant quad);
+    // do we have *any* map data for a given world coordinate's containing chunk?
     bool has_contianing_chunk(float x, float y);
-
+    // gets a reference to the containing chunk for a given world coordinate point
+    MapChunk & get_containing_chunk(float x, float y, bool & in_bounds);
+    
+    // gets the size of a quadrant
     Vec2I get_quadrant_size(Quadrant q);
 
 private:
