@@ -39,5 +39,31 @@ Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right, cv::Po
 		double internal_angle = findAngle(points[last_index], points[i], points[next_index]);
 		corners.push_back(Corner{internal_angle, points[i]});
     }
+
+    std::vector<Corner> Tag::getCorners() const 
+    {
+        return corners;
+    }
+
+    cv::Vec3d calcOrientation() 
+    {
+        std::vector<cv::Point> image_points;
+        std::vector<cv::Point> object_points;
+        for (int i = 0; i < corners.size(); i++)
+        {
+            image_points.push_back(corners[i]);
+        }
+        object_points.push_back(cv::Point(2i));
+        object_points.push_back(cv::Point(2i));
+        object_points.push_back(cv::Point(2i));
+        object_points.push_back(cv::Point(2i));
+        cv::Mat rvec;
+        cv::Mat tvec;
+        cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, rvec, tvec);
+        cv::Mat rmat;
+        cv::Rodrigues(rvec, rmat);
+
+
+    }
 }
 } // namespace AR
