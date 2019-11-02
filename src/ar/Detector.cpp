@@ -39,13 +39,14 @@ namespace AR
 
 		for(size_t i = 0; i < contours.size(); i++)
 		{
-			std::vector<cv::Point> approx;
+			std::vector<cv::Point2f> approx;
 			cv::approxPolyDP(contours[i], approx, arcLength(contours[i], true)*0.02, true);
 			if(approx.size() == 4
 			   && cv::isContourConvex(approx)
 			   && cv::contourArea(approx) > CONTOUR_AREA_THRESH)
 			{
 				//make Tag with approximated coordinates
+				std::cout << "Found tag with corners " << approx << std::endl;
 				Tag tag(approx[0], approx[1], approx[2], approx[3]);
 				output.push_back(tag);
 			}
