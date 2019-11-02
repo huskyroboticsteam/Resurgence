@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <unordered_set>
+#include <functional>
 
 constexpr float ChunkDimensionMeters = 1.0f;
 
@@ -29,6 +30,8 @@ struct MapObstacle {
     float x, y;
     // the set of chunks this obstacle is currently "in"
     std::unordered_set<Vec2I> containing_chunks;
+    // the unique identifier for this obstacle
+    uint64_t uid;
     // obstacle data...
 };
 
@@ -83,7 +86,7 @@ public:
     size_t getHeight();
     
     MapChunk & getChunk(const Vec2I & xy_offset, bool & in_bounds);
-    const MapChunk & getChunk(const Vec2I & xy_offset, int y_offset, bool & in_bounds) const;
+    const MapChunk & getChunk(const Vec2I & xy_offset, bool & in_bounds) const;
 
     static MapChunk & getDummyChunk();
 
@@ -97,7 +100,7 @@ private:
     size_t height;
     // actual array
     std::shared_ptr<MapChunk> * array;
-
+    // grow the array
     void resize(int new_width, int new_height);
     
 };
@@ -115,9 +118,9 @@ public:
     EnvMap();
     ~EnvMap();
     // these methods perform a spacial query of the map (global map coords in meters).
-    std::vector<std::shared_ptr<MapObstacle>> findObjectsWithinRadius(float radius, float x, float y) const;
-    std::vector<std::shared_ptr<MapObstacle>> findObjectsWithinSquare(float half_width, float x, float y) const;
-    std::vector<std::shared_ptr<MapObstacle>> findObjectsWithinRect(float x_lower_left, float y_lower_left, float x_upper_right, float y_upper_right) const;
+    std::vector<std::shared_ptr<const MapObstacle>> findObjectsWithinRadius(float radius, float x, float y) const;
+    std::vector<std::shared_ptr<const MapObstacle>> findObjectsWithinSquare(float half_width, float x, float y) const;
+    std::vector<std::shared_ptr<const MapObstacle>> findObjectsWithinRect(float x_lower_left, float y_lower_left, float x_upper_right, float y_upper_right) const;
     // represents an index into the map arrays.
     struct XYQ {
         Vec2I xy;
@@ -134,12 +137,18 @@ public:
 
     // gets the size of a quadrant
     Vec2I getQuadrantSize(Quadrant q);
-
+    // gets/sets robot position
     void getRobotPosition(float & x, float & y);
     void setRobotPosition(float x, float y);
+    // gets a new uid for an obstacle
+    uint64_t newObstacleUID();
 
 private:
     MapChunkArray quadrants[4];
     float robot_x;
     float robot_y;
+    uint64_t uid_counter;
+
+    void iterateChunkRect(XYQ low, XYQ high, std::function<void(XYQ, const MapChunk &)> per_chunk) const;
+    void iterateChunkRect(XYQ low, XYQ high, std::function<void(XYQ, MapChunk &)> per_chunk);
 };
