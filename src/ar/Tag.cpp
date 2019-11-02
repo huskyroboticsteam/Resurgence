@@ -69,7 +69,7 @@ namespace AR
         return corners;
     }
 
-    cv::Vec3d Tag::calcOrientation() 
+    cv::Vec3d Tag::calcOrientation() const
     {
         std::vector<cv::Point> image_points;
         std::vector<cv::Point> object_points;
@@ -89,5 +89,48 @@ namespace AR
 
 		return rotationMatrixToEulerAngles(rmat);
     }
+
+    float Tag::getPitch() const 
+    {
+        
+        if (orientation == NULL) 
+        {
+
+            orientation = calcOrientation();
+
+        }
+
+        return orientation[0];
+
+    }
+
+    float Tag::getYaw() const 
+    {
+        
+        if (orientation == NULL) 
+        {
+
+            orientation = calcOrientation();
+
+        }
+
+        return orientation[1];
+
+    }
+    
+    float Tag::getPitch() const 
+    {
+        
+        if (orientation == NULL) 
+        {
+
+            orientation = calcOrientation();
+
+        }
+
+        return orientation[2];
+
+    }
+
 
 } // namespace AR
