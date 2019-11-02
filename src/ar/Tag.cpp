@@ -13,6 +13,29 @@ namespace AR
         return acos(dot_product / (a_mag * c_mag));
     }
 
+	cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
+	{
+		double sy = sqrt(R.at<double>(0,0) * R.at<double>(0,0)
+						+  R.at<double>(1,0) * R.at<double>(1,0));
+ 
+		bool singular = sy < 1e-6;
+ 
+		double x, y, z;
+		if (!singular)
+		{
+			x = atan2(R.at<double>(2,1) , R.at<double>(2,2));
+			y = atan2(-R.at<double>(2,0), sy);
+			z = atan2(R.at<double>(1,0), R.at<double>(0,0));
+		}
+		else
+		{
+			x = atan2(-R.at<double>(1,2), R.at<double>(1,1));
+			y = atan2(-R.at<double>(2,0), sy);
+			z = 0;
+		}
+		return cv::Vec3f(x, y, z);    
+	}
+
     Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right, cv::Point bottom_left)
     {
         // validate points
@@ -46,24 +69,25 @@ namespace AR
         return corners;
     }
 
-    cv::Vec3d calcOrientation() 
+    cv::Vec3d Tag::calcOrientation() 
     {
         std::vector<cv::Point> image_points;
         std::vector<cv::Point> object_points;
         for (int i = 0; i < corners.size(); i++)
         {
-            image_points.push_back(corners[i]);
+            image_points.push_back(corners[i].point);
         }
-        object_points.push_back(cv::Point(2i));
-        object_points.push_back(cv::Point(2i));
-        object_points.push_back(cv::Point(2i));
-        object_points.push_back(cv::Point(2i));
+        object_points.push_back(cv::Point2i(0, 0));
+        object_points.push_back(cv::Point2i(200, 0));
+        object_points.push_back(cv::Point2i(200, 200));
+        object_points.push_back(cv::Point2i(0, 200));
         cv::Mat rvec;
         cv::Mat tvec;
         cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, rvec, tvec);
         cv::Mat rmat;
         cv::Rodrigues(rvec, rmat);
 
+		return rotationMatrixToEulerAngles(rmat);
     }
 
 } // namespace AR
