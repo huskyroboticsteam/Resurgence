@@ -20,31 +20,23 @@ std::vector<std::shared_ptr<Point>> convertFrame(std::vector<std::shared_ptr<Pol
 
 double calcDiff(std::shared_ptr<Point> p1, std::shared_ptr<Point> p2)
 { //Calculates difference between two points
-    double xP = std::pow(p2->xCoord - p1->xCoord, 2);
-    double yP = std::pow(p2->yCoord - p1->yCoord, 2);
+    double xP = pow(p2->xCoord - p1->xCoord, 2);
+    double yP = pow(p2->yCoord - p1->yCoord, 2);
 
     double diff = std::sqrt(xP + yP);
     return diff;
 }
 
 
-void filterPoints(std::vector<std::shared_ptr<Point>> points)
+std::vector<std::set<std::shared_ptr<Point>>> filterPoints(
+    std::vector<std::shared_ptr<Point>> points, float sep_distance)
 {
-    // for(int i = 1; i <= points.size; i++)
-    // {
-    //     double diff = calcDiff(points[i], points[i-1]);
-    //     if(diff < sizeOfRobot)
-    //     {
-    //         Objects.push_back()
-    //         //create new object, put points in objects pt vector 
-    //     }
-    // }
     std::vector<std::shared_ptr<Object>> objects;
     Object lastObject;
     std::shared_ptr<Point> lastPoint = nullptr;
     for(int i = 1; i < points.size(); i++) {
         double diff = calcDiff(points[i], points[i-1]);
-        if(diff < sizeOfRobot) {
+        if(diff < sep_distance) {
             if(lastPoint == points[i-1]) {
                 lastObject.pts.push_back(points[i]);
             } else {
@@ -62,7 +54,7 @@ void filterPoints(std::vector<std::shared_ptr<Point>> points)
     }
     //checks last point and first point
     double diff = calcDiff(points[points.size()-1], points[0]);
-    if(diff < sizeOfRobot) {
+    if(diff < sep_distance) {
         if(lastPoint == points[points.size()-1]) {
             lastObject.pts.push_back(points[0]);
         } else {
