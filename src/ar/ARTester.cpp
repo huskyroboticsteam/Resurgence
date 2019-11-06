@@ -64,13 +64,10 @@ int main()
 		{
 			std::vector<AR::Corner> corners = tag.getCorners();
 			corners.push_back(corners[0]);
-			std::cout << "Drawing lines between: ";
 			for(int i = 0; i < corners.size()-1; i++)
 			{
-				std::cout << corners[i].point << " and " << corners[i+1].point << ", ";
-				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 255, 0));
+				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255), 3);
 			}
-			std::cout << std::endl;
         }
 
         cv::imshow(ORIG_WINDOW_NAME, frame);

@@ -33,9 +33,10 @@ namespace AR
 		cv::Mat prepped_input = prepImage(input, blur_size, canny_thresh_1, canny_thresh_2);
 		
 		std::vector<std::vector<cv::Point>> contours;
+		std::vector<cv::Vec4i> heirarchy;
 		std::vector<Tag> output;
-		
-		cv::findContours(prepped_input, contours, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+		cv::findContours(prepped_input, contours,
+						 cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
 		for(size_t i = 0; i < contours.size(); i++)
 		{
@@ -45,7 +46,8 @@ namespace AR
 			   && cv::isContourConvex(approx)
 			   && cv::contourArea(approx) > CONTOUR_AREA_THRESH)
 			{
-				//sort
+				//sort points into the correct order (top left, top right, bottom right, bottom
+				//  left)
 				struct sortY {
 					bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.y < pt2.y);}
 				} sort_y;
@@ -60,7 +62,7 @@ namespace AR
 				std::sort(approx.begin()+2, approx.end(), sort_x_rev);
 				
 				//make Tag with approximated coordinates
-				std::cout << "Found tag with corners " << approx << std::endl;
+				//std::cout << "Found tag with corners " << approx << std::endl;
 				Tag tag(approx[0], approx[1], approx[2], approx[3]);
 				output.push_back(tag);
 			}
