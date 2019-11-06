@@ -37,5 +37,6 @@ void ObstacleMap::updateObstacleMap(){
 
 ObstacleMap::ObstacleMap(float rad){
     this->radius = rad;
+    this->obstacle_map = bool[2 * rad + 1][2 * rad + 1];
     updatePathMap();
 }

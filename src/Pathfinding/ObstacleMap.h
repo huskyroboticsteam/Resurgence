@@ -16,8 +16,8 @@
 //increase bounding box 
 
 class ObstacleMap{
-    bool[][] obstacle_map;
     float const radius;
+    bool obstacle_map[2 * radius + 1][2 * radius + 1];
 
 private:
     void resetObstacleMap();
