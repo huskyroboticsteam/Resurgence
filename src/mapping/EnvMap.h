@@ -25,13 +25,24 @@ namespace std {
     };
 }
 
+class IObstacle {
+public:
+    inline virtual ~IObstacle() = default;
+
+    virtual float getXY(float & x, float & y) const = 0;
+    virtual void getSurroundingChunks(std::vector<Vec2I> & chunk_offsets_out) const = 0;
+};
+
 struct MapObstacle {
+    // MapObstacle must be default-constructible and copy-constructible
+    MapObstacle() = default;
+    MapObstacle(const MapObstacle & copy_from) = default;
     // global position relative to start position
-    float x, y;
+    float x = 0.0f, y = 0.0f;
     // the set of chunks this obstacle is currently "in"
     std::unordered_set<Vec2I> containing_chunks;
     // the unique identifier for this obstacle
-    uint64_t uid;
+    size_t uid;
     // obstacle data...
 };
 
@@ -140,14 +151,16 @@ public:
     // gets/sets robot position
     void getRobotPosition(float & x, float & y);
     void setRobotPosition(float x, float y);
-    // gets a new uid for an obstacle
-    uint64_t newObstacleUID();
+    // create a new obstacle and get it's uid
+    size_t newObstacleUID(const MapObstacle & proto);
+    // gets an obstacle (or none) based on uid
+    std::shared_ptr<MapObstacle> getObstacle(size_t uid);
 
 private:
     MapChunkArray quadrants[4];
     float robot_x;
     float robot_y;
-    uint64_t uid_counter;
+    std::vector<std::shared_ptr<MapObstacle>> obstacles;
 
     void iterateChunkRect(XYQ low, XYQ high, std::function<void(XYQ, const MapChunk &)> per_chunk) const;
     void iterateChunkRect(XYQ low, XYQ high, std::function<void(XYQ, MapChunk &)> per_chunk);

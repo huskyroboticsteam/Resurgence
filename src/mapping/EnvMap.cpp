@@ -106,7 +106,7 @@ EnvMap::EnvMap():
     },
     robot_x(0.0f),
     robot_y(0.0f),
-    uid_counter(0) {
+    obstacles() {
 }
 
 EnvMap::~EnvMap() {
@@ -555,9 +555,19 @@ void EnvMap::iterateChunkRect(EnvMap::XYQ low, EnvMap::XYQ high, std::function<v
     }
 }
 
-uint64_t EnvMap::newObstacleUID() {
-    uid_counter ++;
-    return uid_counter - 1;
+size_t EnvMap::newObstacleUID(const MapObstacle & obstacle) {
+    size_t uid = obstacles.size();
+    std::shared_ptr<MapObstacle> new_obst = std::shared_ptr<MapObstacle>(new MapObstacle(obstacle));
+    new_obst->uid = uid;
+    obstacles.push_back(new_obst);
+    return uid;
+}
+
+std::shared_ptr<MapObstacle> EnvMap::getObstacle(size_t uid) {
+    if (uid >= obstacles.size()) {
+        return std::shared_ptr<MapObstacle>(nullptr);
+    }
+    return obstacles[uid];
 }
 
 std::vector<std::shared_ptr<const MapObstacle>> EnvMap::findObjectsWithinRadius(float radius, float x, float y) const {
