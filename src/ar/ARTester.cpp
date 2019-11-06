@@ -60,14 +60,17 @@ int main()
 		std::cout << "Found " << tags.size() << " tags" << std::endl;
 		
 		// draw lines between tag points
-		std::vector<cv::Point> corners = getCorners();
-		corners.push_back(corners[0]);
-		for(int i = 0, i < corners.size(), i++)
+		for(AR::Tag tag : tags)
 		{
-			cv::line(frame, corners[i], corners[i+1], Scalar(0,255,0));
-		}
+			std::vector<AR::Corner> corners = tag.getCorners();
+			corners.push_back(corners[0]);
+			for(int i = 0; i < corners.size()-1; i++)
+			{
+				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255), 3);
+			}
+        }
 
-		cv::imshow(ORIG_WINDOW_NAME, frame);
+        cv::imshow(ORIG_WINDOW_NAME, frame);
 
 		if(cv::waitKey(5) == 'q')
 			break;
