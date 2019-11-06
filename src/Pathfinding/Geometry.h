@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 
+static float const err = 0.000001
+
 struct Point
 {
     double x; //float?

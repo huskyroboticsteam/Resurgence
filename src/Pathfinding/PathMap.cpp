@@ -1,11 +1,11 @@
 #include "PathMap.h"
-//vector included in PathMap.h
-static float const radius = 20; 
 
+
+//vector and EnvMap.h included in PathMap.h
 
 std::vector<std::shared_ptr<MapObstacle>> PathMap::getData(){
-    float x, y;
-    getRobotPosition(x, y);//assigns robot position to x and y
+    float robotX, robotY;
+    getRobotPosition(robotX, robotY);//assigns robot position to x and y
     //get robot location to input as coordinates
 
     //following method needs global coords
@@ -17,6 +17,7 @@ void PathMap::updatePathMap(){//is this necessary? only used to make pathing mor
 
 }
 
-void PathMap::PathMap(){
+void PathMap::PathMap(float rad){
+    this->radius = rad;
     updatePathMap();
 }

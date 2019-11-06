@@ -1,6 +1,11 @@
 #pragma once
 #include <vector>
-#include <EnvMap.h>
+#include "EnvMap.h"
+
+//use asserts
+
+//make a graph object for pathing
+//use 2d array not vectors
 
 //make reference or pointer to global SLAM map obj
 // recieve list of obstacles within specified range
@@ -11,12 +16,13 @@
 //increase bounding box 
 
 class PathMap{
-    vector< vector<bool> > pathMap;
+    bool[][] pathMap;
+    float const radius;
 
 private:
     std::vector<std::shared_ptr<MapObstacle>> getData();
 
 public:
     void updatePathMap();
-    void PathMap();
+    void PathMap(float rad);
 }
