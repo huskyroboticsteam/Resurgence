@@ -10,4 +10,5 @@ class Map
         void updateRobotLocation(node_ptr location);
         void createNode(Point p);
         double distanceBetweenNodes(node_ptr a, node_ptr b);
+        void dijkstra();
 };
