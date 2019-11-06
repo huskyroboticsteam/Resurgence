@@ -45,6 +45,20 @@ namespace AR
 			   && cv::isContourConvex(approx)
 			   && cv::contourArea(approx) > CONTOUR_AREA_THRESH)
 			{
+				//sort
+				struct sortY {
+					bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.y < pt2.y);}
+				} sort_y;
+				struct sortX {
+					bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x < pt2.x);}
+				} sort_x;
+				struct sortXRev {
+					bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x > pt2.x);}
+				} sort_x_rev;
+				std::sort(approx.begin(), approx.end(), sort_y);
+				std::sort(approx.begin(), approx.begin()+2, sort_x);
+				std::sort(approx.begin()+2, approx.end(), sort_x_rev);
+				
 				//make Tag with approximated coordinates
 				std::cout << "Found tag with corners " << approx << std::endl;
 				Tag tag(approx[0], approx[1], approx[2], approx[3]);
