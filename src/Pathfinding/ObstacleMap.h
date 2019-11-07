@@ -23,8 +23,10 @@ class ObstacleMap{
 private:
     void resetObstacleMap();
     std::vector<std::shared_ptr<MapObstacle>> getData(float robotX, float robotY);
+    static int transform(int val, bool direction);
 
 public:
     void updateObstacleMap();
     ObstacleMap(float rad, float step_size);
 };
+
