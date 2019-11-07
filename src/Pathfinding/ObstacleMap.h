@@ -16,8 +16,9 @@
 //increase bounding box 
 
 class ObstacleMap{
-    float const radius;
-    bool obstacle_map[2 * radius + 1][2 * radius + 1];
+    static float radius;
+    static float step_size;
+    std::vector< std::vector<bool> > obstacle_map;
 
 private:
     void resetObstacleMap();
@@ -25,5 +26,5 @@ private:
 
 public:
     void updateObstacleMap();
-    ObstacleMap(float rad);
-}
+    ObstacleMap(float rad, float step_size);
+};
