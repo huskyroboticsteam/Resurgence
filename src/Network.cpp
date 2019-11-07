@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "Network.h"
+#include "CANPacket.h"
 
 #include <cassert>
 
@@ -77,7 +78,7 @@ void SendOutgoingNetworkPackets()
     {
         if(p.kind == PacketKind::CAN){
             #ifdef __linux__
-                
+            
             frame.can_id = p.address & 0x1FF;
             frame.can_dlc = 8;
             for(int i = 0; i < 8; i++){
@@ -118,6 +119,3 @@ void TestCANPackets()
     std::cout << "Input Cycle Complete" << std::endl;
 
 }
-
-// TODO: Below or in new file, add functions for different can 
-//       communication packet types
