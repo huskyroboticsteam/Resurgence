@@ -5,45 +5,48 @@
 #include <unordered_set>
 #include <functional>
 
+#include "../math/Vec2.h"
+
 constexpr float ChunkDimensionMeters = 1.0f;
 
-// basic representation of an integer {x, y} pair
-struct Vec2I {
-    int x;
-    int y;
 
-    inline bool operator==(const Vec2I & other) {
-        return (x == other.x && y == other.y);
-    }
+using Math::Vec2;
+using Math::Vec2I;
+
+// which quadrant array in the map
+enum class Quadrant : int {
+    NorthEast = 0,
+    NorthWest = 1,
+    SouthWest = 2,
+    SouthEast = 3
+};
+
+// represents an index into the map arrays.
+struct XYQ {
+    Vec2I xy;
+    Quadrant quad;
 };
 
 namespace std {
-    template<> struct hash<Vec2I> {
-        std::size_t operator()(const Vec2I & v) const noexcept {
-            return (size_t) (0x10000 * v.y + v.x);
+    template<> struct hash<XYQ> {
+        std::size_t operator()(const XYQ & v) const noexcept {
+            return (size_t) (0x4000000 * static_cast<int>(v.quad) + 0x2000 * v.xy.y + v.xy.x);
         }
     };
 }
-
-class IObstacle {
-public:
-    inline virtual ~IObstacle() = default;
-
-    virtual float getXY(float & x, float & y) const = 0;
-    virtual void getSurroundingChunks(std::vector<Vec2I> & chunk_offsets_out) const = 0;
-};
 
 struct MapObstacle {
     // MapObstacle must be default-constructible and copy-constructible
     MapObstacle() = default;
     MapObstacle(const MapObstacle & copy_from) = default;
     // global position relative to start position
-    float x = 0.0f, y = 0.0f;
+    Vec2 position;
     // the set of chunks this obstacle is currently "in"
-    std::unordered_set<Vec2I> containing_chunks;
+    std::unordered_set<XYQ> containing_chunks;
     // the unique identifier for this obstacle
     size_t uid;
     // obstacle data...
+    std::vector<Math::Vec2> points;
 };
 
 struct MapChunkObject {
@@ -79,7 +82,7 @@ Represents a chunk on the map
 */
 struct MapChunk {
     // the list of all the objects in this chunk
-    std::vector<std::shared_ptr<MapChunkObject>> objects;
+    std::vector<MapChunkObject> objects;
 };
 
 /*
@@ -113,30 +116,16 @@ private:
     std::shared_ptr<MapChunk> * array;
     // grow the array
     void resize(int new_width, int new_height);
-    
 };
 
 class EnvMap {
 public:
-    // which quadrant array
-    enum class Quadrant : int {
-        NorthEast = 0,
-        NorthWest = 1,
-        SouthWest = 2,
-        SouthEast = 3
-    };
-
     EnvMap();
     ~EnvMap();
     // these methods perform a spacial query of the map (global map coords in meters).
     std::vector<std::shared_ptr<const MapObstacle>> findObjectsWithinRadius(float radius, float x, float y) const;
     std::vector<std::shared_ptr<const MapObstacle>> findObjectsWithinSquare(float half_width, float x, float y) const;
     std::vector<std::shared_ptr<const MapObstacle>> findObjectsWithinRect(float x_lower_left, float y_lower_left, float x_upper_right, float y_upper_right) const;
-    // represents an index into the map arrays.
-    struct XYQ {
-        Vec2I xy;
-        Quadrant quad;
-    };
     // transforms a point in global coords (meters)
     static XYQ xyToQuadrantOffset(float x, float y);
     // transforms a quadrant into an index
@@ -155,6 +144,8 @@ public:
     size_t newObstacleUID(const MapObstacle & proto);
     // gets an obstacle (or none) based on uid
     std::shared_ptr<MapObstacle> getObstacle(size_t uid);
+    // updates an obstacle's map data
+    void updateObstacle(size_t uid, const MapObstacle & new_data);
 
 private:
     MapChunkArray quadrants[4];

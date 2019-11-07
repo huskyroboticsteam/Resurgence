@@ -113,7 +113,7 @@ EnvMap::~EnvMap() {
 }
 
 // transforms a point in global coords (meters)
-EnvMap::XYQ EnvMap::xyToQuadrantOffset(float x, float y) {
+XYQ EnvMap::xyToQuadrantOffset(float x, float y) {
     float x_abs = fabs(x);
     float y_abs = fabs(y);
     bool x_sign = x >= 0.0f;
@@ -181,7 +181,7 @@ iterateChunkRect():
 This internal function accepts a low xyq (inclusive) and a high xyq (inclusive) defining a rectangle of chunks. This function
 takes a function pointer (see: lambda expression) to evaluate for each valid chunk in the rectangle.
 */
-void EnvMap::iterateChunkRect(EnvMap::XYQ low, EnvMap::XYQ high, std::function<void(EnvMap::XYQ, MapChunk &)> per_chunk) {
+void EnvMap::iterateChunkRect(XYQ low, XYQ high, std::function<void(XYQ, MapChunk &)> per_chunk) {
     switch(low.quad) {
         case Quadrant::NorthEast: {
             switch(high.quad) {
@@ -368,7 +368,7 @@ void EnvMap::iterateChunkRect(EnvMap::XYQ low, EnvMap::XYQ high, std::function<v
     }
 }
 
-void EnvMap::iterateChunkRect(EnvMap::XYQ low, EnvMap::XYQ high, std::function<void(EnvMap::XYQ, const MapChunk &)> per_chunk) const {
+void EnvMap::iterateChunkRect(XYQ low, XYQ high, std::function<void(XYQ, const MapChunk &)> per_chunk) const {
     switch(low.quad) {
         case Quadrant::NorthEast: {
             switch(high.quad) {
@@ -585,11 +585,11 @@ std::vector<std::shared_ptr<const MapObstacle>> EnvMap::findObjectsWithinRadius(
     iterateChunkRect(lower_left_index, upper_right_index, [&](XYQ current_xyq, const MapChunk & chunk) {
         size_t chunk_obj_count = chunk.objects.size();
         for (size_t i = 0; i < chunk_obj_count; i ++) {
-            const MapChunkObject & chunk_obj = * chunk.objects[i];
+            const MapChunkObject & chunk_obj = chunk.objects[i];
             const MapObstacle & obstacle = * chunk_obj.obstacle;
             if (found_uids.find(obstacle.uid) == found_uids.end()) {
-                float dx = x - obstacle.x;
-                float dy = y - obstacle.y;
+                float dx = x - obstacle.position.x;
+                float dy = y - obstacle.position.y;
                 float dist = sqrtf(dx * dx + dy * dy);
                 if (dist <= radius) {
                     uint64_t obj_uid = obstacle.uid;
@@ -622,11 +622,11 @@ std::vector<std::shared_ptr<const MapObstacle>> EnvMap::findObjectsWithinRect(fl
     iterateChunkRect(lower_left_index, upper_right_index, [&](XYQ current_xyq, const MapChunk & chunk) {
         size_t chunk_obj_count = chunk.objects.size();
         for (size_t i = 0; i < chunk_obj_count; i ++) {
-            MapChunkObject & chunk_obj = * chunk.objects[i];
-            MapObstacle & obstacle = * chunk_obj.obstacle;
+            const MapChunkObject & chunk_obj = chunk.objects[i];
+            const MapObstacle & obstacle = * chunk_obj.obstacle;
 
             if (found_uids.find(obstacle.uid) == found_uids.end()) {
-                if (obstacle.x >= x_low && obstacle.x <= x_high && obstacle.y >= y_low && obstacle.y <= y_high) {
+                if (obstacle.position.x >= x_low && obstacle.position.x <= x_high && obstacle.position.y >= y_low && obstacle.position.y <= y_high) {
                     uint64_t obj_uid = obstacle.uid;
                     found_uids.insert(obj_uid);
                     out_set.push_back(chunk_obj.obstacle);
@@ -636,5 +636,20 @@ std::vector<std::shared_ptr<const MapObstacle>> EnvMap::findObjectsWithinRect(fl
     });
 
     return out_set;
+}
+
+void EnvMap::updateObstacle(size_t uid, const MapObstacle & new_data) {
+    if (uid >= obstacles.size()) {
+        return;
+    }
+    std::shared_ptr<MapObstacle> obstacle = obstacles[uid];
+
+    obstacle->position = new_data.position;
+    obstacle->points = new_data.points;
+
+    size_t point_count = new_data.points.size();
+    for (size_t i = 0; i < point_count; i ++) {
+        //XYQ chunk_index_of_point = 
+    }
 }
 
