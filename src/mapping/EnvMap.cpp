@@ -648,8 +648,57 @@ void EnvMap::updateObstacle(size_t uid, const MapObstacle & new_data) {
     obstacle->points = new_data.points;
 
     size_t point_count = new_data.points.size();
+
+    std::unordered_set<XYQ> new_containing_chunks;
     for (size_t i = 0; i < point_count; i ++) {
-        //XYQ chunk_index_of_point = 
+        XYQ chunk_index_of_point = xyToQuadrantOffset(new_data.points[i].x, new_data.points[i].y);
+        new_containing_chunks.insert(chunk_index_of_point);
+    }
+
+    std::unordered_set<XYQ>::const_iterator chunk_iter = new_containing_chunks.cbegin();
+    while(chunk_iter != new_containing_chunks.cend()) {
+        bool bad_xyq = false;
+        XYQ chunk_xyq = * chunk_iter;
+        MapChunk & chunk = getOrCreateChunk(chunk_xyq, bad_xyq);
+        if (bad_xyq) {
+            // This should never happen if xyToQuadrantOffset is implemented correctly
+            throw "BAD PROGRAMMER! (xyToQuadrantOffset did the wrong thing, creating negative xy in an XYQ)";
+        }
+
+        size_t chunk_object_count = chunk.objects.size();
+
+        bool found_ref = false;
+        for (size_t i = 0; i < chunk_object_count; i ++) {
+            if (chunk.objects[i].obstacle == obstacle) {
+                chunk.objects[i].relative_pos = obstacle->position - (chunk_xyq.xy.into_Vec2() + Vec2(0.5f, 0.5f));
+                found_ref = true;
+                break;
+            }
+        }
+
+        if (! found_ref) {
+            chunk.objects.push_back(MapChunkObject {
+                obstacle->position - (chunk_xyq.xy.into_Vec2() + Vec2(0.5f, 0.5f)),
+                obstacle
+            });
+        }
+
+        chunk_iter ++;
     }
 }
 
+MapChunk & EnvMap::getChunk(XYQ xyq, bool & in_bounds) {
+    MapChunkArray & array = quadrants[static_cast<size_t>(xyq.quad)];
+    return array.getChunk(xyq.xy, in_bounds);
+}
+
+const MapChunk & EnvMap::getChunk(XYQ xyq, bool & in_bounds) const {
+    const MapChunkArray & array = quadrants[static_cast<size_t>(xyq.quad)];
+    return array.getChunk(xyq.xy, in_bounds);
+}
+
+MapChunk & EnvMap::getOrCreateChunk(XYQ xyq, bool & bad_xyq) {
+    MapChunkArray & array = quadrants[static_cast<size_t>(xyq.quad)];
+    bool in_bounds = true;
+    return array.createOrGet(xyq.xy.x, xyq.xy.y, bad_xyq);
+}

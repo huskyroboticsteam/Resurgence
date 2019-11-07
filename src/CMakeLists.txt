@@ -10,6 +10,11 @@ add_executable(Rover
         Network.cpp
         mapping/EnvMap.cpp)
 
+add_executable(EnvMapTest
+        mapping/EnvMapTest.cpp
+        mapping/EnvMap.cpp)
+
 #target_link_libraries(Rover ${OpenCV_LIBS})
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 11)
+set_property(TARGET EnvMapTest PROPERTY CXX_STANDARD 11)

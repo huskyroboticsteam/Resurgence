@@ -29,8 +29,14 @@ struct XYQ {
 
 namespace std {
     template<> struct hash<XYQ> {
-        std::size_t operator()(const XYQ & v) const noexcept {
+        inline std::size_t operator()(const XYQ & v) const noexcept {
             return (size_t) (0x4000000 * static_cast<int>(v.quad) + 0x2000 * v.xy.y + v.xy.x);
+        }
+    };
+
+    template<> struct equal_to<XYQ> {
+        inline bool operator()(const XYQ a, const XYQ b) const {
+            return a.xy == b.xy && a.quad == b.quad;
         }
     };
 }
@@ -73,7 +79,7 @@ struct MapChunkObject {
     | * <-(0.0f, 0.0f) (1.0f, 0.0f)-> * |
     *-----------------------------------*
     */
-    float x_rel, y_rel;
+    Vec2 relative_pos;
     std::shared_ptr<MapObstacle> obstacle;
 };
 
@@ -134,6 +140,11 @@ public:
     bool hasContainingChunk(float x, float y);
     // gets a reference to the containing chunk for a given world coordinate point
     MapChunk & getContainingChunk(float x, float y, bool & in_bounds);
+    // gets a chunk given an XYQ
+    MapChunk & getChunk(XYQ xyq, bool & in_bounds);
+    const MapChunk & getChunk(XYQ xyq, bool & in_bounds) const;
+    // gets a chunk given an XYQ, or creates it if it doesn't exist
+    MapChunk & getOrCreateChunk(XYQ xyq, bool & bad_xyq);
 
     // gets the size of a quadrant
     Vec2I getQuadrantSize(Quadrant q);
