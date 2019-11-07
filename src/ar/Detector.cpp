@@ -33,19 +33,36 @@ namespace AR
 		cv::Mat prepped_input = prepImage(input, blur_size, canny_thresh_1, canny_thresh_2);
 		
 		std::vector<std::vector<cv::Point>> contours;
+		std::vector<cv::Vec4i> heirarchy;
 		std::vector<Tag> output;
-		
-		cv::findContours(prepped_input, contours, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+		cv::findContours(prepped_input, contours,
+						 cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
 		for(size_t i = 0; i < contours.size(); i++)
 		{
-			std::vector<cv::Point> approx;
+			std::vector<cv::Point2f> approx;
 			cv::approxPolyDP(contours[i], approx, arcLength(contours[i], true)*0.02, true);
 			if(approx.size() == 4
 			   && cv::isContourConvex(approx)
 			   && cv::contourArea(approx) > CONTOUR_AREA_THRESH)
 			{
+				//sort points into the correct order (top left, top right, bottom right, bottom
+				//  left)
+				struct sortY {
+					bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.y < pt2.y);}
+				} sort_y;
+				struct sortX {
+					bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x < pt2.x);}
+				} sort_x;
+				struct sortXRev {
+					bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x > pt2.x);}
+				} sort_x_rev;
+				std::sort(approx.begin(), approx.end(), sort_y);
+				std::sort(approx.begin(), approx.begin()+2, sort_x);
+				std::sort(approx.begin()+2, approx.end(), sort_x_rev);
+				
 				//make Tag with approximated coordinates
+				//std::cout << "Found tag with corners " << approx << std::endl;
 				Tag tag(approx[0], approx[1], approx[2], approx[3]);
 				output.push_back(tag);
 			}

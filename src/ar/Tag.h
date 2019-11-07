@@ -5,6 +5,8 @@
 #include <opencv2/calib3d.hpp>
 
 #include <vector>
+#include <chrono>
+#include <iostream>
 
 #define EVAN_LAPTOP_CAMERA_PARAMS 1
 #define EVAN_WEBCAM_PARAMS 2
@@ -53,6 +55,11 @@ namespace AR
 	{
 		double angle;
 		cv::Point point;
+	};
+
+	class InvalidCornerException: public std::exception
+	{
+		virtual const char* what() const throw();
 	};
 
 	enum CornerIndex{

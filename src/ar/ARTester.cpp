@@ -59,7 +59,18 @@ int main()
 		// show locations of tags in window
 		std::cout << "Found " << tags.size() << " tags" << std::endl;
 		
-		cv::imshow(ORIG_WINDOW_NAME, frame);
+		// draw lines between tag points
+		for(AR::Tag tag : tags)
+		{
+			std::vector<AR::Corner> corners = tag.getCorners();
+			corners.push_back(corners[0]);
+			for(int i = 0; i < corners.size()-1; i++)
+			{
+				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255), 3);
+			}
+        }
+
+        cv::imshow(ORIG_WINDOW_NAME, frame);
 
 		if(cv::waitKey(5) == 'q')
 			break;
