@@ -1,24 +1,28 @@
 #pragma once
 #include <memory>
 
-using node_ptr = std::shared_ptr<Node>;
+struct Point
+{
+    double x; //float?
+    double y; //float?
+
+    bool equals(Point p);
+};
 
 struct Node
 {
     Point location;//current location of node relative to origin
     bool is_blocked;//False is no obstacle, True is obstacle
-    node_ptr north;
-    node_ptr south;
-    node_ptr east;
-    node_ptr west;
+    std::shared_ptr<Node> north;
+    std::shared_ptr<Node> south;
+    std::shared_ptr<Node> east;
+    std::shared_ptr<Node> west;
 
-    //when creating node, give null values to unknown parts
+    //when creating node, give null alues to unknown parts
 };
 
-struct Point
-{
-    double x; //float?
-    double y; //float?
-};
+//using node_ptr = std::shared_ptr<Node>;
+
+
 
 double distance(Point a, Point b);

@@ -5,3 +5,11 @@ double distance(Point a, Point b)
 {
     return(sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y) *  (a.y - b.y)));
 }
+
+bool Point::equals(Point p)
+{
+    if(p.x == this->x && p.y == this->y){
+        return true;
+    }
+    return false;
+}

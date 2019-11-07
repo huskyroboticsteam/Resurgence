@@ -1,5 +1,6 @@
 #pragma once
 #include "Geometry.h"
+#include <vector>
 class Pather {
     public:
         // start searching from our current location up to the target.
@@ -10,10 +11,20 @@ class Pather {
         // move toward the closest neighbor, then
         // re-do the step above when get to that neighbor node. 
 
-        node_ptr getTheClosestLocation();
-        double distanceToTarget(node_ptr currentLocation, node_ptr target);
+        Geometry::node_ptr getTheClosestLocation();
+        double distanceBetweenNodes(Geometry::node_ptr currentLocation, Geometry::node_ptr target);
         bool isShorterDistance(double distanceA, double distanceB);
-        bool isAObstacle(node_ptr childeNode);
-    private:   
-            
+        bool isAObstacle(Geometry::node_ptr childeNode);
+        Pather::Pather(std::vector<std::vector<bool>> map)
+        // Looking for the neighbors, calculate the distance from current --> neighbors
+        // assign the distance value to the interval value of each neighbor
+        // mark that neighbor as visited.
+
+    private:  
+        std::vector<std::vector<bool>> map;
+        struct point {
+            int x;
+            int y;
+        }
+        
 };
