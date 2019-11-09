@@ -80,6 +80,26 @@ namespace AR
 		std::cout << "calcOrientation took " << duration << "us" << std::endl;
 	}
 
+	cv::Point getTriCentr(Point pt1, Point pt2, Point pt3) {
+		double centroidX = (pt1.x + pt2.x + pt3.x) / 3;
+		double centroidY = (pt1.y + pt2.y + pt3.y) / 3;
+		return centroid(centroidX, centroidY);
+
+	}
+
+	cv::Point Tag::getQuadCentr(Point pt1, Point pt2, Point pt3, Point pt4) {
+		double centroidX = (pt1.x + pt2.x + pt3.x + pt4.x) / 4;
+		double centroidY = (pt1.y + pt2.y + pt3.y + pt4.y) / 4;
+		return centroid(centroidX, centroidY);
+	}
+
+	cv::Point Tag::getCenter() const {
+		return getQuadCentr(getTriCentr(corners[0].point, corners[1].point, corners[2].point), 
+				getTriCentr(corners[1].point, corners[2].point, corners[3].point), 
+				getTriCentr(corners[2].point, corners[3].point, corners[0].point), 
+				getTriCentr(corners[3].point, corners[0].point, corners[1].point));
+	}
+
 	std::vector<Corner> Tag::getCorners() const
 	{
 		return corners;
