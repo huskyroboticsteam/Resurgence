@@ -2,6 +2,11 @@
 #include "Globals.h"
 #include "Network.h"
 
+extern "C" 
+{
+    #include "CANPacket.h"
+}
+
 void InitializeRover()
 {
     // TODO(sasha): Call individual initialization functions
@@ -17,6 +22,7 @@ int main(int argc, char **argv)
                                        //              this includes both CAN and Network packets (maybe)
         //UpdateRoverState();
         SendOutgoingNetworkPackets();
+
     }
     return 0;
 }
