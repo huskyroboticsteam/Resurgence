@@ -74,11 +74,9 @@ namespace AR
 			corners.push_back(Corner{ internal_angle, points[i] });
 		}
 		auto t1 = std::chrono::high_resolution_clock::now();
-		calcOrientation();
+		orientation = calcOrientation();
 		auto t2 = std::chrono::high_resolution_clock::now();
-
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-
 		std::cout << "calcOrientation took " << duration << "us" << std::endl;
 	}
 
@@ -110,44 +108,17 @@ namespace AR
 
     float Tag::getPitch() const 
     {
-        
-        if (orientation == NULL) 
-        {
-
-            orientation = calcOrientation();
-
-        }
-
-        return orientation[0];
-
-    }
+		return orientation[0];
+	}
 
     float Tag::getYaw() const 
     {
-        
-        if (orientation == NULL) 
-        {
-
-            orientation = calcOrientation();
-
-        }
-
-        return orientation[1];
-
+		return orientation[1];
     }
     
-    float Tag::getPitch() const 
+    float Tag::getRoll() const 
     {
-        
-        if (orientation == NULL) 
-        {
-
-            orientation = calcOrientation();
-
-        }
-
         return orientation[2];
-
     }
 
 
