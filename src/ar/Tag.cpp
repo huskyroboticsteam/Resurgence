@@ -80,24 +80,30 @@ namespace AR
 		std::cout << "calcOrientation took " << duration << "us" << std::endl;
 	}
 
-	cv::Point getTriCentr(Point pt1, Point pt2, Point pt3) {
+	cv::Point getTriCentr(cv::Point pt1, cv::Point pt2, cv::Point pt3) {
 		double centroidX = (pt1.x + pt2.x + pt3.x) / 3;
 		double centroidY = (pt1.y + pt2.y + pt3.y) / 3;
-		return centroid(centroidX, centroidY);
+		return cv::Point2d(centroidX, centroidY);
 
 	}
 
-	cv::Point Tag::getQuadCentr(Point pt1, Point pt2, Point pt3, Point pt4) {
+	cv::Point getQuadCentr(cv::Point pt1, cv::Point pt2, cv::Point pt3, cv::Point pt4) {
 		double centroidX = (pt1.x + pt2.x + pt3.x + pt4.x) / 4;
 		double centroidY = (pt1.y + pt2.y + pt3.y + pt4.y) / 4;
-		return centroid(centroidX, centroidY);
+		return cv::Point2d(centroidX, centroidY);
 	}
 
 	cv::Point Tag::getCenter() const {
-		return getQuadCentr(getTriCentr(corners[0].point, corners[1].point, corners[2].point), 
-				getTriCentr(corners[1].point, corners[2].point, corners[3].point), 
-				getTriCentr(corners[2].point, corners[3].point, corners[0].point), 
-				getTriCentr(corners[3].point, corners[0].point, corners[1].point));
+		std::vector<cv::Point> tri_centers;
+		for(size_t i = 0; i<4; i++)
+		{
+			size_t next = (i==3 ? 0 : i+1);
+			size_t prev = (i==0 ? 3 : i-1);
+			tri_centers.push_back(getTriCentr(corners[prev].point,
+											  corners[i].point,
+											  corners[next].point));
+		}
+		return getQuadCentr(tri_centers[0], tri_centers[1], tri_centers[2], tri_centers[3]);
 	}
 
 	std::vector<Corner> Tag::getCorners() const
