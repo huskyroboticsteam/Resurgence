@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <math.h>
+#include <memory> // remove once EnvMap.h is included
 //#include "EnvMap.h"
 
 //use asserts
@@ -16,14 +18,14 @@
 //increase bounding box 
 
 class ObstacleMap{
-    static float radius;
-    static float step_size;
+    float radius;
+    float step_size;
     std::vector< std::vector<bool> > obstacle_map;
 
 private:
     void resetObstacleMap();
     std::vector<std::shared_ptr<MapObstacle>> getData(float robotX, float robotY);
-    static int transform(int val, bool direction);
+    int transform(int val, bool direction);
 
 public:
     void updateObstacleMap();
