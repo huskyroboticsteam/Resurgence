@@ -54,7 +54,7 @@ void ObstacleMap::updateObstacleMap()
     int x, y;
     std::vector<std::shared_ptr<MapObstacle>> data = getData(robotX, robotY);
     // for(auto &obstacle_pointer : data)
-    for (int i = 0; i < static_cast<int>(data.size()); i++)
+    for (int i = 0; i <data.size(); i++)
     {
         // for (Vec2 point : (*obstacle_pointer).points)
         for (Vec2 point : data[i].points)
