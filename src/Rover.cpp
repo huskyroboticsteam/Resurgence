@@ -15,8 +15,8 @@ int main(int argc, char **argv)
     {
         ParseIncomingNetworkPackets(); // NOTE(sasha): Since we're probably going to be using SocketCAN,
                                        //              this includes both CAN and Network packets (maybe)
-        // UpdateRoverState();
-        // SendOutgoingNetworkPackets();
+        //UpdateRoverState();
+        SendOutgoingNetworkPackets();
     }
     return 0;
 }

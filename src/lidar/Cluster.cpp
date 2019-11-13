@@ -1,67 +1,81 @@
 #include "Cluster.h"
 
-#include <iostream>
+#include <cmath>
 
-std::shared_ptr<Point> polarTo2D(double r, double theta)
-{   //returns a point struct containing an x,y cartesian coord relative to LIDAR reading
-    Point p;
-    p.xCoord = r * std::cos(theta);
-    p.yCoord = r * std::sin(theta);
-    return std::make_shared<Point>(p);
+// returns a point struct containing an x,y cartesian coord relative to LIDAR reading
+std::shared_ptr<PointXY> polarTo2D(float r, float theta)
+{     
+    PointXY p;
+    p.x = r * cos(theta);
+    p.y = r * sin(theta);
+    return std::make_shared<PointXY>(p);
 }
 
-std::vector<std::shared_ptr<Point>> convertFrame(std::vector<std::shared_ptr<Polar2D>> frame) {
-    std::vector<std::shared_ptr<Point>> cartesians;
-    for(std::shared_ptr<Polar2D> p : frame) {
-            cartesians.push_back(polarTo2D(p->r,p->theta));
+std::vector<std::shared_ptr<PointXY>> convertFrame(std::vector<std::shared_ptr<Polar2D>> frame)
+{
+    std::vector<std::shared_ptr<PointXY>> cartesians;
+    for (std::shared_ptr<Polar2D> p : frame)
+    {
+        cartesians.push_back(polarTo2D(p->r, p->theta));
     }
     return cartesians;
 }
 
-double calcDiff(std::shared_ptr<Point> p1, std::shared_ptr<Point> p2)
-{ //Calculates difference between two points
-    double xP = pow(p2->xCoord - p1->xCoord, 2);
-    double yP = pow(p2->yCoord - p1->yCoord, 2);
+// Calculates difference between two points
+float distance(std::shared_ptr<PointXY> p1, std::shared_ptr<PointXY> p2)
+{     
+    float xP = powf(p2->x - p1->x, 2);
+    float yP = powf(p2->y - p1->y, 2);
 
-    double diff = std::sqrt(xP + yP);
+    float diff = sqrtf(xP + yP);
     return diff;
 }
 
-
-std::vector<std::set<std::shared_ptr<Point>>> filterPoints(
-    std::vector<std::shared_ptr<Point>> points, float sep_distance)
+std::vector<std::set<std::shared_ptr<PointXY>>> filterPointXYs(
+    std::vector<std::shared_ptr<PointXY>> points, float sep_threshold)
 {
-    std::vector<std::shared_ptr<Object>> objects;
-    Object lastObject;
-    std::shared_ptr<Point> lastPoint = nullptr;
-    for(int i = 1; i < points.size(); i++) {
-        double diff = calcDiff(points[i], points[i-1]);
-        if(diff < sep_distance) {
-            if(lastPoint == points[i-1]) {
-                lastObject.pts.push_back(points[i]);
-            } else {
-                Object obj;
-                obj.pts.push_back(points[i-1]);
-                obj.pts.push_back(points[i]);
+    std::vector<std::set<std::shared_ptr<PointXY>>> clusters;
+    std::set<std::shared_ptr<PointXY>> lastCluster;
+    std::shared_ptr<PointXY> lastPoint = nullptr;
+    for (int i = 1; i < points.size(); i++)
+    {
+        float diff = distance(points[i], points[i - 1]);
+        if (diff < sep_threshold)
+        {
+            if (lastPoint == points[i - 1])
+            {
+                lastCluster.insert(points[i]);
+            }
+            else
+            {
+                std::set<std::shared_ptr<PointXY>> cluster;
+                cluster.insert(points[i - 1]);
+                cluster.insert(points[i]);
                 lastPoint = points[i];
-                objects.push_back(std::make_shared<Object>(obj));
-                lastObject = obj;
+                clusters.push_back(cluster);
+                lastCluster = cluster;
             }
         }
-        if(lastPoint!=nullptr && calcDiff(points[i], lastPoint) < sizeOfRobot) {
-            lastObject.pts.push_back(points[i]);
+        if (lastPoint != nullptr && distance(points[i], lastPoint) < sep_threshold)
+        {
+            lastCluster.insert(points[i]);
         }
     }
     //checks last point and first point
-    double diff = calcDiff(points[points.size()-1], points[0]);
-    if(diff < sep_distance) {
-        if(lastPoint == points[points.size()-1]) {
-            lastObject.pts.push_back(points[0]);
-        } else {
-            Object obj;
-            obj.pts.push_back(points[points.size()-1]);
-            obj.pts.push_back(points[0]);
-            objects.push_back(std::make_shared<Object>(obj));
+    float diff = distance(points[points.size() - 1], points[0]);
+    if (diff < sep_threshold)
+    {
+        if (lastPoint == points[points.size() - 1])
+        {
+            lastCluster.insert(points[0]);
+        }
+        else
+        {
+            std::set<std::shared_ptr<PointXY>> cluster;
+            cluster.insert(points[points.size() - 1]);
+            cluster.insert(points[0]);
+            clusters.push_back(cluster);
         }
     }
+    return clusters;
 }

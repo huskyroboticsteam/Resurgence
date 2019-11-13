@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <limits>
+#include <queue>
 #include <iostream>
 
 namespace Lidar
@@ -46,25 +47,8 @@ std::vector<std::set<std::shared_ptr<PointXY>>> clusterPoints(
     return clusters;
 }
 
-void getBoundingBoxes(std::set<std::shared_ptr<PointXY>> cluster)
-{
-    float xmin = std::numeric_limits<float>::infinity();
-    float xmax = -std::numeric_limits<float>::infinity();
-    float ymin = xmin;
-    float ymax = xmax;
-    for (std::shared_ptr<PointXY> p: cluster)
-    {
-        xmin = fmin(xmin, p->x);
-        xmax = fmax(xmax, p->x);
-        ymin = fmin(ymin, p->y);
-        ymax = fmax(ymax, p->y);
-    }
-    std::cout << "(" << xmin << ", " << ymin << ") -> (" << xmax << ", " << ymax << ")";
-    std::cout << std::endl;
-}
-
-void filterGroundPoints(std::vector<std::shared_ptr<Polar2D>> pts, float scan_height, 
-    float slope_tol_rad)
+void filterGroundPoints(std::vector<std::shared_ptr<Polar2D>> pts, float scan_height,
+                        float slope_tol_rad)
 {
     std::vector<std::shared_ptr<Polar2D>>::iterator itr = pts.begin();
     while (itr != pts.end())
@@ -81,4 +65,27 @@ void filterGroundPoints(std::vector<std::shared_ptr<Polar2D>> pts, float scan_he
     }
 }
 
+std::vector<BoundingBox> boundCluster(std::set<std::shared_ptr<PointXY>> cluster)
+{
+    std::vector<BoundingBox> bounds;
+    auto xcmp = [](std::shared_ptr<PointXY> p1, std::shared_ptr<PointXY> p2) {
+        return p1->x > p2->x;
+    };
+    auto ycmp = [](std::shared_ptr<PointXY> p1, std::shared_ptr<PointXY> p2) {
+        return p1->y > p2->y;
+    };
+    std::priority_queue<std::shared_ptr<PointXY>, std::vector<std::shared_ptr<PointXY>>,
+        decltype(xcmp)> x_pq(xcmp);
+    std::priority_queue<std::shared_ptr<PointXY>, std::vector<std::shared_ptr<PointXY>>,
+        decltype(ycmp)> y_pq(ycmp);
+    for (std::shared_ptr<PointXY> p: cluster)
+    {
+        x_pq.push(p);
+        y_pq.push(p);
+    }
+
+
+
+    return bounds;
+}
 } // namespace Lidar

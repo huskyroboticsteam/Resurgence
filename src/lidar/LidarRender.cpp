@@ -2,34 +2,43 @@
 
 #include <cmath>
 #include <limits>
-#include <iostream>
 
 #include <GL/glut.h>
 
 int main(int argc, char** argv)
 {
     using namespace Lidar;
-    LidarRender lr(800, 600, "hello");
-    std::set<std::shared_ptr<PointXY>> pts;
-    for (int i = 0; i < 10; i++)
+    LidarRender lr(800, 600, "point clustering simulation", 15, 15);
+    std::set<std::shared_ptr<PointXY>> pts_rad = generateClusterRadius(-5, 5, 2, 10);
+    std::set<std::shared_ptr<PointXY>> pts_lin = generateClusterLinear(1, 8, 8, 1, 0.75, 16);
+
+    std::vector<std::shared_ptr<PointXY>> vertices;
+    float bbox_x[4] = {0.5, 0.5, -0.5, -0.5};
+    float bbox_y[4] = {0.5, -0.5, -0.5, 0.5};
+    for (int i = 0; i < 4; i++)
     {
         PointXY p;
-        p.x = i;
-        p.y = i;
-        pts.insert(std::make_shared<PointXY>(p));
+        p.x = bbox_x[i];
+        p.y = bbox_y[i];
+        vertices.push_back(std::make_shared<PointXY>(p));
     }
+
+    lr.setBackground(1, 1, 1, 1);
     while (1)
     {
-        lr.setBackground(0, 0, 1, 1);
-        lr.drawBoundingPolygon(std::vector<std::pair<float, float>>(), 0, 0, 0);
-        lr.drawPoints(pts, 1, 0, 0);
+        lr.drawBoundingPolygon(vertices, 0, 0, 0, 2);
+        lr.drawPoints(pts_rad, 0, 0, 0, 5);
+        lr.drawPoints(pts_lin, 0, 0, 0, 5);
         lr.flushToDisplay();
     }
 }
 
 namespace Lidar
 {
-LidarRender::LidarRender(int win_width, int win_height, std::string win_title)
+LidarRender::LidarRender(int win_width, int win_height, std::string win_title, 
+    float disp_limits_x_range, float disp_limits_y_range) :
+    disp_x_range(disp_limits_x_range), 
+    disp_y_range(disp_limits_y_range)
 {
     int argc = 0;
     glutInit(&argc, NULL);
@@ -49,37 +58,32 @@ void LidarRender::setBackground(float r, float g, float b, float a)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void LidarRender::drawPoints(std::set<std::shared_ptr<PointXY>> pts, float r, float g, float b)
+void LidarRender::drawPoints(std::set<std::shared_ptr<PointXY>> pts, float r, float g, float b,
+    float pt_size)
 {
-    float xmin = std::numeric_limits<float>::infinity();
-    float xmax = -xmin;
-    float ymin = xmin;
-    float ymax = -xmin;
-    for (std::shared_ptr<PointXY> p: pts)
-    {
-        xmin = fmin(p->x, xmin);
-        xmax = fmax(p->x, xmax);
-        ymin = fmin(p->y, ymin);
-        ymax = fmax(p->y, ymax);        
-    }
-
     glColor3f(r, g, b);
+    glPointSize(pt_size);
     glBegin(GL_POINTS);
-    for (std::shared_ptr<PointXY> p: pts)
+    for (std::shared_ptr<PointXY> p : pts)
     {
-        glVertex2f((p->x - xmin) / (xmax - xmin), (p->y - ymin) / (ymax - ymin));
+        glVertex2f(p->x / this->disp_x_range, p->y / this->disp_y_range);
     }
     glEnd();
 }
 
-void LidarRender::drawBoundingPolygon(std::vector<std::pair<float, float>> vertices, float r,
-    float g, float b)
+void LidarRender::drawBoundingPolygon(std::vector<std::shared_ptr<PointXY>> vertices, float r,
+    float g, float b, float line_width)
 {
     glColor3f(r, g, b);
-    glBegin(GL_POLYGON);
-    glVertex2f(0, 0);
-    glVertex2f(0, 0.5);
-    glVertex2f(0.5, 0);
+    glLineWidth(line_width);
+    glBegin(GL_LINES);
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        std::shared_ptr<PointXY> v1 = vertices[i];
+        std::shared_ptr<PointXY> v2 = vertices[(i + 1) % vertices.size()];
+        glVertex2f(v1->x / this->disp_x_range, v1->y / this->disp_y_range);
+        glVertex2f(v2->x / this->disp_x_range, v2->y / this->disp_y_range);
+    }
     glEnd();
 }
 
