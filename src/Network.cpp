@@ -12,6 +12,7 @@
 #ifdef __linux__
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#include <aio.h>
 #endif
 
 void InitializeNetwork()
