@@ -1,6 +1,8 @@
 #include "Geometry.h"
 #include <cmath>
 
+
+
 double distance(Point a, Point b)
 {
     return(sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y) *  (a.y - b.y)));
@@ -8,8 +10,5 @@ double distance(Point a, Point b)
 
 bool Point::equals(Point p)
 {
-    if(p.x == this->x && p.y == this->y){
-        return true;
-    }
-    return false;
+    return (fabs(p.x - this->x) < err && fabs(p.y - this->y) < err){
 }

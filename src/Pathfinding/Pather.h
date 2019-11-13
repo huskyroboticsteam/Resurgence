@@ -26,5 +26,6 @@ class Pather {
             int x;
             int y;
         }
+        std::vector<point> visited
         
 };
