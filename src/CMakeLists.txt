@@ -18,8 +18,8 @@ add_executable(Rover
         Network.cpp)
 
 add_executable(tests
-  Tests.cpp)
-  
+  Tests.cpp
+  ar/TagUnitTests.cpp)
 
 include(CTest)
 include(Catch)
