@@ -3,20 +3,7 @@
 //vector and EnvMap.h included in PathMap.h
 
 
-ObstacleMap::ObstacleMap(float rad, float step)
-{
-    // get access to global EnvMap object
-    this->radius = rad;
-    this->step_size = step;
-    for(int i = 0; i < (int)(radius * 2 / step + 1); i++)
-    {
-        obstacle_map.push_back(std::vector<bool>()); 
-        std::cout << "2";
-    }
-    updateObstacleMap();
-}
-
-
+//debug here, give nullptrs
 std::vector<std::shared_ptr<MapObstacle>> ObstacleMap::getData(float robotX, float robotY){
     //following method needs global coords
     // return findObjectsWithinSquare(this->radius, robotX, robotY);//floats
@@ -24,9 +11,9 @@ std::vector<std::shared_ptr<MapObstacle>> ObstacleMap::getData(float robotX, flo
     for (int i = 0; i < 10; i++)
     {
         std::shared_ptr<MapObstacle> m;
-        for (int j = j; i < i; j++)
+        for (int j = 0; j < i; j++)
         {
-            (*m).points.push_back(Vec2{2*i, 2*j});
+            m->points.push_back(Vec2{2*i, 2*j});
         }
         temp.push_back(m);
     }
@@ -37,9 +24,9 @@ std::vector<std::shared_ptr<MapObstacle>> ObstacleMap::getData(float robotX, flo
 
 void ObstacleMap::resetObstacleMap()
 {
-    for (int i = 0; i < (int)(radius * 2 / step_size + 1); i++)
+    for (int i = 0; i < size; i++)
     {
-        for (int j = 0; j < (int)(radius * 2 / step_size + 1); j++)
+        for (int j = 0; j < size; j++)
         {
            obstacle_map[i][j] = false;
         }
@@ -51,10 +38,10 @@ int ObstacleMap::transform(int val, bool direction)
     //direction indicates +/- true is plus, false is -
     if(direction)
     {
-        return val + (int)(step_size -  fmodf(val, step_size)); //(step_size - val % step_size);//fmodf
+        return val + (int)(step_size -  fmodf(val, step_size));
     }else
     {
-        return val - (int)fmodf(val, step_size); //val % step_size;//fmodf
+        return val - (int)fmodf(val, step_size);
     }
 }
 
@@ -67,11 +54,11 @@ void ObstacleMap::updateObstacleMap()
     MapObstacle obstacle;
     std::vector<std::shared_ptr<MapObstacle>> data = getData(robotX, robotY);
     int x, y;
-    for (int i = 0; i <data.size(); i++)
+    for (int i = 0; i < data.size(); i++)
     {
-        for (int j = 0; j < (*data[i]).points.size(); j++)
+        for (int j = 0; j < data[i]->points.size(); j++)
         {
-            Vec2 point = (*data[i]).points[j];
+            Vec2 point = data[i]->points[j];
             x = (int)(robotX - point.x + radius/step_size);
             y = (int)(robotY - point.y + radius/step_size);
             //set four points surrounding given point as blocked
@@ -102,11 +89,31 @@ void ObstacleMap::print()
     } 
 }
 
+ObstacleMap::ObstacleMap(float rad, float step): radius(rad), step_size(step),
+                                                 size((int)(radius * 2 / step_size + 1))
+{
+    std::cout << "1";
+    // get access to global EnvMap object
+    // // this->radius = rad;
+    // this->step_size = step;
+    // this->size = ;
+    for(int i = 0; i < size; i++)
+    {
+        obstacle_map.push_back(std::vector<bool>()); 
+        for(int j = 0; j < size; j++)
+        {
+            obstacle_map[i].push_back(false);
+        }
+        std::cout << "2";
+    }
+    updateObstacleMap();
+}
+
 
 int main()
 {
     ObstacleMap map = ObstacleMap(10.0f, 1.0f);
     //std::cout << "got this far";
-    map.print();
+    //map.print();
 };
 

@@ -8,7 +8,7 @@ public:
     int y;
 };
 
-class MapObstacle
+struct MapObstacle
 {
 public:
     std::vector<Vec2> points;

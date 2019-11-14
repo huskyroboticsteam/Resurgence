@@ -22,7 +22,9 @@
 class ObstacleMap{
     float radius;
     float step_size;
+    int size;
     std::vector< std::vector<bool> > obstacle_map;
+    //change to 2d arrays
 
 private:
     void resetObstacleMap();
