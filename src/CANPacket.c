@@ -15,9 +15,9 @@
 uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 {
     uint16_t CANID = 0;
-    CANID = CANID & (0x2FF << (priority & 0x1));
-    CANID = CANID & (0x2F << (devGroup & 0xF));
-    CANID = CANID & (devSerial & 0x2F);
+    CANID = CANID | ((priority & 0x1) << 10);
+    CANID = CANID | ((devGroup & 0xF) << 6);
+    CANID = CANID | (devSerial & 0x2F);
 
     return CANID;
 }
