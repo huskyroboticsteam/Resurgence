@@ -1,66 +1,66 @@
 
 #pragma once
 
-#include "measurement_package.h"
-#include "common.h"
 #include "Eigen/Dense"
+#include "common.h"
+#include "measurement_package.h"
 #include "tools.h"
 #define INF 1000
 
 class EKFSLam {
-public:
-  /**
-  * Constructor.
-  */
-  EKFSLam();
+  public:
+    /**
+     * Constructor.
+     */
+    EKFSLam(EnvMap &env_map, float motion_noise = 0.1);
 
-  /**
-  * Destructor.
-  */
-  virtual ~EKFSLam();
+    /**
+     * Destructor.
+     */
+    virtual ~EKFSLam();
 
-  /**
-  * Initialize
-  */
-  void Initialize(unsigned int landmark_size, unsigned int rob_pose_size = 3, float _motion_noise = 0.1);
+    /*
+     * Update state based on a magnetometer reading
+     */
+    void updateFromMagnetometer(const MagnetometerReading &mr);
 
-  /**
-  *  Prediction the state after motion
-  */
-  void Prediction(const OdoReading& motion);
+    /*
+     * Update state based on a GPS reading
+     */
+    void updateFromGPS(const GPSReading &gps);
 
-  /**
-  *  Correctthe state after observation
-  */
-  void Correction(const vector<RadarReading>& observation);
+    /*
+     * Update state based on a reading from the lidar
+     */
+    void updateFromLidar(size_t object_uid,
+                         std::set<std::shared_ptr<Vec2>> reading);
 
-  /**
-  * Run the whole flow of the Kalman Filter from here.
-  */
-  void ProcessMeasurement(const Record& record);
+    /*
+    * Step the kalman filter forward
+    * With the data that has been added so far from the update methods 
+    * The kalman filter internally stores the time that the last step 
+    * occurred
+    */
+    void step(); 
 
+    Vec2 getPosition();
 
-  //-------------------------------------
-  VectorXd getMu() const {
-      return mu;
-  }
+    float getHeading();
+    
+    // TODO: add a function(s) to access uncertainty values
 
-  MatrixXd getSigma() const {
-      return Sigma;
-  }
+  private:
+    // check whether the tracking toolbox was initialized or not (first
+    // measurement)
+    bool is_initialized_;
 
-
-public:
-  // check whether the tracking toolbox was initialized or not (first measurement)
-  bool is_initialized_;
-
-  // tool object used to compute Jacobian and RMSE
-  Tools tools;
-  Eigen::MatrixXd robSigma;
-  Eigen::MatrixXd robMapSigma;
-  Eigen::MatrixXd mapSigma;
-  Eigen::MatrixXd Sigma;
-  Eigen::VectorXd mu;
-  Eigen::MatrixXd Q_;
-  vector<bool> observedLandmarks;
+    // tool object used to compute Jacobian and RMSE
+    Tools tools;
+    Eigen::MatrixXd robSigma;
+    Eigen::MatrixXd robMapSigma;
+    Eigen::MatrixXd mapSigma;
+    Eigen::MatrixXd Sigma;
+    Eigen::VectorXd mu;
+    Eigen::MatrixXd Q_;
+    vector<bool> observedLandmarks;
 };
