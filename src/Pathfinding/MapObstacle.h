@@ -1,12 +1,15 @@
-// todo: create dummy class
 #pragma once
+#include <vector>
+
+struct Vec2
+{
+public:
+    int x;
+    int y;
+};
 
 class MapObstacle
 {
-    std::vector<Vec2> points
-}
-
-struct Vec2{
-    int x;
-    int y;
-}
+public:
+    std::vector<Vec2> points;
+};

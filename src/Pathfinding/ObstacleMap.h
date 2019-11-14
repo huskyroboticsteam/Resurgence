@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
 #include <math.h>
+#include <iostream>
 #include <memory> // remove once EnvMap.h is included
+#include "MapObstacle.h"
 //#include "EnvMap.h"
 
 //use asserts
@@ -30,5 +32,7 @@ private:
 public:
     void updateObstacleMap();
     ObstacleMap(float rad, float step_size);
+    void print();
+
 };
 
