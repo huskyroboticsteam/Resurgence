@@ -1,4 +1,10 @@
 #include "Tag.h"
+#include "../Util.h"
+
+#include <opencv2/calib3d.hpp>
+
+#include <cassert>
+#include <iostream>
 
 namespace AR
 {
@@ -18,7 +24,7 @@ cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
 	double sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) +
 	                 R.at<double>(1, 0) * R.at<double>(1, 0));
 
-	bool singular = sy < 1e-6;
+	bool singular = util::almostEqual(sy, 0);
 
 	double x, y, z;
 	if (!singular)
@@ -70,14 +76,14 @@ Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
 	orientation = calcOrientation();
 }
 
-cv::Point getTriCentr(cv::Point pt1, cv::Point pt2, cv::Point pt3)
+cv::Point getTriCenter(cv::Point pt1, cv::Point pt2, cv::Point pt3)
 {
 	double centroidX = (pt1.x + pt2.x + pt3.x) / 3;
 	double centroidY = (pt1.y + pt2.y + pt3.y) / 3;
 	return cv::Point2d(centroidX, centroidY);
 }
 
-cv::Point getQuadCentr(cv::Point pt1, cv::Point pt2, cv::Point pt3, cv::Point pt4)
+cv::Point getQuadCenter(cv::Point pt1, cv::Point pt2, cv::Point pt3, cv::Point pt4)
 {
 	double centroidX = (pt1.x + pt2.x + pt3.x + pt4.x) / 4;
 	double centroidY = (pt1.y + pt2.y + pt3.y + pt4.y) / 4;
@@ -92,9 +98,9 @@ cv::Point Tag::getCenter() const
 		size_t next = (i == 3 ? 0 : i + 1);
 		size_t prev = (i == 0 ? 3 : i - 1);
 		tri_centers.push_back(
-		    getTriCentr(corners[prev].point, corners[i].point, corners[next].point));
+		    getTriCenter(corners[prev].point, corners[i].point, corners[next].point));
 	}
-	return getQuadCentr(tri_centers[0], tri_centers[1], tri_centers[2], tri_centers[3]);
+	return getQuadCenter(tri_centers[0], tri_centers[1], tri_centers[2], tri_centers[3]);
 }
 
 std::vector<Corner> Tag::getCorners() const

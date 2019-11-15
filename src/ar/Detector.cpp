@@ -1,5 +1,8 @@
 #include "Detector.h"
 
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+
 namespace AR
 {
 const int CONTOUR_AREA_THRESH = 1000;

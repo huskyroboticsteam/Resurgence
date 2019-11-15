@@ -1,11 +1,7 @@
 #pragma once
 
-#include <opencv2/calib3d.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/types.hpp>
+#include <opencv2/core.hpp>
 
-#include <cassert>
-#include <iostream>
 #include <vector>
 
 #define EVAN_LAPTOP_CAMERA_PARAMS 1
