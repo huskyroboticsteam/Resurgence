@@ -36,22 +36,14 @@ cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
 	return cv::Vec3f(x, y, z);
 }
 
-const char *InvalidCornerException::what() const throw()
-{
-	return "Invalid corners (shape crosses itself)";
-}
-
 void checkCorners(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
                   cv::Point bottom_left)
 {
 	// validate points
-	if (top_left.x - top_right.x > 0          // top left and top right are inverted
-	    || top_left.y - bottom_left.y > 0     // top left and bottom left are inverted
-	    || bottom_left.x - bottom_right.x > 0 // bottom left and bottom right are inverted
-	    || top_right.y - bottom_right.y > 0)  // top right and bottom right are inverted
-	{
-		throw InvalidCornerException();
-	}
+	assert(!(top_left.x - top_right.x > 0          // top left and top right are inverted
+	         || top_left.y - bottom_left.y > 0     // top left and bottom left are inverted
+	         || bottom_left.x - bottom_right.x > 0 // bottom left and bottom right are inverted
+	         || top_right.y - bottom_right.y > 0)); // top right and bottom right are inverted
 }
 
 Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
@@ -75,11 +67,7 @@ Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
 		double internal_angle = findAngle(points[last_index], points[i], points[next_index]);
 		corners.push_back(Corner{internal_angle, points[i]});
 	}
-	auto t1 = std::chrono::high_resolution_clock::now();
 	orientation = calcOrientation();
-	auto t2 = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-	std::cout << "calcOrientation took " << duration << "us" << std::endl;
 }
 
 cv::Point getTriCentr(cv::Point pt1, cv::Point pt2, cv::Point pt3)

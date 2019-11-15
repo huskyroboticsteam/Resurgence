@@ -4,7 +4,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 
-#include <chrono>
+#include <cassert>
 #include <iostream>
 #include <vector>
 
@@ -63,15 +63,6 @@ struct Corner
 {
 	double angle;
 	cv::Point point;
-};
-
-/**
-   Exception class thrown in the event of invalid corner ordering.
-   @see Tag()
- */
-class InvalidCornerException : public std::exception
-{
-	virtual const char *what() const throw();
 };
 
 /**
