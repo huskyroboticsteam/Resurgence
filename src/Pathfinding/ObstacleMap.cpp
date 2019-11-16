@@ -6,7 +6,7 @@
 //debug here, gives nullptrs
 std::vector<std::shared_ptr<MapObstacle>> ObstacleMap::getData(float robotX, float robotY){
     //following method needs global coords
-    return findObjectsWithinSquare(this->radius, robotX, robotY);//floats
+    return slam_map.findObjectsWithinSquare(this->radius, robotX, robotY);//floats
     //std::vector<std::shared_ptr<MapObstacle>> temp;
     // for (int i = 0; i < 8; i++)
     // {

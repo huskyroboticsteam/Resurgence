@@ -4,7 +4,7 @@
 #include <iostream>
 #include <memory> // remove once EnvMap.h is included
 #include "MapObstacle.h"
-//#include "EnvMap.h"
+#include "EnvMap.h"
 
 //use asserts
 
