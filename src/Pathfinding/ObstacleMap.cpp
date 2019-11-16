@@ -1,21 +1,22 @@
 #include "ObstacleMap.h"
-
+#include <cstdlib>
 //vector and EnvMap.h included in PathMap.h
 
 
-//debug here, give nullptrs
+//debug here, gives nullptrs
 std::vector<std::shared_ptr<MapObstacle>> ObstacleMap::getData(float robotX, float robotY){
     //following method needs global coords
     // return findObjectsWithinSquare(this->radius, robotX, robotY);//floats
     std::vector<std::shared_ptr<MapObstacle>> temp;
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 5; i++)
     {
-        std::shared_ptr<MapObstacle> m;
+        MapObstacle m;
         for (int j = 0; j < i; j++)
         {
-            m->points.push_back(Vec2{2*i, 2*j});
+            m.points.push_back(Vec2{rand() % 21 - 11, rand() % 21 - 11});
         }
-        temp.push_back(m);
+        MapObstacle& n = m;
+        temp.push_back(std::make_shared<MapObstacle>(n));
     }
     
     return temp; // delete once EnvMap.h is included, use findObjectsWthinSquare
@@ -28,7 +29,7 @@ void ObstacleMap::resetObstacleMap()
     {
         for (int j = 0; j < size; j++)
         {
-           obstacle_map[i][j] = false;
+           ObstacleMap::obstacle_map[i][j] = false;
         }
     }
 }
@@ -47,11 +48,11 @@ int ObstacleMap::transform(int val, bool direction)
 
 void ObstacleMap::updateObstacleMap()
 {
-    float robotX, robotY;
+    float robotX = 10.0f;
+    float robotY = 10.0f;
     //UNCOMMENT AFTER TESTING
     //getRobotPosition(robotX, robotY); // from EnvMap
     resetObstacleMap();
-    MapObstacle obstacle;
     std::vector<std::shared_ptr<MapObstacle>> data = getData(robotX, robotY);
     int x, y;
     for (int i = 0; i < data.size(); i++)
@@ -63,6 +64,7 @@ void ObstacleMap::updateObstacleMap()
             y = (int)(robotY - point.y + radius/step_size);
             //set four points surrounding given point as blocked
             //likely blocked areas will overlap from proxity of points in MapObstacle
+            //to do: check if out of bounds
             obstacle_map[transform(y, true)][transform(x, true)] = true;
             obstacle_map[transform(y, true)][transform(x, false)] = true;
             obstacle_map[transform(y, false)][transform(x, true)] = true;
@@ -73,9 +75,9 @@ void ObstacleMap::updateObstacleMap()
 
 void ObstacleMap::print()
 {
-    for (int i = 0; i < ObstacleMap::obstacle_map.size(); i++)
+    for (int i = 0; i < size; i++)
     {
-        for(int j = 0; j < ObstacleMap::obstacle_map[i].size(); j++)
+        for(int j = 0; j < size; j++)
         {
             if(ObstacleMap::obstacle_map[i][j])
             {
@@ -84,36 +86,19 @@ void ObstacleMap::print()
             {
                 std::cout << "0 ";
             }
-            std::cout << std::endl;
         }
+        std::cout << std::endl;
     } 
 }
 
-ObstacleMap::ObstacleMap(float rad, float step): radius(rad), step_size(step),
-                                                 size((int)(radius * 2 / step_size + 1))
+ObstacleMap::ObstacleMap()
 {
-    std::cout << "1";
-    // get access to global EnvMap object
-    // // this->radius = rad;
-    // this->step_size = step;
-    // this->size = ;
-    for(int i = 0; i < size; i++)
-    {
-        obstacle_map.push_back(std::vector<bool>()); 
-        for(int j = 0; j < size; j++)
-        {
-            obstacle_map[i].push_back(false);
-        }
-        std::cout << "2";
-    }
     updateObstacleMap();
 }
 
 
 int main()
 {
-    ObstacleMap map = ObstacleMap(10.0f, 1.0f);
-    //std::cout << "got this far";
-    //map.print();
+    ObstacleMap map = ObstacleMap();
+    map.print();
 };
-
