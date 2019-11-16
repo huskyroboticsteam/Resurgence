@@ -12,6 +12,7 @@
 #ifdef __linux__
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#include <aio.h>
 #endif
 
 void InitializeNetwork()
@@ -49,7 +50,7 @@ void SendOutgoingNetworkPacket(OutboundData p)
 {
     // We're going to construct our json data here. We're going to use camel
     // case for the json data fields to conform to Mission Control style guide
-    json j;
+    nlohmann::json j;
     j["timestamp"] = p.timestamp;
     j["backLeftMotorCurrent"] = p.back_left_motor_current;
     // TODO: Finish constructing JSON here
