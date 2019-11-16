@@ -19,6 +19,7 @@
 
 //increase bounding box 
 class ObstacleMap{
+    //EnvMap& slam_map;
     constexpr static float radius = 10.0f;
     constexpr static float step_size = 1.0f;
     constexpr static int size = 21;//(int)(2 * radius + 1);
@@ -32,7 +33,6 @@ private:
 
 public:
     void updateObstacleMap();
-    ObstacleMap();
+    ObstacleMap(Envmap& envmap);
     void print();
-
 };
