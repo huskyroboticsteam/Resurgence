@@ -20,7 +20,10 @@ add_executable(Rover
 
 add_executable(tests
   Tests.cpp
-  ar/TagUnitTests.cpp)
+  Util.cpp
+  # AR Detection tests
+  ar/TagUnitTests.cpp
+  ar/Tag.cpp)
 
 include(CTest)
 include(Catch)
