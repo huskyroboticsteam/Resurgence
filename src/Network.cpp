@@ -112,7 +112,12 @@ void TestCANPackets()
     std::cin >> id;
     packet.address = id;
 
-    //TODO: Figure out how data is ordered
+    uint8_t data[Constants::PACKET_PAYLOAD_SIZE] = {0};
+    data[1] = 1;
+    data[2] = 2;
+    for(int i = 0; i < 8; i++){
+        packet.payload[i] = data[i];
+    }
 
 
     Globals::outgoing_packets.push_back(packet);
