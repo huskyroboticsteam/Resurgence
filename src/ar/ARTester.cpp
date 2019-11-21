@@ -81,11 +81,12 @@ int main(int argc, char* argv[])
 			{
 				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
 				         3);
+				double l = std::sqrt(pow(corners[i].point.x - corners[i + 1].point.x, 2) + pow(corners[i].point.y - corners[i + 1].point.y, 2));
 				cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0),
-				               cv::MARKER_CROSS, 70, 6, cv::FILLED);
+				               cv::MARKER_CROSS, l/5, 2, cv::FILLED);
 			}
-			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 70,
-			               6, cv::FILLED);
+			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 10,
+			               2, cv::FILLED);
 			std::cout << tag.getCenter() << ", ";
 		}
 
