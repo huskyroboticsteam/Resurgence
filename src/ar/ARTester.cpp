@@ -75,9 +75,9 @@ int main()
 			{
 				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
 				         3);
-				cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0), markerType = 1, thickness = 2);
+				cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0), 1, 6, cv::FILLED, 70);
 			}
-			cv::drawMarker(frame, tags.getCenter(), cv::Scalar(0, 255, 0), markerType = 0, thickness = 2);
+			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), 0, 6, cv::FILLED, 70);
 			std::cout << tag.getCenter() << ", ";
 		}
 
