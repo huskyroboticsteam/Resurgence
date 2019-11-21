@@ -66,6 +66,7 @@ int main()
 		std::cout << "Found " << tags.size() << " tags" << std::endl;
 
 		// draw lines between tag points
+		// draw markers on the center and corners
 		for (AR::Tag tag : tags)
 		{
 			std::vector<AR::Corner> corners = tag.getCorners();
@@ -74,9 +75,12 @@ int main()
 			{
 				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
 				         3);
+				cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0), markerType = 1, thickness = 2);
 			}
+			cv::drawMarker(frame, tags.getCenter(), cv::Scalar(0, 255, 0), markerType = 0, thickness = 2);
 			std::cout << tag.getCenter() << ", ";
 		}
+
 		std::cout << std::endl;
 
 		cv::imshow(ORIG_WINDOW_NAME, frame);
