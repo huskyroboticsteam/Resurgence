@@ -15,21 +15,20 @@ constexpr bool EXTRA_WINDOWS = true;
 
 int camera_id = 0;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-	if(argc > 1)
+	if (argc > 1)
 	{
 		camera_id = std::stoi(argv[1]);
 	}
 
-	
 	cv::Mat frame;
 	cv::VideoCapture cap;
 
 	int api_id = cv::CAP_ANY;
 
 	int thresh_val = 50;
-	int thresh2_val = 50;
+	int thresh2_val = 120;
 	int blur_val = 2;
 
 	std::cout << "Opening camera..." << std::endl;
@@ -81,16 +80,14 @@ int main(int argc, char* argv[])
 			{
 				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
 				         3);
-				double l = std::sqrt(pow(corners[i].point.x - corners[i + 1].point.x, 2) + pow(corners[i].point.y - corners[i + 1].point.y, 2));
+				double l = std::sqrt(pow(corners[i].point.x - corners[i + 1].point.x, 2) +
+				                     pow(corners[i].point.y - corners[i + 1].point.y, 2));
 				cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0),
-				               cv::MARKER_CROSS, l/5, 2, cv::FILLED);
+				               cv::MARKER_CROSS, l / 10, 2, cv::FILLED);
 			}
-			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 10,
+			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 15,
 			               2, cv::FILLED);
-			std::cout << tag.getCenter() << ", ";
 		}
-
-		std::cout << std::endl;
 
 		cv::imshow(ORIG_WINDOW_NAME, frame);
 		if (EXTRA_WINDOWS)
