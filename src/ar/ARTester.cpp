@@ -76,10 +76,10 @@ int main()
 				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
 				         3);
 				cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0),
-				               cv::MARKER_CROSS, 70, 6, cv::FILLED);
+				               cv::MARKER_CROSS, 20, 2, cv::FILLED);
 			}
-			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 70,
-			               6, cv::FILLED);
+			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 20,
+			               2, cv::FILLED);
 			std::cout << tag.getCenter() << ", ";
 		}
 
