@@ -4,8 +4,8 @@
 struct Vec2
 {
 public:
-    int x;
-    int y;
+    float x;
+    float y;
 };
 
 struct MapObstacle

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <memory> // remove once EnvMap.h is included
 #include "MapObstacle.h"
-//#include "EnvMap.h"
+#include "EnvMap.h"
 
 //use asserts
 
@@ -18,12 +18,12 @@
 // recreate grid as orientation/location changes
 
 //increase bounding box 
-
 class ObstacleMap{
-    float radius;
-    float step_size;
-    int size;
-    std::vector< std::vector<bool> > obstacle_map;
+    //EnvMap& slam_map;
+    constexpr static float radius = 10.0f;
+    constexpr static float step_size = 1.0f;
+    constexpr static int size = 21;//(int)(2 * radius + 1);
+    bool obstacle_map[size][size];
     //change to 2d arrays
 
 private:
@@ -33,8 +33,6 @@ private:
 
 public:
     void updateObstacleMap();
-    ObstacleMap(float rad, float step_size);
+    ObstacleMap(Envmap& envmap);
     void print();
-
 };
-
