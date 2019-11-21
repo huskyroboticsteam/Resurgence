@@ -48,6 +48,7 @@ class EKFSLam {
     float getHeading();
     
     // TODO: add a function(s) to access uncertainty values
+    float getValidationValue(size_t id, const MapObstacle &obstacle);
 
   private:
     // check whether the tracking toolbox was initialized or not (first
