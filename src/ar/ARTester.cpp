@@ -13,17 +13,23 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 
 constexpr bool EXTRA_WINDOWS = true;
 
-constexpr int CAMERA_ID = 0;
+int camera_id = 0;
 
-int main()
+int main(int argc, char* argv[])
 {
+	if(argc > 1)
+	{
+		camera_id = std::stoi(argv[1]);
+	}
+
+	
 	cv::Mat frame;
 	cv::VideoCapture cap;
 
 	int api_id = cv::CAP_ANY;
 
-	int thresh_val = 128;
-	int thresh2_val = 128;
+	int thresh_val = 50;
+	int thresh2_val = 50;
 	int blur_val = 2;
 
 	std::cout << "Opening camera..." << std::endl;
@@ -31,7 +37,7 @@ int main()
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
 
-	cap.open(CAMERA_ID + api_id);
+	cap.open(camera_id + api_id);
 	if (!cap.isOpened())
 	{
 		std::cerr << "ERROR! Unable to open camera" << std::endl;
