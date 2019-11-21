@@ -27,6 +27,16 @@ std::vector<Pather::point> Dijkstra(int map[5][5]) {
     return pathToTarget; 
 }
 
-bool shorterDistance(Geometry::node_ptr nodePoint) {
+//get the location of 2 locations on the map, and put them into elementPriority object
+//and return it. 
+Pather::queueElement processData(Pather::point locationA, Pather::point locationB) {
+    double distance = calculateDistance(locationA, locationB);
+    return Pather::queueElement elementP = {locationA, locationB, distance};
+}
 
+//calculate and return the distance between 2 location A and B
+double Pather::calculateDistance(Pather::point locationA, Pather::point locationB) {
+    //do some Math over to calculate and return the distance
+    double distance = 0.0; 
+    return distance;
 }
