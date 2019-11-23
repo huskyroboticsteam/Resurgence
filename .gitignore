@@ -1,6 +1,6 @@
-.vscode
-
-MapObstacle.h
-
 build/*
+.vscode/*
+.vscode
+MapObstacle.h
 **/*.out
+

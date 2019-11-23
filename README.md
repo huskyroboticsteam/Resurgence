@@ -23,9 +23,3 @@ Now, you're ready to build your make file.
 ## Building
 Ensure you have CMake installed.
 Run
-```
-mkdir build
-cd build
-cmake ../src
-make
-```
