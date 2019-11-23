@@ -4,7 +4,8 @@
 
 
 //debug here, gives nullptrs
-std::vector<std::shared_ptr<MapObstacle>> ObstacleMap::getData(float robotX, float robotY){
+std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robotX, float robotY)
+{
     //following method needs global coords
     return slam_map.findObjectsWithinSquare(this->radius, robotX, robotY);//floats
     //std::vector<std::shared_ptr<MapObstacle>> temp;
@@ -56,7 +57,7 @@ void ObstacleMap::updateObstacleMap()
     float robotY = 0.0f;
     slam_map.getRobotPosition(robotX, robotY); // from EnvMap
     resetObstacleMap();
-    std::vector<std::shared_ptr<MapObstacle>> data = getData(robotX, robotY);
+    std::vector<std::shared_ptr<const MapObstacle>> data = getData(robotX, robotY);
     int x, y;
     for (int i = 0; i < data.size(); i++)
     {
@@ -65,21 +66,26 @@ void ObstacleMap::updateObstacleMap()
             Vec2 point = data[i]->points[j];
             x = (int)(point.x - robotX + radius/step_size);
             y = (int)(point.y - robotY + radius/step_size);
-            //set four points surrounding given point as blocked
-            //likely blocked areas will overlap from proxity of points in MapObstacle
-            if (transform(y, true) < size && transform(x, true) < size) {
-                obstacle_map[transform(y, true)][transform(x, true)] = true;
-            }
-            if (transform(y, true) < size && transform(x, false) < size) {
-                obstacle_map[transform(y, true)][transform(x, false)] = true;
-            }
-            if (transform(y, false) < size && transform(x, true) < size) {
-                obstacle_map[transform(y, false)][transform(x, true)] = true;
-            }
-            if (transform(y, false) < size && transform(x, false) < size) {
-                obstacle_map[transform(y, false)][transform(x, false)] = true;
-            }
+            modifyObstacleMap(x,y);   
         }
+    }
+}
+
+void ObstacleMap::modifyObstacleMap(int x, int  y)
+{
+    //set four points surrounding given point as blocked
+    //likely blocked areas will overlap from proxity of points in MapObstacle
+    if (transform(y, true) < size && transform(x, true) < size) {
+        obstacle_map[transform(y, true)][transform(x, true)] = true;
+    }
+    if (transform(y, true) < size && transform(x, false) < size) {
+        obstacle_map[transform(y, true)][transform(x, false)] = true;
+    }
+    if (transform(y, false) < size && transform(x, true) < size) {
+        obstacle_map[transform(y, false)][transform(x, true)] = true;
+    }
+    if (transform(y, false) < size && transform(x, false) < size) {
+        obstacle_map[transform(y, false)][transform(x, false)] = true;
     }
 }
 
@@ -101,9 +107,9 @@ void ObstacleMap::print()
     } 
 }
 
-ObstacleMap::ObstacleMap(EnvMap& envmap)
+ObstacleMap::ObstacleMap(EnvMap envmap)
 {
-    slam_map = envmap;
+    ObstacleMap::slam_map = envmap&;
     updateObstacleMap();
 }
 
@@ -112,4 +118,22 @@ ObstacleMap::ObstacleMap(EnvMap& envmap)
 // {
 //     ObstacleMap map = ObstacleMap();
 //     map.print();
+// };
+
+
+//old tester mapobstacle
+// #pragma once
+// #include <vector>
+
+// struct Vec2
+// {
+// public:
+//     float x;
+//     float y;
+// };
+
+// struct MapObstacle
+// {
+// public:
+//     std::vector<Vec2> points;
 // };
