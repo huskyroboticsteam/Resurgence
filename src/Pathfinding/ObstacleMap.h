@@ -2,11 +2,11 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
-#include <memory> // remove once EnvMap.h is included
-#include "MapObstacle.h"
+// #include <memory> // remove once EnvMap.h is included
+// #include "MapObstacle.h"
 #include "EnvMap.h"
 
-//use asserts
+//to do: use asserts
 
 //make a graph object for pathing
 //use 2d array not vectors
@@ -19,7 +19,7 @@
 
 //increase bounding box 
 class ObstacleMap{
-    //EnvMap& slam_map;
+    EnvMap& slam_map;
     constexpr static float radius = 10.0f;
     constexpr static float step_size = 1.0f;
     constexpr static int size = 21;//(int)(2 * radius + 1);
@@ -28,11 +28,12 @@ class ObstacleMap{
 
 private:
     void resetObstacleMap();
-    std::vector<std::shared_ptr<MapObstacle>> getData(float robotX, float robotY);
+    std::vector<std::shared_ptr<const MapObstacle>> getData(float robotX, float robotY);
     int transform(int val, bool direction);
+    void modifyObstacleMap(int x, int y);
 
 public:
     void updateObstacleMap();
-    ObstacleMap(Envmap& envmap);
+    ObstacleMap(EnvMap envmap);
     void print();
 };
