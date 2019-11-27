@@ -12,10 +12,16 @@ std::vector<Pather::point> Dijkstra(int map[5][5]) {
     priorityqueue <Pather::queueElement> active;
     struct Pather::point src = {map.size()/2, map.size()/2};
     //need endpoint
-    active.emplace(active{src, src, 0});
-    while (!active.empty()){
-        std::queueElement min = active.top(); //get minimum distance 
-        double distance = min
+    struct Pather::queueElement starts = {NULL, src, 0};
+    active.emplace(starts);
+    while (!active.empty() /*&& it is not the target*/){
+        Pather::queueElement min = active.top(); //get minimum distance 
+        double distance = min.distance;
+        std::vector<Pather::point> pointList = getNeighbors(min.activeNode);
+        //go through the point list 
+        //check if it is visied --> if yes, ignore.
+        //Otherwise, get distance = min.distance + constant;
+        //Then create elemeneQueue for it --> add to active list.
     }
     // While a is not empty and we haven't found target:
         // Pull out first value from a and mark visited
@@ -25,6 +31,25 @@ std::vector<Pather::point> Dijkstra(int map[5][5]) {
     // When it's done, if we've found target:
         // Return the path we took to get to target!
     return pathToTarget; 
+}
+
+std::vector<Pather::point> getNeighbors(Pather::point a) {
+    if (a.x + 1 < map.size() && map[a.x + 1][a.y] == true) {
+        list.add(struct Pather::point{a.x + 1, a.y});
+    }
+
+    if (a.y + 1 < map.size() && map[a.x][a.y + 1] == true) {
+        list.add(struct Pather::point{a.x, a.y + 1});
+    }
+
+    if (a.x - 1 >= 0 && map[a.x - 1][a.y] == true) {
+        list.add(struct Pather::point{a.x - 1, a.y});
+    }
+
+    if (a.y - 1 >= 0 && map[a.x][a.y - 1] == true) {
+        list.add(struct Pather::point{a.x, a.y - 1});
+    }
+
 }
 
 //get the location of 2 locations on the map, and put them into elementPriority object

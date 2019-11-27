@@ -13,11 +13,8 @@ class Map
         void updateRobotLocation(Node newPoint);
         void createNode(Point p);
         double distanceBetweenNodes(node_ptr a, node_ptr b);
-<<<<<<< HEAD
         void dijkstra();
-=======
 
         Node getNode(Point p);
         Map();
->>>>>>> 9f910c3ddb4bc9c8bf82e1d9f6b92f2958c71dbb
 };
