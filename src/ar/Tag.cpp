@@ -141,17 +141,20 @@ cv::Vec3d Tag::calcOrientation()
 	{
 		image_points.push_back(corners[i].point);
 	}
-	object_points.push_back(cv::Point3f(0, 0, 0));
-	object_points.push_back(cv::Point3f(200, 0, 0));
-	object_points.push_back(cv::Point3f(200, 200, 0));
-	object_points.push_back(cv::Point3f(0, 200, 0));
+	double w = 200;
+	double h = 200;
+	object_points.push_back(cv::Point3f(-w / 2, h / 2, 0));
+	object_points.push_back(cv::Point3f(w / 2, h / 2, 0));
+	object_points.push_back(cv::Point3f(w / 2, -h / 2, 0));
+	object_points.push_back(cv::Point3f(-w / 2, -h / 2, 0));
 	cv::Mat rvec;
 	cv::Mat tvec;
 	cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, rvec, tvec);
+				 //    false, cv::SOLVEPNP_IPPE_SQUARE);
 	cv::Mat rmat;
 	cv::Rodrigues(rvec, rmat);
-
-	return rotationMatrixToEulerAngles(rmat);
+	cv::Vec3d euler = rotationMatrixToEulerAngles(rmat);
+	return euler;
 }
 
 float Tag::getPitch() const

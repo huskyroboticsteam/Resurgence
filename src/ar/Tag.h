@@ -7,6 +7,7 @@
 #define EVAN_LAPTOP_CAMERA_PARAMS 1
 #define EVAN_WEBCAM_PARAMS 2
 #define ZED_CAMERA_PARAMS 3
+#define BLANK_CAMERA_PARAMS 99
 
 // Change to select which set of intrinsic camera parameters to use.
 #define USE_CAMERA_PARAMS EVAN_LAPTOP_CAMERA_PARAMS
@@ -40,6 +41,14 @@ namespace AR
 	const double DISTORTION_PARAMS_ARRAY[5]	= {2.2319725483552814e-02, -2.3138101190867111e-01,
 											   3.6220766734074462e-03, 3.8852893952725500e-03,
 											   5.4773015987500950e-01};
+#elif USE_CAMERA_PARAMS == BLANK_CAMERA_PARAMS
+
+	//All-zero camera parameters for testing
+	const double CAMERA_PARAMS_ARRAY[9]	= {1,0,0,
+										   0,1,0,
+										   0,0,1};
+	const double DISTORTION_PARAMS_ARRAY[5]	= {0,0,0,0,0};
+	
 #else
 #error "Unknown value for USE_CAMERA_PARAMS"
 #endif
@@ -49,7 +58,8 @@ namespace AR
 /** OpenCV matrix containing the intrinsic camera parameters. */
 const cv::Mat CAMERA_PARAMS(3, 3, CV_64FC1, *CAMERA_PARAMS_ARRAY);
 /** OpenCV matrix containing the distortion parameters. */
-const cv::Mat DISTORTION_PARAMS(5, 1, CV_64FC1, *DISTORTION_PARAMS_ARRAY);
+//const cv::Mat DISTORTION_PARAMS(1, 5, CV_64FC1, *DISTORTION_PARAMS_ARRAY);
+const cv::Mat DISTORTION_PARAMS = cv::Mat::zeros(1, 5, CV_64F);
 
 /**
    Struct type representing a corner of a tag.
