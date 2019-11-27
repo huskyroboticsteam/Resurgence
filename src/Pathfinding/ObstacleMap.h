@@ -6,7 +6,7 @@
 // #include "MapObstacle.h"
 #include "EnvMap.h"
 
-//use asserts
+//to do: use asserts
 
 //make a graph object for pathing
 //use 2d array not vectors
@@ -28,11 +28,12 @@ class ObstacleMap{
 
 private:
     void resetObstacleMap();
-    std::vector<std::shared_ptr<MapObstacle>> getData(float robotX, float robotY);
+    std::vector<std::shared_ptr<const MapObstacle>> getData(float robotX, float robotY);
     int transform(int val, bool direction);
+    void modifyObstacleMap(int x, int y);
 
 public:
     void updateObstacleMap();
-    ObstacleMap(EnvMap& envmap);
+    ObstacleMap(EnvMap envmap);
     void print();
 };
