@@ -193,9 +193,6 @@ std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
 		// if the data read matches criteria for a tag
 		if (isTagData(data))
 		{
-			// add it to tag quadrilaterals vector
-			tag_quads.push_back(current);
-
 			// check if any corners of this quadrilateral are inside one already found (i.e. it
 			// is a duplicate)
 			bool duplicate = false;
@@ -206,6 +203,8 @@ std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
 			// if not a duplicate:
 			if (!duplicate)
 			{
+				// add it to tag quadrilaterals vector
+				tag_quads.push_back(current);
 				// make Tag with approximated coordinates
 				Tag tag(current[0], current[1], current[2], current[3]);
 				output.push_back(tag);
