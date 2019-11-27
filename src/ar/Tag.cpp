@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 namespace AR
 {
@@ -21,6 +22,7 @@ double findAngle(cv::Point a, cv::Point b, cv::Point c)
 
 cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
 {
+	/*
 	double sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) +
 	                 R.at<double>(1, 0) * R.at<double>(1, 0));
 
@@ -39,6 +41,29 @@ cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
 		y = atan2(-R.at<double>(2, 0), sy);
 		z = 0;
 	}
+	*/
+	double x,y,z;
+	if(std::abs(R.at<double>(2,0)) != 1)
+	{
+		y = -asin(R.at<double>(2,0));
+		x = atan2((R.at<double>(2,1)/cos(y)), (R.at<double>(2,2)/cos(y)));
+		z = atan2((R.at<double>(1,0)/cos(y)), (R.at<double>(0,0)/cos(y)));
+	}
+	else 
+	{
+		z = 0;
+		y = 0;
+		if(R.at<double>(2,0) == -1)
+		{
+			x = atan2(R.at<double>(0,1), R.at<double>(0,2));
+		}
+		else
+		{
+			x = atan2(-R.at<double>(0,1), -R.at<double>(0,2));
+		}
+	}
+	x = util::almostEqual(x, M_PI) ? M_PI-x : x;
+	y = util::almostEqual(x, M_PI) ? M_PI-y : y;
 	return cv::Vec3f(x, y, z);
 }
 
