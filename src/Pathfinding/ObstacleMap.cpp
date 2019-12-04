@@ -3,9 +3,7 @@
 #include <iostream>
 //vector and EnvMap.h included in PathMap.h
 
-
-//debug here, gives nullptrs
-std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robotX, float robotY)
+inline std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robotX, float robotY)
 {
     //following method needs global coords
     return slam_map.findObjectsWithinSquare(this->radius, robotX, robotY);//floats
@@ -25,8 +23,6 @@ std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robot
     // MapObstacle& n = m;
     // temp.push_back(std::make_shared<MapObstacle>(n));
     
-    // return temp; // delete once EnvMap.h is included, use findObjectsWthinSquare
-    //std::vector<std::shared_ptr<MapObstacle>> findObjectsWithinRect(float x_lower_left, float y_lower_left, float x_upper_right, float y_upper_right) const;
 }
 
 void ObstacleMap::resetObstacleMap()
@@ -42,7 +38,6 @@ void ObstacleMap::resetObstacleMap()
 
 int ObstacleMap::transform(int val, bool direction)
 {
-    //direction indicates +/- true is plus, false is -
     if(direction)
     {
         return val + (int)(step_size -  fmodf(val, step_size));
@@ -73,7 +68,7 @@ void ObstacleMap::updateObstacleMap()
     }
 }
 
-void ObstacleMap::modifyObstacleMap(int x, int  y)
+inline void ObstacleMap::modifyObstacleMap(int x, int  y)
 {
     //set four points surrounding given point as blocked
     //likely blocked areas will overlap from proxity of points in MapObstacle
