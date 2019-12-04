@@ -107,9 +107,8 @@ void ObstacleMap::print()
     } 
 }
 
-ObstacleMap::ObstacleMap(EnvMap envmap)
+ObstacleMap::ObstacleMap(EnvMap& envmap) : slam_map(envmap)
 {
-    ObstacleMap::slam_map = envmap&;
     updateObstacleMap();
 }
 

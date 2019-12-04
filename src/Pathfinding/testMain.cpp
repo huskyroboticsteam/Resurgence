@@ -1,5 +1,5 @@
 #include "ObstacleMap.h"
-#include "EnvMap.h"
+#include "../mapping/EnvMap.h"
 
 int main()
 {

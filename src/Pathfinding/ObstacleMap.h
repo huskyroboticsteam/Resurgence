@@ -4,7 +4,7 @@
 #include <iostream>
 // #include <memory> // remove once EnvMap.h is included
 // #include "MapObstacle.h"
-#include "EnvMap.h"
+#include "../mapping/EnvMap.h"
 
 //to do: use asserts
 
@@ -34,6 +34,6 @@ private:
 
 public:
     void updateObstacleMap();
-    ObstacleMap(EnvMap envmap);
+    ObstacleMap(EnvMap& envmap);
     void print();
 };
