@@ -1,5 +1,6 @@
 #include "ObstacleMap.h"
 #include <cstdlib>
+#include <iostream>
 //vector and EnvMap.h included in PathMap.h
 
 
@@ -15,7 +16,7 @@ std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robot
     //     for (int j = 0; j < i; j++)
     //     {
     //         m.points.push_back(Vec2{rand() % 21 - 11, rand() % 21 - 11});
-    //     }
+    //     } 
     //     MapObstacle& n = m;
     //     temp.push_back(std::make_shared<MapObstacle>(n));
     // }
@@ -58,6 +59,7 @@ void ObstacleMap::updateObstacleMap()
     slam_map.getRobotPosition(robotX, robotY); // from EnvMap
     resetObstacleMap();
     std::vector<std::shared_ptr<const MapObstacle>> data = getData(robotX, robotY);
+    std::cout << data.size();
     int x, y;
     for (int i = 0; i < data.size(); i++)
     {
