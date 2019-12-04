@@ -33,5 +33,10 @@ class Pather {
             int distFromSrc;
             bool operator<(const queueElement & locate1) const {return !(distFromSrc < locate1.disFromSrc);}
         }
-        
+        struct queueNode {
+        //for use in BFS search
+            point pt;
+            int dist;
+            queue<point> path;
+        }
 };

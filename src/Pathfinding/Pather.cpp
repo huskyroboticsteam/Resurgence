@@ -2,6 +2,7 @@
 #include "Pather.h"
 #include <vector>
 
+
 Pather::Pather(std::vector<std::vector<bool>> map)
 {
     this.map = map;
