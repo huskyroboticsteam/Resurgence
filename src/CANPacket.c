@@ -15,9 +15,9 @@
 //      CANID:      CAN ID with correct formatting        
 uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 {
-    uint16_t CANID = 0;
-    CANID = CANID | ((priority & 0x1) << 10);
-    CANID = CANID | ((devGroup & 0xF) << 6);
+    uint16_t CANID = 0x0000;
+    CANID = CANID | ((priority & 0x01) << 10);
+    CANID = CANID | ((devGroup & 0x0F) << 6);
     CANID = CANID | (devSerial & 0x2F);
 
     return CANID;
