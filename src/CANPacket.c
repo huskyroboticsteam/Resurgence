@@ -46,9 +46,10 @@ CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t data[8])
 // Gets the sender device group number from the payload data
 // Inputs:
 //      data:       A byte array of the payload from CAN packet
+//      dataLength: Length of the given data array.
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataSenderDevice(uint8_t data[8])
+uint8_t ParseDataSenderDevice(uint8_t *data, uint8_t dataLength)
 {
     return ((data[0] & 0xC0) >> 4) + ((data[1] & 0xC0) >> 6);
 }
@@ -56,9 +57,10 @@ uint8_t ParseDataSenderDevice(uint8_t data[8])
 // Gets the sender device serial number from the payload data
 // Inputs:
 //      data:       A byte array of the payload from CAN packet
+//      dataLength: Length of the given data array
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataSenderSerial(uint8_t data[8])
+uint8_t ParseDataSenderSerial(uint8_t *data, uint8_t dataLength)
 {
     return (data[1] & 0x2F);
 }
@@ -66,9 +68,10 @@ uint8_t ParseDataSenderSerial(uint8_t data[8])
 // Gets the packet payload type from the payload data
 // Inputs:
 //      data:       A byte array of the payload from CAN packet
+//      dataLength: Length of the given data array
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataPayloadType(uint8_t data[8])
+uint8_t ParseDataPayloadType(uint8_t *data, uint8_t dataLength)
 {
     return (data[0] & 0x2F);
 }
