@@ -75,3 +75,33 @@ uint8_t ParseDataPayloadType(uint8_t *data, uint8_t dataLength)
 {
     return (data[0] & 0x2F);
 }
+
+// Gets the sender device group number from the payload data
+// Inputs:
+//      packet:     CAN Packet to parse from
+// Outputs:
+//                  A byte representing the sender device number
+uint8_t ParseDataSenderDeviceFromPacket(CANPacket *packet)
+{
+    return ParseDataSenderDevice(packet->data, packet->dlc);
+}
+
+// Gets the sender device serial number from the payload data
+// Inputs:
+//      packet:     CAN Packet to parse from
+// Outputs:
+//                  A byte representing the sender device number
+uint8_t ParseDataSenderSerialFromPacket(CANPacket *packet)
+{
+    return ParseDataSenderDevice(packet->data, packet->dlc);
+}
+
+// Gets the packet payload type from the payload data
+// Inputs:
+//      packet:     CAN Packet to parse from
+// Outputs:
+//                  A byte representing the sender device number
+uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet)
+{
+    return ParseDataPayloadType(packet->data, packet->dlc);
+}

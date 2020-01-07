@@ -11,9 +11,12 @@ typedef struct CANPacket
 
 uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial);
 CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t data[8]);
-uint8_t ParseDataSenderDevice(uint8_t data[8]);
-uint8_t ParseDataSenderSerial(uint8_t data[8]);
-uint8_t ParseDataPayloadType(uint8_t data[8]);
+uint8_t ParseDataSenderDevice(uint8_t *data, uint8_t dataLength);
+uint8_t ParseDataSenderSerial(uint8_t *data, uint8_t dataLength);
+uint8_t ParseDataPayloadType(uint8_t *data, uint8_t dataLength);
+uint8_t ParseDataSenderDeviceFromPacket(CANPacket *packet);
+uint8_t ParseDataSenderSerialFromPacket(CANPacket *packet);
+uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 
 // Device group nibbles
 #define DEVICE_GROUP_BROADCAST          (uint8_t) 0x00
