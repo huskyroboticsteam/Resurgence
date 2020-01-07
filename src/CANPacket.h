@@ -9,8 +9,9 @@ typedef struct
     uint8_t data[8];
 } CANPacket;
 
-uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial);
 CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t* data);
+uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial);
+
 uint8_t ParseDataSenderDevice(uint8_t* data);
 uint8_t ParseDataSenderSerial(uint8_t* data);
 uint8_t ParseDataPayloadType(uint8_t* data);
@@ -52,6 +53,36 @@ uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 #define ID_MOTOR_UNIT_ENC_PPJR_SET      (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x09
 #define ID_MOTOR_UNIT_MAX_JNT_REV_SET   (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x0A
 
+// GPIO Board Packet IDs
+#define ID_GPIO_BOARD_HIGH_NIBBLE       (uint8_t) 0x02
+// REST OF PACKETS TBD...
+
+// Power Distribution Packet IDs
+#define ID_POWER_DIST_HIGH_NIBBLE       (uint8_t) 0x03
+// REST OF PACKETS TBD...
+
 // Priority bits
 #define PACKET_PRIORITY_HIGH            (uint8_t) 0x00
 #define PACKET_PRIORITY_NORMAL          (uint8_t) 0x01
+
+// Telemetry Types
+#define PACKET_TELEMETRY_VOLTAGE        (uint8_t) 0x00
+#define PACKET_TELEMETRY_CURRENT        (uint8_t) 0x01
+#define PACKET_TELEMETRY_PWR_RAIL_STATE (uint8_t) 0x02
+#define PACKET_TELEMETRY_TEMPERATURE    (uint8_t) 0x03
+#define PACKET_TELEMETRY_ANG_POSITION   (uint8_t) 0x04
+#define PACKET_TELEMETRY_GPS_LAT        (uint8_t) 0x05
+#define PACKET_TELEMETRY_GPS_LON        (uint8_t) 0x06
+#define PACKET_TELEMETRY_MAG_DIR        (uint8_t) 0x07
+#define PACKET_TELEMETRY_ACCEL_X        (uint8_t) 0x08
+#define PACKET_TELEMETRY_ACCEL_Y        (uint8_t) 0x09
+#define PACKET_TELEMETRY_ACCEL_Z        (uint8_t) 0x0A
+#define PACKET_TELEMETRY_GYRO_X         (uint8_t) 0x0B
+#define PACKET_TELEMETRY_GYRO_Y         (uint8_t) 0x0C
+#define PACKET_TELEMETRY_GYRO_Z         (uint8_t) 0x0D
+#define PACKET_TELEMETRY_LIM_SW_STATE   (uint8_t) 0x0E
+
+// ESTOP ERROR CODES
+#define ESTOP_ERR_GENERAL               (uint8_t) 0x00
+// MORE TBD...
+
