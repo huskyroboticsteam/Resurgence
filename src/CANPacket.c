@@ -1,4 +1,5 @@
 #include "CANPacket.h"
+
 // Contains functons for creating CAN packets
 // Functions here will be used in Jetson (Rover.cpp) and electronics boards
 
@@ -30,7 +31,7 @@ uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 //      data:       An array of bytes used for sending data over CAN
 // Outputs:
 //      CANPacket:  A struct used for storing the parts needed for a CAN Packet
-struct CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t data[8])
+CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t data[8])
 {
     struct CANPacket cp;
     cp.id = id;
