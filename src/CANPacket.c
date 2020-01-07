@@ -36,7 +36,8 @@ CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t* data)
     CANPacket cp;
     cp.id = id;
     cp.dlc = dlc;   
-    for(int i = 0; i < dlc; i++){
+    for(int i = 0; i < dlc; i++)
+    {
         cp.data[i] = data[i];
     }
 
