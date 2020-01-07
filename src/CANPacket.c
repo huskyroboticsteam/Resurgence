@@ -31,7 +31,7 @@ uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 //      data:       An array of bytes used for sending data over CAN
 // Outputs:
 //      CANPacket:  A struct used for storing the parts needed for a CAN Packet
-CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t* data)
+CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, char* data)
 {
     struct CANPacket cp;
     cp.id = id;
@@ -84,7 +84,7 @@ uint8_t ParseDataPayloadType(char* data)
 //                  A byte representing the sender device number
 uint8_t ParseDataSenderDeviceFromPacket(CANPacket *packet)
 {
-    return ParseDataSenderDevice(packet->data, packet->dlc);
+    return ParseDataSenderDevice(packet->data);
 }
 
 // Gets the sender device serial number from the payload data
@@ -94,7 +94,7 @@ uint8_t ParseDataSenderDeviceFromPacket(CANPacket *packet)
 //                  A byte representing the sender device number
 uint8_t ParseDataSenderSerialFromPacket(CANPacket *packet)
 {
-    return ParseDataSenderDevice(packet->data, packet->dlc);
+    return ParseDataSenderDevice(packet->data);
 }
 
 // Gets the packet payload type from the payload data
@@ -104,5 +104,5 @@ uint8_t ParseDataSenderSerialFromPacket(CANPacket *packet)
 //                  A byte representing the sender device number
 uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet)
 {
-    return ParseDataPayloadType(packet->data, packet->dlc);
+    return ParseDataPayloadType(packet->data);
 }

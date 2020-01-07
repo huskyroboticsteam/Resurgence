@@ -10,20 +10,13 @@ typedef struct CANPacket
 } CANPacket;
 
 uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial);
-<<<<<<< HEAD
 CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, char* data);
 uint8_t ParseDataSenderDevice(char* data);
 uint8_t ParseDataSenderSerial(char* data);
 uint8_t ParseDataPayloadType(char* data);
-=======
-CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t data[8]);
-uint8_t ParseDataSenderDevice(uint8_t *data, uint8_t dataLength);
-uint8_t ParseDataSenderSerial(uint8_t *data, uint8_t dataLength);
-uint8_t ParseDataPayloadType(uint8_t *data, uint8_t dataLength);
 uint8_t ParseDataSenderDeviceFromPacket(CANPacket *packet);
 uint8_t ParseDataSenderSerialFromPacket(CANPacket *packet);
 uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
->>>>>>> 31745b6b40cc88d9ef53b2af5e79cfeae9523aa0
 
 // Device group nibbles
 #define DEVICE_GROUP_BROADCAST          (uint8_t) 0x00
@@ -61,8 +54,4 @@ uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 
 // Priority bits
 #define PACKET_PRIORITY_HIGH            (uint8_t) 0x00
-<<<<<<< HEAD
 #define PACKET_PRIORITY_NORMAL          (uint8_t) 0x01
-=======
-#define PACKET_PRIORITY_NORMAL          (uint8_t) 0x01
->>>>>>> 31745b6b40cc88d9ef53b2af5e79cfeae9523aa0
