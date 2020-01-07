@@ -30,13 +30,14 @@ uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 //      data:       An array of bytes used for sending data over CAN
 // Outputs:
 //      CANPacket:  A struct used for storing the parts needed for a CAN Packet
-struct CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t data[8])
+struct CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, char* data)
 {
     struct CANPacket cp;
     cp.id = id;
     cp.dlc = dlc;   
-    for(int i = 0; i < 8; i++){
-        cp.data[i] = data[i];
+    for(int i = 0; i < dlc; i++){
+        uint8_t datai = *(data + i);
+        cp.data[i] = datai;
     }
 
     return cp;
@@ -44,30 +45,34 @@ struct CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t data[8])
 
 // Gets the sender device group number from the payload data
 // Inputs:
-//      data:       A byte array of the payload from CAN packet
+//      data:       Address of the byte array of the payload from CAN packet
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataSenderDevice(uint8_t data[8])
+uint8_t ParseDataSenderDevice(char* data)
 {
-    return ((data[0] & 0xC0) >> 4) + ((data[1] & 0xC0) >> 6);
+    uint8_t data0 = *(data);
+    uint8_t data1 = *(data + 1);
+    return ((data0 & 0xC0) >> 4) + ((data1 & 0xC0) >> 6);
 }
 
 // Gets the sender device serial number from the payload data
 // Inputs:
-//      data:       A byte array of the payload from CAN packet
+//      data:       Address of the byte array of the payload from CAN packet
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataSenderSerial(uint8_t data[8])
+uint8_t ParseDataSenderSerial(char* data)
 {
-    return (data[1] & 0x2F);
+    uint8_t data1 = *(data + 1);
+    return (data1 & 0x2F);
 }
 
 // Gets the packet payload type from the payload data
 // Inputs:
-//      data:       A byte array of the payload from CAN packet
+//      data:       Address of the byte array of the payload from CAN packet
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataPayloadType(uint8_t data[8])
+uint8_t ParseDataPayloadType(char* data)
 {
-    return (data[0] & 0x2F);
+    uint8_t data0 = *(data);
+    return (data0 & 0x2F);
 }
