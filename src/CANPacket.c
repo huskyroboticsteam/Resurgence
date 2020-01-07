@@ -33,7 +33,7 @@ uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 //      CANPacket:  A struct used for storing the parts needed for a CAN Packet
 CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t* data)
 {
-    struct CANPacket cp;
+    CANPacket cp;
     cp.id = id;
     cp.dlc = dlc;   
     for(int i = 0; i < dlc; i++){

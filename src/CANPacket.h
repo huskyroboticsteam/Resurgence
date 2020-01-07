@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-typedef struct CANPacket
+typedef struct
 {
     uint16_t id;
     uint8_t dlc;
