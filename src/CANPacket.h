@@ -29,7 +29,7 @@ uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 #define DEVICE_GROUP_GPIO_BOARDS        (uint8_t) 0x06
 
 // Common Mode Packet IDs
-#define ID_COMMON_MODE_HIGH_NIBBLE      (uint8_t) 0x00
+#define ID_COMMON_MODE_HIGH_NIBBLE      (uint8_t) DEVICE_GROUP_BROADCAST << 4
 #define ID_ESTOP                        (uint8_t) ID_COMMON_MODE_HIGH_NIBBLE | 0x00
 #define ID_HEARTBEAT                    (uint8_t) ID_COMMON_MODE_HIGH_NIBBLE | 0x01
 #define ID_FAIL_REPORT                  (uint8_t) ID_COMMON_MODE_HIGH_NIBBLE | 0x02
@@ -40,7 +40,7 @@ uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 #define ID_LED_COLOR                    (uint8_t) ID_COMMON_MODE_HIGH_NIBBLE | 0x07
 
 // Motor Unit Packet IDs
-#define ID_MOTOR_UNIT_HIGH_NIBBLE       (uint8_t) 0x10
+#define ID_MOTOR_UNIT_HIGH_NIBBLE       (uint8_t) DEVICE_GROUP_MOTOR_CONTROL << 4
 #define ID_MOTOR_UNIT_MODE_SEL          (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x00
 #define ID_MOTOR_UNIT_CHIP_TYPE_PULL    (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x01
 #define ID_MOTOR_UNIT_PWM_DIR_SET       (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x02
