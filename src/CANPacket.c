@@ -31,14 +31,13 @@ uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 //      data:       An array of bytes used for sending data over CAN
 // Outputs:
 //      CANPacket:  A struct used for storing the parts needed for a CAN Packet
-CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, char* data)
+CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t* data)
 {
     struct CANPacket cp;
     cp.id = id;
     cp.dlc = dlc;   
     for(int i = 0; i < dlc; i++){
-        uint8_t datai = *(data + i);
-        cp.data[i] = datai;
+        cp.data[i] = data[i];
     }
 
     return cp;
@@ -49,21 +48,18 @@ CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, char* data)
 //      data:       Address of the byte array of the payload from CAN packet
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataSenderDevice(char* data)
+uint8_t ParseDataSenderDevice(uint8_t* data)
 {
-    uint8_t data0 = *(data);
-    uint8_t data1 = *(data + 1);
-    return ((data0 & 0xC0) >> 4) + ((data1 & 0xC0) >> 6);
+    return ((data[0] & 0xC0) >> 4) + ((data[1] & 0xC0) >> 6);
 }
 
 //      data:       A byte array of the payload from CAN packet
 //      dataLength: Length of the given data array
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataSenderSerial(char* data)
+uint8_t ParseDataSenderSerial(uint8_t* data)
 {
-    uint8_t data1 = *(data + 1);
-    return (data1 & 0x2F);
+    return (data[1] & 0x2F);
 }
 
 // Gets the packet payload type from the payload data
@@ -71,10 +67,9 @@ uint8_t ParseDataSenderSerial(char* data)
 //      data:       Address of the byte array of the payload from CAN packet
 // Outputs:
 //                  A byte representing the sender device number
-uint8_t ParseDataPayloadType(char* data)
+uint8_t ParseDataPayloadType(uint8_t* data)
 {
-    uint8_t data0 = *(data);
-    return (data0 & 0x2F);
+    return (data[0] & 0x2F);
 }
 
 // Gets the sender device group number from the payload data
