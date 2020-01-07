@@ -1,4 +1,5 @@
 #include "CANPacket.h"
+
 // Contains functons for creating CAN packets
 // Functions here will be used in Jetson (Rover.cpp) and electronics boards
 
@@ -14,9 +15,9 @@
 //      CANID:      CAN ID with correct formatting        
 uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 {
-    uint16_t CANID = 0;
-    CANID = CANID | ((priority & 0x1) << 10);
-    CANID = CANID | ((devGroup & 0xF) << 6);
+    uint16_t CANID = 0x0000;
+    CANID = CANID | ((priority & 0x01) << 10);
+    CANID = CANID | ((devGroup & 0x0F) << 6);
     CANID = CANID | (devSerial & 0x2F);
 
     return CANID;
@@ -30,7 +31,7 @@ uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial)
 //      data:       An array of bytes used for sending data over CAN
 // Outputs:
 //      CANPacket:  A struct used for storing the parts needed for a CAN Packet
-struct CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, char* data)
+CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t* data)
 {
     struct CANPacket cp;
     cp.id = id;
