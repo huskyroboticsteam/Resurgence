@@ -40,7 +40,7 @@ uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 #define ID_LED_COLOR                    (uint8_t) ID_COMMON_MODE_HIGH_NIBBLE | 0x07
 
 // Motor Unit Packet IDs
-#define ID_MOTOR_UNIT_HIGH_NIBBLE       (uint8_t) 0x01
+#define ID_MOTOR_UNIT_HIGH_NIBBLE       (uint8_t) 0x10
 #define ID_MOTOR_UNIT_MODE_SEL          (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x00
 #define ID_MOTOR_UNIT_CHIP_TYPE_PULL    (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x01
 #define ID_MOTOR_UNIT_PWM_DIR_SET       (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x02
@@ -54,11 +54,11 @@ uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 #define ID_MOTOR_UNIT_MAX_JNT_REV_SET   (uint8_t) ID_MOTOR_UNIT_HIGH_NIBBLE | 0x0A
 
 // GPIO Board Packet IDs
-#define ID_GPIO_BOARD_HIGH_NIBBLE       (uint8_t) 0x02
+#define ID_GPIO_BOARD_HIGH_NIBBLE       (uint8_t) 0x20
 // REST OF PACKETS TBD...
 
 // Power Distribution Packet IDs
-#define ID_POWER_DIST_HIGH_NIBBLE       (uint8_t) 0x03
+#define ID_POWER_DIST_HIGH_NIBBLE       (uint8_t) 0x30
 // REST OF PACKETS TBD...
 
 // Priority bits
