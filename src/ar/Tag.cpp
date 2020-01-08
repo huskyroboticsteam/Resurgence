@@ -56,7 +56,7 @@ Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
          cv::Point bottom_left)
 {
 	// validate points
-	checkCorners(top_left, top_right, bottom_right, bottom_left);
+	//	checkCorners(top_left, top_right, bottom_right, bottom_left);
 
 	// fill vector with points
 	std::vector<cv::Point> points;
@@ -73,7 +73,7 @@ Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
 		double internal_angle = findAngle(points[last_index], points[i], points[next_index]);
 		corners.push_back(Corner{internal_angle, points[i]});
 	}
-	orientation = calcOrientation();
+	calcOrientation();
 }
 
 cv::Point getTriCenter(cv::Point pt1, cv::Point pt2, cv::Point pt3)
@@ -108,25 +108,51 @@ std::vector<Corner> Tag::getCorners() const
 	return corners;
 }
 
-cv::Vec3d Tag::calcOrientation()
+void Tag::calcOrientation()
 {
+	// vectors to hold image points (detected corners in image) and object points ("ideal"
+	// corners of the tag in the world coordinate system)
 	std::vector<cv::Point2f> image_points;
 	std::vector<cv::Point3f> object_points;
+
+	// add detected corners to image points vector
 	for (int i = 0; i < corners.size(); i++)
 	{
 		image_points.push_back(corners[i].point);
 	}
-	object_points.push_back(cv::Point3f(0, 0, 0));
-	object_points.push_back(cv::Point3f(200, 0, 0));
-	object_points.push_back(cv::Point3f(200, 200, 0));
-	object_points.push_back(cv::Point3f(0, 200, 0));
-	cv::Mat rvec;
-	cv::Mat tvec;
-	cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, rvec, tvec);
+
+	// create ideal object points
+	int square_len = 1;
+	// top left (-w/2, w/2)
+	object_points.push_back(cv::Point3f(-(square_len / 2), (square_len / 2), 0));
+	// top right (w/2, w/2)
+	object_points.push_back(cv::Point3f((square_len / 2), (square_len / 2), 0));
+	// bottom right (w/2, -w/2)
+	object_points.push_back(cv::Point3f((square_len / 2), -(square_len / 2), 0));
+	// bottom left (-w/2, -w/2)
+	object_points.push_back(cv::Point3f(-(square_len / 2), -(square_len / 2), 0));
+
+	std::cout << "object points: " << object_points << std::endl;
+
+	// Mat objects to hold returned rotation and translation vectors
+	cv::Mat _rvec;
+	cv::Mat _tvec;
+
+	// estimate pose
+	cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, _rvec, _tvec,
+	             false, cv::SOLVEPNP_IPPE_SQUARE);
+
+	// store rotation and translation vectors in this tag instance
+	rvec = _rvec;
+	tvec = _tvec;
+
+	// calculate rotation matrix
 	cv::Mat rmat;
 	cv::Rodrigues(rvec, rmat);
+	std::cout << "rmat: " << rmat << std::endl;
 
-	return rotationMatrixToEulerAngles(rmat);
+	// calculate euler angles
+	orientation = rotationMatrixToEulerAngles(rmat);
 }
 
 float Tag::getPitch() const
@@ -142,6 +168,16 @@ float Tag::getYaw() const
 float Tag::getRoll() const
 {
 	return orientation[2];
+}
+
+cv::Vec3d Tag::getRVec() const
+{
+	return rvec;
+}
+
+cv::Vec3d Tag::getTVec() const
+{
+	return tvec;
 }
 
 } // namespace AR

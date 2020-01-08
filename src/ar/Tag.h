@@ -9,7 +9,7 @@
 #define ZED_CAMERA_PARAMS 3
 
 // Change to select which set of intrinsic camera parameters to use.
-#define USE_CAMERA_PARAMS EVAN_LAPTOP_CAMERA_PARAMS
+#define USE_CAMERA_PARAMS EVAN_WEBCAM_PARAMS
 
 namespace AR
 {
@@ -90,8 +90,10 @@ class Tag
 	std::vector<Corner> corners;
 	/** Stores the orientation Euler angles */
 	cv::Vec3d orientation;
+	cv::Vec3d rvec;
+	cv::Vec3d tvec;
 	/** Calculates the orientation Euler angles */
-	cv::Vec3d calcOrientation();
+	void calcOrientation();
 
   public:
 	/**
@@ -116,5 +118,7 @@ class Tag
 	float getRoll() const;
 	/** Gets the distance from the camera to the tag. CURRENTLY UNIMPLEMENTED. */
 	float getDistance();
+	cv::Vec3d getRVec() const;
+	cv::Vec3d getTVec() const;
 };
 } // namespace AR

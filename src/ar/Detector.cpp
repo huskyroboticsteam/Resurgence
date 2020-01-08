@@ -3,6 +3,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include <iostream>
+
 constexpr int CONTOUR_AREA_THRESH = 1000;
 constexpr int TAG_GRID_SIZE = 9;
 constexpr int IDEAL_TAG_SIZE = TAG_GRID_SIZE * 25;
@@ -173,6 +175,7 @@ std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
 	for (size_t i = 0; i < quads.size(); i++)
 	{
 		std::vector<cv::Point2f> current = quads[i];
+		std::cout << "image points (before sorting): " << current;
 		// sort points into the correct order (top left, top right, bottom right,
 		// bottom left)
 		std::sort(current.begin(), current.end(),
@@ -181,6 +184,7 @@ std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
 		          [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x < pt2.x; });
 		std::sort(current.begin() + 2, current.end(),
 		          [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x > pt2.x; });
+		std::cout << " image points (after sorting): " << current << std::endl;
 
 		// perspective transform the quadrilateral to a flat square, and attempt to read data
 		// from it like it is an AR tag

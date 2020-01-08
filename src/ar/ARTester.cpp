@@ -1,5 +1,6 @@
 #include "Detector.h"
 
+#include <opencv2/calib3d.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -14,6 +15,17 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 constexpr bool EXTRA_WINDOWS = true;
 
 int camera_id = 0;
+
+std::vector<cv::Point2d> normalVec(cv::Vec3d rvec, cv::Vec3d tvec)
+{
+	std::vector<cv::Point2d> image_points;
+	std::vector<cv::Point3d> object_points;
+	object_points.push_back(cv::Point3d(0, 0, 0));
+	object_points.push_back(cv::Point3d(0, 0, 1));
+	cv::projectPoints(object_points, rvec, tvec, AR::CAMERA_PARAMS, AR::DISTORTION_PARAMS,
+	                  image_points);
+	return image_points;
+}
 
 int main(int argc, char *argv[])
 {
@@ -87,6 +99,11 @@ int main(int argc, char *argv[])
 			}
 			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 15,
 			               2, cv::FILLED);
+			std::vector<cv::Point2d> normal = normalVec(tag.getRVec(), tag.getTVec());
+			std::cout << "rvec: " << tag.getRVec() << std::endl
+			          << "tvec: " << tag.getTVec() << std::endl;
+			// std::cout << "Normal vector: " << normal << std::endl;
+			cv::line(frame, normal[0], normal[1], cv::Scalar(0, 0, 255), 3);
 		}
 
 		cv::imshow(ORIG_WINDOW_NAME, frame);
