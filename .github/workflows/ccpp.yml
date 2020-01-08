@@ -10,7 +10,13 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: installopencv
-      run: sudo apt-get install libopencv-dev --fix-missing
+      run: git clone https://github.com/opencv/opencv.git
+      run: cd opencv
+      run: mkdir build
+      run: cd build
+      run: cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+      run: make -j7
+      run: cd ../../
     - name: mkdirbuild
       run: mkdir build
     - name: cmake1
