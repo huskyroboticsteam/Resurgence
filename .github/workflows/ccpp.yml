@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: installopencv
-      run: sudo apt-get install libopencv-dev
+      run: sudo apt-get install libopencv-dev --fix-missing
     - name: mkdirbuild
       run: mkdir build
     - name: cmake1
