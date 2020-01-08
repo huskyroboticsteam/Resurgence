@@ -13,7 +13,7 @@ class ObjectValidator {
 public:
    // Assigns ids to the lidarObstacles
    // Adds any objects that don't exist on the map to the map
-   // Takes PointXY's in global coordinates
+   // Takes in Map obstacles from bounding box class
    std::vector<size_t> validate(std::vector<std::set<std::shared_ptr<Vec2>>> lidarObstacles); 
    ObjectValidator(EnvMap &map, EKFSLam &ekf);
 private:
