@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.2)
 project(Rover LANGUAGES CXX)
 
 #find_package(OpenCV CONFIG REQUIRED)
+
+add_subdirectory(Pathfinding)
+
 add_executable(Rover
         Rover.cpp
         CommandLineOptions.cpp
