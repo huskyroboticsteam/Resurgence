@@ -19,8 +19,8 @@ public:
                 float disp_limits_y_range);
     ~LidarRender();
     void setBackground(float r, float g, float b, float a);
-    void drawPoints(std::set<std::shared_ptr<PointXY>>, float r, float g, float b, float pt_size);
-    void drawBoundingPolygon(std::vector<std::shared_ptr<PointXY>> vertices, float r, float g,
+    void drawPoints(std::set<PointXY> &points, float r, float g, float b, float pt_size);
+    void drawBoundingPolygon(std::vector<PointXY> &vertices, float r, float g,
                              float b, float line_width);
     void flushToDisplay();
 };

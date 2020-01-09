@@ -87,10 +87,7 @@ Now, you're ready to build the project.
 ## Building
 Ensure you have CMake installed.
 Run
-<<<<<<< HEAD
-=======
 ```
 cmake -Bbuild ./src
 cmake --build build
 ```
->>>>>>> 2d605eeae0c1cb9b15455f8044c5d264bbbad946
