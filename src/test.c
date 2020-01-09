@@ -4,6 +4,7 @@
 
 void testBasicPacketCreation();
 void testBasicCANIDConstruction();
+int SendCANPacket(CANPacket packet);
 
 int main() 
 {
@@ -30,4 +31,9 @@ void testBasicPacketCreation()
     assert(packet.dlc == 0x02);
     assert(packet.data[0] == 0x60);
     assert(packet.data[1] == 0x43);
+}
+
+int SendCANPacket(CANPacket packet)
+{
+    return 0;
 }

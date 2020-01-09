@@ -3,6 +3,8 @@
 // Contains functons for creating CAN packets
 // Functions here will be used in Jetson (Rover.cpp) and electronics boards
 
+// ----------- GENERAL PURPOSE Functions ------------------------------ //
+
 // Constructs a CAN ID according to standards set by electronics subsystem
 // for PY2020 rover. Not compatible with Orpheus (PY2019)
 // Inputs: 
@@ -101,4 +103,143 @@ uint8_t ParseDataSenderSerialFromPacket(CANPacket *packet)
 uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet)
 {
     return ParseDataPayloadType(packet->data);
+}
+
+// Ensures that the given packet is of a specified group
+// Inputs:
+//      packet:         CAN Packet to check
+//      expectedType:   ExpectedType of CAN packet
+// Outputs:
+//                  0 if packet not of expectedType,
+//                  Other int otherwise
+int PacketIsInGroup(CANPacket *packet, uint8_t expectedType) 
+{
+    return GetDeviceGroupCode(packet) == expectedType;
+}
+
+// Gets the device group code from CAN packet
+// Inputs:
+//      packet:     CAN Packet to analyze
+// Outputs:
+//                  A byte representing the device
+//                  group code.
+uint8_t GetDeviceGroupCode(CANPacket *packet)
+{
+    uint8_t group = 0;
+    int id = packet->id;
+    id = id & 0x07F; // Strip to ID-only portion of ID
+    group = (uint8_t) ((id & 0x03C0) >> 6);
+    return group;
+}
+
+// Gets the device serial number from CAN packet
+// Inputs:
+//      packet:     CAN Packet to analyze
+// Outputs:
+//                  A byte representing the device
+//                  serial number.
+uint8_t GetDeviceSerialNumber(CANPacket *packet)
+{
+    uint8_t id = (packet->id & 0x00FF);
+    // Strip fo only serial number portion of id
+    return id & 0x3F;
+}
+
+int GetPacketID(CANPacket *packet)
+{
+    return packet->data[0];
+}
+
+int PacketIsOfID(CANPacket *packet, uint8_t expectedID)
+{
+    return GetPacketID(packet) == expectedID;
+}
+
+// Determines if a given packet targets a specific device
+// Useful for determing if a packet should be interpreted by
+// the device
+// Inputs:
+//      packet:                     CAN Packet to check
+//      targetDeviceGroup:          Device group of target device
+//      targetDeviceSerialNumber:   Serial number of target device
+// Outputs:
+//                  Returns 0 if packet does not target device
+//                  Returns any other int if packet does
+int TargetsDevice(CANPacket *packet, uint8_t targetDeviceGroup, uint8_t targetDeviceSerialNumber)
+{
+    uint8_t packetGroup = GetDeviceGroupCode(packet);
+    if (packetGroup == targetDeviceGroup) 
+    {
+        uint8_t serialNumber = GetDeviceSerialNumber(packet);
+        // Return if serial number matches target
+        if (serialNumber == targetDeviceSerialNumber) { return 1; }
+        // Otherwise only return true if packet is broadcast to group
+        return serialNumber == DEVICE_SERIAL_BROADCAST;
+    }
+    // Otherwise only return true if packet is broadcast to all devices
+    return packetGroup == DEVICE_GROUP_BROADCAST;
+}
+
+// ---------------- COMMON INTERFACING FUNCTIONS ------------------- //
+
+// Validates the Heartbeat Packet, returns time between previous Heartbeat packets
+// Inputs:
+//      packet:         CAN Packet to check
+//      lastHeartbeat:  Timestamp (ms) of last detected heartbeat
+// Outputs:
+//                  Time (in ms) between this heartbeat and the previous detected heartbeat
+//                  Negative value if packet is not valid heartbeat packet
+uint32_t GetTimeBetweenHeartbeatPacket(CANPacket *packet, uint32_t lastHeartbeat)
+{
+    if (PacketIsOfID(packet, ID_HEARTBEAT)) 
+    {
+        return GetHeartbeatTimeStamp(packet) - lastHeartbeat;
+    }
+    else { return -1; }
+}
+
+// Validates the Heartbeat Packet, returns time between previous Heartbeat packets
+// Inputs:
+//      packet:         CAN Packet to check
+//      lastHeartbeat:  Timestamp (ms) of last detected heartbeat
+// Outputs:
+//                  Time (in ms) of the timestamp within the packet
+//                  Default return value is uint32 max value, which is used
+//                  if the packet is corrupt or not a heartbeat packet.
+uint32_t GetHeartbeatTimeStamp(CANPacket *packet)
+{
+    if (PacketIsOfID(packet, ID_HEARTBEAT)) 
+    {
+        uint32_t time = (packet->data[1] << 24);
+        time |= (packet->data[2] << 16);
+        time |= (packet->data[3] << 8);
+        time |= packet->data[4]; 
+        return time;
+    }
+    else { return -1; }
+}
+
+// Assembles Heartbeat Packet with given parameters
+// Inputs:
+//      packet:                 CAN Packet to assemble (will overwrite).
+//      broadcast:              1 if broadcast to all devices. 0 to return to MAIN_CPU / Jetson.
+//      heartbeatLeniencyCode:  Max time between heartbeats before system automatically enters a safe operating condition.
+//      timestamp:              Current timestamp as seen by the sender device. (ms)
+void AssembleHeartbeatPacket(CANPacket *packetToAssemble, int broadcast, uint8_t heartbeatLeniencyCode, uint32_t timestamp)
+{
+    uint16_t id = PACKET_PRIORITY_HIGH << 15;
+    uint8_t dlc = 0x06;
+    if (!broadcast)
+    { 
+        id |= DEVICE_GROUP_JETSON << 6;
+        id |= DEVICE_SERIAL_JETSON & 0x3F;
+    }
+
+    packetToAssemble->id = id;
+    packetToAssemble->dlc = dlc;
+    packetToAssemble->data[0] = heartbeatLeniencyCode;
+    packetToAssemble->data[1] = (timestamp & 0xFF000000) >> 24;
+    packetToAssemble->data[2] = (timestamp & 0x00FF0000) >> 16;
+    packetToAssemble->data[3] = (timestamp & 0x0000FF00) >> 8;
+    packetToAssemble->data[4] = (timestamp & 0x000000FF);
 }

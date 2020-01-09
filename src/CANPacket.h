@@ -9,6 +9,8 @@ typedef struct
     uint8_t data[8];
 } CANPacket;
 
+extern int SendCANPacket(CANPacket packet);
+
 CANPacket ConstructCANPacket(uint16_t id, uint8_t dlc, uint8_t* data);
 uint16_t ConstructCANID(uint8_t priority, uint8_t devGroup, uint8_t devSerial);
 
@@ -18,6 +20,17 @@ uint8_t ParseDataPayloadType(uint8_t* data);
 uint8_t ParseDataSenderDeviceFromPacket(CANPacket *packet);
 uint8_t ParseDataSenderSerialFromPacket(CANPacket *packet);
 uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
+
+int PacketIsInGroup(CANPacket *packet, uint8_t expectedType);
+int TargetsDevice(CANPacket *packet, uint8_t targetDeviceGroup, uint8_t targetDeviceSerialNumber);
+uint8_t GetDeviceGroupCode(CANPacket *packet);
+uint8_t GetDeviceSerialNumber(CANPacket *packet);
+int GetPacketID(CANPacket *packet);
+int PacketIsOfID(CANPacket *packet, uint8_t expectedID);
+
+uint32_t GetTimeBetweenHeartbeatPacket(CANPacket *packet, uint32_t lastHeartbeat);
+uint32_t GetHeartbeatTimeStamp(CANPacket *packet);
+void AssembleHeartbeatPacket(CANPacket *packetToAssemble, int broadcast, uint8_t heartbeatLeniencyCode, uint32_t timestamp);
 
 // Device group nibbles
 #define DEVICE_GROUP_BROADCAST          (uint8_t) 0x00
@@ -97,3 +110,5 @@ uint8_t ParseDataPayloadTypeFromPacket(CANPacket *packet);
 #define ESTOP_ERR_GENERAL               (uint8_t) 0x00
 // MORE TBD...
 
+#define DEVICE_SERIAL_BROADCAST         (uint8_t) 0x00
+#define DEVICE_SERIAL_JETSON            (uint8_t) 0x00 // NEEDS TO BE POPULATED 
