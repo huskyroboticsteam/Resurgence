@@ -6,7 +6,8 @@
 inline std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robotX, float robotY)
 {
     //following method needs global coords
-    return slam_map.findObjectsWithinSquare(this->radius, robotX, robotY);//floats
+    //return slam_map.findObjectsWithinSquare(this->radius, robotX, robotY);//floats
+    return slam_map.findObjectsWithinRadius(this->radius, robotX, robotY);
     //std::vector<std::shared_ptr<MapObstacle>> temp;
     // for (int i = 0; i < 8; i++)
     // {
