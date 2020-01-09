@@ -4,7 +4,7 @@
 #include <iostream>
 // #include <memory> // remove once EnvMap.h is included
 // #include "MapObstacle.h"
-#include "EnvMap.h"
+#include "GMap.h"
 
 //to do: use asserts
 
@@ -19,21 +19,20 @@
 
 //increase bounding box 
 class ObstacleMap{
-    EnvMap& slam_map;
-    constexpr static float radius = 10.0f;
-    constexpr static float step_size = 1.0f;
+    GMap slam_map;
+    constexpr static int radius = 10.0;
+    constexpr static int step_size = 1.0;
     constexpr static int size = 21;//(int)(2 * radius + 1);
     bool obstacle_map[size][size];
-    //change to 2d arrays
 
 private:
     void resetObstacleMap();
-    std::vector<std::shared_ptr<const MapObstacle>> getData(float robotX, float robotY);
+    std::vector<Point&> getData(int robotX, int robotY); // change return type (check w/ Assaf)
     int transform(int val, bool direction);
     void modifyObstacleMap(int x, int y);
 
 public:
     void updateObstacleMap();
-    ObstacleMap(EnvMap envmap);
+    ObstacleMap(GMap gMap);
     void print();
 };
