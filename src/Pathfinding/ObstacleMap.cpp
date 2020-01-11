@@ -1,12 +1,6 @@
 #include "ObstacleMap.h"
 #include <cstdlib>
 #include <iostream>
-//vector and EnvMap.h included in PathMap.h
-
-inline std::vector<Point&> ObstacleMap::getData(int centerX, int centerY) // change return type (check w/ assaf)                                                                                                   // get robot x/y from gMap?
-{
-    //return gMap.getObstaclesWithinSquare(this->radius, centerX, centerY); 
-}
 
 void ObstacleMap::resetObstacleMap()
 {
@@ -30,32 +24,30 @@ int ObstacleMap::transform(int val, bool direction)
     }
 }
 
-void ObstacleMap::updateObstacleMap()
+void ObstacleMap::update(std::vector<Point&> obstacles)
 {
     int robotX = 0;
     int robotY = 0;
-    //gMap.getRobotPosition(robotX, robotY); // from gMap
+    //gMap.getRobotPosition(robotX, robotY); // todo: figure out how to get robot position
     resetObstacleMap();
-    std::vector<Point&> data = getData(robotX, robotY); // change type for data
-    std::cout << data.size();
     int x, y;
-    // edit loop once GMap data type is determined
-    for (int i = 0; i < data.size(); i++)
-    {
-        for (int j = 0; j < data[i]->points.size(); j++)
-        {
-            Vec2 point = data[i]->points[j];
-            x = (int)(point.x - robotX + radius/step_size);
-            y = (int)(point.y - robotY + radius/step_size);
-            modifyObstacleMap(x,y);   
+    for (int i = 0; i < obstacles.size(); i++) {
+        if (obstacles[i].x <= (robotX + 10) && obstacles[i].x >= (robotX - 10) && obstacles[i].y <= (robotX + 10) && obstacles[i].y >= (robotX - 10)) {
+            x = (int)(obstacles[i].x - robotX + radius/step_size);
+            y = (int)(obstacles[i].y - robotY + radius/step_size);
+            modifyObstacleMap(x, y);
         }
     }
+    // loop over all points -- Point(x, y)
+    // x = (int)(point.x - robotX + radius/step_size);
+    // y = (int)(point.y - robotY + radius/step_size);
+    // // modifyObstacleMap() w/ valid points in range
 }
 
 inline void ObstacleMap::modifyObstacleMap(int x, int  y)
 {
     //set four points surrounding given point as blocked
-    //likely blocked areas will overlap from proxity of points in MapObstacle
+    //likely blocked areas will overlap from proximity of points in MapObstacle
     if (transform(y, true) < size && transform(x, true) < size) {
         obstacle_map[transform(y, true)][transform(x, true)] = true;
     }
@@ -88,9 +80,9 @@ void ObstacleMap::print()
     } 
 }
 
-ObstacleMap::ObstacleMap(GMap globalMap) : gMap(globalMap)
+ObstacleMap::ObstacleMap(std::vector<Point&> obstacles)
 {
-    updateObstacleMap();
+    update(obstacles);
 }
 
 bool[][]& ObstacleMap::getMap()
