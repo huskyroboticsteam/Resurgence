@@ -1,20 +1,20 @@
-#pragma once
-#include<vector>
-#include "Geometry.h"
-using node_ptr = std::shared_ptr<Node>;
+// #pragma once
+// #include<vector>
+// #include "Geometry.h"
+// using node_ptr = std::shared_ptr<Node>;
 
-class Map
-{
-    public:
-        int radius = 20;
-        int step = 1;
-        std::vector<Node> map;
-        Node robot_current_location;
-        void updateRobotLocation(Node newPoint);
-        void createNode(Point p);
-        double distanceBetweenNodes(node_ptr a, node_ptr b);
-        void dijkstra();
+// class Map
+// {
+//     public:
+//         int radius = 20;
+//         int step = 1;
+//         std::vector<Node> map;
+//         Node robot_current_location;
+//         void updateRobotLocation(Node newPoint);
+//         void createNode(Point p);
+//         double distanceBetweenNodes(node_ptr a, node_ptr b);
+//         void dijkstra();
 
-        Node getNode(Point p);
-        Map();
-};
+//         Node getNode(Point p);
+//         Map();
+// };

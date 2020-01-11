@@ -3,9 +3,10 @@
 #include <iostream>
 //vector and EnvMap.h included in PathMap.h
 
-inline std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robotX, float robotY)
+inline std::vector<Point&> ObstacleMap::getData(int centerX, int centerY) // change return type (check w/ assaf)
+                                                                                                    // get robot x/y from gMap?
 {
-    return slam_map.findObjectsWithinRadius(this->radius, robotX, robotY); 
+    return gMap.getObstaclesWithinSquare(this->radius, centerX, centerY); 
 }
 
 void ObstacleMap::resetObstacleMap()
@@ -23,22 +24,23 @@ int ObstacleMap::transform(int val, bool direction)
 {
     if(direction)
     {
-        return val + (int)(step_size -  fmodf(val, step_size));
+        return val + (int)(step_size - (val % step_size));
     }else
     {
-        return val - (int)fmodf(val, step_size);
+        return val - (int)(val % step_size);
     }
 }
 
 void ObstacleMap::updateObstacleMap()
 {
-    float robotX = 0.0f;
-    float robotY = 0.0f;
-    slam_map.getRobotPosition(robotX, robotY); // from EnvMap
+    int robotX = 0;
+    int robotY = 0;
+    gMap.getRobotPosition(robotX, robotY); // from gMap
     resetObstacleMap();
-    std::vector<std::shared_ptr<const MapObstacle>> data = getData(robotX, robotY);
+    std::vector<Point&> data = getData(robotX, robotY); // change type for data
     std::cout << data.size();
     int x, y;
+    // edit loop once GMap data type is determined
     for (int i = 0; i < data.size(); i++)
     {
         for (int j = 0; j < data[i]->points.size(); j++)
@@ -87,7 +89,7 @@ void ObstacleMap::print()
     } 
 }
 
-ObstacleMap::ObstacleMap(EnvMap& envmap) : slam_map(envmap)
+ObstacleMap::ObstacleMap(GMap globalMap) : gMap(globalMap)
 {
     updateObstacleMap();
 }
