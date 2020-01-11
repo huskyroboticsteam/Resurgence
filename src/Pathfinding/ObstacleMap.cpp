@@ -3,10 +3,9 @@
 #include <iostream>
 //vector and EnvMap.h included in PathMap.h
 
-inline std::vector<Point&> ObstacleMap::getData(int centerX, int centerY) // change return type (check w/ assaf)
-                                                                                                    // get robot x/y from gMap?
+inline std::vector<Point&> ObstacleMap::getData(int centerX, int centerY) // change return type (check w/ assaf)                                                                                                   // get robot x/y from gMap?
 {
-    return gMap.getObstaclesWithinSquare(this->radius, centerX, centerY); 
+    //return gMap.getObstaclesWithinSquare(this->radius, centerX, centerY); 
 }
 
 void ObstacleMap::resetObstacleMap()
@@ -35,7 +34,7 @@ void ObstacleMap::updateObstacleMap()
 {
     int robotX = 0;
     int robotY = 0;
-    gMap.getRobotPosition(robotX, robotY); // from gMap
+    //gMap.getRobotPosition(robotX, robotY); // from gMap
     resetObstacleMap();
     std::vector<Point&> data = getData(robotX, robotY); // change type for data
     std::cout << data.size();
@@ -92,6 +91,11 @@ void ObstacleMap::print()
 ObstacleMap::ObstacleMap(GMap globalMap) : gMap(globalMap)
 {
     updateObstacleMap();
+}
+
+bool[][]& ObstacleMap::getMap()
+{
+    return obstacle_map;
 }
 
 
