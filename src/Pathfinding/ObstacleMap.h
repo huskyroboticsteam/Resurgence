@@ -2,10 +2,9 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
-// #include <memory> // remove once EnvMap.h is included
-// #include "MapObstacle.h"
+// todo: include Point struct located in slam files
 
-//to do: use asserts
+// use asserts
 
 //make a graph object for pathing
 //use 2d array not vectors
@@ -18,7 +17,6 @@
 
 //increase bounding box 
 class ObstacleMap{
-    GMap slam_map;
     constexpr static int radius = 10.0;
     constexpr static int step_size = 1.0;
     constexpr static int size = 21;//(int)(2 * radius + 1);
@@ -26,13 +24,12 @@ class ObstacleMap{
 
 private:
     void resetObstacleMap();
-    std::vector<Point&> getData(int robotX, int robotY); // change return type (check w/ Assaf)
     int transform(int val, bool direction);
     void modifyObstacleMap(int x, int y);
 
 public:
-    void updateObstacleMap();
-    ObstacleMap(GMap gMap);
+    void update(std::vector<Point&> obstacles);
+    ObstacleMap(std::vector<Point&> obstacles);
     void print();
     bool[][]& getMap();
 };
