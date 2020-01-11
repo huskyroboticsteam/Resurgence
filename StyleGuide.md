@@ -3,13 +3,13 @@
 ```
 int MyFunction()
 {
-        if(true)
+    if(true)
+    {
+        while(false)
         {
-                while(false)
-                {
-                }
         }
-        return 0;
+    }
+    return 0;
 }
 ```
 - Function names are in `camelCase`

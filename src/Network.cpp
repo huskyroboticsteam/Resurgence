@@ -8,13 +8,18 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+
+#ifdef __linux__
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#endif
 
 void InitializeNetwork()
 {
+    #ifdef __linux__
     if(Globals::can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW))
         assert(!"Failed to initialize CAN bus!");
+    #endif
     
 }
 
