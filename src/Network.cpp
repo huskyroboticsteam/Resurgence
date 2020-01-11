@@ -1,6 +1,12 @@
 #include "Globals.h"
 #include "Network.h"
-#include "CANPacket.h"
+
+extern "C" 
+{
+    #include "HindsightCAN/CANPacket.h"
+}
+
+
 
 #include <cassert>
 

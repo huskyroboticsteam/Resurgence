@@ -2,11 +2,6 @@
 #include "Globals.h"
 #include "Network.h"
 
-extern "C" 
-{
-    #include "CANPacket.h"
-}
-
 void InitializeRover()
 {
     // TODO(sasha): Call individual initialization functions
