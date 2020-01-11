@@ -16,6 +16,7 @@ jobs:
            cd build &&
            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. &&
            make -j7 &&
+           sudo make install &&
            cd ../../
     - name: mkdirbuild
       run: mkdir build
