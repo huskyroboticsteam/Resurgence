@@ -10,3 +10,4 @@ std::vector<Packet> Globals::incoming_packets;
 std::vector<Packet> Globals::outgoing_packets;
 int Globals::can_fd;
 int Globals::net_fd;
+StatusData Globals::status_data;

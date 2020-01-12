@@ -1,13 +1,6 @@
 #include "Globals.h"
 #include "Network.h"
 
-extern "C" 
-{
-    #include "HindsightCAN/CANPacket.h"
-}
-
-
-
 #include <cassert>
 
 #include <net/if.h>
@@ -62,16 +55,14 @@ void ParseIncomingNetworkPackets()
     recvfrom(Globals::can_fd, &frame, sizeof(struct can_frame),
                   0, (struct sockaddr*)&addr, &len);
 
-    Packet packet;
-    packet.kind = PacketKind::CAN;
+    CANPacket packet;
+    packet.id = frame.can_id;
 
-    packet.address = frame.can_id;
-
-    for(int i = 0; i < 8; i++){
-        packet.payload[i] = frame.data[i];
+    for(int i = 0; i < frame.can_dlc; i++){
+        packet.data[i] = frame.data[i];
     }
 
-    Globals::incoming_packets.push_back(packet);    
+    ParseCANPacket(packet);
 
     #endif
 
@@ -102,6 +93,26 @@ void SendOutgoingNetworkPackets()
             ;
             //aio_write(Globals::net_fd, p);
     }
+    
+}
+
+void ParseCANPacket(CANPacket p)
+{
+    // Future calls for parsing data example
+    // Some functions not present yet
+    /*
+    if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsDevice(p, DEVICE_MEMBER_FRONT_MOTOR) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.front_left_motor_voltage_mv = DecodeTelemetryDataSigned(p)
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.front_left_motor_current_ma = DecodeTelemetryDataSigned(p)
+    }
+    
+
+    */
     
 }
 

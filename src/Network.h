@@ -3,6 +3,11 @@
 #include "Globals.h"
 #include "Constants.h"
 
+extern "C" 
+{
+    #include "HindsightCAN/CANPacket.h"
+}
+
 #include <cstdint>
 
 enum class PacketKind
@@ -21,4 +26,5 @@ struct Packet
 void InitializeNetwork();
 void ParseIncomingNetworkPackets();
 void SendOutgoingNetworkPackets();
+void ParseCANPacket(CANPacket p);
 void TestCANPackets();
