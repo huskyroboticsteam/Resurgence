@@ -122,7 +122,7 @@ void Tag::calcOrientation()
 	}
 
 	// create ideal object points
-	int square_len = 1;
+	double square_len = 200;
 	// top left (-w/2, w/2)
 	object_points.push_back(cv::Point3f(-(square_len / 2), (square_len / 2), 0));
 	// top right (w/2, w/2)

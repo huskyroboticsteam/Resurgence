@@ -16,14 +16,22 @@ constexpr bool EXTRA_WINDOWS = true;
 
 int camera_id = 0;
 
-std::vector<cv::Point2d> normalVec(cv::Vec3d rvec, cv::Vec3d tvec)
+std::vector<cv::Point2d> projectCube(double len, cv::Vec3d rvec, cv::Vec3d tvec)
 {
-	std::vector<cv::Point2d> image_points;
 	std::vector<cv::Point3d> object_points;
-	object_points.push_back(cv::Point3d(0, 0, 0));
-	object_points.push_back(cv::Point3d(0, 0, 1));
+	std::vector<cv::Point2d> image_points;
+	
+	object_points.push_back(cv::Point3d(-(len/2), (len/2), 0));
+	object_points.push_back(cv::Point3d((len/2), (len/2), 0));
+	object_points.push_back(cv::Point3d((len/2), -(len/2), 0));
+	object_points.push_back(cv::Point3d(-(len/2), -(len/2), 0));
+	object_points.push_back(cv::Point3d(-(len/2), (len/2), len));
+	object_points.push_back(cv::Point3d((len/2), (len/2), len));
+	object_points.push_back(cv::Point3d((len/2), -(len/2), len));
+	object_points.push_back(cv::Point3d(-(len/2), -(len/2), len));
 	cv::projectPoints(object_points, rvec, tvec, AR::CAMERA_PARAMS, AR::DISTORTION_PARAMS,
 	                  image_points);
+	
 	return image_points;
 }
 
@@ -44,16 +52,16 @@ int main(int argc, char *argv[])
 	int blur_val = 2;
 
 	std::cout << "Opening camera..." << std::endl;
-
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
-
+	
 	cap.open(camera_id + api_id);
 	if (!cap.isOpened())
 	{
 		std::cerr << "ERROR! Unable to open camera" << std::endl;
 		return 1;
 	}
+
+	//   cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+	//   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
 
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
@@ -90,20 +98,26 @@ int main(int argc, char *argv[])
 			corners.push_back(corners[0]);
 			for (int i = 0; i < corners.size() - 1; i++)
 			{
-				cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
-				         3);
-				double l = std::sqrt(pow(corners[i].point.x - corners[i + 1].point.x, 2) +
-				                     pow(corners[i].point.y - corners[i + 1].point.y, 2));
-				cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0),
-				               cv::MARKER_CROSS, l / 10, 2, cv::FILLED);
+				//   cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
+				//            3);
+				//   double l = std::sqrt(pow(corners[i].point.x - corners[i + 1].point.x, 2) +
+				//                        pow(corners[i].point.y - corners[i + 1].point.y, 2));
+				//   cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0),
+				//                  cv::MARKER_CROSS, l / 10, 2, cv::FILLED);
 			}
 			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 15,
 			               2, cv::FILLED);
-			std::vector<cv::Point2d> normal = normalVec(tag.getRVec(), tag.getTVec());
+			std::vector<cv::Point2d> cubePoints = projectCube(200, tag.getRVec(), tag.getTVec());
 			std::cout << "rvec: " << tag.getRVec() << std::endl
 			          << "tvec: " << tag.getTVec() << std::endl;
 			// std::cout << "Normal vector: " << normal << std::endl;
-			cv::line(frame, normal[0], normal[1], cv::Scalar(0, 0, 255), 3);
+			//cv::line(frame, cubePoints[0], cubePoints[1], cv::Scalar(0, 0, 255), 3);
+			for(size_t i = 0; i < 4; i++){
+				size_t next = (i==3 ? 0 : i+1);
+				cv::line(frame, cubePoints[i], cubePoints[next], cv::Scalar(0,0,255), 3);
+				cv::line(frame, cubePoints[i], cubePoints[i+4], cv::Scalar(0,255,0), 3);
+				cv::line(frame, cubePoints[i+4], cubePoints[next+4], cv::Scalar(255,0,0), 3);
+			}
 		}
 
 		cv::imshow(ORIG_WINDOW_NAME, frame);
