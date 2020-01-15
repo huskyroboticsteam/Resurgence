@@ -3,12 +3,12 @@
 #include <vector>
 #include <queue>
 #include <string>
-#include "ObstacleMap.h"
+//#include "ObstacleMap.h"
 class Pather2 {
 private:
-    bool[ObstacleMap.size][ObstacleMap.size] map;
+    //bool[ObstacleMap.size][ObstacleMap.size] map;
 
-    point getPath(int mat[][], point dest);
+    //point getPath(int mat[][], point dest);
 
 public:
     struct point {

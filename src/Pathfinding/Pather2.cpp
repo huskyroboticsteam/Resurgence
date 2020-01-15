@@ -1,14 +1,15 @@
-#include "ObstacleMap.h"
+//#include "ObstacleMap.h"
 #include "Pather2.h"
 #include <vector>
 #include <queue>
 #include <iostream>
 
 //matrix size
-//#define ROW 5
-//#define COL 5
+#define ROW 5
+#define COL 5
 
 
+// print functions for debugging
 void print_point(std::queue<Pather2::point> q) {
   while (!q.empty())
   {
@@ -35,15 +36,15 @@ bool isValid(int x, int y) {
     return ((x >= 0) && (x < ROW) && (y >= 0) && (y < COL));
 }
 
-int rowNum[] = {-1,0,0,1};
-int rowCol[] = {0,-1,1,0};
+int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
+int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
 
-Pather2::point getPath(bool[][] map, Pather2::point dest){
+Pather2::point getPath(bool map[][5], Pather2::point dest){
 
-    Pather2::point src = {10,10};
+    Pather2::point src = {2,2};
 
     //check if src and dest are represented with 1 not 0
-    if (map[src.x][src.y] || map[dest.x][dest.y]){
+    if ((map[src.x][src.y]) || (map[dest.x][dest.y])){
         struct Pather2::point error = {-1, -1};
         //todo: change destination if destination is blocked
         return error;
@@ -66,10 +67,12 @@ Pather2::point getPath(bool[][] map, Pather2::point dest){
     map[src.x][src.y] = true;
     std::queue<Pather2::queueNode> q;
     std::queue<Pather2::point> newQueue;
+    newQueue.push(src);
     Pather2::queueNode s = {src, 0, newQueue};
     q.push(s);
 
-    
+    // q is the queue of points that are waiting to be checked
+    // curr.path is the path leading up to that point
 
     while (!q.empty()){
         //get front node in nodes to be checked and make it current
@@ -82,25 +85,26 @@ Pather2::point getPath(bool[][] map, Pather2::point dest){
             std::queue<Pather2::point> temp = curr.path;
             temp.pop();
             std::cout << "Final path: ";
-            print_queue(q);
+            print_point(temp);
             return temp.front(); 
         }
 
-        //pop current node off nodes to be checked
+        // pop current node off nodes to be checked
         q.pop();
  
-        //iterate through adj nodes
-        for (int i = 0; i < 4; i++){
+        // iterate through adj nodes
+        for (int i = 0; i < 8; i++){
             int row = pt.x + rowNum[i];
             int col = pt.y + rowCol[i];
             
 
-            //check if adj node is not out of bounds and is not an obstacle
+            // check if adj node is not out of bounds and is not an obstacle
             if (isValid(row, col) && !map[row][col]){
-                //set adj node as visited and push it to nodes to be checked
+                // set adj node as visited and push it to nodes to be checked
                 struct Pather2::point test = {row, col};
-                curr.path.push(test);
-                Pather2::queueNode adjNode = {{row, col}, curr.dist + 1, curr.path};
+                std::queue<Pather2::point> addAdjPointToPath = curr.path;
+                addAdjPointToPath.push(test);
+                Pather2::queueNode adjNode = {{row, col}, curr.dist + 1, addAdjPointToPath};
                 map[adjNode.pt.x][adjNode.pt.y] = true;
                 q.push(adjNode);
             }
@@ -110,20 +114,19 @@ Pather2::point getPath(bool[][] map, Pather2::point dest){
     return src;
 }
 
-Pather2::Pather2(ObstacleMap obstacle_map)
-{
-    map = obstacle_map;   
-}
+// Pather2::Pather2(ObstacleMap obstacle_map)
+// {
+//     map = obstacle_map;   
+// }
 
 int main() {
-    int map[ROW][COL] = {{0, 1, 0, 1, 0},
-                         {0, 0, 0, 0, 1},
-                         {0, 1, 1, 1, 1},
-                         {0, 1, 1, 1, 1},
-                         {1, 1, 1, 1, 1}};
-    struct Pather2::point src = {2, 2};
+    bool map[ROW][COL] = {{true, false, true, false, true},
+                         {true, true, true, true, false},
+                         {true, false, false, false, false},
+                         {true, false, false, true, true},
+                         {false, false, false, false, false}};
     struct Pather2::point destination = {4, 4};
-    struct Pather2::point nextPoint = getPath(map, src, destination);
+    struct Pather2::point nextPoint = getPath(map, destination);
     std::cout << "First point in path: ";
     std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
     std::cout << "" << std::endl;
