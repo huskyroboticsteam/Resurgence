@@ -10,14 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: installopencv
-      run: git clone https://github.com/opencv/opencv.git &&
-           cd opencv &&
-           mkdir build &&
-           cd build &&
-           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. &&
-           make -j7 &&
-           sudo make install &&
-           cd ../../
+      run: sudo apt-get install libopencv-core-dev
     - name: mkdirbuild
       run: mkdir build
     - name: cmake1
