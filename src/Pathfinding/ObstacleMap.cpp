@@ -1,6 +1,5 @@
 #include "ObstacleMap.h"
 #include <cstdlib>
-#include <iostream>
 
 void ObstacleMap::resetObstacleMap()
 {
@@ -28,8 +27,9 @@ void ObstacleMap::update(std::vector<Point&> obstacles)
 {
     int robotX = 0;
     int robotY = 0;
-    //gMap.getRobotPosition(robotX, robotY); // todo: figure out how to get robot position
+    //.getRobotPosition(robotX, robotY); // todo: figure out how to get robot position
     resetObstacleMap();
+    //filter which points we want to plot
     int x, y;
     for (int i = 0; i < obstacles.size(); i++) {
         if (obstacles[i].x <= (robotX + 10) && obstacles[i].x >= (robotX - 10) && obstacles[i].y <= (robotX + 10) && obstacles[i].y >= (robotX - 10)) {
@@ -79,38 +79,3 @@ void ObstacleMap::print()
         std::cout << std::endl;
     } 
 }
-
-ObstacleMap::ObstacleMap(std::vector<Point&> obstacles)
-{
-    update(obstacles);
-}
-
-bool[][]& ObstacleMap::getMap()
-{
-    return obstacle_map;
-}
-
-
-// int main()
-// {
-//     ObstacleMap map = ObstacleMap();
-//     map.print();
-// };
-
-
-//old tester mapobstacle
-// #pragma once
-// #include <vector>
-
-// struct Vec2
-// {
-// public:
-//     float x;
-//     float y;
-// };
-
-// struct MapObstacle
-// {
-// public:
-//     std::vector<Vec2> points;
-// };
