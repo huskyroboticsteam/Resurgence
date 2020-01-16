@@ -12,7 +12,7 @@ jobs:
     - name: installopencv
       run: sudo apt-get install libopencv-core-dev
     - name: find
-      run: find / -name "OpenCVConfig.cmake"
+      run: find /usr/ -name "OpenCVConfig.cmake"
     - name: mkdirbuild
       run: mkdir build
     - name: cmake1
