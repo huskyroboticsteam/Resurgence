@@ -26,5 +26,4 @@ struct Packet
 void InitializeNetwork();
 void ParseIncomingNetworkPackets();
 void SendOutgoingNetworkPackets();
-void ParseCANPacket(CANPacket p);
 void TestCANPackets();

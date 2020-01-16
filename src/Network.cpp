@@ -96,26 +96,6 @@ void SendOutgoingNetworkPackets()
     
 }
 
-void ParseCANPacket(CANPacket p)
-{
-    // Future calls for parsing data example
-    // Some functions not present yet
-    /*
-    if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsDevice(p, DEVICE_MEMBER_FRONT_MOTOR) &&
-            PacketIsOfID(p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
-            StatusData Globals::status_data.front_left_motor_voltage_mv = DecodeTelemetryDataSigned(p)
-        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
-            StatusData Globals::status_data.front_left_motor_current_ma = DecodeTelemetryDataSigned(p)
-    }
-    
-
-    */
-    
-}
-
 // For testing uses
 // Used to manually send can bytes one at a time
 // Data is placed in outgoing packets list and will be processed in
