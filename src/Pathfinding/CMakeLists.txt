@@ -1,5 +1,4 @@
-add_executable(pathTests
-    GMap.cpp
+add_executable(pathing
     ObstacleMap.cpp
-    testMain.cpp
+    Pather2.cpp
     )

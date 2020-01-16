@@ -1,6 +1,14 @@
 #include "ObstacleMap.h"
 #include <cstdlib>
 
+
+//|----------------------------|
+//|                            |
+//|will Point have float values|
+//|                            |
+//|----------------------------|
+
+//sets all values in ObstacleMap to false
 void ObstacleMap::resetObstacleMap()
 {
     for (int i = 0; i < size; i++)
@@ -12,22 +20,22 @@ void ObstacleMap::resetObstacleMap()
     }
 }
 
+//rounds up/down based on direction being true/false
 int ObstacleMap::transform(int val, bool direction)
 {
     if(direction)
     {
         return val + (int)(step_size - (val % step_size));
-    }else
-    {
-        return val - (int)(val % step_size);
     }
+    return val - (int)(val % step_size);
 }
 
+//rebuilds ObstacleMap with new Obstacles
 void ObstacleMap::update(std::vector<Point&> obstacles)
 {
     int robotX = 0;
     int robotY = 0;
-    //.getRobotPosition(robotX, robotY); // todo: figure out how to get robot position
+    //.getRobotPosition(robotX, robotY); // todo: figure out how to get robot position, use filter, ask Benton
     resetObstacleMap();
     //filter which points we want to plot
     int x, y;
@@ -39,15 +47,12 @@ void ObstacleMap::update(std::vector<Point&> obstacles)
         }
     }
     // loop over all points -- Point(x, y)
-    // x = (int)(point.x - robotX + radius/step_size);
-    // y = (int)(point.y - robotY + radius/step_size);
-    // // modifyObstacleMap() w/ valid points in range
 }
 
+
+//set four points surrounding given point as blocked
 inline void ObstacleMap::modifyObstacleMap(int x, int  y)
 {
-    //set four points surrounding given point as blocked
-    //likely blocked areas will overlap from proximity of points in MapObstacle
     if (transform(y, true) < size && transform(x, true) < size) {
         obstacle_map[transform(y, true)][transform(x, true)] = true;
     }
@@ -62,6 +67,8 @@ inline void ObstacleMap::modifyObstacleMap(int x, int  y)
     }
 }
 
+//for testing purposes only, prints a visual representation of ObstacleMap
+//where 1 is an obstacle and 0 is empty
 void ObstacleMap::print()
 {
     for (int i = 0; i < size; i++)
