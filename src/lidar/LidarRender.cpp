@@ -5,7 +5,7 @@
 
 #include <GL/glut.h>
 
-namespace Lidar
+namespace lidar
 {
 LidarRender::LidarRender(int win_width, int win_height, std::string win_title, 
     float disp_limits_x_range, float disp_limits_y_range) :
@@ -30,7 +30,7 @@ void LidarRender::setBackground(float r, float g, float b, float a)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void LidarRender::drawPoints(std::set<PointXY> &pts, float r, float g, float b,
+void LidarRender::drawPoints(const std::vector<PointXY> &pts, float r, float g, float b,
     float pt_size)
 {
     glColor3f(r, g, b);
@@ -68,28 +68,14 @@ void LidarRender::flushToDisplay()
 
 int main(int argc, char** argv)
 {
-    using namespace Lidar;
-    LidarRender lr(800, 600, "point clustering simulation", 15, 15);
-    std::set<PointXY> pts_rad = generateClusterRadius(-5, 5, 2, 10);
-    std::set<PointXY> pts_lin = generateClusterLinear(1, 8, 8, 1, 0.75, 16);
-
-    std::vector<PointXY> vertices;
-    float bbox_x[4] = {0.5, 0.5, -0.5, -0.5};
-    float bbox_y[4] = {0.5, -0.5, -0.5, 0.5};
-    for (int i = 0; i < 4; i++)
-    {
-        PointXY p;
-        p.x = bbox_x[i];
-        p.y = bbox_y[i];
-        vertices.push_back(p);
-    }
+    using namespace lidar;
+    LidarRender lr(800, 600, "point clustering simulation", 5000, 5000);
+    RPLidar l(256000, "/dev/ttyUSB0");
 
     lr.setBackground(1, 1, 1, 1);
     while (1)
     {
-        lr.drawBoundingPolygon(vertices, 0, 0, 0, 2);
-        lr.drawPoints(pts_rad, 0, 0, 0, 5);
-        lr.drawPoints(pts_lin, 0, 0, 0, 5);
+        lr.drawPoints(l.scan_frame(100), 0, 0, 0, 3);
         lr.flushToDisplay();
     }
 }

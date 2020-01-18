@@ -5,7 +5,7 @@
 #include <vector>
 #include <set>
 
-namespace Lidar
+namespace lidar
 {
 
 typedef struct PointXY

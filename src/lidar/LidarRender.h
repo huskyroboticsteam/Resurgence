@@ -1,12 +1,11 @@
 #pragma once
 
 #include "PointCloudProcessing.h"
-#include "PointGenerator.h"
+#include "LidarRead.h"
 
 #include <vector>
-#include <set>
 
-namespace Lidar
+namespace lidar
 {
 class LidarRender
 {
@@ -19,7 +18,7 @@ public:
                 float disp_limits_y_range);
     ~LidarRender();
     void setBackground(float r, float g, float b, float a);
-    void drawPoints(std::set<PointXY> &points, float r, float g, float b, float pt_size);
+    void drawPoints(const std::vector<PointXY> &points, float r, float g, float b, float pt_size);
     void drawBoundingPolygon(std::vector<PointXY> &vertices, float r, float g,
                              float b, float line_width);
     void flushToDisplay();

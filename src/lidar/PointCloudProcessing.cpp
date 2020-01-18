@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace Lidar
+namespace lidar
 {
 
 bool approxEqual(PointXY p, PointXY q)
