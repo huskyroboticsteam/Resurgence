@@ -1,3 +1,4 @@
 FROM spmallick/opencv-docker:opencv
-COPY entrypoint.sh /entrypoint.sh
+COPY ../../PY2020 ./PY2020
+COPY ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
