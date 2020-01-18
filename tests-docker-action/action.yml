@@ -1,0 +1,7 @@
+name: C/C++ CI
+
+on: [push]
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
