@@ -1,3 +1,3 @@
 FROM spmallick/opencv-docker:opencv
 COPY . .
-CMD source ./tests-docker-action/entrypoint.sh
+CMD sh ./tests-docker-action/entrypoint.sh
