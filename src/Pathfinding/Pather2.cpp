@@ -5,8 +5,8 @@
 #include <iostream>
 
 //matrix size
-#define ROW 5
-#define COL 5
+#define ROW 10
+#define COL 10
 
 
 // print functions for debugging
@@ -39,9 +39,9 @@ bool isValid(int x, int y) {
 int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
 int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
 
-Pather2::point getPath(bool map[][5], Pather2::point dest){
+Pather2::point getPath(bool map[][10], Pather2::point dest){
 
-    Pather2::point src = {2,2};
+    Pather2::point src = {5,5};
 
     //check if src and dest are represented with 1 not 0
     if ((map[src.x][src.y]) || (map[dest.x][dest.y])){
@@ -62,7 +62,7 @@ Pather2::point getPath(bool map[][5], Pather2::point dest){
     //     }
     // } 
 
-    //set source as visited, create node with dist 0 from src and push to queue of nodes to be checked
+    //set source as visited, create point with dist 0 from src and push to queue of nodes to be checked
     //visited[src.x][src.y] = true;
     map[src.x][src.y] = true;
     std::queue<Pather2::queueNode> q;
@@ -75,13 +75,13 @@ Pather2::point getPath(bool map[][5], Pather2::point dest){
     // curr.path is the path leading up to that point
 
     while (!q.empty()){
-        //get front node in nodes to be checked and make it current
+        //get front point in points to be checked and make it current
         Pather2::queueNode curr = q.front();
         Pather2::point pt = curr.pt;
 
-        //check if current node is destination node
+        //check if current point is destination node
         if ((pt.x == dest.x) && (pt.y == dest.y)){
-            //return first node after source in path to destination
+            //return first point after source in path to destination
             std::queue<Pather2::point> temp = curr.path;
             temp.pop();
             std::cout << "Final path: ";
@@ -89,18 +89,18 @@ Pather2::point getPath(bool map[][5], Pather2::point dest){
             return temp.front(); 
         }
 
-        // pop current node off nodes to be checked
+        // pop current point off point to be checked
         q.pop();
  
-        // iterate through adj nodes
+        // iterate through adj points
         for (int i = 0; i < 8; i++){
             int row = pt.x + rowNum[i];
             int col = pt.y + rowCol[i];
             
 
-            // check if adj node is not out of bounds and is not an obstacle
+            // check if adj point is not out of bounds and is not an obstacle
             if (isValid(row, col) && !map[row][col]){
-                // set adj node as visited and push it to nodes to be checked
+                // set adj point as visited and push it to points to be checked(q)
                 struct Pather2::point test = {row, col};
                 std::queue<Pather2::point> addAdjPointToPath = curr.path;
                 addAdjPointToPath.push(test);
@@ -120,12 +120,17 @@ Pather2::point getPath(bool map[][5], Pather2::point dest){
 // }
 
 int main() {
-    bool map[ROW][COL] = {{true, false, true, false, true},
-                         {true, true, true, true, false},
-                         {true, false, false, false, false},
-                         {true, false, false, true, true},
-                         {false, false, false, false, false}};
-    struct Pather2::point destination = {4, 4};
+    bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
+ {true, true, false, false, true, true, true, false, true, true},
+ {false, false, false, false, true, true, false, true, false, true},
+ {false, false, false, true, false, true, false, false, true, true},
+ {false, true, false, true, false, true, false, false, false, false},
+ {true, false, true, false, true, false, true, false, true, false},
+ {false, false, false, false, false, true, true, true, false, false},
+ {false, true, false, false, false, false, false, false, true, true},
+ {true, true, true, false, false, true, true, false, false, true}, 
+ {false, false, true, true, true, false, true, true, true, false}};
+    struct Pather2::point destination = {9,9};
     struct Pather2::point nextPoint = getPath(map, destination);
     std::cout << "First point in path: ";
     std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
