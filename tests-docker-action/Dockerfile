@@ -8,3 +8,4 @@ CMD cd ..
 CMD mkdir ./build
 CMD cmake -B./build ./src
 CMD cmake --build ./build
+CMD ./build/tests
