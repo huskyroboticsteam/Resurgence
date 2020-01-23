@@ -12,8 +12,7 @@ int MyFunction()
     return 0;
 }
 ```
-- tabs are 4 spaces
-- Function names are in `PascalCase`
+- Function names are in `camelCase`
 - Struct, Enum, Class, Enum Class, Union, etc. names are in `PascalCase`
 - Variable names are in `snake_case`
 - Always use C++'s includes: `<cstdint>, <cstdio>`, NOT `<stdint.h>, <stdio.h>`

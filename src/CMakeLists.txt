@@ -5,7 +5,8 @@ project(Rover LANGUAGES CXX)
 enable_testing()
 
 find_package(Catch2 REQUIRED)
-find_package(OpenCV CONFIG REQUIRED)
+
+find_package(OpenCV REQUIRED)
 
 add_subdirectory(ar)
 
@@ -16,12 +17,17 @@ add_executable(Rover
         CommandLineOptions.cpp
         Globals.cpp
         Network.cpp
+	      Util.cpp
         mapping/EnvMap.cpp)
 
-target_link_libraries(Rover ${OpenCV_LIBS})
-
 add_executable(tests
-  Tests.cpp)
+  Tests.cpp
+  Util.cpp
+  # AR Detection tests
+  ar/TagUnitTests.cpp
+  ar/Tag.cpp)
+
+target_link_libraries(Rover ${OpenCV_LIBS})
 
 include(CTest)
 include(Catch)
