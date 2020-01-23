@@ -53,7 +53,97 @@ void ParseCANPacket(CANPacket p)
     }
 
     
-    //TODO: Add functions for arm motor boards as well
+    //base
+    else if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsOfDevice(p, DEVICE_SERIAL_MOTOR_BASE) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.base_voltage_mv = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.base_current_ma = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_TEMPERATURE)
+            	StatusData Globals::status_data.base_temp_mc = DecodeTelemetryDataSigned(p);
+    }
+
+    //shoulder
+    else if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsOfDevice(p, DEVICE_SERIAL_MOTOR_SHOULDER) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.shoulder_voltage_mv = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.shoulder_current_ma = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_TEMPERATURE)
+            StatusData Globals::status_data.shoulder_temp_mc = DecodeTelemetryDataSigned(p);
+    }
+
+    //elbow
+    else if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsOfDevice(p, DEVICE_SERIAL_MOTOR_ELBOW) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.elbow_voltage_mv = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.elbow_current_ma = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_TEMPERATURE)
+            StatusData Globals::status_data.elbow_temp_mc = DecodeTelemetryDataSigned(p);
+    }
+
+    //forearm/wrist
+    else if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsOfDevice(p, DEVICE_SERIAL_MOTOR_FOREARM) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.wrist_voltage_mv = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.wrist_current_ma = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_TEMPERATURE)
+            StatusData Globals::status_data.wrist_temp_mc = DecodeTelemetryDataSigned(p);
+    }
+
+
+    //diffleft/wrist1
+    else if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsOfDevice(p, DEVICE_SERIAL_MOTOR_DIFF_WRIST_1) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.diffleft_voltage_mv = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.diffleft_current_ma = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_TEMPERATURE)
+            StatusData Globals::status_data.diffleft_temp_mc = DecodeTelemetryDataSigned(p);
+    }
+
+    //diffright/wrist2
+    else if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsOfDevice(p, DEVICE_SERIAL_MOTOR_DIFF_WRIST_2) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.diffright_voltage_mv = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.diffright_current_ma = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_TEMPERATURE)
+            StatusData Globals::status_data.diffright_temp_mc = DecodeTelemetryDataSigned(p);
+    }
+
+    //hand
+    else if (SenderPacketIsInGroup(p, DEVICE_GROUP_MOTOR_CONTROL) &&
+            SenderPacketIsOfDevice(p, DEVICE_SERIAL_MOTOR_HAND) &&
+            PacketIsOfID(p, ID_TELEMETRY_REPORT))
+    {
+        if (DecodeTelemetryType(p) == PACKET_TELEMETRY_VOLTAGE)
+            StatusData Globals::status_data.hand_voltage_mv = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_CURRENT)
+            StatusData Globals::status_data.hand_current_ma = DecodeTelemetryDataSigned(p);
+        else if (DecodeTelemetryType(p) == PACKET_TELEMETRY_TEMPERATURE)
+            StatusData Globals::status_data.hand_temp_mc = DecodeTelemetryDataSigned(p);
+    }
 
     //TODO: Add in arm limit switch status
     
