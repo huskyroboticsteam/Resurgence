@@ -2,9 +2,7 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
-#include "Geometry.h" //remove once we include slam files
-
-// todo: include Point struct located in slam files
+#include "Point.h" //remove once we include slam files
 
 // recieve list of points
 // plot obstacles onto 2d grid
@@ -24,7 +22,7 @@ private:
     // rounds given coordinates up/down to obstacle_map indices, sets four elements around given coordinates as blocked
     void modifyObstacleMap(int x, int y);
     //for getting robot position
-    void getRobotPosition(float &robotX, float &robotY);
+    void getRobotPosition(float &robotX, float &robotY); //needs to use gps
 
 
 public:

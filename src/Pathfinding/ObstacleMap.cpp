@@ -5,8 +5,8 @@
 //gets robot position
 inline void ObstacleMap::getRobotPosition(float &robotX, float &robotY)
 {
-    robotX = 5.0f;
-    robotY = 5.0f;
+    robotX = 0.0f;//GPS.lat TBD
+    robotY = 0.0f;//GPS.long TBD
 }
 
 
@@ -39,8 +39,6 @@ void ObstacleMap::update(std::vector<Point> obstacles)
     float robotX = 0.0f;
     float robotY = 0.0f;
     getRobotPosition(robotX, robotY);
-    std::cout << robotX << " " << robotY << std::endl;
-    //.getRobotPosition(robotX, robotY); // todo: figure out how to get current robot position, use filter, ask Benton
     resetObstacleMap();
     int x, y;
     for (int i = 0; i < obstacles.size(); i++) {
