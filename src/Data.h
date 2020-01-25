@@ -19,4 +19,4 @@ typedef struct
     float science_temperature;
     float science_humidity;
 
-} OutboundData
+} OutboundData;
