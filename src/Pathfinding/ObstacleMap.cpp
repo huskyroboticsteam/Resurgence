@@ -1,12 +1,14 @@
 #include "ObstacleMap.h"
+#include <iostream>
 #include <cstdlib>
 
+//gets robot position
+inline void ObstacleMap::getRobotPosition(float robotX, float robotY)
+{
+    robotX = 10.0f;
+    robotY = 10.0f;
+}
 
-//|----------------------------|
-//|                            |
-//|will Point have float values|
-//|                            |
-//|----------------------------|
 
 //sets all values in ObstacleMap to false
 void ObstacleMap::resetObstacleMap()
@@ -32,16 +34,19 @@ int ObstacleMap::transform(int val, bool direction)
 }
 
 //rebuilds ObstacleMap with given Obstacles
-void ObstacleMap::update(std::vector<Point&> obstacles)
+void ObstacleMap::update(std::vector<Point> obstacles)
 {
-    int robotX = 0;
-    int robotY = 0;
+    float robotX = -2.0f;
+    float robotY = -2.0f;
+    std::cout << robotX << " " << robotY << std::endl;
+    getRobotPosition(robotX, robotY);
     //.getRobotPosition(robotX, robotY); // todo: figure out how to get robot position, use filter, ask Benton
     resetObstacleMap();
     int x, y;
     for (int i = 0; i < obstacles.size(); i++) {
         //filter which obstacles we want to plot
-        if (obstacles[i].x <= (robotX + radius) && obstacles[i].x >= (robotX - radius) && obstacles[i].y <= (robotX + radius) && obstacles[i].y >= (robotX - radius)) {
+        if (obstacles[i].x <= (robotX + radius) && obstacles[i].x >= (robotX - radius) 
+        && obstacles[i].y <= (robotX + radius) && obstacles[i].y >= (robotX - radius)) {
             x = (int)(obstacles[i].x - robotX + radius/step_size);
             y = (int)(obstacles[i].y - robotY + radius/step_size);
             modifyObstacleMap(x, y);
@@ -49,7 +54,8 @@ void ObstacleMap::update(std::vector<Point&> obstacles)
     }
 }
 
-// rounds given coordinates up/down to obstacle_map indices, sets four elements around given coordinates as blocked
+//rounds given coordinates up/down to obstacle_map indices,
+//sets four elements around given coordinates as blocked
 inline void ObstacleMap::modifyObstacleMap(int x, int  y)
 {
     if (transform(y, true) < size && transform(x, true) < size) {
