@@ -2,9 +2,7 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
-#include "Geometry.h" //remove once we include slam files
-
-// todo: include Point struct located in slam files
+#include "Point.h" //remove once we include slam files
 
 // recieve list of points
 // plot obstacles onto 2d grid
@@ -23,6 +21,9 @@ private:
     int transform(int val, bool direction);
     // rounds given coordinates up/down to obstacle_map indices, sets four elements around given coordinates as blocked
     void modifyObstacleMap(int x, int y);
+    //for getting robot position
+    void getRobotPosition(float &robotX, float &robotY); //needs to use gps
+
 
 public:
     //given values are expected to be in meters, but otherwise are in: ObstacleMap units
@@ -36,7 +37,8 @@ public:
     // call update() before for accurate map
     bool obstacle_map[size][size];
     //rebuilds ObstacleMap with given Obstacles
-    void update(std::vector<Point&> obstacles);
-    //for testing purposes only, prints a visual representation of ObstacleMap, 1 = obstacle, 0 = empty
+    void update(std::vector<Point> obstacles);
+    //for testing purposes only, prints a visual representation of ObstacleMap,
+    //1 = obstacle, 0 = empty
     void print();
 };
