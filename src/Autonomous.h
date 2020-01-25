@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 #include "../src/lidar/Cluster.h"
+#include "WorldData.h"
 
 class Autonomous {
     public:
-        Autonomous();
+        Autonomous(PointXY, std::shared_ptr<WorldData>);
         //Returns a pair of floats, in heading, speed
         //Accepts parameter, current heading of the robot
         std::pair<float, float> getDirections (float currHeading);
@@ -17,5 +18,7 @@ class Autonomous {
         std::pair<float, float> stateForwards (float currHeading, std::pair<float, float> directions);
         std::pair<float, float> stateTurn (float currHeading, std::pair<float, float> directions);
         std::pair<float, float> stateBackwards (float currHeading, std::pair<float, float> directions);
+        std::shared_ptr<WorldData> worldData;
+        PointXY target;
 
 };
