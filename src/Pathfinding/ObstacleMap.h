@@ -2,6 +2,7 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
+#include "Geometry.h" //remove once we include slam files
 
 // todo: include Point struct located in slam files
 
@@ -11,6 +12,7 @@
 // recreate grid as orientation/location changes
 
 //uses default constructor with no params
+
 
 class ObstacleMap{
 

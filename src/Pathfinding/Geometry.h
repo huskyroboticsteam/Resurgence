@@ -3,13 +3,16 @@
 
 // static float const err = 0.000001
 
-// struct Point
-// {
-//     double x; //float?
-//     double y; //float?
+ struct Point
+ {
+     int x; //float?
+     int y; //float?
 
 //     bool equals(Point p);
-// };
+ };
+
+
+
 
 // struct Node
 // {
