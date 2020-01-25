@@ -8,39 +8,6 @@
 
 namespace AR
 {
-double findAngle(cv::Point a, cv::Point b, cv::Point c)
-{
-	a = a - b; // shift vectors so that B is at the origin
-	b = b - b;
-	c = c - b;
-	double dot_product = a.ddot(c);
-	double a_mag = sqrt((a.x * a.x) + (a.y * a.y));
-	double c_mag = sqrt((c.x * c.x) + (c.y * c.y));
-	return acos(dot_product / (a_mag * c_mag));
-}
-
-cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
-{
-	double sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) +
-	                 R.at<double>(1, 0) * R.at<double>(1, 0));
-
-	bool singular = util::almostEqual(sy, 0);
-
-	double x, y, z;
-	if (!singular)
-	{
-		x = atan2(R.at<double>(2, 1), R.at<double>(2, 2));
-		y = atan2(-R.at<double>(2, 0), sy);
-		z = atan2(R.at<double>(1, 0), R.at<double>(0, 0));
-	}
-	else
-	{
-		x = atan2(-R.at<double>(1, 2), R.at<double>(1, 1));
-		y = atan2(-R.at<double>(2, 0), sy);
-		z = 0;
-	}
-	return cv::Vec3f(x, y, z);
-}
 
 void checkCorners(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
                   cv::Point bottom_left)
@@ -56,23 +23,15 @@ Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
          cv::Point bottom_left)
 {
 	// validate points
+	//TODO determine if checkcorners is actually necessary
 	//	checkCorners(top_left, top_right, bottom_right, bottom_left);
 
 	// fill vector with points
-	std::vector<cv::Point> points;
-	points.push_back(top_left);
-	points.push_back(top_right);
-	points.push_back(bottom_right);
-	points.push_back(bottom_left);
+	corners.push_back(top_left);
+	corners.push_back(top_right);
+    corners.push_back(bottom_right);
+    corners.push_back(bottom_left);
 
-	// turn points into Corners
-	for (size_t i = 0; i < points.size(); i++)
-	{
-		size_t last_index = i == 0 ? points.size() - 1 : i - 1;
-		size_t next_index = i == points.size() - 1 ? 0 : i + 1;
-		double internal_angle = findAngle(points[last_index], points[i], points[next_index]);
-		corners.push_back(Corner{internal_angle, points[i]});
-	}
 	calcOrientation();
 }
 
@@ -98,12 +57,12 @@ cv::Point Tag::getCenter() const
 		size_t next = (i == 3 ? 0 : i + 1);
 		size_t prev = (i == 0 ? 3 : i - 1);
 		tri_centers.push_back(
-		    getTriCenter(corners[prev].point, corners[i].point, corners[next].point));
+		    getTriCenter(corners[prev], corners[i], corners[next]));
 	}
 	return getQuadCenter(tri_centers[0], tri_centers[1], tri_centers[2], tri_centers[3]);
 }
 
-std::vector<Corner> Tag::getCorners() const
+std::vector<cv::Point> Tag::getCorners() const
 {
 	return corners;
 }
@@ -118,7 +77,7 @@ void Tag::calcOrientation()
 	// add detected corners to image points vector
 	for (int i = 0; i < corners.size(); i++)
 	{
-		image_points.push_back(corners[i].point);
+		image_points.push_back(corners[i]);
 	}
 
 	// create ideal object points
@@ -145,29 +104,6 @@ void Tag::calcOrientation()
 	// store rotation and translation vectors in this tag instance
 	rvec = _rvec;
 	tvec = _tvec;
-
-	// calculate rotation matrix
-	cv::Mat rmat;
-	cv::Rodrigues(rvec, rmat);
-	std::cout << "rmat: " << rmat << std::endl;
-
-	// calculate euler angles
-	orientation = rotationMatrixToEulerAngles(rmat);
-}
-
-float Tag::getPitch() const
-{
-	return orientation[0];
-}
-
-float Tag::getYaw() const
-{
-	return orientation[1];
-}
-
-float Tag::getRoll() const
-{
-	return orientation[2];
 }
 
 cv::Vec3d Tag::getRVec() const

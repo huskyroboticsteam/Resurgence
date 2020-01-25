@@ -52,16 +52,6 @@ const cv::Mat CAMERA_PARAMS(3, 3, CV_64FC1, *CAMERA_PARAMS_ARRAY);
 const cv::Mat DISTORTION_PARAMS(5, 1, CV_64FC1, *DISTORTION_PARAMS_ARRAY);
 
 /**
-   Struct type representing a corner of a tag.
-   Includes internal angle and the coordinates as an OpenCV Point.
- */
-struct Corner
-{
-	double angle;
-	cv::Point point;
-};
-
-/**
    @brief Enum containing values for the corner indices.
 
    This is mostly used internally but may be used as a reference to see what the correct
@@ -86,39 +76,29 @@ enum CornerIndex
 class Tag
 {
   private:
-	/** Stores the corners of the tag in the image */
-	std::vector<Corner> corners;
-	/** Stores the orientation Euler angles */
-	cv::Vec3d orientation;
-	cv::Vec3d rvec;
-	cv::Vec3d tvec;
-	/** Calculates the orientation Euler angles */
-	void calcOrientation();
+		/** Stores the corners of the tag in the image */
+		std::vector<cv::Point> corners;
+		cv::Vec3d rvec;
+		cv::Vec3d tvec;
+		/** Calculates the orientation */
+		void calcOrientation();
 
   public:
-	/**
-	   Constructor for a Tag. Takes four OpenCV points which are the coordinates of the
-	   corners of the Tag in the image. Note the order of points; this will be checked and
-	   an AR::InvalidCornerException will be thrown if ordering is incorrect.
-	 */
-	Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-	    cv::Point bottom_left);
-	/** Gets the coordinates of the center of the tag. */
-	cv::Point getCenter() const;
-	/**
-	    Gets the corners of the tag. Note that this is a const operation and a copy of the
-	    corners will be returned.
-	*/
-	std::vector<Corner> getCorners() const;
-	/** Gets the pitch (rotation about x axis) of the tag */
-	float getPitch() const;
-	/** Gets the yaw (rotation about y axis) of the tag */
-	float getYaw() const;
-	/** Gets the roll (rotation about z axis) of the tag */
-	float getRoll() const;
-	/** Gets the distance from the camera to the tag. CURRENTLY UNIMPLEMENTED. */
-	float getDistance();
-	cv::Vec3d getRVec() const;
-	cv::Vec3d getTVec() const;
+		/**
+		   Constructor for a Tag. Takes four OpenCV points which are the coordinates of the
+		   corners of the Tag in the image. Note the order of points; this will be checked and
+		   an AR::InvalidCornerException will be thrown if ordering is incorrect.
+		*/
+		Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
+			cv::Point bottom_left);
+		/** Gets the coordinates of the center of the tag. */
+		cv::Point getCenter() const;
+		/**
+		   Gets the corners of the tag. Note that this is a const operation and a copy of the
+		   corners will be returned.
+		*/
+		std::vector<cv::Point> getCorners() const;
+		cv::Vec3d getRVec() const;
+		cv::Vec3d getTVec() const;
 };
 } // namespace AR
