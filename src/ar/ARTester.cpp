@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 		// draw markers on the center and corners
 		for (AR::Tag tag : tags)
 		{
-			std::vector<AR::Corner> corners = tag.getCorners();
+			std::vector<cv::Point> corners = tag.getCorners();
 			corners.push_back(corners[0]);
 			for (int i = 0; i < corners.size() - 1; i++)
 			{
