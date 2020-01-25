@@ -1,6 +1,7 @@
 find_package(OpenCV REQUIRED)
 add_executable(ar_test
   ARTester.cpp
+  CameraParams.cpp
   Detector.cpp
   Tag.cpp
   ../Util.cpp)

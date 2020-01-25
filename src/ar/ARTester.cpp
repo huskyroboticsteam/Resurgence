@@ -70,6 +70,10 @@ int main(int argc, char *argv[])
 	cv::createTrackbar(THRESH2_TRACKBAR_NAME, ORIG_WINDOW_NAME, &thresh2_val, 256);
 	cv::createTrackbar(BLUR_TRACKBAR_NAME, ORIG_WINDOW_NAME, &blur_val, 10);
 
+	//TODO replace later
+	AR::CameraParams params = AR::CameraParams::DEFAULT;
+	AR::Detector detector(params);
+
 	while (true)
 	{
 		cap.read(frame);
@@ -85,7 +89,7 @@ int main(int argc, char *argv[])
 
 		// pass frame to detector here
 		std::vector<AR::Tag> tags =
-		    AR::findTags(frame, gray, edges, thresh_val, thresh2_val, blur_val);
+		    detector.findTags(frame, gray, edges, thresh_val, thresh2_val, blur_val);
 
 		// show locations of tags in window
 		std::cout << "Found " << tags.size() << " tags" << std::endl;

@@ -130,7 +130,12 @@ bool contourInsideAnother(std::vector<cv::Point2f> input, std::vector<cv::Point2
 	return false;
 }
 
-std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
+Detector::Detector(CameraParams params) : cam(params)
+{
+	cam = params;
+}
+
+std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
                           int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
 	// set of "ideal" points used for perspective transform
@@ -219,7 +224,7 @@ std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
 	return output;
 }
 
-std::vector<Tag> findTags(cv::Mat input, int canny_thresh_1, int canny_thresh_2, int blur_size)
+std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
 	cv::Mat junk; // this Mat won't be used later. it's just used to be passed as a
 	              // reference to the function this is overloading.
