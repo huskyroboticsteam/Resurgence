@@ -10,8 +10,10 @@ add_executable(Rover
         CommandLineOptions.cpp
         Globals.cpp
         Network.cpp
-	HindsightCAN/CANPacket.c
-        HindsightCAN/CANCommon.c)
+        ParseCAN.cpp
+        HindsightCAN/CANPacket.c
+        HindsightCAN/CANCommon.c
+        HindsightCAN/Port.c)
 
 #target_link_libraries(Rover ${OpenCV_LIBS})
 

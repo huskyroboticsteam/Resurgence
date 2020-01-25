@@ -6,6 +6,7 @@
 extern "C" 
 {
     #include "HindsightCAN/CANPacket.h"
+    #include "HindsightCAN/CANCommon.h"
 }
 
 #include <cstdint>

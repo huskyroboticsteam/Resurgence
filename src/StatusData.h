@@ -1,3 +1,6 @@
+#ifndef STATUS_DATA_H
+#define STATUS_DATA_H
+
 typedef struct
 {
     // Current list of things to keep track
@@ -64,3 +67,5 @@ typedef struct
     // TODO: Add in science readings
 
 } StatusData;
+
+#endif

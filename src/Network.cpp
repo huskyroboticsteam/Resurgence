@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "Network.h"
+#include "ParseCAN.h"
 
 #include <cassert>
 
