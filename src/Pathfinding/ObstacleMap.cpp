@@ -3,10 +3,10 @@
 #include <cstdlib>
 
 //gets robot position
-inline void ObstacleMap::getRobotPosition(float robotX, float robotY)
+inline void ObstacleMap::getRobotPosition(float &robotX, float &robotY)
 {
-    robotX = 10.0f;
-    robotY = 10.0f;
+    robotX = 5.0f;
+    robotY = 5.0f;
 }
 
 
@@ -36,11 +36,11 @@ int ObstacleMap::transform(int val, bool direction)
 //rebuilds ObstacleMap with given Obstacles
 void ObstacleMap::update(std::vector<Point> obstacles)
 {
-    float robotX = -2.0f;
-    float robotY = -2.0f;
-    std::cout << robotX << " " << robotY << std::endl;
+    float robotX = 0.0f;
+    float robotY = 0.0f;
     getRobotPosition(robotX, robotY);
-    //.getRobotPosition(robotX, robotY); // todo: figure out how to get robot position, use filter, ask Benton
+    std::cout << robotX << " " << robotY << std::endl;
+    //.getRobotPosition(robotX, robotY); // todo: figure out how to get current robot position, use filter, ask Benton
     resetObstacleMap();
     int x, y;
     for (int i = 0; i < obstacles.size(); i++) {

@@ -24,7 +24,7 @@ private:
     // rounds given coordinates up/down to obstacle_map indices, sets four elements around given coordinates as blocked
     void modifyObstacleMap(int x, int y);
     //for getting robot position
-    void getRobotPosition(float robotX, float robotY);
+    void getRobotPosition(float &robotX, float &robotY);
 
 
 public:
