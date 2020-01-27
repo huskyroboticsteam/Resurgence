@@ -14,6 +14,9 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 
 constexpr bool EXTRA_WINDOWS = true;
 
+// Set to whichever camera params should be used
+const AR::CameraParams PARAMS = AR::CameraParams::WEBCAM;
+
 int camera_id = 0;
 
 std::vector<cv::Point2d> projectCube(double len, cv::Vec3d rvec, cv::Vec3d tvec)
@@ -29,8 +32,8 @@ std::vector<cv::Point2d> projectCube(double len, cv::Vec3d rvec, cv::Vec3d tvec)
 	object_points.push_back(cv::Point3d((len/2), (len/2), len));
 	object_points.push_back(cv::Point3d((len/2), -(len/2), len));
 	object_points.push_back(cv::Point3d(-(len/2), -(len/2), len));
-	cv::projectPoints(object_points, rvec, tvec, AR::CAMERA_PARAMS, AR::DISTORTION_PARAMS,
-	                  image_points);
+	cv::projectPoints(object_points, rvec, tvec, PARAMS.getCameraParams(),
+					  PARAMS.getDistCoeff(), image_points);
 	
 	return image_points;
 }
@@ -70,9 +73,7 @@ int main(int argc, char *argv[])
 	cv::createTrackbar(THRESH2_TRACKBAR_NAME, ORIG_WINDOW_NAME, &thresh2_val, 256);
 	cv::createTrackbar(BLUR_TRACKBAR_NAME, ORIG_WINDOW_NAME, &blur_val, 10);
 
-	//TODO replace later
-	AR::CameraParams params = AR::CameraParams::DEFAULT;
-	AR::Detector detector(params);
+	AR::Detector detector(PARAMS);
 
 	while (true)
 	{

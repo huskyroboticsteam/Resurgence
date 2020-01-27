@@ -114,6 +114,12 @@ bool isTagData(cv::Mat &data)
 	return (whiteCount == 3 && blackCount == 1);
 }
 
+TagID getTagIDFromData(cv::Mat& data)
+{
+	// TODO fill in later
+	return ID_UNKNOWN;
+}
+
 /**
    Checks whether or not any points of one contour are inside another contour. Used to filter
    out duplicates.
@@ -214,8 +220,10 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 			{
 				// add it to tag quadrilaterals vector
 				tag_quads.push_back(current);
+				// determine id
+				TagID id = getTagIDFromData(data);
 				// make Tag with approximated coordinates
-				Tag tag(current[0], current[1], current[2], current[3]);
+				Tag tag(current[0], current[1], current[2], current[3], cam, id);
 				output.push_back(tag);
 			}
 		}

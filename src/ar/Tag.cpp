@@ -20,7 +20,7 @@ void checkCorners(cv::Point top_left, cv::Point top_right, cv::Point bottom_righ
 }
 
 Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-         cv::Point bottom_left)
+         cv::Point bottom_left, CameraParams params, TagID tag_id) : params(params)
 {
 	// validate points
 	//TODO determine if checkcorners is actually necessary
@@ -98,8 +98,8 @@ void Tag::calcOrientation()
 	cv::Mat _tvec;
 
 	// estimate pose
-	cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, _rvec, _tvec,
-	             false, cv::SOLVEPNP_IPPE_SQUARE);
+	cv::solvePnP(object_points, image_points, params.getCameraParams(), params.getDistCoeff(),
+				 _rvec, _tvec, false, cv::SOLVEPNP_IPPE_SQUARE);
 
 	// store rotation and translation vectors in this tag instance
 	rvec = _rvec;
