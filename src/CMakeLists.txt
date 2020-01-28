@@ -13,7 +13,7 @@ add_executable(Rover
         ParseCAN.cpp
         HindsightCAN/CANPacket.c
         HindsightCAN/CANCommon.c
-        HindsightCAN/Port.c)
+        HindsightCAN/PortTemplate.c)
 
 #target_link_libraries(Rover ${OpenCV_LIBS})
 
