@@ -1,4 +1,4 @@
-#include "ObstacleMap.h"
+//#include "ObstacleMap.h"
 #include "Pather2.h"
 #include <vector>
 #include <queue>
@@ -50,20 +50,6 @@ Pather2::point BFS(bool map[][10], Pather2::point dest){
         return error;
     }
 
-    //create 2D boolean array and use memset to set all values as false
-    //bool visited[21][21];
-    //memset(visited, false, sizeof visited); 
-
-    // for (int i = 0; i < ROW; i++) {
-    //     for (int j = 0; j < COL; j++) {
-    //         if (map[i][j]) {
-    //             visited[i][j] = true;
-    //         }
-    //     }
-    // } 
-
-    //set source as visited, create point with dist 0 from src and push to queue of nodes to be checked
-    //visited[src.x][src.y] = true;
     map[src.x][src.y] = true;
     std::queue<Pather2::queueNode> q;
     std::queue<Pather2::point> newQueue;
@@ -114,61 +100,68 @@ Pather2::point BFS(bool map[][10], Pather2::point dest){
     return error;
 }
 
-/*
-GET DESTINATION METHOD
+Pather2::point getDest(Pather2::point GPSRobot, Pather2::point GPSDest) {
 
-Given GPS points, get line
-Using 
-
-*/
-Pather2::point getDest(Pather2::point GPSRobot, Pather2::Point GPSDest) {
-
-    const float PI = 3.1415927
-    Pather2::point dest = {0,0};
+    const float PI = 3.1415927;
+    struct Pather2::point dest;
     float ratioX = GPSDest.x - GPSRobot.x;
     float ratioY = GPSDest.y - GPSRobot.y;
 
     // check if dest directly horizontal or vertical
     if (ratioX == 0) {
         if (ratioY > 0) {
-            return {10,0}
+            dest.x = 10;
+            dest.y = 0;
         } else {
-            return {10,20}
+            dest.x = 10;
+            dest.y = 20;
         }
+        return dest;
     } else if (ratioY == 0) {
         if (ratioX > 0) {
-            return {20,10}
+            dest.x = 20;
+            dest.y = 10;
         } else {
-            return {0,10}
+            dest.x = 0;
+            dest.y = 10;
         }
+        return dest;
     }
     float ratio = ratioY / ratioX;
-    float tanValue = atan(ratio) * 180 / PI
+    float tanValue = atan(ratio) * 180 / PI;
 
-    if tanValue == 45 {
-        return {0,20};
-    } else if tanValue == 135 {
-        return {0,0};
-    } else if tanValue == 225 {
-        return {0,20};
-    }else if tanValue == 315 {
-        return {20,20};
-    } else if (45 < tanValue < 135) {
-        int shiftInX = int((10 / ratioY) * ratioX);
-        shiftInX += 10;
-        dest = {shiftInX, 0};
-    } else if (225 < tanValue < 315) {
-        int shiftInX = int((10 / ratioY) * ratioX);
-        shiftInX += 10;
-        dest = {shiftInX, 20};
-    } else if ((tanValue > 315) || (tanValue < 45){
-        int shiftInY = int((10 / ratioX) * ratioY);
+    if (tanValue == 45) {
+        dest.x = 0;
+        dest.y = 20;
+    } else if (tanValue == 135) {
+        dest.x = 0;
+        dest.y = 0;
+    } else if (tanValue == 225) {
+        dest.x = 0;
+        dest.y = 20;
+    }else if (tanValue == 315) {
+        dest.x = 20;
+        dest.y = 20;
+    } else if (45 < tanValue && tanValue < 135) {
+        int shiftInY = int((10 / ratioY) * ratioX);
         shiftInY += 10;
-        dest = {20, shiftInY};
-    } else if (135 < tanValue < 225) {
-        int shiftInY = int((10 / ratioX) * ratioY);
+        dest.x = 0;
+        dest.y = shiftInY;
+    } else if (225 < tanValue && tanValue < 315) {
+        int shiftInY = int((10 / ratioY) * ratioX);
         shiftInY += 10;
-        dest = {0, shiftInY};
+        dest.x = 20;
+        dest.y = shiftInY;
+    } else if ((tanValue > 315) || (tanValue < 45)){
+        int shiftInX = int((10 / ratioX) * ratioY);
+        shiftInX += 10;
+        dest.x = shiftInX;
+        dest.y = 20;
+    } else if (135 < tanValue && tanValue < 225) {
+        int shiftInX = int((10 / ratioX) * ratioY);
+        shiftInX += 10;
+        dest.x = shiftInX;
+        dest.y = 0;
     }
     return dest;
 }
@@ -236,6 +229,10 @@ int main() {
                           {false, false, true, true, true, false, true, true, true, false}};
     struct Pather2::point destination = {9,9};
     struct Pather2::point nextPoint = getPath(map, destination);
+    struct Pather2::point GPS_src = {0,0};
+    struct Pather2::point GPS_dest = {70, 10};
+    struct Pather2::point dest = getDest(GPS_src, GPS_dest);
+    std::cout << "(" << dest.x << "," << dest.y << ")" << std::endl;
     std::cout << "First point in path: ";
     std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
     std::cout << "" << std::endl;
