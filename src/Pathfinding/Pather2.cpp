@@ -1,9 +1,9 @@
-//#include "ObstacleMap.h"
+#include "ObstacleMap.h"
 #include "Pather2.h"
 #include <vector>
 #include <queue>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 //matrix size
 #define ROW 10
@@ -114,6 +114,65 @@ Pather2::point BFS(bool map[][10], Pather2::point dest){
     return error;
 }
 
+/*
+GET DESTINATION METHOD
+
+Given GPS points, get line
+Using 
+
+*/
+Pather2::point getDest(Pather2::point GPSRobot, Pather2::Point GPSDest) {
+
+    const float PI = 3.1415927
+    Pather2::point dest = {0,0};
+    float ratioX = GPSDest.x - GPSRobot.x;
+    float ratioY = GPSDest.y - GPSRobot.y;
+
+    // check if dest directly horizontal or vertical
+    if (ratioX == 0) {
+        if (ratioY > 0) {
+            return {10,0}
+        } else {
+            return {10,20}
+        }
+    } else if (ratioY == 0) {
+        if (ratioX > 0) {
+            return {20,10}
+        } else {
+            return {0,10}
+        }
+    }
+    float ratio = ratioY / ratioX;
+    float tanValue = atan(ratio) * 180 / PI
+
+    if tanValue == 45 {
+        return {0,20};
+    } else if tanValue == 135 {
+        return {0,0};
+    } else if tanValue == 225 {
+        return {0,20};
+    }else if tanValue == 315 {
+        return {20,20};
+    } else if (45 < tanValue < 135) {
+        int shiftInX = int((10 / ratioY) * ratioX);
+        shiftInX += 10;
+        dest = {shiftInX, 0};
+    } else if (225 < tanValue < 315) {
+        int shiftInX = int((10 / ratioY) * ratioX);
+        shiftInX += 10;
+        dest = {shiftInX, 20};
+    } else if ((tanValue > 315) || (tanValue < 45){
+        int shiftInY = int((10 / ratioX) * ratioY);
+        shiftInY += 10;
+        dest = {20, shiftInY};
+    } else if (135 < tanValue < 225) {
+        int shiftInY = int((10 / ratioX) * ratioY);
+        shiftInY += 10;
+        dest = {0, shiftInY};
+    }
+    return dest;
+}
+
 // Pather2::Pather2(ObstacleMap obstacle_map)
 // {
 //     map = obstacle_map;   
@@ -131,14 +190,34 @@ Pather2::point getPath(bool map[10][10], Pather2::point dest){
 }
 
 
-Pather2::point relocateDestination(Pather2::point src, Pather2::point dest){
-  int height = 0;
-  Pather2::point newDest;
-  if (dest.x != src.x) {
-    height = 10*(dest.y - src.y)/(dest.x - src.x);
-    double angle = tan(height/10);
-    newDest = {10 * cos(angle), 10 * sin(angle)};
-  }
+Pather2::point relocateDestination(Pather2::point dest){
+  while(//new destination is not valide)
+    if (dest.x == 20) {
+      switch(dest.y) {
+        case 0: dest.x -= 1;
+                dest.y += 1;
+                break;
+        case 20: dest.x -= 1;
+                dest.y -=;
+                break;
+        default: dest.x -= 1;
+      }
+    } else if (dest.x == 0) {
+      switch(dest.y) {
+        case 0: dest.x += 1;
+                dest.y += 1;
+                break;
+        case 20: dest.y -= 1;
+                dest.x += 1;
+                break;
+        default: dest.x += 1;
+      }
+    } else if (dest.y == 20) {
+      dest.y -= 1;
+    } else if (dest.y == 0) {
+      dest.y += 1;
+    } else if ()
+    }
 }
 
 //If the relative location of the target is put into some invalid coordinate (unreachable),
@@ -146,15 +225,15 @@ Pather2::point relocateDestination(Pather2::point src, Pather2::point dest){
 
 int main() {
     bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
- {true, true, false, false, true, true, true, false, true, true},
- {false, false, false, false, true, true, false, true, false, true},
- {false, false, false, true, false, true, false, false, true, true},
- {false, true, false, true, false, true, false, false, false, false},
- {true, false, true, false, true, false, true, false, true, false},
- {false, false, false, false, false, true, true, true, false, false},
- {false, true, false, false, false, false, false, false, true, true},
- {true, true, true, false, false, true, true, false, false, true}, 
- {false, false, true, true, true, false, true, true, true, false}};
+                          {true, true, false, false, true, true, true, false, true, true},
+                          {false, false, false, false, true, true, false, true, false, true},
+                          {false, false, false, true, false, true, false, false, true, true},
+                          {false, true, false, true, false, true, false, false, false, false},
+                          {true, false, true, false, true, false, true, false, true, false},
+                          {false, false, false, false, false, true, true, true, false, false},
+                          {false, true, false, false, false, false, false, false, true, true},
+                          {true, true, true, false, false, true, true, false, false, true}, 
+                          {false, false, true, true, true, false, true, true, true, false}};
     struct Pather2::point destination = {9,9};
     struct Pather2::point nextPoint = getPath(map, destination);
     std::cout << "First point in path: ";
