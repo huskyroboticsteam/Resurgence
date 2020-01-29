@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <iostream>
+#include <math.h>
 
 //matrix size
 #define ROW 10
@@ -39,13 +40,12 @@ bool isValid(int x, int y) {
 int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
 int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
 
-Pather2::point getPath(bool map[][10], Pather2::point dest){
+Pather2::point BFS(bool map[][10], Pather2::point dest){
 
     Pather2::point src = {5,5};
-
+    struct Pather2::point error = {-1, -1};
     //check if src and dest are represented with 1 not 0
     if ((map[src.x][src.y]) || (map[dest.x][dest.y])){
-        struct Pather2::point error = {-1, -1};
         //todo: change destination if destination is blocked
         return error;
     }
@@ -111,13 +111,38 @@ Pather2::point getPath(bool map[][10], Pather2::point dest){
         }
 
     }
-    return src;
+    return error;
 }
 
 // Pather2::Pather2(ObstacleMap obstacle_map)
 // {
 //     map = obstacle_map;   
 // }
+
+Pather2::point getPath(bool map[10][10], Pather2::point dest){
+  Pather2::point rslt = BFS(map, dest);
+  struct Pather2::point src = {4, 4};
+  while(rslt.x == -1 && rslt.y == -1) {
+    //do something
+    //relocate the relative coordinate of the original target (some functions to determinate new end point relative to our local map)
+    rslt = BFS(map, dest);
+  }
+  return rslt;
+}
+
+
+Pather2::point relocateDestination(Pather2::point src, Pather2::point dest){
+  int height = 0;
+  Pather2::point newDest;
+  if (dest.x != src.x) {
+    height = 10*(dest.y - src.y)/(dest.x - src.x);
+    double angle = tan(height/10);
+    newDest = {10 * cos(angle), 10 * sin(angle)};
+  }
+}
+
+//If the relative location of the target is put into some invalid coordinate (unreachable),
+//then assign any neighbor valid coordinate as the new relative location, and make search again. 
 
 int main() {
     bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
