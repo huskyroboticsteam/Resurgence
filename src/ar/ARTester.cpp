@@ -15,7 +15,7 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 constexpr bool EXTRA_WINDOWS = true;
 
 // Set to whichever camera params should be used
-const AR::CameraParams PARAMS = AR::CameraParams::WEBCAM;
+const AR::CameraParams PARAMS = AR::WEBCAM_PARAMS;
 
 int camera_id = 0;
 
