@@ -4,6 +4,8 @@ project(Rover LANGUAGES CXX C)
 
 #find_package(OpenCV CONFIG REQUIRED)
 
+add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
+
 #TODO Possibly: Add a CMakeLists inside HindsightCAN submodule
 add_executable(Rover
         Rover.cpp
