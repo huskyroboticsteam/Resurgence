@@ -12,13 +12,117 @@ constexpr int BLACK_THRESH = 150;
 
 namespace AR
 {
-cv::Mat removeNoise(cv::Mat input, int blur_size = 5)
+// Declares all functions that will be used
+bool isTagData(cv::Mat &data);
+cv::Mat readData(cv::Mat &input);
+TagID getTagIDFromData(cv::Mat& data);
+cv::Mat removeNoise(cv::Mat input, int blur_size = 5);
+int averageRegion(cv::Mat &input, int x1, int y1, int x2, int y2);
+std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad);
+std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, cv::Mat &grayscale,
+                                            	int canny_thresh_1, int canny_thresh_2, int blur_size);
+bool contourInsideAnother(std::vector<cv::Point2f> input, std::vector<cv::Point2f> other);
+cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
+                  cv::Mat &grayscale);
+void approxContours(std::vector<std::vector<cv::Point> > contours,
+					std::vector<std::vector<cv::Point2f> > &quads);
+
+
+// Overloaded function, only used if grayscale image and outline of edges are not needed
+std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
-	cv::Mat blur;
-	int bsize = (blur_size * 2) + 1;
-	cv::GaussianBlur(input, blur, cv::Size(bsize, bsize), 0);
-	// FIXME: Change to bilateral blur or some other faster method.
-	return blur;
+	cv::Mat junk; // this Mat won't be used later. it's just used to be passed as a
+	              // reference to the function this is overloading.
+	return findTags(input, junk, junk, canny_thresh_1, canny_thresh_2, blur_size);
+}
+
+// Stores grayscale version and outlined edged version of input image to grayscale and edges
+// Returns a vector of Tags obtained from the picture
+std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
+                          int canny_thresh_1, int canny_thresh_2, int blur_size)
+{
+	// Stores all quadrilateral shapes found in the image to the vector: allQuads
+	std::vector<std::vector<cv::Point2f> > allQuads 
+		= getQuads(input, edges, grayscale, canny_thresh_1, canny_thresh_2, blur_size);
+
+	// vector to hold quadrilaterals that are definitely tags 
+	// ~ used to check for duplicates
+	std::vector<std::vector<cv::Point2f> > tag_quads;
+
+	// vector to hold Tag Data that will be returned
+	std::vector<Tag> output;
+
+	// set of "ideal" points used for perspective transform
+	std::vector<cv::Point2f> ideal;
+	ideal.push_back(cv::Point2f(0, 0));
+	ideal.push_back(cv::Point2f(IDEAL_TAG_SIZE, 0));
+	ideal.push_back(cv::Point2f(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
+	ideal.push_back(cv::Point2f(0, IDEAL_TAG_SIZE));
+
+	// loop over all quadrilateral candidates
+	for (size_t i = 0; i < allQuads.size(); i++)
+	{
+		// Sorts corner points in order of: top-left, top-right, 
+		// bottom-right, bottom-left and stores it in quad
+		std::vector<cv::Point2f> quad = sortCorners(allQuads[i]);
+
+		// perspective transform the quadrilateral to a flat square
+		cv::Mat transform = cv::getPerspectiveTransform(quad, ideal);
+		cv::Mat square;
+		cv::warpPerspective(grayscale, square, transform,
+		                    cv::Size(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
+
+		// Attempt to read the data as if it was an AR tag
+		cv::Mat data = readData(square);
+
+		// Checks if data matches criteria for an AR tag
+		if (isTagData(data))
+		{
+			// check if any corners of this quadrilateral are inside one already found (i.e. it
+			// is a duplicate)
+			bool duplicate = false;
+			for (std::vector<cv::Point2f> q : tag_quads)
+			{
+				duplicate = duplicate || contourInsideAnother(quad, q);
+			}
+			// if not a duplicate:
+			if (!duplicate)
+			{
+				// add it to tag quadrilaterals vector
+				tag_quads.push_back(quad);
+				// determine id
+				TagID id = getTagIDFromData(data);
+				// Create new Tag object with approximated coordinates
+				Tag tag(quad[0], quad[1], quad[2], quad[3], cam, id);
+				output.push_back(tag);
+			}
+		}
+	}
+
+	return output;
+}
+
+std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, cv::Mat &grayscale,
+                                                int canny_thresh_1, int canny_thresh_2, int blur_size)
+{
+    // Applies grayscale, outlines objects in the picture and emphasizes outlines
+	edges = prepImage(input, blur_size, canny_thresh_1, canny_thresh_2, grayscale);
+
+	// vector to hold any contours found
+	std::vector<std::vector<cv::Point> > contours;
+	// vector to hold quadrilaterals that could be possible tags
+	std::vector<std::vector<cv::Point2f> > quads;
+	std::vector<cv::Vec4i> heirarchy; // ?? What is this vector for
+
+	// Find contours in the image and saves it to contours
+	cv::findContours(edges, contours, heirarchy, cv::RETR_TREE,
+	                 cv::CHAIN_APPROX_SIMPLE);
+
+	// Approximates contours with polygons. 
+	// Saves contour to quads if polygon is a quadrilateral
+	approxContours(contours, quads);
+
+    return quads;
 }
 
 cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
@@ -37,24 +141,50 @@ cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
 	return edges;
 }
 
-/**
-   Averages the pixel values in the region of the given Mat bounded by the given coordinates.
-*/
-int averageRegion(cv::Mat &input, int x1, int y1, int x2, int y2)
+cv::Mat removeNoise(cv::Mat input, int blur_size)
 {
-	// get only the region specified
-	cv::Mat region = input(cv::Rect2i(x1, y1, x2 - x1, y2 - y1));
-	// average all pixels
-	cv::Scalar mean = cv::mean(region);
-	// get the first component of the scalar
-	int avg = mean[0];
-	return avg;
+	cv::Mat blur;
+	int bsize = (blur_size * 2) + 1;
+	cv::GaussianBlur(input, blur, cv::Size(bsize, bsize), 0);
+	// FIXME: Change to bilateral blur or some other faster method.
+	return blur;
 }
 
-/**
+void approxContours(std::vector<std::vector<cv::Point> > contours,
+                    std::vector<std::vector<cv::Point2f> > &quads) 
+{
+    for (size_t i = 0; i < contours.size(); i++) {
+        std::vector<cv::Point2f> approx;
+		cv::approxPolyDP(contours[i], approx, arcLength(contours[i], true) * 0.02, true);
+		// if polygons have 4 sides and are of an appropriately large area
+		if (approx.size() == 4 && cv::isContourConvex(approx) &&
+		    cv::contourArea(approx) > CONTOUR_AREA_THRESH)
+		{
+			// add them to quadrilateral candidates
+			quads.push_back(approx);
+		}
+    }
+}
+
+std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad) {
+    std::cout << "image points (before sorting): " << quad;
+    // sort points into the correct order (top left, top right, bottom right,
+    // bottom left)
+    std::sort(quad.begin(), quad.end(),
+                [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.y < pt2.y; });
+    std::sort(quad.begin(), quad.begin() + 2,
+                [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x < pt2.x; });
+    std::sort(quad.begin() + 2, quad.end(),
+                [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x > pt2.x; });
+    std::cout << " image points (after sorting): " << quad << std::endl;
+
+    return quad;
+}
+
+/*
    Reads the data in a given Mat containing a flat image of an AR Tag and returns it as a 9x9
    Mat of the average pixel values for each grid square.
- */
+*/
 cv::Mat readData(cv::Mat &input)
 {
 	cv::Mat output = cv::Mat::zeros(TAG_GRID_SIZE, TAG_GRID_SIZE, CV_8UC1);
@@ -68,11 +198,26 @@ cv::Mat readData(cv::Mat &input)
 			int y1 = r * square_size;
 			int x2 = (c + 1) * square_size;
 			int y2 = (r + 1) * square_size;
-			int val = averageRegion(input, x1, y1, x2, y2);
+			// divides avg pixel value by threshold. Black is stored as 0, White as 1
+			int val = averageRegion(input, x1, y1, x2, y2) / BLACK_THRESH;
 			output.at<uint8_t>(r, c) = val;
 		}
 	}
 	return output;
+}
+
+/*
+   Averages the pixel values in the region of the given Mat bounded by the given coordinates.
+*/
+int averageRegion(cv::Mat &input, int x1, int y1, int x2, int y2)
+{
+	// get only the region specified
+	cv::Mat region = input(cv::Rect2i(x1, y1, x2 - x1, y2 - y1));
+	// average all pixels
+	cv::Scalar mean = cv::mean(region);
+	// get the first component of the scalar
+	int avg = mean[0];
+	return avg;
 }
 
 bool isTagData(cv::Mat &data)
@@ -83,9 +228,9 @@ bool isTagData(cv::Mat &data)
 		for (int y = 0; y < TAG_GRID_SIZE; y++)
 		{
 			// skip the region in the middle of the tag, we only care about the border
-			if ((x < 2 || x > 6) && (y < 2 || y > 6))
+			if ((x < 2 || x > 6) || (y < 2 || y > 6))
 			{
-				if (data.at<uint8_t>(y, x) > BLACK_THRESH)
+				if (data.at<uint8_t>(y, x) == 1)
 				{
 					return false;
 				}
@@ -100,7 +245,7 @@ bool isTagData(cv::Mat &data)
 	int blackCount = 0;
 	for (cv::Point p : orientationPoints)
 	{
-		if (data.at<uint8_t>(p) > BLACK_THRESH)
+		if (data.at<uint8_t>(p) == 1)
 		{
 			whiteCount++;
 		}
@@ -114,16 +259,10 @@ bool isTagData(cv::Mat &data)
 	return (whiteCount == 3 && blackCount == 1);
 }
 
-TagID getTagIDFromData(cv::Mat& data)
-{
-	// TODO fill in later
-	return ID_UNKNOWN;
-}
-
-/**
+/*
    Checks whether or not any points of one contour are inside another contour. Used to filter
    out duplicates.
- */
+*/
 bool contourInsideAnother(std::vector<cv::Point2f> input, std::vector<cv::Point2f> other)
 {
 	for (cv::Point p : input)
@@ -136,106 +275,15 @@ bool contourInsideAnother(std::vector<cv::Point2f> input, std::vector<cv::Point2
 	return false;
 }
 
+TagID getTagIDFromData(cv::Mat& data)
+{
+	// TODO fill in later
+	return ID_UNKNOWN;
+}
+
 Detector::Detector(CameraParams params) : cam(params)
 {
 	cam = params;
 }
 
-std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
-                          int canny_thresh_1, int canny_thresh_2, int blur_size)
-{
-	// set of "ideal" points used for perspective transform
-	std::vector<cv::Point2f> ideal;
-	ideal.push_back(cv::Point2f(0, 0));
-	ideal.push_back(cv::Point2f(IDEAL_TAG_SIZE, 0));
-	ideal.push_back(cv::Point2f(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
-	ideal.push_back(cv::Point2f(0, IDEAL_TAG_SIZE));
-
-	cv::Mat prepped_input =
-	    prepImage(input, blur_size, canny_thresh_1, canny_thresh_2, grayscale);
-	edges = prepped_input;
-
-	// vector to hold the contours found
-	std::vector<std::vector<cv::Point>> contours;
-	// vector to hold quadrilaterals that could be possible tags
-	std::vector<std::vector<cv::Point2f>> quads;
-	// vector to hold quadrilaterals that are definitely tags
-	std::vector<std::vector<cv::Point2f>> tag_quads;
-	std::vector<cv::Vec4i> heirarchy;
-	// vector to hold Tags for output
-	std::vector<Tag> output;
-	// find contours in the image
-	cv::findContours(prepped_input, contours, heirarchy, cv::RETR_TREE,
-	                 cv::CHAIN_APPROX_SIMPLE);
-
-	// loop over all contours and approximate them with polygons
-	for (size_t i = 0; i < contours.size(); i++)
-	{
-		std::vector<cv::Point2f> approx;
-		cv::approxPolyDP(contours[i], approx, arcLength(contours[i], true) * 0.02, true);
-		// if polygons have 4 sides and are of an appropriately large area
-		if (approx.size() == 4 && cv::isContourConvex(approx) &&
-		    cv::contourArea(approx) > CONTOUR_AREA_THRESH)
-		{
-			// add them to quadrilateral candidates
-			quads.push_back(approx);
-		}
-	}
-
-	// loop over all quadrilateral candidates
-	for (size_t i = 0; i < quads.size(); i++)
-	{
-		std::vector<cv::Point2f> current = quads[i];
-		std::cout << "image points (before sorting): " << current;
-		// sort points into the correct order (top left, top right, bottom right,
-		// bottom left)
-		std::sort(current.begin(), current.end(),
-		          [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.y < pt2.y; });
-		std::sort(current.begin(), current.begin() + 2,
-		          [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x < pt2.x; });
-		std::sort(current.begin() + 2, current.end(),
-		          [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x > pt2.x; });
-		std::cout << " image points (after sorting): " << current << std::endl;
-
-		// perspective transform the quadrilateral to a flat square, and attempt to read data
-		// from it like it is an AR tag
-		cv::Mat transform = cv::getPerspectiveTransform(current, ideal);
-		cv::Mat square;
-		cv::warpPerspective(grayscale, square, transform,
-		                    cv::Size(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
-		cv::Mat data = readData(square);
-
-		// if the data read matches criteria for a tag
-		if (isTagData(data))
-		{
-			// check if any corners of this quadrilateral are inside one already found (i.e. it
-			// is a duplicate)
-			bool duplicate = false;
-			for (std::vector<cv::Point2f> q : tag_quads)
-			{
-				duplicate = contourInsideAnother(current, q) || duplicate;
-			}
-			// if not a duplicate:
-			if (!duplicate)
-			{
-				// add it to tag quadrilaterals vector
-				tag_quads.push_back(current);
-				// determine id
-				TagID id = getTagIDFromData(data);
-				// make Tag with approximated coordinates
-				Tag tag(current[0], current[1], current[2], current[3], cam, id);
-				output.push_back(tag);
-			}
-		}
-	}
-
-	return output;
-}
-
-std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny_thresh_2, int blur_size)
-{
-	cv::Mat junk; // this Mat won't be used later. it's just used to be passed as a
-	              // reference to the function this is overloading.
-	return findTags(input, junk, junk, canny_thresh_1, canny_thresh_2, blur_size);
-}
 } // namespace AR
