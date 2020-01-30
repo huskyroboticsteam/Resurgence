@@ -1,3 +1,4 @@
+#pragma once
 #include "lidar/Cluster.h"
 
 class WorldData {

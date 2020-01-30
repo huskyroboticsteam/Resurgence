@@ -1,13 +1,15 @@
 #include "Autonomous.h"
 #include <cmath>
 
-Autonomous::Autonomous(PointXY _target,
-                       std::shared_ptr<WorldData> _worldData) :
-    worldData(_worldData),
+Autonomous::Autonomous(PointXY _target) :
     target(_target) {
     state = 1;
     targetHeading = -1;
     turnDirection = 0;
+}
+
+void Autonomous::setWorldData(std::shared_ptr<WorldData> wdata) {
+    this->worldData = wdata;
 }
 
 // Function that returns heading and speed in a pair
