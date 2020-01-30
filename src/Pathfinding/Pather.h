@@ -27,5 +27,11 @@ class Pather {
             int y;
         }
         std::vector<point> visited
+        struct queueElement {
+            point previousNode; //how to use point struct in here?
+            point activeNode;
+            int distFromSrc;
+            bool operator<(const queueElement & locate1) const {return !(distFromSrc < locate1.disFromSrc);}
+        }
         
 };

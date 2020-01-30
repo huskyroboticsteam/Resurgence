@@ -2,16 +2,21 @@
 #include "Pather.h"
 #include <vector>
 
-std::vector<std::vector<bool>> map;
-std::vector<Pather::point> visited;
 Pather::Pather(std::vector<std::vector<bool>> map)
 {
     this.map = map;
 }
 
-std::vector<Pather::point> Dijkstra() {
-    std::vector<Pather::point> pathToTarget;
-    a.push_back(struct Point p = {map.size()/2, map.size()/2});
+std::vector<Pather::point> Dijkstra(int map[5][5]) {
+    std::vector<Pather::point> visited;
+    priorityqueue <Pather::queueElement> active;
+    struct Pather::point src = {map.size()/2, map.size()/2};
+    //need endpoint
+    active.emplace(active{src, src, 0});
+    while (!active.empty()){
+        std::queueElement min = active.top(); //get minimum distance 
+        double distance = min
+    }
     // While a is not empty and we haven't found target:
         // Pull out first value from a and mark visited
         // Foreach neighbor, check if we have closer route
@@ -22,6 +27,16 @@ std::vector<Pather::point> Dijkstra() {
     return pathToTarget; 
 }
 
-bool shorterDistance(Geometry::node_ptr nodePoint) {
+//get the location of 2 locations on the map, and put them into elementPriority object
+//and return it. 
+Pather::queueElement processData(Pather::point locationA, Pather::point locationB) {
+    double distance = calculateDistance(locationA, locationB);
+    return Pather::queueElement elementP = {locationA, locationB, distance};
+}
 
+//calculate and return the distance between 2 location A and B
+double Pather::calculateDistance(Pather::point locationA, Pather::point locationB) {
+    //do some Math over to calculate and return the distance
+    double distance = 0.0; 
+    return distance;
 }

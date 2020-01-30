@@ -87,6 +87,8 @@ int main(int argc, char *argv[])
 			}
 			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 15,
 			               2, cv::FILLED);
+			std::cout << "center: " << tag.getCenter() << " p: " << tag.getPitch()
+			          << " r: " << tag.getRoll() << " y: " << tag.getYaw() << std::endl;
 		}
 
 		cv::imshow(ORIG_WINDOW_NAME, frame);
