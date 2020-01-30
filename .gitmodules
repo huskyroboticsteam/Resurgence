@@ -1,0 +1,3 @@
+[submodule "src/HindsightCAN"]
+	path = src/HindsightCAN
+	url = https://github.com/huskyroboticsteam/HindsightCAN.git

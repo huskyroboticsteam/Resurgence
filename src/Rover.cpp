@@ -13,11 +13,13 @@ int main(int argc, char **argv)
     InitializeRover();
     for(;;)
     {
-        ParseIncomingNetworkPackets(); // NOTE(sasha): Since we're probably going to be using SocketCAN,
+        //ParseIncomingNetworkPackets(); // NOTE(sasha): Since we're probably going to be using SocketCAN,
                                        //              this includes both CAN and Network packets (maybe)
 
 	    //UpdateRoverState();
         SendOutgoingNetworkPackets();
+        TestCANPackets();
+
     }
     return 0;
 }

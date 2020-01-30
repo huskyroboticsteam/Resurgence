@@ -5,6 +5,12 @@
 #include "Json.hpp"
 #include "Data.h"
 
+extern "C" 
+{
+    #include "HindsightCAN/CANPacket.h"
+    #include "HindsightCAN/CANCommon.h"
+}
+
 #include <cstdint>
 
 enum class PacketKind
@@ -23,3 +29,4 @@ struct Packet
 void InitializeNetwork();
 void ParseIncomingNetworkPackets();
 void SendOutgoingNetworkPackets();
+void TestCANPackets();

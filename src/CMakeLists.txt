@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(Rover LANGUAGES CXX)
+project(Rover LANGUAGES CXX C)
 
 enable_testing()
 
 find_package(Catch2 REQUIRED)
 
 find_package(OpenCV REQUIRED)
+
+add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
 add_subdirectory(ar)
 
@@ -17,8 +19,12 @@ add_executable(Rover
         CommandLineOptions.cpp
         Globals.cpp
         Network.cpp
-	      Util.cpp
-        mapping/EnvMap.cpp)
+	Util.cpp
+        mapping/EnvMap.cpp
+        ParseCAN.cpp
+        HindsightCAN/CANPacket.c
+        HindsightCAN/CANCommon.c
+        HindsightCAN/PortTemplate.c)
 
 add_executable(tests
   Tests.cpp
