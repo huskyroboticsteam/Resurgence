@@ -1,5 +1,5 @@
-echo "test"
-git clone --recursive https://github.com/catchorg/Catch2.git
+git submodule update --init --recursive
+git clone https://github.com/catchorg/Catch2.git
 cd ./Catch2
 cmake -B./build -H. -DBUILD_TESTING=OFF
 cmake --build ./build/ --target install
