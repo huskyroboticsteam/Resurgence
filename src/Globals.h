@@ -2,7 +2,7 @@
 
 #include "CommandLineOptions.h"
 #include "Network.h"
-#include "StatusData.h"
+#include "Networking/StatusData.h"
 
 #include <vector>
 

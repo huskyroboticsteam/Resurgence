@@ -1,5 +1,5 @@
-#include "Globals.h"
-#include "Network.h"
+#include "../Globals.h"
+#include "../Network.h"
 
 void ParseCANPacket(CANPacket p)
 {

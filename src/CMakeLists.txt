@@ -21,7 +21,7 @@ add_executable(Rover
         Network.cpp
 	Util.cpp
         mapping/EnvMap.cpp
-        ParseCAN.cpp
+        Networking/ParseCAN.cpp
         HindsightCAN/CANPacket.c
         HindsightCAN/CANCommon.c
         HindsightCAN/PortTemplate.c)

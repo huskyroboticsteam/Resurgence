@@ -1,6 +1,6 @@
 #include "Globals.h"
 #include "Network.h"
-#include "ParseCAN.h"
+#include "Networking/ParseCAN.h"
 
 #include <cassert>
 
@@ -125,12 +125,12 @@ void TestCANPackets()
 }
 
 // Send JSON data to Mission Control
-void SendOutgoingNetworkPacket(OutboundData p)
+void SendOutgoingNetworkPacket(StatusData p)
 {
     // We're going to construct our json data here. We're going to use camel
     // case for the json data fields to conform to Mission Control style guide
-    nlohmann::json j;
-    j["timestamp"] = p.timestamp;
-    j["backLeftMotorCurrent"] = p.back_left_motor_current;
+    //nlohmann::json j;
+    //j["timestamp"] = p.timestamp;
+    //j["backLeftMotorCurrent"] = p.back_left_motor_current;
     // TODO: Finish constructing JSON here
 }
