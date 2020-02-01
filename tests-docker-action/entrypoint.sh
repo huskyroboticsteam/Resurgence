@@ -1,4 +1,3 @@
-echo "test"
 git submodule update --init --recursive
 git clone https://github.com/catchorg/Catch2.git
 cd ./Catch2
