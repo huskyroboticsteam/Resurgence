@@ -11,6 +11,7 @@
 
 //uses default constructor with no params
 
+//todo whatever we get from GPS convert to meters
 
 class ObstacleMap{
 
@@ -19,11 +20,11 @@ private:
     void resetObstacleMap();
     // rounds up/down based on direction being true/false, true = up, false = down
     int transform(int val, bool direction);
-    // rounds given coordinates up/down to obstacle_map indices, sets four elements around given coordinates as blocked
+    // rounds given coordinates up/down to obstacle_map indices,
+    //sets four elements around given coordinates as blocked
     void modifyObstacleMap(int x, int y);
     //for getting robot position
     void getRobotPosition(float &robotX, float &robotY);//needs to use gps
-
 
 public:
     //given values are expected to be in meters, but otherwise are in: ObstacleMap units
