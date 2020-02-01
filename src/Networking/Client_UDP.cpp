@@ -1,60 +1,51 @@
 // UDP client program 
-#include <arpa/inet.h> 
-#include <netinet/in.h> 
-#include <stdio.h> 
-#include <stdlib.h>
-#include <sys/socket.h> 
-#include <sys/types.h> 
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
-#define PORT 5000 
-#define MAXLINE 1024 
-int main() 
-{ 
-	int sockfd; 
-	struct sockaddr_in servaddr; 
+#include <cstring>
 
-	// Creating socket file descriptor 
-	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
-		printf("socket creation failed"); 
-		exit(0); 
-	} 
+#define PORT 5000
+#define MAXLINE 1024
 
-	memset(&servaddr, 0, sizeof(servaddr)); 
+int main()
+{
+	int sockfd;
 
-	// Filling server information 
-	servaddr.sin_family = AF_INET; 
-	servaddr.sin_port = htons(PORT); 
-	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		std::cout << "socket creation failed";
+		exit(0);
+	}
+
+	struct sockaddr_in servaddr;
+	bzero(&servaddr, sizeof(servaddr));
+
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(PORT);
+	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // set this to whatever the server's IP is
 
 	std::string str;
-	char buffer[MAXLINE]; 
+	char buffer[MAXLINE];
 
 	int n;
-	socklen_t len; 
+	socklen_t len;
 
 	while (1) {
 		std::cout << "Enter message: ";
-		std::cin >> str;
+		std::getline(std::cin, str);
 
-		if (str == "exit")
+		if (str == "exit") {
 			break;
+		}
 		
-		// send hello message to server 
-		sendto(sockfd, str.c_str(), str.length(), 
-			0, (const struct sockaddr*)&servaddr, 
-			sizeof(servaddr)); 
+		sendto(sockfd, str.c_str(), str.length(), 0, (const struct sockaddr*)&servaddr, sizeof(servaddr));
 
 		bzero(buffer, sizeof(buffer));
-
-		// receive server's response 
-		printf("Message from server: "); 
-		n = recvfrom(sockfd, buffer, MAXLINE, 
-					0, (struct sockaddr*)&servaddr, 
-					&len); 
-		puts(buffer); 
+		n = recvfrom(sockfd, buffer, MAXLINE, 0, (struct sockaddr*)&servaddr, &len);
+		std::cout << "Message from server: " << buffer << std::endl;
 	}
 
-	close(sockfd); 
-	return 0; 
+	close(sockfd);
 } 
