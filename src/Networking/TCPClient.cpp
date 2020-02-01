@@ -17,6 +17,7 @@ int main()
 
 	if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
 		std::cout << "Error : Connect Failed" << std::endl;
+		exit(0);
 	}
 
 	std::string str;
