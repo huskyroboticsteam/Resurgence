@@ -14,8 +14,6 @@ add_subdirectory(ar)
 
 add_subdirectory(ObstacleSim)
 
-add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
-
 add_executable(Rover
         Rover.cpp
         CommandLineOptions.cpp
