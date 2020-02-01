@@ -1,155 +1,84 @@
 #include "../Globals.h"
 #include "../Network.h"
+#include "json.hpp"
+
+// Expected JSON format of Globals::status_data: each key is a string from one of the group lists below
+// which identifies the device. The value is another JSON object containing one or more keys corresponding to
+// telemetry measurements.
+
+const std::string broadcast_group[] = {};
+const std::string reserved_group[] = {};
+const std::string master_group[] = {"master_broadcast", "jetson"};
+const std::string power_group[] = {
+    "power_broadcast",
+    "battery",
+    "chassis_main",
+    "chassis_drive_l",
+    "chassis_drive_r",
+    "arm_1",
+    "arm_2",
+    "science"
+};
+const std::string motor_group[] = {
+    "motor_broadcast",
+    "arm_base",
+    "shoulder",
+    "elbow",
+    "forearm",
+    "diffleft",
+    "diffright",
+    "hand",
+    "front_left_motor",
+    "front_right_motor",
+    "back_left_motor",
+    "back_right_motor",
+    "science"
+};
+const std::string telemetry_group[] = {"telemetry_broadcast", "localization", "imu", "temperature", "science"};
+const std::string gpio_group[] = {"gpio_broadcast"};
+
+const std::string *groups[] = {
+    broadcast_group,
+    reserved_group,
+    master_group,
+    power_group,
+    motor_group,
+    telemetry_group,
+    gpio_group
+};
+
+const std::string telem_types[] = {
+    "voltage",
+    "current",
+    "power_rail_state",
+    "temperature",
+    "angular_position",
+    "gps_latitude",
+    "gps_longitude",
+    "magnetometer_direction",
+    "accelerometer_x",
+    "accelerometer_y",
+    "accelerometer_z",
+    "gyro_x",
+    "gyro_y",
+    "gyro_z",
+    "limit_switch_status",
+    "adc", // dunno what this means
+    "gpio_state"
+};
+
+const std::string getDeviceTelemetryName(CANPacket &p) {
+    uint8_t device_group = GetSenderDeviceGroupCode(&p);
+    uint8_t device_serial = GetSenderDeviceSerialNumber(&p);
+    return groups[device_group][device_serial];
+}
 
 void ParseCANPacket(CANPacket p)
 {
-    // Future calls for parsing data example
-    // Some functions not present yet so it wont compile
-    // Refer to ParseCAN.h for values needed to be parsed
-    
-    if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_CHASSIS_FL) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.front_left_motor_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.front_left_motor_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.front_left_motor_temp_mc = DecodeTelemetryDataSigned(&p);
+    if (PacketIsOfID(&p, ID_TELEMETRY_REPORT)) {
+        const std::string device_name = getDeviceTelemetryName(p);
+        const std::string telem_type = telem_types[DecodeTelemetryType(&p)];
+        // TODO is this data sometimes unsigned?
+        Globals::status_data[device_name][telem_type] = DecodeTelemetryDataSigned(&p);
     }
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_CHASSIS_FR) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.front_right_motor_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.front_right_motor_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.front_right_motor_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_CHASSIS_BL) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.back_left_motor_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.back_left_motor_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.back_left_motor_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_CHASSIS_BR) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.back_right_motor_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.back_right_motor_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.back_right_motor_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-    
-    //base
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_BASE) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.base_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.base_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-           	Globals::status_data.base_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-    //shoulder
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_SHOULDER) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.shoulder_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.shoulder_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.shoulder_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-    //elbow
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_ELBOW) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.elbow_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.elbow_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.elbow_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-    //forearm/wrist
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_FOREARM) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.wrist_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.wrist_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.wrist_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-
-    //diffleft/wrist1
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_DIFF_WRIST_L) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.diffleft_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.diffleft_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.diffleft_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-    //diffright/wrist2
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_DIFF_WRIST_R) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.diffright_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.diffright_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.diffright_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-    //hand
-    else if (SenderPacketIsInGroup(&p, DEVICE_GROUP_MOTOR_CONTROL) &&
-            SenderPacketIsOfDevice(&p, DEVICE_SERIAL_MOTOR_HAND) &&
-            PacketIsOfID(&p, ID_TELEMETRY_REPORT))
-    {
-        if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_VOLTAGE)
-            Globals::status_data.hand_voltage_mv = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_CURRENT)
-            Globals::status_data.hand_current_ma = DecodeTelemetryDataSigned(&p);
-        else if (DecodeTelemetryType(&p) == PACKET_TELEMETRY_TEMPERATURE)
-            Globals::status_data.hand_temp_mc = DecodeTelemetryDataSigned(&p);
-    }
-
-    //TODO: Add in arm limit switch status
-    
-    //TODO: Add in GPS status data
-
-    //TODO: Add in accelerometer telemetry status data
-
-    //TODO: Add in gyroscope telemetry status data
 }

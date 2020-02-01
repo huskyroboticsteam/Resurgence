@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
+set(CMAKE_CXX_STANDARD 11) # For the json library
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
@@ -48,5 +50,15 @@ include(Catch)
 target_link_libraries(tests Catch2::Catch2)
 target_link_libraries(tests ${OpenCV_LIBS})
 catch_discover_tests(tests)
+
+add_executable(TestCAN
+        test.cpp
+        CommandLineOptions.cpp
+        Globals.cpp
+        Network.cpp
+        Networking/ParseCAN.cpp
+        HindsightCAN/CANPacket.c
+        HindsightCAN/CANCommon.c
+        HindsightCAN/PortTemplate.c)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)

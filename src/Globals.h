@@ -2,7 +2,7 @@
 
 #include "CommandLineOptions.h"
 #include "Network.h"
-#include "Networking/StatusData.h"
+#include "Networking/json.hpp"
 
 #include <vector>
 
@@ -23,5 +23,5 @@ namespace Globals
     extern std::vector<Packet> outgoing_packets;
     extern int can_fd;
     extern int net_fd;
-    extern StatusData status_data;
+    extern nlohmann::json status_data;
 }
