@@ -40,6 +40,11 @@ void ObstacleMap::update(std::vector<Point> obstacles)
     float robotY = 0.0f;
     getRobotPosition(robotX, robotY);
     resetObstacleMap();
+<<<<<<< HEAD
+=======
+    std::vector<std::shared_ptr<const MapObstacle>> data = getData(robotX, robotY);
+    std::cout << data.size();
+>>>>>>> develop
     int x, y;
     for (int i = 0; i < obstacles.size(); i++) {
         //filter which obstacles we want to plot
@@ -52,8 +57,11 @@ void ObstacleMap::update(std::vector<Point> obstacles)
     }
 }
 
+<<<<<<< HEAD
 //rounds given coordinates up/down to obstacle_map indices,
 //sets four elements around given coordinates as blocked
+=======
+>>>>>>> develop
 inline void ObstacleMap::modifyObstacleMap(int x, int  y)
 {
     if (transform(y, true) < size && transform(x, true) < size) {
@@ -88,4 +96,38 @@ void ObstacleMap::print()
         }
         std::cout << std::endl;
     } 
+<<<<<<< HEAD
 }
+=======
+}
+
+ObstacleMap::ObstacleMap(EnvMap& envmap) : slam_map(envmap)
+{
+    updateObstacleMap();
+}
+
+
+// int main()
+// {
+//     ObstacleMap map = ObstacleMap();
+//     map.print();
+// };
+
+
+//old tester mapobstacle
+// #pragma once
+// #include <vector>
+
+// struct Vec2
+// {
+// public:
+//     float x;
+//     float y;
+// };
+
+// struct MapObstacle
+// {
+// public:
+//     std::vector<Vec2> points;
+// };
+>>>>>>> develop

@@ -1,4 +1,8 @@
 build/*
 
-.vscode
 src/Pathfinding/a.out
+.vscode/*
+.vscode
+MapObstacle.h
+**/*.out
+
