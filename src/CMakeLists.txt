@@ -10,6 +10,12 @@ find_package(OpenCV REQUIRED)
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
+enable_testing()
+
+find_package(Catch2 REQUIRED)
+
+find_package(OpenCV REQUIRED)
+
 add_subdirectory(ar)
 
 add_subdirectory(ObstacleSim)
@@ -24,7 +30,9 @@ add_executable(Rover
         Networking/ParseCAN.cpp
         HindsightCAN/CANPacket.c
         HindsightCAN/CANCommon.c
-        HindsightCAN/PortTemplate.c)
+        HindsightCAN/PortTemplate.c
+        Util.cpp
+        mapping/EnvMap.cpp)
 
 add_executable(tests
   Tests.cpp
