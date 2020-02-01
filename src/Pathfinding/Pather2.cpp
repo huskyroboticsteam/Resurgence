@@ -1,4 +1,3 @@
-//#include "ObstacleMap.h"
 #include "Pather2.h"
 #include <vector>
 #include <queue>
@@ -8,7 +7,6 @@
 //matrix size
 #define ROW 10
 #define COL 10
-
 
 // print functions for debugging
 void print_point(std::queue<Pather2::point> q) {
@@ -32,15 +30,16 @@ void print_queue(std::queue<Pather2::queueNode> q) {
   std::cout << std::endl;
 }
 
-//check if node is valid
-bool isValid(int x, int y) {
-    return ((x >= 0) && (x < ROW) && (y >= 0) && (y < COL));
-}
-
-int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
-int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
 
 Pather2::point BFS(bool map[][10], Pather2::point dest){
+
+    //check if node is valid
+    bool isValid(int x, int y) {
+      return ((x >= 0) && (x < ROW) && (y >= 0) && (y < COL));
+    }
+
+    int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
+    int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
 
     Pather2::point src = {5,5};
     struct Pather2::point error = {-1, -1};
@@ -102,7 +101,7 @@ Pather2::point BFS(bool map[][10], Pather2::point dest){
 
 Pather2::point getDest(Pather2::point GPSRobot, Pather2::point GPSDest) {
 
-    const float PI = 3.1415927;
+    const float PI = atan(1) * 4;
     struct Pather2::point dest;
     float ratioX = GPSDest.x - GPSRobot.x;
     float ratioY = GPSDest.y - GPSRobot.y;
@@ -166,11 +165,6 @@ Pather2::point getDest(Pather2::point GPSRobot, Pather2::point GPSDest) {
     return dest;
 }
 
-// Pather2::Pather2(ObstacleMap obstacle_map)
-// {
-//     map = obstacle_map;   
-// }
-
 Pather2::point getPath(bool map[10][10], Pather2::point dest){
   Pather2::point rslt = BFS(map, dest);
   struct Pather2::point src = {4, 4};
@@ -182,7 +176,8 @@ Pather2::point getPath(bool map[10][10], Pather2::point dest){
   return rslt;
 }
 
-
+//If the relative location of the target is put into some invalid coordinate (unreachable),
+//then assign any neighbor valid coordinate as the new relative location, and make search again. 
 Pather2::point relocateDestination(Pather2::point dest){
   while(//new destination is not valide)
     if (dest.x == 20) {
@@ -213,8 +208,24 @@ Pather2::point relocateDestination(Pather2::point dest){
     }
 }
 
-//If the relative location of the target is put into some invalid coordinate (unreachable),
-//then assign any neighbor valid coordinate as the new relative location, and make search again. 
+int returnHeading() {
+        struct Pather2::point GPS_src = {0,0};
+        struct Pather2::point GPS_dest = {70, 10};
+        struct Pather2::point destination = getDest(GPS_src, GPS_dest);
+        struct Pather2::point nextPoint = getPath(map, destination);
+        std::cout << "(" << destination.x << "," << destination.y << ")" << std::endl;
+        std::cout << "First point in path: ";
+        std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
+        std::cout << "" << std::endl;
+        
+        int xDiff = nextPoint.y - 10;
+        int yDiff = nextPoint.x - 10;
+        const float PI = atan(1) * 4;
+        int ratio = yDiff / xDiff;
+        float headingAngle = atan(ratio) * 180 / PI;
+        headingAngle -= 90;
+        return headingAngle;
+}
 
 int main() {
     bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
