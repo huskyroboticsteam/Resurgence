@@ -14,7 +14,7 @@ int main()
 
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(PORT);
-	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // set this to whatever the server's IP is
+	servaddr.sin_addr.s_addr = inet_addr(SERVER_IP);
 
 	std::string str;
 	char buffer[MAXLINE];
