@@ -2,8 +2,7 @@
 
 #include "CommandLineOptions.h"
 #include "Network.h"
-#include "Networking/StatusData.h"
-#include "json.hpp"
+#include "Networking/json.hpp"
 
 #include <vector>
 

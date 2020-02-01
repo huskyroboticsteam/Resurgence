@@ -2,7 +2,6 @@
 #include "../Network.h"
 #include "json.hpp"
 
-
 // Expected JSON format of Globals::status_data: each key is a string from one of the group lists below
 // which identifies the device. The value is another JSON object containing one or more keys corresponding to
 // telemetry measurements.
