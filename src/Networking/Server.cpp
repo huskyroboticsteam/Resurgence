@@ -1,14 +1,4 @@
-// Server program 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <iostream>
-#include <cstring>
-
-#define PORT 5000
-#define MAXLINE 1024
+#include "NetworkConstants.h"
 
 int max(int x, int y) {
 	if (x > y)
@@ -66,16 +56,23 @@ int main()
 			if ((childpid = fork()) == 0) {
 				close(listenfd);
 
-				bzero(buffer, sizeof(buffer));
-				read(connfd, buffer, sizeof(buffer));
-				std::cout << "Message From TCP client: " << buffer << std::endl;
+				while (1) {
+					bzero(buffer, sizeof(buffer));
+					n = read(connfd, buffer, sizeof(buffer));
+					if (n < 0 || strcmp(buffer, CLOSE_TCP) == 0) {
+						break;
+					}
+					std::cout << "Message From TCP client: " << buffer << std::endl;
 
-				std::string str(buffer);
-				str = "Echoing \"" + str + "\"";
-				write(connfd, str.c_str(), str.length());
+					std::string str(buffer);
+					str = "Echoing \"" + str + "\"";
+					write(connfd, str.c_str(), str.length());
+				}
+
 				close(connfd);
 				exit(0);
 			}
+			
 			close(connfd);
 		}
 
