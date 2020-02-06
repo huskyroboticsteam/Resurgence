@@ -10,12 +10,27 @@ constexpr int TAG_GRID_SIZE = 9;
 constexpr int IDEAL_TAG_SIZE = TAG_GRID_SIZE * 25;
 constexpr int BLACK_THRESH = 150;
 
+constexpr int table[][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+							{1, 0, 0, 0, 0, 1, 1, 1},
+							{1, 0, 0, 1, 1, 0, 0, 1},
+							{0, 0, 0, 1, 1, 1, 1, 0},
+							{1, 0, 1, 0, 1, 0, 1, 0},
+							{0, 0, 1, 0, 1, 1, 0, 1},
+							{0, 0, 1, 1, 0, 0, 1, 1},
+							{1, 0, 1, 1, 0, 1, 0, 0},
+							{0, 1, 0, 0, 1, 0, 1, 1},
+							{1, 1, 0, 0, 1, 1, 0, 0},
+							{1, 1, 0, 1, 0, 0, 1, 0},
+							{0, 1, 0, 1, 0, 1, 0, 1},
+							{1, 1, 1, 0, 0, 0, 0, 1}};
+
 namespace AR
 {
 // Declares all functions that will be used
 bool isTagData(cv::Mat &data);
 cv::Mat readData(cv::Mat &input);
 TagID getTagIDFromData(cv::Mat& data);
+std::vector<int> getBitData(cv::Mat data);
 cv::Mat removeNoise(cv::Mat input, int blur_size = 5);
 int averageRegion(cv::Mat &input, int x1, int y1, int x2, int y2);
 std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad);
@@ -277,9 +292,70 @@ bool contourInsideAnother(std::vector<cv::Point2f> input, std::vector<cv::Point2
 
 TagID getTagIDFromData(cv::Mat& data)
 {
-	// TODO fill in later
-	return ID_UNKNOWN;
+	TagID tags[] = {ID_LEG_1, ID_LEG_4L, ID_LEG_4R, ID_LEG_6L, ID_UNKNOWN, ID_UNKNOWN,
+                    ID_LEG_7L, ID_LEG_7R, ID_LEG_5L, ID_LEG_5R, ID_LEG_2, ID_LEG_3, ID_LEG_6R};
+
+    std::vector<int> bits = getBitData(data);
+
+    int found = 0;
+    int number = 4;
+
+    // Loops over the table and find the closest matching bit code
+    for (int i = 0; i < sizeof(table) && found < 2; i++) {
+        int count = 0;
+        for (int j = 0; j < bits.size(); j++) {
+            if (table[i][j] != bits[j]) {
+                count++;
+            }
+        }
+
+        if (count == 0) {
+            number = i;
+            found = 2;
+        } else if (count == 1) {
+            if (found == 0) {
+                number = i;
+				found++;
+            } else {
+                return ID_UNKNOWN; // Error: Cannot find single matching Hamming code
+            }
+        }
+    }
+
+    return tags[number];
 }
+
+std::vector<int> getBitData(cv::Mat data) 
+{
+    std::vector<int> bits;
+    for (int row = 5; row < 7; row++) 
+    {
+        for (int col = 2; col < 4; col++)
+        {
+            if (data.at<uint8_t>(row, col) == 0)
+            {
+                bits.push_back(1);
+            }
+            else
+            {
+                bits.push_back(0);
+            }
+        }
+        for (int col = 5; col < 7; col++)
+        {
+            if (data.at<uint8_t>(row, col) == 0)
+            {
+                bits.push_back(1);
+            }
+            else
+            {
+                bits.push_back(0);
+            }
+        }
+    }
+    return bits;
+}
+
 
 Detector::Detector(CameraParams params) : cam(params)
 {

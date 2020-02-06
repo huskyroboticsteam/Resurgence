@@ -32,6 +32,9 @@ Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
     corners.push_back(bottom_right);
     corners.push_back(bottom_left);
 
+	id = tag_id;
+
+
 	calcOrientation();
 }
 
@@ -104,6 +107,11 @@ void Tag::calcOrientation()
 	// store rotation and translation vectors in this tag instance
 	rvec = _rvec;
 	tvec = _tvec;
+}
+
+TagID Tag::getID () const
+{
+	return this->id;
 }
 
 cv::Vec3d Tag::getRVec() const
