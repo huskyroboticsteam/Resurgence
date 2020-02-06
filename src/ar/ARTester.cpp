@@ -94,11 +94,12 @@ int main(int argc, char *argv[])
 
 		// show locations of tags in window
 		std::cout << "Found " << tags.size() << " tags" << std::endl;
-
+		
 		// draw lines between tag points
 		// draw markers on the center and corners
 		for (AR::Tag tag : tags)
 		{
+			std::cout << "Tag ID: " << tag.getID() << std::endl;
 			std::vector<cv::Point> corners = tag.getCorners();
 			corners.push_back(corners[0]);
 			for (int i = 0; i < corners.size() - 1; i++)
