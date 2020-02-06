@@ -10,6 +10,20 @@ constexpr int TAG_GRID_SIZE = 9;
 constexpr int IDEAL_TAG_SIZE = TAG_GRID_SIZE * 25;
 constexpr int BLACK_THRESH = 150;
 
+constexpr int table[][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+							{1, 0, 0, 0, 0, 1, 1, 1},
+							{1, 0, 0, 1, 1, 0, 0, 1},
+							{0, 0, 0, 1, 1, 1, 1, 0},
+							{1, 0, 1, 0, 1, 0, 1, 0},
+							{0, 0, 1, 0, 1, 1, 0, 1},
+							{0, 0, 1, 1, 0, 0, 1, 1},
+							{1, 0, 1, 1, 0, 1, 0, 0},
+							{0, 1, 0, 0, 1, 0, 1, 1},
+							{1, 1, 0, 0, 1, 1, 0, 0},
+							{1, 1, 0, 1, 0, 0, 1, 0},
+							{0, 1, 0, 1, 0, 1, 0, 1},
+							{1, 1, 1, 0, 0, 0, 0, 1}};
+
 namespace AR
 {
 // Declares all functions that will be used
@@ -283,27 +297,11 @@ TagID getTagIDFromData(cv::Mat& data)
 
     std::vector<int> bits = getBitData(data);
 
-    // Adds all the hamming code data
-    std::vector<std::vector<int>> table;
-    std::vector<int> zero = {0, 0, 0, 0, 0, 0, 0, 0}; table.push_back(zero);
-    std::vector<int> one = {1, 0, 0, 0, 0, 1, 1, 1}; table.push_back(one);
-    std::vector<int> two = {1, 0, 0, 1, 1, 0, 0, 1}; table.push_back(two);
-    std::vector<int> three = {0, 0, 0, 1, 1, 1, 1, 0}; table.push_back(three);
-    std::vector<int> four = {1, 0, 1, 0, 1, 0, 1, 0}; table.push_back(four);
-    std::vector<int> five = {0, 0, 1, 0, 1, 1, 0, 1}; table.push_back(five);
-    std::vector<int> six = {0, 0, 1, 1, 0, 0, 1, 1}; table.push_back(six);
-    std::vector<int> seven = {1, 0, 1, 1, 0, 1, 0, 0}; table.push_back(seven);
-    std::vector<int> eight = {0, 1, 0, 0, 1, 0, 1, 1}; table.push_back(eight);
-    std::vector<int> nine = {1, 1, 0, 0, 1, 1, 0, 0}; table.push_back(nine);
-    std::vector<int> ten = {1, 1, 0, 1, 0, 0, 1, 0}; table.push_back(ten);
-    std::vector<int> eleven = {0, 1, 0, 1, 0, 1, 0, 1}; table.push_back(eleven);
-    std::vector<int> twelve = {1, 1, 1, 0, 0, 0, 0, 1}; table.push_back(twelve);
-
     int found = 0;
-    int number;
+    int number = 4;
 
     // Loops over the table and find the closest matching bit code
-    for (int i = 0; i < table.size() && found < 2; i++) {
+    for (int i = 0; i < sizeof(table) && found < 2; i++) {
         int count = 0;
         for (int j = 0; j < bits.size(); j++) {
             if (table[i][j] != bits[j]) {

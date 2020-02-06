@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	//   cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-	//   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+	 cap.set(cv::CAP_PROP_FRAME_WIDTH, 3840);
+	 cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
