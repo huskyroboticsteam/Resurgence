@@ -1,22 +1,21 @@
-#include "Globals.h"
-#include "Network.h"
-#include "Networking/ParseCAN.h"
-extern "C" 
+#include "../Globals.h"
+#include "../Network.h"
+#include "ParseCAN.h"
+extern "C"
 {
-    #include "HindsightCAN/Port.h"
+    #include "../HindsightCAN/Port.h"
 }
-#include <stdio.h>
-#include <assert.h>
+#include <catch2/catch.hpp>
 #include <iostream>
 
-void testBasicCANIDConstruction() 
+TEST_CASE("Basic CAN ID construction", "[CAN]")
 {
     uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL, DEVICE_GROUP_MOTOR_CONTROL, 0x05);
     uint16_t EXPECTED = 0x0505;
-    assert(CAN_ID == EXPECTED);
+    REQUIRE(CAN_ID == EXPECTED);
 }
 
-void testBasicPacketCreation() 
+TEST_CASE("Basic packet creation", "[CAN]")
 {
     uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL, DEVICE_GROUP_MOTOR_CONTROL, 0x05);
     uint8_t testDataPacket[2];
@@ -24,13 +23,14 @@ void testBasicPacketCreation()
     testDataPacket[1] = 0x43;
     CANPacket packet = ConstructCANPacket(CAN_ID, 0x02, testDataPacket);
 
-    assert(packet.id == 0x0505);
-    assert(packet.dlc == 0x02);
-    assert(packet.data[0] == 0x60);
-    assert(packet.data[1] == 0x43);
+    REQUIRE(packet.id == 0x0505);
+    REQUIRE(packet.dlc == 0x02);
+    REQUIRE(packet.data[0] == 0x60);
+    REQUIRE(packet.data[1] == 0x43);
 }
 
-void testParseCAN() {
+TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
+{
     uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL, DEVICE_GROUP_JETSON, DEVICE_SERIAL_JETSON);
     uint8_t testDataPacket[7];
     WriteSenderSerialAndPacketID(testDataPacket, 0x36); // 0x36 is telemetry report
@@ -43,20 +43,5 @@ void testParseCAN() {
 
     ParseCANPacket(packet);
     std::cout << Globals::status_data << std::endl;
-    assert(Globals::status_data.dump() == "{\"front_right_motor\":{\"current\":256}}");
-}
-
-int main() 
-{
-    testBasicCANIDConstruction();
-    std::cout << "pass\n";
-    testBasicPacketCreation();
-    std::cout << "pass\n";
-    testParseCAN();
-    std::cout << "pass\n";
-}
-
-int SendCANPacket(CANPacket packet)
-{
-    return 0;
+    REQUIRE(Globals::status_data.dump() == "{\"front_right_motor\":{\"current\":256}}");
 }

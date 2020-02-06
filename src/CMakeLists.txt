@@ -41,7 +41,16 @@ add_executable(tests
   Util.cpp
   # AR Detection tests
   ar/TagUnitTests.cpp
-  ar/Tag.cpp)
+  ar/Tag.cpp
+  # CAN tests
+  Networking/tests.cpp
+  CommandLineOptions.cpp
+  Globals.cpp
+  Network.cpp
+  Networking/ParseCAN.cpp
+  HindsightCAN/CANPacket.c
+  HindsightCAN/CANCommon.c
+  HindsightCAN/PortTemplate.c)
 
 target_link_libraries(Rover ${OpenCV_LIBS})
 
@@ -51,14 +60,10 @@ target_link_libraries(tests Catch2::Catch2)
 target_link_libraries(tests ${OpenCV_LIBS})
 catch_discover_tests(tests)
 
-add_executable(TestCAN
-        test.cpp
-        CommandLineOptions.cpp
-        Globals.cpp
-        Network.cpp
-        Networking/ParseCAN.cpp
-        HindsightCAN/CANPacket.c
-        HindsightCAN/CANCommon.c
-        HindsightCAN/PortTemplate.c)
+add_executable(Server
+  Networking/Server.cpp)
+
+add_executable(TCPClient
+  Networking/TCPClient.cpp)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
