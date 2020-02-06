@@ -72,12 +72,11 @@ void ParseIncomingNetworkPackets()
 
 void SendOutgoingNetworkPackets()
 {
-    
     for(const Packet &p : Globals::outgoing_packets)
     {
         if(p.kind == PacketKind::CAN){
             #ifdef __linux__
-            
+
             frame.can_id = p.address & 0x1FF;
             frame.can_dlc = 8;
             for(int i = 0; i < 8; i++){
@@ -95,7 +94,7 @@ void SendOutgoingNetworkPackets()
             ;
             //aio_write(Globals::net_fd, p);
     }
-    
+    SendMissionControlStatus();
 }
 
 // For testing uses
@@ -125,7 +124,7 @@ void TestCANPackets()
 }
 
 // Send JSON data to Mission Control
-void SendOutgoingNetworkPacket(StatusData p)
+void SendMissionControlStatus()
 {
     // We're going to construct our json data here. We're going to use camel
     // case for the json data fields to conform to Mission Control style guide
