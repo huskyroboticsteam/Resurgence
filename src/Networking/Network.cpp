@@ -74,7 +74,12 @@ void recvBaseStationPacket()
   char buffer[MAXLINE];
   bzero(buffer, sizeof(buffer));
   read(base_station_fd, buffer, sizeof(buffer));
-  std::cout << buffer << std::endl;
+  std::cout << "Message from base station: " << buffer << std::endl;
+  nlohmann::json parsed_message = nlohmann::json::parse(buffer);
+  // TODO proper input validation. Here we assume we got a dict with key "speed"
+  std::cout << parsed_message["speed"] << std::endl;
+  std::string serialized_status = Globals::status_data.dump();
+  write(base_station_fd, serialized_status.c_str(), serialized_status.length());
 }
 
 // TODO(sasha): We probably want all of this to use asynchronous IO
