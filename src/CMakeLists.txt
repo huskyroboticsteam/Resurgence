@@ -66,4 +66,7 @@ add_executable(Server
 add_executable(TCPClient
   Networking/TCPClient.cpp)
 
+add_executable(FakeBaseStation
+  Networking/FakeBaseStation.cpp)
+
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
