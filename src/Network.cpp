@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Network.h"
 #include "Networking/ParseCAN.h"
+#include "Networking/NetworkConstants.h"
 
 #include <cassert>
 
@@ -17,57 +18,86 @@
 #include <linux/can/raw.h>
 #include <aio.h>
 
-struct sockaddr_can addr;
-struct can_frame frame;
-struct ifreq ifr;
+struct sockaddr_can can_addr;
+struct can_frame can_frame_;
+struct ifreq can_ifr;
 #endif
 
 #include<iostream>
 
-void InitializeNetwork()
+int can_fd;
+int base_station_fd;
+
+void error(const char *msg) {
+  std::cout << msg << std::endl;
+  exit(1);
+}
+
+void InitializeCANSocket()
 {
-    #ifdef __linux__
+  #ifdef __linux__
 
-    if(Globals::can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW))
-        assert(!"Failed to initialize CAN bus!");
+  if(can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW))
+      error("Failed to initialize CAN bus!");
 
-    strcpy(ifr.ifr_name, "can0");
-    ioctl(Globals::can_fd, SIOCGIFINDEX, &ifr);
+  strcpy(can_ifr.ifr_name, "can0");
+  ioctl(can_fd, SIOCGIFINDEX, &can_ifr);
 
-    addr.can_family = AF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
+  can_addr.can_family = AF_CAN;
+  can_addr.can_ifindex = can_ifr.ifr_ifindex;
 
-    bind(Globals::can_fd, (struct sockaddr *)&addr, sizeof(addr));
+  bind(can_fd, (struct sockaddr *)&can_addr, sizeof(can_addr));
 
-    #endif
-    
+  #endif
+}
+
+void InitializeBaseStationSocket()
+{
+	if ((base_station_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    error("Base station socket creation failed");
+	}
+
+	struct sockaddr_in servaddr;
+	bzero(&servaddr, sizeof(servaddr));
+
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(PORT);
+	servaddr.sin_addr.s_addr = inet_addr(SERVER_IP);
+
+	if (connect(base_station_fd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
+		error("Base station connect failed");
+	}
+}
+
+void recvBaseStationPacket()
+{
+  char buffer[MAXLINE];
+  bzero(buffer, sizeof(buffer));
+  read(base_station_fd, buffer, sizeof(buffer));
+  std::cout << buffer << std::endl;
 }
 
 // TODO(sasha): We probably want all of this to use asynchronous IO
 //              Check out POSIX aio.
-void ParseIncomingNetworkPackets()
+void recvCANPacket()
 {
+  #ifdef __linux__
+  socklen_t len = sizeof(can_addr);
 
-    // TODO: Get network packets
-    
-    #ifdef __linux__
-    socklen_t len = sizeof(addr);
+  // TODO: Probably should thread reading CAN
+  recvfrom(can_fd, &can_frame_, sizeof(struct can_frame),
+                0, (struct sockaddr*)&can_addr, &len);
 
-    // TODO: Probably should thread reading CAN
-    recvfrom(Globals::can_fd, &frame, sizeof(struct can_frame),
-                  0, (struct sockaddr*)&addr, &len);
+  CANPacket packet;
+  packet.id = can_frame_.can_id;
 
-    CANPacket packet;
-    packet.id = frame.can_id;
+  for(int i = 0; i < can_frame_.can_dlc; i++){
+      packet.data[i] = can_frame_.data[i];
+  }
 
-    for(int i = 0; i < frame.can_dlc; i++){
-        packet.data[i] = frame.data[i];
-    }
+  ParseCANPacket(packet);
 
-    ParseCANPacket(packet);
-
-    #endif
-
+  #endif
 }
 
 void SendOutgoingNetworkPackets()
@@ -77,24 +107,23 @@ void SendOutgoingNetworkPackets()
         if(p.kind == PacketKind::CAN){
             #ifdef __linux__
 
-            frame.can_id = p.address & 0x1FF;
-            frame.can_dlc = 8;
+            can_frame_.can_id = p.address & 0x1FF;
+            can_frame_.can_dlc = 8;
             for(int i = 0; i < 8; i++){
-                frame.data[i] = p.payload[i];
+                can_frame_.data[i] = p.payload[i];
             }
 
-            sendto(Globals::can_fd, &frame, sizeof(struct can_frame),
-                0, (struct sockaddr*)&addr, sizeof(addr));
+            sendto(can_fd, &can_frame_, sizeof(struct can_frame),
+                0, (struct sockaddr*)&can_addr, sizeof(can_addr));
 
             #endif
             //TODO Maybe?: Use aio
-            //aio_write(Globals::can_fd, p);
+            //aio_write(can_fd, p);
         }
         else if(p.kind == PacketKind::Network)
             ;
-            //aio_write(Globals::net_fd, p);
+            //aio_write(net_fd, p);
     }
-    SendMissionControlStatus();
 }
 
 // For testing uses

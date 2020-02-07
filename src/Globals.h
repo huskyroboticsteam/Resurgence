@@ -21,7 +21,5 @@ namespace Globals
     extern RoverState curr_state;
     extern std::vector<Packet> incoming_packets;
     extern std::vector<Packet> outgoing_packets;
-    extern int can_fd;
-    extern int net_fd;
     extern nlohmann::json status_data;
 }

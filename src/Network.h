@@ -4,7 +4,7 @@
 #include "Constants.h"
 #include "Networking/json.hpp"
 
-extern "C" 
+extern "C"
 {
     #include "HindsightCAN/CANPacket.h"
     #include "HindsightCAN/CANCommon.h"
@@ -25,8 +25,7 @@ struct Packet
     uint8_t payload[Constants::PACKET_PAYLOAD_SIZE];
 };
 
-void InitializeNetwork();
-void ParseIncomingNetworkPackets();
-void SendOutgoingNetworkPackets();
-void SendMissionControlStatus();
-void TestCANPackets();
+void InitializeCANSocket();
+void InitializeBaseStationSocket();
+void recvCANPacket();
+void recvBaseStationPacket();

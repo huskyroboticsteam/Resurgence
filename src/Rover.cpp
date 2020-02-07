@@ -4,7 +4,8 @@
 
 void InitializeRover()
 {
-    // TODO(sasha): Call individual initialization functions
+    //InitializeCANSocket();
+    InitializeBaseStationSocket();
 }
 
 int main(int argc, char **argv)
@@ -13,13 +14,10 @@ int main(int argc, char **argv)
     InitializeRover();
     for(;;)
     {
-        //ParseIncomingNetworkPackets(); // NOTE(sasha): Since we're probably going to be using SocketCAN,
-                                       //              this includes both CAN and Network packets (maybe)
-
-	    //UpdateRoverState();
-        SendOutgoingNetworkPackets();
-        TestCANPackets();
-
+        // These methods also send packets if necessary, depending
+        // on what they receive. (Not implemented yet.)
+        //recvCANPacket();
+        recvBaseStationPacket();
     }
     return 0;
 }
