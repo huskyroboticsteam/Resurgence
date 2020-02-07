@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Globals.h"
-#include "Constants.h"
-#include "Networking/json.hpp"
+#include "../Globals.h"
+#include "../Constants.h"
+#include "json.hpp"
 
 extern "C"
 {
-    #include "HindsightCAN/CANPacket.h"
-    #include "HindsightCAN/CANCommon.h"
+    #include "../HindsightCAN/CANPacket.h"
+    #include "../HindsightCAN/CANCommon.h"
 }
 
 #include <cstdint>

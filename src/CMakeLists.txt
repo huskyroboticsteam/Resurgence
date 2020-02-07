@@ -26,7 +26,7 @@ add_executable(Rover
         Rover.cpp
         CommandLineOptions.cpp
         Globals.cpp
-        Network.cpp
+        Networking/Network.cpp
 	Util.cpp
         mapping/EnvMap.cpp
         Networking/ParseCAN.cpp
@@ -46,7 +46,7 @@ add_executable(tests
   Networking/tests.cpp
   CommandLineOptions.cpp
   Globals.cpp
-  Network.cpp
+  Networking/Network.cpp
   Networking/ParseCAN.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c

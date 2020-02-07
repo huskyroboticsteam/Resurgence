@@ -1,7 +1,7 @@
-#include "Globals.h"
+#include "../Globals.h"
 #include "Network.h"
-#include "Networking/ParseCAN.h"
-#include "Networking/NetworkConstants.h"
+#include "ParseCAN.h"
+#include "NetworkConstants.h"
 
 #include <cassert>
 

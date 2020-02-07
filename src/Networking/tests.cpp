@@ -1,5 +1,4 @@
 #include "../Globals.h"
-#include "../Network.h"
 #include "ParseCAN.h"
 extern "C"
 {

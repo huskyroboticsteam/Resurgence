@@ -1,6 +1,5 @@
 #include "CommandLineOptions.h"
 #include "Globals.h"
-#include "Network.h"
 #include "Networking/json.hpp"
 
 #include <vector>

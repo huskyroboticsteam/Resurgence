@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CommandLineOptions.h"
-#include "Network.h"
+#include "Networking/Network.h"
 #include "Networking/json.hpp"
 
 #include <vector>

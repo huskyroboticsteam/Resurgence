@@ -1,6 +1,6 @@
 #include "CommandLineOptions.h"
 #include "Globals.h"
-#include "Network.h"
+#include "Networking/Network.h"
 
 void InitializeRover()
 {
