@@ -37,8 +37,9 @@ void InitializeCANSocket()
 {
   #ifdef __linux__
 
-  if(can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW))
-      error("Failed to initialize CAN bus!");
+  if((can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+    error("Failed to initialize CAN bus!");
+  }
 
   strcpy(can_ifr.ifr_name, "can0");
   ioctl(can_fd, SIOCGIFINDEX, &can_ifr);
@@ -47,6 +48,30 @@ void InitializeCANSocket()
   can_addr.can_ifindex = can_ifr.ifr_ifindex;
 
   bind(can_fd, (struct sockaddr *)&can_addr, sizeof(can_addr));
+
+  #endif
+}
+
+// TODO(sasha): We probably want all of this to use asynchronous IO
+//              Check out POSIX aio.
+void recvCANPacket()
+{
+  #ifdef __linux__
+  socklen_t len = sizeof(can_addr);
+
+  // TODO: Probably should thread reading CAN
+  std::cout << "Watiing for CAN packet" << std::endl;
+  recvfrom(can_fd, &can_frame_, sizeof(struct can_frame),
+                0, (struct sockaddr*)&can_addr, &len);
+
+  CANPacket packet;
+  packet.id = can_frame_.can_id;
+
+  for(int i = 0; i < can_frame_.can_dlc; i++){
+      packet.data[i] = can_frame_.data[i];
+  }
+
+  ParseCANPacket(packet);
 
   #endif
 }
@@ -73,6 +98,7 @@ void recvBaseStationPacket()
 {
   char buffer[MAXLINE];
   bzero(buffer, sizeof(buffer));
+  std::cout << "Watiing for base station packet" << std::endl;
   read(base_station_fd, buffer, sizeof(buffer));
   std::cout << "Message from base station: " << buffer << std::endl;
   nlohmann::json parsed_message = nlohmann::json::parse(buffer);
@@ -80,29 +106,6 @@ void recvBaseStationPacket()
   std::cout << parsed_message["speed"] << std::endl;
   std::string serialized_status = Globals::status_data.dump();
   write(base_station_fd, serialized_status.c_str(), serialized_status.length());
-}
-
-// TODO(sasha): We probably want all of this to use asynchronous IO
-//              Check out POSIX aio.
-void recvCANPacket()
-{
-  #ifdef __linux__
-  socklen_t len = sizeof(can_addr);
-
-  // TODO: Probably should thread reading CAN
-  recvfrom(can_fd, &can_frame_, sizeof(struct can_frame),
-                0, (struct sockaddr*)&can_addr, &len);
-
-  CANPacket packet;
-  packet.id = can_frame_.can_id;
-
-  for(int i = 0; i < can_frame_.can_dlc; i++){
-      packet.data[i] = can_frame_.data[i];
-  }
-
-  ParseCANPacket(packet);
-
-  #endif
 }
 
 void SendOutgoingNetworkPackets()

@@ -4,7 +4,7 @@
 
 void InitializeRover()
 {
-    //InitializeCANSocket();
+    InitializeCANSocket();
     InitializeBaseStationSocket();
 }
 
@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     {
         // These methods also send packets if necessary, depending
         // on what they receive. (Not implemented yet.)
-        //recvCANPacket();
+        recvCANPacket();
         recvBaseStationPacket();
     }
     return 0;

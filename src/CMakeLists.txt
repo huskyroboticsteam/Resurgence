@@ -69,4 +69,10 @@ add_executable(TCPClient
 add_executable(FakeBaseStation
   Networking/FakeBaseStation.cpp)
 
+add_executable(FakeCANBoard
+  Networking/FakeCANBoard.cpp
+  HindsightCAN/CANPacket.c
+  HindsightCAN/CANCommon.c
+  HindsightCAN/PortTemplate.c)
+
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
