@@ -24,4 +24,5 @@ namespace Globals
     extern int can_fd;
     extern int net_fd;
     extern nlohmann::json status_data;
+    extern struct aiocb aio_can_req;
 }

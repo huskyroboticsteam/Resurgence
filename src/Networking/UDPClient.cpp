@@ -3,7 +3,6 @@
 int main()
 {
 	int sockfd;
-
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		std::cout << "socket creation failed";
 		exit(0);

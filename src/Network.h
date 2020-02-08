@@ -4,6 +4,9 @@
 #include "Constants.h"
 #include "Networking/json.hpp"
 
+#include <aio.h>
+#include <fcntl.h>
+
 extern "C" 
 {
     #include "HindsightCAN/CANPacket.h"
