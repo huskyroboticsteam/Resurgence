@@ -94,7 +94,7 @@ void Tag::calcOrientation()
 	// bottom left (-w/2, -w/2)
 	object_points.push_back(cv::Point3f(-(square_len / 2), -(square_len / 2), 0));
 
-	std::cout << "object points: " << object_points << std::endl;
+	//std::cout << "object points: " << object_points << std::endl;
 
 	// Mat objects to hold returned rotation and translation vectors
 	cv::Mat _rvec;

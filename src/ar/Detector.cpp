@@ -2,6 +2,7 @@
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <ctime>
 
 #include <iostream>
 
@@ -56,9 +57,14 @@ std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny
 std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
                           int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
+
+	std::clock_t c_start = std::clock(); // Stores current cpu time
+
 	// Stores all quadrilateral shapes found in the image to the vector: allQuads
 	std::vector<std::vector<cv::Point2f> > allQuads 
 		= getQuads(input, edges, grayscale, canny_thresh_1, canny_thresh_2, blur_size);
+
+	std::cout << "Number of Quads found: " << allQuads.size() << std::endl;
 
 	// vector to hold quadrilaterals that are definitely tags 
 	// ~ used to check for duplicates
@@ -113,6 +119,11 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 			}
 		}
 	}
+
+	std::clock_t c_end = std::clock();
+
+	long double time_elapsed_ms = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
+	std::cout << "\"Find Tags\" time used: " << time_elapsed_ms << " ms\n";
 
 	return output;
 }
@@ -182,7 +193,7 @@ void approxContours(std::vector<std::vector<cv::Point> > contours,
 }
 
 std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad) {
-    std::cout << "image points (before sorting): " << quad;
+    //std::cout << "image points (before sorting): " << quad;
     // sort points into the correct order (top left, top right, bottom right,
     // bottom left)
     std::sort(quad.begin(), quad.end(),
@@ -191,7 +202,7 @@ std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad) {
                 [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x < pt2.x; });
     std::sort(quad.begin() + 2, quad.end(),
                 [](cv::Point pt1, cv::Point pt2) -> bool { return pt1.x > pt2.x; });
-    std::cout << " image points (after sorting): " << quad << std::endl;
+    //std::cout << " image points (after sorting): " << quad << std::endl;
 
     return quad;
 }
