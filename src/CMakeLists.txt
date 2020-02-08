@@ -45,6 +45,7 @@ add_executable(tests
   ar/Tag.cpp
   # CAN tests
   Networking/tests.cpp
+  Networking/TestPackets.cpp
   CommandLineOptions.cpp
   Globals.cpp
   Networking/Network.cpp
@@ -73,6 +74,7 @@ add_executable(FakeBaseStation
 add_executable(FakeCANBoard
   Networking/FakeCANBoard.cpp
   Networking/CANUtils.cpp
+  Networking/TestPackets.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/PortTemplate.c)

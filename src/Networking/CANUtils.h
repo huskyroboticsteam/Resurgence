@@ -8,7 +8,7 @@ extern "C"
 }
 
 void InitializeCANSocket();
-void SendTestCANPacket();
+void SendCANPacket(const CANPacket &packet);
 CANPacket recvCANPacket();
 
 #endif

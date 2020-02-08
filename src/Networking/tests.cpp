@@ -1,5 +1,6 @@
 #include "../Globals.h"
 #include "ParseCAN.h"
+#include "TestPackets.h"
 extern "C"
 {
     #include "../HindsightCAN/Port.h"
@@ -30,17 +31,7 @@ TEST_CASE("Basic packet creation", "[CAN]")
 
 TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
 {
-    uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL, DEVICE_GROUP_JETSON, DEVICE_SERIAL_JETSON);
-    uint8_t testDataPacket[7];
-    WriteSenderSerialAndPacketID(testDataPacket, 0x36); // 0x36 is telemetry report
-    testDataPacket[2] = 0x01; // current
-    testDataPacket[3] = 0x00;
-    testDataPacket[4] = 0x00;
-    testDataPacket[5] = 0x01; // 256 milliamps
-    testDataPacket[6] = 0x00;
-    CANPacket packet = ConstructCANPacket(CAN_ID, 0x07, testDataPacket);
-
-    ParseCANPacket(packet);
+    ParseCANPacket(motorTelemetry());
     std::cout << Globals::status_data << std::endl;
     REQUIRE(Globals::status_data.dump() == "{\"front_right_motor\":{\"current\":256}}");
 }
