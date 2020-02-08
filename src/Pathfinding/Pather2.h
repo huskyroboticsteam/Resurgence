@@ -6,9 +6,6 @@
 //#include "ObstacleMap.h"
 class Pather2 {
 private:
-    //bool[ObstacleMap.size][ObstacleMap.size] map;
-
-    //point getPath(int mat[][], point dest);
 
 public:
     struct point {
@@ -22,4 +19,7 @@ public:
         int dist;
         std::queue<point> path;
     };
+    point getPath(bool map[][21], point dest);
+    point relocateDestination(point dest, int shrink_constant);
+    int returnHeading(bool map[][21]);
 };
