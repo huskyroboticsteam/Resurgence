@@ -1,8 +1,10 @@
 #include "CommandLineOptions.h"
 #include "Globals.h"
+#include "Networking/NetworkConstants.h"
 #include "Networking/Network.h"
 #include "Networking/CANUtils.h"
 #include "Networking/ParseCAN.h"
+#include "Networking/ParseBaseStation.h"
 
 void InitializeRover()
 {
@@ -14,13 +16,17 @@ int main(int argc, char **argv)
 {
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover();
+    CANPacket packet;
+    char buffer[MAXLINE];
     for(;;)
     {
-        // These methods also send packets if necessary, depending
-        // on what they receive. (Not implemented yet.)
-        CANPacket packet = recvCANPacket();
-        ParseCANPacket(packet);
-        recvBaseStationPacket();
+        if (recvCANPacket(&packet) != 0) {
+            ParseCANPacket(packet);
+        }
+        bzero(buffer, sizeof(buffer));
+        if (recvBaseStationPacket(buffer) != 0) {
+            ParseBaseStationPacket(buffer);
+        }
     }
     return 0;
 }

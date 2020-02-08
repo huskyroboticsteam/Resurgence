@@ -84,25 +84,27 @@ void SendCANPacket(const CANPacket &packet)
   }
 }
 
-CANPacket recvCANPacket()
+int recvCANPacket(CANPacket *packet)
 {
-  CANPacket packet;
   socklen_t len = sizeof(can_addr);
 
-  std::cout << "Waiting for CAN packet" << std::endl;
   if (recvfrom(can_fd, &can_frame_, sizeof(struct can_frame),
-                0, (struct sockaddr*)&can_addr, &len) < 0)
+                MSG_DONTWAIT, (struct sockaddr*)&can_addr, &len) < 0)
   {
-    perror("Failed to receive CAN packet");
+    if (errno != EAGAIN && errno != EWOULDBLOCK) {
+      perror("Failed to receive CAN packet");
+    }
+    return 0;
   }
   else
   {
     std::cout << "Got CAN packet" << std::endl;
-    packet.id = can_frame_.can_id;
+    packet->id = can_frame_.can_id;
+    packet->dlc = can_frame_.can_dlc;
     for(int i = 0; i < can_frame_.can_dlc; i++)
     {
-        packet.data[i] = can_frame_.data[i];
+        packet->data[i] = can_frame_.data[i];
     }
+    return 1;
   }
-  return packet;
 }

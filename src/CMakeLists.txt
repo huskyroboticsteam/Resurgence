@@ -28,6 +28,7 @@ add_executable(Rover
         Globals.cpp
         Networking/Network.cpp
         Networking/CANUtils.cpp
+        Networking/ParseBaseStation.cpp
         Util.cpp
         mapping/EnvMap.cpp
         Networking/ParseCAN.cpp

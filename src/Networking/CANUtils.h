@@ -9,6 +9,9 @@ extern "C"
 
 void InitializeCANSocket();
 void SendCANPacket(const CANPacket &packet);
-CANPacket recvCANPacket();
+
+// Returns 1 if a packet was received, 0 otherwise
+// If a packet was received, stores it at *packet.
+int recvCANPacket(CANPacket *packet);
 
 #endif

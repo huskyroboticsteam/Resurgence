@@ -39,24 +39,25 @@ void InitializeBaseStationSocket()
   }
 }
 
-void recvBaseStationPacket()
+int recvBaseStationPacket(char *buffer)
 {
-  char buffer[MAXLINE];
-  bzero(buffer, sizeof(buffer));
-  std::cout << "Waiting for base station packet" << std::endl;
-  if (read(base_station_fd, buffer, sizeof(buffer)) < 0)
+  // TODO: How do we split base station packets? If we split on newlines
+  // this will require more complicated buffer management.
+  // If we split by requiring the base station to send a four-byte length
+  // before sending each packet, we might need to dynamically allocate
+  // memory. Either way we may need to handle blocking reads more carefully.
+  if (recv(base_station_fd, buffer, MAXLINE, MSG_DONTWAIT) < 0)
   {
-    perror("Failed to read from base station");
+    if (errno != EAGAIN && errno != EWOULDBLOCK) {
+      perror("Failed to read from base station");
+    }
+    return 0;
   }
-  else
-  {
-    std::cout << "Message from base station: " << buffer << std::endl;
-    nlohmann::json parsed_message = nlohmann::json::parse(buffer);
-    // TODO proper input validation. Here we assume we got a dict with key "speed"
-    std::cout << parsed_message["speed"] << std::endl;
-  }
-  std::string serialized_status = Globals::status_data.dump();
-  if (write(base_station_fd, serialized_status.c_str(), serialized_status.length()) < 0)
+  return 1;
+}
+
+void sendBaseStationPacket(const std::string &packet) {
+  if (write(base_station_fd, packet.c_str(), packet.length()) < 0)
   {
     perror("Failed to send to base station");
   }

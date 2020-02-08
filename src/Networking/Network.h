@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Globals.h"
 #include "../Constants.h"
 #include "json.hpp"
 
@@ -26,4 +25,5 @@ struct Packet
 };
 
 void InitializeBaseStationSocket();
-void recvBaseStationPacket();
+int recvBaseStationPacket(char *buffer);
+void sendBaseStationPacket(const std::string &packet);
