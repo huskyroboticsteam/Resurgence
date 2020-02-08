@@ -27,7 +27,8 @@ add_executable(Rover
         CommandLineOptions.cpp
         Globals.cpp
         Networking/Network.cpp
-	Util.cpp
+        Networking/CANUtils.cpp
+        Util.cpp
         mapping/EnvMap.cpp
         Networking/ParseCAN.cpp
         HindsightCAN/CANPacket.c
@@ -71,6 +72,7 @@ add_executable(FakeBaseStation
 
 add_executable(FakeCANBoard
   Networking/FakeCANBoard.cpp
+  Networking/CANUtils.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/PortTemplate.c)

@@ -25,7 +25,5 @@ struct Packet
     uint8_t payload[Constants::PACKET_PAYLOAD_SIZE];
 };
 
-void InitializeCANSocket();
 void InitializeBaseStationSocket();
-void recvCANPacket();
 void recvBaseStationPacket();
