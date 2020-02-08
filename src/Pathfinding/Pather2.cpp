@@ -31,12 +31,12 @@ void print_queue(std::queue<Pather2::queueNode> q) {
 }
 
 
-Pather2::point BFS(bool map[][10], Pather2::point dest){
+Pather2::point BFS(bool map[][21], Pather2::point dest){
 
     //check if node is valid
-    bool isValid(int x, int y) {
-      return ((x >= 0) && (x < ROW) && (y >= 0) && (y < COL));
-    }
+    // bool isValid(int x, int y) {
+    //   return ((x >= 0) && (x < ROW) && (y >= 0) && (y < COL));
+    // }
 
     int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
     int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
@@ -82,9 +82,9 @@ Pather2::point BFS(bool map[][10], Pather2::point dest){
             int row = pt.x + rowNum[i];
             int col = pt.y + rowCol[i];
             
-
+            //((row >= 0) && (row < 21) && (col >= 0) && (col < 21))
             // check if adj point is not out of bounds and is not an obstacle
-            if (isValid(row, col) && !map[row][col]){
+            if (((row >= 0) && (row < 21) && (col >= 0) && (col < 21)) && !map[row][col]){
                 // set adj point as visited and push it to points to be checked(q)
                 struct Pather2::point test = {row, col};
                 std::queue<Pather2::point> addAdjPointToPath = curr.path;
@@ -165,32 +165,21 @@ Pather2::point getDest(Pather2::point GPSRobot, Pather2::point GPSDest) {
     return dest;
 }
 
-Pather2::point getPath(bool map[10][10], Pather2::point dest){
-  Pather2::point rslt = BFS(map, dest);
-  struct Pather2::point src = {4, 4};
-  while(rslt.x == -1 && rslt.y == -1) {
-    //do something
-    //relocate the relative coordinate of the original target (some functions to determinate new end point relative to our local map)
-    rslt = BFS(map, dest);
-  }
-  return rslt;
-}
 
 //If the relative location of the target is put into some invalid coordinate (unreachable),
 //then assign any neighbor valid coordinate as the new relative location, and make search again. 
-Pather2::point relocateDestination(Pather2::point dest){
-  while(//new destination is not valide)
-    if (dest.x == 20) {
+Pather2::point relocateDestination(Pather2::point dest, int shrink_constant){
+    if (dest.x == 20 - shrink_constant) {
       switch(dest.y) {
         case 0: dest.x -= 1;
                 dest.y += 1;
                 break;
         case 20: dest.x -= 1;
-                dest.y -=;
+                dest.y -= 1;
                 break;
         default: dest.x -= 1;
       }
-    } else if (dest.x == 0) {
+    } else if (dest.x == 0 + shrink_constant) {
       switch(dest.y) {
         case 0: dest.x += 1;
                 dest.y += 1;
@@ -200,15 +189,30 @@ Pather2::point relocateDestination(Pather2::point dest){
                 break;
         default: dest.x += 1;
       }
-    } else if (dest.y == 20) {
+    } else if (dest.y == 20 - shrink_constant) {
       dest.y -= 1;
-    } else if (dest.y == 0) {
+    } else if (dest.y == 0 + shrink_constant) {
       dest.y += 1;
-    } else if ()
     }
+    return dest;
 }
 
-int returnHeading() {
+
+Pather2::point getPath(bool map[][21], Pather2::point dest){
+  Pather2::point rslt = BFS(map, dest);
+  struct Pather2::point src = {4, 4};
+  int shrink_constant = 0;
+  while(rslt.x == -1 && rslt.y == -1) {
+    dest = relocateDestination(dest, shrink_constant);
+    //do something
+    //relocate the relative coordinate of the original target (some functions to determinate new end point relative to our local map)
+    rslt = BFS(map, dest);
+    shrink_constant += 1;
+  }
+  return rslt;
+}
+
+int returnHeading(bool map[][21]) {
         struct Pather2::point GPS_src = {0,0};
         struct Pather2::point GPS_dest = {70, 10};
         struct Pather2::point destination = getDest(GPS_src, GPS_dest);
@@ -228,24 +232,24 @@ int returnHeading() {
 }
 
 int main() {
-    bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
-                          {true, true, false, false, true, true, true, false, true, true},
-                          {false, false, false, false, true, true, false, true, false, true},
-                          {false, false, false, true, false, true, false, false, true, true},
-                          {false, true, false, true, false, true, false, false, false, false},
-                          {true, false, true, false, true, false, true, false, true, false},
-                          {false, false, false, false, false, true, true, true, false, false},
-                          {false, true, false, false, false, false, false, false, true, true},
-                          {true, true, true, false, false, true, true, false, false, true}, 
-                          {false, false, true, true, true, false, true, true, true, false}};
-    struct Pather2::point destination = {9,9};
-    struct Pather2::point nextPoint = getPath(map, destination);
-    struct Pather2::point GPS_src = {0,0};
-    struct Pather2::point GPS_dest = {70, 10};
-    struct Pather2::point dest = getDest(GPS_src, GPS_dest);
-    std::cout << "(" << dest.x << "," << dest.y << ")" << std::endl;
-    std::cout << "First point in path: ";
-    std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
-    std::cout << "" << std::endl;
+    // bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
+    //                       {true, true, false, false, true, true, true, false, true, true},
+    //                       {false, false, false, false, true, true, false, true, false, true},
+    //                       {false, false, false, true, false, true, false, false, true, true},
+    //                       {false, true, false, true, false, true, false, false, false, false},
+    //                       {true, false, true, false, true, false, true, false, true, false},
+    //                       {false, false, false, false, false, true, true, true, false, false},
+    //                       {false, true, false, false, false, false, false, false, true, true},
+    //                       {true, true, true, false, false, true, true, false, false, true}, 
+    //                       {false, false, true, true, true, false, true, true, true, false}};
+    // struct Pather2::point destination = {9,9};
+    // struct Pather2::point nextPoint = getPath(map, destination);
+    // struct Pather2::point GPS_src = {0,0};
+    // struct Pather2::point GPS_dest = {70, 10};
+    // struct Pather2::point dest = getDest(GPS_src, GPS_dest);
+    // std::cout << "(" << dest.x << "," << dest.y << ")" << std::endl;
+    // std::cout << "First point in path: ";
+    // std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
+    // std::cout << "" << std::endl;
     return 0;
 }
