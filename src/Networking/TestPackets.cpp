@@ -21,11 +21,11 @@ CANPacket motorTelemetry()
 CANPacket LEDTest()
 {
   uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL, DEVICE_GROUP_GPIO_BOARDS, DEVICE_SERIAL_JETSON); //CHANGE SERIAL - TALK TO ELECTRONICS
-  uint8_t testDataPacket[5];
+  uint8_t testDataPacket[4];
   WritePacketIDOnly(testDataPacket, 0x37); //0x37 is LED RGB ID
-  testDataPacket[2] = 0xFF; // R value
-  testDataPacket[3] = 0x00; // G value
-  testDataPacket[4] = 0x00; // B value
+  testDataPacket[1] = 0xFF; // R value
+  testDataPacket[2] = 0x00; // G value
+  testDataPacket[3] = 0x00; // B value
 
-  return ConstructCANPacket(CAN_ID, 0x05, testDataPacket);
+  return ConstructCANPacket(CAN_ID, 0x04, testDataPacket);
 }
