@@ -1,5 +1,4 @@
 #include "../Globals.h"
-#include "../Network.h"
 #include "json.hpp"
 
 // Expected JSON format of Globals::status_data: each key is a string from one of the group lists below

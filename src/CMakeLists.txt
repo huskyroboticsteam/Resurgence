@@ -26,8 +26,10 @@ add_executable(Rover
         Rover.cpp
         CommandLineOptions.cpp
         Globals.cpp
-        Network.cpp
-	Util.cpp
+        Networking/Network.cpp
+        Networking/CANUtils.cpp
+        Networking/ParseBaseStation.cpp
+        Util.cpp
         mapping/EnvMap.cpp
         Networking/ParseCAN.cpp
         HindsightCAN/CANPacket.c
@@ -44,9 +46,10 @@ add_executable(tests
   ar/Tag.cpp
   # CAN tests
   Networking/tests.cpp
+  Networking/TestPackets.cpp
   CommandLineOptions.cpp
   Globals.cpp
-  Network.cpp
+  Networking/Network.cpp
   Networking/ParseCAN.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
@@ -65,5 +68,16 @@ add_executable(Server
 
 add_executable(TCPClient
   Networking/TCPClient.cpp)
+
+add_executable(FakeBaseStation
+  Networking/FakeBaseStation.cpp)
+
+add_executable(FakeCANBoard
+  Networking/FakeCANBoard.cpp
+  Networking/CANUtils.cpp
+  Networking/TestPackets.cpp
+  HindsightCAN/CANPacket.c
+  HindsightCAN/CANCommon.c
+  HindsightCAN/PortTemplate.c)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
