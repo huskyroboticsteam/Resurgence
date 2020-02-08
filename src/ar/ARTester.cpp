@@ -6,6 +6,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include <iostream>
+#include <ctime>
 
 const std::string ORIG_WINDOW_NAME = "Image (Original)";
 const std::string THRESH_TRACKBAR_NAME = "Threshold";
