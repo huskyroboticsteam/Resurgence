@@ -2,8 +2,7 @@
 
 #include "Globals.h"
 #include "Constants.h"
-#include "Networking/Json.hpp"
-#include "Networking/StatusData.h"
+#include "Networking/json.hpp"
 
 extern "C" 
 {
@@ -29,4 +28,5 @@ struct Packet
 void InitializeNetwork();
 void ParseIncomingNetworkPackets();
 void SendOutgoingNetworkPackets();
+void SendMissionControlStatus();
 void TestCANPackets();
