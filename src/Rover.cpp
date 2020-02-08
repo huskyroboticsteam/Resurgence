@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "Networking/Network.h"
 #include "Networking/CANUtils.h"
+#include "Networking/ParseCAN.h"
 
 void InitializeRover()
 {
@@ -17,7 +18,8 @@ int main(int argc, char **argv)
     {
         // These methods also send packets if necessary, depending
         // on what they receive. (Not implemented yet.)
-        recvCANPacket();
+        CANPacket packet = recvCANPacket();
+        ParseCANPacket(packet);
         recvBaseStationPacket();
     }
     return 0;
