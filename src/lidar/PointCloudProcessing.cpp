@@ -119,13 +119,15 @@ std::vector<std::vector<PointXY>> filterPointXYs(std::vector<PointXY> points, fl
 }
 
 // removes points from the pts list that are ground points
-void filterGroundPoints(std::vector<Polar2D> &pts, float scan_height,
+// pitch_rad is positive if learning forward, else negative
+// scan_height must be in the same units as the points distance
+void filterGroundPoints(std::vector<Polar2D> &pts, float scan_height, float pitch_rad,
                         float slope_tol_rad)
 {
     std::vector<Polar2D>::iterator itr = pts.begin();
     while (itr != pts.end())
     {
-        float slope_rad = tanhf(scan_height / (*itr).r);
+        float slope_rad = M_PI - pitch_rad - atan((*itr).r / scan_height);
         if (slope_rad < slope_tol_rad)
         {
             itr = pts.erase(itr);
@@ -150,52 +152,35 @@ std::vector<PointXY> convexHull(std::vector<PointXY> &cluster)
                   return p1.x < p2.x;
               });
 
-    auto orientation = [](PointXY p, PointXY q, PointXY r)
-    {
-        return (q.x * r.y) - (q.y * r.x) - (p.x * r.y) + (p.y * r.x) + (p.x * q.y) - (p.y * q.x);  
+    // 0 -> collinear, positive -> counterclockwise, negative -> clockwise
+    auto orientation = [](PointXY p, PointXY q, PointXY r) {
+        return (q.x * r.y) - (q.y * r.x) - (p.x * r.y) + (p.y * r.x) + (p.x * q.y) - (p.y * q.x);
     };
 
-    std::vector<PointXY> hull;
-    hull.push_back(cluster[0]);
-    hull.push_back(cluster[1]);
-    for (int i = 2; i < cluster.size(); i++)
+    std::vector<PointXY> top_hull;
+    std::vector<PointXY> bot_hull;
+    for (int i = 0; i < cluster.size(); i++)
     {
-        while (hull.size() >= 2 and orientation(hull[hull.size() - 2],
-            hull[hull.size() - 1], cluster[i]) > 0)
+        while (top_hull.size() >= 2 && orientation(top_hull[top_hull.size() - 2],
+                                                   top_hull[top_hull.size() - 1], cluster[i]) > 0)
         {
-            hull.pop_back();
+            top_hull.pop_back();
         }
-        hull.push_back(cluster[i]);
+        top_hull.push_back(cluster[i]);
     }
 
-    for (int i = cluster.size() - 2; i > 0; i--)
+    for (int i = cluster.size() - 1; i >= 0; i--)
     {
-        while (hull.size() >= 2 and orientation(hull[hull.size() - 2],
-            hull[hull.size() - 1], cluster[i]) > 0)
+        while (bot_hull.size() >= 2 and orientation(bot_hull[bot_hull.size() - 2],
+                                                    bot_hull[bot_hull.size() - 1], cluster[i]) > 0)
         {
-            hull.pop_back();
+            bot_hull.pop_back();
         }
-        hull.push_back(cluster[i]); 
+        bot_hull.push_back(cluster[i]);
     }
 
-    return hull;
+    top_hull.insert(top_hull.end(), bot_hull.begin() + 1, bot_hull.end() - 1);
+    return top_hull;
 }
 
-} // namespace Lidar
-
-
-int main(int argc, char **argv)
-{
-    using namespace lidar;
-    std::vector<PointXY> cluster;
-    cluster.push_back({0, 0});
-    cluster.push_back({10, 10});
-    cluster.push_back({7, 0});
-    cluster.push_back({6, 1});
-    std::vector<PointXY> hull = convexHull(cluster);
-    for (PointXY p: hull)
-    {
-        std::cout << p.x << " " << p.y << std::endl;
-    }
-    return 0;
-}
+} // namespace lidar
