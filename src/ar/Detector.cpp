@@ -49,13 +49,15 @@ std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny
 {
 	cv::Mat junk; // this Mat won't be used later. it's just used to be passed as a
 	              // reference to the function this is overloading.
-	return findTags(input, junk, junk, canny_thresh_1, canny_thresh_2, blur_size);
+	std::vector<std::vector<cv::Point2f>> junk2;
+	return findTags(input, junk, junk, junk2, canny_thresh_1, canny_thresh_2, blur_size);
 }
 
 // Stores grayscale version and outlined edged version of input image to grayscale and edges
 // Returns a vector of Tags obtained from the picture
 std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
-                          int canny_thresh_1, int canny_thresh_2, int blur_size)
+                          std::vector<std::vector<cv::Point2f> > &quad_corners,
+						  int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
 
 	std::clock_t c_start = std::clock(); // Stores current cpu time
@@ -86,6 +88,8 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		// Sorts corner points in order of: top-left, top-right, 
 		// bottom-right, bottom-left and stores it in quad
 		std::vector<cv::Point2f> quad = sortCorners(allQuads[i]);
+
+		quad_corners.push_back(quad);
 
 		// perspective transform the quadrilateral to a flat square
 		cv::Mat transform = cv::getPerspectiveTransform(quad, ideal);
@@ -123,7 +127,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 	std::clock_t c_end = std::clock();
 
 	long double time_elapsed_ms = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
-	std::cout << "\"Find Tags\" time used: " << time_elapsed_ms << " ms\n";
+	std::cout << "Detector time used: " << time_elapsed_ms << " ms\n";
 
 	return output;
 }

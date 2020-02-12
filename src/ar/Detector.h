@@ -37,6 +37,7 @@ class Detector
 		   @param blur_size Optional, the size of the blur used. MUST BE AN ODD NUMBER.
 		*/
 		std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
+								  std::vector<std::vector<cv::Point2f> > &quad_corners,
 								  int canny_thresh_1 = 50, int canny_thresh_2 = 120,
 								  int blur_size = 5);
 

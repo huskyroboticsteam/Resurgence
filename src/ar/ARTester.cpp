@@ -39,6 +39,17 @@ std::vector<cv::Point2d> projectCube(double len, cv::Vec3d rvec, cv::Vec3d tvec)
 	return image_points;
 }
 
+std::vector<cv::Point2d> projectSquare()
+{
+	std::vector<cv::Point3d> object_points;
+	std::vector<cv::Point2d> image_points;
+
+	
+
+
+
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc > 1)
@@ -96,9 +107,21 @@ int main(int argc, char *argv[])
 		cv::Mat gray;
 		cv::Mat edges;
 
+		std::vector<std::vector<cv::Point2f> > quad_corners;
+
 		// pass frame to detector here
 		std::vector<AR::Tag> tags =
-		    detector.findTags(frame, gray, edges, thresh_val, thresh2_val, blur_val);
+		    detector.findTags(frame, gray, edges, quad_corners, thresh_val, thresh2_val, blur_val);
+
+		// Draws a green line around all quadrilateral shapes found in the image (debugging purposes)
+		cv::Scalar green_line = cv::Scalar(0, 255, 0);
+		for (std::vector<cv::Point2f> quad: quad_corners)
+		{
+			cv::line(frame, quad[0], quad[1], green_line);
+			cv::line(frame, quad[1], quad[2], green_line);
+			cv::line(frame, quad[2], quad[3], green_line);
+			cv::line(frame, quad[3], quad[0], green_line);								
+		}
 
 		// show locations of tags in window
 //		std::cout << "Found " << tags.size() << " tags" << std::endl;
@@ -126,6 +149,7 @@ int main(int argc, char *argv[])
 			//          << "tvec: " << tag.getTVec() << std::endl;
 			// std::cout << "Normal vector: " << normal << std::endl;
 			//cv::line(frame, cubePoints[0], cubePoints[1], cv::Scalar(0, 0, 255), 3);
+
 			for(size_t i = 0; i < 4; i++){
 				size_t next = (i==3 ? 0 : i+1);
 				cv::line(frame, cubePoints[i], cubePoints[next], cv::Scalar(0,0,255), 3);
