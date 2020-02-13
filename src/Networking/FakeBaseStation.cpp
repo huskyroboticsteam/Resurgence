@@ -1,8 +1,17 @@
 #include "NetworkConstants.h"
+#include <csignal>
+
+int listenfd;
+
+void cleanup(int signum) {
+  std::cout << "Interrupted\n";
+  close(listenfd);
+  exit(0);
+}
 
 int main()
 {
-  int listenfd, connfd;
+  int connfd;
   char buffer[MAXLINE];
   pid_t childpid;
   ssize_t n;
@@ -18,9 +27,17 @@ int main()
   servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   servaddr.sin_port = htons(PORT);
 
+  signal(SIGINT, cleanup);
+
   // binding server addr structure to listenfd
-  bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
-  listen(listenfd, 10);
+  if (bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
+    perror("Could not bind");
+    exit(1);
+  }
+  if (listen(listenfd, 10) < 0) {
+    perror("Could not listen");
+    exit(1);
+  }
 
   std::cout << "Waiting for rover....\n";
   while (1)
