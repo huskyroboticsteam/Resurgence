@@ -39,17 +39,6 @@ std::vector<cv::Point2d> projectCube(double len, cv::Vec3d rvec, cv::Vec3d tvec)
 	return image_points;
 }
 
-std::vector<cv::Point2d> projectSquare()
-{
-	std::vector<cv::Point3d> object_points;
-	std::vector<cv::Point2d> image_points;
-
-	
-
-
-
-}
-
 int main(int argc, char *argv[])
 {
 	if (argc > 1)
@@ -117,10 +106,10 @@ int main(int argc, char *argv[])
 		cv::Scalar green_line = cv::Scalar(0, 255, 0);
 		for (std::vector<cv::Point2f> quad: quad_corners)
 		{
-			cv::line(frame, quad[0], quad[1], green_line);
-			cv::line(frame, quad[1], quad[2], green_line);
-			cv::line(frame, quad[2], quad[3], green_line);
-			cv::line(frame, quad[3], quad[0], green_line);								
+			cv::line(frame, quad[0], quad[1], green_line, 2);
+			cv::line(frame, quad[1], quad[2], green_line, 2);
+			cv::line(frame, quad[2], quad[3], green_line, 2);
+			cv::line(frame, quad[3], quad[0], green_line, 2);								
 		}
 
 		// show locations of tags in window
