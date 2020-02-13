@@ -34,7 +34,6 @@ cv::Mat readData(cv::Mat &input);
 TagID getTagIDFromData(cv::Mat& data);
 std::vector<int> getBitData(cv::Mat data);
 cv::Mat removeNoise(cv::Mat input, int blur_size = 5);
-int averageRegion(cv::Mat &input, int x1, int y1, int x2, int y2);
 std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad);
 std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, cv::Mat &grayscale,
                                             	int canny_thresh_1, int canny_thresh_2, int blur_size);
@@ -223,18 +222,13 @@ cv::Mat readData(cv::Mat &input)
 {
 	cv::Mat output = cv::Mat::zeros(TAG_GRID_SIZE, TAG_GRID_SIZE, CV_8UC1);
 	int square_size = input.rows / TAG_GRID_SIZE;
-	for (int r = 0; r < TAG_GRID_SIZE; r++)
+	for (int row = 0; row < TAG_GRID_SIZE; row++)
 	{
-		for (int c = 0; c < TAG_GRID_SIZE; c++)
+		for (int col = 0; col < TAG_GRID_SIZE; col++)
 		{
-			// average each region, and set the appropriate output value
-			int x1 = c * square_size;
-			int y1 = r * square_size;
-			int x2 = (c + 1) * square_size;
-			int y2 = (r + 1) * square_size;
-			// divides avg pixel value by threshold. Black is stored as 0, White as 1
-			int val = averageRegion(input, x1, y1, x2, y2) / BLACK_THRESH;
-			output.at<uint8_t>(r, c) = val;
+			int x = col * square_size + (square_size / 2);
+			int y = row * square_size + (square_size / 2);
+			output.at<uint8_t>(row, col) = input.at<uint8_t>(y, x) / BLACK_THRESH;
 		}
 	}
 	return output;
@@ -244,20 +238,6 @@ cv::Mat threshold(cv::Mat input) {
 	cv::Mat output;
 	cv::adaptiveThreshold(input, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 151, 0);
 	return output;
-}
-
-/*
-   Averages the pixel values in the region of the given Mat bounded by the given coordinates.
-*/
-int averageRegion(cv::Mat &input, int x1, int y1, int x2, int y2)
-{
-	// get only the region specified
-	cv::Mat region = input(cv::Rect2i(x1, y1, x2 - x1, y2 - y1));
-	// average all pixels
-	cv::Scalar mean = cv::mean(region);
-	// get the first component of the scalar
-	int avg = mean[0];
-	return avg;
 }
 
 bool isTagData(cv::Mat &data)
