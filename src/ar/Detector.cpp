@@ -29,6 +29,7 @@ namespace AR
 {
 // Declares all functions that will be used
 bool isTagData(cv::Mat &data);
+cv::Mat threshold(cv::Mat input);
 cv::Mat readData(cv::Mat &input);
 TagID getTagIDFromData(cv::Mat& data);
 std::vector<int> getBitData(cv::Mat data);
@@ -97,8 +98,11 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		cv::warpPerspective(grayscale, square, transform,
 		                    cv::Size(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
 
+		// Apply adaptive gaussian thresholding to the square
+		cv::Mat thresholded_square = threshold(square);
+
 		// Attempt to read the data as if it was an AR tag
-		cv::Mat data = readData(square);
+		cv::Mat data = readData(thresholded_square);
 
 		// Checks if data matches criteria for an AR tag
 		if (isTagData(data))
@@ -233,6 +237,12 @@ cv::Mat readData(cv::Mat &input)
 			output.at<uint8_t>(r, c) = val;
 		}
 	}
+	return output;
+}
+
+cv::Mat threshold(cv::Mat input) {
+	cv::Mat output;
+	cv::adaptiveThreshold(input, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 151, 0);
 	return output;
 }
 
