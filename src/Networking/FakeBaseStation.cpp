@@ -26,7 +26,10 @@ int main()
   while (1)
   {
     len = sizeof(cliaddr);
-    connfd = accept(listenfd, (struct sockaddr*)&cliaddr, &len);
+    if ((connfd = accept(listenfd, (struct sockaddr*)&cliaddr, &len)) < 0) {
+      perror("Could not open listening socket");
+      exit(1);
+    }
     if ((childpid = fork()) == 0)
     {
       std::cout << "Connected to rover.\n";
@@ -37,10 +40,14 @@ int main()
       {
         std::cout << "Enter message in JSON format (no newlines): ";
         std::getline(std::cin, str);
-        write(connfd, str.c_str(), str.length());
+        if (write(connfd, str.c_str(), str.length()) < 0) {
+          perror("Socket write failed");
+        }
 
         bzero(buffer, sizeof(buffer));
-        n = read(connfd, buffer, sizeof(buffer));
+        if ((n = read(connfd, buffer, sizeof(buffer))) < 0) {
+          perror("Socket read failed");
+        }
         if (n <= 0 || strcmp(buffer, CLOSE_TCP) == 0)
         {
           std::cout << "Disconnected from rover.\n";
