@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SyntheticLidar.h"
+#include "URGLidar.h"
 
 #include <vector>
 #include <set>
