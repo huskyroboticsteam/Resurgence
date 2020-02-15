@@ -4,15 +4,21 @@
 #include "Eigen/Dense"
 #include "common.h"
 #include "measurement_package.h"
+#include "../ObjectValidator.h"
 #include "tools.h"
 #define INF 1000
+
+struct ObstaclePoint {
+  const float& x;
+  const float& y;
+};
 
 class EKFSLam {
   public:
     /**
      * Constructor.
      */
-    EKFSLam(EnvMap &env_map, float motion_noise = 0.1);
+    EKFSLam(float motion_noise = 0.1);
 
     /**
      * Destructor.
@@ -50,6 +56,8 @@ class EKFSLam {
     // TODO: add a function(s) to access uncertainty values
     float getValidationValue(size_t id, const MapObstacle &obstacle);
 
+    std::vector<
+
   private:
     // check whether the tracking toolbox was initialized or not (first
     // measurement)
@@ -64,4 +72,5 @@ class EKFSLam {
     Eigen::VectorXd mu;
     Eigen::MatrixXd Q_;
     vector<bool> observedLandmarks;
+    ObjectValidator object_validator;
 };
