@@ -1,5 +1,10 @@
 #pragma once
 
+<<<<<<< HEAD
+=======
+#include "URGLidar.h"
+
+>>>>>>> 9394cc3bf17070e0604cf744a9bcbf314ba87420
 #include <vector>
 #include <set>
 
