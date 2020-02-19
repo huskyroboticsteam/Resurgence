@@ -30,6 +30,10 @@ add_executable(tests
   Autonomous.cpp
   FakeMap.cpp)
 
+add_executable(lidar_read
+    lidar/URGLidar.cpp)
+
+target_link_libraries(lidar_read liburg_c.a)
 target_link_libraries(Rover ${OpenCV_LIBS})
 
 include(CTest)
