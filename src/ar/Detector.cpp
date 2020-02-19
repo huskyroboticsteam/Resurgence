@@ -28,9 +28,7 @@ constexpr int table[][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
 namespace AR
 {
 // Declares all functions that will be used
-bool isTagData(cv::Mat &data);
-cv::Mat threshold(cv::Mat input);
-cv::Mat readData(cv::Mat &input);
+bool readCheckData(cv::Mat &input, cv::Mat &output);
 TagID getTagIDFromData(cv::Mat& data);
 std::vector<int> getBitData(cv::Mat data);
 cv::Mat removeNoise(cv::Mat input, int blur_size = 5);
@@ -97,14 +95,17 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		cv::warpPerspective(grayscale, square, transform,
 		                    cv::Size(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
 
-		// Apply adaptive gaussian thresholding to the square
-		cv::Mat thresholded_square = threshold(square);
+		// Apply adaptive gaussian thresholding to the square, saves it to t_square
+		cv::Mat t_square;
+		cv::adaptiveThreshold(square, t_square, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 151, 0);
 
-		// Attempt to read the data as if it was an AR tag
-		cv::Mat data = readData(thresholded_square);
+		// Create Mat to store tag data
+		cv::Mat data = cv::Mat::zeros(TAG_GRID_SIZE, TAG_GRID_SIZE, CV_8UC1);
 
-		// Checks if data matches criteria for an AR tag
-		if (isTagData(data))
+		// Reads the quadrilateral as if it was a tag
+		// Returns true if it is a tag 
+		// Tag data gets stored in data variable
+		if (readCheckData(t_square, data))
 		{
 			// check if any corners of this quadrilateral are inside one already found (i.e. it
 			// is a duplicate)
@@ -214,14 +215,15 @@ std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad) {
     return quad;
 }
 
-/*
-   Reads the data in a given Mat containing a flat image of an AR Tag and returns it as a 9x9
-   Mat of the average pixel values for each grid square.
-*/
-cv::Mat readData(cv::Mat &input)
+bool readCheckData(cv::Mat &input, cv::Mat &output)
 {
-	cv::Mat output = cv::Mat::zeros(TAG_GRID_SIZE, TAG_GRID_SIZE, CV_8UC1);
+	// Create points to check for orientation
+	cv::Point2i orientationPoints[] = {cv::Point2i(4, 2), cv::Point2i(2, 4), cv::Point2i(4, 6),
+	                                   cv::Point2i(6, 4)};
+	
 	int square_size = input.rows / TAG_GRID_SIZE;
+	int whiteCount = 0;
+	int blackCount = 0;
 	for (int row = 0; row < TAG_GRID_SIZE; row++)
 	{
 		for (int col = 0; col < TAG_GRID_SIZE; col++)
@@ -229,43 +231,21 @@ cv::Mat readData(cv::Mat &input)
 			int x = col * square_size + (square_size / 2);
 			int y = row * square_size + (square_size / 2);
 			output.at<uint8_t>(row, col) = input.at<uint8_t>(y, x) / BLACK_THRESH;
-		}
-	}
-	return output;
-}
 
-cv::Mat threshold(cv::Mat input) {
-	cv::Mat output;
-	cv::adaptiveThreshold(input, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 151, 0);
-	return output;
-}
-
-bool isTagData(cv::Mat &data)
-{
-	// check for 2-wide black border
-	for (int x = 0; x < TAG_GRID_SIZE; x++)
-	{
-		for (int y = 0; y < TAG_GRID_SIZE; y++)
-		{
-			// skip the region in the middle of the tag, we only care about the border
-			if ((x < 2 || x > 6) || (y < 2 || y > 6))
-			{
-				if (data.at<uint8_t>(y, x) == 1)
-				{
+			// Ensures that all borders are black
+			if ((col < 2 || col > 6) || (row < 2 || row > 6)) {
+				if (output.at<uint8_t>(row, col) == 1) {
 					return false;
 				}
 			}
 		}
 	}
 
-	// check for orientation shape
-	cv::Point2i orientationPoints[] = {cv::Point2i(4, 2), cv::Point2i(2, 4), cv::Point2i(4, 6),
-	                                   cv::Point2i(6, 4)};
-	int whiteCount = 0;
-	int blackCount = 0;
+	// Checks for 3 white squares and 
+	// 1 black square in orientation points.
 	for (cv::Point p : orientationPoints)
 	{
-		if (data.at<uint8_t>(p) == 1)
+		if (output.at<uint8_t>(p) == 1)
 		{
 			whiteCount++;
 		}
@@ -274,6 +254,7 @@ bool isTagData(cv::Mat &data)
 			blackCount++;
 		}
 	}
+
 	// we should see 3 white squares and one black square in all the possible places for
 	// orientation markers. If not, it's not a tag.
 	return (whiteCount == 3 && blackCount == 1);
