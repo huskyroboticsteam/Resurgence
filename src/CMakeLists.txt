@@ -43,3 +43,4 @@ target_link_libraries(tests ${OpenCV_LIBS})
 catch_discover_tests(tests)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
+set_property(TARGET lidar_read PROPERTY CXX_STANDARD 14)
