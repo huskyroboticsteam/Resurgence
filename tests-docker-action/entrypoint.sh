@@ -1,5 +1,5 @@
 echo "test"
-sudo apt-get install -y mercurial
+apt-get install -y mercurial
 hg clone http://hg.code.sf.net/p/urgnetwork/urg_library 
 cd urg_library
 make
