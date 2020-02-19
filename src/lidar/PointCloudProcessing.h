@@ -14,11 +14,6 @@ typedef struct PointXY
     float y;
 } PointXY;
 
-typedef struct Polar2D
-{
-    double r, theta;
-} Polar2D;
-
 typedef struct BoundingBox
 {
     float xmin;
