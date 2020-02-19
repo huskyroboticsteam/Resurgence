@@ -1,7 +1,6 @@
 echo "test"
-apt-get install -y --fix-missing mercurial
-hg clone http://hg.code.sf.net/p/urgnetwork/urg_library 
-cd urg_library
+git clone https://github.com/andrewbriand/urg_library-1.2.5.git
+cd urg_library-1.2.5
 make
 make install
 git clone https://github.com/catchorg/Catch2.git
