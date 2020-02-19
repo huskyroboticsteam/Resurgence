@@ -1,4 +1,4 @@
-#include "ekfslam.h"
+#include "EKFSlam.h"
 
 /*
  * Constructor.

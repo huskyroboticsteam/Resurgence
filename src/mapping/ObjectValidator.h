@@ -15,7 +15,7 @@ public:
    // Adds any objects that don't exist on the map to the map
    // Takes in Map obstacles from bounding box class
    std::vector<size_t> validate(std::vector<std::set<std::shared_ptr<Vec2>>> lidarObstacles); 
-   ObjectValidator(EnvMap &map, EKFSLam &ekf);
+   ObjectValidator(EKFSLam &ekf);
 private:
    EnvMap &map;
    EKFSlam &ekf;
