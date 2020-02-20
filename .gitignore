@@ -5,5 +5,6 @@ src/Pathfinding/a.out
 .vscode
 MapObstacle.h
 **/*.out
+.idea
 3.4.7.zip
 opencv-3.4.7/

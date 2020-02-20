@@ -1,0 +1,589 @@
+cmake_minimum_required(VERSION 3.15)
+project(PY2020)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(src)
+include_directories(src/ar)
+include_directories(src/lidar)
+include_directories(src/mapping)
+include_directories(src/math)
+include_directories(src/ObstacleSim)
+include_directories(src/Pathfinding)
+include_directories(src/SIM/SFML/doc)
+include_directories(src/SIM/SFML/examples/cocoa)
+include_directories(src/SIM/SFML/examples/island)
+include_directories(src/SIM/SFML/examples/opengl)
+include_directories(src/SIM/SFML/examples/shader)
+include_directories(src/SIM/SFML/examples/vulkan)
+include_directories(src/SIM/SFML/examples/window)
+include_directories(src/SIM/SFML/examples/X11)
+include_directories(src/SIM/SFML/extlibs)
+include_directories(src/SIM/SFML/extlibs/headers)
+include_directories(src/SIM/SFML/extlibs/headers/AL)
+include_directories(src/SIM/SFML/extlibs/headers/FLAC)
+include_directories(src/SIM/SFML/extlibs/headers/freetype2)
+include_directories(src/SIM/SFML/extlibs/headers/freetype2/config)
+include_directories(src/SIM/SFML/extlibs/headers/glad)
+include_directories(src/SIM/SFML/extlibs/headers/glad/include)
+include_directories(src/SIM/SFML/extlibs/headers/glad/include/glad)
+include_directories(src/SIM/SFML/extlibs/headers/mingw)
+include_directories(src/SIM/SFML/extlibs/headers/ogg)
+include_directories(src/SIM/SFML/extlibs/headers/stb_image)
+include_directories(src/SIM/SFML/extlibs/headers/vorbis)
+include_directories(src/SIM/SFML/extlibs/headers/vulkan)
+include_directories(src/SIM/SFML/include)
+include_directories(src/SIM/SFML/include/SFML)
+include_directories(src/SIM/SFML/include/SFML/Audio)
+include_directories(src/SIM/SFML/include/SFML/Graphics)
+include_directories(src/SIM/SFML/include/SFML/Network)
+include_directories(src/SIM/SFML/include/SFML/System)
+include_directories(src/SIM/SFML/include/SFML/Window)
+include_directories(src/SIM/SFML/src/SFML/Audio)
+include_directories(src/SIM/SFML/src/SFML/Graphics)
+include_directories(src/SIM/SFML/src/SFML/Network)
+include_directories(src/SIM/SFML/src/SFML/Network/Unix)
+include_directories(src/SIM/SFML/src/SFML/Network/Win32)
+include_directories(src/SIM/SFML/src/SFML/System/Android)
+include_directories(src/SIM/SFML/src/SFML/System/Unix)
+include_directories(src/SIM/SFML/src/SFML/System/Win32)
+include_directories(src/SIM/SFML/src/SFML/Window)
+include_directories(src/SIM/SFML/src/SFML/Window/Android)
+include_directories(src/SIM/SFML/src/SFML/Window/FreeBSD)
+include_directories(src/SIM/SFML/src/SFML/Window/iOS)
+include_directories(src/SIM/SFML/src/SFML/Window/OpenBSD)
+include_directories(src/SIM/SFML/src/SFML/Window/OSX)
+include_directories(src/SIM/SFML/src/SFML/Window/Unix)
+include_directories(src/SIM/SFML/src/SFML/Window/Win32)
+include_directories(src/SIM/SFML/test/src/TestUtilities)
+include_directories("src/SIM/SFML/tools/xcode/templates/SFML/SFML App.xctemplate")
+
+add_executable(PY2020
+        src/SIM/SFML/doc/mainpage.hpp
+        src/SIM/SFML/examples/android/app/src/main/jni/main.cpp
+        src/SIM/SFML/examples/cocoa/CocoaAppDelegate.h
+        src/SIM/SFML/examples/cocoa/CocoaAppDelegate.mm
+        src/SIM/SFML/examples/cocoa/main.m
+        src/SIM/SFML/examples/cocoa/NSString+stdstring.h
+        src/SIM/SFML/examples/cocoa/NSString+stdstring.mm
+        src/SIM/SFML/examples/ftp/Ftp.cpp
+        src/SIM/SFML/examples/island/Island.cpp
+        src/SIM/SFML/examples/island/stb_perlin.h
+        src/SIM/SFML/examples/joystick/Joystick.cpp
+        src/SIM/SFML/examples/opengl/gl.h
+        src/SIM/SFML/examples/opengl/OpenGL.cpp
+        src/SIM/SFML/examples/pong/Pong.cpp
+        src/SIM/SFML/examples/shader/Effect.hpp
+        src/SIM/SFML/examples/shader/Shader.cpp
+        src/SIM/SFML/examples/sockets/Sockets.cpp
+        src/SIM/SFML/examples/sockets/TCP.cpp
+        src/SIM/SFML/examples/sockets/UDP.cpp
+        src/SIM/SFML/examples/sound/Sound.cpp
+        src/SIM/SFML/examples/sound_capture/SoundCapture.cpp
+        src/SIM/SFML/examples/voip/Client.cpp
+        src/SIM/SFML/examples/voip/Server.cpp
+        src/SIM/SFML/examples/voip/VoIP.cpp
+        src/SIM/SFML/examples/vulkan/Vulkan.cpp
+        src/SIM/SFML/examples/vulkan/vulkan.h
+        src/SIM/SFML/examples/win32/Win32.cpp
+        src/SIM/SFML/examples/window/gl.h
+        src/SIM/SFML/examples/window/Window.cpp
+        src/SIM/SFML/examples/X11/gl.h
+        src/SIM/SFML/examples/X11/X11.cpp
+        src/SIM/SFML/extlibs/headers/AL/al.h
+        src/SIM/SFML/extlibs/headers/AL/alc.h
+        src/SIM/SFML/extlibs/headers/AL/alext.h
+        src/SIM/SFML/extlibs/headers/AL/efx-creative.h
+        src/SIM/SFML/extlibs/headers/AL/efx-presets.h
+        src/SIM/SFML/extlibs/headers/AL/efx.h
+        src/SIM/SFML/extlibs/headers/FLAC/all.h
+        src/SIM/SFML/extlibs/headers/FLAC/assert.h
+        src/SIM/SFML/extlibs/headers/FLAC/callback.h
+        src/SIM/SFML/extlibs/headers/FLAC/export.h
+        src/SIM/SFML/extlibs/headers/FLAC/format.h
+        src/SIM/SFML/extlibs/headers/FLAC/metadata.h
+        src/SIM/SFML/extlibs/headers/FLAC/ordinals.h
+        src/SIM/SFML/extlibs/headers/FLAC/stream_decoder.h
+        src/SIM/SFML/extlibs/headers/FLAC/stream_encoder.h
+        src/SIM/SFML/extlibs/headers/freetype2/config/ftconfig.h
+        src/SIM/SFML/extlibs/headers/freetype2/config/ftheader.h
+        src/SIM/SFML/extlibs/headers/freetype2/config/ftmodule.h
+        src/SIM/SFML/extlibs/headers/freetype2/config/ftoption.h
+        src/SIM/SFML/extlibs/headers/freetype2/config/ftstdlib.h
+        src/SIM/SFML/extlibs/headers/freetype2/freetype.h
+        src/SIM/SFML/extlibs/headers/freetype2/ft2build.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftadvanc.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftautoh.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftbbox.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftbdf.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftbitmap.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftbzip2.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftcache.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftcffdrv.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftchapters.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftcid.h
+        src/SIM/SFML/extlibs/headers/freetype2/fterrdef.h
+        src/SIM/SFML/extlibs/headers/freetype2/fterrors.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftgasp.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftglyph.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftgxval.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftgzip.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftimage.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftincrem.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftlcdfil.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftlist.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftlzw.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftmac.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftmm.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftmodapi.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftmoderr.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftotval.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftoutln.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftpfr.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftrender.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftsizes.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftsnames.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftstroke.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftsynth.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftsystem.h
+        src/SIM/SFML/extlibs/headers/freetype2/fttrigon.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftttdrv.h
+        src/SIM/SFML/extlibs/headers/freetype2/fttypes.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftwinfnt.h
+        src/SIM/SFML/extlibs/headers/freetype2/ftxf86.h
+        src/SIM/SFML/extlibs/headers/freetype2/t1tables.h
+        src/SIM/SFML/extlibs/headers/freetype2/ttnameid.h
+        src/SIM/SFML/extlibs/headers/freetype2/tttables.h
+        src/SIM/SFML/extlibs/headers/freetype2/tttags.h
+        src/SIM/SFML/extlibs/headers/freetype2/ttunpat.h
+        src/SIM/SFML/extlibs/headers/glad/include/glad/egl.h
+        src/SIM/SFML/extlibs/headers/glad/include/glad/gl.h
+        src/SIM/SFML/extlibs/headers/glad/include/glad/glx.h
+        src/SIM/SFML/extlibs/headers/glad/include/glad/wgl.h
+        src/SIM/SFML/extlibs/headers/mingw/_mingw_dxhelper.h
+        src/SIM/SFML/extlibs/headers/mingw/dinput.h
+        src/SIM/SFML/extlibs/headers/ogg/config_types.h
+        src/SIM/SFML/extlibs/headers/ogg/ogg.h
+        src/SIM/SFML/extlibs/headers/ogg/os_types.h
+        src/SIM/SFML/extlibs/headers/stb_image/stb_image.h
+        src/SIM/SFML/extlibs/headers/stb_image/stb_image_write.h
+        src/SIM/SFML/extlibs/headers/vorbis/codec.h
+        src/SIM/SFML/extlibs/headers/vorbis/vorbisenc.h
+        src/SIM/SFML/extlibs/headers/vorbis/vorbisfile.h
+        src/SIM/SFML/extlibs/headers/vulkan/vk_icd.h
+        src/SIM/SFML/extlibs/headers/vulkan/vk_layer.h
+        src/SIM/SFML/extlibs/headers/vulkan/vk_platform.h
+        src/SIM/SFML/extlibs/headers/vulkan/vk_sdk_platform.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_android.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_core.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_ios.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_macos.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_mir.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_vi.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_wayland.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_win32.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_xcb.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_xlib.h
+        src/SIM/SFML/extlibs/headers/vulkan/vulkan_xlib_xrandr.h
+        src/SIM/SFML/extlibs/headers/catch.hpp
+        src/SIM/SFML/include/SFML/Audio/AlResource.hpp
+        src/SIM/SFML/include/SFML/Audio/Export.hpp
+        src/SIM/SFML/include/SFML/Audio/InputSoundFile.hpp
+        src/SIM/SFML/include/SFML/Audio/Listener.hpp
+        src/SIM/SFML/include/SFML/Audio/Music.hpp
+        src/SIM/SFML/include/SFML/Audio/OutputSoundFile.hpp
+        src/SIM/SFML/include/SFML/Audio/Sound.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundBuffer.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundBufferRecorder.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundFileFactory.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundFileFactory.inl
+        src/SIM/SFML/include/SFML/Audio/SoundFileReader.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundFileWriter.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundRecorder.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundSource.hpp
+        src/SIM/SFML/include/SFML/Audio/SoundStream.hpp
+        src/SIM/SFML/include/SFML/Graphics/BlendMode.hpp
+        src/SIM/SFML/include/SFML/Graphics/CircleShape.hpp
+        src/SIM/SFML/include/SFML/Graphics/Color.hpp
+        src/SIM/SFML/include/SFML/Graphics/ConvexShape.hpp
+        src/SIM/SFML/include/SFML/Graphics/Drawable.hpp
+        src/SIM/SFML/include/SFML/Graphics/Export.hpp
+        src/SIM/SFML/include/SFML/Graphics/Font.hpp
+        src/SIM/SFML/include/SFML/Graphics/Glsl.hpp
+        src/SIM/SFML/include/SFML/Graphics/Glsl.inl
+        src/SIM/SFML/include/SFML/Graphics/Glyph.hpp
+        src/SIM/SFML/include/SFML/Graphics/Image.hpp
+        src/SIM/SFML/include/SFML/Graphics/PrimitiveType.hpp
+        src/SIM/SFML/include/SFML/Graphics/Rect.hpp
+        src/SIM/SFML/include/SFML/Graphics/Rect.inl
+        src/SIM/SFML/include/SFML/Graphics/RectangleShape.hpp
+        src/SIM/SFML/include/SFML/Graphics/RenderStates.hpp
+        src/SIM/SFML/include/SFML/Graphics/RenderTarget.hpp
+        src/SIM/SFML/include/SFML/Graphics/RenderTexture.hpp
+        src/SIM/SFML/include/SFML/Graphics/RenderWindow.hpp
+        src/SIM/SFML/include/SFML/Graphics/Shader.hpp
+        src/SIM/SFML/include/SFML/Graphics/Shape.hpp
+        src/SIM/SFML/include/SFML/Graphics/Sprite.hpp
+        src/SIM/SFML/include/SFML/Graphics/Text.hpp
+        src/SIM/SFML/include/SFML/Graphics/Texture.hpp
+        src/SIM/SFML/include/SFML/Graphics/Transform.hpp
+        src/SIM/SFML/include/SFML/Graphics/Transformable.hpp
+        src/SIM/SFML/include/SFML/Graphics/Vertex.hpp
+        src/SIM/SFML/include/SFML/Graphics/VertexArray.hpp
+        src/SIM/SFML/include/SFML/Graphics/VertexBuffer.hpp
+        src/SIM/SFML/include/SFML/Graphics/View.hpp
+        src/SIM/SFML/include/SFML/Network/Export.hpp
+        src/SIM/SFML/include/SFML/Network/Ftp.hpp
+        src/SIM/SFML/include/SFML/Network/Http.hpp
+        src/SIM/SFML/include/SFML/Network/IpAddress.hpp
+        src/SIM/SFML/include/SFML/Network/Packet.hpp
+        src/SIM/SFML/include/SFML/Network/Socket.hpp
+        src/SIM/SFML/include/SFML/Network/SocketHandle.hpp
+        src/SIM/SFML/include/SFML/Network/SocketSelector.hpp
+        src/SIM/SFML/include/SFML/Network/TcpListener.hpp
+        src/SIM/SFML/include/SFML/Network/TcpSocket.hpp
+        src/SIM/SFML/include/SFML/Network/UdpSocket.hpp
+        src/SIM/SFML/include/SFML/System/Clock.hpp
+        src/SIM/SFML/include/SFML/System/Err.hpp
+        src/SIM/SFML/include/SFML/System/Export.hpp
+        src/SIM/SFML/include/SFML/System/FileInputStream.hpp
+        src/SIM/SFML/include/SFML/System/InputStream.hpp
+        src/SIM/SFML/include/SFML/System/Lock.hpp
+        src/SIM/SFML/include/SFML/System/MemoryInputStream.hpp
+        src/SIM/SFML/include/SFML/System/Mutex.hpp
+        src/SIM/SFML/include/SFML/System/NativeActivity.hpp
+        src/SIM/SFML/include/SFML/System/NonCopyable.hpp
+        src/SIM/SFML/include/SFML/System/Sleep.hpp
+        src/SIM/SFML/include/SFML/System/String.hpp
+        src/SIM/SFML/include/SFML/System/String.inl
+        src/SIM/SFML/include/SFML/System/Thread.hpp
+        src/SIM/SFML/include/SFML/System/Thread.inl
+        src/SIM/SFML/include/SFML/System/ThreadLocal.hpp
+        src/SIM/SFML/include/SFML/System/ThreadLocalPtr.hpp
+        src/SIM/SFML/include/SFML/System/ThreadLocalPtr.inl
+        src/SIM/SFML/include/SFML/System/Time.hpp
+        src/SIM/SFML/include/SFML/System/Utf.hpp
+        src/SIM/SFML/include/SFML/System/Utf.inl
+        src/SIM/SFML/include/SFML/System/Vector2.hpp
+        src/SIM/SFML/include/SFML/System/Vector2.inl
+        src/SIM/SFML/include/SFML/System/Vector3.hpp
+        src/SIM/SFML/include/SFML/System/Vector3.inl
+        src/SIM/SFML/include/SFML/Window/Clipboard.hpp
+        src/SIM/SFML/include/SFML/Window/Context.hpp
+        src/SIM/SFML/include/SFML/Window/ContextSettings.hpp
+        src/SIM/SFML/include/SFML/Window/Cursor.hpp
+        src/SIM/SFML/include/SFML/Window/Event.hpp
+        src/SIM/SFML/include/SFML/Window/Export.hpp
+        src/SIM/SFML/include/SFML/Window/GlResource.hpp
+        src/SIM/SFML/include/SFML/Window/Joystick.hpp
+        src/SIM/SFML/include/SFML/Window/Keyboard.hpp
+        src/SIM/SFML/include/SFML/Window/Mouse.hpp
+        src/SIM/SFML/include/SFML/Window/Sensor.hpp
+        src/SIM/SFML/include/SFML/Window/Touch.hpp
+        src/SIM/SFML/include/SFML/Window/VideoMode.hpp
+        src/SIM/SFML/include/SFML/Window/Vulkan.hpp
+        src/SIM/SFML/include/SFML/Window/Window.hpp
+        src/SIM/SFML/include/SFML/Window/WindowBase.hpp
+        src/SIM/SFML/include/SFML/Window/WindowHandle.hpp
+        src/SIM/SFML/include/SFML/Window/WindowStyle.hpp
+        src/SIM/SFML/include/SFML/Audio.hpp
+        src/SIM/SFML/include/SFML/Config.hpp
+        src/SIM/SFML/include/SFML/GpuPreference.hpp
+        src/SIM/SFML/include/SFML/Graphics.hpp
+        src/SIM/SFML/include/SFML/Main.hpp
+        src/SIM/SFML/include/SFML/Network.hpp
+        src/SIM/SFML/include/SFML/OpenGL.hpp
+        src/SIM/SFML/include/SFML/System.hpp
+        src/SIM/SFML/include/SFML/Window.hpp
+        src/SIM/SFML/src/SFML/Audio/ALCheck.cpp
+        src/SIM/SFML/src/SFML/Audio/ALCheck.hpp
+        src/SIM/SFML/src/SFML/Audio/AlResource.cpp
+        src/SIM/SFML/src/SFML/Audio/AudioDevice.cpp
+        src/SIM/SFML/src/SFML/Audio/AudioDevice.hpp
+        src/SIM/SFML/src/SFML/Audio/InputSoundFile.cpp
+        src/SIM/SFML/src/SFML/Audio/Listener.cpp
+        src/SIM/SFML/src/SFML/Audio/Music.cpp
+        src/SIM/SFML/src/SFML/Audio/OutputSoundFile.cpp
+        src/SIM/SFML/src/SFML/Audio/Sound.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundBuffer.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundBufferRecorder.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileFactory.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileReaderFlac.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileReaderFlac.hpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileReaderOgg.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileReaderOgg.hpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileReaderWav.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileReaderWav.hpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileWriterFlac.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileWriterFlac.hpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileWriterOgg.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileWriterOgg.hpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileWriterWav.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundFileWriterWav.hpp
+        src/SIM/SFML/src/SFML/Audio/SoundRecorder.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundSource.cpp
+        src/SIM/SFML/src/SFML/Audio/SoundStream.cpp
+        src/SIM/SFML/src/SFML/Graphics/BlendMode.cpp
+        src/SIM/SFML/src/SFML/Graphics/CircleShape.cpp
+        src/SIM/SFML/src/SFML/Graphics/Color.cpp
+        src/SIM/SFML/src/SFML/Graphics/ConvexShape.cpp
+        src/SIM/SFML/src/SFML/Graphics/Font.cpp
+        src/SIM/SFML/src/SFML/Graphics/GLCheck.cpp
+        src/SIM/SFML/src/SFML/Graphics/GLCheck.hpp
+        src/SIM/SFML/src/SFML/Graphics/GLExtensions.cpp
+        src/SIM/SFML/src/SFML/Graphics/GLExtensions.hpp
+        src/SIM/SFML/src/SFML/Graphics/Glsl.cpp
+        src/SIM/SFML/src/SFML/Graphics/Image.cpp
+        src/SIM/SFML/src/SFML/Graphics/ImageLoader.cpp
+        src/SIM/SFML/src/SFML/Graphics/ImageLoader.hpp
+        src/SIM/SFML/src/SFML/Graphics/RectangleShape.cpp
+        src/SIM/SFML/src/SFML/Graphics/RenderStates.cpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTarget.cpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTexture.cpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTextureImpl.cpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTextureImpl.hpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTextureImplDefault.cpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTextureImplDefault.hpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTextureImplFBO.cpp
+        src/SIM/SFML/src/SFML/Graphics/RenderTextureImplFBO.hpp
+        src/SIM/SFML/src/SFML/Graphics/RenderWindow.cpp
+        src/SIM/SFML/src/SFML/Graphics/Shader.cpp
+        src/SIM/SFML/src/SFML/Graphics/Shape.cpp
+        src/SIM/SFML/src/SFML/Graphics/Sprite.cpp
+        src/SIM/SFML/src/SFML/Graphics/Text.cpp
+        src/SIM/SFML/src/SFML/Graphics/Texture.cpp
+        src/SIM/SFML/src/SFML/Graphics/TextureSaver.cpp
+        src/SIM/SFML/src/SFML/Graphics/TextureSaver.hpp
+        src/SIM/SFML/src/SFML/Graphics/Transform.cpp
+        src/SIM/SFML/src/SFML/Graphics/Transformable.cpp
+        src/SIM/SFML/src/SFML/Graphics/Vertex.cpp
+        src/SIM/SFML/src/SFML/Graphics/VertexArray.cpp
+        src/SIM/SFML/src/SFML/Graphics/VertexBuffer.cpp
+        src/SIM/SFML/src/SFML/Graphics/View.cpp
+        src/SIM/SFML/src/SFML/Main/MainAndroid.cpp
+        src/SIM/SFML/src/SFML/Main/MainiOS.mm
+        src/SIM/SFML/src/SFML/Main/MainWin32.cpp
+        src/SIM/SFML/src/SFML/Main/SFMLActivity.cpp
+        src/SIM/SFML/src/SFML/Network/Unix/SocketImpl.cpp
+        src/SIM/SFML/src/SFML/Network/Unix/SocketImpl.hpp
+        src/SIM/SFML/src/SFML/Network/Win32/SocketImpl.cpp
+        src/SIM/SFML/src/SFML/Network/Win32/SocketImpl.hpp
+        src/SIM/SFML/src/SFML/Network/Ftp.cpp
+        src/SIM/SFML/src/SFML/Network/Http.cpp
+        src/SIM/SFML/src/SFML/Network/IpAddress.cpp
+        src/SIM/SFML/src/SFML/Network/Packet.cpp
+        src/SIM/SFML/src/SFML/Network/Socket.cpp
+        src/SIM/SFML/src/SFML/Network/SocketImpl.hpp
+        src/SIM/SFML/src/SFML/Network/SocketSelector.cpp
+        src/SIM/SFML/src/SFML/Network/TcpListener.cpp
+        src/SIM/SFML/src/SFML/Network/TcpSocket.cpp
+        src/SIM/SFML/src/SFML/Network/UdpSocket.cpp
+        src/SIM/SFML/src/SFML/System/Android/Activity.cpp
+        src/SIM/SFML/src/SFML/System/Android/Activity.hpp
+        src/SIM/SFML/src/SFML/System/Android/NativeActivity.cpp
+        src/SIM/SFML/src/SFML/System/Android/ResourceStream.cpp
+        src/SIM/SFML/src/SFML/System/Android/ResourceStream.hpp
+        src/SIM/SFML/src/SFML/System/Unix/ClockImpl.cpp
+        src/SIM/SFML/src/SFML/System/Unix/ClockImpl.hpp
+        src/SIM/SFML/src/SFML/System/Unix/MutexImpl.cpp
+        src/SIM/SFML/src/SFML/System/Unix/MutexImpl.hpp
+        src/SIM/SFML/src/SFML/System/Unix/SleepImpl.cpp
+        src/SIM/SFML/src/SFML/System/Unix/SleepImpl.hpp
+        src/SIM/SFML/src/SFML/System/Unix/ThreadImpl.cpp
+        src/SIM/SFML/src/SFML/System/Unix/ThreadImpl.hpp
+        src/SIM/SFML/src/SFML/System/Unix/ThreadLocalImpl.cpp
+        src/SIM/SFML/src/SFML/System/Unix/ThreadLocalImpl.hpp
+        src/SIM/SFML/src/SFML/System/Win32/ClockImpl.cpp
+        src/SIM/SFML/src/SFML/System/Win32/ClockImpl.hpp
+        src/SIM/SFML/src/SFML/System/Win32/MutexImpl.cpp
+        src/SIM/SFML/src/SFML/System/Win32/MutexImpl.hpp
+        src/SIM/SFML/src/SFML/System/Win32/SleepImpl.cpp
+        src/SIM/SFML/src/SFML/System/Win32/SleepImpl.hpp
+        src/SIM/SFML/src/SFML/System/Win32/ThreadImpl.cpp
+        src/SIM/SFML/src/SFML/System/Win32/ThreadImpl.hpp
+        src/SIM/SFML/src/SFML/System/Win32/ThreadLocalImpl.cpp
+        src/SIM/SFML/src/SFML/System/Win32/ThreadLocalImpl.hpp
+        src/SIM/SFML/src/SFML/System/Clock.cpp
+        src/SIM/SFML/src/SFML/System/Err.cpp
+        src/SIM/SFML/src/SFML/System/FileInputStream.cpp
+        src/SIM/SFML/src/SFML/System/Lock.cpp
+        src/SIM/SFML/src/SFML/System/MemoryInputStream.cpp
+        src/SIM/SFML/src/SFML/System/Mutex.cpp
+        src/SIM/SFML/src/SFML/System/Sleep.cpp
+        src/SIM/SFML/src/SFML/System/String.cpp
+        src/SIM/SFML/src/SFML/System/Thread.cpp
+        src/SIM/SFML/src/SFML/System/ThreadLocal.cpp
+        src/SIM/SFML/src/SFML/System/Time.cpp
+        src/SIM/SFML/src/SFML/Window/Android/ClipboardImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Android/ClipboardImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Android/CursorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Android/CursorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Android/InputImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Android/InputImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Android/JoystickImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Android/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Android/SensorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Android/SensorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Android/VideoModeImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Android/WindowImplAndroid.cpp
+        src/SIM/SFML/src/SFML/Window/Android/WindowImplAndroid.hpp
+        src/SIM/SFML/src/SFML/Window/FreeBSD/JoystickImpl.cpp
+        src/SIM/SFML/src/SFML/Window/FreeBSD/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/ClipboardImpl.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/ClipboardImpl.mm
+        src/SIM/SFML/src/SFML/Window/iOS/CursorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/iOS/CursorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/EaglContext.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/EaglContext.mm
+        src/SIM/SFML/src/SFML/Window/iOS/InputImpl.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/InputImpl.mm
+        src/SIM/SFML/src/SFML/Window/iOS/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/JoystickImpl.mm
+        src/SIM/SFML/src/SFML/Window/iOS/ObjCType.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/SensorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/SensorImpl.mm
+        src/SIM/SFML/src/SFML/Window/iOS/SFAppDelegate.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/SFAppDelegate.mm
+        src/SIM/SFML/src/SFML/Window/iOS/SFMain.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/SFMain.mm
+        src/SIM/SFML/src/SFML/Window/iOS/SFView.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/SFView.mm
+        src/SIM/SFML/src/SFML/Window/iOS/SFViewController.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/SFViewController.mm
+        src/SIM/SFML/src/SFML/Window/iOS/VideoModeImpl.mm
+        src/SIM/SFML/src/SFML/Window/iOS/WindowImplUIKit.hpp
+        src/SIM/SFML/src/SFML/Window/iOS/WindowImplUIKit.mm
+        src/SIM/SFML/src/SFML/Window/OpenBSD/JoystickImpl.cpp
+        src/SIM/SFML/src/SFML/Window/OpenBSD/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/AutoreleasePoolWrapper.h
+        src/SIM/SFML/src/SFML/Window/OSX/AutoreleasePoolWrapper.mm
+        src/SIM/SFML/src/SFML/Window/OSX/cg_sf_conversion.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/cg_sf_conversion.mm
+        src/SIM/SFML/src/SFML/Window/OSX/ClipboardImpl.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/ClipboardImpl.mm
+        src/SIM/SFML/src/SFML/Window/OSX/cpp_objc_conversion.h
+        src/SIM/SFML/src/SFML/Window/OSX/cpp_objc_conversion.mm
+        src/SIM/SFML/src/SFML/Window/OSX/CursorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/CursorImpl.mm
+        src/SIM/SFML/src/SFML/Window/OSX/HIDInputManager.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/HIDInputManager.mm
+        src/SIM/SFML/src/SFML/Window/OSX/HIDJoystickManager.cpp
+        src/SIM/SFML/src/SFML/Window/OSX/HIDJoystickManager.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/InputImpl.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/InputImpl.mm
+        src/SIM/SFML/src/SFML/Window/OSX/JoystickImpl.cpp
+        src/SIM/SFML/src/SFML/Window/OSX/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/NSImage+raw.h
+        src/SIM/SFML/src/SFML/Window/OSX/NSImage+raw.mm
+        src/SIM/SFML/src/SFML/Window/OSX/Scaling.h
+        src/SIM/SFML/src/SFML/Window/OSX/SensorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/OSX/SensorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/SFApplication.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFApplication.m
+        src/SIM/SFML/src/SFML/Window/OSX/SFApplicationDelegate.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFApplicationDelegate.m
+        src/SIM/SFML/src/SFML/Window/OSX/SFContext.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/SFContext.mm
+        src/SIM/SFML/src/SFML/Window/OSX/SFKeyboardModifiersHelper.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFKeyboardModifiersHelper.mm
+        src/SIM/SFML/src/SFML/Window/OSX/SFOpenGLView+keyboard.mm
+        src/SIM/SFML/src/SFML/Window/OSX/SFOpenGLView+keyboard_priv.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFOpenGLView+mouse.mm
+        src/SIM/SFML/src/SFML/Window/OSX/SFOpenGLView+mouse_priv.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFOpenGLView.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFOpenGLView.mm
+        src/SIM/SFML/src/SFML/Window/OSX/SFSilentResponder.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFSilentResponder.m
+        src/SIM/SFML/src/SFML/Window/OSX/SFViewController.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFViewController.mm
+        src/SIM/SFML/src/SFML/Window/OSX/SFWindow.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFWindow.m
+        src/SIM/SFML/src/SFML/Window/OSX/SFWindowController.h
+        src/SIM/SFML/src/SFML/Window/OSX/SFWindowController.mm
+        src/SIM/SFML/src/SFML/Window/OSX/VideoModeImpl.cpp
+        src/SIM/SFML/src/SFML/Window/OSX/WindowImplCocoa.hpp
+        src/SIM/SFML/src/SFML/Window/OSX/WindowImplCocoa.mm
+        src/SIM/SFML/src/SFML/Window/OSX/WindowImplDelegateProtocol.h
+        src/SIM/SFML/src/SFML/Window/Unix/ClipboardImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/ClipboardImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/CursorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/CursorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/Display.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/Display.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/GlxContext.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/GlxContext.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/InputImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/InputImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/JoystickImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/SensorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/SensorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/VideoModeImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/VulkanImplX11.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/VulkanImplX11.hpp
+        src/SIM/SFML/src/SFML/Window/Unix/WindowImplX11.cpp
+        src/SIM/SFML/src/SFML/Window/Unix/WindowImplX11.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/ClipboardImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/ClipboardImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/CursorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/CursorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/InputImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/InputImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/JoystickImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/SensorImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/SensorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/VideoModeImpl.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/VulkanImplWin32.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/VulkanImplWin32.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/WglContext.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/WglContext.hpp
+        src/SIM/SFML/src/SFML/Window/Win32/WindowImplWin32.cpp
+        src/SIM/SFML/src/SFML/Window/Win32/WindowImplWin32.hpp
+        src/SIM/SFML/src/SFML/Window/Clipboard.cpp
+        src/SIM/SFML/src/SFML/Window/ClipboardImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Context.cpp
+        src/SIM/SFML/src/SFML/Window/Cursor.cpp
+        src/SIM/SFML/src/SFML/Window/CursorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/EGLCheck.cpp
+        src/SIM/SFML/src/SFML/Window/EGLCheck.hpp
+        src/SIM/SFML/src/SFML/Window/EglContext.cpp
+        src/SIM/SFML/src/SFML/Window/EglContext.hpp
+        src/SIM/SFML/src/SFML/Window/GlContext.cpp
+        src/SIM/SFML/src/SFML/Window/GlContext.hpp
+        src/SIM/SFML/src/SFML/Window/GlResource.cpp
+        src/SIM/SFML/src/SFML/Window/InputImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Joystick.cpp
+        src/SIM/SFML/src/SFML/Window/JoystickImpl.hpp
+        src/SIM/SFML/src/SFML/Window/JoystickManager.cpp
+        src/SIM/SFML/src/SFML/Window/JoystickManager.hpp
+        src/SIM/SFML/src/SFML/Window/Keyboard.cpp
+        src/SIM/SFML/src/SFML/Window/Mouse.cpp
+        src/SIM/SFML/src/SFML/Window/Sensor.cpp
+        src/SIM/SFML/src/SFML/Window/SensorImpl.hpp
+        src/SIM/SFML/src/SFML/Window/SensorManager.cpp
+        src/SIM/SFML/src/SFML/Window/SensorManager.hpp
+        src/SIM/SFML/src/SFML/Window/Touch.cpp
+        src/SIM/SFML/src/SFML/Window/VideoMode.cpp
+        src/SIM/SFML/src/SFML/Window/VideoModeImpl.hpp
+        src/SIM/SFML/src/SFML/Window/Vulkan.cpp
+        src/SIM/SFML/src/SFML/Window/Window.cpp
+        src/SIM/SFML/src/SFML/Window/WindowBase.cpp
+        src/SIM/SFML/src/SFML/Window/WindowImpl.cpp
+        src/SIM/SFML/src/SFML/Window/WindowImpl.hpp
+        src/SIM/SFML/test/src/Graphics/Rect.cpp
+        src/SIM/SFML/test/src/System/Vector2.cpp
+        src/SIM/SFML/test/src/System/Vector3.cpp
+        src/SIM/SFML/test/src/TestUtilities/GraphicsUtil.cpp
+        src/SIM/SFML/test/src/TestUtilities/GraphicsUtil.hpp
+        src/SIM/SFML/test/src/TestUtilities/SystemUtil.cpp
+        src/SIM/SFML/test/src/TestUtilities/SystemUtil.hpp
+        src/SIM/SFML/test/src/TestUtilities/WindowUtil.cpp
+        src/SIM/SFML/test/src/TestUtilities/WindowUtil.hpp
+        src/SIM/SFML/test/src/CatchMain.cpp
+        "src/SIM/SFML/tools/xcode/templates/SFML/SFML App.xctemplate/main.cpp"
+        "src/SIM/SFML/tools/xcode/templates/SFML/SFML App.xctemplate/ResourcePath.hpp"
+        "src/SIM/SFML/tools/xcode/templates/SFML/SFML App.xctemplate/ResourcePath.mm"
+        "src/SIM/SFML/tools/xcode/templates/SFML/SFML CLT.xctemplate/main.cpp"
+        src/SIM/sim.cpp)
