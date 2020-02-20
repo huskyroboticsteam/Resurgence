@@ -33,5 +33,5 @@ TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
 {
     ParseCANPacket(motorTelemetry());
     std::cout << Globals::status_data << std::endl;
-    REQUIRE(Globals::status_data.dump() == "{\"front_right_motor\":{\"current\":256}}");
+    REQUIRE(Globals::status_data.dump() == "{\"front_right_wheel\":{\"current\":256}}");
 }

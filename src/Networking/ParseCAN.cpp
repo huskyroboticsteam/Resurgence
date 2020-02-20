@@ -5,10 +5,10 @@
 // which identifies the device. The value is another JSON object containing one or more keys corresponding to
 // telemetry measurements.
 
-const std::string broadcast_group[] = {};
-const std::string reserved_group[] = {};
-const std::string master_group[] = {"master_broadcast", "jetson"};
-const std::string power_group[] = {
+extern const std::vector<std::string> broadcast_group = {};
+extern const std::vector<std::string> reserved_group = {};
+extern const std::vector<std::string> master_group = {"master_broadcast", "jetson"};
+extern const std::vector<std::string> power_group = {
     "power_broadcast",
     "battery",
     "chassis_main",
@@ -18,7 +18,7 @@ const std::string power_group[] = {
     "arm_2",
     "science"
 };
-const std::string motor_group[] = {
+extern const std::vector<std::string> motor_group = {
     "motor_broadcast",
     "arm_base",
     "shoulder",
@@ -27,16 +27,16 @@ const std::string motor_group[] = {
     "diffleft",
     "diffright",
     "hand",
-    "front_left_motor",
-    "front_right_motor",
-    "back_left_motor",
-    "back_right_motor",
+    "front_left_wheel",
+    "front_right_wheel",
+    "back_left_wheel",
+    "back_right_wheel",
     "science"
 };
-const std::string telemetry_group[] = {"telemetry_broadcast", "localization", "imu", "temperature", "science"};
-const std::string gpio_group[] = {"gpio_broadcast"};
+extern const std::vector<std::string> telemetry_group = {"telemetry_broadcast", "localization", "imu", "temperature", "science"};
+extern const std::vector<std::string> gpio_group = {"gpio_broadcast"};
 
-const std::string *groups[] = {
+extern const std::vector<std::vector<std::string>> can_groups = {
     broadcast_group,
     reserved_group,
     master_group,
@@ -46,7 +46,7 @@ const std::string *groups[] = {
     gpio_group
 };
 
-const std::string telem_types[] = {
+extern const std::vector<std::string> telem_types = {
     "voltage",
     "current",
     "power_rail_state",
@@ -69,7 +69,7 @@ const std::string telem_types[] = {
 const std::string getDeviceTelemetryName(CANPacket &p) {
     uint8_t device_group = GetSenderDeviceGroupCode(&p);
     uint8_t device_serial = GetSenderDeviceSerialNumber(&p);
-    return groups[device_group][device_serial];
+    return can_groups[device_group][device_serial];
 }
 
 void ParseCANPacket(CANPacket p)
