@@ -16,8 +16,22 @@ using nlohmann::json;
 
 json motor_status = {};
 
+// It's important that all of these arrays are sorted in the same order (the indices correspond)
+std::vector<std::string> possible_keys = {"mode", "P", "I", "D", "PID target", "PWM target"};
+std::vector<int> packet_ids = {
+  ID_MOTOR_UNIT_MODE_SEL,
+  ID_MOTOR_UNIT_PID_P_SET,
+  ID_MOTOR_UNIT_PID_I_SET,
+  ID_MOTOR_UNIT_PID_D_SET,
+  ID_MOTOR_UNIT_PID_POS_TGT_SET,
+  ID_MOTOR_UNIT_PWM_DIR_SET
+};
+std::vector<int> packet_lengths = {
+  2, 5, 5, 5, 5, 5
+};
+
 void ParseMotorPacket(json &message);
-bool SendCANPacketToMotor(json &message, std::string &key, int motor_serial);
+bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
 
 int getIndex(const std::vector<std::string> &arr, std::string &value)
 {
@@ -55,12 +69,15 @@ void ParseMotorPacket(json &message)
   motor_status[motor]["motor"] = motor;
   std::cout << "Original status: " << motor_status[motor] << std::endl;
 
-  std::vector<std::string> possible_keys = {"mode", "P", "I", "D", "PID target", "PWM target"};
 
-  for (std::string key : possible_keys) {
+  for (int key_idx = 0; key_idx < possible_keys.size(); key_idx++) {
+    std::string key = possible_keys[key_idx];
     if (message[key] != nullptr && message[key] != motor_status[motor][key]) {
       std::cout << "Updating " << key << std::endl;
-      if (SendCANPacketToMotor(message, key, motor_serial)) {
+      uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL,
+                                       DEVICE_GROUP_MOTOR_CONTROL,
+                                       motor_serial);
+      if (SendCANPacketToMotor(message, key_idx, CAN_ID)) {
         motor_status[motor][key] = message[key];
       } else {
         std::cout << "Failed to send CAN packet.\n";
@@ -71,16 +88,15 @@ void ParseMotorPacket(json &message)
   std::cout << "Final status: " << motor_status[motor] << std::endl << std::endl;
 }
 
-bool SendCANPacketToMotor(json &message, std::string &key, int motor_serial) {
+bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID) {
+  std::string key = possible_keys[key_idx];
+  int length = packet_lengths[key_idx];
+  int packet_id = packet_ids[key_idx];
+  uint8_t data[length];
+  WritePacketIDOnly(data, packet_id);
+
   if (key == "mode") {
     std::string mode = message[key];
-    uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL,
-                                     DEVICE_GROUP_MOTOR_CONTROL,
-                                     motor_serial);
-    uint8_t length = 0x02;
-    uint8_t data[length];
-    WritePacketIDOnly(data, ID_MOTOR_UNIT_MODE_SEL);
-
     if (mode == "PWM") {
       data[1] = MOTOR_UNIT_MODE_PWM;
     } else if (mode == "PID") {
@@ -89,9 +105,14 @@ bool SendCANPacketToMotor(json &message, std::string &key, int motor_serial) {
       std::cout << "Error: unrecognized mode " << mode << std::endl;
       return false;
     }
-    CANPacket p = ConstructCANPacket(CAN_ID, length, data);
-    SendCANPacket(p);
+  }
+  else // key is one of P, I, D, PID target, or PWM target
+  {
+    uint32_t val = message[key];
+    PackIntIntoDataMSBFirst(data, val, 1);
   }
 
+  CANPacket p = ConstructCANPacket(CAN_ID, length, data);
+  SendCANPacket(p);
   return true;
 }
