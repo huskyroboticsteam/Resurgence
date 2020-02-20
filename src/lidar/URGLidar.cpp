@@ -1,5 +1,7 @@
 #include "URGLidar.h"
 
+#include <iostream>
+
 URGLidar::URGLidar() : lastFrameTime(std::chrono::steady_clock::now())
 {
 }
@@ -32,7 +34,7 @@ std::vector<Polar2D> URGLidar::getLastFrame()
     return lastFrame;
 }
 
-auto URGLidar::getLastFrameTime()
+std::chrono::time_point<std::chrono::steady_clock> URGLidar::getLastFrameTime()
 {
     return lastFrameTime;
 }
@@ -74,4 +76,30 @@ bool URGLidar::close()
     urg_close(&urg);
     error = 0;
     return true;
+}
+
+int main(int argc, char **argv)
+{
+    URGLidar lidar;
+    if (!lidar.open())
+    {
+        std::cout << "open failed with error code: " << lidar.getError() << std::endl;
+        return 1;
+    }
+    if (!lidar.createFrame())
+    {
+        std::cout << "create frame failed with error code: " << lidar.getError() << std::endl;
+        return 1;
+    }
+    std::vector<Polar2D> points = lidar.getLastFrame();
+    for (Polar2D p : points)
+    {
+        std::cout << "dist=" << p.r << ", theta=" << p.theta << std::endl;
+    }
+    if (!lidar.close())
+    {
+        std::cout << "close failed with error code: " << lidar.getError() << std::endl;
+        return 1;
+    }
+    return 0;
 }

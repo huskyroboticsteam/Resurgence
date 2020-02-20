@@ -52,7 +52,7 @@ public:
      * last queried for a new frame, or the time this URGLidar was
      * created if no frame have been created.
      */
-    auto getLastFrameTime();
+    std::chrono::time_point<std::chrono::steady_clock> getLastFrameTime();
     /**
      * Builds the next frame and updates the last frame and time variables
      * @returns True if this operation was successful.
