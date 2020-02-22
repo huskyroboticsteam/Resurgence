@@ -49,34 +49,36 @@ enum TagID
  */
 class Tag
 {
-  private:
-		/** Stores the corners of the tag in the image */
-		std::vector<cv::Point> corners;
-		cv::Vec3d rvec;
-		cv::Vec3d tvec;
-		TagID id;
-		CameraParams params;
+private:
+	/** Stores the corners of the tag in the image */
+	std::vector<cv::Point> corners;
+	cv::Vec3d rvec;
+	cv::Vec3d tvec;
+	cv::Vec3d coordinates;
+	TagID id;
+	CameraParams params;
 		
-		/** Calculates the orientation */
-		void calcOrientation();
+	/** Calculates the orientation */
+	void calcOrientation();
 
-  public:
-		/**
-		   Constructor for a Tag. Takes four OpenCV points which are the coordinates of the
-		   corners of the Tag in the image. Note the order of points; this will be checked and
-		   an AR::InvalidCornerException will be thrown if ordering is incorrect.
-		*/
-		Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-			cv::Point bottom_left, CameraParams params, TagID tag_id = ID_UNKNOWN);
-		/** Gets the coordinates of the center of the tag. */
-		cv::Point getCenter() const;
-		/**
-		   Gets the corners of the tag. Note that this is a const operation and a copy of the
-		   corners will be returned.
-		*/
-		std::vector<cv::Point> getCorners() const;
-		cv::Vec3d getRVec() const;
-		cv::Vec3d getTVec() const;
-		TagID getID() const;
+public:
+	/**
+	   Constructor for a Tag. Takes four OpenCV points which are the coordinates of the
+	   corners of the Tag in the image. Note the order of points; this will be checked and
+	   an AR::InvalidCornerException will be thrown if ordering is incorrect.
+	*/
+	Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
+		cv::Point bottom_left, CameraParams params, TagID tag_id = ID_UNKNOWN);
+	/** Gets the coordinates of the center of the tag. */
+	cv::Point getCenter() const;
+	/**
+	   Gets the corners of the tag. Note that this is a const operation and a copy of the
+	   corners will be returned.
+	*/
+	std::vector<cv::Point> getCorners() const;
+	cv::Vec3d getRVec() const;
+	cv::Vec3d getTVec() const;
+	cv::Vec3d getCoordinates() const;
+	TagID getID() const;
 };
 } // namespace AR

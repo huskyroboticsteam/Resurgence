@@ -16,7 +16,7 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 constexpr bool EXTRA_WINDOWS = true;
 
 // Set to whichever camera params should be used
-const AR::CameraParams PARAMS = AR::WEBCAM_PARAMS;
+const AR::CameraParams PARAMS = AR::WEBCAM_1080_PARAMS;
 
 int camera_id = 0;
 
@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-//	   cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-//	   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
@@ -136,8 +136,10 @@ int main(int argc, char *argv[])
 			corners.push_back(corners[0]);
 			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 15,
 			               2, cv::FILLED);
-			std::vector<cv::Point2d> cubePoints = projectCube(200, tag.getRVec(), tag.getTVec());
+			std::vector<cv::Point2d> cubePoints = projectCube(0.2, tag.getRVec(), tag.getTVec());
+			std::cout << "rvec: " << tag.getRVec() << std::endl;
 			std::cout << "tvec: " << tag.getTVec() << std::endl;
+			std::cout << "coordinates: " << tag.getCoordinates() << std::endl;
 
 			for(size_t i = 0; i < 4; i++){
 				size_t next = (i==3 ? 0 : i+1);

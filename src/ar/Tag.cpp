@@ -84,7 +84,7 @@ void Tag::calcOrientation()
 	}
 
 	// create ideal object points
-	double square_len = 200;
+	double square_len = 0.2;
 	// top left (-w/2, w/2)
 	object_points.push_back(cv::Point3f(-(square_len / 2), (square_len / 2), 0));
 	// top right (w/2, w/2)
@@ -107,6 +107,14 @@ void Tag::calcOrientation()
 	// store rotation and translation vectors in this tag instance
 	rvec = _rvec;
 	tvec = _tvec;
+
+	cv::Mat rmat;
+	cv::Rodrigues(rvec, rmat);
+	cv::Mat coord = rmat * tvec;
+	
+	coordinates[0] = coord.at<double>(0,0);
+	coordinates[1] = coord.at<double>(1,0);
+	coordinates[2] = coord.at<double>(2,0);
 }
 
 TagID Tag::getID () const
@@ -122,6 +130,11 @@ cv::Vec3d Tag::getRVec() const
 cv::Vec3d Tag::getTVec() const
 {
 	return tvec;
+}
+
+cv::Vec3d Tag::getCoordinates() const
+{
+	return coordinates;
 }
 
 } // namespace AR
