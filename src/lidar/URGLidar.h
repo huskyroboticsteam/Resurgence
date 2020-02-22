@@ -4,8 +4,8 @@
 #include <chrono>
 #include <math.h>
 #include <vector>
-#include "urg_c/urg_sensor.h"
-#include "urg_c/urg_utils.h"
+#include <urg_c/urg_sensor.h>
+#include <urg_c/urg_utils.h>
 
 struct Polar2D;
 
@@ -29,7 +29,7 @@ private:
     int error = 0;
     const char connect_device[13] = "/dev/ttyACM0";
     const long connect_baudrate = 115200;
-    std::vector<std::shared_ptr<Polar2D>> lastFrame;                  //The last completed frame.
+    std::vector<Polar2D> lastFrame;                                   //The last completed frame.
     std::chrono::time_point<std::chrono::steady_clock> lastFrameTime; //The system time at which the last frame was completed.
 
 public:
@@ -46,7 +46,7 @@ public:
     /**
      * @returns The last completed frame of nullptr if there is none.
      */
-    std::vector<std::shared_ptr<Polar2D>> getLastFrame();
+    std::vector<Polar2D> getLastFrame();
     /**
      * @returns the steady clock timestamp just before the sensor was
      * last queried for a new frame, or the time this URGLidar was

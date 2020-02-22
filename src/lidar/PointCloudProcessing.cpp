@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace Lidar
+namespace lidar
 {
 
 bool approxEqual(PointXY p, PointXY q)
@@ -29,10 +29,10 @@ void localToGlobal(PointXY &p, float x_loc, float y_loc, float heading)
 // clustering algorithm
 // O(n^2) time
 // does not assume any ordering or patterns among points
-std::vector<std::set<PointXY>> clusterPoints(
+std::vector<std::vector<PointXY>> clusterPoints(
     std::vector<PointXY> &pts, float sep_threshold)
 {
-    std::vector<std::set<PointXY>> clusters;
+    std::vector<std::vector<PointXY>> clusters;
     for (PointXY curr : pts)
     {
         int nearest_cluster = -1;
@@ -51,12 +51,12 @@ std::vector<std::set<PointXY>> clusterPoints(
         }
         if (min_dist < sep_threshold)
         {
-            clusters[nearest_cluster].insert(curr);
+            clusters[nearest_cluster].push_back(curr);
         }
         else
         {
-            clusters.push_back(std::set<PointXY>());
-            clusters.back().insert(curr);
+            clusters.push_back(std::vector<PointXY>());
+            clusters[clusters.size() - 1].push_back(curr);
         }
     }
     return clusters;
@@ -65,10 +65,10 @@ std::vector<std::set<PointXY>> clusterPoints(
 // another clustering algorithm
 // O(n) time
 // assumes points are in order by their polar degree
-std::vector<std::set<PointXY>> filterPointXYs(std::vector<PointXY> points, float sep_threshold)
+std::vector<std::vector<PointXY>> filterPointXYs(std::vector<PointXY> points, float sep_threshold)
 {
-    std::vector<std::set<PointXY>> clusters;
-    std::set<PointXY> lastCluster;
+    std::vector<std::vector<PointXY>> clusters;
+    std::vector<PointXY> lastCluster;
     PointXY lastPoint;
     for (int i = 1; i < points.size(); i++)
     {
@@ -77,13 +77,13 @@ std::vector<std::set<PointXY>> filterPointXYs(std::vector<PointXY> points, float
         {
             if (approxEqual(lastPoint, points[i - 1]))
             {
-                lastCluster.insert(points[i]);
+                lastCluster.push_back(points[i]);
             }
             else
             {
-                std::set<PointXY> cluster;
-                cluster.insert(points[i - 1]);
-                cluster.insert(points[i]);
+                std::vector<PointXY> cluster;
+                cluster.push_back(points[i - 1]);
+                cluster.push_back(points[i]);
                 lastPoint = points[i];
                 clusters.push_back(cluster);
                 lastCluster = cluster;
@@ -95,7 +95,7 @@ std::vector<std::set<PointXY>> filterPointXYs(std::vector<PointXY> points, float
         if (!approxEqual(lastPoint, zero_pt) &&
             distance(points[i].x, points[i].y, lastPoint.x, lastPoint.y) < sep_threshold)
         {
-            lastCluster.insert(points[i]);
+            lastCluster.push_back(points[i]);
         }
     }
     //checks last point and first point
@@ -105,26 +105,29 @@ std::vector<std::set<PointXY>> filterPointXYs(std::vector<PointXY> points, float
     {
         if (approxEqual(lastPoint, points[points.size() - 1]))
         {
-            lastCluster.insert(points[0]);
+            lastCluster.push_back(points[0]);
         }
         else
         {
-            std::set<PointXY> cluster;
-            cluster.insert(points[points.size() - 1]);
-            cluster.insert(points[0]);
+            std::vector<PointXY> cluster;
+            cluster.push_back(points[points.size() - 1]);
+            cluster.push_back(points[0]);
             clusters.push_back(cluster);
         }
     }
     return clusters;
 }
 
-void filterGroundPoints(std::vector<Polar2D> &pts, float scan_height,
+// removes points from the pts list that are ground points
+// pitch_rad is positive if learning forward, else negative
+// scan_height must be in the same units as the points distance
+void filterGroundPoints(std::vector<Polar2D> &pts, float scan_height, float pitch_rad,
                         float slope_tol_rad)
 {
     std::vector<Polar2D>::iterator itr = pts.begin();
     while (itr != pts.end())
     {
-        float slope_rad = tanhf(scan_height / (*itr).r);
+        float slope_rad = M_PI - pitch_rad - atan((*itr).r / scan_height);
         if (slope_rad < slope_tol_rad)
         {
             itr = pts.erase(itr);
@@ -136,45 +139,48 @@ void filterGroundPoints(std::vector<Polar2D> &pts, float scan_height,
     }
 }
 
-float orientation(PointXY p, PointXY q, PointXY r)
+std::vector<PointXY> convexHull(std::vector<PointXY> &cluster)
 {
-    return (q.x * r.y - q.y * r.x) - (p.x * r.y - p.y * r.x) + (p.x * q.y - p.y * q.x);
-}
-
-std::vector<PointXY> convexHull(std::set<PointXY> &cluster)
-{
-    if (cluster.size() < 3)
+    if (cluster.size() <= 3)
     {
-        return std::vector<PointXY>();
+        return cluster;
     }
 
     // sort points by their x coordinates
-    std::vector<PointXY> points(cluster.begin(), cluster.end());
-    std::sort(std::begin(points), std::end(points),
-              [](std::shared_ptr<PointXY> p1, std::shared_ptr<PointXY> p2) {
-                  return p1->x < p2->x;
+    std::sort(std::begin(cluster), std::end(cluster),
+              [](PointXY p1, PointXY p2) {
+                  return p1.x < p2.x;
               });
 
-    std::vector<PointXY> hull;
-    hull.push_back(points[0]);
-    hull.push_back(points[1]);
-    for (int i = 3; i < points.size(); i++)
+    // 0 -> collinear, positive -> counterclockwise, negative -> clockwise
+    auto orientation = [](PointXY p, PointXY q, PointXY r) {
+        return (q.x * r.y) - (q.y * r.x) - (p.x * r.y) + (p.y * r.x) + (p.x * q.y) - (p.y * q.x);
+    };
+
+    std::vector<PointXY> top_hull;
+    std::vector<PointXY> bot_hull;
+    for (int i = 0; i < cluster.size(); i++)
     {
-        if (orientation(*(hull.end() - 1), *hull.end(), points[i]) < 0)
+        while (top_hull.size() >= 2 && orientation(top_hull[top_hull.size() - 2],
+                                                   top_hull[top_hull.size() - 1], cluster[i]) > 0)
         {
-            hull.push_back(points[i]);
+            top_hull.pop_back();
         }
-        else
-        {
-            std::vector<PointXY>::iterator itr = hull.end();
-            while (orientation(*(hull.end() - 1), *hull.end(), points[i]) >= 0)
-            {
-                itr = hull.erase(itr);
-            }
-        }
+        top_hull.push_back(cluster[i]);
     }
 
-    return hull;
+    for (int i = cluster.size() - 1; i >= 0; i--)
+    {
+        while (bot_hull.size() >= 2 and orientation(bot_hull[bot_hull.size() - 2],
+                                                    bot_hull[bot_hull.size() - 1], cluster[i]) > 0)
+        {
+            bot_hull.pop_back();
+        }
+        bot_hull.push_back(cluster[i]);
+    }
+
+    top_hull.insert(top_hull.end(), bot_hull.begin() + 1, bot_hull.end() - 1);
+    return top_hull;
 }
 
-} // namespace Lidar
+} // namespace lidar
