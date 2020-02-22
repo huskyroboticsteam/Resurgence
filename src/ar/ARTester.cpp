@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	//   cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-	//   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+//	   cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+//	   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
@@ -80,11 +80,25 @@ int main(int argc, char *argv[])
 	long double total_time = 0.0;
 	long double time = 0.0;
 
+	int count = 0;
+	char choice = ' ';
+
+	std::cout << "1) Continuously grab frame. \n2) Grab 10 frames at a time" << std::endl;
+	std::cin >> choice;
+
+	bool frame_by_frame = choice == '2';
+
 	while (true)
 	{	
+		if (frame_by_frame && count % 10 == 0)
+		{
+			std::cin.get();
+		}
+
 		std::clock_t c_start = std::clock(); // Stores current cpu time
 		loop_num++;
 
+		// Grabs frame
 		cap.read(frame);
 		if (frame.empty())
 		{
@@ -98,7 +112,8 @@ int main(int argc, char *argv[])
 
 		std::vector<std::vector<cv::Point2f> > quad_corners;
 
-		// pass frame to detector here
+		// Passes frame to the detector class. 
+		// Tags will be located and returned.
 		std::vector<AR::Tag> tags =
 		    detector.findTags(frame, gray, edges, quad_corners, thresh_val, thresh2_val, blur_val);
 
@@ -111,33 +126,18 @@ int main(int argc, char *argv[])
 			cv::line(frame, quad[2], quad[3], green_line, 2);
 			cv::line(frame, quad[3], quad[0], green_line, 2);								
 		}
-
-		// show locations of tags in window
-//		std::cout << "Found " << tags.size() << " tags" << std::endl;
 		
-		// draw lines between tag points
-		// draw markers on the center and corners
+		// Draws an outline around the tag and a cross in the center
+		// Projects a cube onto the tag to debug TVec and RVec
 		for (AR::Tag tag : tags)
 		{
 			std::cout << "Tag ID: " << tag.getID() << std::endl;
 			std::vector<cv::Point> corners = tag.getCorners();
 			corners.push_back(corners[0]);
-			for (int i = 0; i < corners.size() - 1; i++)
-			{
-				//   cv::line(frame, corners[i].point, corners[i + 1].point, cv::Scalar(0, 0, 255),
-				//            3);
-				//   double l = std::sqrt(pow(corners[i].point.x - corners[i + 1].point.x, 2) +
-				//                        pow(corners[i].point.y - corners[i + 1].point.y, 2));
-				//   cv::drawMarker(frame, corners[i].point, cv::Scalar(255, 0, 0),
-				//                  cv::MARKER_CROSS, l / 10, 2, cv::FILLED);
-			}
 			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 15,
 			               2, cv::FILLED);
 			std::vector<cv::Point2d> cubePoints = projectCube(200, tag.getRVec(), tag.getTVec());
-			// std::cout << "rvec: " << tag.getRVec() << std::endl
-			//          << "tvec: " << tag.getTVec() << std::endl;
-			// std::cout << "Normal vector: " << normal << std::endl;
-			//cv::line(frame, cubePoints[0], cubePoints[1], cv::Scalar(0, 0, 255), 3);
+			std::cout << "tvec: " << tag.getTVec() << std::endl;
 
 			for(size_t i = 0; i < 4; i++){
 				size_t next = (i==3 ? 0 : i+1);
@@ -147,6 +147,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		// Opens up a window to display frames
 		cv::imshow(ORIG_WINDOW_NAME, frame);
 		if (EXTRA_WINDOWS)
 		{
@@ -157,9 +158,8 @@ int main(int argc, char *argv[])
 		if (cv::waitKey(5) == 'q')
 			break;
 
-
+		// Calculates time used to complete one loop on average
 		std::clock_t c_end = std::clock();
-
 		total_time += 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
 		std::cout << "Average CPU time used: " << total_time / loop_num << " ms\n";
 	}
