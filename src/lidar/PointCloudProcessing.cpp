@@ -18,6 +18,11 @@ float distance(float x0, float y0, float x1, float y1)
     return sqrtf(powf(x0 - x1, 2) + powf(y0 - y1, 2));
 }
 
+PointXY polarToCartesian(Polar2D p)
+{
+    return PointXY({p.r * cosf(p.theta), p.r * sinf(p.theta)});
+}
+
 // p is a point relative to the robot
 // heading should be in radians, 0 is north, pi/2 is east, pi is south, 3*pi/2 is west
 void localToGlobal(PointXY &p, float x_loc, float y_loc, float heading)
@@ -65,7 +70,8 @@ std::vector<std::vector<PointXY>> clusterPoints(
 // another clustering algorithm
 // O(n) time
 // assumes points are in order by their polar degree
-std::vector<std::vector<PointXY>> filterPointXYs(std::vector<PointXY> points, float sep_threshold)
+std::vector<std::vector<PointXY>> clusterOrderedPoints(std::vector<PointXY> &points,
+                                                       float sep_threshold)
 {
     std::vector<std::vector<PointXY>> clusters;
     std::vector<PointXY> lastCluster;
