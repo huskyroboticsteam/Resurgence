@@ -13,6 +13,11 @@ class Detector
 {
 	private:
 		CameraParams cam;
+		#ifdef WITH_GPU
+			cv::Ptr<cv::cuda::CannyEdgeDetector> detector;
+			Ptr<Filter> cv::cuda::createMorphologyFilter filter;
+		#endif
+
 	public:
 		Detector(CameraParams params);
 		

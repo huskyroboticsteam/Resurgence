@@ -1,5 +1,9 @@
 #include "Detector.h"
 
+#ifdef WITH_GPU
+	#include <opencv2/cudafilters.hpp>
+#endif
+
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <ctime>
@@ -162,15 +166,34 @@ std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, c
 cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
                   cv::Mat &grayscale)
 {
-	cv::Mat blur = removeNoise(input, blur_size);
-	cv::Mat gray;
+
 	cv::Mat edges;
 
-	cv::cvtColor(blur, gray, cv::COLOR_RGB2GRAY);
-	cv::Canny(gray, edges, thresh_val, thresh_val2);
-	cv::dilate(edges, edges, cv::Mat(), cv::Point(-1, -1));
+	#ifndef WITH_GPU
+		cv::Mat gray;	
+		cv::Mat blur = removeNoise(input, blur_size);
+		cv::cvtColor(blur, gray, cv::COLOR_RGB2GRAY);
+		cv::Canny(gray, edges, thresh_val, thresh_val2);
+		cv::dilate(edges, edges, cv::Mat(), cv::Point(-1, -1));
 
-	grayscale = gray;
+		grayscale = gray;
+	#else
+		cv::cuda::GpuMat gpu_input;
+		gpu_input.upload(input);	
+
+		cv::cuda::GpuMat gpu_gray;
+		cv::cuda::cvtColor(input, gpu_gray, cv::COLOR_BGR2GRAY);
+
+		cv::cuda::GpuMat gpu_blur;
+		cv::cuda::fastNlMeansDenoising(gpu_gray, gpu_blur, blur_size * 1.0);
+
+		cv::cuda::GpuMat gpu_edges;
+		detector->detect(gpu_gray, gpu_edges);
+		filter->apply(gpu_edges, gpu_edges);
+
+		gpu_gray.download(grayscale);
+		gpu_gray.download(edges);
+	#endif
 
 	return edges;
 }
@@ -346,6 +369,10 @@ std::vector<int> getBitData(cv::Mat data)
 Detector::Detector(CameraParams params) : cam(params)
 {
 	cam = params;
+	#ifdef WITH_GPU
+		detector = cv::cuda::createCannyEdgeDetector(50, 100);
+		filter = cv::cuda::createMorphologyFilter(cv::MORPH_DILATE, cv::CV_8UC1, cv::Mat());
+	#endif
 }
 
 } // namespace AR
