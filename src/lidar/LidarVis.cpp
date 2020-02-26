@@ -65,6 +65,18 @@ int main(int argc, char **argv)
         std::cout << "failed to open lidar" << std::endl;
         return lidar.getError();
     }
+    std::cout << "getting one frame from lidar as test read:" << std::endl;
+    if (!lidar.createFrame())
+    {
+        std::cout << "failed to create test frame" << std::endl;
+        return lidar.getError();
+    }
+    std::vector<Polar2D> testFrame = lidar.getLastFrame();
+    for (Polar2D p : testFrame)
+    {
+        std::cout << "(" << p.r << ", " << p.theta << ") " << std::endl;
+    }
+    std::cout << std::endl;
     lidar::LidarVis vis(600, 400, {1.0, 1.0, 1.0});
     while (true)
     {
