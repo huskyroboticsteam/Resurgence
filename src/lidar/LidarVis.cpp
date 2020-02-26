@@ -1,5 +1,7 @@
 #include "LidarVis.h"
 
+#include <iostream>
+
 namespace lidar
 {
 LidarVis::LidarVis(int win_width, int win_height, std::vector<double> rgb) : view(win_height, win_width, CV_8UC3, cv::Scalar(rgb[0], rgb[1], rgb[2]))
@@ -60,6 +62,7 @@ int main(int argc, char **argv)
     URGLidar lidar;
     if (!lidar.open())
     {
+        std::cout << "failed to open lidar" << std::endl;
         return lidar.getError();
     }
     lidar::LidarVis vis(600, 400, {1.0, 1.0, 1.0});
@@ -67,6 +70,7 @@ int main(int argc, char **argv)
     {
         if (!lidar.createFrame())
         {
+            std::cout << "failed to create frame" << std::endl;
             return lidar.getError();
         }
         std::vector<Polar2D> polarPts = lidar.getLastFrame();
