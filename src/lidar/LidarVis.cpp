@@ -93,6 +93,16 @@ int main(int argc, char **argv)
         }
         vis.drawPoints(pts, true, true, 500, {0, 0, 0}, 3);
         vis.display();
+
+        if (cv::waitKey(5) == 'q')
+        {
+            break;
+        }
+    }
+    if (!lidar.close())
+    {
+        std::cout << "failed to close lidar device" << std::endl;
+        return lidar.getError();
     }
     return 0;
 }
