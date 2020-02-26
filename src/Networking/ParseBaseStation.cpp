@@ -17,8 +17,12 @@ using nlohmann::json;
 json motor_status = {};
 
 // It's important that all of these arrays are sorted in the same order (the indices correspond)
-std::vector<std::string> possible_keys = {"mode", "P", "I", "D", "PID target", "PWM target"};
-std::vector<int> packet_ids = {
+std::map<std::string, std::vector<std::string>> possible_keys = {{"motor", {}}, {"ik", {}}, {"drive", {}}}
+possible_keys["motor"] = {"mode", "P", "I", "D", "PID target", "PWM target"};
+possible_keys["ik"] = {"wrist_base_target", "hand_orientation_target"};
+possible_keys["drive"] = {"forward_backward", "left_right"};
+
+std::vector<int> motor_packet_ids = {
   ID_MOTOR_UNIT_MODE_SEL,
   ID_MOTOR_UNIT_PID_P_SET,
   ID_MOTOR_UNIT_PID_I_SET,
@@ -26,9 +30,10 @@ std::vector<int> packet_ids = {
   ID_MOTOR_UNIT_PID_POS_TGT_SET,
   ID_MOTOR_UNIT_PWM_DIR_SET
 };
-std::vector<int> packet_lengths = {
+std::vector<int> motor_packet_lengths = {
   2, 5, 5, 5, 5, 5
 };
+
 
 void ParseMotorPacket(json &message);
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
@@ -50,6 +55,7 @@ void ParseBaseStationPacket(char* buffer)
   // TODO proper input validation. Sometimes the rover crashes due to malformatted json
   std::string type = parsed_message["type"];
   std::cout << "Message type: " << type << std::endl;
+  // TODO implement inverse kinematics
   if (type == "motor") {
     ParseMotorPacket(parsed_message);
   }
@@ -70,8 +76,8 @@ void ParseMotorPacket(json &message)
   std::cout << "Original status: " << motor_status[motor] << std::endl;
 
 
-  for (int key_idx = 0; key_idx < possible_keys.size(); key_idx++) {
-    std::string key = possible_keys[key_idx];
+  for (int key_idx = 0; key_idx < possible_keys["motor"].size(); key_idx++) {
+    std::string key = possible_keys["motor"][key_idx];
     if (message[key] != nullptr && message[key] != motor_status[motor][key]) {
       std::cout << "Updating " << key << std::endl;
       uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL,
@@ -89,9 +95,9 @@ void ParseMotorPacket(json &message)
 }
 
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID) {
-  std::string key = possible_keys[key_idx];
-  int length = packet_lengths[key_idx];
-  int packet_id = packet_ids[key_idx];
+  std::string key = possible_keys["motor"][key_idx];
+  int length = motor_packet_lengths[key_idx];
+  int packet_id = motor_packet_ids[key_idx];
   uint8_t data[length];
   WritePacketIDOnly(data, packet_id);
 
