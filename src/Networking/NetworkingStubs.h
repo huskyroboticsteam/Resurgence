@@ -11,5 +11,7 @@ extern "C"
 // NetworkingStubs.cpp will just save their arguments into an array
 // which can be retrieved using popCANPacket and popBaseStationPacket
 
+int numCANPackets();
+int numBaseStationPackets();
 CANPacket popCANPacket();
 std::string popBaseStationPacket();

@@ -5,6 +5,16 @@
 std::queue<CANPacket> can_packets {};
 std::queue<std::string> base_station_packets {};
 
+int numCANPackets()
+{
+  return can_packets.size();
+}
+
+int numBaseStationPackets()
+{
+  return base_station_packets.size();
+}
+
 void SendCANPacket(const CANPacket &packet)
 {
   can_packets.push(packet);
