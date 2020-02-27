@@ -21,6 +21,8 @@ class Simulator
     void drawPath();
     //private helped method to bind coordinates to location on window
     void interpretCoordinates();
+    //draw robot on center of screen
+    void drawRobot();
     private:
     Mat img = Mat::zeros( w, w, CV_8UC3 );
 }
