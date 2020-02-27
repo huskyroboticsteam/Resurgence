@@ -21,5 +21,6 @@ class Simulator
     void drawPath(); // take in full path from main method, change pather2 to return full path to main method
     //private helped method to bind coordinates to location on window
     void interpretCoordinates();
-    
+    private:
+    Mat img = Mat::zeros( w, w, CV_8UC3 );
 }
