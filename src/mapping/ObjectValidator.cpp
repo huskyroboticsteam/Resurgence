@@ -1,49 +1,80 @@
 #include "ObjectValidator.h"
 
 // Associate each extracted landmark to the closest landmark we have seen before 
-std::vector<size_t> ObjectValidator::validate(std::vector<MapObstacle> lidarObstacles) {
-
+std::vector<size_t> ObjectValidator::validate(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters) {
+    std::vector<PointXY> lidarObstacles = boundingBox(lidarClusters,1);
     const int landmarkConstant = 1;    //placeholder value for now
     const float lidarRange = 10;       //temp lidar range
     std::vector<size_t> obstacleIDs;
-    Vec2 currPosition = ekf.getPosition(); 
+    PointXY currPosition = ekf.getPosition(); 
 
-    // Use the map to get a bunch of known obstacles near our current position
-    std::vector<std::shared_ptr<const MapObstacle>> nearObstacles = 
-        map.findObjectsWithinRadius(lidarRange, currPosition.x, currPosition.y);
+    // Use the map to get all known obstacles
+    std::vector<ObstaclePoint> existingObs = ekf.getObstacles();
 
     // Cycle through all the passed obstacles
     for(int i = 0; i < lidarObstacles.size; i++) 
     {
         float leastDistance = lidarRange; //start value at greater than range of lidar
-        MapObstacle closestObstacle;
+        PointXY closestObstacle;
+        int id;
         // Cycle through all known obstacles 
-        for(std::shared_ptr<const MapObstacle> obstacle : nearObstacles) 
+        for(int j = 0; j < existingObs.size; j++) 
         {
-            MapObstacle ob = *obstacle;
-            Vec2 obstaclePos = ob.position;
             // calculate the distance between the two obstacles
-            float deltaX = obstaclePos.x - lidarObstacles[i].position.x;
-            float deltaY = obstaclePos.y - lidarObstacles[i].position.y;
+            float deltaX = existingObs[j].x - lidarObstacles[i].x;
+            float deltaY = existingObs[j].y - lidarObstacles[i].y;
             float distance = std::sqrt(std::pow(deltaX , 2.0) + std::pow(deltaY , 2.0));
             //Find pair of closest obstacles;
             if(distance < leastDistance) 
             {
                 leastDistance = distance;
-                closestObstacle = ob;
+                closestObstacle.x = existingObs[j].x;
+                closestObstacle.y = existingObs[j].y;
+                id = j + 1; //associate passed obstacle with an id of a known obstacle
             }
         }
-        // pass id of closest obstacle and the map obstacle we've associated with it, get back value
-        float validationValue = ekf.getValidationValue(closestObstacle.uid, lidarObstacles[i]);
+        // pass id of closest obstacle and the map obstacle we've associated with it 
+        // get back validation value to see if obstacles are the same
+        float validationValue = ekf.getValidationValue(id, lidarObstacles[i]);
         if (validationValue <= landmarkConstant) 
         { //passed validation gate
-            obstacleIDs.push_back(ob.uid);        //add id of known obstacle
+            obstacleIDs.push_back(id);        //add id of known obstacle
         }
         else 
         { // failed validation gate, is a new obstacle
-            size_t newID = map.newObstacleUID(lidarObstacles[i]); //add new obstacle to map, get an id 
-            obstacleIDs.push_back(newID);                         //add id to vector
+            int newID = ekf.getNewLandmarkID();  //add new obstacle to map, get an id 
+            obstacleIDs.push_back(newID);  //add id to vector
         }
     }
     return obstacleIDs; // return the output vector
 }
+
+std::vector<PointXY> boundingBox(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters, float boxSize) {
+    std::vector<PointXY> boxes;
+    float boxRadius = boxSize/2;
+    //Loop through every set of clusters from the lidar
+    //Each set is a seperate obstacles
+    for(set<std::shared_ptr<PointXY>> clusterSet: lidarClusters) {
+        std::set<std::shared_ptr<PointXY>>::iterator it = clusterSet.begin();
+        PointXY firstPoint = **it;
+        boxes.push_back(firstPoint); //put a "box" around the first point
+        it++;
+        //iterate through the set
+        while (it != clusterSet.end()) {
+            PointXY point = **it;
+            //check if point in set is within any of the existing boxes
+            for(PointXY box : boxes) {
+                bool inX = (point.x > (box.x - boxRadius)) && (point.x < (box.x + boxRadius));
+                bool inY = (point.y > (box.y - boxRadius)) && (point.y < (box.y + boxRadius));
+                if(!inX || !inY) {
+                    //if the point is not in any boxes, add it as a box
+                    boxes.push_back(point);
+                }
+            }
+	        //Increment the iterator
+        	it++;
+        }
+    }
+    return boxes;
+}
+        

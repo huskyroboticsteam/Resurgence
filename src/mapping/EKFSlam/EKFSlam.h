@@ -49,20 +49,26 @@ class EKFSLam {
     */
     void step(); 
 
-    Vec2 getPosition();
+    //Returns a PointXY(x,y) of the robot's latest position
+    PointXY getPosition();
 
+    //Returns a float of the robot's latest heading
     float getHeading();
     
     // TODO: add a function(s) to access uncertainty values
-    float getValidationValue(size_t id, const MapObstacle &obstacle);
+    float getValidationValue(size_t id, PointXY obstacle);
+    
+    // Returns a vector of points of all obstacles
+    std::vector<ObstaclePoint> getObstacles();
 
-    std::vector<
+    //Returns a new id to be associated to a new landmark
+    int EKFSLam::getNewLandmarkID();
 
   private:
     // check whether the tracking toolbox was initialized or not (first
     // measurement)
     bool is_initialized_;
-
+    std::vector<ObstaclePoint> obstacles;
     // tool object used to compute Jacobian and RMSE
     Tools tools;
     Eigen::MatrixXd robSigma;
@@ -73,4 +79,5 @@ class EKFSLam {
     Eigen::MatrixXd Q_;
     vector<bool> observedLandmarks;
     ObjectValidator object_validator;
+    int counter;
 };

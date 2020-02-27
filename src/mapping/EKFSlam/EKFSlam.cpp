@@ -1,10 +1,12 @@
-#include "EKFSlam.h"
+#include "ekfslam.h"
 
 /*
  * Constructor.
  */
 EKFSLam::EKFSLam() {
   is_initialized_ = false;
+  obstacles = new std::vector<ObstaclePoint>();
+  counter = 0;
 }
 
 /**
@@ -13,13 +15,13 @@ Initialize the parameters
 
 void EKFSLam::Initialize(unsigned int landmark_size, unsigned int rob_pose_size, float _motion_noise) {
   
-  int N       = landmark_size;
-  int r       = rob_pose_size;       
-  mu          = VectorXd::Zero(2*N + r, 1);
+  int N       = landmark_size; //number of landmarks
+  int r       = rob_pose_size; //number of robot states(3)  
+  mu          = VectorXd::Zero(2*N + r, 1); //state vector, x,y,angle,obs
   robSigma    = MatrixXd::Zero(r, r);
   robMapSigma = MatrixXd::Zero(r, 2*N);
   mapSigma    = INF*MatrixXd::Identity(2*N, 2*N);
-  Sigma = MatrixXd::Zero(2*N + r, 2*N + r);
+  Sigma = MatrixXd::Zero(2*N + r, 2*N + r); //Covariance Matrix
 
   Sigma.topLeftCorner(r, r)          = robSigma;
   Sigma.topRightCorner(r, 2*N)       = robMapSigma;
@@ -46,13 +48,14 @@ EKFSLam::~EKFSLam() {}
 
 
 void EKFSLam::Prediction(const OdoReading& motion) {
-
+//take in motion of robot
+//use update from magnetometer and gps here
   double angle = mu(2);
   double r1    = motion.r1;
   double t     = motion.t;
   double r2    = motion.r2;
 
-  MatrixXd Gt = MatrixXd(3,3);
+  MatrixXd Gt = MatrixXd(3,3); //Matrix A(jacobian of prediction model)
   Gt << 1, 0, -t*sin(angle + r1),
         0, 1,  t*cos(angle + r1),
         0, 0,  0;
@@ -60,10 +63,11 @@ void EKFSLam::Prediction(const OdoReading& motion) {
   float c = cos(angle + r1);
   float s = sin(angle + r1);
 
-  mu(0) = mu(0)  + t*c;
-  mu(1) = mu(1) + t*s;
-  mu(2) = mu(2) + r1 + r2;
+  mu(0) = mu(0)  + t*c; //update x
+  mu(1) = mu(1) + t*s;  //update y
+  mu(2) = mu(2) + r1 + r2;  //update heading
   
+  //Update Covariance Matrix
   int size = Sigma.cols();
   Sigma.topLeftCorner(3,3) = Gt * Sigma.topLeftCorner(3,3) * Gt.transpose();
   Sigma.topRightCorner(3, size-3) = Gt * Sigma.topRightCorner(3, size-3);
@@ -74,7 +78,11 @@ void EKFSLam::Prediction(const OdoReading& motion) {
 
 
 void EKFSLam::Correction(const vector<RadarReading>& observations) {
-
+//takes in observations, which is a vector of readings, has id, range, bearing
+//call validator here, validator will associate lidar readings with existing obstacles
+//returns a vector of ids corresponding to the lidar readings
+//validator will assign a new id to a new obstacle
+//object_validator.validate();
   // number of measurements in this step
   int m = observations.size();
   //[range, bearing, range, bearing, .....]
@@ -84,13 +92,13 @@ void EKFSLam::Correction(const vector<RadarReading>& observations) {
   //Jacobian matrix;
   int N = observedLandmarks.size();
   MatrixXd H = MatrixXd::Zero(2*m, 2*N + 3);
-  for (int i = 0; i < m; i++) {
+  for (int i = 0; i < m; i++) { //cycle through observations
 
       auto& reading = observations[i];
-      long long landmarkId = reading.id;
+      long long landmarkId = reading.id; //change to take from validator
       float     range      = reading.range;
       float     bearing    = reading.bearing;
-      //landmark is not seen before, so to initialize the landmarks
+      //landmark is not seen before(has a new id), so to initialize the landmarks
       if (!observedLandmarks[landmarkId-1]) {
           mu(2*landmarkId + 1) = mu(0) + range*cos(mu(2) + bearing);
           mu(2*landmarkId+2) = mu(1) + range*sin(mu(2) + bearing);
@@ -119,15 +127,17 @@ void EKFSLam::Correction(const vector<RadarReading>& observations) {
   MatrixXd Q = MatrixXd::Identity(2*m, 2*m)*0.01;
   //compute the Kalman gain
   MatrixXd Ht = H.transpose();
-  MatrixXd HQ = (H*Sigma*Ht) + Q;
+  MatrixXd HQ = (H*Sigma*Ht) + Q; //Innovation Covariance (S)
   MatrixXd Si = HQ.inverse();
-  MatrixXd K = Sigma*Ht*Si;
+  //Kalman Gain
+  //two columns, range and bearing for robot state and each landmark
+  MatrixXd K = Sigma*Ht*Si;  
   //update 
 
-  VectorXd diff = Z - expectedZ;
+  VectorXd diff = Z - expectedZ; //(z-h) = v
   tools.normalize_bearing(diff);
-  mu = mu + K * diff;
-  Sigma = Sigma - K*H*Sigma;
+  mu = mu + K * diff; //update state vector
+  Sigma = Sigma - K*H*Sigma; //update covariance matrix
   mu(2) = tools.normalize_angle(mu(2));
 }
 
@@ -135,4 +145,33 @@ void EKFSLam::ProcessMeasurement(const Record& record) {
 
       Prediction(record.odo); 
       Correction(record.radars);
+}
+
+std::vector<ObstaclePoint> EKFSLam::getObstacles() {
+  for(int i = obstacles.size + 3; i < mu.size; i ++) {
+    ObstaclePoint ob{mu[i], mu[i+1]};
+    obstacles.push_back(ob);
+  }
+  return obstacles;
+}
+
+PointXY EKFSLam::getPosition() {
+  PointXY location{mu[0], mu[1]};
+  return location;
+}
+
+float EKFSLam::getHeading() {
+  return mu[2];
+}
+
+float EKFSLam::getValidationValue(size_t id, PointXY obstacle) {
+//innovation covariance:HQ
+//v^T * HQ^-1 * v < lambda
+//v = innovation
+
+}
+
+int EKFSLam::getNewLandmarkID() {
+  counter++;
+  return counter;
 }

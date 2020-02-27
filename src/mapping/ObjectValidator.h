@@ -11,12 +11,19 @@ The EKFSLAM algorithm relies on knowing this information
 */
 class ObjectValidator {
 public:
-   // Assigns ids to the lidarObstacles
-   // Adds any objects that don't exist on the map to the map
-   // Takes in Map obstacles from bounding box class
-   std::vector<size_t> validate(std::vector<std::set<std::shared_ptr<Vec2>>> lidarObstacles); 
+   //Associates passed obstacles to lidarObstacles
+   //Assigns the correct id to associated obstacles
+   //Gives a new id to obstacles considered to be new
+   //Returns a vector of those ids
+   std::vector<size_t> validate(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters); 
    ObjectValidator(EKFSLam &ekf);
 private:
+   //Takes in clusters of points collected from the lidar
+   //Associates a point as an obstacle, putting a "box" around it
+   //Treat any point not within a box as also a new obstacle
+   //Returns a vector of points of all the obstacles
+   //The point represents the center of the box
+   std::vector<PointXY> boundingBox(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters, float boxSize);
    EnvMap &map;
-   EKFSlam &ekf;
+   EKFSLam &ekf;
 };
