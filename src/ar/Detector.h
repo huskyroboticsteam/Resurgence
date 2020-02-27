@@ -5,12 +5,6 @@
 
 #include <opencv2/core.hpp>
 
-#ifdef WITH_GPU
-#include <opencv2/core/cuda.hpp>
-#include <opencv2/cudafilters.hpp>
-#include <opencv2/cudaimgproc.hpp>
-#endif
-
 #include <vector>
 
 namespace AR
@@ -19,11 +13,6 @@ class Detector
 {
 	private:
 		CameraParams cam;
-		#ifdef WITH_GPU
-			cv::Ptr<cv::cuda::CannyEdgeDetector> detector;
-			cv::Ptr<cv::cuda::createMorphologyFilter> filter;
-		#endif
-
 	public:
 		Detector(CameraParams params);
 		

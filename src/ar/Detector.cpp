@@ -4,6 +4,7 @@
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudafilters.hpp>
 #include <opencv2/cudaimgproc.hpp>
+#include <opencv2/photo/cuda.hpp>
 #endif
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -147,6 +148,11 @@ std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, c
     // Applies grayscale, outlines objects in the picture and emphasizes outlines
 	edges = prepImage(input, blur_size, canny_thresh_1, canny_thresh_2, grayscale);
 
+	#ifdef WITH_GPU
+		cv::Ptr<cv::cuda::CannyEdgeDetector> detector;
+		cv::Ptr<cv::cuda::Filter> filter;
+	#endif
+
 	// vector to hold any contours found
 	std::vector<std::vector<cv::Point> > contours;
 	// vector to hold quadrilaterals that could be possible tags
@@ -179,8 +185,13 @@ cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
 
 		grayscale = gray;
 	#else
+		cv::Ptr<cv::cuda::CannyEdgeDetector> detector = 
+			cv::cuda::createCannyEdgeDetector(50, 100);
+		cv::Ptr<cv::cuda::Filter> filter = 
+			cv::cuda::createMorphologyFilter(cv::MORPH_DILATE, CV_8UC1, cv::Mat());
+
 		cv::cuda::GpuMat gpu_input;
-		gpu_input.upload(input);	
+		gpu_input.upload(input);
 
 		cv::cuda::GpuMat gpu_gray;
 		cv::cuda::cvtColor(input, gpu_gray, cv::COLOR_BGR2GRAY);
@@ -370,10 +381,6 @@ std::vector<int> getBitData(cv::Mat data)
 Detector::Detector(CameraParams params) : cam(params)
 {
 	cam = params;
-	#ifdef WITH_GPU
-		detector = cv::cuda::createCannyEdgeDetector(50, 100);
-		filter = cv::cuda::createMorphologyFilter(cv::MORPH_DILATE, cv::CV_8UC1, cv::Mat());
-	#endif
 }
 
 } // namespace AR
