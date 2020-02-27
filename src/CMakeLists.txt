@@ -6,7 +6,7 @@ set(USE_GPU OFF CACHE BOOL "Whether or not to compile GPU code")
 
 if("${USE_GPU}")
   message(STATUS "GPU code is ON")
-  add_compile_definitions(WITH_GPU)
+  add_definitions(-DWITH_GPU)
 else()
   message(STATUS "GPU code is OFF")
 endif()
