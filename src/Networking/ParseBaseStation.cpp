@@ -43,7 +43,7 @@ int getIndex(const std::vector<std::string> &arr, std::string &value)
   return -1;
 }
 
-void ParseBaseStationPacket(char* buffer)
+void ParseBaseStationPacket(char const* buffer)
 {
   std::cout << "Message from base station: " << buffer << std::endl;
   json parsed_message = json::parse(buffer);
@@ -53,7 +53,6 @@ void ParseBaseStationPacket(char* buffer)
   if (type == "motor") {
     ParseMotorPacket(parsed_message);
   }
-  sendBaseStationPacket(Globals::status_data.dump());
 }
 
 void ParseMotorPacket(json &message)
@@ -85,7 +84,7 @@ void ParseMotorPacket(json &message)
     }
   }
 
-  std::cout << "Final status: " << motor_status[motor] << std::endl << std::endl;
+  sendBaseStationPacket(motor_status[motor].dump());
 }
 
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID) {

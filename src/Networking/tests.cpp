@@ -1,12 +1,16 @@
 #include "../Globals.h"
 #include "ParseCAN.h"
+#include "ParseBaseStation.cpp"
 #include "TestPackets.h"
+#include "NetworkingStubs.h"
 extern "C"
 {
     #include "../HindsightCAN/Port.h"
 }
 #include <catch2/catch.hpp>
 #include <iostream>
+
+using nlohmann::json;
 
 TEST_CASE("Basic CAN ID construction", "[CAN]")
 {
@@ -34,4 +38,11 @@ TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
     ParseCANPacket(motorTelemetry());
     std::cout << Globals::status_data << std::endl;
     REQUIRE(Globals::status_data.dump() == "{\"front_right_wheel\":{\"current\":256}}");
+}
+
+TEST_CASE("Can change motor mode", "[BaseStation]")
+{
+    char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"mode\": \"PID\"}";
+    ParseBaseStationPacket(msg);
+    REQUIRE(popBaseStationPacket() == "{\"mode\":\"PID\",\"motor\":\"front_right_wheel\"}");
 }
