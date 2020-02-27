@@ -36,8 +36,9 @@ Bad:
 - ALWAYS guard a header file with `#pragma once`
 - Never make threads. If you need to make a thread, talk to Sasha and he'll make it for you or tell you
   that you don't need one.
-  
- ## Indentation
- Use tabs to indent, and use additional spaces to align multi-line code (i.e. when lines are too long and
- have to be wrapped).
- 
+- Never use #define, prefer constexpr
+- Never use raw pointers, prefer smart pointers (i.e shared_ptr) or references  
+
+### Indentation
+Use tabs to indent, and use additional spaces to align multi-line code (i.e. when lines are too long and
+have to be wrapped).

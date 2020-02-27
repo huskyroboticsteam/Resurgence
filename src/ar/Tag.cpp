@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 namespace AR
 {
@@ -21,6 +22,7 @@ double findAngle(cv::Point a, cv::Point b, cv::Point c)
 
 cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
 {
+	/*
 	double sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) +
 	                 R.at<double>(1, 0) * R.at<double>(1, 0));
 
@@ -39,6 +41,29 @@ cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
 		y = atan2(-R.at<double>(2, 0), sy);
 		z = 0;
 	}
+	*/
+	double x,y,z;
+	if(std::abs(R.at<double>(2,0)) != 1)
+	{
+		y = -asin(R.at<double>(2,0));
+		x = atan2((R.at<double>(2,1)/cos(y)), (R.at<double>(2,2)/cos(y)));
+		z = atan2((R.at<double>(1,0)/cos(y)), (R.at<double>(0,0)/cos(y)));
+	}
+	else 
+	{
+		z = 0;
+		y = 0;
+		if(R.at<double>(2,0) == -1)
+		{
+			x = atan2(R.at<double>(0,1), R.at<double>(0,2));
+		}
+		else
+		{
+			x = atan2(-R.at<double>(0,1), -R.at<double>(0,2));
+		}
+	}
+	x = util::almostEqual(x, M_PI) ? M_PI-x : x;
+	y = util::almostEqual(x, M_PI) ? M_PI-y : y;
 	return cv::Vec3f(x, y, z);
 }
 
@@ -116,17 +141,20 @@ cv::Vec3d Tag::calcOrientation()
 	{
 		image_points.push_back(corners[i].point);
 	}
-	object_points.push_back(cv::Point3f(0, 0, 0));
-	object_points.push_back(cv::Point3f(200, 0, 0));
-	object_points.push_back(cv::Point3f(200, 200, 0));
-	object_points.push_back(cv::Point3f(0, 200, 0));
+	double w = 200;
+	double h = 200;
+	object_points.push_back(cv::Point3f(-w / 2, h / 2, 0));
+	object_points.push_back(cv::Point3f(w / 2, h / 2, 0));
+	object_points.push_back(cv::Point3f(w / 2, -h / 2, 0));
+	object_points.push_back(cv::Point3f(-w / 2, -h / 2, 0));
 	cv::Mat rvec;
 	cv::Mat tvec;
 	cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, rvec, tvec);
+				 //    false, cv::SOLVEPNP_IPPE_SQUARE);
 	cv::Mat rmat;
 	cv::Rodrigues(rvec, rmat);
-
-	return rotationMatrixToEulerAngles(rmat);
+	cv::Vec3d euler = rotationMatrixToEulerAngles(rmat);
+	return euler;
 }
 
 float Tag::getPitch() const

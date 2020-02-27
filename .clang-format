@@ -1,0 +1,16 @@
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 95
+UseTab: Always
+BreakBeforeBraces: Allman
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AccessModifierOffset: -4
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:	"\".+\\.h\""
+    Priority:	4
+  - Regex:	"<.+(\\.h|\\.hpp)>"
+    Priority:	2
+  - Regex:	"<.+>"
+    Priority:	1
