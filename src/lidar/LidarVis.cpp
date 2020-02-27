@@ -4,13 +4,14 @@
 
 namespace lidar
 {
-LidarVis::LidarVis(int win_width, int win_height, std::vector<double> rgb) : view(win_height, win_width, CV_8UC3, cv::Scalar(rgb[0], rgb[1], rgb[2]))
+LidarVis::LidarVis(int win_width, int win_height, std::vector<double> rgb) : view(win_height, win_width, CV_8UC3, cv::Scalar(rgb[0], rgb[1], rgb[2])), bg_color(cv::Scalar(rgb[0], rgb[1], rgb[2]))
 {
 }
 
 void LidarVis::drawPoints(std::vector<PointXY> &pts, bool clusterOn, bool ptsOrdered,
                           int sep_threshold, std::vector<double> rgb, int ptRadius)
 {
+    this->view.setTo(this->bg_color);
     cv::Scalar ptColor(rgb[0], rgb[1], rgb[2]);
     if (clusterOn)
     {
@@ -50,11 +51,10 @@ void LidarVis::drawPoints(std::vector<PointXY> &pts, bool clusterOn, bool ptsOrd
     }
 }
 
-void LidarVis::display()
+cv::Mat LidarVis::getView()
 {
-    cv::imshow("", this->view);
+    return this->view;
 }
-
 } // namespace lidar
 
 int main(int argc, char **argv)
@@ -74,10 +74,13 @@ int main(int argc, char **argv)
     std::vector<Polar2D> testFrame = lidar.getLastFrame();
     for (Polar2D p : testFrame)
     {
-        std::cout << "(" << p.r << ", " << p.theta << ") " << std::endl;
+        std::cout << "(" << p.r << ", " << p.theta << ") ";
     }
     std::cout << std::endl;
-    lidar::LidarVis vis(600, 400, {1.0, 1.0, 1.0});
+
+    lidar::LidarVis vis(600, 400, {255, 255, 255});
+    std::string win_name = "Lidar Visualization";
+    cv::namedWindow(win_name);
     while (true)
     {
         if (!lidar.createFrame())
@@ -91,8 +94,8 @@ int main(int argc, char **argv)
         {
             pts.push_back(lidar::polarToCartesian(p));
         }
-        vis.drawPoints(pts, true, true, 500, {0, 0, 0}, 3);
-        vis.display();
+        vis.drawPoints(pts, false, true, 500, {0, 0, 0}, 3);
+        cv::imshow(win_name, vis.getView());
 
         if (cv::waitKey(5) == 'q')
         {
