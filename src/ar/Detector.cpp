@@ -148,11 +148,6 @@ std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, c
     // Applies grayscale, outlines objects in the picture and emphasizes outlines
 	edges = prepImage(input, blur_size, canny_thresh_1, canny_thresh_2, grayscale);
 
-	#ifdef WITH_GPU
-		cv::Ptr<cv::cuda::CannyEdgeDetector> detector;
-		cv::Ptr<cv::cuda::Filter> filter;
-	#endif
-
 	// vector to hold any contours found
 	std::vector<std::vector<cv::Point> > contours;
 	// vector to hold quadrilaterals that could be possible tags
@@ -194,7 +189,7 @@ cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
 		gpu_input.upload(input);
 
 		cv::cuda::GpuMat gpu_gray;
-		cv::cuda::cvtColor(input, gpu_gray, cv::COLOR_BGR2GRAY);
+		cv::cuda::cvtColor(gpu_input, gpu_gray, cv::COLOR_BGR2GRAY);
 
 		cv::cuda::GpuMat gpu_blur;
 		cv::cuda::fastNlMeansDenoising(gpu_gray, gpu_blur, blur_size * 1.0);
@@ -204,7 +199,7 @@ cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
 		filter->apply(gpu_edges, gpu_edges);
 
 		gpu_gray.download(grayscale);
-		gpu_gray.download(edges);
+		gpu_edges.download(edges);
 	#endif
 
 	return edges;
