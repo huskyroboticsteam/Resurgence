@@ -4,6 +4,8 @@
 #include "json.hpp"
 #include "CANUtils.h"
 #include "ParseCAN.h"
+#include <cmath>
+#include <tgmath.h>
 
 extern "C"
 {
@@ -34,7 +36,6 @@ std::vector<int> motor_packet_lengths = {
   2, 5, 5, 5, 5, 5
 };
 
-
 void ParseMotorPacket(json &message);
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
 
@@ -56,10 +57,43 @@ void ParseBaseStationPacket(char* buffer)
   std::string type = parsed_message["type"];
   std::cout << "Message type: " << type << std::endl;
   // TODO implement inverse kinematics
+  if (type == "ik") {
+    ParseIKPacket(parsed_message);
   if (type == "motor") {
     ParseMotorPacket(parsed_message);
   }
   sendBaseStationPacket(Globals::status_data.dump());
+}
+
+void ParseIKPacket(json &message) {
+  for (int key_idx = 0; key_idx < possible_keys["ik"].size(); key_idx++) {
+    std::string key = possible_keys["ik"][key_idx];
+    if (message[key] != nullptr) {
+      if (message[key] == "wrist_base_target") {
+        double x = message[key][0];
+        double y = message[key][1];
+	double z = message[key][2];
+        //TODO Send arctan(y/x) to base joint
+	
+	double forward = sqrt(x*x + y*y);
+	double height = z;
+
+	double crossSection = sqrt(height*height + forward*forward);
+	double shoulderAngleA = atan(height/forward);
+	double elbowAngle = acos((crossSection*crossSection - ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)/(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
+        double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
+	if (forward == 0)
+	{
+	  double shoulderAngle = M_PI/2 - shoulderAngleB;
+	}
+	else
+        {
+		shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
+	}
+	//TODO Send shoulderAngle and elbowAngle to shoulder and elbow joints
+      }   
+    }
+  }
 }
 
 void ParseMotorPacket(json &message)
