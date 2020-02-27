@@ -2,7 +2,16 @@ cmake_minimum_required(VERSION 3.2)
 
 project(Rover LANGUAGES CXX)
 
-#find_package(OpenCV CONFIG REQUIRED)
+set(USE_GPU OFF CACHE BOOL "Whether or not to compile GPU code")
+
+if("${USE_GPU}")
+  message(STATUS "GPU code is ON")
+  add_compile_definitions(WITH_GPU)
+else()
+  message(STATUS "GPU code is OFF")
+endif()
+
+find_package(OpenCV CONFIG REQUIRED)
 add_subdirectory(ar)
 
 add_subdirectory(ObstacleSim)
@@ -14,6 +23,6 @@ add_executable(Rover
         Network.cpp
 	Util.cpp)
 
-#target_link_libraries(Rover ${OpenCV_LIBS})
+target_link_libraries(Rover ${OpenCV_LIBS})
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
