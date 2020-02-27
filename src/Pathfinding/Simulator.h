@@ -18,7 +18,7 @@ class Simulator
     //take in Obstaclemap 2-d array, draw obstacles
     void drawMap(bool obstacle_map[][]);
     //take in algorithm, draw path
-    void drawPath();
+    void drawPath(); // take in full path from main method, change pather2 to return full path to main method
     //private helped method to bind coordinates to location on window
     void interpretCoordinates();
     
