@@ -21,5 +21,6 @@ class Simulator
     void drawPath();
     //private helped method to bind coordinates to location on window
     void interpretCoordinates();
-    
+    private:
+    Mat img = Mat::zeros( w, w, CV_8UC3 );
 }
