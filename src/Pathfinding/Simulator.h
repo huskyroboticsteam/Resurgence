@@ -29,6 +29,8 @@ class Simulator
     void drawPath(); // take in full path from main method, change pather2 to return full path to main method
     //private helped method to bind coordinates to location on window
     void interpretCoordinates();
+    //draw robot on center of screen
+    void drawRobot();
 
     constexpr static int size = 21;
 
