@@ -148,11 +148,6 @@ std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, c
     // Applies grayscale, outlines objects in the picture and emphasizes outlines
 	edges = prepImage(input, blur_size, canny_thresh_1, canny_thresh_2, grayscale);
 
-	#ifdef WITH_GPU
-		cv::Ptr<cv::cuda::CannyEdgeDetector> detector;
-		cv::Ptr<cv::cuda::Filter> filter;
-	#endif
-
 	// vector to hold any contours found
 	std::vector<std::vector<cv::Point> > contours;
 	// vector to hold quadrilaterals that could be possible tags
@@ -187,24 +182,26 @@ cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
 	#else
 		cv::Ptr<cv::cuda::CannyEdgeDetector> detector = 
 			cv::cuda::createCannyEdgeDetector(50, 100);
-		cv::Ptr<cv::cuda::Filter> filter = 
+		cv::Ptr<cv::cuda::Filter> guassian_filter = 
+			cv::cuda::createGaussianFilter(CV_8UC1, CV_8UC1, blur_size * 2 + 1, thresh_val);
+		cv::Ptr<cv::cuda::Filter> dilate_filter = 
 			cv::cuda::createMorphologyFilter(cv::MORPH_DILATE, CV_8UC1, cv::Mat());
 
 		cv::cuda::GpuMat gpu_input;
 		gpu_input.upload(input);
 
 		cv::cuda::GpuMat gpu_gray;
-		cv::cuda::cvtColor(input, gpu_gray, cv::COLOR_BGR2GRAY);
+		cv::cuda::cvtColor(gpu_input, gpu_gray, cv::COLOR_BGR2GRAY);
 
 		cv::cuda::GpuMat gpu_blur;
-		cv::cuda::fastNlMeansDenoising(gpu_gray, gpu_blur, blur_size * 1.0);
+		guassian_filter->apply(gpu_gray, gpu_blur)
 
 		cv::cuda::GpuMat gpu_edges;
-		detector->detect(gpu_gray, gpu_edges);
-		filter->apply(gpu_edges, gpu_edges);
+		detector->detect(gpu_blur, gpu_edges);
+		dilate_filter->apply(gpu_edges, gpu_edges);
 
 		gpu_gray.download(grayscale);
-		gpu_gray.download(edges);
+		gpu_edges.download(edges);
 	#endif
 
 	return edges;
