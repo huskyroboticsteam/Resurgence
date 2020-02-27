@@ -4,50 +4,23 @@
 
 namespace lidar
 {
-LidarVis::LidarVis(int win_width, int win_height, std::vector<double> rgb) : view(win_height, win_width, CV_8UC3, cv::Scalar(rgb[0], rgb[1], rgb[2])), bg_color(cv::Scalar(rgb[0], rgb[1], rgb[2]))
+LidarVis::LidarVis(int win_width, int win_height, std::vector<double> rgb) : view(win_height, win_width, CV_8UC3, cv::Scalar(rgb[0], rgb[1], rgb[2])),
+                                                                             bg_color(cv::Scalar(rgb[0], rgb[1], rgb[2])),
+                                                                             win_width(win_width),
+                                                                             win_height(win_height)
 {
 }
 
-void LidarVis::drawPoints(std::vector<PointXY> &pts, bool clusterOn, bool ptsOrdered,
-                          int sep_threshold, std::vector<double> rgb, int ptRadius)
+void LidarVis::drawPoints(std::vector<PointXY> &pts, std::vector<double> rgb, int ptRadius,
+                          int max_range)
 {
     this->view.setTo(this->bg_color);
     cv::Scalar ptColor(rgb[0], rgb[1], rgb[2]);
-    if (clusterOn)
+    for (PointXY pt : pts)
     {
-        std::vector<std::vector<PointXY>> clusters;
-        if (ptsOrdered)
-        {
-            clusters = clusterOrderedPoints(pts, sep_threshold);
-        }
-        else
-        {
-            clusterPoints(pts, sep_threshold);
-        }
-
-        for (std::vector<PointXY> cluster : clusters)
-        {
-            for (PointXY pt : cluster)
-            {
-                cv::circle(this->view, cv::Point(pt.x, pt.y), ptRadius, ptColor);
-            }
-
-            std::vector<PointXY> hull = convexHull(cluster);
-            for (int i = 0; i < hull.size() - 1; i++)
-            {
-                cv::line(this->view, cv::Point(hull[i].x, hull[i].y),
-                         cv::Point(hull[i + 1].x, hull[i + 1].y), ptColor);
-            }
-            cv::line(this->view, cv::Point(hull[hull.size() - 1].x, hull[hull.size() - 1].y),
-                     cv::Point(hull[0].x, hull[0].y), ptColor);
-        }
-    }
-    else
-    {
-        for (PointXY pt : pts)
-        {
-            cv::circle(this->view, cv::Point(pt.x, pt.y), ptRadius, ptColor);
-        }
+        int x = (pt.x / (2 * max_range) + 0.5) * this->win_width;
+        int y = (pt.y / (2 * max_range) + 0.5) * this->win_height;
+        cv::circle(this->view, cv::Point(x, y), ptRadius, ptColor, -1);
     }
 }
 
@@ -94,7 +67,7 @@ int main(int argc, char **argv)
         {
             pts.push_back(lidar::polarToCartesian(p));
         }
-        vis.drawPoints(pts, false, true, 500, {0, 0, 0}, 3);
+        vis.drawPoints(pts, {0, 0, 0}, 3, 3000);
         cv::imshow(win_name, vis.getView());
 
         if (cv::waitKey(5) == 'q')
