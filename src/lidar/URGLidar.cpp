@@ -29,7 +29,7 @@ bool URGLidar::open()
     return true;
 }
 
-std::vector<std::shared_ptr<Polar2D>> URGLidar::getLastFrame()
+std::vector<Polar2D> URGLidar::getLastFrame()
 {
     return lastFrame;
 }
@@ -55,12 +55,11 @@ bool URGLidar::createFrame()
     int length_data_size = urg_get_distance(&urg, length_data, NULL);
 
     //Build each shared Polar2D point and store them in a std::vector
-    std::vector<std::shared_ptr<Polar2D>> frame;
+    std::vector<Polar2D> frame;
     for (int i = 0; i < length_data_size; ++i)
     {
         Polar2D pd{length_data[i], urg_index2rad(&urg, i)};
-        std::shared_ptr<Polar2D> spd = std::make_shared<Polar2D>(pd);
-        frame.push_back(spd);
+        frame.push_back(pd);
     }
     lastFrame = frame;
     error = 0;
@@ -77,30 +76,4 @@ bool URGLidar::close()
     urg_close(&urg);
     error = 0;
     return true;
-}
-
-int main(int argc, char **argv)
-{
-    URGLidar lidar;
-    if (!lidar.open())
-    {
-        std::cout << "open failed with error code: " << lidar.getError() << std::endl;
-        return 1;
-    }
-    if (!lidar.createFrame())
-    {
-        std::cout << "create frame failed with error code: " << lidar.getError() << std::endl;
-        return 1;
-    }
-    std::vector<std::shared_ptr<Polar2D>> points = lidar.getLastFrame();
-    for (std::shared_ptr<Polar2D> p : points)
-    {
-        std::cout << "dist=" << p->r << ", theta=" << p->theta << std::endl;
-    }
-    if (!lidar.close())
-    {
-        std::cout << "close failed with error code: " << lidar.getError() << std::endl;
-        return 1;
-    }
-    return 0;
 }

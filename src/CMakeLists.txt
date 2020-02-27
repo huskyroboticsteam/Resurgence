@@ -30,10 +30,12 @@ add_executable(tests
   Autonomous.cpp
   FakeMap.cpp)
 
-add_executable(lidar_read
+add_executable(lidar_vis
+    lidar/LidarVis.cpp
+    lidar/PointCloudProcessing.cpp
     lidar/URGLidar.cpp)
 
-target_link_libraries(lidar_read liburg_c.a)
+target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
 
 include(CTest)
@@ -43,4 +45,4 @@ target_link_libraries(tests ${OpenCV_LIBS})
 catch_discover_tests(tests)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
-set_property(TARGET lidar_read PROPERTY CXX_STANDARD 14)
+set_property(TARGET lidar_vis PROPERTY CXX_STANDARD 14)
