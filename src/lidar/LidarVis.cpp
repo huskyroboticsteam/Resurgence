@@ -62,21 +62,14 @@ int main(int argc, char **argv)
             return lidar.getError();
         }
         std::vector<Polar2D> polarPts = lidar.getLastFrame();
-        std::vector<lidar::PointXY> pts;
+        std::vector<lidar::PointXY> pts(polarPts.size());
         for (Polar2D p : polarPts)
         {
             pts.push_back(lidar::polarToCartesian(p));
         }
 
-        // tmp points to test coord conversion
-        std::vector<lidar::PointXY> tmppts;
-        tmppts.push_back({-2000, 2000});
-        tmppts.push_back({3000, 3000});
-        tmppts.push_back({4000, 1500});
-
-        vis.drawPoints(tmppts, {0, 0, 0}, 3, 5000);
+        vis.drawPoints(pts, {0, 0, 0}, 3, 5000);
         cv::imshow(win_name, vis.getView());
-
         if (cv::waitKey(5) == 'q')
         {
             break;

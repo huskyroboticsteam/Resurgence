@@ -48,17 +48,19 @@ bool URGLidar::createFrame()
         error = ret;
         return false;
     }
-    //Allocate memory to store the length data the scan will generate.
+    // Allocate memory to store the length data the scan will generate.
     long *length_data = (long *)malloc(sizeof(long) * urg_max_data_size(&urg));
     lastFrameTime = std::chrono::steady_clock::now();
     //Record the time just before recording starts and start recording the frame.
     int length_data_size = urg_get_distance(&urg, length_data, NULL);
 
-    //Build each shared Polar2D point and store them in a std::vector
+    // Build each shared Polar2D point and store them in a std::vector
+    // Since we consider theta = 0 to be straight ahead with the robot facing the positive y axis
+    // Add PI / 2 to the angle
     std::vector<Polar2D> frame;
     for (int i = 0; i < length_data_size; ++i)
     {
-        Polar2D pd{length_data[i], urg_index2rad(&urg, i)};
+        Polar2D pd{length_data[i], urg_index2rad(&urg, i) + M_PI / 2};
         frame.push_back(pd);
     }
     lastFrame = frame;
