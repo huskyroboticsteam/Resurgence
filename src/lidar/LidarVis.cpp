@@ -19,7 +19,7 @@ void LidarVis::drawPoints(std::vector<PointXY> &pts, std::vector<double> rgb, in
     for (PointXY pt : pts)
     {
         int x = (pt.x / (2 * max_range) + 0.5) * this->win_width;
-        int y = (pt.y / (2 * max_range) + 0.5) * this->win_height;
+        int y = this->win_height - ((pt.y / (2 * max_range) + 0.5) * this->win_height);
         cv::circle(this->view, cv::Point(x, y), ptRadius, ptColor, -1);
     }
 }
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     }
     std::cout << std::endl;
 
-    lidar::LidarVis vis(600, 400, {255, 255, 255});
+    lidar::LidarVis vis(600, 600, {255, 255, 255});
     std::string win_name = "Lidar Visualization";
     cv::namedWindow(win_name);
     while (true)
@@ -67,7 +67,14 @@ int main(int argc, char **argv)
         {
             pts.push_back(lidar::polarToCartesian(p));
         }
-        vis.drawPoints(pts, {0, 0, 0}, 3, 3000);
+
+        // tmp points to test coord conversion
+        std::vector<lidar::PointXY> tmppts;
+        tmppts.push_back({-2000, 2000});
+        tmppts.push_back({3000, 3000});
+        tmppts.push_back({4000, 1500});
+
+        vis.drawPoints(tmppts, {0, 0, 0}, 3, 5000);
         cv::imshow(win_name, vis.getView());
 
         if (cv::waitKey(5) == 'q')

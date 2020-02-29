@@ -22,7 +22,7 @@ private:
 
 public:
     LidarVis(int win_width, int win_height, std::vector<double> rgb);
-    void LidarVis::drawPoints(std::vector<PointXY> &pts, std::vector<double> rgb, int ptRadius,
+    void drawPoints(std::vector<PointXY> &pts, std::vector<double> rgb, int ptRadius,
                               int max_range);
     cv::Mat getView();
 };
