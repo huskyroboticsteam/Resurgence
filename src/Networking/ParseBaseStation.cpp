@@ -19,11 +19,11 @@ using nlohmann::json;
 json motor_status = {};
 
 // It's important that all of these arrays are sorted in the same order (the indices correspond)
-std::map<std::string, std::vector<std::string>> possible_keys = {{"motor", {}}, {"ik", {}}, {"drive", {}}}
-possible_keys["motor"] = {"mode", "P", "I", "D", "PID target", "PWM target"};
-possible_keys["ik"] = {"wrist_base_target", "hand_orientation_target"};
-possible_keys["drive"] = {"forward_backward", "left_right"};
-
+std::map<std::string, std::vector<std::string>> possible_keys = {
+	{"motor", {"mode", "P", "I", "D", "PID target", "PWM target"}},
+        {"ik", {"wrist_base_target", "hand_orientation_target"}},
+        {"drive", {"forward_backward", "left_right"}}
+};
 std::vector<int> motor_packet_ids = {
   ID_MOTOR_UNIT_MODE_SEL,
   ID_MOTOR_UNIT_PID_P_SET,
@@ -38,6 +38,7 @@ std::vector<int> motor_packet_lengths = {
 
 bool ParseMotorPacket(json &message);
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
+void ParseIKPacket(json &message);
 
 int getIndex(const std::vector<std::string> &arr, std::string &value)
 {
@@ -59,12 +60,15 @@ bool ParseBaseStationPacket(char const* buffer)
   // TODO implement inverse kinematics
   if (type == "ik") {
     ParseIKPacket(parsed_message);
+  }  
   if (type == "motor") {
     return ParseMotorPacket(parsed_message);
   }
 }
 
 void ParseIKPacket(json &message) {
+  double ELBOW_LENGTH = 0;
+  double SHOULDER_LENGTH = 0;
   for (int key_idx = 0; key_idx < possible_keys["ik"].size(); key_idx++) {
     std::string key = possible_keys["ik"][key_idx];
     if (message[key] != nullptr) {
@@ -87,7 +91,7 @@ void ParseIKPacket(json &message) {
 	}
 	else
         {
-		shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
+          double shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
 	}
 	//TODO Send shoulderAngle and elbowAngle to shoulder and elbow joints
       }   
