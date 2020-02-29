@@ -49,8 +49,8 @@ add_executable(tests
   Networking/TestPackets.cpp
   CommandLineOptions.cpp
   Globals.cpp
-  Networking/Network.cpp
   Networking/ParseCAN.cpp
+  Networking/NetworkingStubs.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/PortTemplate.c)

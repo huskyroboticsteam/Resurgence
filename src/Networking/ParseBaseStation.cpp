@@ -36,7 +36,7 @@ std::vector<int> motor_packet_lengths = {
   2, 5, 5, 5, 5, 5
 };
 
-void ParseMotorPacket(json &message);
+bool ParseMotorPacket(json &message);
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
 
 int getIndex(const std::vector<std::string> &arr, std::string &value)
@@ -49,7 +49,7 @@ int getIndex(const std::vector<std::string> &arr, std::string &value)
   return -1;
 }
 
-void ParseBaseStationPacket(char* buffer)
+bool ParseBaseStationPacket(char const* buffer)
 {
   std::cout << "Message from base station: " << buffer << std::endl;
   json parsed_message = json::parse(buffer);
@@ -60,9 +60,8 @@ void ParseBaseStationPacket(char* buffer)
   if (type == "ik") {
     ParseIKPacket(parsed_message);
   if (type == "motor") {
-    ParseMotorPacket(parsed_message);
+    return ParseMotorPacket(parsed_message);
   }
-  sendBaseStationPacket(Globals::status_data.dump());
 }
 
 void ParseIKPacket(json &message) {
@@ -96,14 +95,14 @@ void ParseIKPacket(json &message) {
   }
 }
 
-void ParseMotorPacket(json &message)
+bool ParseMotorPacket(json &message)
 {
   std::string motor = message["motor"];
   int motor_serial = getIndex(motor_group, motor);
   if (motor_serial < 0)
   {
     std::cout << "Unrecognized motor " << motor << std::endl;
-    return;
+    return false;
   }
   std::cout << "Parsing motor packet for motor " << motor << std::endl;
   motor_status[motor]["motor"] = motor;
@@ -121,11 +120,13 @@ void ParseMotorPacket(json &message)
         motor_status[motor][key] = message[key];
       } else {
         std::cout << "Failed to send CAN packet.\n";
+        return false;
       }
     }
   }
 
-  std::cout << "Final status: " << motor_status[motor] << std::endl << std::endl;
+  sendBaseStationPacket(motor_status[motor].dump());
+  return true;
 }
 
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID) {
