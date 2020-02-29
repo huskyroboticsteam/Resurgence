@@ -53,14 +53,23 @@ int getIndex(const std::vector<std::string> &arr, std::string &value)
 bool ParseBaseStationPacket(char const* buffer)
 {
   std::cout << "Message from base station: " << buffer << std::endl;
-  json parsed_message = json::parse(buffer);
+  json parsed_message;
+  try
+  {
+    parsed_message = json::parse(buffer);
+  }
+  catch (json::parse_error) {
+    std::cout << "Parse error\n";
+    return false;
+  }
   // TODO proper input validation. Sometimes the rover crashes due to malformatted json
   std::string type = parsed_message["type"];
   std::cout << "Message type: " << type << std::endl;
   // TODO implement inverse kinematics
   if (type == "ik") {
     ParseIKPacket(parsed_message);
-  }  
+    return true; // TODO return false on error
+  }
   if (type == "motor") {
     return ParseMotorPacket(parsed_message);
   }

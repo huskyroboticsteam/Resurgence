@@ -43,13 +43,27 @@ TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
 TEST_CASE("Can change motor mode", "[BaseStation]")
 {
     char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"mode\": \"PID\"}";
-    ParseBaseStationPacket(msg);
+    REQUIRE(ParseBaseStationPacket(msg) == true);
     REQUIRE(popBaseStationPacket() == "{\"mode\":\"PID\",\"motor\":\"front_right_wheel\"}");
     CANPacket p = popCANPacket();
     REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_MODE_SEL));
-    REQUIRE(p.data[1] == MOTOR_UNIT_MODE_PID);
     REQUIRE(p.dlc == 2);
-    // TODO check that the device group and serial are correct
+    REQUIRE(p.data[1] == MOTOR_UNIT_MODE_PID);
+    REQUIRE(GetDeviceGroupCode(&p) == DEVICE_GROUP_MOTOR_CONTROL);
+    REQUIRE(GetDeviceSerialNumber(&p) == 0x09); // front right wheel
+}
+
+TEST_CASE("Can set P coefficient", "[BaseStation]")
+{
+    char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"P\": 256}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    CANPacket p = popCANPacket();
+    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PID_P_SET));
+    REQUIRE(p.dlc == 5);
+    REQUIRE(p.data[1] == 0);
+    REQUIRE(p.data[2] == 0);
+    REQUIRE(p.data[3] == 1); // 256 (MSB first)
+    REQUIRE(p.data[4] == 0);
 }
 
 TEST_CASE("Does not send CAN packets if nothing changes", "[BaseStation]")
@@ -58,11 +72,11 @@ TEST_CASE("Does not send CAN packets if nothing changes", "[BaseStation]")
     // This motor name needs to be different from the previous one, because the motor_status object is
     // preserved across test cases.
     char const *msg = "{\"type\": \"motor\", \"motor\": \"arm_base\", \"mode\": \"PID\"}";
-    ParseBaseStationPacket(msg);
+    REQUIRE(ParseBaseStationPacket(msg) == true);
     REQUIRE(numCANPackets() == 1);
     popCANPacket();
     REQUIRE(numCANPackets() == 0);
-    ParseBaseStationPacket(msg);
+    REQUIRE(ParseBaseStationPacket(msg) == true);
     REQUIRE(numCANPackets() == 0);
 }
 
@@ -72,5 +86,9 @@ TEST_CASE("Can handle malformed packets", "[BaseStation]")
     REQUIRE(ParseBaseStationPacket(msg) == false);
 }
 
-// TODO: make sure it ignores invalid motor names
-// TODO: make sure on e.g. P coefficient set, the data looks like we expect it to
+TEST_CASE("Ignores invalid motor names", "[BaseStation]")
+{
+    char const *msg = "{\"type\": \"motor\", \"motor\": \"xyzzy\", \"mode\": \"PID\"}";
+    REQUIRE(ParseBaseStationPacket(msg) == false);
+}
+
