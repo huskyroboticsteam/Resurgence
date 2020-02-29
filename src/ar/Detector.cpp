@@ -1,7 +1,7 @@
 #include "Detector.h"
 
 #ifdef WITH_GPU
-#include <opencv2/cudaWarping.hpp>
+#include <opencv2/cudawarping.hpp>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudafilters.hpp>
 #include <opencv2/cudaimgproc.hpp>
