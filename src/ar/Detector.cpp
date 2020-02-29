@@ -38,13 +38,12 @@ namespace AR
 bool readCheckData(cv::Mat &input, cv::Mat &output);
 TagID getTagIDFromData(cv::Mat& data);
 std::vector<int> getBitData(cv::Mat data);
-cv::Mat removeNoise(cv::Mat input, int blur_size = 5);
 std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad);
 std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, cv::Mat &grayscale,
                                             	int canny_thresh_1, int canny_thresh_2, int blur_size);
 bool contourInsideAnother(std::vector<cv::Point2f> input, std::vector<cv::Point2f> other);
-cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
-                  cv::Mat &grayscale);
+cv::Mat prepImage(cv::Mat input, int thresh_val, int thresh_val2,
+                  cv::Mat &grayscale, int blur_size = 5);
 void approxContours(std::vector<std::vector<cv::Point> > contours,
 					std::vector<std::vector<cv::Point2f> > &quads);
 
@@ -157,7 +156,7 @@ std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, c
                                                 int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
     // Applies grayscale, outlines objects in the picture and emphasizes outlines
-	edges = prepImage(input, blur_size, canny_thresh_1, canny_thresh_2, grayscale);
+	edges = prepImage(input, canny_thresh_1, canny_thresh_2, grayscale, blur_size);
 
 	// vector to hold any contours found
 	std::vector<std::vector<cv::Point> > contours;
@@ -176,55 +175,54 @@ std::vector<std::vector<cv::Point2f> > getQuads(cv::Mat input, cv::Mat &edges, c
     return quads;
 }
 
-cv::Mat prepImage(cv::Mat input, int blur_size, int thresh_val, int thresh_val2,
-                  cv::Mat &grayscale)
+cv::Mat prepImage(cv::Mat input, int thresh_val, int thresh_val2,
+                  cv::Mat &grayscale, int blur_size)
 {
 
 	cv::Mat edges;
+	#ifdef WITH_GPU
+		// Declares cuda objects for edge detection, filtering, and dilating
+		cv::Ptr<cv::cuda::CannyEdgeDetector> detector = 
+			cv::cuda::createCannyEdgeDetector(50, 100);
+		int bsize = blur_size * 2 + 1;
+		cv::Ptr<cv::cuda::Filter> guassian_filter = 
+			cv::cuda::createGaussianFilter(CV_8UC1, CV_8UC1, cv::Size(bsize, bsize), 0);
+		cv::Ptr<cv::cuda::Filter> dilate_filter = 
+			cv::cuda::createMorphologyFilter(cv::MORPH_DILATE, CV_8UC1, cv::Mat());
 
-	#ifndef WITH_GPU
+		// Loads the input frame to a gpu equivalent
+		cv::cuda::GpuMat gpu_input;
+		gpu_input.upload(input);
+
+		// Implements grayscale
+		cv::cuda::GpuMat gpu_gray;
+		cv::cuda::cvtColor(gpu_input, gpu_gray, cv::COLOR_BGR2GRAY);
+
+		// Applies gaussian filter
+		cv::cuda::GpuMat gpu_blur;
+		guassian_filter->apply(gpu_gray, gpu_blur);
+
+		// Detects and dilates the edges
+		cv::cuda::GpuMat gpu_edges;
+		detector->detect(gpu_blur, gpu_edges);
+		dilate_filter->apply(gpu_edges, gpu_edges);
+
+		// Converts the gpu matrices to normal matrices to be displayed
+		gpu_gray.download(grayscale);
+		gpu_edges.download(edges);
+	#else
 		cv::Mat gray;	
-		cv::Mat blur = removeNoise(input, blur_size);
+		cv::Mat blur;
+		int bsize = (blur_size * 2) + 1;
+		cv::GaussianBlur(input, blur, cv::Size(bsize, bsize), 0);
 		cv::cvtColor(blur, gray, cv::COLOR_RGB2GRAY);
 		cv::Canny(gray, edges, thresh_val, thresh_val2);
 		cv::dilate(edges, edges, cv::Mat(), cv::Point(-1, -1));
 
 		grayscale = gray;
-	#else
-		cv::Ptr<cv::cuda::CannyEdgeDetector> detector = 
-			cv::cuda::createCannyEdgeDetector(50, 100);
-		cv::Ptr<cv::cuda::Filter> guassian_filter = 
-			cv::cuda::createGaussianFilter(CV_8UC1, CV_8UC1, blur_size * 2 + 1, thresh_val);
-		cv::Ptr<cv::cuda::Filter> dilate_filter = 
-			cv::cuda::createMorphologyFilter(cv::MORPH_DILATE, CV_8UC1, cv::Mat());
-
-		cv::cuda::GpuMat gpu_input;
-		gpu_input.upload(input);
-
-		cv::cuda::GpuMat gpu_gray;
-		cv::cuda::cvtColor(gpu_input, gpu_gray, cv::COLOR_BGR2GRAY);
-
-		cv::cuda::GpuMat gpu_blur;
-		guassian_filter->apply(gpu_gray, gpu_blur)
-
-		cv::cuda::GpuMat gpu_edges;
-		detector->detect(gpu_blur, gpu_edges);
-		dilate_filter->apply(gpu_edges, gpu_edges);
-
-		gpu_gray.download(grayscale);
-		gpu_edges.download(edges);
 	#endif
 
 	return edges;
-}
-
-cv::Mat removeNoise(cv::Mat input, int blur_size)
-{
-	cv::Mat blur;
-	int bsize = (blur_size * 2) + 1;
-	cv::GaussianBlur(input, blur, cv::Size(bsize, bsize), 0);
-	// FIXME: Change to bilateral blur or some other faster method.
-	return blur;
 }
 
 void approxContours(std::vector<std::vector<cv::Point> > contours,
@@ -327,7 +325,7 @@ TagID getTagIDFromData(cv::Mat& data)
     std::vector<int> bits = getBitData(data);
 
     int found = 0;
-    int number = 4;
+    int bit = 4;
 
     // Loops over the table and find the closest matching bit code
     for (int i = 0; i < sizeof(table) && found < 2; i++) {
@@ -338,12 +336,16 @@ TagID getTagIDFromData(cv::Mat& data)
             }
         }
 
+		// Exits loop and sets the tag to the exact matching code
         if (count == 0) {
-            number = i;
+            bit = i;
             found = 2;
+
+		// Sets the tag to the closest matching code
+		// Only happens once, a second time will return ID_UNKNOWN
         } else if (count == 1) {
             if (found == 0) {
-                number = i;
+                bit = i;
 				found++;
             } else {
                 return ID_UNKNOWN; // Error: Cannot find single matching Hamming code
@@ -351,7 +353,7 @@ TagID getTagIDFromData(cv::Mat& data)
         }
     }
 
-    return tags[number];
+    return tags[bit];
 }
 
 std::vector<int> getBitData(cv::Mat data) 
