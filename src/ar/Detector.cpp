@@ -1,6 +1,7 @@
 #include "Detector.h"
 
 #ifdef WITH_GPU
+#include <opencv2/cudaWarping.hpp>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudafilters.hpp>
 #include <opencv2/cudaimgproc.hpp>
@@ -69,7 +70,10 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 	// Stores all quadrilateral shapes found in the image to the vector: allQuads
 	std::vector<std::vector<cv::Point2f> > allQuads 
 		= getQuads(input, edges, grayscale, canny_thresh_1, canny_thresh_2, blur_size);
-
+	#ifdef WITH_GPU
+		cv::cuda::GpuMat gpu_grayscale;
+		gpu_grayscale.upload(grayscale);
+	#endif
 	std::cout << "Number of Quads found: " << allQuads.size() << std::endl;
 
 	// vector to hold quadrilaterals that are definitely tags 
@@ -98,8 +102,15 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		// perspective transform the quadrilateral to a flat square
 		cv::Mat transform = cv::getPerspectiveTransform(quad, ideal);
 		cv::Mat square;
+		#ifndef WITH_GPU
 		cv::warpPerspective(grayscale, square, transform,
 		                    cv::Size(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
+		#else
+		cv::cuda::GpuMat gpu_square;
+		cv::cuda::warpPerspective(gpu_grayscale, gpu_square, transform,
+		                    cv::Size(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
+		gpu_square.download(square);
+		#endif
 
 		// Apply adaptive gaussian thresholding to the square, saves it to t_square
 		cv::Mat t_square;
