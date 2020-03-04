@@ -84,7 +84,7 @@ void ParseIKPacket(json &message) {
         double x = message[key][0];
         double y = message[key][1];
 	double z = message[key][2];
-        json new_message = {{"type", "motor"}, {"mode", "PID"}, {"PID target", 0}}; //Replace 0 with atan(y/x)
+        json new_message = {{"type", "motor"}, {"mode", "PID"}, {"PID target", 0}}; //Replace 0 with atan(y/x), Add motor serial
 	ParseMotorPacket(new_message);
         
 
