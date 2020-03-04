@@ -26,8 +26,16 @@ void Simulator::drawMap(bool obstacle_map[][21]){
     }
 };
 
-void Simulator::drawPath(){
-
+void Simulator::drawPath(queue<point> path){
+    while(!path.empty()){  
+        path.pop
+        line(img,
+        Point(path),
+        end,
+        Scalar(0,0,0),
+        thickness,
+        lineType);
+    }
 };
 
 void Simulator::interpretCoordinates(){
