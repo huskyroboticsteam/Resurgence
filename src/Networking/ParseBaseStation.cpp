@@ -65,19 +65,18 @@ bool ParseBaseStationPacket(char const* buffer)
   // TODO proper input validation. Sometimes the rover crashes due to malformatted json
   std::string type = parsed_message["type"];
   std::cout << "Message type: " << type << std::endl;
-  // TODO implement inverse kinematics
   if (type == "ik") {
     ParseIKPacket(parsed_message);
     return true; // TODO return false on error
-  }
+  }  
   if (type == "motor") {
     return ParseMotorPacket(parsed_message);
   }
 }
 
 void ParseIKPacket(json &message) {
-  double ELBOW_LENGTH = 0;
-  double SHOULDER_LENGTH = 0;
+  double ELBOW_LENGTH = Constants::ELBOW_LENGTH;
+  double SHOULDER_LENGTH = Constants::SHOULDER_LENGTH;
   for (int key_idx = 0; key_idx < possible_keys["ik"].size(); key_idx++) {
     std::string key = possible_keys["ik"][key_idx];
     if (message[key] != nullptr) {
@@ -85,14 +84,18 @@ void ParseIKPacket(json &message) {
         double x = message[key][0];
         double y = message[key][1];
 	double z = message[key][2];
-        //TODO Send arctan(y/x) to base joint
-	
+        json new_message = {{"type", "motor"}, {"mode", "PID"}, {"PID target", 0}}; //Replace 0 with atan(y/x)
+	ParseMotorPacket(new_message);
+        
+
 	double forward = sqrt(x*x + y*y);
 	double height = z;
 
 	double crossSection = sqrt(height*height + forward*forward);
 	double shoulderAngleA = atan(height/forward);
-	double elbowAngle = acos((crossSection*crossSection - ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)/(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
+	double elbowAngle = acos((crossSection*crossSection 
+		- ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
+		/(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
         double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
 	if (forward == 0)
 	{
@@ -117,7 +120,7 @@ bool ParseMotorPacket(json &message)
     std::cout << "Unrecognized motor " << motor << std::endl;
     return false;
   }
-  std::cout << "Parsing motor packet for motor " << motor << std::endl;
+  std::cout << "Parsing motor packeast for motor " << motor << std::endl;
   motor_status[motor]["motor"] = motor;
   std::cout << "Original status: " << motor_status[motor] << std::endl;
 
