@@ -102,12 +102,17 @@ int main(int argc, char *argv[])
 		loop_num++;
 
 		// Grabs frame
+		auto read_start = std::chrono::system_clock::now();
 		cap.read(frame);
+		auto read_end = std::chrono::system_clock::now();
 		if (frame.empty())
 		{
 			std::cerr << "ERROR! Blank frame grabbed" << std::endl;
 			break;
 		}
+		long double read_time = std::chrono::duration_cast<std::chrono::milliseconds>
+			(read_end - read_start).count();
+		std::cout << "Read took " << read_time << "ms" <<std::endl;
 
 		// Mats to hold grayscale and edge detection results
 		cv::Mat gray;
@@ -160,7 +165,7 @@ int main(int argc, char *argv[])
 			cv::imshow("Edges", edges);
 		}
 
-		if (cv::waitKey(5) == 'q')
+		if (cv::waitKey(1) == 'q')
 			break;
 
 		// Calculates time used to complete one loop on average
