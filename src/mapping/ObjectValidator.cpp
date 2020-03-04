@@ -1,7 +1,8 @@
 #include "ObjectValidator.h"
+#include "EKFSlam/EKFSlam.h"
 
 // Associate each extracted landmark to the closest landmark we have seen before 
-std::vector<size_t> ObjectValidator::validate(std::vector<PointXY> lidarObstacles) {
+std::vector<size_t> ObjectValidator::validate(std::vector<PointXY>& lidarObstacles) {
     
     const int landmarkConstant = 1;    //placeholder value for now
     const float lidarRange = 10;       //temp lidar range
@@ -12,13 +13,13 @@ std::vector<size_t> ObjectValidator::validate(std::vector<PointXY> lidarObstacle
     std::vector<ObstaclePoint> existingObs = ekf.getObstacles();
 
     // Cycle through all the passed obstacles
-    for(int i = 0; i < lidarObstacles.size; i++) 
+    for(int i = 0; i < lidarObstacles.size(); i++) 
     {
         float leastDistance = lidarRange; //start value at greater than range of lidar
         PointXY closestObstacle;
         int id;
         // Cycle through all known obstacles 
-        for(int j = 0; j < existingObs.size; j++) 
+        for(int j = 0; j < existingObs.size(); j++) 
         {
             // calculate the distance between the two obstacles
             float deltaX = existingObs[j].x - lidarObstacles[i].x;
@@ -49,7 +50,7 @@ std::vector<size_t> ObjectValidator::validate(std::vector<PointXY> lidarObstacle
     return obstacleIDs; // return the output vector
 }
 
-std::vector<PointXY> boundingBox(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters, float boxSize) {
+std::vector<PointXY> ObjectValidator::boundingBox(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters, float boxSize) {
     std::vector<PointXY> boxes;
     float boxRadius = boxSize/2;
     //Loop through every set of clusters from the lidar
