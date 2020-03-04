@@ -7,8 +7,6 @@ inline void ObstacleMap::getRobotPosition(float &robotX, float &robotY)
 {
     robotX = 0.0f;//GPS.lat TBD
     robotY = 0.0f;//GPS.long TBD
-
-    //status_data keys: "gps_latitude", "gps_longitude"
 }
 
 
@@ -71,7 +69,6 @@ inline void ObstacleMap::modifyObstacleMap(int x, int  y)
         obstacle_map[transform(y, false)][transform(x, false)] = true;
     }
 }
-
 
 //for testing purposes only, prints a visual representation of ObstacleMap
 //where 1 is an obstacle and 0 is empty

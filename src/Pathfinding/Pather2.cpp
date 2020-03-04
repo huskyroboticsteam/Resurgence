@@ -30,8 +30,8 @@ void print_queue(std::queue<Pather2::queueNode> q) {
   std::cout << std::endl;
 }
 
-
-Pather2::point BFS(bool map[][21], Pather2::point dest){
+// returns full path
+std::queue<Pather2::point> BFS(bool map[][21], Pather2::point dest){
 
     //check if node is valid
     // bool isValid(int x, int y) {
@@ -42,7 +42,8 @@ Pather2::point BFS(bool map[][21], Pather2::point dest){
     int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
 
     Pather2::point src = {5,5};
-    struct Pather2::point error = {-1, -1};
+    std::queue<Pather2::point> error;
+    error.push(src);
     //check if src and dest are represented with 1 not 0
     if ((map[src.x][src.y]) || (map[dest.x][dest.y])){
         //todo: change destination if destination is blocked
@@ -71,7 +72,8 @@ Pather2::point BFS(bool map[][21], Pather2::point dest){
             temp.pop();
             std::cout << "Final path: ";
             print_point(temp);
-            return temp.front(); 
+
+            return temp; 
         }
 
         // pop current point off point to be checked
@@ -97,6 +99,13 @@ Pather2::point BFS(bool map[][21], Pather2::point dest){
 
     }
     return error;
+}
+
+// helper BFS method to return first point in path
+Pather2::point mainBFS(bool map[][21], Pather2::point dest) {
+   std::queue<Pather2::point> path = BFS(map, dest);
+   return path.front();
+
 }
 
 Pather2::point getDest(Pather2::point GPSRobot, Pather2::point GPSDest) {
@@ -199,14 +208,14 @@ Pather2::point relocateDestination(Pather2::point dest, int shrink_constant){
 
 
 Pather2::point getPath(bool map[][21], Pather2::point dest){
-  Pather2::point rslt = BFS(map, dest);
+  Pather2::point rslt = mainBFS(map, dest);
   struct Pather2::point src = {4, 4};
   int shrink_constant = 0;
   while(rslt.x == -1 && rslt.y == -1) {
     dest = relocateDestination(dest, shrink_constant);
     //do something
     //relocate the relative coordinate of the original target (some functions to determinate new end point relative to our local map)
-    rslt = BFS(map, dest);
+    rslt = mainBFS(map, dest);
     shrink_constant += 1;
   }
   return rslt;
