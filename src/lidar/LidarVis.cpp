@@ -75,12 +75,14 @@ int main(int argc, char **argv)
 		}
 
 		std::vector<std::vector<PointXY>> clusters = clusterPoints(pts, cluster_sep_thresh);
-		std::vector<std::vector<PointXY>> bounds;
+		int cluster_count = 0;
 		for (std::vector<PointXY> cluster : clusters)
 		{
+			cluster_count++;
 			std::vector<PointXY> bounds = convexHull(cluster);
 			vis.outlinePolygon(bounds, {200, 0, 0});
 		}
+		std::cout << "cluster count: " << cluster_count << std::endl;
 
 		vis.drawPoints(pts, {0, 0, 0}, 3);
 		cv::imshow(win_name, vis.getView());
