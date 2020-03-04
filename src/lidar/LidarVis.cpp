@@ -4,10 +4,9 @@
 
 namespace lidar
 {
-LidarVis::LidarVis(int win_width, int win_height, std::vector<double> bgr, int max_range)
-	: view(win_height, win_width, CV_8UC3, cv::Scalar(bgr[0], bgr[1], bgr[2])),
-	  bg_color(cv::Scalar(bgr[0], bgr[1], bgr[2])), win_width(win_width),
-	  win_height(win_height), lidar_max_range(max_range)
+LidarVis::LidarVis(int win_width, int win_height, cv::Scalar bgr, int max_range)
+	: view(win_height, win_width, CV_8UC3, cv::Scalar(bgr[0], bgr[1], bgr[2])), bg_color(bgr),
+	  win_width(win_width), win_height(win_height), lidar_max_range(max_range)
 {
 }
 
@@ -18,30 +17,41 @@ cv::Point LidarVis::worldToCvPoint(PointXY p)
 	return cv::Point(x, y);
 }
 
-void LidarVis::drawPoints(std::vector<PointXY> &pts, std::vector<double> bgr, int pt_radius)
+void LidarVis::drawPoints(std::vector<PointXY> &pts, cv::Scalar bgr, int pt_radius)
 {
-	this->view.setTo(this->bg_color);
-	cv::Scalar pt_color(bgr[0], bgr[1], bgr[2]);
 	for (PointXY p : pts)
 	{
-		cv::circle(this->view, worldToCvPoint(p), pt_radius, pt_color, -1);
+		cv::circle(this->view, worldToCvPoint(p), pt_radius, bgr, -1);
 	}
 }
 
-void LidarVis::outlinePolygon(std::vector<PointXY> &vertices, std::vector<double> bgr)
+void LidarVis::outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr)
 {
-	cv::Scalar line_color(bgr[0], bgr[1], bgr[2]);
 	for (int i = 0; i < vertices.size(); i++)
 	{
 		cv::Point p1 = worldToCvPoint(vertices[i]);
 		cv::Point p2 = worldToCvPoint(vertices[(i + 1) % vertices.size()]);
-		cv::line(this->view, p1, p2, line_color);
+		cv::line(this->view, p1, p2, bgr);
 	}
+}
+
+void LidarVis::clear()
+{
+	this->view.setTo(this->bg_color);
 }
 
 cv::Mat LidarVis::getView()
 {
 	return this->view;
+}
+
+void LidarVis::display(std::string win_name, char esc_char)
+{
+	cv::imshow(win_name, this->view);
+	if (cv::waitKey(0) == esc_char)
+	{
+		return;
+	}
 }
 } // namespace lidar
 
@@ -57,11 +67,11 @@ int main(int argc, char **argv)
 
 	float cluster_sep_thresh = 1000;
 
-	LidarVis vis(600, 600, {255, 255, 255}, 5000);
-	std::string win_name = "Lidar Visualization";
-	cv::namedWindow(win_name);
+	LidarVis vis(vis_win_width, vis_win_height, vis_bg_color, lidar_max_range);
+	cv::namedWindow(vis_win_name);
 	while (true)
 	{
+		vis.clear();
 		if (!lidar.createFrame())
 		{
 			std::cout << "failed to create frame" << std::endl;
@@ -74,23 +84,17 @@ int main(int argc, char **argv)
 			pts.push_back(lidar::polarToCartesian(p));
 		}
 
-		vis.drawPoints(pts, {0, 0, 0}, 3);
+		vis.drawPoints(pts, vis_pt_color, vis_pt_radius);
 		std::vector<std::vector<PointXY>> clusters = clusterPoints(pts, cluster_sep_thresh);
-		int cluster_count = 0;
 		for (std::vector<PointXY> cluster : clusters)
 		{
-			cluster_count++;
 			std::vector<PointXY> bounds = convexHull(cluster);
-			vis.outlinePolygon(bounds, {200, 0, 0});
+			vis.outlinePolygon(bounds, vis_conv_hull_color);
 		}
-		std::cout << "cluster count: " << cluster_count << std::endl;
 
-		cv::imshow(win_name, vis.getView());
-		if (cv::waitKey(5) == 'q')
-		{
-			break;
-		}
+		vis.display(vis_win_name, vis_win_esc);
 	}
+
 	if (!lidar.close())
 	{
 		std::cout << "failed to close lidar device" << std::endl;

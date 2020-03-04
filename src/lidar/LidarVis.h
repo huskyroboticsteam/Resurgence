@@ -12,6 +12,18 @@
 
 namespace lidar
 {
+constexpr int lidar_max_range = 5000;
+constexpr int vis_win_width = 600;
+constexpr int vis_win_height = 600;
+constexpr int vis_pt_radius = 3;
+constexpr int cluster_sep_threshold = 1000;
+const std::string vis_win_name = "Lidar Visualizer";
+constexpr char vis_win_esc = 'q';
+const cv::Scalar vis_bg_color(255, 255, 255);
+const cv::Scalar vis_pt_color(0, 0, 0);
+const cv::Scalar vis_conv_hull_color(255, 0, 0);
+const cv::Scalar vis_lidar_color(0, 0, 255);
+
 class LidarVis
 {
 private:
@@ -20,12 +32,14 @@ private:
 	int win_width;
 	int win_height;
 	int lidar_max_range;
+	cv::Point worldToCvPoint(PointXY p);
 
 public:
-	LidarVis(int win_width, int win_height, std::vector<double> bgr, int max_range);
-	void drawPoints(std::vector<PointXY> &pts, std::vector<double> bgr, int ptRadius);
-	void outlinePolygon(std::vector<PointXY> &vertices, std::vector<double> bgr);
-	cv::Point worldToCvPoint(PointXY p);
+	LidarVis(int win_width, int win_height, cv::Scalar bgr, int max_range);
+	void drawPoints(std::vector<PointXY> &pts, cv::Scalar bgr, int ptRadius);
+	void outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr);
+	void display(std::string win_name, char esc_char);
+	void clear();
 	cv::Mat getView();
 };
 } // namespace lidar
