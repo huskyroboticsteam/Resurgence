@@ -13,17 +13,26 @@ struct ObstaclePoint {
   const float& y;
 };
 
-class EKFSLam {
+struct MagnetometerReading {
+  float heading; // in degrees
+};
+
+struct GPSReading {
+  float x; // with respect to starting point
+  float y;
+};
+
+class EKFSlam {
   public:
     /**
      * Constructor.
      */
-    EKFSLam(float motion_noise = 0.1);
+    EKFSlam(float motion_noise = 0.1);
 
     /**
      * Destructor.
      */
-    virtual ~EKFSLam();
+    virtual ~EKFSlam();
 
     /*
      * Update state based on a magnetometer reading
@@ -38,8 +47,7 @@ class EKFSLam {
     /*
      * Update state based on a reading from the lidar
      */
-    void updateFromLidar(size_t object_uid,
-                         std::set<std::shared_ptr<Vec2>> reading);
+    void updateFromLidar(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters);
 
     /*
     * Step the kalman filter forward
@@ -62,7 +70,7 @@ class EKFSLam {
     std::vector<ObstaclePoint> getObstacles();
 
     //Returns a new id to be associated to a new landmark
-    int EKFSLam::getNewLandmarkID();
+    int EKFSlam::getNewLandmarkID();
 
   private:
     // check whether the tracking toolbox was initialized or not (first

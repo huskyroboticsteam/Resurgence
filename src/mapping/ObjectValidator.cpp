@@ -1,8 +1,8 @@
 #include "ObjectValidator.h"
 
 // Associate each extracted landmark to the closest landmark we have seen before 
-std::vector<size_t> ObjectValidator::validate(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters) {
-    std::vector<PointXY> lidarObstacles = boundingBox(lidarClusters,1);
+std::vector<size_t> ObjectValidator::validate(std::vector<PointXY> lidarObstacles) {
+    
     const int landmarkConstant = 1;    //placeholder value for now
     const float lidarRange = 10;       //temp lidar range
     std::vector<size_t> obstacleIDs;
