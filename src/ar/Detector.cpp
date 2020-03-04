@@ -11,6 +11,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include <ctime>
+#include <chrono>
 #include <iostream>
 
 constexpr int CONTOUR_AREA_THRESH = 1000;
@@ -65,6 +66,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 {
 
 	std::clock_t c_start = std::clock(); // Stores current cpu time
+	auto wall_start = std::chrono::system_clock::now();
 
 	// Stores all quadrilateral shapes found in the image to the vector: allQuads
 	std::vector<std::vector<cv::Point2f> > allQuads 
@@ -145,9 +147,13 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 	}
 
 	std::clock_t c_end = std::clock();
-
+	auto wall_end = std::chrono::system_clock::now();
 	long double time_elapsed_ms = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
-	std::cout << "Detector time used: " << time_elapsed_ms << " ms\n";
+	long double wall_elapsed =
+		std::chrono::duration_cast<std::chrono::microseconds>(wall_end - wall_start).count()
+		/ 1000.0;
+	std::cout << "Detector time used: " << time_elapsed_ms << "ms (CPU) " << wall_elapsed
+			  << "ms (Wall)" << std::endl;
 
 	return output;
 }

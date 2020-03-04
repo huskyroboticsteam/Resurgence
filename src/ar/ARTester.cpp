@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <ctime>
+#include <chrono>
 
 const std::string ORIG_WINDOW_NAME = "Image (Original)";
 const std::string THRESH_TRACKBAR_NAME = "Threshold";
@@ -56,6 +57,10 @@ int main(int argc, char *argv[])
 	int blur_val = 2;
 
 	std::cout << "Opening camera..." << std::endl;
+
+	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 	
 	cap.open(camera_id + api_id);
 	if (!cap.isOpened())
@@ -63,10 +68,6 @@ int main(int argc, char *argv[])
 		std::cerr << "ERROR! Unable to open camera" << std::endl;
 		return 1;
 	}
-
-	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
 
 	double loop_num = 0.0;
 	long double total_time = 0.0;
-	long double time = 0.0;
+	long double total_wall = 0.0;
 
 	int count = 0;
 	char choice = ' ';
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
 		}
 
 		std::clock_t c_start = std::clock(); // Stores current cpu time
+		auto wall_start = std::chrono::system_clock::now();
 		loop_num++;
 
 		// Grabs frame
@@ -163,8 +165,15 @@ int main(int argc, char *argv[])
 
 		// Calculates time used to complete one loop on average
 		std::clock_t c_end = std::clock();
-		total_time += 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
-		std::cout << "Average CPU time used: " << total_time / loop_num << " ms\n";
+		auto wall_end = std::chrono::system_clock::now();
+		auto wall_t = std::chrono::duration_cast<std::chrono::microseconds>(wall_end - wall_start)
+			.count() / 1000.0;
+		long double cpu_t = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
+		total_time += cpu_t;
+		total_wall += wall_t;
+		std::cout << "CPU Time: " << cpu_t << "ms, avg: " << total_time / loop_num
+				  << "ms; Wall Time: " << wall_t << "ms, avg: " << total_wall / loop_num
+				  << "ms" << std::endl;
 	}
 	return 0;
 }
