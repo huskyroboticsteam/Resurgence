@@ -16,7 +16,7 @@ public:
    //Gives a new id to obstacles considered to be new
    //Returns a vector of those ids
    std::vector<size_t> validate(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters); 
-   ObjectValidator(EKFSLam &ekf);
+   ObjectValidator(EKFSlam &ekf);
 private:
    //Takes in clusters of points collected from the lidar
    //Associates a point as an obstacle, putting a "box" around it
@@ -25,5 +25,5 @@ private:
    //The point represents the center of the box
    std::vector<PointXY> boundingBox(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters, float boxSize);
    EnvMap &map;
-   EKFSLam &ekf;
+   EKFSlam &ekf;
 };
