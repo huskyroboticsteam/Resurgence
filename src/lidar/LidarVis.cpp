@@ -43,8 +43,47 @@ void LidarVis::drawLidar(cv::Scalar bgr, int symb_px_size)
 
 void LidarVis::setGrid(cv::Scalar bgr, int scale)
 {
-	// grid should have (0, 0) at center
-	// (0, 0) is also at the center of view window
+	PointXY p({0, 0});
+
+	// vertical lines to left of center
+	for (p.x = 0; worldToCvPoint(p).x >= 0; p.x -= scale)
+	{
+		cv::Point p1 = worldToCvPoint(p);
+		p1.y = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.y = this->win_height;
+		cv::line(this->view, p1, p2, bgr);
+	}
+
+	// vertical lines to the right of center
+	for (p.x = scale; worldToCvPoint(p).x < this->win_width; p.x += scale)
+	{
+		cv::Point p1 = worldToCvPoint(p);
+		p1.y = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.y = this->win_height;
+		cv::line(this->view, p1, p2, bgr);
+	}
+
+	// horizontal lines above center
+	for (p.y = 0; worldToCvPoint(p).y >= 0; p.y += scale)
+	{
+		cv::Point p1 = worldToCvPoint(p);
+		p1.x = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.x = this->win_width;
+		cv::line(this->view, p1, p2, bgr);
+	}
+
+    // horizontal lines below center
+	for (p.y = -scale; worldToCvPoint(p).y < this->win_height; p.y -= scale)
+    {
+		cv::Point p1 = worldToCvPoint(p);
+		p1.x = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.x = this->win_width;
+		cv::line(this->view, p1, p2, bgr);
+	}
 }
 
 void LidarVis::clear()
