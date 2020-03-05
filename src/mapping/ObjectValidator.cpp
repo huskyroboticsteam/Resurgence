@@ -64,7 +64,9 @@ std::vector<PointXY> ObjectValidator::boundingBox(std::vector<std::vector<PointX
         while (it != clusterSet.end()) {
             PointXY point = *it;
             //check if point in set is within any of the existing boxes
-            for(PointXY box : boxes) {
+	    // Can't push cause we're iterating 
+	    // PLZ FIX
+            for (PointXY box : boxes) {
                 bool inX = (point.x > (box.x - boxRadius)) && (point.x < (box.x + boxRadius));
                 bool inY = (point.y > (box.y - boxRadius)) && (point.y < (box.y + boxRadius));
                 if(!inX || !inY) {
