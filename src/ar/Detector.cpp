@@ -62,7 +62,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny
 // Returns a vector of Tags obtained from the picture
 std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
                           std::vector<std::vector<cv::Point2f> > &quad_corners,
-						  int canny_thresh_1, int canny_thresh_2, int blur_size)
+									int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
 
 	std::clock_t c_start = std::clock(); // Stores current cpu time
@@ -76,6 +76,8 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		gpu_grayscale.upload(grayscale);
 	#endif
 	std::cout << "Number of Quads found: " << allQuads.size() << std::endl;
+
+	bool hasOutputSquare = false;
 
 	// vector to hold quadrilaterals that are definitely tags 
 	// ~ used to check for duplicates
@@ -115,7 +117,18 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 
 		// Apply adaptive gaussian thresholding to the square, saves it to t_square
 		cv::Mat t_square;
-		cv::adaptiveThreshold(square, t_square, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 151, 0);
+		cv::adaptiveThreshold(square, t_square, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+							  cv::THRESH_BINARY, 151, 0);
+
+		if (hasOutputSquare)
+		{
+			cv::hconcat(edges, t_square, edges);
+		}
+		else
+		{
+			edges = t_square;
+			hasOutputSquare = true;
+		}
 
 		// Create Mat to store tag data
 		cv::Mat data = cv::Mat::zeros(TAG_GRID_SIZE, TAG_GRID_SIZE, CV_8UC1);

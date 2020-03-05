@@ -17,7 +17,7 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 constexpr bool EXTRA_WINDOWS = true;
 
 // Set to whichever camera params should be used
-const AR::CameraParams PARAMS = AR::WEBCAM_1080_PARAMS;
+const AR::CameraParams PARAMS = AR::WEBCAM_PARAMS;
 
 int camera_id = 0;
 
@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
 	std::cout << "Opening camera..." << std::endl;
 
 	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 	
 	cap.open(camera_id + api_id);
 	if (!cap.isOpened())
