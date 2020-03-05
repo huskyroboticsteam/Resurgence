@@ -2,7 +2,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "Pather2.h"
+#include "Pather2.h" //used to reference point struct created in Pather 2. Resolve and remove in the future.
 
 #define w 400
 
@@ -22,7 +22,7 @@ class Simulator
     //take in Obstaclemap 2-d array, draw obstacles
     void drawMap(bool obstacle_map[][21]);
     //take in algorithm, draw path
-    void drawPath(queue<point> path); // take in full path from main method, change pather2 to return full path to main method
+    void drawPath(std::queue<pather2::point> path); // take in full path from main method, change pather2 to return full path to main method
     //private helped method to bind coordinates to location on window
     void interpretCoordinates();
     //draw robot on center of screen
