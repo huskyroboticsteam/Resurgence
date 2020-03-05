@@ -1,12 +1,13 @@
 #include "EKFSlam.h"
+#include "../ObjectValidator.h"
 
 /*
  * Constructor.
  */
-EKFSlam::EKFSlam() {
+EKFSlam::EKFSlam(float motion_noise) : object_validator(*this) {
   is_initialized_ = false;
-  obstacles = new std::vector<ObstaclePoint>();
   counter = 0;
+  this->Initialize(10, 3, motion_noise);
 }
 
 /**
@@ -82,10 +83,9 @@ void EKFSlam::updateFromLidar(std::vector<std::set<std::shared_ptr<PointXY>>> li
 //call validator here, validator will associate lidar readings with existing obstacles
 //returns a vector of ids corresponding to the lidar readings
 //validator will assign a new id to a new obstacle
-//object_validator.validate();
-  // number of measurements in this step
   std::vector<PointXY> boxes = object_validator.boundingBox(lidarClusters, 1);
   std::vector<size_t> ids = object_validator.validate(boxes);
+  // number of measurements in this step
   int m = ids.size();
   assert(m == boxes.size());
   //[range, bearing, range, bearing, .....]
@@ -142,14 +142,14 @@ void EKFSlam::updateFromLidar(std::vector<std::set<std::shared_ptr<PointXY>>> li
   mu(2) = tools.normalize_angle(mu(2));
 }
 
-void EKFSlam::ProcessMeasurement(const Record& record) {
+/*void EKFSlam::ProcessMeasurement(const Record& record) {
 
       Prediction(record.odo); 
       Correction(record.radars);
-}
+}*/
 
 std::vector<ObstaclePoint> EKFSlam::getObstacles() {
-  for(int i = obstacles.size + 3; i < mu.size; i ++) {
+  for(int i = obstacles.size() + 3; i < mu.size(); i ++) {
     ObstaclePoint ob{mu[i], mu[i+1]};
     obstacles.push_back(ob);
   }
@@ -175,8 +175,4 @@ float EKFSlam::getValidationValue(size_t id, PointXY obstacle) {
 int EKFSlam::getNewLandmarkID() {
   counter++;
   return counter;
-}
-
-void EKFSlam::updateFromLidar(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters) {
-
 }

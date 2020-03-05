@@ -4,8 +4,14 @@
 #include "Eigen/Dense"
 #include "common.h"
 #include "measurement_package.h"
-#include "../ObjectValidator.h"
+#include "../../math/PointXY.h"
 #include "tools.h"
+#include <set>
+#include <vector>
+#include <memory>
+
+#include "../ObjectValidator.h"
+
 #define INF 1000
 
 struct ObstaclePoint {
@@ -27,22 +33,15 @@ class EKFSlam {
     /**
      * Constructor.
      */
-    EKFSlam(float motion_noise = 0.1);
+    EKFSlam(float motion_noise = 0.6f);
 
     /**
      * Destructor.
      */
     virtual ~EKFSlam();
 
-    /*
-     * Update state based on a magnetometer reading
-     */
-    void updateFromMagnetometer(const MagnetometerReading &mr);
 
-    /*
-     * Update state based on a GPS reading
-     */
-    void updateFromGPS(const GPSReading &gps);
+    void Prediction(const MagnetometerReading &mr, const GPSReading &gps);
 
     /*
      * Update state based on a reading from the lidar
@@ -70,7 +69,7 @@ class EKFSlam {
     std::vector<ObstaclePoint> getObstacles();
 
     //Returns a new id to be associated to a new landmark
-    int EKFSlam::getNewLandmarkID();
+    int getNewLandmarkID();
 
   private:
     // check whether the tracking toolbox was initialized or not (first
@@ -87,5 +86,6 @@ class EKFSlam {
     Eigen::MatrixXd Q_;
     vector<bool> observedLandmarks;
     ObjectValidator object_validator;
+    void Initialize(unsigned int landmark_size, unsigned int rob_pose_size, float _motion_noise);
     int counter;
 };

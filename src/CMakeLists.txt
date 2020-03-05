@@ -35,6 +35,13 @@ add_executable(lidar_vis
     lidar/PointCloudProcessing.cpp
     lidar/URGLidar.cpp)
 
+add_executable(lidarOnlyTest
+	mapping/EKFSlam/lidarOnlyTest.cpp
+        mapping/EKFSlam/EKFSlam.cpp
+        mapping/ObjectValidator.cpp
+        mapping/EKFSlam/tools.cpp
+        )
+
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
 
@@ -46,3 +53,4 @@ catch_discover_tests(tests)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
 set_property(TARGET lidar_vis PROPERTY CXX_STANDARD 14)
+set_property(TARGET lidarOnlyTest PROPERTY CXX_STANDARD 14)
