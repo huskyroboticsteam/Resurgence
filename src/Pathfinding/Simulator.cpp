@@ -29,9 +29,9 @@ void Simulator::drawMap(bool obstacle_map[][21]){
 void Simulator::drawPath(queue<point> path){
     while(!path.empty()){ 
         pather2::point start = path.front();
-        path.pop
+        path.pop();
         pather2::point end = path.front();
-        path.pop
+        path.pop();
         line(img,
         start,
         end,
