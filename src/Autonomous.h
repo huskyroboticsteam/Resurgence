@@ -9,16 +9,16 @@
 class Autonomous
 {
 public:
-    Autonomous(lidar::PointXY);
+    Autonomous(PointXY);
     //Returns a pair of floats, in heading, speed
     //Accepts current heading of the robot as parameter
     std::pair<float, float> getDirections(float currHeading);
     //Gets the target's coordinate
-    lidar::PointXY getTarget();
+    PointXY getTarget();
     void setWorldData(std::shared_ptr<WorldData>);
 
 private:
-    lidar::PointXY target;
+    PointXY target;
     float targetHeading;
     int state;         //1 is move forwards, 0 is turning, -1 is back up
     int turnDirection; //0 is turn towards target, 1 turn right, -1 turn left

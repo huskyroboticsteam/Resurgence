@@ -27,7 +27,7 @@ public:
    //Treat any point not within a box as also a new obstacle
    //Returns a vector of points of all the obstacles
    //The point represents the center of the box
-   std::vector<PointXY> boundingBox(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters, float boxSize);
+   std::vector<PointXY> boundingBox(std::vector<std::vector<PointXY>> lidarClusters, float boxSize);
 private:
 
    EKFSlam &ekf;

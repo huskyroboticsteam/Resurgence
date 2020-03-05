@@ -50,19 +50,19 @@ std::vector<size_t> ObjectValidator::validate(std::vector<PointXY>& lidarObstacl
     return obstacleIDs; // return the output vector
 }
 
-std::vector<PointXY> ObjectValidator::boundingBox(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters, float boxSize) {
+std::vector<PointXY> ObjectValidator::boundingBox(std::vector<std::vector<PointXY>> lidarClusters, float boxSize) {
     std::vector<PointXY> boxes;
     float boxRadius = boxSize/2;
     //Loop through every set of clusters from the lidar
     //Each set is a seperate obstacles
-    for(set<std::shared_ptr<PointXY>> clusterSet: lidarClusters) {
-        std::set<std::shared_ptr<PointXY>>::iterator it = clusterSet.begin();
-        PointXY firstPoint = **it;
+    for(std::vector<PointXY> clusterSet: lidarClusters) {
+        std::vector<PointXY>::iterator it = clusterSet.begin();
+        PointXY firstPoint = *it;
         boxes.push_back(firstPoint); //put a "box" around the first point
         it++;
         //iterate through the set
         while (it != clusterSet.end()) {
-            PointXY point = **it;
+            PointXY point = *it;
             //check if point in set is within any of the existing boxes
             for(PointXY box : boxes) {
                 bool inX = (point.x > (box.x - boxRadius)) && (point.x < (box.x + boxRadius));

@@ -41,9 +41,12 @@ add_executable(lidarOnlyTest
         mapping/EKFSlam/EKFSlam.cpp
         mapping/ObjectValidator.cpp
         mapping/EKFSlam/tools.cpp
-        )
+        lidar/LidarVis.cpp
+        lidar/PointCloudProcessing.cpp
+        lidar/URGLidar.cpp)
 
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
+target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
 
 include(CTest)

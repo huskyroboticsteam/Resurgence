@@ -1,18 +1,18 @@
 #pragma once
 
 #include "URGLidar.h"
-
+#include "../math/PointXY.h"
 #include <vector>
 #include <set>
 
 namespace lidar
 {
 
-typedef struct PointXY
-{
-    float x;
-    float y;
-} PointXY;
+// typedef struct PointXY
+// {
+//     float x;
+//     float y;
+// } PointXY;
 
 typedef struct BoundingBox
 {
