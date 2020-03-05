@@ -53,30 +53,32 @@ std::vector<size_t> ObjectValidator::validate(std::vector<PointXY>& lidarObstacl
 std::vector<PointXY> ObjectValidator::boundingBox(std::vector<std::vector<PointXY>> lidarClusters, float boxSize) {
     std::vector<PointXY> boxes;
     float boxRadius = boxSize/2;
-    //Loop through every set of clusters from the lidar
-    //Each set is a seperate obstacles
-    for(std::vector<PointXY> clusterSet: lidarClusters) {
-        std::vector<PointXY>::iterator it = clusterSet.begin();
-        PointXY firstPoint = *it;
-        boxes.push_back(firstPoint); //put a "box" around the first point
-        it++;
-        //iterate through the set
-        while (it != clusterSet.end()) {
-            PointXY point = *it;
-            //check if point in set is within any of the existing boxes
-	    // Can't push cause we're iterating 
-	    // PLZ FIX
-            for (PointXY box : boxes) {
-                bool inX = (point.x > (box.x - boxRadius)) && (point.x < (box.x + boxRadius));
-                bool inY = (point.y > (box.y - boxRadius)) && (point.y < (box.y + boxRadius));
-                if(!inX || !inY) {
-                    //if the point is not in any boxes, add it as a box
-                    boxes.push_back(point);
-                }
+    //Loop through every vector of clusters from the lidar
+    //Each vector is a seperate obstacle
+    for(int i = 0; i < lidarClusters.size(); i++) {
+        PointXY firstPoint = lidarClusters[i][0];
+        boxes.push_back(firstPoint); //put a box around the first point of an obstacle
+        int prevBoxes = boxes.size(); //find box index to start at 
+        //loop through each point in an obstacle
+        for(int j = 1; j < lidarClusters[i].size(); j++) {
+            //check if point in obstacle is within any of the existing boxes
+            //will stop looping if point is in a box or we have looped through all the boxes
+            bool inBox = false;
+            for(int k = prevBoxes - 1; (k < boxes.size()) && (inBox == false); k++) {
+                bool inX = (lidarClusters[i][j].x > (boxes[k].x - boxRadius)) && 
+                           (lidarClusters[i][j].x < (boxes[k].x + boxRadius));
+                bool inY = (lidarClusters[i][j].y > (boxes[k].y - boxRadius)) && 
+                           (lidarClusters[i][j].y < (boxes[k].y + boxRadius));
+                if(inX || inY) {
+                    //point is within an existing box, stop looping
+                    inBox = true;
+                } 
             }
-	        //Increment the iterator
-        	it++;
-        }
+            if(!inBox) {
+                //done looping, point isn't in a box, so add it as one
+                boxes.push_back(lidarClusters[i][j]);
+            }
+        } 
     }
     return boxes;
 }
