@@ -87,7 +87,7 @@ bool ParseIKPacket(json &message) {
 	
 	if (!ParseMotorPacket(base_packet)) 
 	{
-          std::cout << "Failed to send CAN packet.\n";
+          std::cout << "Failed to send CAN packet to base motor.\n";
           return false;
 	}
         
@@ -114,15 +114,17 @@ bool ParseIKPacket(json &message) {
         json shoulder_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_SHOULDER"}, {"mode", "PID"}, {"PID target", shoulderAngle}};
 	if (!ParseMotorPacket(elbow_packet))
 	{
-          std::cout << "Failed to send CAN packet.\n";
+          std::cout << "Failed to send CAN packet to elbow motor.\n";
 	  return false;
 	}
         if (!ParseMotorPacket(shoulder_packet))
 	{
-          std::cout << "Failed to send CAN packet.\n";
+          std::cout << "Failed to send CAN packet to shoulder motor.\n";
 	  return false;
 	}
       }
+
+      //TODO Add functionality for other key.
 
     }
   }
