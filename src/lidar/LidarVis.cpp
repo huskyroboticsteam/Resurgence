@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 		}
 
 		cv::imshow(vis_win_name, vis.getView());
-		if (cv::waitKey(0) == vis_win_esc)
+		if (cv::waitKey(5) == vis_win_esc)
 		{
 			break;
 		}
