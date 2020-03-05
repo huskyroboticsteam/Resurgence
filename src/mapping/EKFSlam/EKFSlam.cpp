@@ -78,7 +78,7 @@ void EKFSlam::Prediction(const MagnetometerReading &mr, const GPSReading &gps) {
 }
 
 
-void EKFSlam::updateFromLidar(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters) {
+void EKFSlam::updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters) {
 //takes in observations, which is a vector of readings, has id, range, bearing
 //call validator here, validator will associate lidar readings with existing obstacles
 //returns a vector of ids corresponding to the lidar readings
@@ -128,14 +128,14 @@ void EKFSlam::updateFromLidar(std::vector<std::set<std::shared_ptr<PointXY>>> li
   MatrixXd Q = MatrixXd::Identity(2*m, 2*m)*0.01;
   //compute the Kalman gain
   MatrixXd Ht = H.transpose();
-  MatrixXd HQ = (H*Sigma*Ht) + Q; //Innovation Covariance (S)
+  HQ = (H*Sigma*Ht) + Q; //Innovation Covariance (S)
   MatrixXd Si = HQ.inverse();
   //Kalman Gain
   //two columns, range and bearing for robot state and each landmark
   MatrixXd K = Sigma*Ht*Si;  
   //update 
 
-  VectorXd diff = Z - expectedZ; //(z-h) = v
+  diff = Z - expectedZ; //(z-h) = v innovation?
   tools.normalize_bearing(diff);
   mu = mu + K * diff; //update state vector
   Sigma = Sigma - K*H*Sigma; //update covariance matrix
@@ -169,6 +169,7 @@ float EKFSlam::getValidationValue(size_t id, PointXY obstacle) {
 //innovation covariance:HQ
 //v^T * HQ^-1 * v < lambda
 //v = innovation
+  return 0;
 
 }
 

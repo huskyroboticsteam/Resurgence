@@ -46,7 +46,7 @@ class EKFSlam {
     /*
      * Update state based on a reading from the lidar
      */
-    void updateFromLidar(std::vector<std::set<std::shared_ptr<PointXY>>> lidarClusters);
+    void updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters);
 
     /*
     * Step the kalman filter forward
@@ -84,6 +84,8 @@ class EKFSlam {
     Eigen::MatrixXd Sigma;
     Eigen::VectorXd mu;
     Eigen::MatrixXd Q_;
+    Eigen::VectorXd diff;
+    Eigen::MatrixXd HQ;
     vector<bool> observedLandmarks;
     ObjectValidator object_validator;
     void Initialize(unsigned int landmark_size, unsigned int rob_pose_size, float _motion_noise);

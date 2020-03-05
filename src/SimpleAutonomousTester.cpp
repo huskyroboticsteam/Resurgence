@@ -5,7 +5,7 @@
 
 TEST_CASE("full autonomous", "[autonomous]")
 {
-    lidar::PointXY p;
+    PointXY p;
     p.x = -10;
     p.y = 10;
     Autonomous autonomous(p);
