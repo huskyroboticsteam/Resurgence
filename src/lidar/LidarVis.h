@@ -38,7 +38,7 @@ public:
 	LidarVis(int win_width, int win_height, cv::Scalar bgr, int max_range);
 	void drawPoints(std::vector<PointXY> &pts, cv::Scalar bgr, int ptRadius);
 	void outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr);
-	void display(std::string win_name, char esc_char);
+	void drawLidar(cv::Scalar bgr, int symb_size_px);
 	void clear();
 	cv::Mat getView();
 };

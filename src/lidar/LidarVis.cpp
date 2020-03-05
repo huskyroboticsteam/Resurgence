@@ -35,6 +35,14 @@ void LidarVis::outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr)
 	}
 }
 
+void LidarVis::drawLidar(cv::Scalar bgr, int symb_px_size)
+{
+	cv::Point bot_left =
+		cv::Point((this->win_width - symb_px_size) / 2, (this->win_height - symb_px_size) / 2);
+	cv::Point bot_right = cv::Point((this->win_width + symb_px_size) / 2, bot_left.y);
+	cv::Point top_mid = cv::Point((bot_left.x + bot_right.x) / 2, bot_left.y + symb_px_size);
+}
+
 void LidarVis::clear()
 {
 	this->view.setTo(this->bg_color);
@@ -43,15 +51,6 @@ void LidarVis::clear()
 cv::Mat LidarVis::getView()
 {
 	return this->view;
-}
-
-void LidarVis::display(std::string win_name, char esc_char)
-{
-	cv::imshow(win_name, this->view);
-	if (cv::waitKey(0) == esc_char)
-	{
-		return;
-	}
 }
 } // namespace lidar
 
@@ -64,8 +63,6 @@ int main(int argc, char **argv)
 		std::cout << "failed to open lidar" << std::endl;
 		return lidar.getError();
 	}
-
-	float cluster_sep_thresh = 1000;
 
 	LidarVis vis(vis_win_width, vis_win_height, vis_bg_color, lidar_max_range);
 	cv::namedWindow(vis_win_name);
@@ -85,14 +82,18 @@ int main(int argc, char **argv)
 		}
 
 		vis.drawPoints(pts, vis_pt_color, vis_pt_radius);
-		std::vector<std::vector<PointXY>> clusters = clusterPoints(pts, cluster_sep_thresh);
+		std::vector<std::vector<PointXY>> clusters = clusterPoints(pts, cluster_sep_threshold);
 		for (std::vector<PointXY> cluster : clusters)
 		{
 			std::vector<PointXY> bounds = convexHull(cluster);
 			vis.outlinePolygon(bounds, vis_conv_hull_color);
 		}
 
-		vis.display(vis_win_name, vis_win_esc);
+		cv::imshow(vis_win_name, vis.getView());
+		if (cv::waitKey(0) == vis_win_esc)
+		{
+			break;
+		}
 	}
 
 	if (!lidar.close())
