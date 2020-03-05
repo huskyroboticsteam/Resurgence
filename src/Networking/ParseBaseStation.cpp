@@ -58,11 +58,21 @@ bool ParseBaseStationPacket(char const* buffer)
   {
     parsed_message = json::parse(buffer);
   }
-  catch (json::parse_error) {
+  catch (json::parse_error)
+  {
     std::cout << "Parse error\n";
     return false;
   }
-  std::string type = parsed_message["type"];
+  std::string type;
+  try
+  {
+    type = parsed_message["type"];
+  }
+  catch (json::type_error)
+  {
+    std::cout << "Could not find message type\n";
+    return false;
+  }
   std::cout << "Message type: " << type << std::endl;
   if (type == "ik") {
     return ParseIKPacket(parsed_message);
