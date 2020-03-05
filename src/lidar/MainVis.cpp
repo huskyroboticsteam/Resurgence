@@ -29,6 +29,7 @@ int main(int argc, char **argv)
 			pts.push_back(lidar::polarToCartesian(p));
 		}
 
+		vis.setGrid(vis_pt_color, 1000);
 		vis.drawPoints(pts, vis_pt_color, vis_pt_radius);
 		std::vector<std::vector<PointXY>> clusters = clusterPoints(pts, cluster_sep_threshold);
 		for (std::vector<PointXY> cluster : clusters)
