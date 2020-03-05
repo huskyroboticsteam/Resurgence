@@ -41,6 +41,12 @@ void LidarVis::drawLidar(cv::Scalar bgr, int symb_px_size)
 	cv::Point top_mid = cv::Point((bot_left.x + bot_right.x) / 2, bot_left.y + symb_px_size);
 }
 
+void LidarVis::setGrid(cv::Scalar bgr, int scale)
+{
+	// grid should have (0, 0) at center
+	// (0, 0) is also at the center of view window
+}
+
 void LidarVis::clear()
 {
 	this->view.setTo(this->bg_color);

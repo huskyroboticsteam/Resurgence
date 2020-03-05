@@ -36,6 +36,7 @@ int main(int argc, char **argv)
 			std::vector<PointXY> bounds = convexHull(cluster);
 			vis.outlinePolygon(bounds, vis_conv_hull_color);
 		}
+		vis.drawLidar(vis_lidar_color, 10);
 
 		cv::imshow(vis_win_name, vis.getView());
 		if (cv::waitKey(5) == vis_win_esc)

@@ -176,7 +176,7 @@ std::vector<PointXY> convexHull(std::vector<PointXY> &cluster)
 
 	for (int i = cluster.size() - 1; i >= 0; i--)
 	{
-		while (bot_hull.size() >= 2 and
+		while (bot_hull.size() >= 2 &&
 			   orientation(bot_hull[bot_hull.size() - 2], bot_hull[bot_hull.size() - 1],
 						   cluster[i]) > 0)
 		{

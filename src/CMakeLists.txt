@@ -31,6 +31,7 @@ add_executable(tests
   FakeMap.cpp)
 
 add_executable(lidar_vis
+    lidar/MainVis.cpp
     lidar/LidarVis.cpp
     lidar/PointCloudProcessing.cpp
     lidar/URGLidar.cpp)

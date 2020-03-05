@@ -39,6 +39,8 @@ public:
 	void drawPoints(std::vector<PointXY> &pts, cv::Scalar bgr, int ptRadius);
 	void outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr);
 	void drawLidar(cv::Scalar bgr, int symb_size_px);
+	void setGrid(cv::Scalar bgr, int scale);
+	void setScale(int x, int y, bool grid_scale, bool win_scale);
 	void clear();
 	cv::Mat getView();
 };
