@@ -38,7 +38,7 @@ std::vector<int> motor_packet_lengths = {
 
 bool ParseMotorPacket(json &message);
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
-void ParseIKPacket(json &message);
+bool ParseIKPacket(json &message);
 
 int getIndex(const std::vector<std::string> &arr, std::string &value)
 {
@@ -62,19 +62,17 @@ bool ParseBaseStationPacket(char const* buffer)
     std::cout << "Parse error\n";
     return false;
   }
-  // TODO proper input validation. Sometimes the rover crashes due to malformatted json
   std::string type = parsed_message["type"];
   std::cout << "Message type: " << type << std::endl;
   if (type == "ik") {
-    ParseIKPacket(parsed_message);
-    return true; // TODO return false on error
+    return ParseIKPacket(parsed_message);
   }  
   if (type == "motor") {
     return ParseMotorPacket(parsed_message);
   }
 }
 
-void ParseIKPacket(json &message) {
+bool ParseIKPacket(json &message) {
   double ELBOW_LENGTH = Constants::ELBOW_LENGTH;
   double SHOULDER_LENGTH = Constants::SHOULDER_LENGTH;
   for (int key_idx = 0; key_idx < possible_keys["ik"].size(); key_idx++) {
@@ -84,14 +82,21 @@ void ParseIKPacket(json &message) {
         double x = message[key][0];
         double y = message[key][1];
 	double z = message[key][2];
-        json new_message = {{"type", "motor"}, {"mode", "PID"}, {"PID target", 0}}; //Replace 0 with atan(y/x), Add motor serial
-	ParseMotorPacket(new_message);
+	double base_angle = atan(y/x); //TODO Check with electronics
+        json base_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_BASE"}, {"mode", "PID"}, {"PID target", base_angle}};
+	
+	if (!ParseMotorPacket(base_packet)) 
+	{
+          std::cout << "Failed to send CAN packet.\n";
+          return false;
+	}
         
 
 	double forward = sqrt(x*x + y*y);
 	double height = z;
 
 	double crossSection = sqrt(height*height + forward*forward);
+	double shoulderAngle = 0;
 	double shoulderAngleA = atan(height/forward);
 	double elbowAngle = acos((crossSection*crossSection 
 		- ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
@@ -99,16 +104,30 @@ void ParseIKPacket(json &message) {
         double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
 	if (forward == 0)
 	{
-	  double shoulderAngle = M_PI/2 - shoulderAngleB;
+	  shoulderAngle = M_PI/2 - shoulderAngleB;
 	}
 	else
         {
-          double shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
+          shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
 	}
-	//TODO Send shoulderAngle and elbowAngle to shoulder and elbow joints
-      }   
+        json elbow_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_ELBOW"}, {"mode", "PID"}, {"PID target", elbowAngle}};	
+        json shoulder_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_SHOULDER"}, {"mode", "PID"}, {"PID target", shoulderAngle}};
+	if (!ParseMotorPacket(elbow_packet))
+	{
+          std::cout << "Failed to send CAN packet.\n";
+	  return false;
+	}
+        if (!ParseMotorPacket(shoulder_packet))
+	{
+          std::cout << "Failed to send CAN packet.\n";
+	  return false;
+	}
+      }
+
     }
   }
+
+  return true;
 }
 
 bool ParseMotorPacket(json &message)
