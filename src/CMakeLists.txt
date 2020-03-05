@@ -38,6 +38,22 @@ add_executable(Rover
         Util.cpp
         mapping/EnvMap.cpp)
 
+add_executable(RoverNoCAN
+  Rover.cpp
+  CommandLineOptions.cpp
+  Globals.cpp
+  Networking/Network.cpp
+  Networking/CANStubs.cpp
+  Networking/ParseBaseStation.cpp
+  Util.cpp
+  mapping/EnvMap.cpp
+  Networking/ParseCAN.cpp
+  HindsightCAN/CANPacket.c
+  HindsightCAN/CANCommon.c
+  HindsightCAN/PortTemplate.c
+  Util.cpp
+  mapping/EnvMap.cpp)
+
 add_executable(tests
   Tests.cpp
   Util.cpp
