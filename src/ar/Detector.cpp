@@ -16,7 +16,8 @@
 
 constexpr int CONTOUR_AREA_THRESH = 1000;
 constexpr int TAG_GRID_SIZE = 9;
-constexpr int IDEAL_TAG_SIZE = TAG_GRID_SIZE * 25;
+constexpr int SQUARE_SIZE = 30;
+constexpr int IDEAL_TAG_SIZE = TAG_GRID_SIZE * SQUARE_SIZE;
 constexpr int BLACK_THRESH = 150;
 
 constexpr int table[][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
@@ -282,19 +283,26 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 	                                   cv::Point2i(6, 4)};
 	
 	int square_size = input.rows / TAG_GRID_SIZE;
+	int margin = 4;
 	int whiteCount = 0;
 	int blackCount = 0;
+	cv::Mat square;
 	for (int row = 0; row < TAG_GRID_SIZE; row++)
 	{
 		for (int col = 0; col < TAG_GRID_SIZE; col++)
 		{
-			int x = col * square_size + (square_size / 2);
-			int y = row * square_size + (square_size / 2);
-			output.at<uint8_t>(row, col) = input.at<uint8_t>(y, x) / BLACK_THRESH;
+			int x1 = col * square_size + margin;
+			int x2 = (col+1) * square_size - margin;
+			int y1 = row * square_size + margin;
+			int y2 = (row+1) * square_size - margin;
+			cv::Rect area(x1, y1, x2-x1, y2-y1);
+			square = input(area);
+			output.at<uint8_t>(row, col) = cv::mean(square) / BLACK_THRESH;
 
 			// Ensures that all borders are black
-			if ((col < 2 || col > 6) || (row < 2 || row > 6)) {
+			if ((col == 1 || col == 7) || (row == 1 || row == 7)) {
 				if (output.at<uint8_t>(row, col) == 1) {
+					std::cout << "Failed border test" << std::endl;
 					return false;
 				}
 			}
@@ -317,7 +325,9 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 
 	// we should see 3 white squares and one black square in all the possible places for
 	// orientation markers. If not, it's not a tag.
-	return (whiteCount == 3 && blackCount == 1);
+	bool success = (whiteCount == 3 && blackCount == 1);
+	std::cout << "Orientation marker test: " << success << std::endl;
+	return success;
 }
 
 /*
