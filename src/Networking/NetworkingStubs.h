@@ -7,7 +7,7 @@ extern "C"
 }
 #include <string>
 
-// For testing purposes. The implementations of SendCANPacket and sendBaseStationPacket in
+// For testing purposes. The implementations of sendCANPacket and sendBaseStationPacket in
 // NetworkingStubs.cpp will just save their arguments into an array
 // which can be retrieved using popCANPacket and popBaseStationPacket
 

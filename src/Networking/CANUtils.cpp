@@ -59,7 +59,7 @@ void InitializeCANSocket()
   }
 }
 
-void SendCANPacket(const CANPacket &packet)
+void sendCANPacket(const CANPacket &packet)
 {
   // TODO why do we have our own custom struct for CAN packets? Should just use `struct can_frame`.
   can_frame_.can_id = packet.id;

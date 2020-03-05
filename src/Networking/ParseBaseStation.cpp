@@ -191,6 +191,6 @@ bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID) {
   }
 
   CANPacket p = ConstructCANPacket(CAN_ID, length, data);
-  SendCANPacket(p);
+  sendCANPacket(p);
   return true;
 }

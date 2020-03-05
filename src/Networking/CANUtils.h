@@ -8,7 +8,7 @@ extern "C"
 }
 
 void InitializeCANSocket();
-void SendCANPacket(const CANPacket &packet);
+void sendCANPacket(const CANPacket &packet);
 
 // Returns 1 if a packet was received, 0 otherwise
 // If a packet was received, stores it at *packet.

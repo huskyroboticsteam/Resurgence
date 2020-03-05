@@ -15,7 +15,7 @@ int numBaseStationPackets()
   return base_station_packets.size();
 }
 
-void SendCANPacket(const CANPacket &packet)
+void sendCANPacket(const CANPacket &packet)
 {
   can_packets.push(packet);
 }

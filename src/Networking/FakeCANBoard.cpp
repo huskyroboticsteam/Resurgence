@@ -10,6 +10,6 @@ int main() {
   std::cout << "Press enter to send a CAN packet > ";
   while(1) {
     std::getline(std::cin, str);
-    SendCANPacket(motorTelemetry());
+    sendCANPacket(motorTelemetry());
   }
 }
