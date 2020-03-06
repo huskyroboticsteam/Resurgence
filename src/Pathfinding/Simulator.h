@@ -22,7 +22,7 @@ class Simulator
     //take in Obstaclemap 2-d array, draw obstacles
     void drawMap(bool obstacle_map[][21]);
     //take in algorithm, draw path
-    void drawPath(std::queue<pather2::point> path); // take in full path from main method, change pather2 to return full path to main method
+    void drawPath(std::queue<Pather2::point> path); // take in full path from main method, change pather2 to return full path to main method
     //private helped method to bind coordinates to location on window
     void interpretCoordinates();
     //draw robot on center of screen

@@ -1,11 +1,12 @@
 #include "Simulator.h"
 
-int main(void ){
-    bool[21][21] arr; 
-    drawMap(arr);
-    interpretCoordinates();
-    drawPath();
-    drawRobot();
+int main(void){
+    bool arr[21][21]; // replace with obstacle_map
+    Simulator sim; 
+    sim.drawMap(arr);
+    sim.interpretCoordinates();
+    sim.drawPath(path); // get path from Pather2 to pass in
+    sim.drawRobot();
     imshow("Simulator", img);
     int key = waitKey(0);
 };
@@ -26,18 +27,22 @@ void Simulator::drawMap(bool obstacle_map[][21]){
     }
 };
 
-void Simulator::drawPath(queue<point> path){
+void Simulator::drawPath(std::queue<Pather2::point> path){
     while(!path.empty()){ 
-        pather2::point start = path.front();
+        Pather2::point start = path.front();
         path.pop();
-        pather2::point end = path.front();
+        Pather2::point end = path.front();
         path.pop();
+
+        cv:Point startcv{start.x, start.y}; // may be incorrect syntax
+        cv:Point endcv{end.x, end.y};
+
         line(img,
-        start,
-        end,
+        startcv,
+        endcv,
         Scalar(0,0,0),
-        thickness,
-        lineType);
+        2,
+        LINE_8);
     }
 };
 
