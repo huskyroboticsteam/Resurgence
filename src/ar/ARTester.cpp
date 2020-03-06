@@ -1,4 +1,5 @@
 #include "Detector.h"
+#include "ThreadedCapture.h"
 
 #include <opencv2/calib3d.hpp>
 #include <opencv2/core.hpp>
@@ -14,7 +15,7 @@ const std::string THRESH_TRACKBAR_NAME = "Threshold";
 const std::string THRESH2_TRACKBAR_NAME = "Threshold 2";
 const std::string BLUR_TRACKBAR_NAME = "Blur";
 
-constexpr bool EXTRA_WINDOWS = true;
+constexpr bool EXTRA_WINDOWS = false;
 
 // Set to whichever camera params should be used
 const AR::CameraParams PARAMS = AR::WEBCAM_PARAMS;
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 	}
 
 	cv::Mat frame;
-	cv::VideoCapture cap;
+	AR::ThreadedCapture cap;
 
 	int api_id = cv::CAP_ANY;
 
@@ -62,8 +63,7 @@ int main(int argc, char *argv[])
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 	
-	cap.open(camera_id + api_id);
-	if (!cap.isOpened())
+	if (!cap.open(camera_id + api_id))
 	{
 		std::cerr << "ERROR! Unable to open camera" << std::endl;
 		return 1;
@@ -180,5 +180,6 @@ int main(int argc, char *argv[])
 				  << "ms; Wall Time: " << wall_t << "ms, avg: " << total_wall / loop_num
 				  << "ms" << std::endl;
 	}
+	
 	return 0;
 }
