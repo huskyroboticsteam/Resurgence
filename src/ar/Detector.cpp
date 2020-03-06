@@ -297,7 +297,7 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 			int y2 = (row+1) * square_size - margin;
 			cv::Rect area(x1, y1, x2-x1, y2-y1);
 			square = input(area);
-			output.at<uint8_t>(row, col) = cv::mean(square) / BLACK_THRESH;
+			output.at<uint8_t>(row, col) = cv::mean(square)[0] / BLACK_THRESH;
 
 			// Ensures that all borders are black
 			if ((col == 1 || col == 7) || (row == 1 || row == 7)) {
