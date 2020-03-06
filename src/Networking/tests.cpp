@@ -42,6 +42,7 @@ TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
 
 TEST_CASE("Can change motor mode", "[BaseStation]")
 {
+    clearPackets();
     char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"mode\": \"PID\"}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
     REQUIRE(popBaseStationPacket() == "{\"mode\":\"PID\",\"motor\":\"front_right_wheel\"}");
@@ -55,6 +56,7 @@ TEST_CASE("Can change motor mode", "[BaseStation]")
 
 TEST_CASE("Can set P coefficient", "[BaseStation]")
 {
+    clearPackets();
     char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"P\": 256}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
     CANPacket p = popCANPacket();
@@ -68,6 +70,7 @@ TEST_CASE("Can set P coefficient", "[BaseStation]")
 
 TEST_CASE("Does not send CAN packets if nothing changes", "[BaseStation]")
 {
+    clearPackets();
     REQUIRE(numCANPackets() == 0);
     // This motor name needs to be different from the previous one, because the motor_status object is
     // preserved across test cases.
@@ -92,3 +95,15 @@ TEST_CASE("Ignores invalid motor names", "[BaseStation]")
     REQUIRE(ParseBaseStationPacket(msg) == false);
 }
 
+TEST_CASE("Can handle drive packets", "[BaseStation]")
+{
+    char const *msg = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == -50);
+}
+
+TEST_CASE("Can handle malformed drive packets", "[BaseStation]")
+{
+    char const *msg = "{\"type\":\"drive\",\"forward_backward\":2.9}";
+    REQUIRE(ParseBaseStationPacket(msg) == false);
+}

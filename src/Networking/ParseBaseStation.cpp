@@ -16,8 +16,6 @@ extern "C"
 
 using nlohmann::json;
 
-json motor_status = {};
-
 // It's important that all of these arrays are sorted in the same order (the indices correspond)
 std::map<std::string, std::vector<std::string>> possible_keys = {
 	{"motor", {"mode", "P", "I", "D", "PID target", "PWM target"}},
@@ -39,6 +37,7 @@ std::vector<int> motor_packet_lengths = {
 bool ParseMotorPacket(json &message);
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
 bool ParseIKPacket(json &message);
+bool ParseDrivePacket(json &message);
 
 int getIndex(const std::vector<std::string> &arr, std::string &value)
 {
@@ -76,8 +75,11 @@ bool ParseBaseStationPacket(char const* buffer)
   std::cout << "Message type: " << type << std::endl;
   if (type == "ik") {
     return ParseIKPacket(parsed_message);
-  }  
-  if (type == "motor") {
+  }
+  else if (type == "drive") {
+    return ParseDrivePacket(parsed_message);
+  }
+  else if (type == "motor") {
     return ParseMotorPacket(parsed_message);
   }
 }
@@ -94,13 +96,13 @@ bool ParseIKPacket(json &message) {
 	double z = message[key][2];
 	double base_angle = atan(y/x); //TODO Check with electronics
         json base_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_BASE"}, {"mode", "PID"}, {"PID target", base_angle}};
-	
-	if (!ParseMotorPacket(base_packet)) 
+
+	if (!ParseMotorPacket(base_packet))
 	{
           std::cout << "Failed to send CAN packet to base motor.\n";
           return false;
 	}
-        
+
 
 	double forward = sqrt(x*x + y*y);
 	double height = z;
@@ -108,7 +110,7 @@ bool ParseIKPacket(json &message) {
 	double crossSection = sqrt(height*height + forward*forward);
 	double shoulderAngle = 0;
 	double shoulderAngleA = atan(height/forward);
-	double elbowAngle = acos((crossSection*crossSection 
+	double elbowAngle = acos((crossSection*crossSection
 		- ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
 		/(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
         double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
@@ -151,20 +153,20 @@ bool ParseMotorPacket(json &message)
     std::cout << "Unrecognized motor " << motor << std::endl;
     return false;
   }
-  std::cout << "Parsing motor packeast for motor " << motor << std::endl;
-  motor_status[motor]["motor"] = motor;
-  std::cout << "Original status: " << motor_status[motor] << std::endl;
+  std::cout << "Parsing motor packet for motor " << motor << std::endl;
+  Globals::motor_status[motor]["motor"] = motor;
+  std::cout << "Original status: " << Globals::motor_status[motor] << std::endl;
 
 
   for (int key_idx = 0; key_idx < possible_keys["motor"].size(); key_idx++) {
     std::string key = possible_keys["motor"][key_idx];
-    if (message[key] != nullptr && message[key] != motor_status[motor][key]) {
+    if (message[key] != nullptr && message[key] != Globals::motor_status[motor][key]) {
       std::cout << "Updating " << key << std::endl;
       uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL,
                                        DEVICE_GROUP_MOTOR_CONTROL,
                                        motor_serial);
       if (SendCANPacketToMotor(message, key_idx, CAN_ID)) {
-        motor_status[motor][key] = message[key];
+        Globals::motor_status[motor][key] = message[key];
       } else {
         std::cout << "Failed to send CAN packet.\n";
         return false;
@@ -172,7 +174,51 @@ bool ParseMotorPacket(json &message)
     }
   }
 
-  sendBaseStationPacket(motor_status[motor].dump());
+  sendBaseStationPacket(Globals::motor_status[motor].dump());
+  return true;
+}
+
+bool ParseDrivePacket(json &message)
+{
+  double fb, lr;
+  try
+  {
+    fb = message["forward_backward"];
+    lr = message["left_right"];
+  }
+  catch (json::type_error)
+  {
+    std::cout << "Malformatted drive packet\n";
+    return false;
+  }
+  if (fb > 1.0 || fb < -1.0 || lr > 1.0 || lr < -1.0)
+  {
+    std::cout << "Drive targets not within bounds +/- 1.0\n";
+    return false;
+  }
+  // TODO I'm curious how intuitive it would be to use remote control with wheel velocities rather
+  // than kinematic velocities. That would actually allow the rover to go faster, I think.
+  // Another alternative: add a boolean "wheel_velocities" indicating which mode to use
+  // (if true, the other keys should just be "right" and "left").
+  double right = (fb + lr)/2;
+  double left =  (fb - lr)/2;
+  int max_pwm = 1000; // TODO figure out what is the maximum value the hardware supports
+  int right_pwm = (int) max_pwm * right;
+  int left_pwm = (int) max_pwm * left;
+  json packet = {};
+  packet["type"] = "motor";
+  packet["mode"] = "PWM";
+  // TODO we may need to switch some of these signs
+  packet["PWM target"] = right_pwm;
+  packet["motor"] = "front_right_wheel";
+  ParseMotorPacket(packet);
+  packet["motor"] = "back_right_wheel";
+  ParseMotorPacket(packet);
+  packet["PWM target"] = left_pwm;
+  packet["motor"] = "front_left_wheel";
+  ParseMotorPacket(packet);
+  packet["motor"] = "back_left_wheel";
+  ParseMotorPacket(packet);
   return true;
 }
 

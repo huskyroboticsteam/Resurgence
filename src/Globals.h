@@ -20,4 +20,5 @@ namespace Globals
     extern CommandLineOptions opts;
     extern RoverState curr_state;
     extern nlohmann::json status_data;
+    extern nlohmann::json motor_status;
 }

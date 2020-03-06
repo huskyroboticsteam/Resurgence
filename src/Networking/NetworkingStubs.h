@@ -13,5 +13,6 @@ extern "C"
 
 int numCANPackets();
 int numBaseStationPackets();
+void clearPackets();
 CANPacket popCANPacket();
 std::string popBaseStationPacket();

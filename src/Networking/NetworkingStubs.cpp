@@ -15,6 +15,19 @@ int numBaseStationPackets()
   return base_station_packets.size();
 }
 
+
+void clearPackets()
+{
+  while (!can_packets.empty())
+  {
+    can_packets.pop();
+  }
+  while (!base_station_packets.empty())
+  {
+    base_station_packets.pop();
+  }
+}
+
 void sendCANPacket(const CANPacket &packet)
 {
   can_packets.push(packet);
