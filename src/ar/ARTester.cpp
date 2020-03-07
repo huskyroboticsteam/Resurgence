@@ -58,16 +58,16 @@ int main(int argc, char *argv[])
 	int blur_val = 2;
 
 	std::cout << "Opening camera..." << std::endl;
-
-	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-	
-	if (!cap.open(camera_id + api_id))
+	if (!cap.open(camera_id, api_id))
 	{
 		std::cerr << "ERROR! Unable to open camera" << std::endl;
 		return 1;
 	}
+
+	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+
 
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 

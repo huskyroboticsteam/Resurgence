@@ -1,5 +1,7 @@
 #include "ThreadedCapture.h"
 
+#include <iostream>
+
 namespace AR
 {
 
@@ -8,10 +10,14 @@ void ThreadedCapture::readLoop()
 	while(running)
 	{
 		cv::Mat frame;
+		
+		cap_mutex.lock();
 		cap.read(frame);
-		mutex.lock();
+		cap_mutex.unlock();
+		
+		frame_mutex.lock();
 		current_frame = frame;
-		mutex.unlock();
+		frame_mutex.unlock();
 	}
 }
 
@@ -29,14 +35,20 @@ bool ThreadedCapture::open(int cam_id, int api)
 
 void ThreadedCapture::read(cv::Mat& frame)
 {
-	mutex.lock();
+	frame_mutex.lock();
 	frame = current_frame;
-	mutex.unlock();
+	frame_mutex.unlock();
 }
 
 bool ThreadedCapture::set(cv::VideoCaptureProperties prop, double value)
 {
-	return cap.set(prop,value);
+	cap_mutex.lock();
+	bool val = cap.set(prop,value);
+	//   std::cout << val << ") set " << prop << ": " << value << ", actual val: "
+	//   		  << cap.get(prop) << std::endl;
+	cap_mutex.unlock();
+
+	return val;
 }
 
 ThreadedCapture::~ThreadedCapture()
@@ -44,6 +56,12 @@ ThreadedCapture::~ThreadedCapture()
 	running = false;
 	thread.join();
 	cap.release();
+}
+
+ThreadedCapture::ThreadedCapture()
+{
+	cv::VideoCapture _cap;
+	this->cap = _cap;
 }
 
 }
