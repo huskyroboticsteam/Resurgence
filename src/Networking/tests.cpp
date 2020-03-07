@@ -45,7 +45,8 @@ TEST_CASE("Can change motor mode", "[BaseStation]")
     clearPackets();
     char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"mode\": \"PID\"}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(popBaseStationPacket() == "{\"mode\":\"PID\",\"motor\":\"front_right_wheel\"}");
+    REQUIRE(popBaseStationPacket() == "{\"status\":\"ok\"}");
+    REQUIRE(Globals::motor_status["front_right_wheel"]["mode"] == "PID");
     CANPacket p = popCANPacket();
     REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_MODE_SEL));
     REQUIRE(p.dlc == 2);

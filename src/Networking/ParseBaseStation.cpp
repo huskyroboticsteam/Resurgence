@@ -49,6 +49,16 @@ int getIndex(const std::vector<std::string> &arr, std::string &value)
   return -1;
 }
 
+bool sendError(std::string const &msg)
+{
+  json error_message = {};
+  error_message["status"] = "error";
+  error_message["msg"] = msg;
+  sendBaseStationPacket(error_message.dump());
+  return false;
+}
+
+
 bool ParseBaseStationPacket(char const* buffer)
 {
   std::cout << "Message from base station: " << buffer << std::endl;
@@ -59,8 +69,7 @@ bool ParseBaseStationPacket(char const* buffer)
   }
   catch (json::parse_error)
   {
-    std::cout << "Parse error\n";
-    return false;
+    return sendError("Parse error");
   }
   std::string type;
   try
@@ -69,19 +78,25 @@ bool ParseBaseStationPacket(char const* buffer)
   }
   catch (json::type_error)
   {
-    std::cout << "Could not find message type\n";
-    return false;
+    return sendError("Could not find message type");
   }
   std::cout << "Message type: " << type << std::endl;
+  bool success;
   if (type == "ik") {
-    return ParseIKPacket(parsed_message);
+    success = ParseIKPacket(parsed_message);
   }
   else if (type == "drive") {
-    return ParseDrivePacket(parsed_message);
+    success = ParseDrivePacket(parsed_message);
   }
   else if (type == "motor") {
-    return ParseMotorPacket(parsed_message);
+    success = ParseMotorPacket(parsed_message);
   }
+  if (success)
+  {
+    json response = {{"status", "ok"}};
+    sendBaseStationPacket(response.dump());
+  }
+  return success;
 }
 
 bool ParseIKPacket(json &message) {
@@ -93,47 +108,43 @@ bool ParseIKPacket(json &message) {
       if (message[key] == "wrist_base_target") {
         double x = message[key][0];
         double y = message[key][1];
-	double z = message[key][2];
-	double base_angle = atan(y/x); //TODO Check with electronics
+        double z = message[key][2];
+        double base_angle = atan(y/x); //TODO Check with electronics
         json base_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_BASE"}, {"mode", "PID"}, {"PID target", base_angle}};
 
-	if (!ParseMotorPacket(base_packet))
-	{
-          std::cout << "Failed to send CAN packet to base motor.\n";
+        if (!ParseMotorPacket(base_packet))
+        {
           return false;
-	}
+        }
 
+        double forward = sqrt(x*x + y*y);
+        double height = z;
 
-	double forward = sqrt(x*x + y*y);
-	double height = z;
-
-	double crossSection = sqrt(height*height + forward*forward);
-	double shoulderAngle = 0;
-	double shoulderAngleA = atan(height/forward);
-	double elbowAngle = acos((crossSection*crossSection
-		- ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
-		/(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
-        double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
-	if (forward == 0)
-	{
-	  shoulderAngle = M_PI/2 - shoulderAngleB;
-	}
-	else
+        double crossSection = sqrt(height*height + forward*forward);
+        double shoulderAngle = 0;
+        double shoulderAngleA = atan(height/forward);
+        double elbowAngle = acos((crossSection*crossSection
+          - ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
+          /(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
+              double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
+        if (forward == 0)
+        {
+          shoulderAngle = M_PI/2 - shoulderAngleB;
+        }
+        else
         {
           shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
-	}
+        }
         json elbow_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_ELBOW"}, {"mode", "PID"}, {"PID target", elbowAngle}};	
         json shoulder_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_SHOULDER"}, {"mode", "PID"}, {"PID target", shoulderAngle}};
-	if (!ParseMotorPacket(elbow_packet))
-	{
-          std::cout << "Failed to send CAN packet to elbow motor.\n";
-	  return false;
-	}
+        if (!ParseMotorPacket(elbow_packet))
+        {
+          return false;
+        }
         if (!ParseMotorPacket(shoulder_packet))
-	{
-          std::cout << "Failed to send CAN packet to shoulder motor.\n";
-	  return false;
-	}
+        {
+          return false;
+        }
       }
 
       //TODO Add functionality for other key.
@@ -150,8 +161,7 @@ bool ParseMotorPacket(json &message)
   int motor_serial = getIndex(motor_group, motor);
   if (motor_serial < 0)
   {
-    std::cout << "Unrecognized motor " << motor << std::endl;
-    return false;
+    return sendError("Unrecognized motor " + motor);
   }
   std::cout << "Parsing motor packet for motor " << motor << std::endl;
   Globals::motor_status[motor]["motor"] = motor;
@@ -168,13 +178,11 @@ bool ParseMotorPacket(json &message)
       if (SendCANPacketToMotor(message, key_idx, CAN_ID)) {
         Globals::motor_status[motor][key] = message[key];
       } else {
-        std::cout << "Failed to send CAN packet.\n";
-        return false;
+        return sendError("Failed to send CAN packet to motor " + motor);
       }
     }
   }
 
-  sendBaseStationPacket(Globals::motor_status[motor].dump());
   return true;
 }
 
@@ -188,13 +196,11 @@ bool ParseDrivePacket(json &message)
   }
   catch (json::type_error)
   {
-    std::cout << "Malformatted drive packet\n";
-    return false;
+    return sendError("Malformatted drive packet");
   }
   if (fb > 1.0 || fb < -1.0 || lr > 1.0 || lr < -1.0)
   {
-    std::cout << "Drive targets not within bounds +/- 1.0\n";
-    return false;
+    return sendError("Drive targets not within bounds +/- 1.0");
   }
   // TODO I'm curious how intuitive it would be to use remote control with wheel velocities rather
   // than kinematic velocities. That would actually allow the rover to go faster, I think.
@@ -236,8 +242,7 @@ bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID) {
     } else if (mode == "PID") {
       data[1] = MOTOR_UNIT_MODE_PID;
     } else {
-      std::cout << "Error: unrecognized mode " << mode << std::endl;
-      return false;
+      return sendError("Unrecognized mode " + mode);
     }
   }
   else // key is one of P, I, D, PID target, or PWM target
