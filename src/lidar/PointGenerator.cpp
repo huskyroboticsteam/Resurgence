@@ -5,9 +5,9 @@
 
 namespace lidar
 {
-std::set<PointXY> generateClusterRadius(float x0, float y0, float r, int num_pts)
+std::vector<PointXY> generateClusterRadius(float x0, float y0, float r, int num_pts)
 {
-	std::set<PointXY> pts;
+	std::vector<PointXY> pts;
 	for (int i = 0; i < num_pts; i++)
 	{
 		float x =
@@ -18,25 +18,25 @@ std::set<PointXY> generateClusterRadius(float x0, float y0, float r, int num_pts
 		PointXY p;
 		p.x = x;
 		p.y = y;
-		pts.insert(p);
+		pts.push_back(p);
 	}
 	return pts;
 }
 
-std::set<PointXY> generateClusterLinear(float x0, float y0, float x1, float y1, float tol,
-										int num_pts)
+std::vector<PointXY> generateClusterLinear(float x0, float y0, float x1, float y1, float tol,
+										   int num_pts)
 {
 	// create vector for line, which we will multiply by a random value to get a value
 	float lin_x = x1 - x0;
 	float lin_y = y1 - y0;
 
-	std::set<PointXY> pts;
+	std::vector<PointXY> pts;
 	for (int i = 0; i < num_pts; i++)
 	{
 		float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 		float x = x0 + r * lin_x;
 		float y = y0 + r * lin_y;
-		pts.insert(*generateClusterRadius(x, y, tol, 1).begin());
+		pts.push_back(*generateClusterRadius(x, y, tol, 1).begin());
 	}
 	return pts;
 }
