@@ -15,10 +15,10 @@ const std::string THRESH_TRACKBAR_NAME = "Threshold";
 const std::string THRESH2_TRACKBAR_NAME = "Threshold 2";
 const std::string BLUR_TRACKBAR_NAME = "Blur";
 
-constexpr bool EXTRA_WINDOWS = false;
+constexpr bool EXTRA_WINDOWS = true;
 
 // Set to whichever camera params should be used
-const AR::CameraParams PARAMS = AR::WEBCAM_PARAMS;
+const AR::CameraParams PARAMS = AR::WEBCAM_720_PARAMS;
 
 int camera_id = 0;
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
+//	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
 

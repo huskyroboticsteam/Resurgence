@@ -97,6 +97,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 	// loop over all quadrilateral candidates
 	for (size_t i = 0; i < allQuads.size(); i++)
 	{
+		std::cout << "Quad " << i+1 << "/" << allQuads.size() << std::endl;
 		// Sorts corner points in order of: top-left, top-right, 
 		// bottom-right, bottom-left and stores it in quad
 		std::vector<cv::Point2f> quad = sortCorners(allQuads[i]);
@@ -119,17 +120,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		// Apply adaptive gaussian thresholding to the square, saves it to t_square
 		cv::Mat t_square;
 		cv::adaptiveThreshold(square, t_square, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C,
-							  cv::THRESH_BINARY, 151, 0);
-
-		if (hasOutputSquare)
-		{
-			cv::hconcat(edges, t_square, edges);
-		}
-		else
-		{
-			edges = t_square;
-			hasOutputSquare = true;
-		}
+							  cv::THRESH_BINARY, 125, 0);
 
 		// Create Mat to store tag data
 		cv::Mat data = cv::Mat::zeros(TAG_GRID_SIZE, TAG_GRID_SIZE, CV_8UC1);
@@ -157,6 +148,16 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 				Tag tag(quad[0], quad[1], quad[2], quad[3], cam, id);
 				output.push_back(tag);
 			}
+		}
+
+		if (hasOutputSquare)
+		{
+			cv::hconcat(edges, t_square, edges);
+		}
+		else
+		{
+			edges = t_square;
+			hasOutputSquare = true;
 		}
 	}
 
@@ -298,16 +299,24 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 			cv::Rect area(x1, y1, x2-x1, y2-y1);
 			square = input(area);
 			output.at<uint8_t>(row, col) = cv::mean(square)[0] / BLACK_THRESH;
+			cv::Scalar line_col(255,0,0);
+			cv::line(input, cv::Point2i(x1,y1), cv::Point2i(x2,y1), line_col);
+			cv::line(input, cv::Point2i(x2,y1), cv::Point2i(x2,y2), line_col);
+			cv::line(input, cv::Point2i(x2,y2), cv::Point2i(x1,y2), line_col);
+			cv::line(input, cv::Point2i(x1,y2), cv::Point2i(x1,y1), line_col);
 
 			// Ensures that all borders are black
-			if ((col == 1 || col == 7) || (row == 1 || row == 7)) {
+			if ((col == 0 || col == 8) || (row == 0 || row == 8)) {
 				if (output.at<uint8_t>(row, col) == 1) {
-					std::cout << "Failed border test" << std::endl;
+					std::cout << "\tFailed border test" << std::endl;
 					return false;
 				}
 			}
 		}
 	}
+
+	std::cout << "\tPassed border test" << std::endl;
+	std::cout << output << std::endl;
 
 	// Checks for 3 white squares and 
 	// 1 black square in orientation points.
@@ -326,7 +335,7 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 	// we should see 3 white squares and one black square in all the possible places for
 	// orientation markers. If not, it's not a tag.
 	bool success = (whiteCount == 3 && blackCount == 1);
-	std::cout << "Orientation marker test: " << success << std::endl;
+	std::cout << "\tOrientation marker test: " << success << std::endl;
 	return success;
 }
 
