@@ -45,12 +45,16 @@ int recvBaseStationPacket(char *buffer)
   // If we split by requiring the base station to send a four-byte length
   // before sending each packet, we might need to dynamically allocate
   // memory. Either way we may need to handle blocking reads more carefully.
-  if (recv(base_station_fd, buffer, MAXLINE, MSG_DONTWAIT) < 0)
+  int ret = recv(base_station_fd, buffer, MAXLINE, MSG_DONTWAIT);
+  if (ret < 0)
   {
     if (errno != EAGAIN && errno != EWOULDBLOCK) {
       perror("Failed to read from base station");
     }
     return 0;
+  } else if (ret == 0) {
+    perror("Base station disconnected");
+    exit(1);
   }
   return 1;
 }

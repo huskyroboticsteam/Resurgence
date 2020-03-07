@@ -19,7 +19,6 @@ namespace Globals
 {
     extern CommandLineOptions opts;
     extern RoverState curr_state;
-    extern std::vector<Packet> incoming_packets;
-    extern std::vector<Packet> outgoing_packets;
     extern nlohmann::json status_data;
+    extern nlohmann::json motor_status;
 }

@@ -41,12 +41,10 @@ void InitializeCANSocket()
     strcpy(can_ifr.ifr_name, "vcan0");
     if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0)
     {
-      // You can make a virtual CAN interface with
-      //
-      // sudo ip link add type vcan
-      // sudo ip link set dev vcan0 up
-      //
-      error("Failed to get virtual CAN interface index");
+      error("Failed to get virtual CAN interface index\n"
+            "You can make a virtual CAN interface with\n\n"
+            "  sudo ip link add type vcan\n"
+            "  sudo ip link set dev vcan0 up\n\n");
     }
     std::cout << "Found virtual CAN interface index." << std::endl;
   }
@@ -61,7 +59,7 @@ void InitializeCANSocket()
   }
 }
 
-void SendCANPacket(const CANPacket &packet)
+void sendCANPacket(const CANPacket &packet)
 {
   // TODO why do we have our own custom struct for CAN packets? Should just use `struct can_frame`.
   can_frame_.can_id = packet.id;

@@ -13,19 +13,6 @@ extern "C"
 #include <aio.h>
 #include <fcntl.h>
 
-enum class PacketKind
-{
-    CAN,
-    Network,
-};
-
-struct Packet
-{
-    PacketKind kind;
-    int address;
-    uint8_t payload[Constants::PACKET_PAYLOAD_SIZE];
-};
-
 void InitializeBaseStationSocket();
 int recvBaseStationPacket(char *buffer);
 void sendBaseStationPacket(const std::string &packet);
