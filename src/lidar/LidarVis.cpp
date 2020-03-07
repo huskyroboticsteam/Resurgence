@@ -36,9 +36,9 @@ void LidarVis::outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr)
 void LidarVis::drawLidar(cv::Scalar bgr, int symb_px_size)
 {
 	cv::Point bot_left =
-		cv::Point((this->win_width - symb_px_size) / 2, (this->win_height - symb_px_size) / 2);
+		cv::Point((this->win_width - symb_px_size) / 2, (this->win_height + symb_px_size) / 2);
 	cv::Point bot_right = cv::Point((this->win_width + symb_px_size) / 2, bot_left.y);
-	cv::Point top_mid = cv::Point((bot_left.x + bot_right.x) / 2, bot_left.y + symb_px_size);
+	cv::Point top_mid = cv::Point((bot_left.x + bot_right.x) / 2, bot_left.y - symb_px_size);
 	std::vector<std::vector<cv::Point>> pts = {{bot_left, bot_right, top_mid}};
 	cv::fillPoly(this->view, pts, bgr);
 }
