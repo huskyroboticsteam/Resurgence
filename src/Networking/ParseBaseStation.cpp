@@ -157,7 +157,15 @@ bool ParseIKPacket(json &message) {
 
 bool ParseMotorPacket(json &message)
 {
-  std::string motor = message["motor"];
+  std::string motor;
+  try
+  {
+    motor = message["motor"];
+  }
+  catch (json::type_error)
+  {
+    return sendError("No motor specified");
+  }
   int motor_serial = getIndex(motor_group, motor);
   if (motor_serial < 0)
   {
