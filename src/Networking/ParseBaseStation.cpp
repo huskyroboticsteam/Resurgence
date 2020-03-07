@@ -4,6 +4,7 @@
 #include "json.hpp"
 #include "CANUtils.h"
 #include "ParseCAN.h"
+#include "log.h"
 #include <cmath>
 #include <tgmath.h>
 
@@ -58,10 +59,9 @@ bool sendError(std::string const &msg)
   return false;
 }
 
-
 bool ParseBaseStationPacket(char const* buffer)
 {
-  std::cout << "Message from base station: " << buffer << std::endl;
+  log(LOG_INFO, "Message from base station: " + (std::string) buffer);
   json parsed_message;
   try
   {
@@ -80,7 +80,7 @@ bool ParseBaseStationPacket(char const* buffer)
   {
     return sendError("Could not find message type");
   }
-  std::cout << "Message type: " << type << std::endl;
+  log(LOG_DEBUG, "Message type: " + type);
   bool success;
   if (type == "ik") {
     success = ParseIKPacket(parsed_message);
@@ -163,15 +163,15 @@ bool ParseMotorPacket(json &message)
   {
     return sendError("Unrecognized motor " + motor);
   }
-  std::cout << "Parsing motor packet for motor " << motor << std::endl;
+  log(LOG_DEBUG, "Parsing motor packet for motor " + motor);
   Globals::motor_status[motor]["motor"] = motor;
-  std::cout << "Original status: " << Globals::motor_status[motor] << std::endl;
+  log(LOG_DEBUG, "Original status: " + Globals::motor_status[motor].dump());
 
 
   for (int key_idx = 0; key_idx < possible_keys["motor"].size(); key_idx++) {
     std::string key = possible_keys["motor"][key_idx];
     if (message[key] != nullptr && message[key] != Globals::motor_status[motor][key]) {
-      std::cout << "Updating " << key << std::endl;
+      log(LOG_DEBUG, "Updating " + key);
       uint16_t CAN_ID = ConstructCANID(PACKET_PRIORITY_NORMAL,
                                        DEVICE_GROUP_MOTOR_CONTROL,
                                        motor_serial);

@@ -23,20 +23,21 @@ add_subdirectory(ar)
 add_subdirectory(ObstacleSim)
 
 add_executable(Rover
-        Rover.cpp
-        CommandLineOptions.cpp
-        Globals.cpp
-        Networking/Network.cpp
-        Networking/CANUtils.cpp
-        Networking/ParseBaseStation.cpp
-        Util.cpp
-        mapping/EnvMap.cpp
-        Networking/ParseCAN.cpp
-        HindsightCAN/CANPacket.c
-        HindsightCAN/CANCommon.c
-        HindsightCAN/PortTemplate.c
-        Util.cpp
-        mapping/EnvMap.cpp)
+  Rover.cpp
+  CommandLineOptions.cpp
+  Globals.cpp
+  Networking/Network.cpp
+  Networking/CANUtils.cpp
+  Networking/ParseBaseStation.cpp
+  Util.cpp
+  mapping/EnvMap.cpp
+  Networking/ParseCAN.cpp
+  Networking/log.cpp
+  HindsightCAN/CANPacket.c
+  HindsightCAN/CANCommon.c
+  HindsightCAN/PortTemplate.c
+  Util.cpp
+  mapping/EnvMap.cpp)
 
 add_executable(RoverNoCAN
   Rover.cpp
@@ -45,6 +46,7 @@ add_executable(RoverNoCAN
   Networking/Network.cpp
   Networking/CANStubs.cpp
   Networking/ParseBaseStation.cpp
+  Networking/log.cpp
   Util.cpp
   mapping/EnvMap.cpp
   Networking/ParseCAN.cpp
@@ -63,6 +65,7 @@ add_executable(tests
   # CAN tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
+  Networking/log.cpp
   CommandLineOptions.cpp
   Globals.cpp
   Networking/ParseCAN.cpp
