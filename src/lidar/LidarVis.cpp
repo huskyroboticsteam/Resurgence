@@ -39,6 +39,8 @@ void LidarVis::drawLidar(cv::Scalar bgr, int symb_px_size)
 		cv::Point((this->win_width - symb_px_size) / 2, (this->win_height - symb_px_size) / 2);
 	cv::Point bot_right = cv::Point((this->win_width + symb_px_size) / 2, bot_left.y);
 	cv::Point top_mid = cv::Point((bot_left.x + bot_right.x) / 2, bot_left.y + symb_px_size);
+	std::vector<std::vector<cv::Point>> pts = {{bot_left, bot_right, top_mid}};
+	cv::fillPoly(this->view, pts, bgr);
 }
 
 void LidarVis::setGrid(cv::Scalar bgr, int scale)
@@ -75,9 +77,9 @@ void LidarVis::setGrid(cv::Scalar bgr, int scale)
 		cv::line(this->view, p1, p2, bgr);
 	}
 
-    // horizontal lines below center
+	// horizontal lines below center
 	for (p.y = -scale; worldToCvPoint(p).y < this->win_height; p.y -= scale)
-    {
+	{
 		cv::Point p1 = worldToCvPoint(p);
 		p1.x = 0;
 		cv::Point p2 = worldToCvPoint(p);
