@@ -25,7 +25,11 @@ add_executable(tests
   Util.cpp
   # AR Detection tests
   ar/TagUnitTests.cpp
-  ar/Tag.cpp)
+  ar/Tag.cpp
+  # Pathing tests
+  Pathfinding/ObstacleMap.cpp
+  ../tests/Pathfinding/ObstacleMapTest.cpp
+  )
 
 target_link_libraries(Rover ${OpenCV_LIBS})
 

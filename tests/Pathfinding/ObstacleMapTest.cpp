@@ -1,7 +1,9 @@
 #include <catch2/catch.hpp>
-#include "Pathfinding/ObstacleMap.h"
 #include <vector>
-#include "Pathfinding/Point.h"
+#include <iostream>
+
+#include "../../src/Pathfinding/ObstacleMap.h"
+#include "../../src/Pathfinding/Point.h"
 
 #define CATCH_CONFIG_MAIN
 
@@ -10,11 +12,7 @@ namespace Pathfinding
     //copied over from ObstacleMap
     int transform(int val, bool direction)
     {
-        if(direction)
-        {
-            return val + (int)(1 - (val % 1));
-        }
-        return val - (int)(val % 1);
+        return val + direction;
     }
 
     void getMapObjSol(bool sol[21][21], std::vector<Point> vecOfPoints)
@@ -26,14 +24,20 @@ namespace Pathfinding
                 sol[i][j] = false;
             }
         }
+        std::cout << "looped falses" << std::endl;
         for (Point p : vecOfPoints)
         {
-            int x = p.x;
-            int y = p.y;
-            sol[transform(y, true)][transform(x, true)] = true;
-            sol[transform(y, true)][transform(x, false)] = true;
-            sol[transform(y, false)][transform(x, true)] = true;
-            sol[transform(y, false)][transform(x, false)] = true;
+            int x = static_cast<int>(p.x);
+            int y = static_cast<int>(p.y);
+            // sol[transform(y, true)][transform(x, true)] = true;
+            // sol[transform(y, true)][transform(x, false)] = true;
+            // sol[transform(y, false)][transform(x, true)] = true;
+            // sol[transform(y, false)][transform(x, false)] = true;
+            std::cout << transform(y, true) + 11 << std::endl;
+            std::cout << transform(y, false) + 11 << std::endl;
+            std::cout << transform(x, true) + 11 << std::endl;
+            std::cout << transform(x, false) + 11 << std::endl;
+            std::cout << "done with a point" << std::endl;
         }
     }
 
@@ -43,8 +47,8 @@ namespace Pathfinding
         {
             for (int j = 0; j < 21; j++)
             {
-                bool objMapVal = obstacle_map[i + 10][j+ 10];
-                bool solVal = obstacle_map[i + 10][j + 10];
+                bool objMapVal = obstacle_map[i][j];
+                bool solVal = sol[i][j];
                 if (objMapVal != solVal)
                 {
                     return false;
@@ -55,7 +59,7 @@ namespace Pathfinding
     }
 }
 
-TEST_CASE("Create and fill ObstacleMap")
+TEST_CASE("Pathfinding")
 {
     std::vector<Point> vectorOfPoints = {
         Point { 2.0f, 2.0f },
@@ -67,7 +71,9 @@ TEST_CASE("Create and fill ObstacleMap")
 
     ObstacleMap objMap;
     objMap.update(vectorOfPoints);
+    objMap.print();
     bool sol[21][21];
+    std::cout << "created sol arr" << std::endl;
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
     REQUIRE(Pathfinding::boolMapsEquals(objMap.obstacle_map, sol));
 }

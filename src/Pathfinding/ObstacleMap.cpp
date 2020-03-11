@@ -54,7 +54,7 @@ void ObstacleMap::update(std::vector<Point> obstacles)
 
 //rounds given coordinates up/down to obstacle_map indices,
 //sets four elements around given coordinates as blocked
-inline void ObstacleMap::modifyObstacleMap(int x, int  y)
+inline void ObstacleMap::modifyObstacleMap(int x, int y)
 {
     if (transform(y, true) < size && transform(x, true) < size) {
         obstacle_map[transform(y, true)][transform(x, true)] = true;
