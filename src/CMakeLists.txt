@@ -30,10 +30,7 @@ add_executable(Rover
 
 add_executable(tests
   Tests.cpp
-  Util.cpp
-  # AR Detection tests
-  ar/TagUnitTests.cpp
-  ar/Tag.cpp)
+  Util.cpp)
 
 target_link_libraries(Rover ${OpenCV_LIBS})
 target_link_libraries(Rover Threads::Threads)
