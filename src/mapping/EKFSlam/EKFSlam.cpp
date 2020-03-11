@@ -78,14 +78,6 @@ void EKFSlam::Prediction(const MagnetometerReading &mr, const GPSReading &gps) {
 }
 
 
-<<<<<<< HEAD
-void EKFSLam::Correction(const vector<RadarReading>& observations) {
-  //takes in observations, which is a vector of readings, has id, range, bearing
-  //call validator here, validator will associate lidar readings with existing obstacles
-  //returns a vector of ids corresponding to the lidar readings
-  //validator will assign a new id to a new obstacle
-  //object_validator.validate();
-=======
 void EKFSlam::updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters) {
 //takes in observations, which is a vector of readings, has id, range, bearing
 //call validator here, validator will associate lidar readings with existing obstacles
@@ -93,7 +85,6 @@ void EKFSlam::updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters) 
 //validator will assign a new id to a new obstacle
   std::vector<PointXY> boxes = object_validator.boundingBox(lidarClusters, 1);
   std::vector<size_t> ids = object_validator.validate(boxes);
->>>>>>> ca77d8c035b648b7a1bd5a467f866099c564eef3
   // number of measurements in this step
   int m = ids.size();
   assert(m == boxes.size());
