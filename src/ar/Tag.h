@@ -1,10 +1,10 @@
 #pragma once
 
-#include "CameraParams.h"
+#include <vector>
 
 #include <opencv2/core.hpp>
 
-#include <vector>
+#include "CameraParams.h"
 
 namespace AR
 {
@@ -23,6 +23,9 @@ enum CornerIndex
 	BOTTOM_LEFT = 3
 };
 
+/**
+   Tag ID enum. Each member's value is the numerical ID of the tag it stands for.
+ */
 enum TagID
 {
 	ID_UNKNOWN = -1,
@@ -54,10 +57,9 @@ private:
 	std::vector<cv::Point> corners;
 	cv::Vec3d rvec;
 	cv::Vec3d tvec;
-	cv::Vec3d coordinates;
 	TagID id;
 	CameraParams params;
-		
+
 	/** Calculates the orientation */
 	void calcOrientation();
 
@@ -66,19 +68,53 @@ public:
 	   Constructor for a Tag. Takes four OpenCV points which are the coordinates of the
 	   corners of the Tag in the image. Note the order of points; this will be checked and
 	   an AR::InvalidCornerException will be thrown if ordering is incorrect.
+
+	   Also takes in a set of CameraParams, and the ID of this tag (the ID checking should be
+	   done outside of the Tag class).
+
+	   Please note that you should not need to call this constructor yourself as it is called
+	   by the Detector class, with values determined through image processing that happens in
+	   the Detector class.
 	*/
-	Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-		cv::Point bottom_left, CameraParams params, TagID tag_id = ID_UNKNOWN);
-	/** Gets the coordinates of the center of the tag. */
+	Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right, cv::Point bottom_left,
+		CameraParams params, TagID tag_id = ID_UNKNOWN);
+	/** Gets the 2D (image) coordinates of the center of the tag. */
 	cv::Point getCenter() const;
 	/**
-	   Gets the corners of the tag. Note that this is a const operation and a copy of the
-	   corners will be returned.
+	   Gets the 2D (image) corners of the tag. Note that this is a const operation and a copy
+	   of the corners will be returned.
 	*/
 	std::vector<cv::Point> getCorners() const;
+	/**
+	   Gets the rotation vector of the tag. This vector defines a line through the origin
+	   around which points are rotated to transform them from the object reference frame to the
+	   camera reference frame; its length is the angle of rotation. You will likely not need
+	   this for most uses.
+	 */
 	cv::Vec3d getRVec() const;
+	/**
+	   Gets the translation vector of the tag. This vector defines the translation necessary to
+	   transform points from the object reference frame to the camera reference frame. For the
+	   center of the tag (0,0,0), this vector is in effect the 3D coordinates of the tag
+	   relative to the camera.
+
+	   This function will return real world units; these are dependent upon the camera
+	   parameters you are currently using.
+	 */
 	cv::Vec3d getTVec() const;
+	/**
+	   Gets the 3D coordinates of the tag with respect to the camera. The return value is
+	   currently the same as getTVec, but this function is provided for convenience as its name
+	   is more intuitive.
+
+	   This function will return real world units; these are dependent upon the camera
+	   parameters you are currently using.
+	 */
 	cv::Vec3d getCoordinates() const;
+	/**
+	   Gets the ID of the tag. If the ID cannot be determined or is not a known ID marking a
+	   leg of the autonomous course, the ID_UNKNOWN value will be returned.
+	 */
 	TagID getID() const;
 };
 } // namespace AR

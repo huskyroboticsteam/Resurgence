@@ -1,39 +1,40 @@
 #include "Tag.h"
-#include "../Util.h"
-
-#include <opencv2/calib3d.hpp>
 
 #include <cassert>
 #include <iostream>
+
+#include <opencv2/calib3d.hpp>
+
+#include "../Util.h"
 
 namespace AR
 {
 
 void checkCorners(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-                  cv::Point bottom_left)
+				  cv::Point bottom_left)
 {
 	// validate points
-	assert(!(top_left.x - top_right.x > 0          // top left and top right are inverted
-	         || top_left.y - bottom_left.y > 0     // top left and bottom left are inverted
-	         || bottom_left.x - bottom_right.x > 0 // bottom left and bottom right are inverted
-	         || top_right.y - bottom_right.y > 0)); // top right and bottom right are inverted
+	assert(!(top_left.x - top_right.x > 0		   // top left and top right are inverted
+			 || top_left.y - bottom_left.y > 0	   // top left and bottom left are inverted
+			 || bottom_left.x - bottom_right.x > 0 // bottom left and bottom right are inverted
+			 || top_right.y - bottom_right.y > 0)); // top right and bottom right are inverted
 }
 
 Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-         cv::Point bottom_left, CameraParams params, TagID tag_id) : params(params)
+		 cv::Point bottom_left, CameraParams params, TagID tag_id)
+	: params(params)
 {
 	// validate points
-	//TODO determine if checkcorners is actually necessary
+	// TODO determine if checkcorners is actually necessary
 	//	checkCorners(top_left, top_right, bottom_right, bottom_left);
 
 	// fill vector with points
 	corners.push_back(top_left);
 	corners.push_back(top_right);
-    corners.push_back(bottom_right);
-    corners.push_back(bottom_left);
+	corners.push_back(bottom_right);
+	corners.push_back(bottom_left);
 
 	id = tag_id;
-
 
 	calcOrientation();
 }
@@ -59,8 +60,7 @@ cv::Point Tag::getCenter() const
 	{
 		size_t next = (i == 3 ? 0 : i + 1);
 		size_t prev = (i == 0 ? 3 : i - 1);
-		tri_centers.push_back(
-		    getTriCenter(corners[prev], corners[i], corners[next]));
+		tri_centers.push_back(getTriCenter(corners[prev], corners[i], corners[next]));
 	}
 	return getQuadCenter(tri_centers[0], tri_centers[1], tri_centers[2], tri_centers[3]);
 }
@@ -94,7 +94,7 @@ void Tag::calcOrientation()
 	// bottom left (-w/2, -w/2)
 	object_points.push_back(cv::Point3f(-(square_len / 2), -(square_len / 2), 0));
 
-	//std::cout << "object points: " << object_points << std::endl;
+	// std::cout << "object points: " << object_points << std::endl;
 
 	// Mat objects to hold returned rotation and translation vectors
 	cv::Mat _rvec;
@@ -107,17 +107,9 @@ void Tag::calcOrientation()
 	// store rotation and translation vectors in this tag instance
 	rvec = _rvec;
 	tvec = _tvec;
-
-	cv::Mat rmat;
-	cv::Rodrigues(rvec, rmat);
-	cv::Mat coord = rmat * tvec;
-	
-	coordinates[0] = coord.at<double>(0,0);
-	coordinates[1] = coord.at<double>(1,0);
-	coordinates[2] = coord.at<double>(2,0);
 }
 
-TagID Tag::getID () const
+TagID Tag::getID() const
 {
 	return this->id;
 }
@@ -134,7 +126,7 @@ cv::Vec3d Tag::getTVec() const
 
 cv::Vec3d Tag::getCoordinates() const
 {
-	return coordinates;
+	return tvec;
 }
 
 } // namespace AR
