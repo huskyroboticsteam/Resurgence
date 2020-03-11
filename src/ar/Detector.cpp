@@ -72,7 +72,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 									std::vector<std::vector<cv::Point2f>> &quad_corners,
 									int canny_thresh_1, int canny_thresh_2, int blur_size)
 {
-#ifdef NDEBUG
+#ifndef NDEBUG
 	std::clock_t c_start = std::clock(); // Stores current cpu time
 	auto wall_start = std::chrono::system_clock::now();
 #endif
@@ -105,7 +105,9 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 	// loop over all quadrilateral candidates
 	for (size_t i = 0; i < allQuads.size(); i++)
 	{
+#ifndef NDEBUG
 		std::cout << "Quad " << i + 1 << "/" << allQuads.size() << std::endl;
+#endif
 		// Sorts corner points in order of: top-left, top-right,
 		// bottom-right, bottom-left and stores it in quad
 		std::vector<cv::Point2f> quad = sortCorners(allQuads[i]);
@@ -169,7 +171,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		}
 	}
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 	std::clock_t c_end = std::clock();
 	auto wall_end = std::chrono::system_clock::now();
 	long double time_elapsed_ms = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
@@ -318,7 +320,7 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 			{
 				if (output.at<uint8_t>(row, col) == 1)
 				{
-#ifdef NDEBUG
+#ifndef NDEBUG
 					std::cout << "\tFailed border test" << std::endl;
 #endif
 					return false;
@@ -327,7 +329,7 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 		}
 	}
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 	std::cout << "\tPassed border test" << std::endl;
 	std::cout << output << std::endl;
 #endif
@@ -349,7 +351,7 @@ bool readCheckData(cv::Mat &input, cv::Mat &output)
 	// we should see 3 white squares and one black square in all the possible places for
 	// orientation markers. If not, it's not a tag.
 	bool success = (whiteCount == 3 && blackCount == 1);
-#ifdef NDEBUG
+#ifndef NDEBUG
 	std::cout << "\tOrientation marker test: " << success << std::endl;
 #endif
 	return success;
