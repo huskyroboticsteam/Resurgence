@@ -78,11 +78,11 @@ void EKFSLam::Prediction(const OdoReading& motion) {
 
 
 void EKFSLam::Correction(const vector<RadarReading>& observations) {
-//takes in observations, which is a vector of readings, has id, range, bearing
-//call validator here, validator will associate lidar readings with existing obstacles
-//returns a vector of ids corresponding to the lidar readings
-//validator will assign a new id to a new obstacle
-//object_validator.validate();
+  //takes in observations, which is a vector of readings, has id, range, bearing
+  //call validator here, validator will associate lidar readings with existing obstacles
+  //returns a vector of ids corresponding to the lidar readings
+  //validator will assign a new id to a new obstacle
+  //object_validator.validate();
   // number of measurements in this step
   int m = observations.size();
   //[range, bearing, range, bearing, .....]
@@ -148,7 +148,7 @@ void EKFSLam::ProcessMeasurement(const Record& record) {
 }
 
 std::vector<ObstaclePoint> EKFSLam::getObstacles() {
-  for(int i = obstacles.size + 3; i < mu.size; i ++) {
+  for(int i = obstacles.size + 3; i < mu.size; i = i + 2) {
     ObstaclePoint ob{mu[i], mu[i+1]};
     obstacles.push_back(ob);
   }
