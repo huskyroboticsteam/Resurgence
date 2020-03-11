@@ -1,5 +1,5 @@
 # PY2020
-PY2020 Jetson TX2 Codebase [Untitled Rover]
+PY2020 Jetson TX2 Codebase Hindsight
 
 # Project Setup
 
@@ -87,6 +87,7 @@ Now, you're ready to build the project.
 ## Building
 Ensure you have CMake installed.
 Run
+
 ```
 cmake -Bbuild ./src
 cmake --build build

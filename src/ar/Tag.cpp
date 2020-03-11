@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 #include <opencv2/calib3d.hpp>
 
