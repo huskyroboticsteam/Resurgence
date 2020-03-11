@@ -6,7 +6,7 @@ add_executable(ar_test
   CameraParams.cpp
   Detector.cpp
   Tag.cpp
-  ThreadedCapture.cpp
+  ../ThreadedCapture.cpp
   ../Util.cpp)
 
 set_property(TARGET ar_test PROPERTY CXX_STANDARD 14)

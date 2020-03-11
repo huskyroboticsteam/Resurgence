@@ -12,6 +12,7 @@ else()
 endif()
 
 find_package(OpenCV CONFIG REQUIRED)
+find_package(Threads REQUIRED)
 add_subdirectory(ar)
 
 add_subdirectory(ObstacleSim)
@@ -24,5 +25,6 @@ add_executable(Rover
 	Util.cpp)
 
 target_link_libraries(Rover ${OpenCV_LIBS})
+target_link_libraries(Rover Threads::Threads)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
