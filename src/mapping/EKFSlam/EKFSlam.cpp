@@ -167,8 +167,8 @@ std::vector<ObstaclePoint> EKFSlam::getObstacles() {
   // 9 < 9 is false so yeah  hmmmmmmmmm
   // is there a difference between () and [] indexing for these matrices?
   // lemme look it seems like either works....
-  for (int i = obstacles.size() + 3; i < mu.rows() - 1; i = i + 2) {
-    ObstaclePoint ob{mu[i], mu[i+1]};
+  for (int i = 2 * obstacles.size() + 3; i < mu.rows() - 1; i = i + 2) {
+    ObstaclePoint ob{mu(i), mu(i+1)};
     obstacles.push_back(ob);
   }
   return obstacles;
