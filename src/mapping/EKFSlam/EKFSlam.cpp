@@ -148,8 +148,8 @@ void EKFSlam::updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters) 
       Correction(record.radars);
 }*/
 
-std::vector<ObstaclePoint> EKFSLam::getObstacles() {
-  for(int i = obstacles.size + 3; i < mu.size; i = i + 2) {
+std::vector<ObstaclePoint> EKFSlam::getObstacles() {
+  for (int i = obstacles.size + 3; i < mu.size; i = i + 2) {
     ObstaclePoint ob{mu[i], mu[i+1]};
     obstacles.push_back(ob);
   }
