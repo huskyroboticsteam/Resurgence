@@ -1,104 +1,43 @@
 #include "Tag.h"
-#include "../Util.h"
-
-#include <opencv2/calib3d.hpp>
 
 #include <cassert>
 #include <iostream>
 #include <cmath>
 
+#include <opencv2/calib3d.hpp>
+
+#include "../Util.h"
+
 namespace AR
 {
-double findAngle(cv::Point a, cv::Point b, cv::Point c)
-{
-	a = a - b; // shift vectors so that B is at the origin
-	b = b - b;
-	c = c - b;
-	double dot_product = a.ddot(c);
-	double a_mag = sqrt((a.x * a.x) + (a.y * a.y));
-	double c_mag = sqrt((c.x * c.x) + (c.y * c.y));
-	return acos(dot_product / (a_mag * c_mag));
-}
-
-cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R)
-{
-	/*
-	double sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) +
-	                 R.at<double>(1, 0) * R.at<double>(1, 0));
-
-	bool singular = util::almostEqual(sy, 0);
-
-	double x, y, z;
-	if (!singular)
-	{
-		x = atan2(R.at<double>(2, 1), R.at<double>(2, 2));
-		y = atan2(-R.at<double>(2, 0), sy);
-		z = atan2(R.at<double>(1, 0), R.at<double>(0, 0));
-	}
-	else
-	{
-		x = atan2(-R.at<double>(1, 2), R.at<double>(1, 1));
-		y = atan2(-R.at<double>(2, 0), sy);
-		z = 0;
-	}
-	*/
-	double x,y,z;
-	if(std::abs(R.at<double>(2,0)) != 1)
-	{
-		y = -asin(R.at<double>(2,0));
-		x = atan2((R.at<double>(2,1)/cos(y)), (R.at<double>(2,2)/cos(y)));
-		z = atan2((R.at<double>(1,0)/cos(y)), (R.at<double>(0,0)/cos(y)));
-	}
-	else 
-	{
-		z = 0;
-		y = 0;
-		if(R.at<double>(2,0) == -1)
-		{
-			x = atan2(R.at<double>(0,1), R.at<double>(0,2));
-		}
-		else
-		{
-			x = atan2(-R.at<double>(0,1), -R.at<double>(0,2));
-		}
-	}
-	x = util::almostEqual(x, M_PI) ? M_PI-x : x;
-	y = util::almostEqual(x, M_PI) ? M_PI-y : y;
-	return cv::Vec3f(x, y, z);
-}
 
 void checkCorners(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-                  cv::Point bottom_left)
+				  cv::Point bottom_left)
 {
 	// validate points
-	assert(!(top_left.x - top_right.x > 0          // top left and top right are inverted
-	         || top_left.y - bottom_left.y > 0     // top left and bottom left are inverted
-	         || bottom_left.x - bottom_right.x > 0 // bottom left and bottom right are inverted
-	         || top_right.y - bottom_right.y > 0)); // top right and bottom right are inverted
+	assert(!(top_left.x - top_right.x > 0		   // top left and top right are inverted
+			 || top_left.y - bottom_left.y > 0	   // top left and bottom left are inverted
+			 || bottom_left.x - bottom_right.x > 0 // bottom left and bottom right are inverted
+			 || top_right.y - bottom_right.y > 0)); // top right and bottom right are inverted
 }
 
 Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-         cv::Point bottom_left)
+		 cv::Point bottom_left, CameraParams params, TagID tag_id)
+	: params(params)
 {
 	// validate points
-	checkCorners(top_left, top_right, bottom_right, bottom_left);
+	// TODO determine if checkcorners is actually necessary
+	//	checkCorners(top_left, top_right, bottom_right, bottom_left);
 
 	// fill vector with points
-	std::vector<cv::Point> points;
-	points.push_back(top_left);
-	points.push_back(top_right);
-	points.push_back(bottom_right);
-	points.push_back(bottom_left);
+	corners.push_back(top_left);
+	corners.push_back(top_right);
+	corners.push_back(bottom_right);
+	corners.push_back(bottom_left);
 
-	// turn points into Corners
-	for (size_t i = 0; i < points.size(); i++)
-	{
-		size_t last_index = i == 0 ? points.size() - 1 : i - 1;
-		size_t next_index = i == points.size() - 1 ? 0 : i + 1;
-		double internal_angle = findAngle(points[last_index], points[i], points[next_index]);
-		corners.push_back(Corner{internal_angle, points[i]});
-	}
-	orientation = calcOrientation();
+	id = tag_id;
+
+	calcOrientation();
 }
 
 cv::Point getTriCenter(cv::Point pt1, cv::Point pt2, cv::Point pt3)
@@ -122,54 +61,73 @@ cv::Point Tag::getCenter() const
 	{
 		size_t next = (i == 3 ? 0 : i + 1);
 		size_t prev = (i == 0 ? 3 : i - 1);
-		tri_centers.push_back(
-		    getTriCenter(corners[prev].point, corners[i].point, corners[next].point));
+		tri_centers.push_back(getTriCenter(corners[prev], corners[i], corners[next]));
 	}
 	return getQuadCenter(tri_centers[0], tri_centers[1], tri_centers[2], tri_centers[3]);
 }
 
-std::vector<Corner> Tag::getCorners() const
+std::vector<cv::Point> Tag::getCorners() const
 {
 	return corners;
 }
 
-cv::Vec3d Tag::calcOrientation()
+void Tag::calcOrientation()
 {
+	// vectors to hold image points (detected corners in image) and object points ("ideal"
+	// corners of the tag in the world coordinate system)
 	std::vector<cv::Point2f> image_points;
 	std::vector<cv::Point3f> object_points;
+
+	// add detected corners to image points vector
 	for (int i = 0; i < corners.size(); i++)
 	{
-		image_points.push_back(corners[i].point);
+		image_points.push_back(corners[i]);
 	}
-	double w = 200;
-	double h = 200;
-	object_points.push_back(cv::Point3f(-w / 2, h / 2, 0));
-	object_points.push_back(cv::Point3f(w / 2, h / 2, 0));
-	object_points.push_back(cv::Point3f(w / 2, -h / 2, 0));
-	object_points.push_back(cv::Point3f(-w / 2, -h / 2, 0));
-	cv::Mat rvec;
-	cv::Mat tvec;
-	cv::solvePnP(object_points, image_points, CAMERA_PARAMS, DISTORTION_PARAMS, rvec, tvec);
-				 //    false, cv::SOLVEPNP_IPPE_SQUARE);
-	cv::Mat rmat;
-	cv::Rodrigues(rvec, rmat);
-	cv::Vec3d euler = rotationMatrixToEulerAngles(rmat);
-	return euler;
+
+	// create ideal object points
+	double square_len = 0.2;
+	// top left (-w/2, w/2)
+	object_points.push_back(cv::Point3f(-(square_len / 2), (square_len / 2), 0));
+	// top right (w/2, w/2)
+	object_points.push_back(cv::Point3f((square_len / 2), (square_len / 2), 0));
+	// bottom right (w/2, -w/2)
+	object_points.push_back(cv::Point3f((square_len / 2), -(square_len / 2), 0));
+	// bottom left (-w/2, -w/2)
+	object_points.push_back(cv::Point3f(-(square_len / 2), -(square_len / 2), 0));
+
+	// std::cout << "object points: " << object_points << std::endl;
+
+	// Mat objects to hold returned rotation and translation vectors
+	cv::Mat _rvec;
+	cv::Mat _tvec;
+
+	// estimate pose
+	cv::solvePnP(object_points, image_points, params.getCameraParams(), params.getDistCoeff(),
+				 _rvec, _tvec, false, cv::SOLVEPNP_IPPE_SQUARE);
+
+	// store rotation and translation vectors in this tag instance
+	rvec = _rvec;
+	tvec = _tvec;
 }
 
-float Tag::getPitch() const
+TagID Tag::getID() const
 {
-	return orientation[0];
+	return this->id;
 }
 
-float Tag::getYaw() const
+cv::Vec3d Tag::getRVec() const
 {
-	return orientation[1];
+	return rvec;
 }
 
-float Tag::getRoll() const
+cv::Vec3d Tag::getTVec() const
 {
-	return orientation[2];
+	return tvec;
+}
+
+cv::Vec3d Tag::getCoordinates() const
+{
+	return tvec;
 }
 
 } // namespace AR
