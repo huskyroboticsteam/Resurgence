@@ -15,7 +15,7 @@ public:
     //Checks if there is an obstacle 1 unit in front of the robot
     bool lidarSees() override;
     //Returns GPS of robot
-    lidar::PointXY getGPS() override;
+    PointXY getGPS() override;
     //Returns heading of robot
     float getHeading() override;
     //starts the autonomous pathing
@@ -30,9 +30,9 @@ private:
     std::vector<float> makeLine(float x2, float y2, float x1, float y1);
     Autonomous &autonomous;
     float heading;
-    lidar::PointXY robotPos;
-    std::vector<std::pair<lidar::PointXY, lidar::PointXY>> obstacles;
-    lidar::PointXY target;
+    PointXY robotPos;
+    std::vector<std::pair<PointXY, PointXY>> obstacles;
+    PointXY target;
     //Margin of error
     float margin;
 };

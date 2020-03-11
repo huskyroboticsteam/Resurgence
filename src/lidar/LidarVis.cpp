@@ -1,108 +1,100 @@
 #include "LidarVis.h"
 
-#include <iostream>
-
 namespace lidar
 {
-LidarVis::LidarVis(int win_width, int win_height, std::vector<double> rgb) : view(win_height, win_width, CV_8UC3, cv::Scalar(rgb[0], rgb[1], rgb[2]))
+LidarVis::LidarVis(int win_width, int win_height, cv::Scalar bgr, int max_range)
+	: view(win_height, win_width, CV_8UC3, cv::Scalar(bgr[0], bgr[1], bgr[2])), bg_color(bgr),
+	  win_width(win_width), win_height(win_height), lidar_max_range(max_range)
 {
 }
 
-void LidarVis::drawPoints(std::vector<PointXY> &pts, bool clusterOn, bool ptsOrdered,
-                          int sep_threshold, std::vector<double> rgb, int ptRadius)
+cv::Point LidarVis::worldToCvPoint(PointXY p)
 {
-    cv::Scalar ptColor(rgb[0], rgb[1], rgb[2]);
-    if (clusterOn)
-    {
-        std::vector<std::vector<PointXY>> clusters;
-        if (ptsOrdered)
-        {
-            clusters = clusterOrderedPoints(pts, sep_threshold);
-        }
-        else
-        {
-            clusterPoints(pts, sep_threshold);
-        }
-
-        for (std::vector<PointXY> cluster : clusters)
-        {
-            for (PointXY pt : cluster)
-            {
-                cv::circle(this->view, cv::Point(pt.x, pt.y), ptRadius, ptColor);
-            }
-
-            std::vector<PointXY> hull = convexHull(cluster);
-            for (int i = 0; i < hull.size() - 1; i++)
-            {
-                cv::line(this->view, cv::Point(hull[i].x, hull[i].y),
-                         cv::Point(hull[i + 1].x, hull[i + 1].y), ptColor);
-            }
-            cv::line(this->view, cv::Point(hull[hull.size() - 1].x, hull[hull.size() - 1].y),
-                     cv::Point(hull[0].x, hull[0].y), ptColor);
-        }
-    }
-    else
-    {
-        for (PointXY pt : pts)
-        {
-            cv::circle(this->view, cv::Point(pt.x, pt.y), ptRadius, ptColor);
-        }
-    }
+	int x = (p.x / (2 * this->lidar_max_range) + 0.5) * this->win_width;
+	int y = 0.5 * this->win_width * (1 - p.y / this->lidar_max_range);
+	return cv::Point(x, y);
 }
 
-void LidarVis::display()
+void LidarVis::drawPoints(std::vector<PointXY> &pts, cv::Scalar bgr, int pt_radius)
 {
-    cv::imshow("", this->view);
+	for (PointXY p : pts)
+	{
+		cv::circle(this->view, worldToCvPoint(p), pt_radius, bgr, -1);
+	}
 }
 
+void LidarVis::outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr)
+{
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		cv::Point p1 = worldToCvPoint(vertices[i]);
+		cv::Point p2 = worldToCvPoint(vertices[(i + 1) % vertices.size()]);
+		cv::line(this->view, p1, p2, bgr);
+	}
+}
+
+void LidarVis::drawLidar(cv::Scalar bgr, int symb_px_size)
+{
+	cv::Point bot_left =
+		cv::Point((this->win_width - symb_px_size) / 2, (this->win_height + symb_px_size) / 2);
+	cv::Point bot_right = cv::Point((this->win_width + symb_px_size) / 2, bot_left.y);
+	cv::Point top_mid = cv::Point((bot_left.x + bot_right.x) / 2, bot_left.y - symb_px_size);
+	std::vector<std::vector<cv::Point>> pts = {{bot_left, bot_right, top_mid}};
+	cv::fillPoly(this->view, pts, bgr);
+}
+
+void LidarVis::setGrid(cv::Scalar bgr, int scale)
+{
+	PointXY p({0, 0});
+
+	// vertical lines to left of center
+	for (p.x = 0; worldToCvPoint(p).x >= 0; p.x -= scale)
+	{
+		cv::Point p1 = worldToCvPoint(p);
+		p1.y = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.y = this->win_height;
+		cv::line(this->view, p1, p2, bgr);
+	}
+
+	// vertical lines to the right of center
+	for (p.x = scale; worldToCvPoint(p).x < this->win_width; p.x += scale)
+	{
+		cv::Point p1 = worldToCvPoint(p);
+		p1.y = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.y = this->win_height;
+		cv::line(this->view, p1, p2, bgr);
+	}
+
+	// horizontal lines above center
+	for (p.y = 0; worldToCvPoint(p).y >= 0; p.y += scale)
+	{
+		cv::Point p1 = worldToCvPoint(p);
+		p1.x = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.x = this->win_width;
+		cv::line(this->view, p1, p2, bgr);
+	}
+
+	// horizontal lines below center
+	for (p.y = -scale; worldToCvPoint(p).y < this->win_height; p.y -= scale)
+	{
+		cv::Point p1 = worldToCvPoint(p);
+		p1.x = 0;
+		cv::Point p2 = worldToCvPoint(p);
+		p2.x = this->win_width;
+		cv::line(this->view, p1, p2, bgr);
+	}
+}
+
+void LidarVis::clear()
+{
+	this->view.setTo(this->bg_color);
+}
+
+cv::Mat LidarVis::getView()
+{
+	return this->view;
+}
 } // namespace lidar
-
-int main(int argc, char **argv)
-{
-    URGLidar lidar;
-    if (!lidar.open())
-    {
-        std::cout << "failed to open lidar" << std::endl;
-        return lidar.getError();
-    }
-    std::cout << "getting one frame from lidar as test read:" << std::endl;
-    if (!lidar.createFrame())
-    {
-        std::cout << "failed to create test frame" << std::endl;
-        return lidar.getError();
-    }
-    std::vector<Polar2D> testFrame = lidar.getLastFrame();
-    for (Polar2D p : testFrame)
-    {
-        std::cout << "(" << p.r << ", " << p.theta << ") " << std::endl;
-    }
-    std::cout << std::endl;
-    lidar::LidarVis vis(600, 400, {1.0, 1.0, 1.0});
-    while (true)
-    {
-        if (!lidar.createFrame())
-        {
-            std::cout << "failed to create frame" << std::endl;
-            return lidar.getError();
-        }
-        std::vector<Polar2D> polarPts = lidar.getLastFrame();
-        std::vector<lidar::PointXY> pts;
-        for (Polar2D p : polarPts)
-        {
-            pts.push_back(lidar::polarToCartesian(p));
-        }
-        vis.drawPoints(pts, true, true, 500, {0, 0, 0}, 3);
-        vis.display();
-
-        if (cv::waitKey(5) == 'q')
-        {
-            break;
-        }
-    }
-    if (!lidar.close())
-    {
-        std::cout << "failed to close lidar device" << std::endl;
-        return lidar.getError();
-    }
-    return 0;
-}

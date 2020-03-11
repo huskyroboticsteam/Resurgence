@@ -1,19 +1,20 @@
-#include "ekfslam.h"
+#include "EKFSlam.h"
+#include "../ObjectValidator.h"
 
 /*
  * Constructor.
  */
-EKFSLam::EKFSLam() {
+EKFSlam::EKFSlam(float motion_noise) : object_validator(*this) {
   is_initialized_ = false;
-  obstacles = new std::vector<ObstaclePoint>();
   counter = 0;
+  this->Initialize(10, 3, motion_noise);
 }
 
 /**
 Initialize the parameters
 **/
 
-void EKFSLam::Initialize(unsigned int landmark_size, unsigned int rob_pose_size, float _motion_noise) {
+void EKFSlam::Initialize(unsigned int landmark_size, unsigned int rob_pose_size, float _motion_noise) {
   
   int N       = landmark_size; //number of landmarks
   int r       = rob_pose_size; //number of robot states(3)  
@@ -44,28 +45,28 @@ void EKFSLam::Initialize(unsigned int landmark_size, unsigned int rob_pose_size,
 /**
 * Destructor.
 */
-EKFSLam::~EKFSLam() {}
+EKFSlam::~EKFSlam() {}
 
 
-void EKFSLam::Prediction(const OdoReading& motion) {
+void EKFSlam::Prediction(const MagnetometerReading &mr, const GPSReading &gps) {
 //take in motion of robot
 //use update from magnetometer and gps here
-  double angle = mu(2);
-  double r1    = motion.r1;
-  double t     = motion.t;
-  double r2    = motion.r2;
+  //double angle = mu(2);
+  //double r1    = motion.r1;
+  //double t     = motion.t;
+  //double r2    = motion.r2;
 
   MatrixXd Gt = MatrixXd(3,3); //Matrix A(jacobian of prediction model)
-  Gt << 1, 0, -t*sin(angle + r1),
-        0, 1,  t*cos(angle + r1),
+  Gt << 1, 0, -(gps.y - mu(1)),
+        0, 1,  gps.x - mu(0),
         0, 0,  0;
 
-  float c = cos(angle + r1);
-  float s = sin(angle + r1);
+  //float c = cos(angle + r1);
+  //float s = sin(angle + r1);
 
-  mu(0) = mu(0)  + t*c; //update x
-  mu(1) = mu(1) + t*s;  //update y
-  mu(2) = mu(2) + r1 + r2;  //update heading
+  mu(0) = gps.x; //update x
+  mu(1) = gps.y;  //update y
+  mu(2) = mr.heading;  //update heading
   
   //Update Covariance Matrix
   int size = Sigma.cols();
@@ -77,14 +78,25 @@ void EKFSLam::Prediction(const OdoReading& motion) {
 }
 
 
+<<<<<<< HEAD
 void EKFSLam::Correction(const vector<RadarReading>& observations) {
   //takes in observations, which is a vector of readings, has id, range, bearing
   //call validator here, validator will associate lidar readings with existing obstacles
   //returns a vector of ids corresponding to the lidar readings
   //validator will assign a new id to a new obstacle
   //object_validator.validate();
+=======
+void EKFSlam::updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters) {
+//takes in observations, which is a vector of readings, has id, range, bearing
+//call validator here, validator will associate lidar readings with existing obstacles
+//returns a vector of ids corresponding to the lidar readings
+//validator will assign a new id to a new obstacle
+  std::vector<PointXY> boxes = object_validator.boundingBox(lidarClusters, 1);
+  std::vector<size_t> ids = object_validator.validate(boxes);
+>>>>>>> ca77d8c035b648b7a1bd5a467f866099c564eef3
   // number of measurements in this step
-  int m = observations.size();
+  int m = ids.size();
+  assert(m == boxes.size());
   //[range, bearing, range, bearing, .....]
   VectorXd Z          = VectorXd::Zero(2*m);
   VectorXd expectedZ  = VectorXd::Zero(2*m);
@@ -94,21 +106,19 @@ void EKFSLam::Correction(const vector<RadarReading>& observations) {
   MatrixXd H = MatrixXd::Zero(2*m, 2*N + 3);
   for (int i = 0; i < m; i++) { //cycle through observations
 
-      auto& reading = observations[i];
-      long long landmarkId = reading.id; //change to take from validator
-      float     range      = reading.range;
-      float     bearing    = reading.bearing;
+      PointXY& reading = boxes[i];
+      size_t landmarkId = ids[i]; //change to take from validator
       //landmark is not seen before(has a new id), so to initialize the landmarks
       if (!observedLandmarks[landmarkId-1]) {
-          mu(2*landmarkId + 1) = mu(0) + range*cos(mu(2) + bearing);
-          mu(2*landmarkId+2) = mu(1) + range*sin(mu(2) + bearing);
+          mu(2*landmarkId + 1) = reading.x;
+          mu(2*landmarkId+2) = reading.y;
           //Indicate in the observedLandmarks vector that this landmark has been observed
           observedLandmarks[landmarkId-1] = true;
       }
 
       //add the landmark meansurement to the Z vector
-      Z(2*i) = range;
-      Z(2*i+1) = bearing;
+      Z(2*i) = std::sqrt(std::pow(mu(0) - reading.x, 2) + std::pow(mu(1) - reading.y, 2));
+      Z(2*i+1) = atan2f(mu(1) - reading.y, mu(0) - reading.x);
       //use the current estimate of the landmark poseq
       double deltax = mu(2*landmarkId+1) - mu(0);
       double deltay = mu(2*landmarkId+2) - mu(1);
@@ -127,25 +137,25 @@ void EKFSLam::Correction(const vector<RadarReading>& observations) {
   MatrixXd Q = MatrixXd::Identity(2*m, 2*m)*0.01;
   //compute the Kalman gain
   MatrixXd Ht = H.transpose();
-  MatrixXd HQ = (H*Sigma*Ht) + Q; //Innovation Covariance (S)
+  HQ = (H*Sigma*Ht) + Q; //Innovation Covariance (S)
   MatrixXd Si = HQ.inverse();
   //Kalman Gain
   //two columns, range and bearing for robot state and each landmark
   MatrixXd K = Sigma*Ht*Si;  
   //update 
 
-  VectorXd diff = Z - expectedZ; //(z-h) = v
+  diff = Z - expectedZ; //(z-h) = v innovation?
   tools.normalize_bearing(diff);
   mu = mu + K * diff; //update state vector
   Sigma = Sigma - K*H*Sigma; //update covariance matrix
   mu(2) = tools.normalize_angle(mu(2));
 }
 
-void EKFSLam::ProcessMeasurement(const Record& record) {
+/*void EKFSlam::ProcessMeasurement(const Record& record) {
 
       Prediction(record.odo); 
       Correction(record.radars);
-}
+}*/
 
 std::vector<ObstaclePoint> EKFSLam::getObstacles() {
   for(int i = obstacles.size + 3; i < mu.size; i = i + 2) {
@@ -155,23 +165,24 @@ std::vector<ObstaclePoint> EKFSLam::getObstacles() {
   return obstacles;
 }
 
-PointXY EKFSLam::getPosition() {
+PointXY EKFSlam::getPosition() {
   PointXY location{mu[0], mu[1]};
   return location;
 }
 
-float EKFSLam::getHeading() {
+float EKFSlam::getHeading() {
   return mu[2];
 }
 
-float EKFSLam::getValidationValue(size_t id, PointXY obstacle) {
+float EKFSlam::getValidationValue(size_t id, PointXY obstacle) {
 //innovation covariance:HQ
 //v^T * HQ^-1 * v < lambda
 //v = innovation
+  return 0;
 
 }
 
-int EKFSLam::getNewLandmarkID() {
+int EKFSlam::getNewLandmarkID() {
   counter++;
   return counter;
 }

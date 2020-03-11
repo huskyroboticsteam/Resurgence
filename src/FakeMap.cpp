@@ -10,33 +10,33 @@ FakeMap::FakeMap(Autonomous &autonomous_) : autonomous(autonomous_)
     heading = 0;
     margin = pow(10, -5);
 
-    lidar::PointXY ob;
+    PointXY ob;
     ob.x = -12;
     ob.y = 10;
-    lidar::PointXY ob1;
+    PointXY ob1;
     ob1.x = -12;
     ob1.y = 8;
-    std::pair<lidar::PointXY, lidar::PointXY> obs;
+    std::pair<PointXY, PointXY> obs;
     obs = std::make_pair(ob, ob1);
     obstacles.push_back(obs);
 
-    lidar::PointXY ob10;
+    PointXY ob10;
     ob10.x = -12;
     ob10.y = 8;
-    lidar::PointXY ob11;
+    PointXY ob11;
     ob11.x = -8;
     ob11.y = 8;
-    std::pair<lidar::PointXY, lidar::PointXY> obs5;
+    std::pair<PointXY, PointXY> obs5;
     obs5 = std::make_pair(ob10, ob11);
     obstacles.push_back(obs5);
 
-    lidar::PointXY ob2;
+    PointXY ob2;
     ob2.x = -8;
     ob2.y = 8;
-    lidar::PointXY ob3;
+    PointXY ob3;
     ob3.x = -8;
     ob3.y = 10;
-    std::pair<lidar::PointXY, lidar::PointXY> obs1;
+    std::pair<PointXY, PointXY> obs1;
     obs1 = std::make_pair(ob2, ob3);
     obstacles.push_back(obs1);
     target = autonomous.getTarget();
@@ -122,7 +122,7 @@ float FakeMap::targetDistance()
     return 1; //returning 1 is target is not within 1 unit distance
 }
 
-lidar::PointXY FakeMap::getGPS()
+PointXY FakeMap::getGPS()
 {
     return robotPos;
 }

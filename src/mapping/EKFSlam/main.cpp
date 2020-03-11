@@ -52,7 +52,7 @@ int main(int arc, char* argv[])
 
    Draw draw;
 
-   EKFSLam ekfslam;
+   EKFSlam ekfslam;
    ekfslam.Initialize(mapper.data.size(), 3);
    
    for (int i = 0; i < measurements.data.size(); i++) { 

@@ -4,8 +4,14 @@
 #include "Eigen/Dense"
 #include "common.h"
 #include "measurement_package.h"
-#include "../ObjectValidator.h"
+#include "../../math/PointXY.h"
 #include "tools.h"
+#include <set>
+#include <vector>
+#include <memory>
+
+#include "../ObjectValidator.h"
+
 #define INF 1000
 
 struct ObstaclePoint {
@@ -13,33 +19,34 @@ struct ObstaclePoint {
   const float& y;
 };
 
-class EKFSLam {
+struct MagnetometerReading {
+  float heading; // in degrees
+};
+
+struct GPSReading {
+  float x; // with respect to starting point
+  float y;
+};
+
+class EKFSlam {
   public:
     /**
      * Constructor.
      */
-    EKFSLam(float motion_noise = 0.1);
+    EKFSlam(float motion_noise = 0.6f);
 
     /**
      * Destructor.
      */
-    virtual ~EKFSLam();
+    virtual ~EKFSlam();
 
-    /*
-     * Update state based on a magnetometer reading
-     */
-    void updateFromMagnetometer(const MagnetometerReading &mr);
 
-    /*
-     * Update state based on a GPS reading
-     */
-    void updateFromGPS(const GPSReading &gps);
+    void Prediction(const MagnetometerReading &mr, const GPSReading &gps);
 
     /*
      * Update state based on a reading from the lidar
      */
-    void updateFromLidar(size_t object_uid,
-                         std::set<std::shared_ptr<Vec2>> reading);
+    void updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters);
 
     /*
     * Step the kalman filter forward
@@ -62,7 +69,7 @@ class EKFSLam {
     std::vector<ObstaclePoint> getObstacles();
 
     //Returns a new id to be associated to a new landmark
-    int EKFSLam::getNewLandmarkID();
+    int getNewLandmarkID();
 
   private:
     // check whether the tracking toolbox was initialized or not (first
@@ -77,7 +84,10 @@ class EKFSLam {
     Eigen::MatrixXd Sigma;
     Eigen::VectorXd mu;
     Eigen::MatrixXd Q_;
+    Eigen::VectorXd diff;
+    Eigen::MatrixXd HQ;
     vector<bool> observedLandmarks;
     ObjectValidator object_validator;
+    void Initialize(unsigned int landmark_size, unsigned int rob_pose_size, float _motion_noise);
     int counter;
 };

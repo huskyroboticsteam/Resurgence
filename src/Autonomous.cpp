@@ -3,7 +3,7 @@
 
 constexpr float PI = M_PI;
 
-Autonomous::Autonomous(lidar::PointXY _target) : target(_target)
+Autonomous::Autonomous(PointXY _target) : target(_target)
 {
     state = 0;
     targetHeading = -1;
@@ -84,7 +84,7 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
         }
         else
         { //calculate angle to obstacle
-            lidar::PointXY robotPos = worldData->getGPS();
+            PointXY robotPos = worldData->getGPS();
             float x = target.x - robotPos.x;
             float y = target.y - robotPos.y;
             targetHeading = atan2f(y, x) * (180 / PI);
@@ -124,7 +124,7 @@ Autonomous::stateBackwards(float currHeading,
     }
 }
 
-lidar::PointXY Autonomous::getTarget()
+PointXY Autonomous::getTarget()
 {
     return target;
 }
