@@ -23,6 +23,9 @@ const cv::Scalar vis_bg_color(255, 255, 255);
 const cv::Scalar vis_pt_color(0, 0, 0);
 const cv::Scalar vis_conv_hull_color(255, 0, 0);
 const cv::Scalar vis_lidar_color(0, 0, 255);
+const cv::Scalar vis_grid_color(0, 128, 0);
+constexpr int vis_grid_dist = 1000;
+constexpr int vis_lidar_size = 10;
 
 class LidarVis
 {
@@ -40,7 +43,6 @@ public:
 	void outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr);
 	void drawLidar(cv::Scalar bgr, int symb_size_px);
 	void setGrid(cv::Scalar bgr, int scale);
-	void setScale(int x, int y, bool grid_scale, bool win_scale);
 	void clear();
 	cv::Mat getView();
 };

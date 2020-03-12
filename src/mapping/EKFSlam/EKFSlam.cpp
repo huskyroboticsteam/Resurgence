@@ -149,8 +149,26 @@ void EKFSlam::updateFromLidar(std::vector<std::vector<PointXY>>& lidarClusters) 
 }*/
 
 std::vector<ObstaclePoint> EKFSlam::getObstacles() {
-  for(int i = obstacles.size() + 3; i < mu.size(); i ++) {
-    ObstaclePoint ob{mu[i], mu[i+1]};
+  //mu has 3 rows for state, then +2 for each obstacle
+  // so in this method im updating the obstacles vector. Im taking new obstacles in mu and puttingit in obstacles
+  //im taking the x and y for each obstacle, so thats why i increment by 2
+  //i f any of this info is helpful
+  
+  // we reference mu[i+1], so we don't want i to be = mu.rows() - 1
+  // though I'm not sure if that's the problem
+  // That makes sense, I think the -1 will fix it then, because 
+  //ex. mu has 9 rows, index 3,5 is x. assume obstacles is empty
+  // index 3 is the first x coordinate, so i starts at 3. Wait no that's not possible
+  // because then the loop wouldn't run
+  // so i starts at 3 if obstacles is empty. 
+  // say there are 3 obstacles stored in mu. mu.rows() returns 9
+  // then i goes to 5, 7, the loop doesn't run on 9
+  // the loop wouldn't run even without the - 1 right
+  // 9 < 9 is false so yeah  hmmmmmmmmm
+  // is there a difference between () and [] indexing for these matrices?
+  // lemme look it seems like either works....
+  for (int i = 2 * obstacles.size() + 3; i < mu.rows() - 1; i = i + 2) {
+    ObstaclePoint ob{mu(i), mu(i+1)};
     obstacles.push_back(ob);
   }
   return obstacles;
