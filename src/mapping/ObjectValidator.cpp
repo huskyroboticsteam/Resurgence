@@ -58,7 +58,7 @@ std::vector<PointXY> ObjectValidator::boundingBox(std::vector<std::vector<PointX
     for(int i = 0; i < lidarClusters.size(); i++) {
         PointXY firstPoint = lidarClusters[i][0];
         boxes.push_back(firstPoint); //put a box around the first point of an obstacle
-        int prevBoxes = boxes.size(); //find box index to start at 
+        int prevBoxes = boxes.size(); //find box index to start at
         //loop through each point in an obstacle
         for(int j = 1; j < lidarClusters[i].size(); j++) {
             //check if point in obstacle is within any of the existing boxes
@@ -69,7 +69,7 @@ std::vector<PointXY> ObjectValidator::boundingBox(std::vector<std::vector<PointX
                            (lidarClusters[i][j].x < (boxes[k].x + boxRadius));
                 bool inY = (lidarClusters[i][j].y > (boxes[k].y - boxRadius)) && 
                            (lidarClusters[i][j].y < (boxes[k].y + boxRadius));
-                if(inX || inY) {
+                if(inX && inY) {
                     //point is within an existing box, stop looping
                     inBox = true;
                 } 
