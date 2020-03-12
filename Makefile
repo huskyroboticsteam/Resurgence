@@ -783,33 +783,6 @@ ar/TagUnitTests.cpp.s:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/ar/TagUnitTests.cpp.s
 .PHONY : ar/TagUnitTests.cpp.s
 
-mapping/EnvMap.o: mapping/EnvMap.cpp.o
-
-.PHONY : mapping/EnvMap.o
-
-# target to build an object file
-mapping/EnvMap.cpp.o:
-	$(MAKE) -f CMakeFiles/Rover.dir/build.make CMakeFiles/Rover.dir/mapping/EnvMap.cpp.o
-.PHONY : mapping/EnvMap.cpp.o
-
-mapping/EnvMap.i: mapping/EnvMap.cpp.i
-
-.PHONY : mapping/EnvMap.i
-
-# target to preprocess a source file
-mapping/EnvMap.cpp.i:
-	$(MAKE) -f CMakeFiles/Rover.dir/build.make CMakeFiles/Rover.dir/mapping/EnvMap.cpp.i
-.PHONY : mapping/EnvMap.cpp.i
-
-mapping/EnvMap.s: mapping/EnvMap.cpp.s
-
-.PHONY : mapping/EnvMap.s
-
-# target to generate assembly for a file
-mapping/EnvMap.cpp.s:
-	$(MAKE) -f CMakeFiles/Rover.dir/build.make CMakeFiles/Rover.dir/mapping/EnvMap.cpp.s
-.PHONY : mapping/EnvMap.cpp.s
-
 tests/Pathfinding/ObstacleMapTest.o: tests/Pathfinding/ObstacleMapTest.cpp.o
 
 .PHONY : tests/Pathfinding/ObstacleMapTest.o
@@ -905,9 +878,6 @@ help:
 	@echo "... ar/TagUnitTests.o"
 	@echo "... ar/TagUnitTests.i"
 	@echo "... ar/TagUnitTests.s"
-	@echo "... mapping/EnvMap.o"
-	@echo "... mapping/EnvMap.i"
-	@echo "... mapping/EnvMap.s"
 	@echo "... tests/Pathfinding/ObstacleMapTest.o"
 	@echo "... tests/Pathfinding/ObstacleMapTest.i"
 	@echo "... tests/Pathfinding/ObstacleMapTest.s"

@@ -18,10 +18,8 @@ class ObstacleMap{
 private:
     //sets all values in ObstacleMap to false
     void resetObstacleMap();
-    // rounds up/down based on direction being true/false, true = up, false = down
-    int transform(int val, bool direction);
-    // rounds given coordinates up/down to obstacle_map indices,
-    //sets four elements around given coordinates as blocked
+    // sets four elements around coordinates of point that have
+    //been truncated to x and y
     void modifyObstacleMap(int x, int y);
     //for getting robot position
     void getRobotPosition(float &robotX, float &robotY);//needs to use gps

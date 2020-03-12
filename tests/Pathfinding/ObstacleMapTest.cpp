@@ -9,10 +9,21 @@
 
 namespace Pathfinding
 {
-    //copied over from ObstacleMap
-    int transform(int val, bool direction)
+    void print(bool sol[21][21])
     {
-        return val + direction;
+        for (int i = 0; i < 21; i++)
+        {
+            for (int j = 0; j < 21; j++)
+            {
+                if(sol[i][j])
+                {
+                    std::cout << 1 << " ";
+                } else {
+                    std::cout << 0 << " ";
+                }
+            }
+            std::cout << std::endl;
+        }
     }
 
     void getMapObjSol(bool sol[21][21], std::vector<Point> vecOfPoints)
@@ -27,18 +38,17 @@ namespace Pathfinding
         std::cout << "looped falses" << std::endl;
         for (Point p : vecOfPoints)
         {
+            std::cout << p.x << " cast " << static_cast<int>(p.x) << std::endl;
             int x = static_cast<int>(p.x);
             int y = static_cast<int>(p.y);
-            // sol[transform(y, true)][transform(x, true)] = true;
-            // sol[transform(y, true)][transform(x, false)] = true;
-            // sol[transform(y, false)][transform(x, true)] = true;
-            // sol[transform(y, false)][transform(x, false)] = true;
-            std::cout << transform(y, true) + 11 << std::endl;
-            std::cout << transform(y, false) + 11 << std::endl;
-            std::cout << transform(x, true) + 11 << std::endl;
-            std::cout << transform(x, false) + 11 << std::endl;
+            assert(y + 11 < 21 && y + 11 >= 0);
+            sol[y + 1 + 10][x + 1 + 10] = true;
+            sol[y + 1 + 10][x + 10] = true;
+            sol[y + 10][x + 1 + 10] = true;
+            sol[y + 10][x + 10] = true;
             std::cout << "done with a point" << std::endl;
         }
+        std::cout << sol << std::endl;
     }
 
     bool boolMapsEquals(bool obstacle_map[21][21], bool sol[21][21])
@@ -49,7 +59,7 @@ namespace Pathfinding
             {
                 bool objMapVal = obstacle_map[i][j];
                 bool solVal = sol[i][j];
-                if (objMapVal != solVal)
+                if (objMapVal ^ solVal)
                 {
                     return false;
                 }
@@ -68,12 +78,14 @@ TEST_CASE("Pathfinding")
         Point { 3.0f, -3.0f }
     };
 
-
+    
     ObstacleMap objMap;
     objMap.update(vectorOfPoints);
     objMap.print();
+
     bool sol[21][21];
     std::cout << "created sol arr" << std::endl;
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
+    Pathfinding::print(sol);
     REQUIRE(Pathfinding::boolMapsEquals(objMap.obstacle_map, sol));
 }

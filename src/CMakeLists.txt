@@ -17,8 +17,7 @@ add_executable(Rover
         CommandLineOptions.cpp
         Globals.cpp
         Network.cpp
-	      Util.cpp
-        mapping/EnvMap.cpp)
+	      Util.cpp)
 
 add_executable(tests
   Tests.cpp

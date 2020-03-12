@@ -22,17 +22,6 @@ void ObstacleMap::resetObstacleMap()
     }
 }
 
-// rounds up/down based on direction being true/false
-// true = up, false = down
-int ObstacleMap::transform(int val, bool direction)
-{
-    if(direction)
-    {
-        return val + (int)(step_size - (val % step_size));
-    }
-    return val - (int)(val % step_size);
-}
-
 //rebuilds ObstacleMap with given Obstacles
 void ObstacleMap::update(std::vector<Point> obstacles)
 {
@@ -45,8 +34,8 @@ void ObstacleMap::update(std::vector<Point> obstacles)
         //filter which obstacles we want to plot
         if (obstacles[i].x <= (robotX + radius) && obstacles[i].x >= (robotX - radius) 
         && obstacles[i].y <= (robotX + radius) && obstacles[i].y >= (robotX - radius)) {
-            x = (int)(obstacles[i].x - robotX + radius/step_size);
-            y = (int)(obstacles[i].y - robotY + radius/step_size);
+            x = static_cast<int>(obstacles[i].x - robotX + radius/step_size);
+            y = static_cast<int>(obstacles[i].y - robotY + radius/step_size);
             modifyObstacleMap(x, y);
         }
     }
@@ -56,17 +45,17 @@ void ObstacleMap::update(std::vector<Point> obstacles)
 //sets four elements around given coordinates as blocked
 inline void ObstacleMap::modifyObstacleMap(int x, int y)
 {
-    if (transform(y, true) < size && transform(x, true) < size) {
-        obstacle_map[transform(y, true)][transform(x, true)] = true;
+    if (y + 1 < size && x + 1 < size) {
+        obstacle_map[y + 1][x + 1] = true;
     }
-    if (transform(y, true) < size && transform(x, false) < size) {
-        obstacle_map[transform(y, true)][transform(x, false)] = true;
+    if (y + 1 < size && x >= 0) {
+        obstacle_map[y + 1][x] = true;
     }
-    if (transform(y, false) < size && transform(x, true) < size) {
-        obstacle_map[transform(y, false)][transform(x, true)] = true;
+    if (y >= 0 && x + 1 < size) {
+        obstacle_map[y][x + 1] = true;
     }
-    if (transform(y, false) < size && transform(x, false) < size) {
-        obstacle_map[transform(y, false)][transform(x, false)] = true;
+    if (y >= 0 && x >= 0) {
+        obstacle_map[y][x] = true;
     }
 }
 
