@@ -1,17 +1,20 @@
 #include "Simulator.h"
 
-int main(void){
+using namespace cv;
+
+int main(void) {
     bool arr[21][21]; // replace with obstacle_map
     Simulator sim; 
     sim.drawMap(arr);
     sim.interpretCoordinates();
-    sim.drawPath(path); // get path from Pather2 to pass in
+    std::queue<Pather2::point> path;  // get path from Pather2 to pass in
+    sim.drawPath(path);
     sim.drawRobot();
-    imshow("Simulator", img);
+    imshow("Simulator", sim.img);
     int key = waitKey(0);
 };
 
-void Simulator::drawMap(bool obstacle_map[][21]){
+void Simulator::drawMap(bool obstacle_map[][21]) {
     
     for(int i; i < size; i++){
         for(int j; j < size; j++){
@@ -27,15 +30,15 @@ void Simulator::drawMap(bool obstacle_map[][21]){
     }
 };
 
-void Simulator::drawPath(std::queue<Pather2::point> path){
+void Simulator::drawPath(std::queue<Pather2::point, std::deque<Pather2::point, std::allocator<Pather2::point>>> path) {
     while(!path.empty()){ 
         Pather2::point start = path.front();
         path.pop();
         Pather2::point end = path.front();
         path.pop();
 
-        cv:Point startcv{start.x, start.y}; // may be incorrect syntax
-        cv:Point endcv{end.x, end.y};
+        cv::Point startcv{start.x * 21, start.y * 21}; // may be incorrect syntax
+        cv::Point endcv{end.x * 21, end.y * 21};
 
         line(img,
         startcv,
@@ -46,11 +49,11 @@ void Simulator::drawPath(std::queue<Pather2::point> path){
     }
 };
 
-void Simulator::interpretCoordinates(){
+void Simulator::interpretCoordinates() {
 
 };
 
-void drawRobot(){
+void Simulator::drawRobot() {
     int robotWidthHalf = 5;
     int robotHeightHalf = 10;
     rectangle(img,

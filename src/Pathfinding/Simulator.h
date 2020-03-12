@@ -28,8 +28,8 @@ class Simulator
     //draw robot on center of screen
     void drawRobot();
 
+    Mat img = Mat::zeros( w, w, CV_8UC3 );
+
     constexpr static int size = 21;
 
-    private:
-    Mat img = Mat::zeros( w, w, CV_8UC3 );
-};
+    };
