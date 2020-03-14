@@ -29,6 +29,7 @@ add_executable(Rover
   Networking/Network.cpp
   Networking/CANUtils.cpp
   Networking/ParseBaseStation.cpp
+  Networking/IK.cpp
   Util.cpp
   mapping/EnvMap.cpp
   Networking/ParseCAN.cpp
@@ -46,6 +47,7 @@ add_executable(RoverNoCAN
   Networking/Network.cpp
   Networking/CANStubs.cpp
   Networking/ParseBaseStation.cpp
+  Networking/IK.cpp
   Networking/log.cpp
   Util.cpp
   mapping/EnvMap.cpp
@@ -69,6 +71,8 @@ add_executable(tests
   CommandLineOptions.cpp
   Globals.cpp
   Networking/ParseCAN.cpp
+  Networking/ParseBaseStation.cpp
+  Networking/IK.cpp
   Networking/NetworkingStubs.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c

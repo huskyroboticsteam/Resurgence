@@ -1,10 +1,11 @@
 
 #include "Network.h"
 #include "../Globals.h"
-#include "json.hpp"
 #include "CANUtils.h"
 #include "ParseCAN.h"
 #include "log.h"
+#include "IK.h"
+#include "ParseBaseStation.h"
 #include <cmath>
 #include <tgmath.h>
 
@@ -17,11 +18,9 @@ extern "C"
 
 using nlohmann::json;
 
-// It's important that all of these arrays are sorted in the same order (the indices correspond)
+// It's important that all of these vectors are sorted in the same order (the indices correspond)
 std::map<std::string, std::vector<std::string>> possible_keys = {
 	{"motor", {"mode", "P", "I", "D", "PID target", "PWM target"}},
-        {"ik", {"wrist_base_target", "hand_orientation_target"}},
-        {"drive", {"forward_backward", "left_right"}}
 };
 std::vector<int> motor_packet_ids = {
   ID_MOTOR_UNIT_MODE_SEL,
@@ -35,9 +34,7 @@ std::vector<int> motor_packet_lengths = {
   2, 5, 5, 5, 5, 5
 };
 
-bool ParseMotorPacket(json &message);
 bool SendCANPacketToMotor(json &message, int key_idx, uint16_t CAN_ID);
-bool ParseIKPacket(json &message);
 bool ParseDrivePacket(json &message);
 
 int getIndex(const std::vector<std::string> &arr, std::string &value)
@@ -56,6 +53,7 @@ bool sendError(std::string const &msg)
   error_message["status"] = "error";
   error_message["msg"] = msg;
   sendBaseStationPacket(error_message.dump());
+  log(LOG_ERROR, error_message.dump());
   return false;
 }
 
@@ -97,62 +95,6 @@ bool ParseBaseStationPacket(char const* buffer)
     sendBaseStationPacket(response.dump());
   }
   return success;
-}
-
-bool ParseIKPacket(json &message) {
-  double ELBOW_LENGTH = Constants::ELBOW_LENGTH;
-  double SHOULDER_LENGTH = Constants::SHOULDER_LENGTH;
-  for (int key_idx = 0; key_idx < possible_keys["ik"].size(); key_idx++) {
-    std::string key = possible_keys["ik"][key_idx];
-    if (message[key] != nullptr) {
-      if (message[key] == "wrist_base_target") {
-        double x = message[key][0];
-        double y = message[key][1];
-        double z = message[key][2];
-        double base_angle = atan(y/x); //TODO Check with electronics
-        json base_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_BASE"}, {"mode", "PID"}, {"PID target", base_angle}};
-
-        if (!ParseMotorPacket(base_packet))
-        {
-          return false;
-        }
-
-        double forward = sqrt(x*x + y*y);
-        double height = z;
-
-        double crossSection = sqrt(height*height + forward*forward);
-        double shoulderAngle = 0;
-        double shoulderAngleA = atan(height/forward);
-        double elbowAngle = acos((crossSection*crossSection
-          - ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
-          /(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
-              double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
-        if (forward == 0)
-        {
-          shoulderAngle = M_PI/2 - shoulderAngleB;
-        }
-        else
-        {
-          shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
-        }
-        json elbow_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_ELBOW"}, {"mode", "PID"}, {"PID target", elbowAngle}};	
-        json shoulder_packet = {{"type", "motor"}, {"motor", "DEVICE_SERIAL_MOTOR_SHOULDER"}, {"mode", "PID"}, {"PID target", shoulderAngle}};
-        if (!ParseMotorPacket(elbow_packet))
-        {
-          return false;
-        }
-        if (!ParseMotorPacket(shoulder_packet))
-        {
-          return false;
-        }
-      }
-
-      //TODO Add functionality for other key.
-
-    }
-  }
-
-  return true;
 }
 
 bool ParseMotorPacket(json &message)

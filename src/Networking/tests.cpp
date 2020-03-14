@@ -1,11 +1,13 @@
 #include "../Globals.h"
 #include "ParseCAN.h"
-#include "ParseBaseStation.cpp"
+#include "ParseBaseStation.h"
 #include "TestPackets.h"
 #include "NetworkingStubs.h"
+#include "IK.h"
 extern "C"
 {
     #include "../HindsightCAN/Port.h"
+    #include "../HindsightCAN/CANMotorUnit.h"
 }
 #include <catch2/catch.hpp>
 #include <iostream>
@@ -107,4 +109,25 @@ TEST_CASE("Can handle malformed drive packets", "[BaseStation]")
 {
     char const *msg = "{\"type\":\"drive\",\"forward_backward\":2.9}";
     REQUIRE(ParseBaseStationPacket(msg) == false);
+}
+
+void assert_IK_equals(double base, double shoulder, double elbow)
+{
+    CANPacket p;
+    p = popCANPacket();
+    int base_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
+    REQUIRE(intToRad(base_val, 0, 0) == Approx(base));
+    p = popCANPacket();
+    int shoulder_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
+    REQUIRE(intToRad(shoulder_val, 0, 0) == Approx(shoulder));
+    p = popCANPacket();
+    int elbow_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
+    REQUIRE(intToRad(elbow_val, 0, 0) == Approx(elbow));
+}
+
+TEST_CASE("Can handle IK packets", "[BaseStation]")
+{
+    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[1.3, 0.0, 0.0]}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    assert_IK_equals(0., 0., 0.);
 }
