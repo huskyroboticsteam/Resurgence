@@ -21,55 +21,65 @@ double intToRad(int32_t i, int32_t offset, int32_t sign_flip)
 bool ParseIKPacket(json &message) {
   double ELBOW_LENGTH = Constants::ELBOW_LENGTH;
   double SHOULDER_LENGTH = Constants::SHOULDER_LENGTH;
-  json target = message["wrist_base_target"];
-  double x = target[0];
-  double y = target[1];
-  double z = target[2];
-  double base_angle = atan2(x, y);
-  json base_packet = {{"type", "motor"},
-                      {"motor", "arm_base"},
-                      {"mode", "PID"},
-                      {"PID target", radToInt(base_angle, 0, 1)}}; // TODO offset, flip
+  if (message["wrist_base_target"] != nullptr)
+  {
+    json target = message["wrist_base_target"];
+    double x, y, z;
+    try {
+      x = target[0];
+      y = target[1];
+      z = target[2];
+    }
+    catch (json::type_error)
+    {
+      return sendError("Could not parse wrist_base_target");
+    }
+    double base_angle = atan2(y, x);
+    json base_packet = {{"type", "motor"},
+                        {"motor", "arm_base"},
+                        {"mode", "PID"},
+                        {"PID target", radToInt(base_angle, 0, 1)}}; // TODO offset, flip
 
-  if (!ParseMotorPacket(base_packet))
-  {
-    return false;
+    if (!ParseMotorPacket(base_packet))
+    {
+      return false;
+    }
+
+    double forward = sqrt(x*x + y*y);
+    double height = z;
+
+    double crossSection = sqrt(height*height + forward*forward);
+    double shoulderAngleA = atan2(height, forward);
+    double cosElbowAngle = (crossSection*crossSection
+      - ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
+      /(-2*SHOULDER_LENGTH*ELBOW_LENGTH);
+    if (abs(cosElbowAngle) > 1.0)
+    {
+      return sendError("Infeasible IK target");
+    }
+    double elbowInsideAngle = acos(cosElbowAngle);
+    double shoulderAngleB = asin(sin(elbowInsideAngle)*ELBOW_LENGTH/crossSection);
+    double shoulderAngle = shoulderAngleA + shoulderAngleB;
+    double elbowAngle = M_PI - elbowInsideAngle;
+
+    json elbow_packet = {{"type", "motor"},
+                         {"motor", "elbow"},
+                         {"mode", "PID"},
+                         {"PID target", radToInt(elbowAngle, PI_AS_INT, 1)}};
+    json shoulder_packet = {{"type", "motor"},
+                            {"motor", "shoulder"},
+                            {"mode", "PID"},
+                            {"PID target", radToInt(shoulderAngle, PI_AS_INT, 1)}};
+    if (!ParseMotorPacket(elbow_packet))
+    {
+      return false;
+    }
+    if (!ParseMotorPacket(shoulder_packet))
+    {
+      return false;
+    }
   }
 
-  double forward = sqrt(x*x + y*y);
-  double height = z;
-
-  double crossSection = sqrt(height*height + forward*forward);
-  double shoulderAngle = 0;
-  double shoulderAngleA = atan(height/forward);
-  double elbowAngle = acos((crossSection*crossSection
-    - ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
-    /(-2*SHOULDER_LENGTH*ELBOW_LENGTH));
-        double shoulderAngleB = asin(sin(elbowAngle)*ELBOW_LENGTH/crossSection);
-  if (forward == 0)
-  {
-    shoulderAngle = M_PI/2 - shoulderAngleB;
-  }
-  else
-  {
-    shoulderAngle = M_PI - (shoulderAngleA + shoulderAngleB);
-  }
-  json elbow_packet = {{"type", "motor"},
-                       {"motor", "elbow"},
-                       {"mode", "PID"},
-                       {"PID target", radToInt(elbowAngle, PI_AS_INT, 1)}};
-  json shoulder_packet = {{"type", "motor"},
-                          {"motor", "shoulder"},
-                          {"mode", "PID"},
-                          {"PID target", radToInt(shoulderAngle, PI_AS_INT, 1)}};
-  if (!ParseMotorPacket(elbow_packet))
-  {
-    return false;
-  }
-  if (!ParseMotorPacket(shoulder_packet))
-  {
-    return false;
-  }
   // TODO add functionality for "hand_orientation_target"
   return true;
 }

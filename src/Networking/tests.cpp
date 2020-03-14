@@ -127,7 +127,29 @@ void assert_IK_equals(double base, double shoulder, double elbow)
 
 TEST_CASE("Can handle IK packets", "[BaseStation]")
 {
+    clearPackets();
     char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[1.3, 0.0, 0.0]}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
     assert_IK_equals(0., 0., 0.);
 }
+
+TEST_CASE("Can handle degenerate IK packets", "[BaseStation]")
+{
+    char const *msg = "{\"type\":\"ik\"}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    msg = "{\"type\":\"ik\",\"wrist_base_target\":\"asdf\"}";
+    REQUIRE(ParseBaseStationPacket(msg) == false);
+}
+
+TEST_CASE("Reports error if IK target is infeasible", "[BaseStation]")
+{
+    clearPackets();
+    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[100.0, 0.0, 0.0]}";
+    REQUIRE(ParseBaseStationPacket(msg) == false);
+    json m = json::parse(popBaseStationPacket());
+    REQUIRE(m["msg"] == "Infeasible IK target");
+}
+
+// joint limits
+// targets below the ground plane
+// targets behind the vertical
