@@ -35,12 +35,20 @@ bool ParseIKPacket(json &message) {
       return sendError("Could not parse wrist_base_target");
     }
     double baseAngle = atan2(y, x);
+    double forward = sqrt(x*x + y*y);
+    double height = z;
+    if (baseAngle > M_PI/2)
+    {
+      baseAngle -= M_PI;
+      forward *= -1.0;
+    } else if (baseAngle < -M_PI/2) {
+      baseAngle += M_PI;
+      forward *= -1.0;
+    }
+
     if (baseAngle > Constants::ARM_BASE_MAX || baseAngle < Constants::ARM_BASE_MIN) {
       return sendError("IK solution outside joint limits for arm base");
     }
-
-    double forward = sqrt(x*x + y*y);
-    double height = z;
 
     double crossSection = sqrt(height*height + forward*forward);
     double shoulderAngleA = atan2(height, forward);

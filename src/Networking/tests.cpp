@@ -154,13 +154,13 @@ TEST_CASE("Can reach targets below the ground plane", "[BaseStation]")
 // Not sure if we actually need the rover to do this during the competition,
 // but it doesn't hurt to be prepared.
 // This also helps make sure the robot doesn't go too crazy near the vertical pole?
-//TEST_CASE("Can reach some targets behind the vertical", "[BaseStation]")
-//{
- //   clearPackets();
-  //  char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[-0.1, 0.0, 1.2]}";
-   // REQUIRE(ParseBaseStationPacket(msg) == true);
-    //assert_IK_equals(0., M_PI/2, 0.);
-//}
+TEST_CASE("Can reach some targets behind the vertical", "[BaseStation]")
+{
+    clearPackets();
+    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[-0.1, 0.0, 1.26]}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    assert_IK_equals(0., 1.905204, 0.473425);
+}
 
 TEST_CASE("Can handle degenerate IK packets", "[BaseStation]")
 {
@@ -185,6 +185,6 @@ TEST_CASE("Respects joint limits", "[BaseStation]")
     char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[-1.0, 0.0, 0.0]}";
     REQUIRE(ParseBaseStationPacket(msg) == false);
     json m = json::parse(popBaseStationPacket());
-    REQUIRE(m["msg"] == "IK solution outside joint limits for arm base");
+    REQUIRE(m["msg"] == "IK solution outside joint limits for shoulder");
 }
 
