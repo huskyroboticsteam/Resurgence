@@ -111,27 +111,56 @@ TEST_CASE("Can handle malformed drive packets", "[BaseStation]")
     REQUIRE(ParseBaseStationPacket(msg) == false);
 }
 
+CANPacket popPIDPkt()
+{
+  CANPacket p;
+  while (!PacketIsOfID(&p, ID_MOTOR_UNIT_PID_POS_TGT_SET))
+    p = popCANPacket();
+  return p;
+}
+
 void assert_IK_equals(double base, double shoulder, double elbow)
 {
     CANPacket p;
-    p = popCANPacket();
+    p = popPIDPkt();
     int base_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(base_val, 0, 0) == Approx(base));
-    p = popCANPacket();
+    REQUIRE(intToRad(base_val, 0, 1) == Approx(base));
+
+    p = popPIDPkt();
     int shoulder_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(shoulder_val, 0, 0) == Approx(shoulder));
-    p = popCANPacket();
+    REQUIRE(intToRad(shoulder_val, 0, 1) == Approx(shoulder));
+
+    p = popPIDPkt();
     int elbow_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(elbow_val, 0, 0) == Approx(elbow));
+    REQUIRE(intToRad(elbow_val, 0, 1) == Approx(elbow));
 }
 
 TEST_CASE("Can handle IK packets", "[BaseStation]")
 {
     clearPackets();
-    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[1.3, 0.0, 0.0]}";
+    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[1.2, 0.0, 0.0]}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
-    assert_IK_equals(0., 0., 0.);
+    assert_IK_equals(0., 0.428172, 0.792013);
 }
+
+TEST_CASE("Can reach targets below the ground plane", "[BaseStation]")
+{
+    clearPackets();
+    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[0.6, 0.8, -0.2]}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    assert_IK_equals(0.927291, 0.534880, 1.342617);
+}
+
+// Not sure if we actually need the rover to do this during the competition,
+// but it doesn't hurt to be prepared.
+// This also helps make sure the robot doesn't go too crazy near the vertical pole?
+//TEST_CASE("Can reach some targets behind the vertical", "[BaseStation]")
+//{
+ //   clearPackets();
+  //  char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[-0.1, 0.0, 1.2]}";
+   // REQUIRE(ParseBaseStationPacket(msg) == true);
+    //assert_IK_equals(0., M_PI/2, 0.);
+//}
 
 TEST_CASE("Can handle degenerate IK packets", "[BaseStation]")
 {
@@ -150,6 +179,12 @@ TEST_CASE("Reports error if IK target is infeasible", "[BaseStation]")
     REQUIRE(m["msg"] == "Infeasible IK target");
 }
 
-// joint limits
-// targets below the ground plane
-// targets behind the vertical
+TEST_CASE("Respects joint limits", "[BaseStation]")
+{
+    clearPackets();
+    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[-1.0, 0.0, 0.0]}";
+    REQUIRE(ParseBaseStationPacket(msg) == false);
+    json m = json::parse(popBaseStationPacket());
+    REQUIRE(m["msg"] == "IK solution outside joint limits for arm base");
+}
+
