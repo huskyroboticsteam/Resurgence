@@ -30,12 +30,16 @@ void ObstacleMap::update(std::vector<Point> obstacles)
     getRobotPosition(robotX, robotY);
     resetObstacleMap();
     int x, y;
-    for (int i = 0; i < obstacles.size(); i++) {
+    float px, py;
+    for (Point p : obstacles) {
+        px = p.x;
+        py = p.y;
         //filter which obstacles we want to plot
-        if (obstacles[i].x <= (robotX + radius) && obstacles[i].x >= (robotX - radius) 
-        && obstacles[i].y <= (robotX + radius) && obstacles[i].y >= (robotX - radius)) {
-            x = static_cast<int>(obstacles[i].x - robotX + radius/step_size);
-            y = static_cast<int>(obstacles[i].y - robotY + radius/step_size);
+        // check vector.back()
+        if (px <= (robotX + radius) && px >= (robotX - radius) 
+        && py <= (robotY + radius) && py >= (robotY - radius)) {
+            x = static_cast<int>(px - robotX) + radius;
+            y = static_cast<int>(py - robotY) + radius;
             modifyObstacleMap(x, y);
         }
     }

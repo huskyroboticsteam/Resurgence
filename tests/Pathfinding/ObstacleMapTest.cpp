@@ -38,7 +38,7 @@ namespace Pathfinding
         std::cout << "looped falses" << std::endl;
         for (Point p : vecOfPoints)
         {
-            std::cout << p.x << " cast " << static_cast<int>(p.x) << std::endl;
+            std::cout << p.y << " cast " << static_cast<int>(p.y) << std::endl;
             int x = static_cast<int>(p.x);
             int y = static_cast<int>(p.y);
             assert(y + 11 < 21 && y + 11 >= 0);
@@ -59,7 +59,7 @@ namespace Pathfinding
             {
                 bool objMapVal = obstacle_map[i][j];
                 bool solVal = sol[i][j];
-                if (objMapVal ^ solVal)
+                if (objMapVal != solVal)
                 {
                     return false;
                 }
@@ -72,16 +72,19 @@ namespace Pathfinding
 TEST_CASE("Pathfinding")
 {
     std::vector<Point> vectorOfPoints = {
-        Point { 2.0f, 2.0f },
-        Point { -2.0f, -2.0f },
-        Point { -3.0f, 3.0f },
-        Point { 3.0f, -3.0f }
+        Point{2.0f, 2.0f},
+        Point{-2.0f, -2.0f},
+        Point{-3.0f, 3.0f},
+        Point{3.0f, -3.0f},
+        Point{5.0f, -5.0f}
     };
 
-    
+    // assert(vectorOfPoints[4].y == -5.0f);
     ObstacleMap objMap;
     objMap.update(vectorOfPoints);
     objMap.print();
+    // assert(vectorOfPoints[4].y == -5.0f);
+    std::cout << vectorOfPoints.back().y << std::endl;
 
     bool sol[21][21];
     std::cout << "created sol arr" << std::endl;
