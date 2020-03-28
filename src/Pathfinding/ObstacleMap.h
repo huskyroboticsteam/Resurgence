@@ -36,7 +36,7 @@ public:
     // call update() before for accurate map
     bool obstacle_map[size][size];
     //rebuilds ObstacleMap with given Obstacles
-    void update(std::vector<Point> obstacles);
+    void update(std::vector<Point>& obstacles);
     //for testing purposes only, prints a visual representation of ObstacleMap,
     //1 = obstacle, 0 = empty
     void print();

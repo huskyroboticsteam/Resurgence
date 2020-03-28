@@ -23,17 +23,22 @@ void ObstacleMap::resetObstacleMap()
 }
 
 //rebuilds ObstacleMap with given Obstacles
-void ObstacleMap::update(std::vector<Point> obstacles)
+void ObstacleMap::update(std::vector<Point>& obstacles)
 {
+    std::cout << "back y " << obstacles.back().y << std::endl;
     float robotX = 0.0f;
     float robotY = 0.0f;
     getRobotPosition(robotX, robotY);
     resetObstacleMap();
     int x, y;
     float px, py;
+    // for (int i = 0; i < obstacles.size(); i++)
     for (Point p : obstacles) {
         px = p.x;
         py = p.y;
+        std::cout <<"update py= " << py << std::endl;
+        std::cout <<"update p.y= " << p.y << std::endl;
+
         //filter which obstacles we want to plot
         // check vector.back()
         if (px <= (robotX + radius) && px >= (robotX - radius) 

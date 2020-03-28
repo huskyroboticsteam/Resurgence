@@ -76,19 +76,24 @@ TEST_CASE("Pathfinding")
         Point{-2.0f, -2.0f},
         Point{-3.0f, 3.0f},
         Point{3.0f, -3.0f},
-        Point{5.0f, -5.0f}
+        Point{5.0f, -5.0f},
+        Point{1.0f, 1.0f}
     };
+    std::cout << vectorOfPoints.back().y << std::endl;
+
 
     // assert(vectorOfPoints[4].y == -5.0f);
     ObstacleMap objMap;
+    std::cout << "before update " << vectorOfPoints.back().y << std::endl;
+
     objMap.update(vectorOfPoints);
-    objMap.print();
+    // objMap.print();
     // assert(vectorOfPoints[4].y == -5.0f);
     std::cout << vectorOfPoints.back().y << std::endl;
 
     bool sol[21][21];
     std::cout << "created sol arr" << std::endl;
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
-    Pathfinding::print(sol);
+    // Pathfinding::print(sol);
     REQUIRE(Pathfinding::boolMapsEquals(objMap.obstacle_map, sol));
 }
