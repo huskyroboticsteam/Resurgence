@@ -15,5 +15,9 @@ TEST_CASE("full autonomous", "[autonomous]")
     fm->addObstacle(PointXY{2, 2}, PointXY{2, -2});
     autonomous.setWorldData(fm);
     REQUIRE(fm->lidarSees() == false);
-    fm->callAutonomous();
+    std::future<void> future = std::async(std::launch::async, [&]() {
+        fm->callAutonomous();
+    });
+    std::future_status status = future.wait_for(std::chrono::seconds(10));
+    REQUIRE(status == std::future_status::ready);
 }
