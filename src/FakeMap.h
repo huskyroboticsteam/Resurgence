@@ -35,6 +35,7 @@ private:
     PointXY robotPos;
     std::vector<std::pair<PointXY, PointXY>> obstacles;
     PointXY target;
+    int steps;
     //Margin of error
     float margin;
 };

@@ -22,7 +22,7 @@ private:
     PointXY target;
     float targetHeading;
     int state;         //1 is move forwards, 0 is turning, -1 is back up
-    int turnDirection; //0 is turn towards target, 1 turn right, -1 turn left
+    int turnCounter; //0 is turn towards target, else, keep turning right
     bool rightTurn;
     int forwardCount; //Counter for how many times to move forwards after a set turn
     std::shared_ptr<WorldData> worldData;

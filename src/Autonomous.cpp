@@ -7,7 +7,7 @@ Autonomous::Autonomous(PointXY _target) : target(_target)
 {
     state = 0;
     targetHeading = -1;
-    turnDirection = 0;
+    turnCounter = 0;
     forwardCount = -1;
     rightTurn = 1;
 }
@@ -51,6 +51,7 @@ Autonomous::stateForwards(float currHeading,
         else
         { //moved forwards for a set number of times, now turn
             forwardCount = -1;
+            turnCounter = 0;
             return stateTurn(currHeading, directions);
         }
     }
@@ -69,17 +70,11 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
     }
     else
     { // find heading to turn to
-        if (turnDirection != 0)
+        if (turnCounter > 0 || forwardCount > 0)
         {
-            if (turnDirection == 1)
-            { // turn right
-                targetHeading = currHeading + 90;
-            }
-            else if (turnDirection == -1)
-            { // turn left
-                targetHeading = currHeading - 90;
-            }
-            turnDirection = 0;
+            // turn right
+            targetHeading = currHeading + 45;
+            
             forwardCount = 5;
         }
         else
@@ -89,14 +84,7 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
             float y = target.y - robotPos.y;
             targetHeading = atan2f(y, x) * (180 / PI);
             targetHeading = 360 - targetHeading + 90;
-            if (turnDirection == 1)
-            {
-                turnDirection = -1;
-            }
-            else
-            {
-                turnDirection = 1;
-            }
+            turnCounter = 1;
         }
         if (targetHeading > 360)
         {

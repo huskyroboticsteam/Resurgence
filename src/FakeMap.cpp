@@ -9,8 +9,7 @@ FakeMap::FakeMap(Autonomous &autonomous_) : autonomous(autonomous_)
     robotPos.y = 0;
     heading = 0;
     margin = pow(10, -5);
-
-    
+    steps = 0;
     target = autonomous.getTarget();
 }
 
@@ -28,17 +27,20 @@ void FakeMap::callAutonomous()
         std::cout << "x: " << robotPos.x << std::endl;
         std::cout << "y: " << robotPos.y << std::endl;
         std::cout << "heading: " << heading << std::endl;
+        steps ++;
     } //target is nearby, move once more
     std::pair<float, float> directions = autonomous.getDirections(getHeading());
     update(directions);
+    steps ++;
     std::cout << "x: " << robotPos.x << std::endl;
     std::cout << "y: " << robotPos.y << std::endl;
     std::cout << "heading: " << heading << std::endl;
+    std::cout << "steps: " << steps << std::endl;
 }
 
 bool FakeMap::lidarSees()
 {
-    bool isObs = true;
+    bool isObs = false;
     //find the point that is 1 unit in front of robot pos.
     float inFrontX = sin(heading * (PI / 180)) + robotPos.x;
     float inFrontY = cos(heading * (PI / 180)) + robotPos.y;
