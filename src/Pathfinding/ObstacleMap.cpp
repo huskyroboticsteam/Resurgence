@@ -41,12 +41,20 @@ void ObstacleMap::update(std::vector<Point>& obstacles)
 
         //filter which obstacles we want to plot
         // check vector.back()
-        if (px <= (robotX + radius) && px >= (robotX - radius) 
-        && py <= (robotY + radius) && py >= (robotY - radius)) {
-            x = static_cast<int>(px - robotX) + radius;
-            y = static_cast<int>(py - robotY) + radius;
-            modifyObstacleMap(x, y);
+        x = static_cast<int>(px - robotX) + radius;
+        y = static_cast<int>(py - robotY) + radius;
+        if (x >= 0 && x < size && y >= 0 && y < 21)
+        {
+            modifyObstacleMap(x,y);
         }
+
+
+        // if (px <= (robotX + radius) && px >= (robotX - radius) 
+        // && py <= (robotY + radius) && py >= (robotY - radius)) {
+        //     x = static_cast<int>(px - robotX) + radius;
+        //     y = static_cast<int>(py - robotY) + radius;
+        //     modifyObstacleMap(x, y);
+        // }
     }
 }
 

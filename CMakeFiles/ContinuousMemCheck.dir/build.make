@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/assafvayner/robotics/PY2020/src
+CMAKE_SOURCE_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/assafvayner/robotics/PY2020
+CMAKE_BINARY_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020
 
 # Utility rule file for ContinuousMemCheck.
 
@@ -71,6 +71,6 @@ CMakeFiles/ContinuousMemCheck.dir/clean:
 .PHONY : CMakeFiles/ContinuousMemCheck.dir/clean
 
 CMakeFiles/ContinuousMemCheck.dir/depend:
-	cd /home/assafvayner/robotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ContinuousMemCheck.dir/depend
 

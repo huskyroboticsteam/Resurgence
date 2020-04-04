@@ -4,8 +4,8 @@
 
 
 # Configuration directories and files
-SourceDirectory: /home/assafvayner/robotics/PY2020/src
-BuildDirectory: /home/assafvayner/robotics/PY2020
+SourceDirectory: /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src
+BuildDirectory: /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020
 
 # Where to place the cost data store
 CostDataFile: 
@@ -36,7 +36,7 @@ ScpCommand: /usr/bin/scp
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/usr/bin/cmake" "/home/assafvayner/robotics/PY2020/src"
+ConfigureCommand: "/usr/bin/cmake" "/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src"
 MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 

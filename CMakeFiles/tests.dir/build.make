@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/assafvayner/robotics/PY2020/src
+CMAKE_SOURCE_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/assafvayner/robotics/PY2020
+CMAKE_BINARY_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020
 
 # Include any dependencies generated for this target.
 include CMakeFiles/tests.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/tests.dir/flags.make
 
 CMakeFiles/tests.dir/Tests.cpp.o: CMakeFiles/tests.dir/flags.make
 CMakeFiles/tests.dir/Tests.cpp.o: src/Tests.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/tests.dir/Tests.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/Tests.cpp.o -c /home/assafvayner/robotics/PY2020/src/Tests.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/tests.dir/Tests.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/Tests.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Tests.cpp
 
 CMakeFiles/tests.dir/Tests.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/tests.dir/Tests.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/Tests.cpp > CMakeFiles/tests.dir/Tests.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Tests.cpp > CMakeFiles/tests.dir/Tests.cpp.i
 
 CMakeFiles/tests.dir/Tests.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/tests.dir/Tests.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/Tests.cpp -o CMakeFiles/tests.dir/Tests.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Tests.cpp -o CMakeFiles/tests.dir/Tests.cpp.s
 
 CMakeFiles/tests.dir/Tests.cpp.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/tests.dir/Tests.cpp.o.provides.build: CMakeFiles/tests.dir/Tests.cpp.
 
 CMakeFiles/tests.dir/Util.cpp.o: CMakeFiles/tests.dir/flags.make
 CMakeFiles/tests.dir/Util.cpp.o: src/Util.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/tests.dir/Util.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/Util.cpp.o -c /home/assafvayner/robotics/PY2020/src/Util.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/tests.dir/Util.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/Util.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Util.cpp
 
 CMakeFiles/tests.dir/Util.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/tests.dir/Util.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/Util.cpp > CMakeFiles/tests.dir/Util.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Util.cpp > CMakeFiles/tests.dir/Util.cpp.i
 
 CMakeFiles/tests.dir/Util.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/tests.dir/Util.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/Util.cpp -o CMakeFiles/tests.dir/Util.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Util.cpp -o CMakeFiles/tests.dir/Util.cpp.s
 
 CMakeFiles/tests.dir/Util.cpp.o.requires:
 
@@ -107,16 +107,16 @@ CMakeFiles/tests.dir/Util.cpp.o.provides.build: CMakeFiles/tests.dir/Util.cpp.o
 
 CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o: CMakeFiles/tests.dir/flags.make
 CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o: src/ar/TagUnitTests.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o -c /home/assafvayner/robotics/PY2020/src/ar/TagUnitTests.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/ar/TagUnitTests.cpp
 
 CMakeFiles/tests.dir/ar/TagUnitTests.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/tests.dir/ar/TagUnitTests.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/ar/TagUnitTests.cpp > CMakeFiles/tests.dir/ar/TagUnitTests.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/ar/TagUnitTests.cpp > CMakeFiles/tests.dir/ar/TagUnitTests.cpp.i
 
 CMakeFiles/tests.dir/ar/TagUnitTests.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/tests.dir/ar/TagUnitTests.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/ar/TagUnitTests.cpp -o CMakeFiles/tests.dir/ar/TagUnitTests.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/ar/TagUnitTests.cpp -o CMakeFiles/tests.dir/ar/TagUnitTests.cpp.s
 
 CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o.requires:
 
@@ -131,16 +131,16 @@ CMakeFiles/tests.dir/ar/TagUnitTests.cpp.o.provides.build: CMakeFiles/tests.dir/
 
 CMakeFiles/tests.dir/ar/Tag.cpp.o: CMakeFiles/tests.dir/flags.make
 CMakeFiles/tests.dir/ar/Tag.cpp.o: src/ar/Tag.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/tests.dir/ar/Tag.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/ar/Tag.cpp.o -c /home/assafvayner/robotics/PY2020/src/ar/Tag.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/tests.dir/ar/Tag.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/ar/Tag.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/ar/Tag.cpp
 
 CMakeFiles/tests.dir/ar/Tag.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/tests.dir/ar/Tag.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/ar/Tag.cpp > CMakeFiles/tests.dir/ar/Tag.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/ar/Tag.cpp > CMakeFiles/tests.dir/ar/Tag.cpp.i
 
 CMakeFiles/tests.dir/ar/Tag.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/tests.dir/ar/Tag.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/ar/Tag.cpp -o CMakeFiles/tests.dir/ar/Tag.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/ar/Tag.cpp -o CMakeFiles/tests.dir/ar/Tag.cpp.s
 
 CMakeFiles/tests.dir/ar/Tag.cpp.o.requires:
 
@@ -155,16 +155,16 @@ CMakeFiles/tests.dir/ar/Tag.cpp.o.provides.build: CMakeFiles/tests.dir/ar/Tag.cp
 
 CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o: CMakeFiles/tests.dir/flags.make
 CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o: src/Pathfinding/ObstacleMap.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o -c /home/assafvayner/robotics/PY2020/src/Pathfinding/ObstacleMap.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Pathfinding/ObstacleMap.cpp
 
 CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/Pathfinding/ObstacleMap.cpp > CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Pathfinding/ObstacleMap.cpp > CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.i
 
 CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/Pathfinding/ObstacleMap.cpp -o CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Pathfinding/ObstacleMap.cpp -o CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.s
 
 CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o.requires:
 
@@ -179,16 +179,16 @@ CMakeFiles/tests.dir/Pathfinding/ObstacleMap.cpp.o.provides.build: CMakeFiles/te
 
 CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.o: CMakeFiles/tests.dir/flags.make
 CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.o: tests/Pathfinding/ObstacleMapTest.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.o -c /home/assafvayner/robotics/PY2020/tests/Pathfinding/ObstacleMapTest.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/tests/Pathfinding/ObstacleMapTest.cpp
 
 CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/tests/Pathfinding/ObstacleMapTest.cpp > CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/tests/Pathfinding/ObstacleMapTest.cpp > CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.i
 
 CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/tests/Pathfinding/ObstacleMapTest.cpp -o CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/tests/Pathfinding/ObstacleMapTest.cpp -o CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.s
 
 CMakeFiles/tests.dir/tests/Pathfinding/ObstacleMapTest.cpp.o.requires:
 
@@ -238,9 +238,9 @@ tests: /usr/local/lib/libopencv_imgcodecs.so.3.4.7
 tests: /usr/local/lib/libopencv_imgproc.so.3.4.7
 tests: /usr/local/lib/libopencv_core.so.3.4.7
 tests: CMakeFiles/tests.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable tests"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable tests"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/tests.dir/link.txt --verbose=$(VERBOSE)
-	/usr/bin/cmake -D TEST_TARGET=tests -D TEST_EXECUTABLE=/home/assafvayner/robotics/PY2020/tests -D TEST_EXECUTOR= -D TEST_WORKING_DIR=/home/assafvayner/robotics/PY2020 -D TEST_SPEC= -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_LIST=tests_TESTS -D CTEST_FILE=/home/assafvayner/robotics/PY2020/tests_tests-b858cb2.cmake -P /usr/local/lib/cmake/Catch2/CatchAddTests.cmake
+	/usr/bin/cmake -D TEST_TARGET=tests -D TEST_EXECUTABLE=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/tests -D TEST_EXECUTOR= -D TEST_WORKING_DIR=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 -D TEST_SPEC= -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_LIST=tests_TESTS -D CTEST_FILE=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/tests_tests-b858cb2.cmake -P /usr/local/lib/cmake/Catch2/CatchAddTests.cmake
 
 # Rule to build all files generated by this target.
 CMakeFiles/tests.dir/build: tests
@@ -261,6 +261,6 @@ CMakeFiles/tests.dir/clean:
 .PHONY : CMakeFiles/tests.dir/clean
 
 CMakeFiles/tests.dir/depend:
-	cd /home/assafvayner/robotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tests.dir/depend
 

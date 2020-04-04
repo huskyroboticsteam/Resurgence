@@ -79,8 +79,6 @@ TEST_CASE("Pathfinding")
         Point{5.0f, -5.0f},
         Point{1.0f, 1.0f}
     };
-    std::cout << vectorOfPoints.back().y << std::endl;
-
 
     // assert(vectorOfPoints[4].y == -5.0f);
     ObstacleMap objMap;
@@ -89,7 +87,7 @@ TEST_CASE("Pathfinding")
     objMap.update(vectorOfPoints);
     // objMap.print();
     // assert(vectorOfPoints[4].y == -5.0f);
-    std::cout << vectorOfPoints.back().y << std::endl;
+    std::cout << "after update " << vectorOfPoints.back().y << std::endl;
 
     bool sol[21][21];
     std::cout << "created sol arr" << std::endl;

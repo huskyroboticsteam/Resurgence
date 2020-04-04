@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/assafvayner/robotics/PY2020/src
+CMAKE_SOURCE_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/assafvayner/robotics/PY2020
+CMAKE_BINARY_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Rover.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/Rover.dir/flags.make
 
 CMakeFiles/Rover.dir/Rover.cpp.o: CMakeFiles/Rover.dir/flags.make
 CMakeFiles/Rover.dir/Rover.cpp.o: src/Rover.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Rover.dir/Rover.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Rover.cpp.o -c /home/assafvayner/robotics/PY2020/src/Rover.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Rover.dir/Rover.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Rover.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Rover.cpp
 
 CMakeFiles/Rover.dir/Rover.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Rover.dir/Rover.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/Rover.cpp > CMakeFiles/Rover.dir/Rover.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Rover.cpp > CMakeFiles/Rover.dir/Rover.cpp.i
 
 CMakeFiles/Rover.dir/Rover.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Rover.dir/Rover.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/Rover.cpp -o CMakeFiles/Rover.dir/Rover.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Rover.cpp -o CMakeFiles/Rover.dir/Rover.cpp.s
 
 CMakeFiles/Rover.dir/Rover.cpp.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/Rover.dir/Rover.cpp.o.provides.build: CMakeFiles/Rover.dir/Rover.cpp.
 
 CMakeFiles/Rover.dir/CommandLineOptions.cpp.o: CMakeFiles/Rover.dir/flags.make
 CMakeFiles/Rover.dir/CommandLineOptions.cpp.o: src/CommandLineOptions.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Rover.dir/CommandLineOptions.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/CommandLineOptions.cpp.o -c /home/assafvayner/robotics/PY2020/src/CommandLineOptions.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Rover.dir/CommandLineOptions.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/CommandLineOptions.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/CommandLineOptions.cpp
 
 CMakeFiles/Rover.dir/CommandLineOptions.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Rover.dir/CommandLineOptions.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/CommandLineOptions.cpp > CMakeFiles/Rover.dir/CommandLineOptions.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/CommandLineOptions.cpp > CMakeFiles/Rover.dir/CommandLineOptions.cpp.i
 
 CMakeFiles/Rover.dir/CommandLineOptions.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Rover.dir/CommandLineOptions.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/CommandLineOptions.cpp -o CMakeFiles/Rover.dir/CommandLineOptions.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/CommandLineOptions.cpp -o CMakeFiles/Rover.dir/CommandLineOptions.cpp.s
 
 CMakeFiles/Rover.dir/CommandLineOptions.cpp.o.requires:
 
@@ -107,16 +107,16 @@ CMakeFiles/Rover.dir/CommandLineOptions.cpp.o.provides.build: CMakeFiles/Rover.d
 
 CMakeFiles/Rover.dir/Globals.cpp.o: CMakeFiles/Rover.dir/flags.make
 CMakeFiles/Rover.dir/Globals.cpp.o: src/Globals.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Rover.dir/Globals.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Globals.cpp.o -c /home/assafvayner/robotics/PY2020/src/Globals.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Rover.dir/Globals.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Globals.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Globals.cpp
 
 CMakeFiles/Rover.dir/Globals.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Rover.dir/Globals.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/Globals.cpp > CMakeFiles/Rover.dir/Globals.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Globals.cpp > CMakeFiles/Rover.dir/Globals.cpp.i
 
 CMakeFiles/Rover.dir/Globals.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Rover.dir/Globals.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/Globals.cpp -o CMakeFiles/Rover.dir/Globals.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Globals.cpp -o CMakeFiles/Rover.dir/Globals.cpp.s
 
 CMakeFiles/Rover.dir/Globals.cpp.o.requires:
 
@@ -131,16 +131,16 @@ CMakeFiles/Rover.dir/Globals.cpp.o.provides.build: CMakeFiles/Rover.dir/Globals.
 
 CMakeFiles/Rover.dir/Network.cpp.o: CMakeFiles/Rover.dir/flags.make
 CMakeFiles/Rover.dir/Network.cpp.o: src/Network.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Rover.dir/Network.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Network.cpp.o -c /home/assafvayner/robotics/PY2020/src/Network.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Rover.dir/Network.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Network.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Network.cpp
 
 CMakeFiles/Rover.dir/Network.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Rover.dir/Network.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/Network.cpp > CMakeFiles/Rover.dir/Network.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Network.cpp > CMakeFiles/Rover.dir/Network.cpp.i
 
 CMakeFiles/Rover.dir/Network.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Rover.dir/Network.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/Network.cpp -o CMakeFiles/Rover.dir/Network.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Network.cpp -o CMakeFiles/Rover.dir/Network.cpp.s
 
 CMakeFiles/Rover.dir/Network.cpp.o.requires:
 
@@ -155,16 +155,16 @@ CMakeFiles/Rover.dir/Network.cpp.o.provides.build: CMakeFiles/Rover.dir/Network.
 
 CMakeFiles/Rover.dir/Util.cpp.o: CMakeFiles/Rover.dir/flags.make
 CMakeFiles/Rover.dir/Util.cpp.o: src/Util.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Rover.dir/Util.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Util.cpp.o -c /home/assafvayner/robotics/PY2020/src/Util.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Rover.dir/Util.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Rover.dir/Util.cpp.o -c /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Util.cpp
 
 CMakeFiles/Rover.dir/Util.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Rover.dir/Util.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/assafvayner/robotics/PY2020/src/Util.cpp > CMakeFiles/Rover.dir/Util.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Util.cpp > CMakeFiles/Rover.dir/Util.cpp.i
 
 CMakeFiles/Rover.dir/Util.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Rover.dir/Util.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/assafvayner/robotics/PY2020/src/Util.cpp -o CMakeFiles/Rover.dir/Util.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src/Util.cpp -o CMakeFiles/Rover.dir/Util.cpp.s
 
 CMakeFiles/Rover.dir/Util.cpp.o.requires:
 
@@ -212,7 +212,7 @@ Rover: /usr/local/lib/libopencv_imgcodecs.so.3.4.7
 Rover: /usr/local/lib/libopencv_imgproc.so.3.4.7
 Rover: /usr/local/lib/libopencv_core.so.3.4.7
 Rover: CMakeFiles/Rover.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/assafvayner/robotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable Rover"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable Rover"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Rover.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -233,6 +233,6 @@ CMakeFiles/Rover.dir/clean:
 .PHONY : CMakeFiles/Rover.dir/clean
 
 CMakeFiles/Rover.dir/depend:
-	cd /home/assafvayner/robotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020/CMakeFiles/Rover.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles/Rover.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Rover.dir/depend
 

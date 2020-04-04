@@ -1,1 +1,1 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/Simulator.dir/Simulator.cpp.o  -o Simulator 
+/usr/bin/c++    -rdynamic CMakeFiles/Simulator.dir/Simulator.cpp.o  -o Simulator 

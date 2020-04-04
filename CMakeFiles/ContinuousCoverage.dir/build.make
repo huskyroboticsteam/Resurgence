@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/assafvayner/robotics/PY2020/src
+CMAKE_SOURCE_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/assafvayner/robotics/PY2020
+CMAKE_BINARY_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020
 
 # Utility rule file for ContinuousCoverage.
 
@@ -71,6 +71,6 @@ CMakeFiles/ContinuousCoverage.dir/clean:
 .PHONY : CMakeFiles/ContinuousCoverage.dir/clean
 
 CMakeFiles/ContinuousCoverage.dir/depend:
-	cd /home/assafvayner/robotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020/src /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020 /home/assafvayner/robotics/PY2020/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ContinuousCoverage.dir/depend
 

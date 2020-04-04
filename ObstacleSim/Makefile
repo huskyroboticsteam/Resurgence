@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/assafvayner/robotics/PY2020/src
+CMAKE_SOURCE_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/assafvayner/robotics/PY2020
+CMAKE_BINARY_DIR = /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -91,14 +91,14 @@ test/fast: test
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/assafvayner/robotics/PY2020 && $(CMAKE_COMMAND) -E cmake_progress_start /home/assafvayner/robotics/PY2020/CMakeFiles /home/assafvayner/robotics/PY2020/ObstacleSim/CMakeFiles/progress.marks
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/assafvayner/robotics/PY2020/CMakeFiles 0
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/ObstacleSim/CMakeFiles/progress.marks
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/clean
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/clean
 .PHONY : clean
 
 # The main clean target
@@ -108,22 +108,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/preinstall
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/preinstall
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/assafvayner/robotics/PY2020 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 ObstacleSim/CMakeFiles/Simulator.dir/rule:
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/CMakeFiles/Simulator.dir/rule
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f CMakeFiles/Makefile2 ObstacleSim/CMakeFiles/Simulator.dir/rule
 .PHONY : ObstacleSim/CMakeFiles/Simulator.dir/rule
 
 # Convenience name for target.
@@ -133,7 +133,7 @@ Simulator: ObstacleSim/CMakeFiles/Simulator.dir/rule
 
 # fast build rule for target.
 Simulator/fast:
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/build
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/build
 .PHONY : Simulator/fast
 
 Simulator.o: Simulator.cpp.o
@@ -142,7 +142,7 @@ Simulator.o: Simulator.cpp.o
 
 # target to build an object file
 Simulator.cpp.o:
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/Simulator.cpp.o
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/Simulator.cpp.o
 .PHONY : Simulator.cpp.o
 
 Simulator.i: Simulator.cpp.i
@@ -151,7 +151,7 @@ Simulator.i: Simulator.cpp.i
 
 # target to preprocess a source file
 Simulator.cpp.i:
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/Simulator.cpp.i
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/Simulator.cpp.i
 .PHONY : Simulator.cpp.i
 
 Simulator.s: Simulator.cpp.s
@@ -160,7 +160,7 @@ Simulator.s: Simulator.cpp.s
 
 # target to generate assembly for a file
 Simulator.cpp.s:
-	cd /home/assafvayner/robotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/Simulator.cpp.s
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(MAKE) -f ObstacleSim/CMakeFiles/Simulator.dir/build.make ObstacleSim/CMakeFiles/Simulator.dir/Simulator.cpp.s
 .PHONY : Simulator.cpp.s
 
 # Help Target
@@ -187,6 +187,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/assafvayner/robotics/PY2020 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
