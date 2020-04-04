@@ -31,11 +31,10 @@ private:
     //makes a line in the form of ax + by = c
     std::vector<float> makeLine(float x2, float y2, float x1, float y1);
     Autonomous &autonomous;
-    float heading;
-    PointXY robotPos;
-    std::vector<std::pair<PointXY, PointXY>> obstacles;
-    PointXY target;
-    int steps;
-    //Margin of error
-    float margin;
+    float heading; //robot's current heading
+    PointXY robotPos; //robot's current position
+    std::vector<std::pair<PointXY, PointXY>> obstacles; //vector of obstacles
+    PointXY target; //robot's target point
+    int steps; //Counter for number of actions robot has taken
+    float margin; //Margin of error
 };

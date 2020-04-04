@@ -7,9 +7,8 @@ Autonomous::Autonomous(PointXY _target) : target(_target)
 {
     state = 0;
     targetHeading = -1;
-    turnCounter = 0;
     forwardCount = -1;
-    rightTurn = 1;
+    rightTurn = false;
 }
 
 void Autonomous::setWorldData(std::shared_ptr<WorldData> wdata)
@@ -51,7 +50,7 @@ Autonomous::stateForwards(float currHeading,
         else
         { //moved forwards for a set number of times, now turn
             forwardCount = -1;
-            turnCounter = 0;
+            rightTurn = false; //moved forward enough times without obstruction, next turn to target
             return stateTurn(currHeading, directions);
         }
     }
@@ -70,11 +69,10 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
     }
     else
     { // find heading to turn to
-        if (turnCounter > 0 || forwardCount > 0)
+        if (rightTurn || forwardCount > 0)
         {
             // turn right
             targetHeading = currHeading + 45;
-            
             forwardCount = 5;
         }
         else
@@ -84,7 +82,7 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
             float y = target.y - robotPos.y;
             targetHeading = atan2f(y, x) * (180 / PI);
             targetHeading = 360 - targetHeading + 90;
-            turnCounter = 1;
+            rightTurn = true; //next turn will turn right
         }
         if (targetHeading > 360)
         {
