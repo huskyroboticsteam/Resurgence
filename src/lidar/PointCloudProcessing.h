@@ -4,6 +4,8 @@
 
 #include "../math/PointXY.h"
 
+class Polar2D;
+
 namespace lidar
 {
 

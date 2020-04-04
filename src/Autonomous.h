@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cmath>
+#include <memory>
 #include "lidar/PointCloudProcessing.h"
 #include "WorldData.h"
 #include "FakeMap.h"
