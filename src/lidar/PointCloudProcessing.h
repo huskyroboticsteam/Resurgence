@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "../math/PointXY.h"
-#include "URGLidar.h"
 
 namespace lidar
 {

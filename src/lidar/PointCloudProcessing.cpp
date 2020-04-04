@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include "URGLidar.h"
 
 namespace lidar
 {
