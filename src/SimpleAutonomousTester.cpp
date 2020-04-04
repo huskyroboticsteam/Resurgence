@@ -2,6 +2,8 @@
 #include "Autonomous.h"
 #include "WorldData.h"
 #include <catch2/catch.hpp>
+#include <future>
+#include <thread>
 
 TEST_CASE("full autonomous", "[autonomous]")
 {
