@@ -22,6 +22,8 @@ public:
     void callAutonomous();
     //Returns the distance of the target if distance is <1
     float targetDistance();
+    // Adds a line-shaped obstacle to the map with endpoints first and second
+    void addObstacle(PointXY first, PointXY second);
 
 private:
     //updates the robot's position and heading

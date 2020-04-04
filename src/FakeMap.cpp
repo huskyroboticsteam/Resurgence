@@ -10,36 +10,13 @@ FakeMap::FakeMap(Autonomous &autonomous_) : autonomous(autonomous_)
     heading = 0;
     margin = pow(10, -5);
 
-    PointXY ob;
-    ob.x = -12;
-    ob.y = 10;
-    PointXY ob1;
-    ob1.x = -12;
-    ob1.y = 8;
-    std::pair<PointXY, PointXY> obs;
-    obs = std::make_pair(ob, ob1);
-    obstacles.push_back(obs);
-
-    PointXY ob10;
-    ob10.x = -12;
-    ob10.y = 8;
-    PointXY ob11;
-    ob11.x = -8;
-    ob11.y = 8;
-    std::pair<PointXY, PointXY> obs5;
-    obs5 = std::make_pair(ob10, ob11);
-    obstacles.push_back(obs5);
-
-    PointXY ob2;
-    ob2.x = -8;
-    ob2.y = 8;
-    PointXY ob3;
-    ob3.x = -8;
-    ob3.y = 10;
-    std::pair<PointXY, PointXY> obs1;
-    obs1 = std::make_pair(ob2, ob3);
-    obstacles.push_back(obs1);
+    
     target = autonomous.getTarget();
+}
+
+void FakeMap::addObstacle(PointXY first, PointXY second) {
+    std::pair<PointXY, PointXY> obs = std::make_pair(first, second);
+    obstacles.push_back(obs);
 }
 
 void FakeMap::callAutonomous()
