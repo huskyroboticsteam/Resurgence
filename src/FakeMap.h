@@ -19,7 +19,7 @@ public:
     //Returns heading of robot
     float getHeading() override;
     //starts the autonomous pathing
-    void callAutonomous();
+    bool callAutonomous(int maxSteps);
     //Returns the distance of the target if distance is <1
     float targetDistance();
     // Adds a line-shaped obstacle to the map with endpoints first and second

@@ -18,8 +18,9 @@ void FakeMap::addObstacle(PointXY first, PointXY second) {
     obstacles.push_back(obs);
 }
 
-void FakeMap::callAutonomous()
+bool FakeMap::callAutonomous(int maxSteps)
 {
+    steps = 0;
     while (targetDistance() == 1) //while the target isn't nearby
     {
         std::pair<float, float> directions = autonomous.getDirections(getHeading());
@@ -28,6 +29,9 @@ void FakeMap::callAutonomous()
         std::cout << "y: " << robotPos.y << std::endl;
         std::cout << "heading: " << heading << std::endl;
         steps ++;
+        if (steps > maxSteps) {
+          return false;
+        }
     } //target is nearby, move once more
     std::pair<float, float> directions = autonomous.getDirections(getHeading());
     update(directions);
@@ -36,6 +40,7 @@ void FakeMap::callAutonomous()
     std::cout << "y: " << robotPos.y << std::endl;
     std::cout << "heading: " << heading << std::endl;
     std::cout << "steps: " << steps << std::endl;
+    return true;
 }
 
 bool FakeMap::lidarSees()

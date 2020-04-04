@@ -17,5 +17,5 @@ TEST_CASE("full autonomous", "[autonomous]")
     fm->addObstacle(PointXY{2, 2}, PointXY{2, -2});
     autonomous.setWorldData(fm);
     REQUIRE(fm->lidarSees() == false);
-    fm->callAutonomous();
+    REQUIRE(fm->callAutonomous(200));
 }
