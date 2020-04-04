@@ -51,7 +51,7 @@ target_link_libraries(Rover ${OpenCV_LIBS})
 
 include(CTest)
 include(Catch)
-target_link_libraries(tests Catch2::Catch2 pthread)
+target_link_libraries(tests Catch2::Catch2)
 target_link_libraries(tests ${OpenCV_LIBS})
 catch_discover_tests(tests)
 
