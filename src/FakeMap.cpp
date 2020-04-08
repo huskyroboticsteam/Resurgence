@@ -13,9 +13,15 @@ FakeMap::FakeMap(Autonomous &autonomous_) : autonomous(autonomous_)
     target = autonomous.getTarget();
 }
 
-void FakeMap::addObstacle(PointXY first, PointXY second) {
+void FakeMap::addObstacle(PointXY first, PointXY second) 
+{
     std::pair<PointXY, PointXY> obs = std::make_pair(first, second);
     obstacles.push_back(obs);
+}
+
+PointXY FakeMap::getRobotPos() 
+{
+    return robotPos;
 }
 
 bool FakeMap::callAutonomous(int maxSteps)
@@ -28,8 +34,9 @@ bool FakeMap::callAutonomous(int maxSteps)
         std::cout << "x: " << robotPos.x << std::endl;
         std::cout << "y: " << robotPos.y << std::endl;
         std::cout << "heading: " << heading << std::endl;
-        steps ++;
-        if (steps > maxSteps) {
+        steps++;
+        if (steps > maxSteps) 
+        {
           return false;
         }
     } //target is nearby, move once more

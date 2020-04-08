@@ -37,9 +37,9 @@ std::vector<size_t> ObjectValidator::validate(std::vector<PointXY>& lidarObstacl
         // pass id of closest obstacle and the map obstacle we've associated with it 
         // get back validation value to see if obstacles are the same
         float validationValue = ekf.getValidationValue(id, lidarObstacles[i]);
-        if (validationValue <= landmarkConstant) 
-        { //passed validation gate
-            obstacleIDs.push_back(id);        //add id of known obstacle
+        if (leastDistance <= landmarkConstant) 
+        { //passed validation gate(currently ignoring validation value)
+            obstacleIDs.push_back(id); //add id of known obstacle
         }
         else 
         { // failed validation gate, is a new obstacle

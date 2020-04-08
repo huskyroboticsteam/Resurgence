@@ -70,10 +70,9 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
     else
     { // find heading to turn to
         if (rightTurn || forwardCount > 0)
-        {
-            // turn right
+        { // turn right if last turn was towards target or was obstructed when moving forwards
             targetHeading = currHeading + 45;
-            forwardCount = 5;
+            forwardCount = 5; //reset forward count
         }
         else
         { //calculate angle to obstacle
@@ -85,7 +84,7 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
             rightTurn = true; //next turn will turn right
         }
         if (targetHeading > 360)
-        {
+        { //fixing angles over 360
             targetHeading = targetHeading - 360;
         }
         directions = std::make_pair(targetHeading, 0);

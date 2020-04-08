@@ -24,6 +24,8 @@ public:
     float targetDistance();
     // Adds a line-shaped obstacle to the map with endpoints first and second
     void addObstacle(PointXY first, PointXY second);
+    //Get the robot's pos
+    PointXY getRobotPos();
 
 private:
     //updates the robot's position and heading
