@@ -27,9 +27,11 @@ class Simulator
     void interpretCoordinates();
     //draw robot on center of screen
     void drawRobot();
+    // mark edge location closest to destination or draw destination location if in bounds
+    void drawDestination();
 
     Mat img = Mat::zeros( w, w, CV_8UC3 );
 
     constexpr static int size = 21;
 
-    };
+};
