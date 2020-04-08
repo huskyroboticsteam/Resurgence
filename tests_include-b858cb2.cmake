@@ -1,5 +1,0 @@
-if(EXISTS "/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/tests_tests-b858cb2.cmake")
-  include("/mnt/c/Users/Assaf/Documents/huskyrobotics/PY2020/tests_tests-b858cb2.cmake")
-else()
-  add_test(tests_NOT_BUILT-b858cb2 tests_NOT_BUILT-b858cb2)
-endif()

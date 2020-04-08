@@ -9,4 +9,4 @@ include_directories(src/lidar)
 include_directories(src/ObstacleSim)
 include_directories(src/Pathfinding)
 
-add_executable(PY2020)
+
