@@ -26,19 +26,11 @@ namespace Pathfinding
         }
     }
 
-    void getMapObjSol(bool sol[21][21], std::vector<Point> vecOfPoints)
+    void getMapObjSol(bool sol[21][21], std::vector<Point>& vecOfPoints)
     {
-        for (int i = 0; i < 21; i++)
-        {
-            for (int j = 0; j < 21; j++)
-            {
-                sol[i][j] = false;
-            }
-        }
-        std::cout << "looped falses" << std::endl;
+        fillFalse(sol);
         for (Point p : vecOfPoints)
         {
-            std::cout << p.y << " cast " << static_cast<int>(p.y) << std::endl;
             int x = static_cast<int>(p.x);
             int y = static_cast<int>(p.y);
             assert(y + 11 < 21 && y + 11 >= 0);
@@ -46,9 +38,7 @@ namespace Pathfinding
             sol[y + 1 + 10][x + 10] = true;
             sol[y + 10][x + 1 + 10] = true;
             sol[y + 10][x + 10] = true;
-            std::cout << "done with a point" << std::endl;
         }
-        std::cout << sol << std::endl;
     }
 
     bool boolMapsEquals(bool obstacle_map[21][21], bool sol[21][21])
@@ -67,6 +57,17 @@ namespace Pathfinding
         }
         return true;
     }
+
+    void fillFalse(bool sol[21][21])
+    {
+        for (int i = 0; i < 21; i++)
+        {
+            for (int j = 0; j < 21; j++)
+            {
+                sol[i][j] = false;
+            }
+        }
+    }
 }
 
 TEST_CASE("Pathfinding")
@@ -80,18 +81,19 @@ TEST_CASE("Pathfinding")
         Point{1.0f, 1.0f}
     };
 
-    // assert(vectorOfPoints[4].y == -5.0f);
     ObstacleMap objMap;
     std::cout << "before update " << vectorOfPoints.back().y << std::endl;
 
     objMap.update(vectorOfPoints);
-    // objMap.print();
-    // assert(vectorOfPoints[4].y == -5.0f);
-    std::cout << "after update " << vectorOfPoints.back().y << std::endl;
+    std::cout << "ObstacleMap" << std::endl;
+    objMap.print();
 
     bool sol[21][21];
-    std::cout << "created sol arr" << std::endl;
+    // std::cout << "before sol " << vectorOfPoints.back().y << std::endl;
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
-    // Pathfinding::print(sol);
+    std::cout << "after sol " << vectorOfPoints.back().y << std::endl;
+    std::cout << "sol" << std::endl;
+
+    Pathfinding::print(sol);
     REQUIRE(Pathfinding::boolMapsEquals(objMap.obstacle_map, sol));
 }

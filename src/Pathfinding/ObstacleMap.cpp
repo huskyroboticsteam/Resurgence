@@ -25,36 +25,19 @@ void ObstacleMap::resetObstacleMap()
 //rebuilds ObstacleMap with given Obstacles
 void ObstacleMap::update(std::vector<Point>& obstacles)
 {
-    std::cout << "back y " << obstacles.back().y << std::endl;
     float robotX = 0.0f;
     float robotY = 0.0f;
     getRobotPosition(robotX, robotY);
     resetObstacleMap();
     int x, y;
     float px, py;
-    // for (int i = 0; i < obstacles.size(); i++)
     for (Point p : obstacles) {
-        px = p.x;
-        py = p.y;
-        std::cout <<"update py= " << py << std::endl;
-        std::cout <<"update p.y= " << p.y << std::endl;
-
-        //filter which obstacles we want to plot
-        // check vector.back()
-        x = static_cast<int>(px - robotX) + radius;
-        y = static_cast<int>(py - robotY) + radius;
+        x = static_cast<int>(p.x - robotX) + radius;
+        y = static_cast<int>(p.y - robotY) + radius;
         if (x >= 0 && x < size && y >= 0 && y < 21)
         {
             modifyObstacleMap(x,y);
         }
-
-
-        // if (px <= (robotX + radius) && px >= (robotX - radius) 
-        // && py <= (robotY + radius) && py >= (robotY - radius)) {
-        //     x = static_cast<int>(px - robotX) + radius;
-        //     y = static_cast<int>(py - robotY) + radius;
-        //     modifyObstacleMap(x, y);
-        // }
     }
 }
 
