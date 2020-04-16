@@ -9,7 +9,6 @@ inline void ObstacleMap::getRobotPosition(float &robotX, float &robotY)
     robotY = 0.0f;//GPS.long TBD
 }
 
-
 //sets all values in ObstacleMap to false
 inline void ObstacleMap::resetObstacleMap()
 {
@@ -22,6 +21,12 @@ inline void ObstacleMap::resetObstacleMap()
     }
 }
 
+//returns true if coordinate is within bounds of square ObstacleMap
+inline bool inBounds(int coordinate)
+{
+    return coordinate < ObstacleMap::size && coordinate >= 0;
+}
+
 //rebuilds ObstacleMap with given Obstacles
 void ObstacleMap::update(std::vector<Point>& obstacles)
 {
@@ -30,11 +35,10 @@ void ObstacleMap::update(std::vector<Point>& obstacles)
     getRobotPosition(robotX, robotY);
     resetObstacleMap();
     int x, y;
-    float px, py;
     for (Point p : obstacles) {
         x = static_cast<int>(p.x - robotX) + radius;
         y = static_cast<int>(p.y - robotY) + radius;
-        if (x >= 0 && x < size && y >= 0 && y < 21)
+        if (inBounds(x) && inBounds(y))
         {
             modifyObstacleMap(x,y);
         }

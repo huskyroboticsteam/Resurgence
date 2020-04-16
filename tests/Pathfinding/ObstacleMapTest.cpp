@@ -9,10 +9,11 @@
 
 namespace Pathfinding
 {
+    //constant constraints for dummy double array sol
     const int radius = 10;
     const int size = 2 * radius + 1;
 
-
+    //prints visualization of bool double array where 1 is True and 0 is false
     void print(bool sol[21][21])
     {
         for (int i = 0; i < 21; i++)
@@ -30,7 +31,7 @@ namespace Pathfinding
         }
     }
 
-
+    //sets all valus of sol to false
     inline void fillFalse(bool sol[][size])
     {
         for (int i = 0; i < size; i++)
@@ -42,12 +43,14 @@ namespace Pathfinding
         }
     }
 
+    //checks if coord is within bounds of the dummy double array dimensions
     bool withinBounds(int coord)
     {
-        return coord < 21 && coord >= 0;
+        return coord < size && coord >= 0;
     }
 
-
+    //makes dummy obstacle map resultant array out of sol
+    //similar to ObstacleMap.update(<vectorOfPoints>)
     void getMapObjSol(bool sol[][size], std::vector<Point>& vectorOfPoints)
     {
         fillFalse(sol);
@@ -72,6 +75,7 @@ namespace Pathfinding
         }
     }
 
+    //checks equivalancy of size and values of obstacleMap object and sol 
     bool boolMapsEquals(ObstacleMap& obsMap, bool sol[][size])
     {
         if(obsMap.size != size || obsMap.radius != radius) {
@@ -94,7 +98,7 @@ namespace Pathfinding
 
 }
 
-TEST_CASE("Pathfinding")
+TEST_CASE("ObstacleMap")
 {
     //this test tests basic creation of ObstacleMap
     //also tests updating ObstacleMap as input updates
@@ -127,15 +131,16 @@ TEST_CASE("Pathfinding")
 
 }
 
-TEST_CASE("Pathfinding OUT of BOUNDS")
+TEST_CASE("ObstacleMap OUT OF BOUNDS")
 {
     //this test tests with points outside of the bounds of ObstacleMap
+    //and points with non-rounded float values
     //assumes center at 0, 0
 
     std::vector<Point> vectorOfPoints = {
-        Point{20.0f, 2.0f},
+        Point{20.0f, 2.0f}, //Out OF BOUNDS
         Point{-2.0f, -2.0f},
-        Point{-30.0f, 3.0f},
+        Point{-30.0f, 3.0f}, //Out OF BOUNDS
         Point{3.0f, -3.00008f},
         Point{5.0f, -5.770f},
         Point{1.50f, 1.60f}
