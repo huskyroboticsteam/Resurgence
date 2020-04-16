@@ -5,13 +5,13 @@ using namespace cv;
 
 int main(void) {
     // robot location for all tests: (0.0f, 0.0f)
-    // Test1: destination = (10.0f, 10.0f)
+    // Test1:
     ObstacleMap testMap1;
     std::vector<Point> points1 = {}; // supposed to be Point.h
     testMap1.update(points1);
-    runTest(testMap1);
+    runTest(testMap1, Point{10.0f, 10.0f});
 
-    // Test2: destination = (10.0f, 10.0f)
+    // Test2:
     ObstacleMap testMap2;
     std::vector<Point> points2 = {
         Point{1.0f, 1.0f},
@@ -26,9 +26,9 @@ int main(void) {
         Point{10.0f, 10.0f}
     };
     testMap2.update(points2);
-    runTest(testMap2);
+    runTest(testMap2, Point{10.0f, 10.0f});
 
-    // Test3: destination = (10.0f, 10.0f)
+    // Test3:
     ObstacleMap testMap3;
     std::vector<Point> points3 = {
         Point{2.0f, 2.0f},
@@ -39,9 +39,9 @@ int main(void) {
         Point{1.0f, 1.0f}
     };
     testMap3.update(points3);
-    runTest(testMap3);
+    runTest(testMap3, Point{10.0f, 10.0f});
 
-    // Test4: destination = (10.0f, 7.0f)
+    // Test4:
     ObstacleMap testMap4;
     std::vector<Point> points4 = {
         Point{1.0f, 1.0f},
@@ -56,9 +56,9 @@ int main(void) {
         Point{10.0f, 10.0f}
     };
     testMap3.update(points4);
-    runTest(testMap4);
+    runTest(testMap4, Point{10.0f, 7.0f});
 
-    // Test5: destination = (7.0f, 10.0f)
+    // Test5:
     ObstacleMap testMap5;
     std::vector<Point> points5 = {
         Point{1.0f, 1.0f},
@@ -73,9 +73,9 @@ int main(void) {
         Point{10.0f, 10.0f}
     };
     testMap3.update(points5);
-    runTest(testMap5);
+    runTest(testMap5, Point{7.0f, 10.0f});
 
-    // Test6: destination = (5.0f, 5.0f)
+    // Test6:
     ObstacleMap testMap6;
     std::vector<Point> points6 = {
         Point{1.0f, 1.0f},
@@ -90,15 +90,16 @@ int main(void) {
         Point{1.0f, 3.0f}
     };
     testMap3.update(points6);
-    runTest(testMap6);
+    runTest(testMap6, Point{5.0f, 5.0f});
 
 };
 
-void runTest(ObstacleMap testMap) {
+void runTest(ObstacleMap testMap, Point dest) {
     Simulator sim; 
+    Pather2 pather;
     sim.drawMap(testMap.obstacle_map);
     sim.interpretCoordinates();
-    std::queue<Pather2::point> path;  // get path from Pather2 to pass in, change to use point.h
+    std::queue<Point> path = pather.BFS(testMap.obstacle_map, dest);
     sim.drawPath(path);
     sim.drawRobot();
     sim.drawDestination();
@@ -123,11 +124,11 @@ void Simulator::drawMap(bool obstacle_map[][21]) {
     }
 };
 
-void Simulator::drawPath(std::queue<Pather2::point, std::deque<Pather2::point, std::allocator<Pather2::point>>> path) {
+void Simulator::drawPath(std::queue<Point, std::deque<Point, std::allocator<Point>>> path) {
     while(!path.empty()){ 
-        Pather2::point start = path.front();
+        Point start = path.front();
         path.pop();
-        Pather2::point end = path.front();
+        Point end = path.front();
         path.pop();
 
         cv::Point startcv{start.x * 21, start.y * 21}; // may be incorrect syntax

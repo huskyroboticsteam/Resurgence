@@ -11,10 +11,12 @@ private:
 public:       
     struct queueNode {
     //for use in BFS search
-        point pt;
+        Point pt;
         int dist;
-        std::queue<point> path;
+        std::queue<Point> path;
     };
+    // returns full path
+    std::queue<Point> Pather2::BFS(bool map[][21], Point dest);
     Point getPath(bool map[][21], Point dest);
     Point relocateDestination(Point dest, int shrink_constant);
     int returnHeading(bool map[][21]);
