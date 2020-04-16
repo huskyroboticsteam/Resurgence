@@ -49,9 +49,19 @@ add_executable(lidarOnlyTest
         lidar/PointCloudProcessing.cpp
         lidar/URGLidar.cpp)
 
+add_executable(simulator_navigation_demo
+  simulator/navigation.cpp
+  simulator/plan.cpp
+  simulator/search.cpp
+  simulator/utils.cpp
+  simulator/graphics.cpp
+  simulator/world.cpp
+  simulator/world_ui.cpp)
+
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
+target_link_libraries(simulator_navigation_demo sfml-graphics sfml-window sfml-system)
 
 include(CTest)
 include(Catch)
