@@ -28,7 +28,11 @@ add_executable(tests
   ar/Tag.cpp
   SimpleAutonomousTester.cpp
   Autonomous.cpp
-  FakeMap.cpp)
+  FakeMap.cpp
+  mapping/ValidatorTest.cpp
+  mapping/ObjectValidator.cpp
+  mapping/EKFSlam/EKFSlam.cpp
+  mapping/EKFSlam/tools.cpp)
 
 add_executable(lidar_vis
     lidar/MainVis.cpp

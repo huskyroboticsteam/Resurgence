@@ -22,7 +22,7 @@ public:
    //Returns a vector of those ids
    std::vector<size_t> validate(std::vector<PointXY>& lidarClusters); 
    ObjectValidator(EKFSlam &ekf_) : ekf(ekf_) {}
-      //Takes in clusters of points collected from the lidar
+   //Takes in clusters of points collected from the lidar
    //Associates a point as an obstacle, putting a "box" around it
    //Treat any point not within a box as also a new obstacle
    //Returns a vector of points of all the obstacles
