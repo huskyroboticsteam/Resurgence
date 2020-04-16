@@ -11,7 +11,7 @@ inline void ObstacleMap::getRobotPosition(float &robotX, float &robotY)
 
 
 //sets all values in ObstacleMap to false
-void ObstacleMap::resetObstacleMap()
+inline void ObstacleMap::resetObstacleMap()
 {
     for (int i = 0; i < size; i++)
     {
