@@ -11,9 +11,9 @@ private:
 public:       
     struct queueNode {
     //for use in BFS search
-        point pt;
+        Point pt;
         int dist;
-        std::queue<point> path;
+        std::queue<Point> path;
     };
     Point getPath(bool map[][21], Point dest);
     Point relocateDestination(Point dest, int shrink_constant);
