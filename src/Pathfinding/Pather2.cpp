@@ -32,7 +32,7 @@ void print_queue(std::queue<Pather2::queueNode> q) {
 }
  
 // returns full path
-std::queue<Point> BFS(bool map[][21], Point dest){
+std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
   
    int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
    int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
