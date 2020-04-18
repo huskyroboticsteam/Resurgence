@@ -2,11 +2,19 @@
 #include <iostream>
 #include <cstdlib>
 
-//gets robot position
-inline void ObstacleMap::getRobotPosition(float &robotX, float &robotY)
+//constructor
+ObstacleMap::ObstacleMap()
 {
-    robotX = 0.0f;//GPS.lat TBD
-    robotY = 0.0f;//GPS.long TBD
+    robotX = 0.0f;
+    robotY = 0.0f;
+}
+
+
+
+//gets robot position
+inline void ObstacleMap::updateRobotPosition()
+{
+    //fill when recieve GPS, update values to robotX and robotY fields
 }
 
 //sets all values in ObstacleMap to false
@@ -30,9 +38,7 @@ inline bool inBounds(int coordinate)
 //rebuilds ObstacleMap with given Obstacles
 void ObstacleMap::update(std::vector<Point>& obstacles)
 {
-    float robotX = 0.0f;
-    float robotY = 0.0f;
-    getRobotPosition(robotX, robotY);
+    updateRobotPosition();//updates values in robotX and robotY fields
     resetObstacleMap();
     int x, y;
     for (Point p : obstacles) {
@@ -82,3 +88,11 @@ void ObstacleMap::print()
         std::cout << std::endl;
     } 
 }
+
+
+//for test compile
+// int main()
+// {
+//     ObstacleMap temp;
+//     std::cout << temp.robotX + temp.robotY << std::endl;
+// }

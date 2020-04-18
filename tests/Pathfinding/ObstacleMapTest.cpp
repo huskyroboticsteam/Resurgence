@@ -60,32 +60,29 @@ namespace Pathfinding
             int y = static_cast<int>(p.y) + radius;
             if(withinBounds(x) && withinBounds(y)) {
                 if (y + 1 < size && x + 1 < size) {
-                    sol[y][x] = true;
+                    sol[y + 1][x + 1] = true;
                 }
                 if (y + 1 < size && x >= 0) {
-                    sol[y][x + 1] = true;
-                }
-                if (y >= 0 && x + 1 < size) {
                     sol[y + 1][x] = true;
                 }
+                if (y >= 0 && x + 1 < size) {
+                    sol[y][x + 1] = true;
+                }
                 if (y >= 0 && x >= 0) {
-                    sol[y + 1][x + 1] = true;
+                    sol[y][x] = true;
                 }
             }
         }
     }
 
     //checks equivalancy of size and values of obstacleMap object and sol 
-    bool boolMapsEquals(ObstacleMap& obsMap, bool sol[][size])
+    bool boolMapsEquals(bool obstacleMap[][size], bool sol[][size])
     {
-        if(obsMap.size != size || obsMap.radius != radius) {
-            return false;
-        }
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                bool obsMapVal = obsMap.obstacle_map[i][j];
+                bool obsMapVal = obstacleMap[i][j];
                 bool solVal = sol[i][j];
                 if (obsMapVal != solVal)
                 {
@@ -120,14 +117,14 @@ TEST_CASE("ObstacleMap")
     // check that they have equal resulting structure by value
     obsMap.update(vectorOfPoints);
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
-    REQUIRE(Pathfinding::boolMapsEquals(obsMap, sol));
+    REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 
     // Adds point to the vector of points and update both obsMap and sol
     // check that they have equal resulting structure by value
     vectorOfPoints.push_back(Point{-7.0, 3.0});
     obsMap.update(vectorOfPoints);
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
-    REQUIRE(Pathfinding::boolMapsEquals(obsMap, sol));
+    REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 
 }
 
@@ -153,5 +150,41 @@ TEST_CASE("ObstacleMap OUT OF BOUNDS")
     // check that they have equal resulting structure by value
     obsMap.update(vectorOfPoints);
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
-    REQUIRE(Pathfinding::boolMapsEquals(obsMap, sol));
+    REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
+}
+
+TEST_CASE("ObstacleMap CHANGE CENTER")
+{
+    std::vector<Point> vectorOfPoints = {
+        Point{10.0f, 10.0f},
+        Point{10.0f, -10.0f},
+        Point{-10.0f, 10.0f},
+        Point{-10.0f, -10.0f}
+    };
+
+    ObstacleMap obsMap;
+    std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
+    bool sol[Pathfinding::size][Pathfinding::size];
+    obsMap.update(vectorOfPoints);
+    std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
+    Pathfinding::getMapObjSol(sol, vectorOfPoints);
+    REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
+
+    obsMap.robotX = 5.0f;
+    obsMap.robotY = 5.0f;
+    std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
+    obsMap.update(vectorOfPoints);
+    REQUIRE(!Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
+
+    std::vector<Point> shiftedVectorOfPoints;
+    for(Point p : vectorOfPoints)
+    {
+        shiftedVectorOfPoints.push_back(Point{p.x - 5.0f, p.y - 5.0f});
+    }
+    Pathfinding::getMapObjSol(sol, shiftedVectorOfPoints);
+    std::cout << "obsMap" << std::endl;
+    obsMap.print();
+    std::cout << "sol" << std::endl;
+    Pathfinding::print(sol);
+    REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 }

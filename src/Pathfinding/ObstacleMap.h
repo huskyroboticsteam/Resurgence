@@ -21,8 +21,8 @@ private:
     // sets four elements around coordinates of point that have
     //been truncated to x and y
     void modifyObstacleMap(int x, int y);
-    //for getting robot position
-    void getRobotPosition(float &robotX, float &robotY);//needs to use gps
+    //for retrieving robot position
+    void updateRobotPosition();//needs to use gps
 
 public:
     //given values are expected to be in meters, but otherwise are in: ObstacleMap units
@@ -30,9 +30,17 @@ public:
     constexpr static int radius = 10;
     // length/width of obstacle_map
     constexpr static int size = 1 + 2 * radius;
+    
+    //robot coordinates ing GPS
+    float robotX;//initialized to 0.0f upon construction
+    float robotY;//initialized to 0.0f upon construction
 
     // call update() before for accurate map
     bool obstacle_map[size][size];
+    
+    //constructor
+    ObstacleMap();
+    // ObstacleMap(std::vector<Point>& obstacles);
     //rebuilds ObstacleMap with given Obstacles
     void update(std::vector<Point>& obstacles);
     //for testing purposes only, prints a visual representation of ObstacleMap,
