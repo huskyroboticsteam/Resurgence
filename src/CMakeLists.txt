@@ -6,10 +6,6 @@ enable_testing()
 
 find_package(Catch2 REQUIRED)
 
-find_package(OpenCV REQUIRED)
-
-add_subdirectory(ar)
-
 add_subdirectory(ObstacleSim)
 
 add_executable(Rover
@@ -17,15 +13,15 @@ add_executable(Rover
         CommandLineOptions.cpp
         Globals.cpp
         Network.cpp
-	      Util.cpp
-        mapping/EnvMap.cpp)
+	      Util.cpp)
 
 add_executable(tests
   Tests.cpp
   Util.cpp
-  # AR Detection tests
-  ar/TagUnitTests.cpp
-  ar/Tag.cpp)
+  # Pathing tests
+  Pathfinding/ObstacleMap.cpp
+  ../tests/Pathfinding/ObstacleMapTest.cpp
+  )
 
 target_link_libraries(Rover ${OpenCV_LIBS})
 

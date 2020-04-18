@@ -1,32 +1,16 @@
 #include "ObstacleMap.h"
-#include <cstdlib>
 #include <iostream>
-//vector and EnvMap.h included in PathMap.h
+#include <cstdlib>
 
-inline std::vector<std::shared_ptr<const MapObstacle>> ObstacleMap::getData(float robotX, float robotY)
+//gets robot position
+inline void ObstacleMap::getRobotPosition(float &robotX, float &robotY)
 {
-    //following method needs global coords
-    //return slam_map.findObjectsWithinSquare(this->radius, robotX, robotY);//floats
-    return slam_map.findObjectsWithinRadius(this->radius, robotX, robotY);
-    //std::vector<std::shared_ptr<MapObstacle>> temp;
-    // for (int i = 0; i < 8; i++)
-    // {
-    //     MapObstacle m;
-    //     for (int j = 0; j < i; j++)
-    //     {
-    //         m.points.push_back(Vec2{rand() % 21 - 11, rand() % 21 - 11});
-    //     } 
-    //     MapObstacle& n = m;
-    //     temp.push_back(std::make_shared<MapObstacle>(n));
-    // }
-    // MapObstacle m;
-    // m.points.push_back(Vec2{10.0f, 9.0f});
-    // MapObstacle& n = m;
-    // temp.push_back(std::make_shared<MapObstacle>(n));
-    
+    robotX = 0.0f;//GPS.lat TBD
+    robotY = 0.0f;//GPS.long TBD
 }
 
-void ObstacleMap::resetObstacleMap()
+//sets all values in ObstacleMap to false
+inline void ObstacleMap::resetObstacleMap()
 {
     for (int i = 0; i < size; i++)
     {
@@ -37,56 +21,50 @@ void ObstacleMap::resetObstacleMap()
     }
 }
 
-int ObstacleMap::transform(int val, bool direction)
+//returns true if coordinate is within bounds of square ObstacleMap
+inline bool inBounds(int coordinate)
 {
-    if(direction)
-    {
-        return val + (int)(step_size -  fmodf(val, step_size));
-    }else
-    {
-        return val - (int)fmodf(val, step_size);
-    }
+    return coordinate < ObstacleMap::size && coordinate >= 0;
 }
 
-void ObstacleMap::updateObstacleMap()
+//rebuilds ObstacleMap with given Obstacles
+void ObstacleMap::update(std::vector<Point>& obstacles)
 {
     float robotX = 0.0f;
     float robotY = 0.0f;
-    slam_map.getRobotPosition(robotX, robotY); // from EnvMap
+    getRobotPosition(robotX, robotY);
     resetObstacleMap();
-    std::vector<std::shared_ptr<const MapObstacle>> data = getData(robotX, robotY);
-    std::cout << data.size();
     int x, y;
-    for (int i = 0; i < data.size(); i++)
-    {
-        for (int j = 0; j < data[i]->points.size(); j++)
+    for (Point p : obstacles) {
+        x = static_cast<int>(p.x - robotX) + radius;
+        y = static_cast<int>(p.y - robotY) + radius;
+        if (inBounds(x) && inBounds(y))
         {
-            Vec2 point = data[i]->points[j];
-            x = (int)(point.x - robotX + radius/step_size);
-            y = (int)(point.y - robotY + radius/step_size);
-            modifyObstacleMap(x,y);   
+            modifyObstacleMap(x,y);
         }
     }
 }
 
-inline void ObstacleMap::modifyObstacleMap(int x, int  y)
+//rounds given coordinates up/down to obstacle_map indices,
+//sets four elements around given coordinates as blocked
+inline void ObstacleMap::modifyObstacleMap(int x, int y)
 {
-    //set four points surrounding given point as blocked
-    //likely blocked areas will overlap from proxity of points in MapObstacle
-    if (transform(y, true) < size && transform(x, true) < size) {
-        obstacle_map[transform(y, true)][transform(x, true)] = true;
+    if (y + 1 < size && x + 1 < size) {
+        obstacle_map[y + 1][x + 1] = true;
     }
-    if (transform(y, true) < size && transform(x, false) < size) {
-        obstacle_map[transform(y, true)][transform(x, false)] = true;
+    if (y + 1 < size && x >= 0) {
+        obstacle_map[y + 1][x] = true;
     }
-    if (transform(y, false) < size && transform(x, true) < size) {
-        obstacle_map[transform(y, false)][transform(x, true)] = true;
+    if (y >= 0 && x + 1 < size) {
+        obstacle_map[y][x + 1] = true;
     }
-    if (transform(y, false) < size && transform(x, false) < size) {
-        obstacle_map[transform(y, false)][transform(x, false)] = true;
+    if (y >= 0 && x >= 0) {
+        obstacle_map[y][x] = true;
     }
 }
 
+//for testing purposes only, prints a visual representation of ObstacleMap
+//where 1 is an obstacle and 0 is empty
 void ObstacleMap::print()
 {
     for (int i = 0; i < size; i++)
@@ -104,33 +82,3 @@ void ObstacleMap::print()
         std::cout << std::endl;
     } 
 }
-
-ObstacleMap::ObstacleMap(EnvMap& envmap) : slam_map(envmap)
-{
-    updateObstacleMap();
-}
-
-
-// int main()
-// {
-//     ObstacleMap map = ObstacleMap();
-//     map.print();
-// };
-
-
-//old tester mapobstacle
-// #pragma once
-// #include <vector>
-
-// struct Vec2
-// {
-// public:
-//     float x;
-//     float y;
-// };
-
-// struct MapObstacle
-// {
-// public:
-//     std::vector<Vec2> points;
-// };
