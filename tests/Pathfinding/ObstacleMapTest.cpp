@@ -58,7 +58,9 @@ namespace Pathfinding
         {
             int x = static_cast<int>(p.x) + radius;
             int y = static_cast<int>(p.y) + radius;
+            std::cout << "target point: x: " << p.x << ", y: " << p.y << std::endl;
             if(withinBounds(x) && withinBounds(y)) {
+                std::cout << "point passed as: x: " << x << ", y: " << y << std::endl;
                 if (y + 1 < size && x + 1 < size) {
                     sol[y + 1][x + 1] = true;
                 }
@@ -176,10 +178,12 @@ TEST_CASE("ObstacleMap CHANGE CENTER")
     obsMap.update(vectorOfPoints);
     REQUIRE(!Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 
+    std::cout << "actual change test" << std::endl; 
     std::vector<Point> shiftedVectorOfPoints;
     for(Point p : vectorOfPoints)
     {
         shiftedVectorOfPoints.push_back(Point{p.x - 5.0f, p.y - 5.0f});
+        std::cout << "px: " << shiftedVectorOfPoints.back().x << ", py: " << shiftedVectorOfPoints.back().y << std::endl;
     }
     Pathfinding::getMapObjSol(sol, shiftedVectorOfPoints);
     std::cout << "obsMap" << std::endl;
