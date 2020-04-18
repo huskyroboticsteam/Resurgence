@@ -60,10 +60,10 @@ void approxContours(std::vector<std::vector<cv::Point>> contours,
 std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny_thresh_2,
 									int blur_size)
 {
-	cv::Mat junk; // this Mat won't be used later. it's just used to be passed as a
-				  // reference to the function this is overloading.
-	std::vector<std::vector<cv::Point2f>> junk2;
-	return findTags(input, junk, junk, junk2, canny_thresh_1, canny_thresh_2, blur_size);
+	cv::Mat gray;  // these won't be used later. it's just used to be passed as 
+	cv::Mat edges; // reference to the function this is overloading.
+	std::vector<std::vector<cv::Point2f>> corners;
+	return findTags(input, gray, edges, corners, canny_thresh_1, canny_thresh_2, blur_size);
 }
 
 // Stores grayscale version and outlined edged version of input image to grayscale and edges
@@ -84,7 +84,9 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 	cv::cuda::GpuMat gpu_grayscale;
 	gpu_grayscale.upload(grayscale);
 #endif
+#ifndef NDEBUG
 	std::cout << "Number of Quads found: " << allQuads.size() << std::endl;
+#endif
 
 	bool hasOutputSquare = false;
 
