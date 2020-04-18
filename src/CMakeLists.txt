@@ -11,6 +11,16 @@ else()
   message(STATUS "GPU code is OFF")
 endif()
 
+set(AR_TESTS_WINDOWS OFF CACHE BOOL
+	"Whether or not the AR unit tests should show images in windows")
+
+if("${AR_TESTS_WINDOWS}")
+  message(STATUS "AR unit tests: image windows are ON")
+  add_definitions(-DAR_TESTS_WINDOWS)
+else()
+  message(STATUS "AR unit tests: image windows are OFF")
+endif()
+
 enable_testing()
 find_package(Catch2 REQUIRED)
 
@@ -30,7 +40,13 @@ add_executable(Rover
 
 add_executable(tests
   Tests.cpp
-  Util.cpp)
+  Util.cpp
+  # AR Tests
+  ar/ARUnitTests.cpp
+  ar/Tag.cpp
+  ar/Detector.cpp
+  ar/CameraParams.cpp)
+  
 
 target_link_libraries(Rover ${OpenCV_LIBS})
 target_link_libraries(Rover Threads::Threads)
