@@ -183,7 +183,12 @@ TEST_CASE("ObstacleMap CHANGE CENTER")
     for(Point p : vectorOfPoints)
     {
         shiftedVectorOfPoints.push_back(Point{p.x - 5.0f, p.y - 5.0f});
+        std::cout << sizeof(shiftedVectorOfPoints) << std::endl;
         std::cout << "px: " << shiftedVectorOfPoints.back().x << ", py: " << shiftedVectorOfPoints.back().y << std::endl;
+    }
+    for(Point p : shiftedVectorOfPoints)
+    {
+        std::cout << "px: " << p.x << ", py: " << p.y << std::endl;
     }
     Pathfinding::getMapObjSol(sol, shiftedVectorOfPoints);
     std::cout << "obsMap" << std::endl;
