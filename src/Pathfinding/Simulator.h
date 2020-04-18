@@ -1,4 +1,6 @@
 #pragma once
+<<<<<<< HEAD
+=======
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
@@ -35,3 +37,4 @@ class Simulator
     constexpr static int size = 21;
 
 };
+>>>>>>> d38e1ad15a975b8906947271d6a712edaec541d8
