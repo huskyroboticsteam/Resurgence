@@ -1,0 +1,3 @@
+[submodule "src/simulator"]
+	path = src/simulator
+	url = git@github.com:nhatch/slam

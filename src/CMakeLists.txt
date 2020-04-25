@@ -6,6 +6,10 @@ enable_testing()
 
 find_package(Catch2 REQUIRED)
 
+find_package(OpenCV REQUIRED)
+
+add_subdirectory(ar)
+
 add_subdirectory(ObstacleSim)
 
 add_executable(Rover
@@ -13,7 +17,8 @@ add_executable(Rover
         CommandLineOptions.cpp
         Globals.cpp
         Network.cpp
-	      Util.cpp)
+	      Util.cpp
+        mapping/EnvMap.cpp)
 
 add_executable(tests
   Tests.cpp
@@ -21,9 +26,49 @@ add_executable(tests
   # Pathing tests
   Pathfinding/ObstacleMap.cpp
   ../tests/Pathfinding/ObstacleMapTest.cpp
+    # AR Detection tests
+  ar/TagUnitTests.cpp
+  ar/Tag.cpp
+  SimpleAutonomousTester.cpp
+  Autonomous.cpp
+  FakeMap.cpp
+  mapping/ValidatorTest.cpp
+  mapping/ObjectValidator.cpp
+  mapping/EKFSlam/EKFSlam.cpp
+  mapping/EKFSlam/tools.cpp)
   )
 
 target_link_libraries(Rover ${OpenCV_LIBS})
+
+
+add_executable(lidar_vis
+    lidar/MainVis.cpp
+    lidar/LidarVis.cpp
+    lidar/PointCloudProcessing.cpp
+    lidar/URGLidar.cpp)
+
+add_executable(lidarOnlyTest
+	mapping/EKFSlam/lidarOnlyTest.cpp
+        mapping/EKFSlam/EKFSlam.cpp
+        mapping/ObjectValidator.cpp
+        mapping/EKFSlam/tools.cpp
+        lidar/LidarVis.cpp
+        lidar/PointCloudProcessing.cpp
+        lidar/URGLidar.cpp)
+
+add_executable(simulator_navigation_demo
+  simulator/navigation.cpp
+  simulator/plan.cpp
+  simulator/search.cpp
+  simulator/utils.cpp
+  simulator/graphics.cpp
+  simulator/world.cpp
+  simulator/world_ui.cpp)
+
+target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
+target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
+target_link_libraries(Rover ${OpenCV_LIBS})
+target_link_libraries(simulator_navigation_demo sfml-graphics sfml-window sfml-system)
 
 include(CTest)
 include(Catch)
@@ -32,3 +77,5 @@ target_link_libraries(tests ${OpenCV_LIBS})
 catch_discover_tests(tests)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
+set_property(TARGET lidar_vis PROPERTY CXX_STANDARD 14)
+set_property(TARGET lidarOnlyTest PROPERTY CXX_STANDARD 14)
