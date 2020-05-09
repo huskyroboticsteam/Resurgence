@@ -2,40 +2,48 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
-// #include <memory> // remove once EnvMap.h is included
-// #include "MapObstacle.h"
-#include "../mapping/EnvMap.h"
+#include "Point.h"
 
-// constructed with reference or pointer to global EnvMap
-// recieve list of obstacles within specified range around robot
+// recieve list of points
 // plot obstacles onto 2d grid
 // pass grid onto pathing
 // recreate grid as orientation/location changes
 
-//increase bounding box 
+//uses default constructor with no params
+
+//todo whatever we get from GPS convert to meters
+
 class ObstacleMap{
-    EnvMap& slam_map;
-    constexpr static float radius = 10.0f;
-    constexpr static float step_size = 1.0f;
-    constexpr static int size = 21;
-    bool obstacle_map[size][size];
 
 private:
-    // clears all obstacles from the map
+    //sets all values in ObstacleMap to false
     void resetObstacleMap();
-    // retrieves obstacle location data
-    std::vector<std::shared_ptr<const MapObstacle>> getData(float robotX, float robotY);
-    // converts obstacle coordinates to indices
-    // direction indicates +/- for rounding up or down to the nearest index, true is plus, false is -
-    int transform(int val, bool direction);
-    // sets the four elements around the given coordinates as blocked
+    // sets four elements around coordinates of point that have
+    //been truncated to x and y
     void modifyObstacleMap(int x, int y);
+    //for retrieving robot position
+    void updateRobotPosition();//needs to use gps
 
 public:
-    // clears the obstacle map and plots a new set of obstacles around the robot's current location
-    void updateObstacleMap();
-    // constructs an ObstacleMap with a reference to the global EnvMap
-    ObstacleMap(EnvMap& envmap);
-    // prints the map as a grid of 0/1, 0 = empty, 1 = blocked
+    //given values are expected to be in meters, but otherwise are in: ObstacleMap units
+    // size = 2 * radius + 1
+    constexpr static int radius = 10;
+    // length/width of obstacle_map
+    constexpr static int size = 1 + 2 * radius;
+    
+    //robot coordinates ing GPS
+    float robotX;//initialized to 0.0f upon construction
+    float robotY;//initialized to 0.0f upon construction
+
+    // call update() before for accurate map
+    bool obstacle_map[size][size];
+    
+    //constructor
+    ObstacleMap();
+    // ObstacleMap(std::vector<Point>& obstacles);
+    //rebuilds ObstacleMap with given Obstacles
+    void update(std::vector<Point>& obstacles);
+    //for testing purposes only, prints a visual representation of ObstacleMap,
+    //1 = obstacle, 0 = empty
     void print();
 };

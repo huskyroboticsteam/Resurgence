@@ -1,4 +1,3 @@
-echo "test"
 git clone https://github.com/andrewbriand/urg_library-1.2.5.git
 cd urg_library-1.2.5
 make
