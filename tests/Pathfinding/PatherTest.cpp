@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "../../src/Pathfinding/Point.h"
-#include "../../src/Pathfinding/Pather.h"
+#include "../../src/Pathfinding/Pather2.h"
 #include "../../src/Pathfinding/ObstacleMap.h"
 
 #define CATCH_CONFIG_MAIN
