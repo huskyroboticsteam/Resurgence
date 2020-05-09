@@ -41,12 +41,12 @@ std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
    std::queue<Point> error;
    error.push(src);
    //check if src and dest are represented with 1 not 0
-   if ((map[src.x][src.y]) || (map[dest.x][dest.y])){
+   if ((map[(int)src.x][(int)src.y]) || (map[(int)dest.x][(int)dest.y])){
        //todo: change destination if destination is blocked
        return error;
    }
   
-   map[src.x][src.y] = true;
+   map[(int)src.x][(int)src.y] = true;
    std::queue<Pather2::queueNode> q;
    std::queue<Point> newQueue;
    newQueue.push(src);
@@ -88,7 +88,7 @@ std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
                std::queue<Point> addAdjPointToPath = curr.path;
                addAdjPointToPath.push(test);
                Pather2::queueNode adjNode = {{row, col}, curr.dist + 1, addAdjPointToPath};
-               map[adjNode.pt.x][adjNode.pt.y] = true;
+               map[(int)adjNode.pt.x][(int)adjNode.pt.y] = true;
                q.push(adjNode);
            }
        }
@@ -174,30 +174,37 @@ Point getDest(Point GPSRobot, Point GPSDest) {
 //If the relative location of the target is put into some invalid coordinate (unreachable),
 //then assign any neighbor valid coordinate as the new relative location, and make search again.
 Point relocateDestination(Point dest, int shrink_constant){
-   if (dest.x == 20 - shrink_constant) {
-       switch(dest.y) {
-           case 0: dest.x -= 1;
-           dest.y += 1;
+   if ((int)dest.x == 20 - shrink_constant) {
+       switch((int)dest.y) {
+           // return Point{dest.x - 1, }
+           case 0: Point{dest.x - 1.0f, dest.y + 1.0f};
+           //dest.x -= 1;
+           //dest.y += 1;
            break;
-           case 20: dest.x -= 1;
-           dest.y -= 1;
+           case 20: Point{dest.x - 1.0f, dest.y - 1.0f};
+           //dest.x -= 1;
+           //dest.y -= 1;
            break;
-           default: dest.x -= 1;
+           default: Point{dest.x - 1.0f, dest.y};
+           //dest.x -= 1;
        }
-   } else if (dest.x == 0 + shrink_constant) {
-       switch(dest.y) {
-           case 0: dest.x += 1;
-           dest.y += 1;
+   } else if ((int)dest.x == 0 + shrink_constant) {
+       switch((int)dest.y) {
+           case 0: Point{dest.x + 1.0f, dest.y + 1.0f};
+           // dest.x += 1;
+           // dest.y += 1;
            break;
-           case 20: dest.y -= 1;
-           dest.x += 1;
+           case 20: Point{dest.x + 1.0f, dest.y - 1.0f};
+           // dest.y -= 1;
+           // dest.x += 1;
            break;
-           default: dest.x += 1;
+           default: Point{dest.x + 1.0f, dest.y};
        }
-   } else if (dest.y == 20 - shrink_constant) {
-       dest.y -= 1;
-   } else if (dest.y == 0 + shrink_constant) {
-       dest.y += 1;
+   } else if ((int)dest.y == 20 - shrink_constant) {
+       return Point{dest.x, dest.y - 1.0f};
+   } else if ((int)dest.y == 0 + shrink_constant) {
+       return Point{dest.x, dest.y + 1.0f};
+       //dest.y += 1;
    }
    return dest;
 }
@@ -205,7 +212,7 @@ Point relocateDestination(Point dest, int shrink_constant){
  
 Point getPath(bool map[][21], Point dest){
  Point rslt = mainBFS(map, dest);
- struct Point src = {4, 4};
+ Point src = {4, 4};
  int shrink_constant = 0;
  while(rslt.x == -1 && rslt.y == -1) {
    dest = relocateDestination(dest, shrink_constant);
@@ -236,7 +243,7 @@ int returnHeading(bool map[][21]) {
        return headingAngle;
 }
  
-int main() {
+//int main() {
    // bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
    //                       {true, true, false, false, true, true, true, false, true, true},
    //                       {false, false, false, false, true, true, false, true, false, true},
@@ -256,5 +263,5 @@ int main() {
    // std::cout << "First point in path: ";
    // std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
    // std::cout << "" << std::endl;
-   return 0;
-}
+   //return 0;
+//}
