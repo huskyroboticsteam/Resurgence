@@ -23,10 +23,7 @@ add_executable(Rover
 add_executable(tests
   Tests.cpp
   Util.cpp
-  # Pathing tests
-  Pathfinding/ObstacleMap.cpp
-  ../tests/Pathfinding/ObstacleMapTest.cpp
-    # AR Detection tests
+  # AR Detection tests
   ar/TagUnitTests.cpp
   ar/Tag.cpp
   SimpleAutonomousTester.cpp
@@ -36,10 +33,6 @@ add_executable(tests
   mapping/ObjectValidator.cpp
   mapping/EKFSlam/EKFSlam.cpp
   mapping/EKFSlam/tools.cpp)
-  )
-
-target_link_libraries(Rover ${OpenCV_LIBS})
-
 
 add_executable(lidar_vis
     lidar/MainVis.cpp
