@@ -1,8 +1,8 @@
 #include "Tag.h"
 
 #include <cassert>
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 #include <opencv2/calib3d.hpp>
 
@@ -10,16 +10,6 @@
 
 namespace AR
 {
-
-void checkCorners(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
-				  cv::Point bottom_left)
-{
-	// validate points
-	assert(!(top_left.x - top_right.x > 0		   // top left and top right are inverted
-			 || top_left.y - bottom_left.y > 0	   // top left and bottom left are inverted
-			 || bottom_left.x - bottom_right.x > 0 // bottom left and bottom right are inverted
-			 || top_right.y - bottom_right.y > 0)); // top right and bottom right are inverted
-}
 
 Tag::Tag(cv::Point top_left, cv::Point top_right, cv::Point bottom_right,
 		 cv::Point bottom_left, CameraParams params, TagID tag_id)
