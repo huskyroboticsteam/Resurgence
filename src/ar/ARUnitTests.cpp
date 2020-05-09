@@ -17,7 +17,7 @@ constexpr int BLACK = 0;
 constexpr int WHITE = 255;
 constexpr int MARGIN = 10;
 
-const AR::CameraParams PARAMS = AR::WEBCAM_720_PARAMS;
+const AR::CameraParams PARAMS = AR::Params::WEBCAM_720_PARAMS;
 const cv::Size IMAGE_SIZE(1280, 720);
 
 constexpr std::bitset<8> hamming_codes[16] = {
