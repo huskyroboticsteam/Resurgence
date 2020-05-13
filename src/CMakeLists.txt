@@ -55,13 +55,13 @@ add_executable(simulator_navigation_demo
   simulator/search.cpp
   simulator/utils.cpp
   simulator/graphics.cpp
-  simulator/world.cpp
-  simulator/world_ui.cpp)
+  simulator/simulator_world.cpp
+  simulator/world.cpp)
 
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
-target_link_libraries(simulator_navigation_demo sfml-graphics sfml-window sfml-system)
+target_link_libraries(simulator_navigation_demo sfml-graphics sfml-window sfml-system X11 pthread)
 
 include(CTest)
 include(Catch)
