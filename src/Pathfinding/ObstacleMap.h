@@ -9,8 +9,6 @@
 // pass grid onto pathing
 // recreate grid as orientation/location changes
 
-//uses default constructor with no params
-
 //todo whatever we get from GPS convert to meters
 
 class ObstacleMap{
@@ -40,9 +38,11 @@ public:
     
     //constructor
     ObstacleMap();
-    // ObstacleMap(std::vector<Point>& obstacles);
+
+    //ObstacleMap(std::vector<Point>& obstacles);
     //rebuilds ObstacleMap with given Obstacles
     void update(std::vector<Point>& obstacles);
+    
     //for testing purposes only, prints a visual representation of ObstacleMap,
     //1 = obstacle, 0 = empty
     void print();

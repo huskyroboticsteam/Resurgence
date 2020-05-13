@@ -9,8 +9,6 @@ ObstacleMap::ObstacleMap()
     robotY = 0.0f;
 }
 
-
-
 //gets robot position
 inline void ObstacleMap::updateRobotPosition()
 {
@@ -88,11 +86,3 @@ void ObstacleMap::print()
         std::cout << std::endl;
     } 
 }
-
-
-//for test compile
-// int main()
-// {
-//     ObstacleMap temp;
-//     std::cout << temp.robotX + temp.robotY << std::endl;
-// }
