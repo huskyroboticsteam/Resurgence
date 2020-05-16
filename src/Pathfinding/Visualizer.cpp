@@ -1,4 +1,4 @@
-#include "Simulator.h"
+#include "Visualizer.h"
 #include "ObstacleMap.h"
 
 using namespace cv;
@@ -95,7 +95,7 @@ int main(void) {
 };
 
 void runTest(ObstacleMap testMap, Point dest) {
-    Simulator sim; 
+    Visualizer sim; 
     Pather2 pather;
     sim.drawMap(testMap.obstacle_map);
     sim.interpretCoordinates();
@@ -103,12 +103,12 @@ void runTest(ObstacleMap testMap, Point dest) {
     sim.drawPath(path);
     sim.drawRobot();
     sim.drawDestination();
-    imshow("Simulator", sim.img);
+    imshow("Visualizer", sim.img);
     int key = waitKey(0);
 
 }
 
-void Simulator::drawMap(bool obstacle_map[][21]) {
+void Visualizer::drawMap(bool obstacle_map[][21]) {
     
     for(int i; i < size; i++){
         for(int j; j < size; j++){
@@ -124,7 +124,7 @@ void Simulator::drawMap(bool obstacle_map[][21]) {
     }
 };
 
-void Simulator::drawPath(std::queue<Point, std::deque<Point, std::allocator<Point>>> path) {
+void Visualizer::drawPath(std::queue<Point, std::deque<Point, std::allocator<Point>>> path) {
     while(!path.empty()){ 
         Point start = path.front();
         path.pop();
@@ -143,11 +143,11 @@ void Simulator::drawPath(std::queue<Point, std::deque<Point, std::allocator<Poin
     }
 };
 
-void Simulator::interpretCoordinates() {
+void Visualizer::interpretCoordinates() {
 
 };
 
-void Simulator::drawRobot() {
+void Visualizer::drawRobot() {
     int robotWidthHalf = 5;
     int robotHeightHalf = 10;
     rectangle(img,
@@ -158,7 +158,7 @@ void Simulator::drawRobot() {
         LINE_8);
 };
 
-void Simulator::drawDestination() {
+void Visualizer::drawDestination() {
         // mark edge location closest to destination or draw destination if in bounds
         // get destination info from pather2
 };
