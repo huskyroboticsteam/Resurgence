@@ -1,5 +1,10 @@
 #include "Detector.h"
 
+/*
+  Implementation of the AR Detection for the Alvar system.
+  To use ArUco, compile with ArUcoDetector.cpp instead.
+ */
+
 // clang-format off
 #ifdef WITH_GPU
 #include <opencv2/core/cuda.hpp>
@@ -44,58 +49,67 @@ namespace AR
 {
 // Declares all functions that will be used
 bool readCheckData(cv::Mat &input, cv::Mat &output);
+
 TagID getTagIDFromData(cv::Mat &data);
+
 std::vector<int> getBitData(cv::Mat data);
+
 std::vector<cv::Point2f> sortCorners(std::vector<cv::Point2f> quad);
-std::vector<std::vector<cv::Point2f>> getQuads(cv::Mat input, cv::Mat &edges,
-											   cv::Mat &grayscale, int canny_thresh_1,
-											   int canny_thresh_2, int blur_size);
+
+std::vector<std::vector<cv::Point2f>> getQuads(cv::Mat input, DetectorParams params,
+											   DetectorOutput &output);
+
 bool contourInsideAnother(std::vector<cv::Point2f> input, std::vector<cv::Point2f> other);
-cv::Mat prepImage(cv::Mat input, int thresh_val, int thresh_val2, cv::Mat &grayscale,
-				  int blur_size = 5);
+
+cv::Mat prepImage(cv::Mat input, DetectorParams params, DetectorOutput &output);
+
 void approxContours(std::vector<std::vector<cv::Point>> contours,
 					std::vector<std::vector<cv::Point2f>> &quads);
 
 // Overloaded function, only used if grayscale image and outline of edges are not needed
+/*
 std::vector<Tag> Detector::findTags(cv::Mat input, int canny_thresh_1, int canny_thresh_2,
 									int blur_size)
 {
-	cv::Mat gray;  // these won't be used later. it's just used to be passed as 
+	cv::Mat gray;  // these won't be used later. it's just used to be passed as
 	cv::Mat edges; // reference to the function this is overloading.
 	std::vector<std::vector<cv::Point2f>> corners;
 	return findTags(input, gray, edges, corners, canny_thresh_1, canny_thresh_2, blur_size);
 }
+*/
 
 // Stores grayscale version and outlined edged version of input image to grayscale and edges
 // Returns a vector of Tags obtained from the picture
-std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
-									std::vector<std::vector<cv::Point2f>> &quad_corners,
-									int canny_thresh_1, int canny_thresh_2, int blur_size)
+//   std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
+//   									std::vector<std::vector<cv::Point2f>> &quad_corners,
+//   									int canny_thresh_1, int canny_thresh_2, int blur_size)
+std::vector<Tag> detectTags(cv::Mat input, DetectorParams params, DetectorOutput &output)
 {
 #ifndef NDEBUG
 	std::clock_t c_start = std::clock(); // Stores current cpu time
 	auto wall_start = std::chrono::system_clock::now();
 #endif
 
+	output.tag_views = std::vector<cv::Mat>();
+	output.rejected_corners = std::vector<std::vector<cv::Point2f>>();
+
 	// Stores all quadrilateral shapes found in the image to the vector: allQuads
 	std::vector<std::vector<cv::Point2f>> allQuads =
-		getQuads(input, edges, grayscale, canny_thresh_1, canny_thresh_2, blur_size);
+		getQuads(input, params, output);
 #ifdef WITH_GPU
 	cv::cuda::GpuMat gpu_grayscale;
-	gpu_grayscale.upload(grayscale);
+	gpu_grayscale.upload(output.grayscaleMat);
 #endif
 #ifndef NDEBUG
 	std::cout << "Number of Quads found: " << allQuads.size() << std::endl;
 #endif
-
-	bool hasOutputSquare = false;
 
 	// vector to hold quadrilaterals that are definitely tags
 	// ~ used to check for duplicates
 	std::vector<std::vector<cv::Point2f>> tag_quads;
 
 	// vector to hold Tag Data that will be returned
-	std::vector<Tag> output;
+	std::vector<Tag> tags;
 
 	// set of "ideal" points used for perspective transform
 	std::vector<cv::Point2f> ideal;
@@ -114,13 +128,11 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		// bottom-right, bottom-left and stores it in quad
 		std::vector<cv::Point2f> quad = sortCorners(allQuads[i]);
 
-		quad_corners.push_back(quad);
-
 		// perspective transform the quadrilateral to a flat square
 		cv::Mat transform = cv::getPerspectiveTransform(quad, ideal);
 		cv::Mat square;
 #ifndef WITH_GPU
-		cv::warpPerspective(grayscale, square, transform,
+		cv::warpPerspective(output.grayscale_mat, square, transform,
 							cv::Size(IDEAL_TAG_SIZE, IDEAL_TAG_SIZE));
 #else
 		cv::cuda::GpuMat gpu_square;
@@ -140,6 +152,7 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 		// Reads the quadrilateral as if it was a tag
 		// Returns true if it is a tag
 		// Tag data gets stored in data variable
+		bool pass = false;
 		if (readCheckData(t_square, data))
 		{
 			// check if any corners of this quadrilateral are inside one already found (i.e. it
@@ -157,20 +170,18 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 				// determine id
 				TagID id = getTagIDFromData(data);
 				// Create new Tag object with approximated coordinates
-				Tag tag(quad[0], quad[1], quad[2], quad[3], cam, id);
-				output.push_back(tag);
+				Tag tag(quad[0], quad[1], quad[2], quad[3], params.camera_params, id);
+				tags.push_back(tag);
+				pass = true;
 			}
 		}
 
-		if (hasOutputSquare)
+		if(!pass)
 		{
-			cv::hconcat(edges, t_square, edges);
+			output.rejected_corners.push_back(quad);
 		}
-		else
-		{
-			edges = t_square;
-			hasOutputSquare = true;
-		}
+
+		output.tag_views.push_back(t_square);		
 	}
 
 #ifndef NDEBUG
@@ -183,24 +194,24 @@ std::vector<Tag> Detector::findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &
 	std::cout << "Detector time used: " << time_elapsed_ms << "ms (CPU) " << wall_elapsed
 			  << "ms (Wall)" << std::endl;
 #endif
-	return output;
+	return tags;
 }
 
-std::vector<std::vector<cv::Point2f>> getQuads(cv::Mat input, cv::Mat &edges,
-											   cv::Mat &grayscale, int canny_thresh_1,
-											   int canny_thresh_2, int blur_size)
+std::vector<std::vector<cv::Point2f>> getQuads(cv::Mat input, DetectorParams params,
+											   DetectorOutput &output)
 {
 	// Applies grayscale, outlines objects in the picture and emphasizes outlines
-	edges = prepImage(input, canny_thresh_1, canny_thresh_2, grayscale, blur_size);
+	output.edges_mat = prepImage(input, params, output);
 
 	// vector to hold any contours found
 	std::vector<std::vector<cv::Point>> contours;
 	// vector to hold quadrilaterals that could be possible tags
 	std::vector<std::vector<cv::Point2f>> quads;
-	std::vector<cv::Vec4i> heirarchy; // ?? What is this vector for
+	std::vector<cv::Vec4i> heirarchy;
 
 	// Find contours in the image and saves it to contours
-	cv::findContours(edges, contours, heirarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+	cv::findContours(output.edges_mat, contours, heirarchy, cv::RETR_TREE,
+					 cv::CHAIN_APPROX_SIMPLE);
 
 	// Approximates contours with polygons.
 	// Saves contour to quads if polygon is a quadrilateral
@@ -209,8 +220,7 @@ std::vector<std::vector<cv::Point2f>> getQuads(cv::Mat input, cv::Mat &edges,
 	return quads;
 }
 
-cv::Mat prepImage(cv::Mat input, int thresh_val, int thresh_val2, cv::Mat &grayscale,
-				  int blur_size)
+cv::Mat prepImage(cv::Mat input, DetectorParams params, DetectorOutput &output)
 {
 
 	cv::Mat edges;
@@ -241,20 +251,21 @@ cv::Mat prepImage(cv::Mat input, int thresh_val, int thresh_val2, cv::Mat &grays
 	dilate_filter->apply(gpu_edges, gpu_edges);
 
 	// Converts the gpu matrices to normal matrices to be displayed
-	gpu_gray.download(grayscale);
+	gpu_gray.download(output.grayscaleMat);
 	gpu_edges.download(edges);
 #else
 	cv::Mat gray;
 	cv::Mat blur;
-	int bsize = (blur_size * 2) + 1;
+	int bsize = (params.blur_size * 2) + 1;
 	cv::GaussianBlur(input, blur, cv::Size(bsize, bsize), 0);
 	cv::cvtColor(blur, gray, cv::COLOR_RGB2GRAY);
-	cv::Canny(gray, edges, thresh_val, thresh_val2);
+	cv::Canny(gray, edges, params.canny_thresh_1, params.canny_thresh_2);
 	cv::dilate(edges, edges, cv::Mat(), cv::Point(-1, -1));
 
-	grayscale = gray;
-#endif
+	output.grayscale_mat = gray;
 
+#endif
+	output.edges_mat = edges;
 	return edges;
 }
 
@@ -453,11 +464,6 @@ std::vector<int> getBitData(cv::Mat data)
 		}
 	}
 	return bits;
-}
-
-Detector::Detector(CameraParams params) : cam(params)
-{
-	cam = params;
 }
 
 } // namespace AR

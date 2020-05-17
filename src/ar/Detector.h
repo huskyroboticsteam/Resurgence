@@ -9,49 +9,23 @@
 
 namespace AR
 {
-class Detector
+struct DetectorParams
 {
-private:
-	CameraParams cam;
-
-public:
-	Detector(CameraParams params);
-
-	/**
-	   @brief Find Tags in the given image.
-
-	   This version of the function is mostly used for interactive testing programs that need
-	   to have a copy of the images at various processing stages. 
-
-	   Most parameters are optional and are mainly intended for testing. For general use it
-	   should be sufficient to simply pass in a Mat containing the image. 
-
-	   @param input The image in which to detect AR tags.
-	   @param grayscale A reference to a Mat where the grayscaled and blurred image should be
-	   stored. 
-	   @param edges A reference to a Mat where the edges from Canny edge detection should be
-	   stored.
-	   @param canny_thresh_1 Optional, the first threshold parameter for Canny edge detection.
-	   @param canny_thresh_2 Optional, the second threshold parameter for Canny edge detection.
-	   @param blur_size Optional, the size of the blur used. MUST BE AN ODD NUMBER.
-	*/
-	std::vector<Tag> findTags(cv::Mat input, cv::Mat &grayscale, cv::Mat &edges,
-							  std::vector<std::vector<cv::Point2f>> &quad_corners,
-							  int canny_thresh_1 = 50, int canny_thresh_2 = 120,
-							  int blur_size = 5);
-
-	/**
-	   @brief Find Tags in the given image.
-
-	   Most parameters are optional and are mainly intended for testing. For general use it
-	   should be sufficient to simply pass in a Mat containing the image.
-
-	   @param input The image in which to detect AR tags.
-	   @param canny_thresh_1 Optional, the first threshold parameter for Canny edge detection.
-	   @param canny_thresh_2 Optional, the second threshold parameter for Canny edge detection.
-	   @param blur_size Optional, the size of the blur used. MUST BE AN ODD NUMBER.
-	*/
-	std::vector<Tag> findTags(cv::Mat input, int canny_thresh_1 = 50, int canny_thresh_2 = 120,
-							  int blur_size = 5);
+	CameraParams camera_params = AR::Params::DEFAULT_PARAMS;
+	int canny_thresh_1 = 50;
+	int canny_thresh_2 = 120;
+	int blur_size = 5;
+	double tag_size = 200.0;
 };
+
+struct DetectorOutput
+{
+	cv::Mat grayscale_mat;
+	cv::Mat edges_mat;
+	std::vector<cv::Mat> tag_views;
+	std::vector<std::vector<cv::Point2f>> rejected_corners;
+};
+
+std::vector<Tag> detectTags(cv::Mat input, DetectorParams params, DetectorOutput &output);
+
 } // namespace AR
