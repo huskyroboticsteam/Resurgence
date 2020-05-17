@@ -2,7 +2,7 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
-#include "Point.h"
+#include "../math/PointXY.h"
 
 // recieve list of points
 // plot obstacles onto 2d grid
@@ -41,7 +41,7 @@ public:
 
     //ObstacleMap(std::vector<Point>& obstacles);
     //rebuilds ObstacleMap with given Obstacles
-    void update(std::vector<Point>& obstacles);
+    void update(std::vector<PointXY>& obstacles);
     
     //for testing purposes only, prints a visual representation of ObstacleMap,
     //1 = obstacle, 0 = empty

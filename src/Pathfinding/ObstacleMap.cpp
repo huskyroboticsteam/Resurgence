@@ -34,12 +34,12 @@ inline bool inBounds(int coordinate)
 }
 
 //rebuilds ObstacleMap with given Obstacles
-void ObstacleMap::update(std::vector<Point>& obstacles)
+void ObstacleMap::update(std::vector<PointXY>& obstacles)
 {
     updateRobotPosition();//updates values in robotX and robotY fields
     resetObstacleMap();
     int x, y;
-    for (Point p : obstacles) {
+    for (PointXY p : obstacles) {
         x = static_cast<int>(p.x - robotX) + radius;
         y = static_cast<int>(p.y - robotY) + radius;
         if (inBounds(x) && inBounds(y))

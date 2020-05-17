@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "../../src/Pathfinding/ObstacleMap.h"
-#include "../../src/Pathfinding/Point.h"
+#include "../../src/math/PointXY.h"
 
 #define CATCH_CONFIG_MAIN
 
@@ -51,10 +51,10 @@ namespace Pathfinding
 
     //makes dummy obstacle map resultant array out of sol
     //similar to ObstacleMap.update(<vectorOfPoints>)
-    void getMapObjSol(bool sol[][size], std::vector<Point>& vectorOfPoints, float shiftX=0.0f, float shiftY=0.0f)
+    void getMapObjSol(bool sol[][size], std::vector<PointXY>& vectorOfPoints, float shiftX=0.0f, float shiftY=0.0f)
     {
         fillFalse(sol);
-        for (Point p : vectorOfPoints)
+        for (PointXY p : vectorOfPoints)
         {
             int x = static_cast<int>(p.x - shiftX) + radius;
             int y = static_cast<int>(p.y - shiftY) + radius;
@@ -101,13 +101,13 @@ TEST_CASE("ObstacleMap")
     //also tests updating ObstacleMap as input updates
     //assumes center at 0, 0
 
-    std::vector<Point> vectorOfPoints = {
-        Point{2.0f, 2.0f},
-        Point{-2.0f, -2.0f},
-        Point{-3.0f, 3.0f},
-        Point{3.0f, -3.0f},
-        Point{5.0f, -5.0f},
-        Point{1.0f, 1.0f}
+    std::vector<PointXY> vectorOfPoints = {
+        PointXY{2.0f, 2.0f},
+        PointXY{-2.0f, -2.0f},
+        PointXY{-3.0f, 3.0f},
+        PointXY{3.0f, -3.0f},
+        PointXY{5.0f, -5.0f},
+        PointXY{1.0f, 1.0f}
     };
 
     ObstacleMap obsMap;
@@ -134,13 +134,13 @@ TEST_CASE("ObstacleMap OUT OF BOUNDS")
     //and points with non-rounded float values
     //assumes center at 0, 0
 
-    std::vector<Point> vectorOfPoints = {
-        Point{20.0f, 2.0f}, //Out OF BOUNDS
-        Point{-2.0f, -2.0f},
-        Point{-30.0f, 3.0f}, //Out OF BOUNDS
-        Point{3.0f, -3.00008f},
-        Point{5.0f, -5.770f},
-        Point{1.50f, 1.60f}
+    std::vector<PointXY> vectorOfPoints = {
+        PointXY{20.0f, 2.0f}, //Out OF BOUNDS
+        PointXY{-2.0f, -2.0f},
+        PointXY{-30.0f, 3.0f}, //Out OF BOUNDS
+        PointXY{3.0f, -3.00008f},
+        PointXY{5.0f, -5.770f},
+        PointXY{1.50f, 1.60f}
     };
 
     ObstacleMap obsMap;
@@ -155,11 +155,11 @@ TEST_CASE("ObstacleMap OUT OF BOUNDS")
 
 TEST_CASE("ObstacleMap CHANGE CENTER")
 {
-    std::vector<Point> vectorOfPoints = {
-        Point{10.0f, 10.0f},
-        Point{10.0f, -10.0f},
-        Point{-10.0f, 10.0f},
-        Point{-10.0f, -10.0f}
+    std::vector<PointXY> vectorOfPoints = {
+        PointXY{10.0f, 10.0f},
+        PointXY{10.0f, -10.0f},
+        PointXY{-10.0f, 10.0f},
+        PointXY{-10.0f, -10.0f}
     };
 
     ObstacleMap obsMap;

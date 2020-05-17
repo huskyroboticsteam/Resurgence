@@ -3,14 +3,13 @@
 #include <queue>
 #include <iostream>
 #include <cmath>
-#include "Point.h"
  
 //matrix size
 // #define ROW 10
 // #define COL 10
  
 // print functions for debugging
-void print_point(std::queue<Point> q) {
+void print_point(std::queue<PointXY> q) {
    while (!q.empty())
    {
        std::cout << "(" << q.front().x << ",";
@@ -23,7 +22,7 @@ void print_point(std::queue<Point> q) {
 void print_queue(std::queue<Pather2::queueNode> q) {
    while (!q.empty())
    {
-       std::queue<Point> temp = q.front().path;
+       std::queue<PointXY> temp = q.front().path;
        print_point(temp);
        std::cout << std::endl;
        q.pop();
@@ -32,13 +31,13 @@ void print_queue(std::queue<Pather2::queueNode> q) {
 }
  
 // returns full path
-std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
+std::queue<PointXY> Pather2::BFS(bool map[][21], PointXY dest){
   
    int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
    int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
   
-   Point src = {5,5};
-   std::queue<Point> error;
+   PointXY src = {5,5};
+   std::queue<PointXY> error;
    error.push(src);
    //check if src and dest are represented with 1 not 0
    if ((map[(int)src.x][(int)src.y]) || (map[(int)dest.x][(int)dest.y])){
@@ -48,7 +47,7 @@ std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
   
    map[(int)src.x][(int)src.y] = true;
    std::queue<Pather2::queueNode> q;
-   std::queue<Point> newQueue;
+   std::queue<PointXY> newQueue;
    newQueue.push(src);
    Pather2::queueNode s = {src, 0, newQueue};
    q.push(s);
@@ -59,12 +58,12 @@ std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
    while (!q.empty()){
        //get front point in points to be checked and make it current
        Pather2::queueNode curr = q.front();
-       Point pt = curr.pt;
+       PointXY pt = curr.pt;
       
        //check if current point is destination node
        if ((pt.x == dest.x) && (pt.y == dest.y)){
            //return first point after source in path to destination
-           std::queue<Point> temp = curr.path;
+           std::queue<PointXY> temp = curr.path;
            temp.pop();
            std::cout << "Final path: ";
            print_point(temp);
@@ -84,8 +83,8 @@ std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
            // check if adj point is not out of bounds and is not an obstacle
            if (((row >= 0) && (row < 21) && (col >= 0) && (col < 21)) && !map[row][col]){
                // set adj point as visited and push it to points to be checked(q)
-               struct Point test = {row, col};
-               std::queue<Point> addAdjPointToPath = curr.path;
+               struct PointXY test = {row, col};
+               std::queue<PointXY> addAdjPointToPath = curr.path;
                addAdjPointToPath.push(test);
                Pather2::queueNode adjNode = {{row, col}, curr.dist + 1, addAdjPointToPath};
                map[(int)adjNode.pt.x][(int)adjNode.pt.y] = true;
@@ -98,16 +97,16 @@ std::queue<Point> Pather2::BFS(bool map[][21], Point dest){
 }
  
 // helper BFS method to return first point in path
-Point mainBFS(bool map[][21], Point dest) {
-   std::queue<Point> path = BFS(map, dest);
+PointXY mainBFS(bool map[][21], PointXY dest) {
+   std::queue<PointXY> path = BFS(map, dest);
    return path.front();
   
 }
  
-Point getDest(Point GPSRobot, Point GPSDest) {
+PointXY getDest(PointXY GPSRobot, PointXY GPSDest) {
   
    const float PI = atan(1) * 4;
-   struct Point dest;
+   struct PointXY dest;
    float ratioX = GPSDest.x - GPSRobot.x;
    float ratioY = GPSDest.y - GPSRobot.y;
   
@@ -173,46 +172,46 @@ Point getDest(Point GPSRobot, Point GPSDest) {
  
 //If the relative location of the target is put into some invalid coordinate (unreachable),
 //then assign any neighbor valid coordinate as the new relative location, and make search again.
-Point relocateDestination(Point dest, int shrink_constant){
+PointXY relocateDestination(PointXY dest, int shrink_constant){
    if ((int)dest.x == 20 - shrink_constant) {
        switch((int)dest.y) {
-           // return Point{dest.x - 1, }
-           case 0: Point{dest.x - 1.0f, dest.y + 1.0f};
+           // return PointXY{dest.x - 1, }
+           case 0: PointXY{dest.x - 1.0f, dest.y + 1.0f};
            //dest.x -= 1;
            //dest.y += 1;
            break;
-           case 20: Point{dest.x - 1.0f, dest.y - 1.0f};
+           case 20: PointXY{dest.x - 1.0f, dest.y - 1.0f};
            //dest.x -= 1;
            //dest.y -= 1;
            break;
-           default: Point{dest.x - 1.0f, dest.y};
+           default: PointXY{dest.x - 1.0f, dest.y};
            //dest.x -= 1;
        }
    } else if ((int)dest.x == 0 + shrink_constant) {
        switch((int)dest.y) {
-           case 0: Point{dest.x + 1.0f, dest.y + 1.0f};
+           case 0: PointXY{dest.x + 1.0f, dest.y + 1.0f};
            // dest.x += 1;
            // dest.y += 1;
            break;
-           case 20: Point{dest.x + 1.0f, dest.y - 1.0f};
+           case 20: PointXY{dest.x + 1.0f, dest.y - 1.0f};
            // dest.y -= 1;
            // dest.x += 1;
            break;
-           default: Point{dest.x + 1.0f, dest.y};
+           default: PointXY{dest.x + 1.0f, dest.y};
        }
    } else if ((int)dest.y == 20 - shrink_constant) {
-       return Point{dest.x, dest.y - 1.0f};
+       return PointXY{dest.x, dest.y - 1.0f};
    } else if ((int)dest.y == 0 + shrink_constant) {
-       return Point{dest.x, dest.y + 1.0f};
+       return PointXY{dest.x, dest.y + 1.0f};
        //dest.y += 1;
    }
    return dest;
 }
  
  
-Point getPath(bool map[][21], Point dest){
- Point rslt = mainBFS(map, dest);
- Point src = {4, 4};
+PointXY getPath(bool map[][21], PointXY dest){
+ PointXY rslt = mainBFS(map, dest);
+ PointXY src = {4, 4};
  int shrink_constant = 0;
  while(rslt.x == -1 && rslt.y == -1) {
    dest = relocateDestination(dest, shrink_constant);
@@ -225,10 +224,10 @@ Point getPath(bool map[][21], Point dest){
 }
  
 int returnHeading(bool map[][21]) {
-       struct Point GPS_src = {0,0};
-       struct Point GPS_dest = {70, 10};
-       struct Point destination = getDest(GPS_src, GPS_dest);
-       struct Point nextPoint = getPath(map, destination);
+       struct PointXY GPS_src = {0,0};
+       struct PointXY GPS_dest = {70, 10};
+       struct PointXY destination = getDest(GPS_src, GPS_dest);
+       struct PointXY nextPoint = getPath(map, destination);
        std::cout << "(" << destination.x << "," << destination.y << ")" << std::endl;
        std::cout << "First point in path: ";
        std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
