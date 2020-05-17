@@ -3,7 +3,7 @@
 #include <vector>
 #include <queue>
 #include <string>
-#include "../math/PointXY"
+#include "../math/PointXY.h"
 //#include "ObstacleMap.h"
 class Pather2 {
 private:

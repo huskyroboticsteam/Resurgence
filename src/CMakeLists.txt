@@ -6,12 +6,6 @@ enable_testing()
 
 find_package(Catch2 REQUIRED)
 
-find_package(OpenCV REQUIRED)
-
-add_subdirectory(ar)
-
-add_subdirectory(ObstacleSim)
-
 add_executable(Rover
         Rover.cpp
         CommandLineOptions.cpp

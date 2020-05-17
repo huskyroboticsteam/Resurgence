@@ -1,6 +1,5 @@
 #include "Visualizer.h"
 #include "ObstacleMap.h"
-#include "../math/PointXY"
 
 using namespace cv;
 

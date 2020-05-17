@@ -86,3 +86,7 @@ void ObstacleMap::print()
         std::cout << std::endl;
     } 
 }
+
+int main(){
+
+};

@@ -31,7 +31,7 @@ TEST_CASE("Pathfinding")
     obj.update(obstaclePosition);
     
     //Construct a searching path object
-    Pather searchingPath;
+    Pather2 searchingPath;
     PointXY nextPoint = searchingPath.getPath(obj, PointXY{10.0f, 10.0f});
 
     PointXY expectPoint = {1.0f, 0.0};

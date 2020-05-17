@@ -3,6 +3,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "Pather2.h"
+#include "../math/PointXY.h"
 
 #define w 400
 

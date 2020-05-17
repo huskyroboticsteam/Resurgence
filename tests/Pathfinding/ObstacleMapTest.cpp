@@ -121,7 +121,7 @@ TEST_CASE("ObstacleMap")
 
     // Adds point to the vector of points and update both obsMap and sol
     // check that they have equal resulting structure by value
-    vectorOfPoints.push_back(Point{-7.0, 3.0});
+    vectorOfPoints.push_back(PointXY{-7.0, 3.0});
     obsMap.update(vectorOfPoints);
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
     REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
