@@ -3,6 +3,7 @@ cd urg_library-1.2.5
 make
 make install
 cd ..
+apt-get update
 apt-get install -y libsfml-dev
 # This next line is apparently where Eigen is installed
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:`pwd`src/mapping/EKFSlam
