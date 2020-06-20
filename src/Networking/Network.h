@@ -13,6 +13,6 @@ extern "C"
 #include <aio.h>
 #include <fcntl.h>
 
-void InitializeBaseStationSocket();
+bool InitializeBaseStationSocket();
 int recvBaseStationPacket(char *buffer);
 void sendBaseStationPacket(const std::string &packet);

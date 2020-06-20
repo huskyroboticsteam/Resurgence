@@ -14,14 +14,17 @@
 
 #include<iostream>
 
-int base_station_fd;
+int base_station_fd = -1;
+bool connected = false;
 
-void InitializeBaseStationSocket()
+bool InitializeBaseStationSocket()
 {
+  if (connected) return connected;
+
   if ((base_station_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
     perror("Base station socket creation failed");
-    exit(1);
+    return false;
   }
 
   struct sockaddr_in servaddr;
@@ -34,12 +37,16 @@ void InitializeBaseStationSocket()
   if (connect(base_station_fd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
   {
     perror("Base station connect failed");
-    exit(1);
+    return false;
   }
+
+  return (connected = true);
 }
 
 int recvBaseStationPacket(char *buffer)
 {
+  if (!connected) return 0;
+
   // TODO: How do we split base station packets? If we split on newlines
   // this will require more complicated buffer management.
   // If we split by requiring the base station to send a four-byte length

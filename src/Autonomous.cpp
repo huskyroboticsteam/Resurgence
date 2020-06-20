@@ -22,7 +22,7 @@ void Autonomous::autonomyIter() {
   // TODO incredibly clever algorithms for state estimation
   // and path planning and control!
 
-  setCmdVel(0.5, 0.1);
+  setCmdVel(0.5, 1.0);
 }
 
 void Autonomous::setWorldData(std::shared_ptr<WorldData> wdata)
