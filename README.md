@@ -63,6 +63,21 @@ There is a Homebrew package for Catch2 as well. Open the Terminal and run this
 command:
 `brew install catch2`
 
+## Install URG library (Hokuyo lidar)
+
+Tested on Ubuntu. Not sure how to install on Mac and Windows.
+
+```
+git clone https://github.com/andrewbriand/urg_library-1.2.5.git
+cd urg_library-1.2.5
+make
+sudo make install
+```
+
+## Install SFML and Eigen (navigation simulator)
+
+Follow instructions in `src/simulator/README.md`.
+
 ## Setup CMake
 CMake is a tool we use that helps us compile our project with the libraries we
 use. This assumes that you have Ubuntu installed and configured.
