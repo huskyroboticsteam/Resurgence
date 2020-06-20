@@ -1,23 +1,32 @@
 #include "CommandLineOptions.h"
 #include "Globals.h"
-#include "Network.h"
+#include "Networking/NetworkConstants.h"
+#include "Networking/Network.h"
+#include "Networking/CANUtils.h"
+#include "Networking/ParseCAN.h"
+#include "Networking/ParseBaseStation.h"
 
 void InitializeRover()
 {
-    // TODO(sasha): Call individual initialization functions
+    InitializeCANSocket();
+    InitializeBaseStationSocket();
 }
 
 int main(int argc, char **argv)
 {
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover();
+    CANPacket packet;
+    char buffer[MAXLINE];
     for(;;)
     {
-        ParseIncomingNetworkPackets(); // NOTE(sasha): Since we're probably going to be using SocketCAN,
-                                       //              this includes both CAN and Network packets (maybe)
-
-	    //UpdateRoverState();
-        SendOutgoingNetworkPackets();
+        if (recvCANPacket(&packet) != 0) {
+            ParseCANPacket(packet);
+        }
+        bzero(buffer, sizeof(buffer));
+        if (recvBaseStationPacket(buffer) != 0) {
+            ParseBaseStationPacket(buffer);
+        }
     }
     return 0;
 }

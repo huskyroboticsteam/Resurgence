@@ -1,3 +1,6 @@
 [submodule "src/simulator"]
 	path = src/simulator
 	url = git@github.com:nhatch/slam
+[submodule "src/HindsightCAN"]
+	path = src/HindsightCAN
+	url = https://github.com/huskyroboticsteam/HindsightCAN.git
