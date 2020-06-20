@@ -16,64 +16,63 @@ enable_testing()
 
 find_package(Catch2 REQUIRED)
 
-add_executable(Rover
-  Rover.cpp
+list(APPEND RoverCommonTest
   CommandLineOptions.cpp
   Globals.cpp
-  Networking/Network.cpp
-  Networking/CANUtils.cpp
   Networking/ParseBaseStation.cpp
   Networking/IK.cpp
-  Util.cpp
-  mapping/EnvMap.cpp
   Networking/ParseCAN.cpp
   Networking/log.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/PortTemplate.c
+  Autonomous.cpp
   Util.cpp
+  simulator/utils.cpp
+  )
+
+list(APPEND RoverCommon
+  Rover.cpp
+  ${RoverCommonTest}
+  Networking/Network.cpp
   mapping/EnvMap.cpp)
+
+add_executable(Rover
+  ${RoverCommon}
+  simulator/noop_world.cpp
+  Networking/CANUtils.cpp
+  )
 
 add_executable(RoverNoCAN
-  Rover.cpp
-  CommandLineOptions.cpp
-  Globals.cpp
-  Networking/Network.cpp
+  ${RoverCommon}
+  simulator/noop_world.cpp
   Networking/CANStubs.cpp
-  Networking/ParseBaseStation.cpp
-  Networking/IK.cpp
-  Networking/log.cpp
-  Util.cpp
-  mapping/EnvMap.cpp
-  Networking/ParseCAN.cpp
-  HindsightCAN/CANPacket.c
-  HindsightCAN/CANCommon.c
-  HindsightCAN/PortTemplate.c
-  Util.cpp
-  mapping/EnvMap.cpp)
+  )
+
+add_executable(RoverSim
+  ${RoverCommon}
+  Networking/CANStubs.cpp
+  #simulator/navigation.cpp
+  #simulator/plan.cpp
+  #simulator/search.cpp
+  simulator/utils.cpp
+  simulator/graphics.cpp
+  simulator/simulator_world.cpp
+  simulator/world.cpp)
 
 add_executable(tests
+  ${RoverCommonTest}
   Tests.cpp
-  Util.cpp
+  simulator/noop_world.cpp
   # AR Detection tests
   ar/TagUnitTests.cpp
   ar/Tag.cpp
   # CAN tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
-  Networking/log.cpp
-  CommandLineOptions.cpp
-  Globals.cpp
-  Networking/ParseCAN.cpp
-  Networking/ParseBaseStation.cpp
-  Networking/IK.cpp
   Networking/NetworkingStubs.cpp
-  HindsightCAN/CANPacket.c
-  HindsightCAN/CANCommon.c
-  HindsightCAN/PortTemplate.c
   # Autonomy tests
   SimpleAutonomousTester.cpp
-  Autonomous.cpp
   FakeMap.cpp
   mapping/ValidatorTest.cpp
   mapping/ObjectValidator.cpp
@@ -104,10 +103,14 @@ add_executable(simulator_navigation_demo
   simulator/simulator_world.cpp
   simulator/world.cpp)
 
+list(APPEND simulator_libs
+  sfml-graphics sfml-window sfml-system X11 pthread)
+
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
-target_link_libraries(simulator_navigation_demo sfml-graphics sfml-window sfml-system X11 pthread)
+target_link_libraries(RoverSim ${OpenCV_LIBS} ${simulator_libs})
+target_link_libraries(simulator_navigation_demo ${simulator_libs})
 
 include(CTest)
 include(Catch)
