@@ -3,6 +3,8 @@ cd urg_library-1.2.5
 make
 make install
 cd ..
+sudo apt-get install libeigen3-dev
+sudo apt-get install libsfml-dev
 git submodule update --init --recursive
 git clone https://github.com/catchorg/Catch2.git
 cd ./Catch2
