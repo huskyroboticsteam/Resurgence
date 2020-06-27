@@ -17,6 +17,7 @@ public:
     //Gets the target's coordinate
     PointXY getTarget();
     void setWorldData(std::shared_ptr<WorldData>);
+    void autonomyIter();
 
 private:
     PointXY target;

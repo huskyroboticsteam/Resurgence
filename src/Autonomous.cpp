@@ -1,4 +1,6 @@
 #include "Autonomous.h"
+#include "simulator/world_interface.h"
+#include "simulator/utils.h"
 #include <cmath>
 
 constexpr float PI = M_PI;
@@ -9,6 +11,18 @@ Autonomous::Autonomous(PointXY _target) : target(_target)
     targetHeading = -1;
     forwardCount = -1;
     rightTurn = false;
+}
+
+void Autonomous::autonomyIter() {
+  transform_t gps = readGPS();
+  transform_t odom = readOdom();
+  points_t lidar = readLidarScan();
+  points_t landmarks = readLandmarks();
+
+  // TODO incredibly clever algorithms for state estimation
+  // and path planning and control!
+
+  setCmdVel(0.5, 1.0);
 }
 
 void Autonomous::setWorldData(std::shared_ptr<WorldData> wdata)
