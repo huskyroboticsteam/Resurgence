@@ -26,6 +26,7 @@ click):
    libtiff-dev libdc1394-22-dev`
    
 Now, to install the extra modules:
+
 3. `git clone https://github.com/opencv/opencv_contrib`
 4. `cd opencv_contrib`
 5. `git checkout 3.4.7`
@@ -34,6 +35,7 @@ Now, to install the extra modules:
 8. `cd`
 
 Now, to install and build OpenCV, with the extra modules:
+
 9. `wget https://github.com/opencv/opencv/archive/3.4.7.zip`
 10. `unzip 3.4.7.zip`
 11. `cd opencv-3.4.7`
