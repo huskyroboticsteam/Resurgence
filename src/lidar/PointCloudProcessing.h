@@ -1,28 +1,31 @@
 #pragma once
 
 #include <vector>
-#include <set>
-#include <memory>
 
-namespace Lidar
-{
+#include "../math/PointXY.h"
 
-typedef struct PointXY
+class Polar2D;
+
+namespace lidar
 {
-    float x;
-    float y;
-} PointXY;
 
 typedef struct BoundingBox
 {
-    float xmin;
-    float ymin;
-    float xmax;
-    float ymax;
+	float xmin;
+	float ymin;
+	float xmax;
+	float ymax;
 } BoundingBox;
 
-std::vector<std::set<std::shared_ptr<PointXY>>> clusterPoints(
-    std::vector<std::shared_ptr<PointXY>> pts, float sepThreshold);
+bool approxEqual(PointXY p, PointXY q);
+float distance(float x0, float y0, float x1, float y1);
+PointXY polarToCartesian(Polar2D p);
+void localToGlobal(PointXY &p, float x_loc, float y_loc, float heading);
+std::vector<std::vector<PointXY>> clusterPoints(std::vector<PointXY> &pts,
+												float sep_threshold);
+std::vector<std::vector<PointXY>> clusterOrderedPoints(std::vector<PointXY> &points,
+													   float sep_threshold);
+void filterGroundPoints(std::vector<Polar2D> &pts, float scan_height, float slope_tol_rad);
+std::vector<PointXY> convexHull(std::vector<PointXY> &cluster);
 
-std::vector<BoundingBox> boundCluster(std::set<std::shared_ptr<PointXY>> cluster);
-}; // namespace Lidar
+}; // namespace lidar

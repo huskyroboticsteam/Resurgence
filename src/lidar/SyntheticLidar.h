@@ -54,5 +54,5 @@ public:
     //Gets the last angle the lidar generated a point at.
     double getLastAngle();
     //Gets the system time at which the last frame was completed.
-    auto getLastFrameTime();
+    //auto getLastFrameTime();
 };

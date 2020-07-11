@@ -6,6 +6,10 @@ PY2020 Jetson TX2 Codebase Hindsight
 There are a few setup steps that are necessary before development on the
 codebase can be done.
 
+Note: Terminal commands to perform many of these steps can be found in the file
+`tests-docker-action/entrypoint.sh`, which is used to automatically set up an
+Ubuntu computer in order to run our integration tests.
+
 ## Install OpenCV
 OpenCV is a computer vision library that's used for the AR tag detection code
 and as such is needed to compile the project.
@@ -85,6 +89,30 @@ There is a Homebrew package for Catch2 as well. Open the Terminal and run this
 command:
 `brew install catch2`
 
+## Install URG library (Hokuyo lidar)
+
+Tested on Ubuntu. Not sure how to install on Mac and Windows.
+
+```
+git clone https://github.com/andrewbriand/urg_library-1.2.5.git
+cd urg_library-1.2.5
+make
+sudo make install
+```
+
+## Install SFML and Eigen (navigation simulator)
+
+Follow instructions in `src/simulator/README.md`, or just execute the commands
+from `tests-docker-action/entrypoint.sh`.
+
+## Setup CMake
+CMake is a tool we use that helps us compile our project with the libraries we
+use. This assumes that you have Ubuntu installed and configured.
+
+If you are using Windows, type this into your Ubuntu terminal and hit "return"
+to install the necessary files:
+`sudo apt install cmake g++ git`
+
 ## Setup Project Repository
 This step will require you to have CMake and Git. If you've followed the above
 OpenCV setup instructions, you should have these installed already. The
@@ -109,7 +137,6 @@ Now, you're ready to build the project.
 ## Building
 Ensure you have CMake installed.
 Run
-
 ```
 mkdir -p build
 cd build
