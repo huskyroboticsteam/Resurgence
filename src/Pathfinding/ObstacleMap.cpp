@@ -1,19 +1,5 @@
 #include "ObstacleMap.h"
 #include <iostream>
-#include <cstdlib>
-
-//constructor
-ObstacleMap::ObstacleMap()
-{
-    robotX = 0.0f;
-    robotY = 0.0f;
-}
-
-//gets robot position
-inline void ObstacleMap::updateRobotPosition()
-{
-    //fill when recieve GPS, update values to robotX and robotY fields
-}
 
 //sets all values in ObstacleMap to false
 inline void ObstacleMap::resetObstacleMap()
@@ -34,9 +20,10 @@ inline bool inBounds(int coordinate)
 }
 
 //rebuilds ObstacleMap with given Obstacles
-void ObstacleMap::update(std::vector<PointXY>& obstacles)
+void ObstacleMap::update(std::vector<PointXY>& obstacles, float robotX, float robotY)
 {
-    updateRobotPosition();//updates values in robotX and robotY fields
+    this->robotX = robotX;
+    this->robotY = robotY;
     resetObstacleMap();
     int x, y;
     for (PointXY p : obstacles) {
@@ -87,6 +74,7 @@ void ObstacleMap::print()
     } 
 }
 
-int main(){
-
-};
+// int main(){
+//     ObstacleMap obs;
+//     std::cout << typeid(obs.obstacle_map).name() << std::endl;
+// }

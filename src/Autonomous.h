@@ -6,6 +6,8 @@
 #include "lidar/PointCloudProcessing.h"
 #include "WorldData.h"
 #include "FakeMap.h"
+#include "Pathfinding/ObstacleMap.h"
+#include "Pathfinding/Pather2.h"
 
 class Autonomous
 {
@@ -29,4 +31,11 @@ private:
     std::pair<float, float> stateForwards(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateTurn(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateBackwards(float currHeading, std::pair<float, float> directions);
+
+    //helpers to use simulator utils types
+    PointXY point_tToPointXY(point_t pnt);
+    std::vector<PointXY>& points_tToPointXYs(points_t pnts);
+    
+    ObstacleMap obsMap;
+    Pather2 pather;
 };
