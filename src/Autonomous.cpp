@@ -15,6 +15,21 @@ Autonomous::Autonomous(PointXY _target) : target(_target)
     // pather = Pather2();
 }
 
+PointXY point_tToPointXY(point_t pnt){
+  return PointXY{static_cast<float>(pnt(0)), static_cast<float>(pnt(1))};
+}
+
+const std::vector<PointXY> points_tToPointXYs(points_t pnts) {
+  std::vector<PointXY> res;
+  for(point_t &pnt : pnts) {
+    res.push_back(point_tToPointXY(pnt));
+  }
+  const std::vector<PointXY>& temp = res;
+  std::cout << "res " << res.size() << std::endl;
+  std::cout << "temp " << temp.size() << std::endl;
+
+  return res;
+}
 
 void Autonomous::autonomyIter() {
   transform_t gps = readGPS();
@@ -22,15 +37,19 @@ void Autonomous::autonomyIter() {
   points_t lidar = readLidarScan();
   points_t landmarks = readLandmarks();
 
-  pose_t gpsPose = toPose(gps, 0);
-//   obsMap.update(points_tToPointXYs(lidar), static_cast<float>(gpsPose(0)), static_cast<float>(gpsPose(1)));
-  PointXY direction = pather.getPath(points_tToPointXYs(lidar), static_cast<float>(gpsPose(0)), static_cast<float>(gpsPose(1)), target);
-  float theta = atan(direction.y / direction.x);
-  double dtheta = static_cast<double>(theta) - gpsPose(3);
-
+  double dtheta;
+  if(lidar.empty()) {
+    dtheta = 0.0;
+  } else {
+    pose_t gpsPose = toPose(gps, 0);
+    const std::vector<PointXY>& ref = points_tToPointXYs(lidar);
+    std::cout << "ref " << ref.size() << std::endl;
+    PointXY direction = pather.getPath(ref, static_cast<float>(gpsPose(0)), static_cast<float>(gpsPose(1)), target);
+    float theta = atan(direction.y / direction.x);
+    dtheta = static_cast<double>(theta) - gpsPose(3);
+  }
   // TODO incredibly clever algorithms for state estimation
   // and path planning and control!
-
 
   setCmdVel(dtheta, 1.0);
 }
@@ -138,14 +157,3 @@ PointXY Autonomous::getTarget()
     return target;
 }
 
-PointXY point_tToPointXY(point_t pnt){
-  return PointXY{static_cast<float>(pnt(0)), static_cast<float>(pnt(1))};
-}
-
-std::vector<PointXY>& points_tToPointXYs(points_t pnts) {
-  std::vector<PointXY> res;
-  for(point_t &pnt : pnts) {
-    res.push_back(point_tToPointXY(pnt));
-  }
-  return res;
-}

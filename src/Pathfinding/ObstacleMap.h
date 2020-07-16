@@ -37,7 +37,7 @@ public:
 
     //ObstacleMap(std::vector<Point>& obstacles);
     //rebuilds ObstacleMap with given Obstacles
-    void update(std::vector<PointXY>& obstacles, float robotX, float robotY);
+    void update(const std::vector<PointXY>& obstacles, float robotX, float robotY);
     
     //for testing purposes only, prints a visual representation of ObstacleMap,
     //1 = obstacle, 0 = empty

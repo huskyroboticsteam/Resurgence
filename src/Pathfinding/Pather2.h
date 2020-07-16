@@ -21,13 +21,13 @@ public:
     // returns full path
     std::queue<PointXY> BFS(PointXY dest);
     
-    PointXY mainBFS(std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest);
+    PointXY mainBFS(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest);
 
-    PointXY getPath(std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest);
+    PointXY getPath(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest);
     
     
     PointXY relocateDestination(PointXY dest, int shrink_constant);
     // int returnHeading();
 
-    void updateMap(std::vector<PointXY>& obstacles, float robotX, float robotY);
+    void updateMap(const std::vector<PointXY>& obstacles, float robotX, float robotY);
 };

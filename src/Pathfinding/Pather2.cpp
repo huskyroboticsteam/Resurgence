@@ -96,7 +96,9 @@ std::queue<PointXY> Pather2::BFS(PointXY dest){
 }
  
 // helper BFS method to return first point in path
-PointXY Pather2::mainBFS(std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest) {
+PointXY Pather2::mainBFS(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest) {
+    std::cout << obstacles.size() << std::endl;
+
     updateMap(obstacles, robotX, robotY);
     std::queue<PointXY> path = BFS(dest);
     return path.front();
@@ -208,7 +210,9 @@ PointXY Pather2::relocateDestination(PointXY dest, int shrink_constant){
 }
  
  
-PointXY Pather2::getPath(std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest){
+PointXY Pather2::getPath(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest){
+    std::cout << "get path " << obstacles.size() << std::endl;
+
     PointXY rslt = mainBFS(obstacles, robotX, robotY, dest);
     PointXY src = {4, 4};
     int shrink_constant = 0;
@@ -241,7 +245,7 @@ PointXY Pather2::getPath(std::vector<PointXY>& obstacles, float robotX, float ro
 //        return headingAngle;
 // }
 
-void Pather2::updateMap(std::vector<PointXY>& obstacles, float robotX, float robotY)
+void Pather2::updateMap(const std::vector<PointXY>& obstacles, float robotX, float robotY)
 {
     obsMap.update(obstacles, robotX, robotY);
 }
