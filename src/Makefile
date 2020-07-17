@@ -1585,33 +1585,6 @@ home/assafvayner/Desktop/PY2020/tests/Pathfinding/ObstacleMapTest.cpp.s:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/home/assafvayner/Desktop/PY2020/tests/Pathfinding/ObstacleMapTest.cpp.s
 .PHONY : home/assafvayner/Desktop/PY2020/tests/Pathfinding/ObstacleMapTest.cpp.s
 
-home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.o: home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.o
-
-.PHONY : home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.o
-
-# target to build an object file
-home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.o:
-	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.o
-.PHONY : home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.o
-
-home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.i: home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.i
-
-.PHONY : home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.i
-
-# target to preprocess a source file
-home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.i:
-	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.i
-.PHONY : home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.i
-
-home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.s: home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.s
-
-.PHONY : home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.s
-
-# target to generate assembly for a file
-home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.s:
-	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.s
-.PHONY : home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.cpp.s
-
 lidar/LidarVis.o: lidar/LidarVis.cpp.o
 
 .PHONY : lidar/LidarVis.o
@@ -1815,39 +1788,6 @@ mapping/EKFSlam/tools.cpp.s:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/mapping/EKFSlam/tools.cpp.s
 	$(MAKE) -f CMakeFiles/lidarOnlyTest.dir/build.make CMakeFiles/lidarOnlyTest.dir/mapping/EKFSlam/tools.cpp.s
 .PHONY : mapping/EKFSlam/tools.cpp.s
-
-mapping/EnvMap.o: mapping/EnvMap.cpp.o
-
-.PHONY : mapping/EnvMap.o
-
-# target to build an object file
-mapping/EnvMap.cpp.o:
-	$(MAKE) -f CMakeFiles/RoverNoCAN.dir/build.make CMakeFiles/RoverNoCAN.dir/mapping/EnvMap.cpp.o
-	$(MAKE) -f CMakeFiles/Rover.dir/build.make CMakeFiles/Rover.dir/mapping/EnvMap.cpp.o
-	$(MAKE) -f CMakeFiles/RoverSim.dir/build.make CMakeFiles/RoverSim.dir/mapping/EnvMap.cpp.o
-.PHONY : mapping/EnvMap.cpp.o
-
-mapping/EnvMap.i: mapping/EnvMap.cpp.i
-
-.PHONY : mapping/EnvMap.i
-
-# target to preprocess a source file
-mapping/EnvMap.cpp.i:
-	$(MAKE) -f CMakeFiles/RoverNoCAN.dir/build.make CMakeFiles/RoverNoCAN.dir/mapping/EnvMap.cpp.i
-	$(MAKE) -f CMakeFiles/Rover.dir/build.make CMakeFiles/Rover.dir/mapping/EnvMap.cpp.i
-	$(MAKE) -f CMakeFiles/RoverSim.dir/build.make CMakeFiles/RoverSim.dir/mapping/EnvMap.cpp.i
-.PHONY : mapping/EnvMap.cpp.i
-
-mapping/EnvMap.s: mapping/EnvMap.cpp.s
-
-.PHONY : mapping/EnvMap.s
-
-# target to generate assembly for a file
-mapping/EnvMap.cpp.s:
-	$(MAKE) -f CMakeFiles/RoverNoCAN.dir/build.make CMakeFiles/RoverNoCAN.dir/mapping/EnvMap.cpp.s
-	$(MAKE) -f CMakeFiles/Rover.dir/build.make CMakeFiles/Rover.dir/mapping/EnvMap.cpp.s
-	$(MAKE) -f CMakeFiles/RoverSim.dir/build.make CMakeFiles/RoverSim.dir/mapping/EnvMap.cpp.s
-.PHONY : mapping/EnvMap.cpp.s
 
 mapping/ObjectValidator.o: mapping/ObjectValidator.cpp.o
 
@@ -2287,9 +2227,6 @@ help:
 	@echo "... home/assafvayner/Desktop/PY2020/tests/Pathfinding/ObstacleMapTest.o"
 	@echo "... home/assafvayner/Desktop/PY2020/tests/Pathfinding/ObstacleMapTest.i"
 	@echo "... home/assafvayner/Desktop/PY2020/tests/Pathfinding/ObstacleMapTest.s"
-	@echo "... home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.o"
-	@echo "... home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.i"
-	@echo "... home/assafvayner/Desktop/PY2020/tests/Pathfinding/PatherTest.s"
 	@echo "... lidar/LidarVis.o"
 	@echo "... lidar/LidarVis.i"
 	@echo "... lidar/LidarVis.s"
@@ -2311,9 +2248,6 @@ help:
 	@echo "... mapping/EKFSlam/tools.o"
 	@echo "... mapping/EKFSlam/tools.i"
 	@echo "... mapping/EKFSlam/tools.s"
-	@echo "... mapping/EnvMap.o"
-	@echo "... mapping/EnvMap.i"
-	@echo "... mapping/EnvMap.s"
 	@echo "... mapping/ObjectValidator.o"
 	@echo "... mapping/ObjectValidator.i"
 	@echo "... mapping/ObjectValidator.s"

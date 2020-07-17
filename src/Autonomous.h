@@ -8,6 +8,7 @@
 #include "FakeMap.h"
 #include "Pathfinding/ObstacleMap.h"
 #include "Pathfinding/Pather2.h"
+#include "simulator/utils.h"
 
 class Autonomous
 {
@@ -31,6 +32,7 @@ private:
     std::pair<float, float> stateForwards(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateTurn(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateBackwards(float currHeading, std::pair<float, float> directions);
+    double pathDirection(points_t lidar, transform_t gps);
 
     //helpers to use simulator utils types
     // PointXY point_tToPointXY(point_t pnt);

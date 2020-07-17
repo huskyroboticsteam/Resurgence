@@ -26,24 +26,14 @@ void ObstacleMap::update(const std::vector<PointXY>& obstacles, float robotX, fl
     this->robotY = robotY;
     resetObstacleMap();
     int x, y;
-    std::cout << obstacles.size() << std::endl;
-    // for(int i = 0; i < obstacles.size(); i++) {
-    //     PointXY &p = obstacles.at(i);
-        
-    // }
-
-
-
     for (const PointXY &p : obstacles) {
-       x = static_cast<int>(p.x - robotX) + radius;
+        x = static_cast<int>(p.x - robotX) + radius;
         y = static_cast<int>(p.y - robotY) + radius;
-        // std::cout << "x: " << x << "  y: " << y << std::endl;
         if (inBounds(x) && inBounds(y))
         {
             modifyObstacleMap(x,y);
         } 
     }
-    std::cout << "place 5" << std::endl;
 }
 
 //rounds given coordinates up/down to obstacle_map indices,

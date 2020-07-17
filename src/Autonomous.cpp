@@ -1,6 +1,5 @@
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
-#include "simulator/utils.h"
 #include <cmath>
 
 constexpr float PI = M_PI;
@@ -11,12 +10,10 @@ Autonomous::Autonomous(PointXY _target) : target(_target)
     targetHeading = -1;
     forwardCount = -1;
     rightTurn = false;
-    // obsMap = ObstacleMap();
-    // pather = Pather2();
 }
 
 PointXY point_tToPointXY(point_t pnt){
-  return PointXY{static_cast<float>(pnt(0)), static_cast<float>(pnt(1))};
+    return PointXY{static_cast<float>(pnt(0)), static_cast<float>(pnt(1))};
 }
 
 const std::vector<PointXY> points_tToPointXYs(points_t pnts) {
@@ -24,35 +21,41 @@ const std::vector<PointXY> points_tToPointXYs(points_t pnts) {
   for(point_t &pnt : pnts) {
     res.push_back(point_tToPointXY(pnt));
   }
-  const std::vector<PointXY>& temp = res;
-  std::cout << "res " << res.size() << std::endl;
-  std::cout << "temp " << temp.size() << std::endl;
-
   return res;
 }
 
-void Autonomous::autonomyIter() {
+void Autonomous::autonomyIter() 
+{
   transform_t gps = readGPS();
   transform_t odom = readOdom();
   points_t lidar = readLidarScan();
   points_t landmarks = readLandmarks();
 
-  double dtheta;
-  if(lidar.empty()) {
-    dtheta = 0.0;
-  } else {
-    pose_t gpsPose = toPose(gps, 0);
-    const std::vector<PointXY>& ref = points_tToPointXYs(lidar);
-    std::cout << "ref " << ref.size() << std::endl;
-    PointXY direction = pather.getPath(ref, static_cast<float>(gpsPose(0)), static_cast<float>(gpsPose(1)), target);
-    float theta = atan(direction.y / direction.x);
-    dtheta = static_cast<double>(theta) - gpsPose(3);
-  }
+  double dtheta = pathDirection(lidar, gps);
+  double speed = 10.0;
   // TODO incredibly clever algorithms for state estimation
   // and path planning and control!
-
-  setCmdVel(dtheta, 1.0);
+  
+  if(!lidar.empty()) {
+    speed = 5.0;
+  }
+  setCmdVel(dtheta, speed);
 }
+
+double Autonomous::pathDirection(points_t lidar, transform_t gps) {
+    double dtheta;
+    if(lidar.empty()) {
+        dtheta = 0.0;
+    } else {
+        pose_t gpsPose = toPose(gps, 0);
+        const std::vector<PointXY>& ref = points_tToPointXYs(lidar);
+        PointXY direction = pather.getPath(ref, static_cast<float>(gpsPose(0)), static_cast<float>(gpsPose(1)), target);
+        float theta = atan(direction.y / direction.x);
+        dtheta = static_cast<double>(theta) - gpsPose(2);
+    }
+    return dtheta;
+}
+
 
 void Autonomous::setWorldData(std::shared_ptr<WorldData> wdata)
 {
