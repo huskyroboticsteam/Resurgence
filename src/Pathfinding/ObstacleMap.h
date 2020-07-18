@@ -19,8 +19,6 @@ private:
     // sets four elements around coordinates of point that have
     //been truncated to x and y
     void modifyObstacleMap(int x, int y);
-    //for retrieving robot position
-    void updateRobotPosition();//needs to use gps
 
 public:
     //given values are expected to be in meters, but otherwise are in: ObstacleMap units
@@ -28,6 +26,7 @@ public:
     constexpr static int radius = 10;
     // length/width of obstacle_map
     constexpr static int size = 1 + 2 * radius;
+    constexpr static float meters_per_cell = 1.f;
     
     //robot coordinates ing GPS
     float robotX;//initialized to 0.0f upon construction
