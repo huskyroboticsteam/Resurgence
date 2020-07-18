@@ -3,13 +3,26 @@
 
 using namespace cv;
 
+void runTest(std::string description, ObstacleMap testMap, PointXY dest) {
+    Visualizer sim;
+    Pather2 pather;
+    sim.drawMap(testMap.obstacle_map);
+    sim.interpretCoordinates();
+    std::queue<PointXY> path = pather.BFS(testMap.obstacle_map, dest);
+    sim.drawPath(path);
+    sim.drawRobot();
+    sim.drawDestination();
+    imshow("Visualizer test: " + description, sim.img);
+    waitKey(0);
+}
+
 int main(void) {
     // robot location for all tests: (0.0f, 0.0f)
     // Test1:
     ObstacleMap testMap1;
     std::vector<PointXY> points1 = {}; // supposed to be PointXY
     testMap1.update(points1);
-    runTest(testMap1, PointXY{10.0f, 10.0f});
+    runTest("empty map", testMap1, PointXY{10.0f, 10.0f});
 
     // Test2:
     ObstacleMap testMap2;
@@ -26,7 +39,7 @@ int main(void) {
         PointXY{10.0f, 10.0f}
     };
     testMap2.update(points2);
-    runTest(testMap2, PointXY{10.0f, 10.0f});
+    runTest("diagonal obstacles", testMap2, PointXY{10.0f, 10.0f});
 
     // Test3:
     ObstacleMap testMap3;
@@ -39,7 +52,7 @@ int main(void) {
         PointXY{1.0f, 1.0f}
     };
     testMap3.update(points3);
-    runTest(testMap3, PointXY{10.0f, 10.0f});
+    runTest("irregular obstacles", testMap3, PointXY{10.0f, 10.0f});
 
     // Test4:
     ObstacleMap testMap4;
@@ -56,7 +69,7 @@ int main(void) {
         PointXY{10.0f, 10.0f}
     };
     testMap3.update(points4);
-    runTest(testMap4, PointXY{10.0f, 7.0f});
+    runTest("different goal", testMap4, PointXY{10.0f, 7.0f});
 
     // Test5:
     ObstacleMap testMap5;
@@ -73,7 +86,7 @@ int main(void) {
         PointXY{10.0f, 10.0f}
     };
     testMap3.update(points5);
-    runTest(testMap5, PointXY{7.0f, 10.0f});
+    runTest("another different goal", testMap5, PointXY{7.0f, 10.0f});
 
     // Test6:
     ObstacleMap testMap6;
@@ -90,49 +103,33 @@ int main(void) {
         PointXY{1.0f, 3.0f}
     };
     testMap3.update(points6);
-    runTest(testMap6, PointXY{5.0f, 5.0f});
-
-};
-
-void runTest(ObstacleMap testMap, PointXY dest) {
-    Visualizer sim; 
-    Pather2 pather;
-    sim.drawMap(testMap.obstacle_map);
-    sim.interpretCoordinates();
-    std::queue<PointXY> path = pather.BFS(testMap.obstacle_map, dest);
-    sim.drawPath(path);
-    sim.drawRobot();
-    sim.drawDestination();
-    imshow("Visualizer", sim.img);
-    int key = waitKey(0);
-
+    runTest("more irregular obstacles", testMap6, PointXY{5.0f, 5.0f});
 }
 
 void Visualizer::drawMap(bool obstacle_map[][21]) {
-    
     for(int i; i < size; i++){
         for(int j; j < size; j++){
             if(obstacle_map[i][j]){
                   rectangle(img,
-                    cv::Point(w/21*i, w/21*j ),
-                    cv::Point(w/21*(i+1), w/21*(j+1)),
+                    cv::Point2d(w/21*i, w/21*j ),
+                    cv::Point2d(w/21*(i+1), w/21*(j+1)),
                     Scalar(255, 255, 255),
                     FILLED,
                     LINE_8 );
             }
         }
     }
-};
+}
 
 void Visualizer::drawPath(std::queue<PointXY, std::deque<PointXY, std::allocator<PointXY>>> path) {
-    while(!path.empty()){ 
+    while(!path.empty()){
         PointXY start = path.front();
         path.pop();
+        if (path.empty()) break;
         PointXY end = path.front();
-        path.pop();
 
-        cv::Point startcv{start.x * 21, start.y * 21}; // may be incorrect syntax
-        cv::Point endcv{end.x * 21, end.y * 21};
+        cv::Point2d startcv{start.x * 21, start.y * 21}; // may be incorrect syntax
+        cv::Point2d endcv{end.x * 21, end.y * 21};
 
         line(img,
         startcv,
@@ -141,24 +138,23 @@ void Visualizer::drawPath(std::queue<PointXY, std::deque<PointXY, std::allocator
         2,
         LINE_8);
     }
-};
+}
 
 void Visualizer::interpretCoordinates() {
-
-};
+}
 
 void Visualizer::drawRobot() {
     int robotWidthHalf = 5;
     int robotHeightHalf = 10;
     rectangle(img,
-        cv::Point(w/2 - robotWidthHalf, w/2 - robotHeightHalf),
-        cv::Point(w/2 + robotWidthHalf, w/2 + robotHeightHalf),
+        cv::Point2d(w/2 - robotWidthHalf, w/2 - robotHeightHalf),
+        cv::Point2d(w/2 + robotWidthHalf, w/2 + robotHeightHalf),
         Scalar(255, 0, 0),
         FILLED,
         LINE_8);
-};
+}
 
 void Visualizer::drawDestination() {
         // mark edge location closest to destination or draw destination if in bounds
         // get destination info from pather2
-};
+}

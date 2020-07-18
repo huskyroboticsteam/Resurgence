@@ -97,7 +97,7 @@ std::queue<PointXY> Pather2::BFS(bool map[][21], PointXY dest){
 }
  
 // helper BFS method to return first point in path
-PointXY mainBFS(bool map[][21], PointXY dest) {
+PointXY Pather2::mainBFS(bool map[][21], PointXY dest) {
    std::queue<PointXY> path = BFS(map, dest);
    return path.front();
   
@@ -172,7 +172,7 @@ PointXY getDest(PointXY GPSRobot, PointXY GPSDest) {
  
 //If the relative location of the target is put into some invalid coordinate (unreachable),
 //then assign any neighbor valid coordinate as the new relative location, and make search again.
-PointXY relocateDestination(PointXY dest, int shrink_constant){
+PointXY Pather2::relocateDestination(PointXY dest, int shrink_constant){
    if ((int)dest.x == 20 - shrink_constant) {
        switch((int)dest.y) {
            // return PointXY{dest.x - 1, }
@@ -207,9 +207,8 @@ PointXY relocateDestination(PointXY dest, int shrink_constant){
    }
    return dest;
 }
- 
- 
-PointXY getPath(bool map[][21], PointXY dest){
+
+PointXY Pather2::getPath(bool map[][21], PointXY dest){
  PointXY rslt = mainBFS(map, dest);
  PointXY src = {4, 4};
  int shrink_constant = 0;
@@ -222,26 +221,7 @@ PointXY getPath(bool map[][21], PointXY dest){
  }
  return rslt;
 }
- 
-int returnHeading(bool map[][21]) {
-       struct PointXY GPS_src = {0,0};
-       struct PointXY GPS_dest = {70, 10};
-       struct PointXY destination = getDest(GPS_src, GPS_dest);
-       struct PointXY nextPoint = getPath(map, destination);
-       std::cout << "(" << destination.x << "," << destination.y << ")" << std::endl;
-       std::cout << "First point in path: ";
-       std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
-       std::cout << "" << std::endl;
-      
-       int xDiff = nextPoint.y - 10;
-       int yDiff = nextPoint.x - 10;
-       const float PI = atan(1) * 4;
-       int ratio = yDiff / xDiff;
-       float headingAngle = atan(ratio) * 180 / PI;
-       headingAngle -= 90;
-       return headingAngle;
-}
- 
+
 //int main() {
    // bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
    //                       {true, true, false, false, true, true, true, false, true, true},

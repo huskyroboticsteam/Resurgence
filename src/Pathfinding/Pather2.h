@@ -16,7 +16,8 @@ public:
         std::queue<PointXY> path;
     };
     // returns full path
-    std::queue<PointXY> Pather2::BFS(bool map[][21], PointXY dest);
+    std::queue<PointXY> BFS(bool map[][21], PointXY dest);
+    PointXY mainBFS(bool map[][21], PointXY dest);
     PointXY getPath(bool map[][21], PointXY dest);
     PointXY relocateDestination(PointXY dest, int shrink_constant);
     int returnHeading(bool map[][21]);

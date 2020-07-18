@@ -103,12 +103,19 @@ add_executable(simulator_navigation_demo
   simulator/simulator_world.cpp
   simulator/world.cpp)
 
+add_executable(visualizer_test
+  Pathfinding/Visualizer.cpp
+  Pathfinding/Pather2.cpp
+  Pathfinding/ObstacleMap.cpp
+  )
+
 list(APPEND simulator_libs
   sfml-graphics sfml-window sfml-system X11 pthread)
 
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
+target_link_libraries(visualizer_test ${OpenCV_LIBS})
 target_link_libraries(RoverSim ${OpenCV_LIBS} ${simulator_libs})
 target_link_libraries(simulator_navigation_demo ${simulator_libs})
 
