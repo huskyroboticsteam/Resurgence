@@ -6,6 +6,8 @@ using namespace cv;
 void runTest(std::string description, ObstacleMap testMap, PointXY dest) {
     Visualizer sim;
     Pather2 pather;
+    std::cout << "Text version of map:\n";
+    testMap.print();
     sim.drawMap(testMap.obstacle_map);
     sim.interpretCoordinates();
     std::queue<PointXY> path = pather.BFS(testMap.obstacle_map, dest);
@@ -14,6 +16,7 @@ void runTest(std::string description, ObstacleMap testMap, PointXY dest) {
     sim.drawDestination();
     imshow("Visualizer test: " + description, sim.img);
     waitKey(0);
+    destroyAllWindows();
 }
 
 int main(void) {
@@ -68,7 +71,7 @@ int main(void) {
         PointXY{9.0f, 9.0f},
         PointXY{10.0f, 10.0f}
     };
-    testMap3.update(points4);
+    testMap4.update(points4);
     runTest("different goal", testMap4, PointXY{10.0f, 7.0f});
 
     // Test5:
@@ -85,7 +88,7 @@ int main(void) {
         PointXY{9.0f, 9.0f},
         PointXY{10.0f, 10.0f}
     };
-    testMap3.update(points5);
+    testMap5.update(points5);
     runTest("another different goal", testMap5, PointXY{7.0f, 10.0f});
 
     // Test6:
@@ -102,7 +105,7 @@ int main(void) {
         PointXY{6.0f, 4.0f},
         PointXY{1.0f, 3.0f}
     };
-    testMap3.update(points6);
+    testMap6.update(points6);
     runTest("more irregular obstacles", testMap6, PointXY{5.0f, 5.0f});
 }
 
