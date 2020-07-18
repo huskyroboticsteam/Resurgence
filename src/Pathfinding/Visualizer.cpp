@@ -9,7 +9,6 @@ void runTest(std::string description, ObstacleMap testMap, PointXY dest) {
     std::cout << "Text version of map:\n";
     testMap.print();
     sim.drawMap(testMap.obstacle_map);
-    sim.interpretCoordinates();
     std::queue<PointXY> path = pather.BFS(testMap.obstacle_map, dest);
     sim.drawPath(path);
     sim.drawRobot();
@@ -130,20 +129,18 @@ void Visualizer::drawPath(std::queue<PointXY, std::deque<PointXY, std::allocator
         path.pop();
         if (path.empty()) break;
         PointXY end = path.front();
+        double scale = w/GRID_SIZE;
 
-        cv::Point2d startcv{start.x * GRID_SIZE, start.y * GRID_SIZE}; // may be incorrect syntax
-        cv::Point2d endcv{end.x * GRID_SIZE, end.y * GRID_SIZE};
+        cv::Point2d startcv{start.x * scale, start.y * scale};
+        cv::Point2d endcv{end.x * scale, end.y * scale};
 
         line(img,
         startcv,
         endcv,
-        Scalar(0,0,0),
+        Scalar(0,0,255),
         2,
         LINE_8);
     }
-}
-
-void Visualizer::interpretCoordinates() {
 }
 
 void Visualizer::drawRobot() {
