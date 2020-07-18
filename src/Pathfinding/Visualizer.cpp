@@ -109,16 +109,16 @@ int main(void) {
     runTest("more irregular obstacles", testMap6, PointXY{5.0f, 5.0f});
 }
 
-void Visualizer::drawMap(bool obstacle_map[][21]) {
-    for(int i; i < size; i++){
-        for(int j; j < size; j++){
+void Visualizer::drawMap(bool obstacle_map[][GRID_SIZE]) {
+    for(int i=0; i < GRID_SIZE; i++){
+        for(int j=0; j < GRID_SIZE; j++){
             if(obstacle_map[i][j]){
-                  rectangle(img,
-                    cv::Point2d(w/21*i, w/21*j ),
-                    cv::Point2d(w/21*(i+1), w/21*(j+1)),
-                    Scalar(255, 255, 255),
-                    FILLED,
-                    LINE_8 );
+                rectangle(img,
+                  cv::Point2d(w/GRID_SIZE*i, w/GRID_SIZE*j ),
+                  cv::Point2d(w/GRID_SIZE*(i+1), w/GRID_SIZE*(j+1)),
+                  Scalar(255, 255, 255),
+                  FILLED,
+                  LINE_8 );
             }
         }
     }
@@ -131,8 +131,8 @@ void Visualizer::drawPath(std::queue<PointXY, std::deque<PointXY, std::allocator
         if (path.empty()) break;
         PointXY end = path.front();
 
-        cv::Point2d startcv{start.x * 21, start.y * 21}; // may be incorrect syntax
-        cv::Point2d endcv{end.x * 21, end.y * 21};
+        cv::Point2d startcv{start.x * GRID_SIZE, start.y * GRID_SIZE}; // may be incorrect syntax
+        cv::Point2d endcv{end.x * GRID_SIZE, end.y * GRID_SIZE};
 
         line(img,
         startcv,
