@@ -14,13 +14,45 @@ Autonomous::Autonomous(PointXY _target) : target(_target)
 }
 
 void Autonomous::autonomyIter() {
-  transform_t gps = readGPS();
+  transform_t gps = readGPS(); // <--- has some heading information
   transform_t odom = readOdom();
   points_t lidar = readLidarScan();
   points_t landmarks = readLandmarks();
 
   // TODO incredibly clever algorithms for state estimation
   // and path planning and control!
+  //
+  // Ben: better localization than just GPS
+  //    EKF that outputs transforms into a map frame
+  //  input:
+  //    GPS reading, odom reading, old EKF estimate
+  //  output:
+  //    robot frame -> map frame transform
+  //    GPS frame -> map frame transform
+  //
+  // Jonah: map compositing
+  //    taking data from different points in time and combining
+  //    into a single map
+  //  input:
+  //    current lidar scan, past composite list of lidar scans
+  //    robot frame -> map frame transform
+  //  output:
+  //    map (provided as list of points)
+  //    list of locations in map frame for the AR tags we've seen so far
+  //
+  // Atharva: "mission planning" -- higher level planning
+  //    driving through gates
+  //    deciding when we're close enough to posts
+  //  input: internal state, current URCLeg information
+  //    currently visible AR tags in robot frame
+  //    robot frame -> map frame transform
+  //    GPS frame -> map frame transform
+  //  output: goal pose in map frame
+  //
+  // Assaf: taking a map and computing a plan
+  //  input: pose of robot in map frame, map (provided as a list of points), goal pose in map frame
+  //  output: movement command
+  //
 
   setCmdVel(0.5, 1.0);
 }
