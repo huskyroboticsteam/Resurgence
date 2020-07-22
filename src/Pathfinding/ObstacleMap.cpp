@@ -9,6 +9,12 @@ ObstacleMap::ObstacleMap()
     robotY = 0.0f;
 }
 
+//gets robot position
+inline void ObstacleMap::updateRobotPosition()
+{
+    //fill when recieve GPS, update values to robotX and robotY fields
+}
+
 //sets all values in ObstacleMap to false
 inline void ObstacleMap::resetObstacleMap()
 {
@@ -28,14 +34,14 @@ inline bool inBounds(int coordinate)
 }
 
 //rebuilds ObstacleMap with given Obstacles
-//assume that obstacle locations are given in robot reference frame
 void ObstacleMap::update(std::vector<PointXY>& obstacles)
 {
+    updateRobotPosition();//updates values in robotX and robotY fields
     resetObstacleMap();
     int x, y;
     for (PointXY p : obstacles) {
-        x = static_cast<int>(p.x/meters_per_cell) + radius;
-        y = static_cast<int>(p.y/meters_per_cell) + radius;
+        x = static_cast<int>(p.x - robotX) + radius;
+        y = static_cast<int>(p.y - robotY) + radius;
         if (inBounds(x) && inBounds(y))
         {
             modifyObstacleMap(x,y);
