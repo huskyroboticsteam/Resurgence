@@ -97,7 +97,7 @@ std::queue<PointXY> Pather2::BFS(PointXY dest){
  
 // helper BFS method to return first point in path
 PointXY Pather2::mainBFS(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest) {
-    updateMap(obstacles, robotX, robotY);
+    obsMap.update(obstacles, robotX, robotY);
     std::queue<PointXY> path = BFS(dest);
     return path.front();
 }
@@ -241,10 +241,6 @@ PointXY Pather2::getPath(const std::vector<PointXY>& obstacles, float robotX, fl
 //        return headingAngle;
 // }
 
-void Pather2::updateMap(const std::vector<PointXY>& obstacles, float robotX, float robotY)
-{
-    obsMap.update(obstacles, robotX, robotY);
-}
  
 //int main() {
    // bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},

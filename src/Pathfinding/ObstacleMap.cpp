@@ -73,8 +73,3 @@ void ObstacleMap::print()
         std::cout << std::endl;
     } 
 }
-
-// int main(){
-//     ObstacleMap obs;
-//     std::cout << typeid(obs.obstacle_map).name() << std::endl;
-// }

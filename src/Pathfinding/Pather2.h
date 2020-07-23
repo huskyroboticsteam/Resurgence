@@ -28,6 +28,4 @@ public:
     
     PointXY relocateDestination(PointXY dest, int shrink_constant);
     // int returnHeading();
-
-    void updateMap(const std::vector<PointXY>& obstacles, float robotX, float robotY);
 };
