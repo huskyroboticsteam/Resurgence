@@ -1,5 +1,12 @@
 build/*
+src/Pathfinding/a.out
 .vscode
 MapObstacle.h
-**/*.out
-
+.idea
+3.4.7.zip
+opencv-3.4.7/
+CMakeCache.txt
+Makefile
+CMakeFiles
+*.cmake
+.DS_Store
