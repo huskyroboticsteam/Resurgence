@@ -28,13 +28,13 @@ TEST_CASE("Pathfinding")
     };
     //Construct an obstacle map
     ObstacleMap obj;
-    obj.update(obstaclePosition);
+    obj.update(obstaclePosition, 0.0f, 0.0f);
     
     //Construct a searching path object
     Pather2 searchingPath;
-    PointXY nextPoint = searchingPath.getPath(obj, PointXY{10.0f, 10.0f});
+    PointXY nextPoint = searchingPath.mainBFS(obj.obstacle_map, PointXY{10.0f, 10.0f});
 
     PointXY expectPoint = {1.0f, 0.0};
     //Check if returned next point is as expected.
-    REQUIRE(Pathfinding::nextPointEqual(nextPoint, expectPoint))
+    REQUIRE(Pathfinding::nextPointEqual(nextPoint, expectPoint));
 }

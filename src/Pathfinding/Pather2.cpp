@@ -31,76 +31,75 @@ void print_queue(std::queue<Pather2::queueNode> q) {
 }
  
 // returns full path
-std::queue<PointXY> Pather2::BFS(bool map[][21], PointXY dest){
-  
-   int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
-   int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
-  
-   PointXY src = {5,5};
-   std::queue<PointXY> error;
-   error.push(src);
-   //check if src and dest are represented with 1 not 0
-   if ((map[(int)src.x][(int)src.y]) || (map[(int)dest.x][(int)dest.y])){
-       //todo: change destination if destination is blocked
-       return error;
-   }
-  
-   map[(int)src.x][(int)src.y] = true;
-   std::queue<Pather2::queueNode> q;
-   std::queue<PointXY> newQueue;
-   newQueue.push(src);
-   Pather2::queueNode s = {src, 0, newQueue};
-   q.push(s);
-  
-   // q is the queue of points that are waiting to be checked
-   // curr.path is the path leading up to that point
-  
-   while (!q.empty()){
-       //get front point in points to be checked and make it current
-       Pather2::queueNode curr = q.front();
-       PointXY pt = curr.pt;
-      
-       //check if current point is destination node
-       if ((pt.x == dest.x) && (pt.y == dest.y)){
-           //return first point after source in path to destination
-           std::queue<PointXY> temp = curr.path;
-           temp.pop();
-           std::cout << "Final path: ";
-           print_point(temp);
-          
-           return temp;
-       }
-      
-       // pop current point off point to be checked
-       q.pop();
-      
-       // iterate through adj points
-       for (int i = 0; i < 8; i++){
-           int row = pt.x + rowNum[i];
-           int col = pt.y + rowCol[i];
-          
-           //((row >= 0) && (row < 21) && (col >= 0) && (col < 21))
-           // check if adj point is not out of bounds and is not an obstacle
-           if (((row >= 0) && (row < 21) && (col >= 0) && (col < 21)) && !map[row][col]){
-               // set adj point as visited and push it to points to be checked(q)
-               struct PointXY test = {row, col};
-               std::queue<PointXY> addAdjPointToPath = curr.path;
-               addAdjPointToPath.push(test);
-               Pather2::queueNode adjNode = {{row, col}, curr.dist + 1, addAdjPointToPath};
-               map[(int)adjNode.pt.x][(int)adjNode.pt.y] = true;
-               q.push(adjNode);
-           }
-       }
-      
-   }
-   return error;
+std::queue<PointXY> Pather2::BFS(PointXY dest){
+    int rowNum[] = {-1,0,0,1, -1, 1, 1, -1};
+    int rowCol[] = {0,-1,1,0, -1, -1, 1, 1};
+
+    PointXY src = {5,5};
+    std::queue<PointXY> error;
+    error.push(src);
+    //check if src and dest are represented with 1 not 0
+    if ((obsMap.obstacle_map[(int)src.x][(int)src.y]) || (obsMap.obstacle_map[(int)dest.x][(int)dest.y])){
+        //todo: change destination if destination is blocked
+        return error;
+    }
+
+    obsMap.obstacle_map[(int)src.x][(int)src.y] = true;
+    std::queue<Pather2::queueNode> q;
+    std::queue<PointXY> newQueue;
+    newQueue.push(src);
+    Pather2::queueNode s = {src, 0, newQueue};
+    q.push(s);
+
+    // q is the queue of points that are waiting to be checked
+    // curr.path is the path leading up to that point
+
+    while (!q.empty()){
+        //get front point in points to be checked and make it current
+        Pather2::queueNode curr = q.front();
+        PointXY pt = curr.pt;
+        
+        //check if current point is destination node
+        if ((pt.x == dest.x) && (pt.y == dest.y)){
+            //return first point after source in path to destination
+            std::queue<PointXY> temp = curr.path;
+            temp.pop();
+            std::cout << "Final path: ";
+            print_point(temp);
+            
+            return temp;
+        }
+        
+        // pop current point off point to be checked
+        q.pop();
+        
+        // iterate through adj points
+        for (int i = 0; i < 8; i++){
+            int row = pt.x + rowNum[i];
+            int col = pt.y + rowCol[i];
+            
+            //((row >= 0) && (row < 21) && (col >= 0) && (col < 21))
+            // check if adj point is not out of bounds and is not an obstacle
+            if (((row >= 0) && (row < 21) && (col >= 0) && (col < 21)) && !obsMap.obstacle_map[row][col]){
+                // set adj point as visited and push it to points to be checked(q)
+                struct PointXY test = PointXY{(float)row, (float)col};
+                std::queue<PointXY> addAdjPointToPath = curr.path;
+                addAdjPointToPath.push(test);
+                Pather2::queueNode adjNode = {PointXY{(float)row, (float)col}, curr.dist + 1, addAdjPointToPath};
+                obsMap.obstacle_map[(int)adjNode.pt.x][(int)adjNode.pt.y] = true;
+                q.push(adjNode);
+            }
+        }
+        
+    }
+    return error;
 }
  
 // helper BFS method to return first point in path
-PointXY Pather2::mainBFS(bool map[][21], PointXY dest) {
-   std::queue<PointXY> path = BFS(map, dest);
-   return path.front();
-  
+PointXY Pather2::mainBFS(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest) {
+    obsMap.update(obstacles, robotX, robotY);
+    std::queue<PointXY> path = BFS(dest);
+    return path.front();
 }
  
 PointXY getDest(PointXY GPSRobot, PointXY GPSDest) {
@@ -207,21 +206,41 @@ PointXY Pather2::relocateDestination(PointXY dest, int shrink_constant){
    }
    return dest;
 }
-
-PointXY Pather2::getPath(bool map[][21], PointXY dest){
- PointXY rslt = mainBFS(map, dest);
- PointXY src = {4, 4};
- int shrink_constant = 0;
- while(rslt.x == -1 && rslt.y == -1) {
-   dest = relocateDestination(dest, shrink_constant);
-   //do something
-   //relocate the relative coordinate of the original target (some functions to determinate new end point relative to our local map)
-   rslt = mainBFS(map, dest);
-   shrink_constant += 1;
- }
- return rslt;
+ 
+PointXY Pather2::getPath(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest){
+    PointXY rslt = mainBFS(obstacles, robotX, robotY, dest);
+    PointXY src = {4, 4};
+    int shrink_constant = 0;
+    while(rslt.x == -1 && rslt.y == -1) {
+        dest = relocateDestination(dest, shrink_constant);
+        //do something
+        //relocate the relative coordinate of the original target (some functions to determinate new end point relative to our local map)
+        rslt = mainBFS(obstacles, robotX, robotY, dest);
+        shrink_constant += 1;
+    }
+    return rslt;
 }
+ 
+// int returnHeading() {
+//        struct PointXY GPS_src = {0,0};
+//        struct PointXY GPS_dest = {70, 10};
+//        struct PointXY destination = getDest(GPS_src, GPS_dest);
+//        struct PointXY nextPoint = getPath(this->obsMap.obstacle_map, destination);
+//        std::cout << "(" << destination.x << "," << destination.y << ")" << std::endl;
+//        std::cout << "First point in path: ";
+//        std::cout << "(" << nextPoint.x << "," << nextPoint.y << ")";
+//        std::cout << "" << std::endl;
+      
+//        int xDiff = nextPoint.y - 10;
+//        int yDiff = nextPoint.x - 10;
+//        const float PI = atan(1) * 4;
+//        int ratio = yDiff / xDiff;
+//        float headingAngle = atan(ratio) * 180 / PI;
+//        headingAngle -= 90;
+//        return headingAngle;
+// }
 
+ 
 //int main() {
    // bool map[ROW][COL] = {{true, false, true, false, true, false, true, true, false, true},
    //                       {true, true, false, false, true, true, true, false, true, true},

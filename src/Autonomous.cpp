@@ -1,6 +1,5 @@
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
-#include "simulator/utils.h"
 #include <cmath>
 
 constexpr float PI = M_PI;
@@ -11,13 +10,46 @@ Autonomous::Autonomous(PointXY _target) : target(_target)
     targetHeading = -1;
     forwardCount = -1;
     rightTurn = false;
+    currHeading = 0;
 }
 
-void Autonomous::autonomyIter() {
+
+PointXY Autonomous::point_tToPointXY(point_t pnt){
+    return PointXY{static_cast<float>(pnt(0)), static_cast<float>(pnt(1))};
+}
+
+bool Autonomous::arrived(pose_t gpsPose) {
+    double currX = gpsPose(0);
+    double currY = gpsPose(1);
+    return util::almostEqual(currX, (double) target.x, 0.5) &&
+            util::almostEqual(currY, (double) target.y, 0.5);
+}
+
+const std::vector<PointXY> Autonomous::points_tToPointXYs(points_t pnts) {
+  std::vector<PointXY> res;
+  for(point_t &pnt : pnts) {
+    res.push_back(point_tToPointXY(pnt));
+  }
+  return res;
+}
+
+double Autonomous::angleToTarget(pose_t gpsPose) {
+    float dy = target.y - (float) gpsPose(1);
+    float dx = target.x - (float) gpsPose(0);
+    double theta = (double) atan2(dy, dx);
+    return theta - gpsPose(2);
+}
+
+void Autonomous::autonomyIter() 
+{
   transform_t gps = readGPS(); // <--- has some heading information
   transform_t odom = readOdom();
   points_t lidar = readLidarScan();
   points_t landmarks = readLandmarks();
+
+
+  pose_t gpsPose = toPose(gps, currHeading);
+  currHeading = gpsPose(2);
 
   // TODO incredibly clever algorithms for state estimation
   // and path planning and control!
@@ -54,8 +86,39 @@ void Autonomous::autonomyIter() {
   //  output: movement command
   //
 
-  setCmdVel(0.5, 1.0);
+  if (arrived(gpsPose)) { //toPose(gps, currHeading)
+    std::cout << "arrived at gate" << std::endl;
+    std::cout << "x: " << gpsPose(0) << " y: " << gpsPose(1) << " theta: " << gpsPose(2) << std::endl;
+
+
+    // implement moving through gates
+    // then update target
+  } else {
+    double dtheta = pathDirection(lidar, gpsPose);
+    double speed = 10.0;
+    // TODO incredibly clever algorithms for state estimation
+    // and path planning and control!
+    
+    if(!lidar.empty()) {
+        speed = 5.0;
+    }
+    setCmdVel(dtheta, speed);
+  }
 }
+
+double Autonomous::pathDirection(points_t lidar, pose_t gpsPose) {
+    double dtheta;
+    if(lidar.empty()) {
+        dtheta = angleToTarget(gpsPose);
+    } else {
+        const std::vector<PointXY>& ref = points_tToPointXYs(lidar);
+        PointXY direction = pather.getPath(ref, (float) gpsPose(0), (float) gpsPose(1), target);
+        float theta = atan2(direction.y, direction.x);
+        dtheta = static_cast<double>(theta) - gpsPose(2);
+    }
+    return dtheta;
+}
+
 
 void Autonomous::setWorldData(std::shared_ptr<WorldData> wdata)
 {
@@ -159,3 +222,4 @@ PointXY Autonomous::getTarget()
 {
     return target;
 }
+
