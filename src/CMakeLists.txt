@@ -110,6 +110,7 @@ add_executable(simulator_navigation_demo
   )
 
 add_executable(visualizer_test
+  Pathfinding/visualizer_test.cpp
   Pathfinding/Visualizer.cpp
   Pathfinding/Pather2.cpp
   Pathfinding/ObstacleMap.cpp
