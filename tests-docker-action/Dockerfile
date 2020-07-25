@@ -1,3 +1,5 @@
-FROM spmallick/opencv-docker:opencv
+FROM estraw/rover-test-deps
+
 COPY . .
+
 ENTRYPOINT ./tests-docker-action/entrypoint.sh
