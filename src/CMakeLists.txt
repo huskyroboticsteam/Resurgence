@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(Rover LANGUAGES CXX C)
 
 find_package(OpenCV REQUIRED)
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3 REQUIRED NO_MODULE)
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
