@@ -58,11 +58,11 @@ inline void ObstacleMap::modifyObstacleMap(int x, int y)
 //where 1 is an obstacle and 0 is empty
 void ObstacleMap::print()
 {
-    for (int i = 0; i < size; i++)
+    for (int y = size-1; y >= 0; y--)
     {
-        for(int j = 0; j < size; j++)
+        for(int x = 0; x < size; x++)
         {
-            if(ObstacleMap::obstacle_map[i][j])
+            if(ObstacleMap::obstacle_map[y][x])
             {
                 std::cout << "1 ";
             }else
@@ -71,5 +71,5 @@ void ObstacleMap::print()
             }
         }
         std::cout << std::endl;
-    } 
+    }
 }
