@@ -33,6 +33,7 @@ private:
     std::pair<float, float> stateForwards(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateTurn(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateBackwards(float currHeading, std::pair<float, float> directions);
+    points_t map_; // List of lidar hits
 
     // not guarenteed to have localization
     double currHeading;

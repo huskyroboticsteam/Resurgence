@@ -71,6 +71,14 @@ void Autonomous::autonomyIter()
   //  output:
   //    map (provided as list of points)
   //    list of locations in map frame for the AR tags we've seen so far
+
+  transform_t robot_to_map; // provided by Ben
+  robot_to_map = odom;
+  for (point_t hit : lidar) {
+    map_.push_back(robot_to_map * hit);
+  }
+  std::cout << "Current map size: " << map_.size() << std::endl;
+
   //
   // Atharva: "mission planning" -- higher level planning
   //    driving through gates
