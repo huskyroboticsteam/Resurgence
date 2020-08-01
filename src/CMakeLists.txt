@@ -117,7 +117,7 @@ add_executable(visualizer_test
   )
 
 list(APPEND simulator_libs
-  sfml-graphics sfml-window sfml-system X11 pthread)
+  sfml-graphics sfml-window sfml-system pthread)
 
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
