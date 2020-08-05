@@ -1,4 +1,4 @@
-FROM estraw/rover-test-deps
+FROM uwhuskyrobots/rover-test-deps
 
 COPY . .
 
