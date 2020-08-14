@@ -131,6 +131,10 @@ Clone the repository.
 
 Navigate into the repository.
 `cd PY2020`
+
+Clone the submodules
+`git submodule init`
+`git submodule update`
   
 Now, you're ready to build the project.
 
