@@ -4,7 +4,11 @@
 
 #include <vector>
 
-CommandLineOptions Globals::opts;
-RoverState Globals::curr_state;
-nlohmann::json Globals::status_data;
-nlohmann::json Globals::motor_status;
+namespace Globals {
+  CommandLineOptions opts;
+  RoverState curr_state;
+  nlohmann::json status_data;
+  nlohmann::json motor_status;
+  bool E_STOP = false;
+  bool AUTONOMOUS = true;
+}

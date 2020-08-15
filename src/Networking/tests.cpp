@@ -188,3 +188,15 @@ TEST_CASE("Respects joint limits", "[BaseStation]")
     REQUIRE(m["msg"] == "IK solution outside joint limits for shoulder");
 }
 
+TEST_CASE("Does not activate motors if e-stopped", "[BaseStation]")
+{
+    clearPackets();
+    char const *msg = "{\"type\":\"estop\",\"release\":false}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    json m = json::parse(popBaseStationPacket());
+    REQUIRE(m["status"] == "ok");
+    char const *msg2 = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
+    REQUIRE(ParseBaseStationPacket(msg2) == false);
+    m = json::parse(popBaseStationPacket());
+    REQUIRE(m["msg"] == "Emergency stop is activated");
+}

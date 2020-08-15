@@ -23,6 +23,7 @@ list(APPEND RoverCommonTest
   Networking/IK.cpp
   Networking/ParseCAN.cpp
   Networking/log.cpp
+  Networking/motor_interface.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/PortTemplate.c
@@ -64,7 +65,6 @@ add_executable(RoverSim
 add_executable(tests
   ${RoverCommonTest}
   Tests.cpp
-  simulator/noop_world.cpp
   # AR Detection tests
   ar/TagUnitTests.cpp
   ar/Tag.cpp
@@ -72,6 +72,7 @@ add_executable(tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
   Networking/NetworkingStubs.cpp
+  Networking/real_world_interface.cpp
   # Autonomy tests
   SimpleAutonomousTester.cpp
   FakeMap.cpp

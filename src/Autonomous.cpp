@@ -1,4 +1,5 @@
 #include "Autonomous.h"
+#include "Globals.h"
 #include "simulator/world_interface.h"
 #include <cmath>
 
@@ -40,8 +41,9 @@ double Autonomous::angleToTarget(pose_t gpsPose) {
     return theta - gpsPose(2);
 }
 
-void Autonomous::autonomyIter() 
+void Autonomous::autonomyIter()
 {
+  if (!Globals::AUTONOMOUS) return;
   transform_t gps = readGPS(); // <--- has some heading information
   transform_t odom = readOdom();
   points_t lidar = readLidarScan();
@@ -102,7 +104,7 @@ void Autonomous::autonomyIter()
     if(!lidar.empty()) {
         speed = 5.0;
     }
-    setCmdVel(dtheta, speed);
+    if (!Globals::E_STOP) setCmdVel(dtheta, speed);
   }
 }
 
