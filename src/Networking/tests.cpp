@@ -188,15 +188,21 @@ TEST_CASE("Respects joint limits", "[BaseStation]")
     REQUIRE(m["msg"] == "IK solution outside joint limits for shoulder");
 }
 
-TEST_CASE("Does not activate motors if e-stopped", "[BaseStation]")
+TEST_CASE("Deactivates wheel motors if e-stopped", "[BaseStation]")
 {
     clearPackets();
-    char const *msg = "{\"type\":\"estop\",\"release\":false}";
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    json m = json::parse(popBaseStationPacket());
+    char const *estop_msg = "{\"type\":\"estop\",\"release\":false}";
+    char const *drive_msg = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
+    json m;
+    REQUIRE(ParseBaseStationPacket(drive_msg) == true);
+    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] != 0);
+    m = json::parse(popBaseStationPacket());
+    REQUIRE(ParseBaseStationPacket(estop_msg) == true);
+    m = json::parse(popBaseStationPacket());
     REQUIRE(m["status"] == "ok");
-    char const *msg2 = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
-    REQUIRE(ParseBaseStationPacket(msg2) == false);
+    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == 0);
+    REQUIRE(ParseBaseStationPacket(drive_msg) == false);
     m = json::parse(popBaseStationPacket());
     REQUIRE(m["msg"] == "Emergency stop is activated");
+    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == 0);
 }

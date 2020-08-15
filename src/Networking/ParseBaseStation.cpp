@@ -75,9 +75,7 @@ bool ParseBaseStationPacket(char const* buffer)
 }
 
 bool ParseEmergencyStop(json &message) {
-  // TODO shouldn't there be some more guaranteed way to do this, e.g. by
-  // cutting the power to the motors?
-  // TODO this should also stop the arm motors
+  // TODO actually send e-stop packet (packet id 0x30 broadcast)
   bool success = setCmdVel(0,0);
   Globals::E_STOP = true;
   bool release;
