@@ -75,7 +75,10 @@ void Autonomous::autonomyIter()
   transform_t robot_to_map; // provided by Ben
   robot_to_map = odom;
   for (point_t hit : lidar) {
-    map_.push_back(robot_to_map * hit);
+    // map_.push_back(robot_to_map * hit);
+    if(std::find(map_.begin(), map_.end(), robot_to_map * hit) == map_.end()){
+        map_.push_back(robot_to_map * hit);
+    }
   }
   std::cout << "Current map size: " << map_.size() << std::endl;
 
