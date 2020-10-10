@@ -33,6 +33,6 @@ class Visualizer
 
     Mat img = Mat::zeros( w, w, CV_8UC3 );
 
-    constexpr static int size = 21;
+    constexpr static int GRID_SIZE = 21;
 
 };

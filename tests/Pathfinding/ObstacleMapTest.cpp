@@ -50,7 +50,7 @@ namespace Pathfinding
     }
 
     //makes dummy obstacle map resultant array out of sol
-    //similar to ObstacleMap.update(<vectorOfPoints>)
+    //similar to ObstacleMap.update(<vectorOfPoints>, x. y)
     void getMapObjSol(bool sol[][size], std::vector<PointXY>& vectorOfPoints, float shiftX=0.0f, float shiftY=0.0f)
     {
         fillFalse(sol);
@@ -115,14 +115,14 @@ TEST_CASE("ObstacleMap")
 
     // Create an ObstacleMap out of given points and dummy double array (sol)
     // check that they have equal resulting structure by value
-    obsMap.update(vectorOfPoints);
+    obsMap.update(vectorOfPoints, 0.0f, 0.0f);
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
     REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 
     // Adds point to the vector of points and update both obsMap and sol
     // check that they have equal resulting structure by value
     vectorOfPoints.push_back(PointXY{-7.0, 3.0});
-    obsMap.update(vectorOfPoints);
+    obsMap.update(vectorOfPoints, 0.0f, 0.0f);
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
     REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 
@@ -148,7 +148,7 @@ TEST_CASE("ObstacleMap OUT OF BOUNDS")
 
     // Create an ObstacleMap out of given points and dummy double array (sol)
     // check that they have equal resulting structure by value
-    obsMap.update(vectorOfPoints);
+    obsMap.update(vectorOfPoints, 0.0f, 0.0f);
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
     REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 }
@@ -163,23 +163,21 @@ TEST_CASE("ObstacleMap CHANGE CENTER")
     };
 
     ObstacleMap obsMap;
-    std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
+    // std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
     bool sol[Pathfinding::size][Pathfinding::size];
-    obsMap.update(vectorOfPoints);
-    std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
+    obsMap.update(vectorOfPoints, 0.0f, 0.0f);
+    // std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
     Pathfinding::getMapObjSol(sol, vectorOfPoints);
     REQUIRE(Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 
-    float shiftX = 5.0f;
-    float shiftY = 5.0f;
-    obsMap.robotX = shiftX;
-    obsMap.robotY = shiftY;
+    float newRobotX = 5.0f;
+    float newRobotY = 5.0f;
     // std::cout << "rx: " << obsMap.robotX << ", ry: " << obsMap.robotY << std::endl;
-    obsMap.update(vectorOfPoints);
+    obsMap.update(vectorOfPoints, newRobotX, newRobotY);
     REQUIRE(!Pathfinding::boolMapsEquals(obsMap.obstacle_map, sol));
 
 
-    Pathfinding::getMapObjSol(sol, vectorOfPoints, shiftX, shiftY);
+    Pathfinding::getMapObjSol(sol, vectorOfPoints, newRobotX, newRobotY);
     // std::cout << "obsMap" << std::endl;
     // obsMap.print();
     // std::cout << "sol" << std::endl;
