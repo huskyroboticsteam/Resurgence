@@ -86,7 +86,6 @@ add_executable(tests
   ${RoverCommonTest}
   Tests.cpp
   # AR Detection tests
-  ar/TagUnitTests.cpp
   ar/Tag.cpp
   # CAN tests
   Networking/tests.cpp
