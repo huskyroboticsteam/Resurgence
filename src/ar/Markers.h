@@ -10,8 +10,10 @@ namespace AR
 {
 namespace Markers
 {
-
-enum URCMarkerID
+/**
+   Enum of marker names for URC.
+ */
+enum URCMarkerName
 {
 	LEG1,
 	LEG2,
@@ -26,23 +28,28 @@ enum URCMarkerID
 	LEG7_R
 };
 
-enum CIRCMarkerID
+/**
+   Enum of marker names for CIRC.
+
+   NOTE: I currently have no information about what the markers will represent for CIRC and
+   which marker IDs are important. Will update when I get more information about that. As of
+   right now, all members of this enum are placeholders.
+ */
+enum CIRCMarkerName
 {
-	// I know nothing about what the AR markers are for CIRC yet. Will update this when I get
-	// some information about that. This is a placeholder for now.
 	CIRCMarker1,
 	CIRCMarker2
 };
 
 /**
-   Returns set of markers that will be used in URC.
+   Returns the set of markers that will be used in URC.
 */
-const std::shared_ptr<MarkerSet<URCMarkerID>> URC_MARKERS();
+const std::shared_ptr<MarkerSet<URCMarkerName>> URC_MARKERS();
 
 /**
-   Returns set of markers that will be used in CIRC.
+   Returns the set of markers that will be used in CIRC.
 */
-const std::shared_ptr<MarkerSet<CIRCMarkerID>> CIRC_MARKERS();
+const std::shared_ptr<MarkerSet<CIRCMarkerName>> CIRC_MARKERS();
 
 } // namespace Markers
 } // namespace AR

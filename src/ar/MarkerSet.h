@@ -73,14 +73,13 @@ private:
 public:
 	MarkerSet(int bit_size, float physical_size);
 	MarkerSet(int bit_size, float physical_size, cv::aruco::Dictionary markerDict);
-	bool addAllFromDict(cv::aruco::Dictionary dict);
+	MarkerSet(int bit_size, float physical_size, cv::Ptr<cv::aruco::Dictionary> markerDictPtr);
 	bool addIDMapping(int id, IDMapping_t mapping);
 	cv::aruco::Dictionary getDict() const;
 	int getBitSize() const;
 	float getPhysicalSize() const;
 	std::vector<Marker> getMarkers() const;
 	bool isIDMapped(int id) const;
-	
 };
 
 }

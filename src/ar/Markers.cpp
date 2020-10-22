@@ -10,6 +10,25 @@ namespace AR
 namespace Markers
 {
 
+// Constants - please note that these are only used internally.
+/** The number of ALVAR markers stored in the data array. */
+constexpr size_t ALVAR_COUNT = 4;
+/** The size in pixels of the data region of an ALVAR marker. */
+constexpr size_t ALVAR_BIT_SIZE = 5;
+/** The border size in pixels of one side of an ALVAR marker. */
+constexpr size_t ALVAR_BORDER_SIZE = 2;
+/** The physical size (in mm) of an ALVAR marker. */
+constexpr size_t ALVAR_PHYS_SIZE = 200;
+/** The bit array size for one ALVAR marker, equal to the bit size squared. */
+constexpr size_t BIT_ARR_SIZE = ALVAR_BIT_SIZE * ALVAR_BIT_SIZE;
+
+/** The size in pixels of the data region of an ARUco marker. */
+constexpr size_t ARUCO_BIT_SIZE = 4;
+/** The border size in pixels of one side of an ARUco marker. */
+constexpr size_t ARUCO_BORDER_SIZE = 1;
+/** The physical size (in mm) of an ARUco marker. */
+constexpr size_t ARUCO_PHYS_SIZE = 100; // we don't know this yet, change later
+
 /**
    2D array of the bits in the ALVAR markers, used in URC. Each marker is 5x5, not
    including border, which is 2 bits wide. 0 is black, 1 is white. The markers can be
@@ -20,17 +39,6 @@ namespace Markers
 
    Note this array is only used internally.
  */
-
-constexpr size_t ALVAR_COUNT = 4;
-constexpr size_t ALVAR_BIT_SIZE = 5;
-constexpr size_t ALVAR_BORDER_SIZE = 2;
-constexpr size_t ALVAR_PHYS_SIZE = 200;
-constexpr size_t BIT_ARR_SIZE = ALVAR_BIT_SIZE * ALVAR_BIT_SIZE;
-
-constexpr size_t ARUCO_BIT_SIZE = 4;
-constexpr size_t ARUCO_BORDER_SIZE = 1;
-constexpr size_t ARUCO_PHYS_SIZE = 100; // we don't know this yet, change later
-
 uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
 	// we have to turn the formatter off here because it's easier to tell the shape of the
 	// tags in this format.
@@ -65,6 +73,9 @@ uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
 	// clang-format on
 };
 
+/**
+   Constructs the "bytes list" (used by the ARUco module to construct dictionaries)
+ */
 cv::Mat makeAlvarBytesList(uint8_t marker_array[ALVAR_COUNT][BIT_ARR_SIZE])
 {
 	cv::Mat bytes_list;
@@ -78,41 +89,41 @@ cv::Mat makeAlvarBytesList(uint8_t marker_array[ALVAR_COUNT][BIT_ARR_SIZE])
 	return bytes_list;
 }
 
-cv::aruco::Dictionary alvar_dict(makeAlvarBytesList(__alvar_markers), ALVAR_BIT_SIZE, 1);
-
-cv::aruco::Dictionary circ_dict = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-
-MarkerSet<URCMarkerID> makeURCSet()
+/**
+   Constructs the URC marker set
+ */
+MarkerSet<URCMarkerName> makeURCSet()
 {
-	MarkerSet<URCMarkerID> set(ALVAR_BIT_SIZE, ALVAR_PHYS_SIZE);
-	set.addAllFromDict(alvar_dict);
+	static const cv::aruco::Dictionary alvar_dict(makeAlvarBytesList(__alvar_markers), ALVAR_BIT_SIZE, 1);
+	MarkerSet<URCMarkerName> set(ALVAR_BIT_SIZE, ALVAR_PHYS_SIZE, alvar_dict);
 	set.addIDMapping(0, LEG1);
 	// TODO add all mappings
 	return set;
 }
 
-MarkerSet<CIRCMarkerID> makeCIRCSet()
+/**
+   Constructs the CIRC marker set
+ */
+MarkerSet<CIRCMarkerName> makeCIRCSet()
 {
-	MarkerSet<CIRCMarkerID> set(ARUCO_BIT_SIZE, ARUCO_PHYS_SIZE);
-	set.addAllFromDict(circ_dict);
+	static const cv::Ptr<cv::aruco::Dictionary> circ_dict_ptr =
+	cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+	MarkerSet<CIRCMarkerName> set(ARUCO_BIT_SIZE, ARUCO_PHYS_SIZE, circ_dict_ptr);
 	set.addIDMapping(0, CIRCMarker1);
 	// TODO add all mappings
 	return set;
 }
 
-const std::shared_ptr<MarkerSet<URCMarkerID>> urc_set =
-	std::make_shared<MarkerSet<URCMarkerID>>(makeURCSet());
-const std::shared_ptr<MarkerSet<CIRCMarkerID>> circ_set =
-	std::make_shared<MarkerSet<CIRCMarkerID>>(makeCIRCSet());
-
-const std::shared_ptr<MarkerSet<URCMarkerID>> URC_MARKERS()
+const std::shared_ptr<MarkerSet<URCMarkerName>> URC_MARKERS()
 {
-	return urc_set;
+	static const MarkerSet<URCMarkerName> URC_SET = makeURCSet();
+	return std::make_shared<MarkerSet<URCMarkerName>>(URC_SET);
 }
 
-const std::shared_ptr<MarkerSet<CIRCMarkerID>> CIRC_MARKERS()
+const std::shared_ptr<MarkerSet<CIRCMarkerName>> CIRC_MARKERS()
 {
-	return circ_set;
+	static const MarkerSet<CIRCMarkerName> CIRC_SET = makeCIRCSet();
+	return std::make_shared<MarkerSet<CIRCMarkerName>>(CIRC_SET);
 }
 
 }; // namespace Markers
