@@ -4,31 +4,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
-set(USE_GPU OFF CACHE BOOL "Whether or not to compile GPU code")
-
-if("${USE_GPU}")
-  message(STATUS "GPU code is ON")
-  add_definitions(-DWITH_GPU)
-else()
-  message(STATUS "GPU code is OFF")
-endif()
-
-set(AR_TESTS_WINDOWS OFF CACHE BOOL
-	"Whether or not the AR unit tests should show images in windows")
-
-if("${AR_TESTS_WINDOWS}")
-  message(STATUS "AR unit tests: image windows are ON")
-  add_definitions(-DAR_TESTS_WINDOWS)
-else()
-  message(STATUS "AR unit tests: image windows are OFF")
-endif()
-
-enable_testing()
-find_package(Catch2 REQUIRED)
-
-find_package(OpenCV CONFIG REQUIRED)
-find_package(Threads REQUIRED)
-add_subdirectory(ar)
+find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
@@ -86,6 +63,7 @@ add_executable(tests
   ${RoverCommonTest}
   Tests.cpp
   # AR Detection tests
+  # ar/ARUnitTests.cpp
   ar/Tag.cpp
   # CAN tests
   Networking/tests.cpp
@@ -137,12 +115,12 @@ add_executable(visualizer_test
   )
 
 list(APPEND simulator_libs
-  sfml-graphics sfml-window sfml-system pthread)
+  sfml-graphics sfml-window sfml-system X11 pthread Eigen3::Eigen)
 
-target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
-target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
-target_link_libraries(Rover ${OpenCV_LIBS})
-target_link_libraries(visualizer_test ${OpenCV_LIBS})
+target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS} Eigen3::Eigen)
+target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS} Eigen3::Eigen)
+target_link_libraries(Rover ${OpenCV_LIBS} Eigen3::Eigen)
+target_link_libraries(RoverNoCAN ${OpenCV_LIBS} Eigen3::Eigen)
 target_link_libraries(RoverSim ${OpenCV_LIBS} ${simulator_libs})
 target_link_libraries(simulator_navigation_demo ${simulator_libs})
 
@@ -151,6 +129,7 @@ include(Catch)
 target_link_libraries(tests Catch2::Catch2)
 target_link_libraries(tests ${OpenCV_LIBS})
 target_link_libraries(tests Threads::Threads)
+target_link_libraries(tests Eigen3::Eigen)
 catch_discover_tests(tests)
 
 add_executable(Server
@@ -158,6 +137,7 @@ add_executable(Server
 
 add_executable(TCPClient
   Networking/TCPClient.cpp)
+target_link_libraries(TCPClient Eigen3::Eigen)
 
 add_executable(FakeBaseStation
   Networking/FakeBaseStation.cpp)
