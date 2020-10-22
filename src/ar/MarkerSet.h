@@ -1,10 +1,11 @@
 #pragma once
 
-#include <opencv2/aruco.hpp>
-#include <opencv2/core.hpp>
-
+#include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include <opencv2/aruco.hpp>
+#include <opencv2/core.hpp>
 
 namespace AR
 {
@@ -23,13 +24,13 @@ private:
 	/**
 	   The width in pixels of the data region of each marker. Does not include the border.
 	 */
-	int data_region_size;
+	uint8_t data_region_size;
 	/**
 	   The width in pixels of the border of the marker. Note that this is only for ONE side of
 	   the square; if the border is 1 pixel wide, then the marker's total size will be the data
 	   region size + 2, for each border.
 	 */
-	int border_size;
+	uint8_t border_size;
 	/**
 	   The ID of the marker. Note that this need not actually be encoded in the data of the
 	   marker, just a unique ID to distinguish this marker from the others.
@@ -39,14 +40,15 @@ private:
 	   The actual bits stored in the data region of the marker, NOT including the border.
 	 */
 	cv::Mat data_bits;
+
 public:
 	/**
 	   Creates a marker, with the given data region size, border size, data bits, and id.
 	 */
-	Marker(int bit_size, cv::Mat bits, int id);
-	int getDataRegionSize() const;
-	int getBorderSize() const;
-	cv::Mat getDataBits() const;
+	Marker(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int id);
+	uint8_t getDataRegionSize() const;
+	uint8_t getBorderSize() const;
+	std::shared_ptr<cv::Mat> getDataBits() const;
 	int getId() const;
 };
 
@@ -61,25 +63,30 @@ public:
    Note that you should probably not need to construct any instances of this class yourself;
    Markers.h will contain predefined MarkerSets that you should use.
  */
-template <class IDMapping_t>
-class MarkerSet
+template <class IDMapping_t> class MarkerSet
 {
 private:
 	cv::aruco::Dictionary dict;
 	std::vector<Marker> markers;
 	float physical_size;
-	int bit_size;
+	uint8_t data_region_size;
+	uint8_t border_size;
 	std::unordered_map<int, IDMapping_t> id_mappings;
+	void init(uint8_t data_region_size, uint8_t border_size, float physical_size,
+			  cv::aruco::Dictionary markerDict);
+
 public:
-	MarkerSet(int bit_size, float physical_size);
-	MarkerSet(int bit_size, float physical_size, cv::aruco::Dictionary markerDict);
-	MarkerSet(int bit_size, float physical_size, cv::Ptr<cv::aruco::Dictionary> markerDictPtr);
+	MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
+			  cv::aruco::Dictionary markerDict);
+	MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
+			  cv::Ptr<cv::aruco::Dictionary> markerDictPtr);
 	bool addIDMapping(int id, IDMapping_t mapping);
 	cv::aruco::Dictionary getDict() const;
-	int getBitSize() const;
+	uint8_t getDataRegionSize() const;
+	uint8_t getBorderSize() const;
 	float getPhysicalSize() const;
 	std::vector<Marker> getMarkers() const;
 	bool isIDMapped(int id) const;
 };
 
-}
+} // namespace AR
