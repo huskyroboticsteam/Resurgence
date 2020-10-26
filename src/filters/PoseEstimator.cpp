@@ -1,117 +1,125 @@
 #include "PoseEstimator.h"
-#include "../simulator/utils.h"
-#include <unsupported/Eigen/MatrixFunctions>
+
 #include <Eigen/LU>
+#include <unsupported/Eigen/MatrixFunctions>
+
+#include "../simulator/utils.h"
 
 typedef Eigen::Matrix3d matrix;
 typedef Eigen::Vector3d vector;
 
-matrix createCovarianceMatrix(const vector &stdDevs) {
-    vector variances = stdDevs.array().square();
-    matrix mat = variances.asDiagonal();
-    return mat;
+matrix createCovarianceMatrix(const vector &stdDevs)
+{
+	vector variances = stdDevs.array().square();
+	matrix mat = variances.asDiagonal();
+	return mat;
 }
 
-void discreteToContinuous(matrix &A, matrix &B, double dt) {
-    matrix G = A;
-    matrix H = B;
-    A = G.log() / dt;
-    B = A * (G - Eigen::Matrix3d::Identity()).inverse() * H;
+void discreteToContinuous(matrix &A, matrix &B, double dt)
+{
+	matrix G = A;
+	matrix H = B;
+	A = G.log() / dt;
+	B = A * (G - Eigen::Matrix3d::Identity()).inverse() * H;
 }
 
 // contQ is covariance matrix
-matrix discretizeQ(const matrix &contA, const matrix &contQ, double dt) {
-    Eigen::Matrix<double, 6, 6> M;
-    M.block<3, 3>(0, 0) = -contA;
-    M.block<3, 3>(0, 3) = contQ;
-    M.block<3, 3>(3, 0).setZero();
-    M.block<3, 3>(3, 3) = contA.transpose();
+matrix discretizeQ(const matrix &contA, const matrix &contQ, double dt)
+{
+	Eigen::Matrix<double, 6, 6> M;
+	M.block<3, 3>(0, 0) = -contA;
+	M.block<3, 3>(0, 3) = contQ;
+	M.block<3, 3>(3, 0).setZero();
+	M.block<3, 3>(3, 3) = contA.transpose();
 
-    Eigen::Matrix<double, 6, 6> phi = (M * dt).exp();
+	Eigen::Matrix<double, 6, 6> phi = (M * dt).exp();
 
-    // Phi12 = phi[0:States,        States:2*States]
-    // Phi22 = phi[States:2*States, States:2*States]
-    Eigen::Matrix3d phi12 =
-            phi.block(0, 3, 3, 3);
-    Eigen::Matrix<double, 3, 3> phi22 =
-            phi.block(3, 3, 3, 3);
+	// Phi12 = phi[0:States,        States:2*States]
+	// Phi22 = phi[States:2*States, States:2*States]
+	Eigen::Matrix3d phi12 = phi.block(0, 3, 3, 3);
+	Eigen::Matrix<double, 3, 3> phi22 = phi.block(3, 3, 3, 3);
 
-    matrix discA = phi22.transpose();
+	matrix discA = phi22.transpose();
 
-    matrix q = discA * phi12;
-    q = (q + q.transpose()) / 2.0;
+	matrix q = discA * phi12;
+	q = (q + q.transpose()) / 2.0;
 
-    return q;
+	return q;
 }
 
 // R is measurement covariance matrix
-matrix discretizeR(const matrix &contR, double dt) {
-    return contR / dt;
+matrix discretizeR(const matrix &contR, double dt)
+{
+	return contR / dt;
 }
 
 // Solves Discrete-time Algebraic Riccati Equation
-// reference: https://scicomp.stackexchange.com/questions/30757/discrete-time-algebraic-riccati-equation-dare-solver-in-c
-matrix DARE(const matrix &A0, const matrix &B, const matrix &Q, const matrix &R) {
-    matrix A = A0;
-    matrix G = B * R.inverse() * B.transpose();
-    matrix H = Q;
-    const matrix I = matrix::Identity();
+// reference:
+// https://scicomp.stackexchange.com/questions/30757/discrete-time-algebraic-riccati-equation-dare-solver-in-c
+matrix DARE(const matrix &A0, const matrix &B, const matrix &Q, const matrix &R)
+{
+	matrix A = A0;
+	matrix G = B * R.inverse() * B.transpose();
+	matrix H = Q;
+	const matrix I = matrix::Identity();
 
-    matrix lastA, lastG, lastH;
-    // converges quadratically
-    do {
-        lastA = A;
-        lastG = G;
-        lastH = H;
+	matrix lastA, lastG, lastH;
+	// converges quadratically
+	do
+	{
+		lastA = A;
+		lastG = G;
+		lastH = H;
 
-        const matrix AIGH = lastA * (I + lastG * lastH).inverse();
-        A = lastA * AIGH * lastA;
-        G = lastG + lastA * AIGH * lastG * lastA.transpose();
-        H = lastH + lastA.transpose() * lastH * (I + lastG * lastH).transpose() * lastA;
-    } while ((H - lastH).norm() / H.norm() >= 0.01);
+		const matrix AIGH = lastA * (I + lastG * lastH).inverse();
+		A = lastA * AIGH * lastA;
+		G = lastG + lastA * AIGH * lastG * lastA.transpose();
+		H = lastH + lastA.transpose() * lastH * (I + lastG * lastH).transpose() * lastA;
+	} while ((H - lastH).norm() / H.norm() >= 0.01);
 
-    return H;
+	return H;
 }
 
-PoseEstimator::PoseEstimator(double trackWidth, const Eigen::Vector3d &stateStdDevs, const Eigen::Vector3d &measurementStdDevs, double dt)
-    : dt(dt), trackWidth(trackWidth), A(matrix::Identity()), B(matrix::Identity()), C(matrix::Identity()), D(matrix::Zero()) {
-    matrix stateCovarianceCont = createCovarianceMatrix(stateStdDevs);
-    matrix measurementCovarianceCont = createCovarianceMatrix(measurementStdDevs);
+PoseEstimator::PoseEstimator(const Eigen::Vector3d &stateStdDevs,
+							 const Eigen::Vector3d &measurementStdDevs, double dt)
+	: dt(dt), A(matrix::Identity()), B(matrix::Identity()), C(matrix::Identity()),
+	  D(matrix::Zero())
+{
+	matrix stateCovarianceCont = createCovarianceMatrix(stateStdDevs);
+	matrix measurementCovarianceCont = createCovarianceMatrix(measurementStdDevs);
 
-    matrix contA = A;
-    matrix contB = B;
-    discreteToContinuous(contA, contB, dt);
+	matrix contA = A;
+	matrix contB = B;
+	discreteToContinuous(contA, contB, dt);
 
-    stateCovariance = discretizeQ(contA, stateCovarianceCont, dt);
-    measurementCovariance = discretizeR(measurementCovarianceCont, dt);
+	stateCovariance = discretizeQ(contA, stateCovarianceCont, dt);
+	measurementCovariance = discretizeR(measurementCovarianceCont, dt);
 
-    // solve DARE for state error covariance matrix
-    matrix P = DARE(A.transpose(), C.transpose(), stateCovariance, measurementCovariance);
+	// solve DARE for state error covariance matrix
+	matrix P = DARE(A.transpose(), C.transpose(), stateCovariance, measurementCovariance);
 
-    matrix S = C * P * C.transpose() + measurementCovariance;
-    // This is the Kalman gain matrix, used to weight the GPS data against the model data
-    gainMatrix = S.transpose().colPivHouseholderQr().solve((C * P.transpose()).transpose());
+	matrix S = C * P * C.transpose() + measurementCovariance;
+	// This is the Kalman gain matrix, used to weight the GPS data against the model data
+	gainMatrix = S.transpose().colPivHouseholderQr().solve((C * P.transpose()).transpose());
 }
 
-vector PoseEstimator::getPoseDiff(const vector &pose, double thetaVel, double xVel) {
-    double dx = xVel * dt;
-    double dTheta = thetaVel * dt;
+vector getPoseDiff(const vector &pose, double dt, double thetaVel, double xVel)
+{
+	double dx = xVel * dt;
+	double dTheta = thetaVel * dt;
 
-    vector updated = toPose(toTransformRotateFirst(dx, 0, dTheta) * toTransform(pose), 0);
-    return updated - pose;
+	vector updated = toPose(toTransformRotateFirst(dx, 0, dTheta) * toTransform(pose), 0);
+	return updated - pose;
 }
 
-void PoseEstimator::predict(const Eigen::Vector3d &u) {
-    xHat = A * xHat + B * u;
+void PoseEstimator::predict(double thetaVel, double xVel)
+{
+	vector u = getPoseDiff(xHat, dt, thetaVel, xVel);
+	xHat = A * xHat + B * u;
 }
 
-void PoseEstimator::correct(const Eigen::Vector3d &u, const Eigen::Vector3d &y) {
-    xHat = xHat + gainMatrix * (y - (C * xHat + D * u));
-}
-
-void PoseEstimator::update(double thetaVel, double xVel, const Eigen::Vector3d &gps) {
-    vector u = getPoseDiff(xHat, thetaVel, xVel);
-
-    correct(u, gps);
-    predict(u);
+void PoseEstimator::correct(const Eigen::Vector3d &gps)
+{
+	vector u(0, 0, 0);
+	xHat = xHat + gainMatrix * (gps - (C * xHat + D * u));
 }
