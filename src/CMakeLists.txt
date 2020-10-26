@@ -32,6 +32,9 @@ list(APPEND RoverCommonTest
   Autonomous.cpp
   Util.cpp
   simulator/utils.cpp
+  filters/PoseEstimator.cpp
+  filters/PoseEstimator.h
+  filters/RollingAvgFilter.h
   )
 
 list(APPEND RoverCommon
