@@ -82,25 +82,25 @@ matrix DARE(const matrix &A0, const matrix &B, const matrix &Q, const matrix &R)
 
 PoseEstimator::PoseEstimator(const Eigen::Vector3d &stateStdDevs,
 							 const Eigen::Vector3d &measurementStdDevs, double dt)
-	: dt(dt), A(matrix::Identity()), B(matrix::Identity()), C(matrix::Identity()),
-	  D(matrix::Zero())
+	: dt(dt), systemMat(matrix::Identity()), inputMat(matrix::Identity()),
+	  outputMat(matrix::Identity()), estimateCovariance(matrix::Zero())
 {
 	matrix stateCovarianceCont = createCovarianceMatrix(stateStdDevs);
 	matrix measurementCovarianceCont = createCovarianceMatrix(measurementStdDevs);
 
-	matrix contA = A;
-	matrix contB = B;
+	matrix contA = systemMat;
+	matrix contB = inputMat;
 	discreteToContinuous(contA, contB, dt);
 
 	stateCovariance = discretizeQ(contA, stateCovarianceCont, dt);
 	measurementCovariance = discretizeR(measurementCovarianceCont, dt);
 
 	// solve DARE for state error covariance matrix
-	matrix P = DARE(A.transpose(), C.transpose(), stateCovariance, measurementCovariance);
+	matrix P = DARE(systemMat.transpose(), outputMat.transpose(), stateCovariance, measurementCovariance);
 
-	matrix S = C * P * C.transpose() + measurementCovariance;
+	matrix S = outputMat * P * outputMat.transpose() + measurementCovariance;
 	// This is the Kalman gain matrix, used to weight the GPS data against the model data
-	gainMatrix = S.transpose().colPivHouseholderQr().solve((C * P.transpose()).transpose());
+	gainMatrix = S.transpose().colPivHouseholderQr().solve((outputMat * P.transpose()).transpose());
 }
 
 vector getPoseDiff(const vector &pose, double dt, double thetaVel, double xVel)
@@ -115,11 +115,19 @@ vector getPoseDiff(const vector &pose, double dt, double thetaVel, double xVel)
 void PoseEstimator::predict(double thetaVel, double xVel)
 {
 	vector u = getPoseDiff(xHat, dt, thetaVel, xVel);
-	xHat = A * xHat + B * u;
+	xHat = systemMat * xHat + inputMat * u;
+	estimateCovariance = systemMat * estimateCovariance * systemMat.transpose() + stateCovariance;
 }
 
-void PoseEstimator::correct(const Eigen::Vector3d &gps)
+void PoseEstimator::correct(const Eigen::Vector3d &measurement)
 {
 	vector u(0, 0, 0);
-	xHat = xHat + gainMatrix * (gps - (C * xHat + D * u));
+	xHat = xHat + gainMatrix * (measurement - outputMat * xHat);
+	estimateCovariance = (matrix::Identity() - gainMatrix * outputMat) * estimateCovariance;
+}
+
+void PoseEstimator::reset(const Eigen::Vector3d &pose)
+{
+	xHat = pose;
+	estimateCovariance = matrix::Zero();
 }
