@@ -8,12 +8,15 @@
 constexpr float PI = M_PI;
 
 Autonomous::Autonomous(PointXY _target)
-	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 0.1)
+	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 0.1), state(0),
+	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false)
 {
-	state = 0;
-	targetHeading = -1;
-	forwardCount = -1;
-	rightTurn = false;
+}
+
+Autonomous::Autonomous(PointXY _target, const pose_t &startPose) : Autonomous(_target)
+{
+	poseEstimator.reset(startPose);
+	calibrated = true;
 }
 
 PointXY Autonomous::point_tToPointXY(const point_t &pnt) const
@@ -47,11 +50,37 @@ double Autonomous::angleToTarget(const pose_t &gpsPose) const
 	return theta - gpsPose(2);
 }
 
+bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &out) {
+	poses.push_back(pose);
+	// 62 samples with 2m std dev and 95% confidence interval gives about +-0.5m
+	if (poses.size() == 62) {
+		pose_t sum;
+		for (const pose_t &p : poses) {
+			sum += p;
+		}
+		sum /= poses.size();
+		out = sum;
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void Autonomous::autonomyIter()
 {
 	if (!Globals::AUTONOMOUS)
 		return;
 	transform_t gps = readGPS(); // <--- has some heading information
+
+	if (!calibrated) {
+		pose_t out;
+		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out)) {
+			poseEstimator.reset(out);
+			calibrated = true;
+			calibrationPoses.clear();
+		}
+	}
+
 	points_t lidar = readLidarScan();
 	points_t landmarks = readLandmarks();
 
