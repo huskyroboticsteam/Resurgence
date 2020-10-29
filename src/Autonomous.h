@@ -1,20 +1,23 @@
 #pragma once
 
-#include <vector>
 #include <cmath>
 #include <memory>
-#include "lidar/PointCloudProcessing.h"
-#include "WorldData.h"
+#include <vector>
+
+#include "filters/PoseEstimator.h"
+
 #include "FakeMap.h"
 #include "Pathfinding/ObstacleMap.h"
 #include "Pathfinding/Pather2.h"
-#include "simulator/utils.h"
 #include "Util.h"
+#include "WorldData.h"
+#include "lidar/PointCloudProcessing.h"
+#include "simulator/utils.h"
 
 class Autonomous
 {
 public:
-    Autonomous(PointXY);
+    explicit Autonomous(PointXY);
     //Returns a pair of floats, in heading, speed
     //Accepts current heading of the robot as parameter
     std::pair<float, float> getDirections(float currHeading);
@@ -25,6 +28,7 @@ public:
 
 private:
     PointXY target;
+	PoseEstimator poseEstimator;
     float targetHeading;
     int state;         //1 is move forwards, 0 is turning, -1 is back up
     bool rightTurn; //boolean for turning right or turning towards target
@@ -33,18 +37,15 @@ private:
     std::pair<float, float> stateForwards(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateTurn(float currHeading, std::pair<float, float> directions);
     std::pair<float, float> stateBackwards(float currHeading, std::pair<float, float> directions);
-
-    // not guarenteed to have localization
-    double currHeading;
     
     //determine direction for robot at any given iteration
-    double pathDirection(points_t lidar, pose_t gpsPose);
-    double angleToTarget(pose_t gpsPose);
-    bool arrived(pose_t gpsPose);
+    double pathDirection(const points_t &lidar, const pose_t &gpsPose);
+    double angleToTarget(const pose_t &gpsPose) const;
+    bool arrived(const pose_t &pose) const;
 
     //helpers to use simulator utils types
-    PointXY point_tToPointXY(point_t pnt);
-    const std::vector<PointXY> points_tToPointXYs(points_t pnts);
+    PointXY point_tToPointXY(const point_t &pnt) const;
+    std::vector<PointXY> points_tToPointXYs(const points_t &pnts) const;
     
     ObstacleMap obsMap;
     Pather2 pather;
