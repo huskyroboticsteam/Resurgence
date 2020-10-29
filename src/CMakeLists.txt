@@ -123,6 +123,10 @@ add_executable(visualizer_test
 list(APPEND simulator_libs
   sfml-graphics sfml-window sfml-system pthread)
 
+# My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
