@@ -119,10 +119,9 @@ void PoseEstimator::predict(double thetaVel, double xVel)
 	estimateCovariance = systemMat * estimateCovariance * systemMat.transpose() + stateCovariance;
 }
 
-void PoseEstimator::correct(const Eigen::Vector3d &measurement)
-{
-	vector u(0, 0, 0);
-	xHat = xHat + gainMatrix * (measurement - outputMat * xHat);
+void PoseEstimator::correct(const transform_t &measurement) {
+	pose_t pose = toPose(measurement, xHat[2]);
+	xHat = xHat + gainMatrix * (pose - outputMat * xHat);
 	estimateCovariance = (matrix::Identity() - gainMatrix * outputMat) * estimateCovariance;
 }
 

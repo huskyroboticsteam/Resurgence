@@ -2,6 +2,8 @@
 
 #include <Eigen/Core>
 
+#include "../simulator/utils.h"
+
 class PoseEstimator
 {
 public:
@@ -21,9 +23,9 @@ public:
 	 * Correct the pose estimation with measurement data.
 	 * The measurement should be in the same space as the state.
 	 *
-	 * @param measurement The measurement to use to correct the filter.
+	 * @param measurement The measurement to use to correct the filter, as a transform.
 	 */
-	void correct(const Eigen::Vector3d &measurement);
+	void correct(const transform_t &measurement);
 
 	/**
 	 * Use the model to predict the next system state, given the current inputs.
@@ -58,21 +60,21 @@ public:
 	 *
 	 * @param pose The pose to which the state estimate will be set.
 	 */
-	void reset(const Eigen::Vector3d &pose);
+	void reset(const pose_t &pose);
 
 	/**
 	 * Gets the current state estimate.
 	 *
 	 * @return The state estimate.
 	 */
-	Eigen::Vector3d getPose() const
+	pose_t getPose() const
 	{
 		return xHat;
 	}
 
 private:
 	double dt;
-	Eigen::Vector3d xHat;
+	pose_t xHat;
 	Eigen::Matrix3d stateCovariance;
 	Eigen::Matrix3d measurementCovariance;
 	Eigen::Matrix3d systemMat, inputMat, outputMat;
