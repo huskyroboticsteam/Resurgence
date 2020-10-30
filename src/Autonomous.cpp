@@ -1,15 +1,19 @@
 #include "Autonomous.h"
 
+#include <Eigen/LU>
 #include <cmath>
 
 #include "Globals.h"
 #include "simulator/world_interface.h"
 
 constexpr float PI = M_PI;
+constexpr double KP_ANGLE = 2;
+constexpr double DRIVE_SPEED = 8;
 
 Autonomous::Autonomous(PointXY _target)
 	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 0.1), state(0),
-	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false)
+	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
+	  landmarkFilter(5)
 {
 }
 
@@ -46,24 +50,63 @@ double Autonomous::angleToTarget(const pose_t &gpsPose) const
 {
 	float dy = target.y - (float)gpsPose(1);
 	float dx = target.x - (float)gpsPose(0);
-	double theta = atan2(dy, dx);
+	double theta = std::atan2(dy, dx);
 	return theta - gpsPose(2);
 }
 
-bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &out) {
+bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &out)
+{
 	poses.push_back(pose);
 	// 62 samples with 2m std dev and 95% confidence interval gives about +-0.5m
-	if (poses.size() == 62) {
+	if (poses.size() == 62)
+	{
 		pose_t sum;
-		for (const pose_t &p : poses) {
+		for (const pose_t &p : poses)
+		{
 			sum += p;
 		}
 		sum /= poses.size();
 		out = sum;
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
+}
+
+double transformAngle(double currAngle, double targetAngle)
+{
+	double range = 2 * PI;
+	double dist = std::fmod(targetAngle - currAngle, range);
+	double absDist = abs(dist);
+
+	int sign = dist > 0 ? 1 : (dist < 0 ? -1 : 0);
+
+	return currAngle + ((absDist > (range / 2)) ? -sign * (range - absDist) : dist);
+}
+
+double getThetaVel(const PointXY &target, const pose_t &pose, double &thetaErr)
+{
+	double dx = target.x - pose[0];
+	double dy = target.y - pose[1];
+	double targetAngle = atan2(dy, dx);
+	targetAngle = transformAngle(pose[2], targetAngle);
+	thetaErr = targetAngle - pose[2];
+
+	return KP_ANGLE * thetaErr;
+}
+
+double dist(const PointXY &p1, const PointXY &p2)
+{
+	return std::hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+void filterLandmarks(points_t &landmarks)
+{
+	landmarks.erase(std::remove_if(landmarks.begin(), landmarks.end(),
+								   [](point_t p) { return p[2] == 0; }),
+					landmarks.end());
 }
 
 void Autonomous::autonomyIter()
@@ -72,41 +115,74 @@ void Autonomous::autonomyIter()
 		return;
 	transform_t gps = readGPS(); // <--- has some heading information
 
-	if (!calibrated) {
+	// If we haven't calibrated position, do so now
+	if (!calibrated)
+	{
+		std::cout << "Calibrating..." << std::endl;
 		pose_t out;
-		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out)) {
+		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
+		{
 			poseEstimator.reset(out);
 			calibrated = true;
 			calibrationPoses.clear();
+			std::cout << "Pose:\n" << out << std::endl;
+		}
+		else
+		{
+			return;
 		}
 	}
 
-	points_t lidar = readLidarScan();
+	// get landmark data and filter out invalid data points
 	points_t landmarks = readLandmarks();
+	filterLandmarks(landmarks);
 
+	// get the latest pose estimation
 	poseEstimator.correct(gps);
 	pose_t pose = poseEstimator.getPose();
 
 	if (arrived(pose))
-	{ // toPose(gps, currHeading)
+	{
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 				  << std::endl;
-
-		// implement moving through gates
-		// then update target
+		landmarkFilter.reset(); // clear the cached data points
 	}
 	else
 	{
-		double dtheta = pathDirection(lidar, pose);
-		double speed = lidar.empty() ? 10 : 5;
-		// TODO incredibly clever algorithms for state estimation
-		// and path planning and control!
+		PointXY driveTarget = target;
+		if (dist(target, point_tToPointXY(pose)) < 25)
+		{
+			// if we have some existing data or new data, set the target using the landmark
+			// data
+			if (landmarkFilter.getNumPoints() > 0 || !landmarks.empty())
+			{
+				if (landmarks.empty())
+				{
+					// we have no new data, so use the data already in the filter
+					driveTarget = point_tToPointXY(landmarkFilter.get());
+				}
+				else
+				{
+					// transform and add the new data to the filter
+					point_t landmark = landmarks[0];
+					transform_t invTransform = toTransform(pose).inverse();
+					point_t landmarkMapSpace = invTransform * landmark;
+					// the filtering is done on the target in map space to reduce any phase lag
+					// caused by filtering
+					driveTarget = point_tToPointXY(landmarkFilter.get(landmarkMapSpace));
+				}
+			}
+		}
+		double thetaErr;
+		double thetaVel = getThetaVel(driveTarget, pose, thetaErr);
+		double driveSpeed =
+			abs(thetaErr) < PI / 4 ? DRIVE_SPEED : 0; // don't drive forward if pointing away
 
 		if (!Globals::E_STOP)
 		{
-			setCmdVel(dtheta, speed);
-			poseEstimator.predict(dtheta, speed);
+			setCmdVel(thetaVel, driveSpeed);
+			poseEstimator.predict(thetaVel, driveSpeed);
 		}
 	}
 }
@@ -122,7 +198,7 @@ double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 	{
 		const std::vector<PointXY> &ref = points_tToPointXYs(lidar);
 		PointXY direction = pather.getPath(ref, (float)gpsPose(0), (float)gpsPose(1), target);
-		float theta = atan2(direction.y, direction.x);
+		float theta = std::atan2(direction.y, direction.x);
 		dtheta = static_cast<double>(theta) - gpsPose(2);
 	}
 	return dtheta;
