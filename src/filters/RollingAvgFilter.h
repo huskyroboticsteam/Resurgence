@@ -21,14 +21,14 @@ public:
 	 * @return The output of the filter. If no data has been entered, returns the default
 	 * value.
 	 */
-	Eigen::Vector3d get()
+	Eigen::Vector3d get() const
 	{
 		Eigen::Vector3d sum;
-		if (dataPoints.size() == 0)
+		if (dataPoints.empty())
 		{
 			return sum;
 		}
-		for (Eigen::Vector3d t : dataPoints)
+		for (const Eigen::Vector3d &t : dataPoints)
 		{
 			sum += t;
 		}
@@ -52,17 +52,22 @@ public:
 		return get();
 	}
 
-	int getNumPoints()
+	void reset()
+	{
+		dataPoints.clear();
+	}
+
+	int getNumPoints() const
 	{
 		return dataPoints.size();
 	}
 
-	int getSize()
+	int getSize() const
 	{
 		return size;
 	}
 
-	std::vector<Eigen::Vector3d> getData()
+	std::vector<Eigen::Vector3d> getData() const
 	{
 		return dataPoints;
 	}

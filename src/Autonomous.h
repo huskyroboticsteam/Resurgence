@@ -10,6 +10,7 @@
 #include "Util.h"
 #include "WorldData.h"
 #include "filters/PoseEstimator.h"
+#include "filters/RollingAvgFilter.h"
 #include "lidar/PointCloudProcessing.h"
 #include "simulator/utils.h"
 
@@ -29,6 +30,7 @@ public:
 private:
 	PointXY target;
 	PoseEstimator poseEstimator;
+	RollingAvgFilter landmarkFilter;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
 	float targetHeading;
