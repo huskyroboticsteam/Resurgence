@@ -1,9 +1,4 @@
-//
-// Created by abdes on 10/31/2020.
-//
-
-#ifndef ROVER_KALMANFILTER_H
-#define ROVER_KALMANFILTER_H
+#pragma once
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -46,9 +41,9 @@ public:
 
 		// solve DARE for asymptotic state error covariance matrix
 		matrix P = DARE(discA.transpose(), outputMat.transpose(), stateCovariance,
-						measurementStdDevs);
+						measurementCovariance);
 
-		matrix S = outputMat * P * outputMat.transpose() + measurementStdDevs;
+		matrix S = outputMat * P * outputMat.transpose() + measurementCovariance;
 		// This is the Kalman gain matrix, used to weight the GPS data against the model data
 		matrix gainMatrix =
 			S.transpose().colPivHouseholderQr().solve((outputMat * P.transpose()).transpose());
@@ -91,9 +86,9 @@ public:
 
 		// solve DARE for asymptotic state error covariance matrix
 		matrix P = DARE(systemMat.transpose(), outputMat.transpose(), stateCovariance,
-						measurementStdDevs);
+						measurementCovariance);
 
-		matrix S = outputMat * P * outputMat.transpose() + measurementStdDevs;
+		matrix S = outputMat * P * outputMat.transpose() + measurementCovariance;
 		// This is the Kalman gain matrix, used to weight the GPS data against the model data
 		matrix gainMatrix =
 			S.transpose().colPivHouseholderQr().solve((outputMat * P.transpose()).transpose());
@@ -278,5 +273,3 @@ private:
 		return H;
 	}
 };
-
-#endif // ROVER_KALMANFILTER_H
