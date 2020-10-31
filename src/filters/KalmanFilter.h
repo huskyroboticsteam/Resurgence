@@ -202,6 +202,9 @@ private:
 
 	static void continuousToDiscrete(matrix &A, input_mat &B, double dt)
 	{
+		// zero order hold discretization for system and input matrices
+		// reference:
+		// https://en.wikipedia.org/wiki/Discretization#Discretization_of_linear_state_space_models
 		Eigen::Matrix<double, numStates + numInputs, numStates + numInputs> M;
 		M.setZero();
 		M.template block<numStates, numStates>(0, 0) = A;
@@ -216,8 +219,8 @@ private:
 	// contA is continuous system matrix, contQ is continuous process covariance matrix
 	static matrix discretizeQ(const matrix &contA, const matrix &contQ, double dt)
 	{
-		// implements zero order hold discretization of the system and state covariance
-		// matrices reference:
+		// zero order hold discretization of the system and state covariance matrices
+		// reference:
 		// https://en.wikipedia.org/wiki/Discretization#Discretization_of_process_noise
 		Eigen::Matrix<double, numStates * 2, numStates * 2> M;
 		M.template block<numStates, numStates>(0, 0) = -contA;
