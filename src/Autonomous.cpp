@@ -147,6 +147,7 @@ void Autonomous::autonomyIter()
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 				  << std::endl;
 		landmarkFilter.reset(); // clear the cached data points
+		setCmdVel(0, 0);
 	}
 	else
 	{
