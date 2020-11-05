@@ -1,0 +1,120 @@
+#pragma once
+
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <unsupported/Eigen/MatrixFunctions>
+
+namespace StateSpace
+{
+
+template <int size>
+Eigen::Matrix<double, size, size>
+createCovarianceMatrix(const Eigen::Matrix<double, size, 1> &stdDevs)
+{
+	Eigen::Matrix<double, size, 1> variances = stdDevs.array().square();
+	Eigen::Matrix<double, size, size> mat = variances.asDiagonal();
+	return mat;
+}
+
+template <int numStates, int numInputs>
+void discreteToContinuous(Eigen::Matrix<double, numStates, numStates> &A,
+						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
+{
+	// Reference paper: https://doi.org/10.1016/0307-904X(80)90177-8
+	auto G = A;
+	auto H = B;
+	A = G.log() / dt;
+	B = A * (G - Eigen::Matrix<double, numStates, numStates>::Identity()).inverse() * H;
+}
+
+template <int numStates, int numInputs>
+void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
+						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
+{
+	// zero order hold discretization for system and input matrices
+	// reference:
+	// https://en.wikipedia.org/wiki/Discretization#Discretization_of_linear_state_space_models
+	Eigen::Matrix<double, numStates + numInputs, numStates + numInputs> M;
+	M.setZero();
+	M.template block<numStates, numStates>(0, 0) = A;
+	M.template block<numStates, numInputs>(0, numStates) = B;
+	M *= dt;
+
+	Eigen::Matrix<double, numStates + numInputs, numStates + numInputs> exp = M.exp();
+	A = exp.template block<numStates, numStates>(0, 0);
+	B = exp.template block<numStates, numInputs>(0, numStates);
+}
+
+// contA is continuous system matrix, contQ is continuous process covariance matrix
+template <int numStates>
+Eigen::Matrix<double, numStates, numStates>
+discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
+			const Eigen::Matrix<double, numStates, numStates> &contQ, double dt)
+{
+	// zero order hold discretization of the system and state covariance matrices
+	// reference:
+	// https://en.wikipedia.org/wiki/Discretization#Discretization_of_process_noise
+	Eigen::Matrix<double, numStates * 2, numStates * 2> M;
+	M.template block<numStates, numStates>(0, 0) = -contA;
+	M.template block<numStates, numStates>(0, numStates) = contQ;
+	M.template block<numStates, numStates>(numStates, 0).setZero();
+	M.template block<numStates, numStates>(numStates, numStates) = contA.transpose();
+
+	Eigen::Matrix<double, numStates * 2, numStates * 2> G = (M * dt).exp();
+
+	Eigen::Matrix<double, numStates, numStates> AinvQ =
+		G.block(0, numStates, numStates, numStates); // this is discA^-1 * Q
+	Eigen::Matrix<double, numStates, numStates> discA =
+		G.block(numStates, numStates, numStates, numStates).transpose();
+
+	Eigen::Matrix<double, numStates, numStates> q = discA * AinvQ; // A * A^-1 * Q = Q
+	q = (q + q.transpose()) / 2.0; // make Q symmetric again if it became asymmetric
+
+	return q;
+}
+
+// R is measurement covariance matrix
+template <int numStates>
+Eigen::Matrix<double, numStates, numStates>
+discretizeR(const Eigen::Matrix<double, numStates, numStates> &contR, double dt)
+{
+	return contR / dt;
+}
+
+// Solves Discrete-time Algebraic Riccati Equation to calculate asymptotic error covariance
+// matrix This can be used to calculate the optimal Kalman gain matrix
+template <int numStates>
+static Eigen::Matrix<double, numStates, numStates>
+DARE(const Eigen::Matrix<double, numStates, numStates> &A0,
+	 const Eigen::Matrix<double, numStates, numStates> &Ctrans,
+	 const Eigen::Matrix<double, numStates, numStates> &Q,
+	 const Eigen::Matrix<double, numStates, numStates> &R)
+{
+	// reference:
+	// https://scicomp.stackexchange.com/questions/30757/discrete-time-algebraic-riccati-equation-dare-solver-in-c
+	Eigen::Matrix<double, numStates, numStates> A = A0;
+	Eigen::Matrix<double, numStates, numStates> G = Ctrans * R.inverse() * Ctrans.transpose();
+	Eigen::Matrix<double, numStates, numStates> H = Q;
+	const Eigen::Matrix<double, numStates, numStates> I =
+		Eigen::Matrix<double, numStates, numStates>::Identity();
+
+	Eigen::Matrix<double, numStates, numStates> lastA;
+	Eigen::Matrix<double, numStates, numStates> lastG;
+	Eigen::Matrix<double, numStates, numStates> lastH;
+	// converges quadratically
+	do
+	{
+		lastA = A;
+		lastG = G;
+		lastH = H;
+
+		const Eigen::Matrix<double, numStates, numStates> AIGH =
+			lastA * (I + lastG * lastH).inverse();
+		A = lastA * AIGH * lastA;
+		G = lastG + lastA * AIGH * lastG * lastA.transpose();
+		H = lastH + lastA.transpose() * lastH * (I + lastG * lastH).transpose() * lastA;
+	} while ((H - lastH).norm() / H.norm() >= 0.01);
+
+	return H;
+}
+} // namespace StateSpace

@@ -35,7 +35,10 @@ list(APPEND RoverCommonTest
   filters/PoseEstimator.cpp
   filters/PoseEstimator.h
   filters/RollingAvgFilter.h
+  filters/KalmanFilterBase.h
   filters/KalmanFilter.h
+  filters/ExtendedKalmanFilter.h
+  filters/StateSpaceUtil.h
   )
 
 list(APPEND RoverCommon
