@@ -39,6 +39,7 @@ list(APPEND RoverCommonTest
   filters/KalmanFilter.h
   filters/ExtendedKalmanFilter.h
   filters/StateSpaceUtil.h
+  math/DiffEq.h
   )
 
 list(APPEND RoverCommon

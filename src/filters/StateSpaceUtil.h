@@ -47,9 +47,10 @@ void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
 
 // contA is continuous system matrix, contQ is continuous process covariance matrix
 template <int numStates>
-Eigen::Matrix<double, numStates, numStates>
-discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
-			const Eigen::Matrix<double, numStates, numStates> &contQ, double dt)
+void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
+				  const Eigen::Matrix<double, numStates, numStates> &contQ,
+				  Eigen::Matrix<double, numStates, numStates> &discA,
+				  Eigen::Matrix<double, numStates, numStates> &discQ, double dt)
 {
 	// zero order hold discretization of the system and state covariance matrices
 	// reference:
@@ -64,13 +65,22 @@ discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
 
 	Eigen::Matrix<double, numStates, numStates> AinvQ =
 		G.block(0, numStates, numStates, numStates); // this is discA^-1 * Q
-	Eigen::Matrix<double, numStates, numStates> discA =
-		G.block(numStates, numStates, numStates, numStates).transpose();
+	discA = G.block(numStates, numStates, numStates, numStates).transpose();
 
 	Eigen::Matrix<double, numStates, numStates> q = discA * AinvQ; // A * A^-1 * Q = Q
-	q = (q + q.transpose()) / 2.0; // make Q symmetric again if it became asymmetric
+	discQ = (q + q.transpose()) / 2.0; // make Q symmetric again if it became asymmetric
+}
 
-	return q;
+// contA is continuous system matrix, contQ is continuous process covariance matrix
+template <int numStates>
+Eigen::Matrix<double, numStates, numStates>
+discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
+			const Eigen::Matrix<double, numStates, numStates> &contQ, double dt)
+{
+	Eigen::Matrix<double, numStates, numStates> discA;
+	Eigen::Matrix<double, numStates, numStates> discQ;
+	discretizeAQ(contA, contQ, discA, discQ, dt);
+	return discQ;
 }
 
 // R is measurement covariance matrix

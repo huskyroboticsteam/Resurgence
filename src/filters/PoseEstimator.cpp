@@ -5,10 +5,14 @@ typedef Eigen::Vector3d vector;
 
 pose_t stateFunc(const pose_t &x, const Eigen::Vector2d &u)
 {
-	double dTheta = u[0];
-	double dx = u[1];
+	double thetaVel = u[0];
+	double xVel = u[1];
 
-	return toPose(toTransformRotateFirst(dx, 0, dTheta) * toTransform(x), x[2]);
+	double theta = x[2];
+
+	pose_t vel;
+	vel << xVel * cos(theta), xVel * sin(theta), thetaVel;
+	return vel;
 }
 
 pose_t measurementFunc(const pose_t &x)
@@ -16,26 +20,9 @@ pose_t measurementFunc(const pose_t &x)
 	return x;
 }
 
-matrix stateFuncJacobian(const pose_t &pose, const Eigen::Vector2d &u)
-{
-	double dTheta = u[0];
-	double dx = u[1];
-
-	double theta = pose[2];
-
-	matrix jacobian;
-	jacobian << -1, 0, -dx * sin(theta + dTheta), 0, -1, dx * cos(theta + dTheta), 0, 0, 1;
-	return jacobian;
-}
-
-matrix measurementFuncJacobian(const pose_t &x) {
-	return matrix::Identity();
-}
-
 PoseEstimator::PoseEstimator(const Eigen::Vector3d &stateStdDevs,
 							 const Eigen::Vector3d &measurementStdDevs, double dt)
-	: ekf(stateFunc, measurementFunc, stateFuncJacobian, measurementFuncJacobian, stateStdDevs, measurementStdDevs),
-	  dt(dt)
+	: ekf(stateFunc, measurementFunc, stateStdDevs, measurementStdDevs, dt), dt(dt)
 {
 }
 
