@@ -3,37 +3,57 @@
 typedef Eigen::Matrix3d matrix;
 typedef Eigen::Vector3d vector;
 
+pose_t stateFunc(const pose_t &x, const Eigen::Vector2d &u)
+{
+	double dTheta = u[0];
+	double dx = u[1];
+
+	return toPose(toTransformRotateFirst(dx, 0, dTheta) * toTransform(x), x[2]);
+}
+
+pose_t measurementFunc(const pose_t &x)
+{
+	return x;
+}
+
+matrix stateFuncJacobian(const pose_t &pose, const Eigen::Vector2d &u)
+{
+	double dTheta = u[0];
+	double dx = u[1];
+
+	double theta = pose[2];
+
+	matrix jacobian;
+	jacobian << -1, 0, -dx * sin(theta + dTheta), 0, -1, dx * cos(theta + dTheta), 0, 0, 1;
+	return jacobian;
+}
+
+matrix measurementFuncJacobian(const pose_t &x) {
+	return matrix::Identity();
+}
+
 PoseEstimator::PoseEstimator(const Eigen::Vector3d &stateStdDevs,
 							 const Eigen::Vector3d &measurementStdDevs, double dt)
-	: kf(KalmanFilter<3, 3>::createDisc(matrix::Identity(), matrix::Identity(),
-										matrix::Identity(), stateStdDevs, measurementStdDevs,
-										dt)),
+	: ekf(stateFunc, measurementFunc, stateFuncJacobian, measurementFuncJacobian, stateStdDevs, measurementStdDevs),
 	  dt(dt)
 {
 }
 
-vector getPoseDiff(const vector &pose, double dt, double thetaVel, double xVel)
-{
-	double dx = xVel * dt;
-	double dTheta = thetaVel * dt;
-
-	vector updated = toPose(toTransformRotateFirst(dx, 0, dTheta) * toTransform(pose), 0);
-	return updated - pose;
-}
-
 void PoseEstimator::predict(double thetaVel, double xVel)
 {
-	vector u = getPoseDiff(kf.getState(), dt, thetaVel, xVel);
-	kf.predict(u);
+	Eigen::Vector2d u;
+	u << thetaVel, xVel;
+	u *= dt;
+	ekf.predict(u);
 }
 
 void PoseEstimator::correct(const transform_t &measurement)
 {
-	pose_t pose = toPose(measurement, kf.getState()[2]);
-	kf.correct(pose);
+	pose_t pose = toPose(measurement, ekf.getState()[2]);
+	ekf.correct(pose);
 }
 
 void PoseEstimator::reset(const Eigen::Vector3d &pose)
 {
-	kf.reset(pose);
+	ekf.reset(pose);
 }

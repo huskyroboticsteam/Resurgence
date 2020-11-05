@@ -3,7 +3,7 @@
 #include <Eigen/Core>
 
 #include "../simulator/utils.h"
-#include "KalmanFilter.h"
+#include "ExtendedKalmanFilter.h"
 
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
@@ -48,7 +48,7 @@ public:
 	 */
 	Eigen::Matrix3d getEstimateCovarianceMat() const
 	{
-		return kf.getEstimateCovarianceMat();
+		return ekf.getEstimateCovarianceMat();
 	}
 
 	/**
@@ -74,10 +74,10 @@ public:
 	 */
 	pose_t getPose() const
 	{
-		return kf.getState();
+		return ekf.getState();
 	}
 
 private:
-	KalmanFilter<3,3> kf;
+	ExtendedKalmanFilter<3,2> ekf;
 	double dt;
 };

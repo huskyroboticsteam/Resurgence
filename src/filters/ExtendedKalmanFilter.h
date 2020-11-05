@@ -18,12 +18,12 @@ public:
 						 state_t (*measurementFunc)(const state_t &),
 						 matrix_t (*stateFuncJacobian)(const state_t &, const input_t &),
 						 matrix_t (*measurementFuncJacobian)(const state_t &),
-						 const state_t &stateStdDevs, const matrix_t &measurementStdDevs)
+						 const state_t &stateStdDevs, const state_t &measurementStdDevs)
 		: stateFunc(stateFunc), measurementFunc(measurementFunc),
 		  stateFuncJacobian(stateFuncJacobian),
 		  measurementFuncJacobian(measurementFuncJacobian),
-		  Q(StateSpace::createCovarianceMatrix(stateStdDevs)),
-		  R(StateSpace::createCovarianceMatrix(measurementStdDevs))
+		  Q(StateSpace::template createCovarianceMatrix<numStates>(stateStdDevs)),
+		  R(StateSpace::template createCovarianceMatrix<numStates>(measurementStdDevs))
 	{
 		this->P = matrix_t::Zero();
 		this->xHat = state_t::Zero();
@@ -32,13 +32,13 @@ public:
 	void predict(const Eigen::Matrix<double, numInputs, 1> &input) override
 	{
 		this->xHat = stateFunc(this->xHat, input);
-		matrix_t F = stateFuncJacobian(numInputs, input);
+		matrix_t F = stateFuncJacobian(this->xHat, input);
 		this->P = F * this->P * F.transpose() + Q;
 	}
 
 	void correct(const Eigen::Matrix<double, numStates, 1> &measurement) override
 	{
-		input_t y = measurement - measurementFunc(this->xHat); // measurement residual
+		state_t y = measurement - measurementFunc(this->xHat); // measurement residual
 		matrix_t H = measurementFuncJacobian(this->xHat);	   // output matrix
 		matrix_t S = H * this->P * H.transpose() + R;		   // residual covariance
 		// near-optimal kalman gain
