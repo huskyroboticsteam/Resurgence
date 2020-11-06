@@ -30,7 +30,6 @@ void PoseEstimator::predict(double thetaVel, double xVel)
 {
 	Eigen::Vector2d u;
 	u << thetaVel, xVel;
-	u *= dt;
 	ekf.predict(u);
 }
 
