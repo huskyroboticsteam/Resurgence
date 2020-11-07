@@ -102,13 +102,6 @@ double dist(const PointXY &p1, const PointXY &p2)
 	return std::hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
-void filterLandmarks(points_t &landmarks)
-{
-	landmarks.erase(std::remove_if(landmarks.begin(), landmarks.end(),
-								   [](point_t p) { return p[2] == 0; }),
-					landmarks.end());
-}
-
 void Autonomous::autonomyIter()
 {
 	if (!Globals::AUTONOMOUS)
@@ -138,7 +131,7 @@ void Autonomous::autonomyIter()
 
 	// get landmark data and filter out invalid data points
 	points_t landmarks = readLandmarks();
-	filterLandmarks(landmarks);
+	point_t firstLandmark = landmarks[0];
 
 	// get the latest pose estimation
 	poseEstimator.correct(gps);
@@ -159,9 +152,10 @@ void Autonomous::autonomyIter()
 		{
 			// if we have some existing data or new data, set the target using the landmark
 			// data
-			if (landmarkFilter.getSize() > 0 || !landmarks.empty())
+			bool landmarkVisible = firstLandmark[2] != 0;
+			if (landmarkFilter.getSize() > 0 || landmarkVisible)
 			{
-				if (landmarks.empty())
+				if (!landmarkVisible)
 				{
 					// we have no new data, so use the data already in the filter
 					driveTarget = point_tToPointXY(landmarkFilter.get());
@@ -169,9 +163,8 @@ void Autonomous::autonomyIter()
 				else
 				{
 					// transform and add the new data to the filter
-					point_t landmark = landmarks[0];
 					transform_t invTransform = toTransform(pose).inverse();
-					point_t landmarkMapSpace = invTransform * landmark;
+					point_t landmarkMapSpace = invTransform * firstLandmark;
 					// the filtering is done on the target in map space to reduce any phase lag
 					// caused by filtering
 					driveTarget = point_tToPointXY(landmarkFilter.get(landmarkMapSpace));
