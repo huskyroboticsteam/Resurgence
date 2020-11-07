@@ -46,10 +46,7 @@ public:
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
 	 */
-	Eigen::Matrix3d getEstimateCovarianceMat() const
-	{
-		return kf.getEstimateCovarianceMat();
-	}
+	Eigen::Matrix3d getEstimateCovarianceMat() const;
 
 	/**
 	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
@@ -72,10 +69,7 @@ public:
 	 *
 	 * @return The state estimate.
 	 */
-	pose_t getPose() const
-	{
-		return kf.getState();
-	}
+	pose_t getPose() const;
 
 private:
 	KalmanFilter<3,3> kf;

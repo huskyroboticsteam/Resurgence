@@ -112,7 +112,10 @@ void filterLandmarks(points_t &landmarks)
 void Autonomous::autonomyIter()
 {
 	if (!Globals::AUTONOMOUS)
+	{
 		return;
+	}
+
 	transform_t gps = readGPS(); // <--- has some heading information
 
 	// If we haven't calibrated position, do so now
@@ -185,8 +188,9 @@ void Autonomous::autonomyIter()
 			setCmdVel(thetaVel, driveSpeed);
 			poseEstimator.predict(thetaVel, driveSpeed);
 
-			std::cout << "ThetaVel: " << thetaVel << " DriveVel: " << driveSpeed << " thetaErr: " << thetaErr
-					  << " targetX: " << driveTarget.x << " targetY: " << driveTarget.y << std::endl;
+			std::cout << "ThetaVel: " << thetaVel << " DriveVel: " << driveSpeed
+					  << " thetaErr: " << thetaErr << " targetX: " << driveTarget.x
+					  << " targetY: " << driveTarget.y << std::endl;
 		}
 	}
 }

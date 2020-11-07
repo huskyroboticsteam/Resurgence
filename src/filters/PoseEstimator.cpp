@@ -5,7 +5,7 @@ typedef Eigen::Vector3d vector;
 
 PoseEstimator::PoseEstimator(const Eigen::Vector3d &stateStdDevs,
 							 const Eigen::Vector3d &measurementStdDevs, double dt)
-	: kf(KalmanFilter<3, 3>::createDisc(matrix::Identity(), matrix::Identity(),
+	: kf(KalmanFilter<3, 3>::createDiscrete(matrix::Identity(), matrix::Identity(),
 										matrix::Identity(), stateStdDevs, measurementStdDevs,
 										dt)),
 	  dt(dt)
@@ -36,4 +36,14 @@ void PoseEstimator::correct(const transform_t &measurement)
 void PoseEstimator::reset(const Eigen::Vector3d &pose)
 {
 	kf.reset(pose);
+}
+
+Eigen::Matrix3d PoseEstimator::getEstimateCovarianceMat() const
+{
+	return kf.getEstimateCovarianceMat();
+}
+
+pose_t PoseEstimator::getPose() const
+{
+	return kf.getState();
 }
