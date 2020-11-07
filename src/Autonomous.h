@@ -30,7 +30,7 @@ public:
 private:
 	PointXY target;
 	PoseEstimator poseEstimator;
-	RollingAvgFilter landmarkFilter;
+	RollingAvgFilter<5,3> landmarkFilter;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
 	float targetHeading;

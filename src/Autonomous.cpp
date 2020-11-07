@@ -13,7 +13,7 @@ constexpr double DRIVE_SPEED = 8;
 Autonomous::Autonomous(PointXY _target)
 	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 0.1), state(0),
 	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
-	  landmarkFilter(5)
+	  landmarkFilter()
 {
 }
 
@@ -156,7 +156,7 @@ void Autonomous::autonomyIter()
 		{
 			// if we have some existing data or new data, set the target using the landmark
 			// data
-			if (landmarkFilter.getNumPoints() > 0 || !landmarks.empty())
+			if (landmarkFilter.getSize() > 0 || !landmarks.empty())
 			{
 				if (landmarks.empty())
 				{
@@ -184,6 +184,9 @@ void Autonomous::autonomyIter()
 		{
 			setCmdVel(thetaVel, driveSpeed);
 			poseEstimator.predict(thetaVel, driveSpeed);
+
+			std::cout << "ThetaVel: " << thetaVel << " DriveVel: " << driveSpeed << " thetaErr: " << thetaErr
+					  << " targetX: " << driveTarget.x << " targetY: " << driveTarget.y << std::endl;
 		}
 	}
 }

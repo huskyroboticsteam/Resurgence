@@ -4,75 +4,92 @@
 #include <vector>
 
 /**
- * Implements a rolling average filter of the specified type. Ideally this would use a template
- * but that causes weird issues with averaging for some reason.
+ * Implements a rolling average filter of the specified type. Can only use double vectors.
  */
-class RollingAvgFilter
+template <int numPoints, int numDims> class RollingAvgFilter
 {
 public:
-	explicit RollingAvgFilter(int size)
-		: size(size), dataPoints(std::vector<Eigen::Vector3d>())
-	{
-	}
-
 	/**
 	 * Get the output of the filter.
 	 *
 	 * @return The output of the filter. If no data has been entered, returns the default
 	 * value.
 	 */
-	Eigen::Vector3d get() const
+	Eigen::Matrix<double, numDims, 1> get() const
 	{
-		Eigen::Vector3d sum;
-		if (dataPoints.empty())
+		Eigen::Matrix<double, numDims, 1> ret;
+		if (size == 0)
 		{
-			return sum;
+			return ret;
 		}
-		for (const Eigen::Vector3d &t : dataPoints)
+		int numData = std::min(numPoints, size);
+		for (int i = 0; i < numData; i++)
 		{
-			sum += t;
+			ret += data.col(i);
 		}
-		return sum / dataPoints.size();
+		return ret / numData;
 	}
 
 	/**
 	 * Adds data to the filter and gets the new output.
 	 *
-	 * @param data The data to add to the filter.
+	 * @param val The data to add to the filter.
 	 * @return The new output of the filter after adding this data.
 	 */
-	Eigen::Vector3d get(const Eigen::Vector3d &data)
+	Eigen::Matrix<double, numDims, 1> get(const Eigen::Matrix<double, numDims, 1> &val)
 	{
-		dataPoints.push_back(data);
-		while (dataPoints.size() > size)
+		data.col(index) = val;
+		index = (index + 1) % numPoints;
+		if (size < numPoints)
 		{
-			dataPoints.erase(dataPoints.begin());
+			size++;
 		}
 
 		return get();
 	}
 
+	/**
+	 * Clears all data in the buffer.
+	 */
 	void reset()
 	{
-		dataPoints.clear();
+		size = 0;
+		index = 0;
 	}
 
-	int getNumPoints() const
-	{
-		return dataPoints.size();
-	}
-
+	/**
+	 * Returns the number of points stored in the buffer.
+	 *
+	 * @return The number of points stored in the buffer, in the range [0, numPoints]
+	 */
 	int getSize() const
 	{
 		return size;
 	}
 
-	std::vector<Eigen::Vector3d> getData() const
+	/**
+	 * Returns the maximum number of points that can be stored in the buffer.
+	 *
+	 * @return The maximum number of points that can be stored in the buffer.
+	 */
+	int getBufferSize() const
 	{
-		return dataPoints;
+		return numPoints;
+	}
+
+	/**
+	 * Get the underlying buffer of the filter.
+	 *
+	 * @return The Matrix representing the buffer of the filter. Data points are stored in each
+	 * column.
+	 */
+	Eigen::Matrix<double, numDims, numPoints> getData() const
+	{
+		return data;
 	}
 
 private:
-	std::vector<Eigen::Vector3d> dataPoints;
+	Eigen::Matrix<double, numDims, numPoints> data; // represents a circular buffer
 	int size;
+	int index;
 };
