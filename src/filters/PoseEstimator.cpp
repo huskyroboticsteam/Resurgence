@@ -17,7 +17,7 @@ vector getPoseDiff(const vector &pose, double dt, double thetaVel, double xVel)
 	double dx = xVel * dt;
 	double dTheta = thetaVel * dt;
 
-	vector updated = toPose(toTransformRotateFirst(dx, 0, dTheta) * toTransform(pose), 0);
+	vector updated = toPose(toTransformRotateFirst(dx, 0, dTheta) * toTransform(pose), pose[2]);
 	return updated - pose;
 }
 
