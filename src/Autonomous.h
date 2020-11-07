@@ -14,7 +14,7 @@
 class Autonomous
 {
 public:
-    Autonomous(PointXY);
+    Autonomous(const URCLeg &target);
     //Returns a pair of floats, in heading, speed
     //Accepts current heading of the robot as parameter
     std::pair<float, float> getDirections(float currHeading);
@@ -24,7 +24,7 @@ public:
     void autonomyIter();
 
 private:
-    PointXY target;
+    URCLeg target;
     float targetHeading;
     int state;         //1 is move forwards, 0 is turning, -1 is back up
     bool rightTurn; //boolean for turning right or turning towards target

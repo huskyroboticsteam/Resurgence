@@ -14,6 +14,8 @@ void InitializeRover()
     InitializeBaseStationSocket();
 }
 
+const double CONTROL_HZ = 10.0;
+
 int main(int argc, char **argv)
 {
     world_interface_init();
@@ -22,8 +24,8 @@ int main(int argc, char **argv)
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communcation from the base station
-    PointXY target { 3.14, 2.71 };
-    Autonomous autonomous(target);
+    int urc_leg = 0;
+    Autonomous autonomous(getLeg(urc_leg));
     char buffer[MAXLINE];
     for(;;)
     {
@@ -35,6 +37,7 @@ int main(int argc, char **argv)
             ParseBaseStationPacket(buffer);
         }
         autonomous.autonomyIter();
+        usleep(1000 * 1000 / CONTROL_HZ);
     }
     return 0;
 }

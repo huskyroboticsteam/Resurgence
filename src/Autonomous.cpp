@@ -5,7 +5,7 @@
 
 constexpr float PI = M_PI;
 
-Autonomous::Autonomous(PointXY _target) : target(_target)
+Autonomous::Autonomous(const URCLeg &_target) : target(_target)
 {
     state = 0;
     targetHeading = -1;
@@ -22,8 +22,8 @@ PointXY Autonomous::point_tToPointXY(point_t pnt){
 bool Autonomous::arrived(pose_t gpsPose) {
     double currX = gpsPose(0);
     double currY = gpsPose(1);
-    return util::almostEqual(currX, (double) target.x, 0.5) &&
-            util::almostEqual(currY, (double) target.y, 0.5);
+    return util::almostEqual(currX, (double) target.approx_GPS(0), 0.5) &&
+            util::almostEqual(currY, (double) target.approx_GPS(1), 0.5);
 }
 
 const std::vector<PointXY> Autonomous::points_tToPointXYs(points_t pnts) {
@@ -35,8 +35,8 @@ const std::vector<PointXY> Autonomous::points_tToPointXYs(points_t pnts) {
 }
 
 double Autonomous::angleToTarget(pose_t gpsPose) {
-    float dy = target.y - (float) gpsPose(1);
-    float dx = target.x - (float) gpsPose(0);
+    float dy = target.approx_GPS(1) - (float) gpsPose(1);
+    float dx = target.approx_GPS(0) - (float) gpsPose(0);
     double theta = (double) atan2(dy, dx);
     return theta - gpsPose(2);
 }
@@ -110,14 +110,14 @@ void Autonomous::autonomyIter()
 
 double Autonomous::pathDirection(points_t lidar, pose_t gpsPose) {
     double dtheta;
-    if(lidar.empty()) {
+    //if(lidar.empty()) {
         dtheta = angleToTarget(gpsPose);
-    } else {
-        const std::vector<PointXY>& ref = points_tToPointXYs(lidar);
-        PointXY direction = pather.getPath(ref, (float) gpsPose(0), (float) gpsPose(1), target);
-        float theta = atan2(direction.y, direction.x);
-        dtheta = static_cast<double>(theta) - gpsPose(2);
-    }
+    //} else {
+    //    const std::vector<PointXY>& ref = points_tToPointXYs(lidar);
+    //    PointXY direction = pather.getPath(ref, (float) gpsPose(0), (float) gpsPose(1), target);
+    //    float theta = atan2(direction.y, direction.x);
+    //    dtheta = static_cast<double>(theta) - gpsPose(2);
+    //}
     return dtheta;
 }
 
@@ -188,8 +188,8 @@ Autonomous::stateTurn(float currHeading, std::pair<float, float> directions)
         else
         { //calculate angle to obstacle
             PointXY robotPos = worldData->getGPS();
-            float x = target.x - robotPos.x;
-            float y = target.y - robotPos.y;
+            float x = target.approx_GPS(0) - robotPos.x;
+            float y = target.approx_GPS(1) - robotPos.y;
             targetHeading = atan2f(y, x) * (180 / PI);
             targetHeading = 360 - targetHeading + 90;
             rightTurn = true; //next turn will turn right
@@ -222,6 +222,6 @@ Autonomous::stateBackwards(float currHeading,
 
 PointXY Autonomous::getTarget()
 {
-    return target;
+    return PointXY { (float)target.approx_GPS(0), (float)target.approx_GPS(1) };
 }
 
