@@ -78,8 +78,9 @@ CMake, or Homebrew for Mac users.
 Open the WSL terminal and run the following commands:
 1. `git clone https://github.com/catchorg/Catch2.git`
 2. `cd Catch2`
-3. `cmake -Bbuild -H. -DBUILD_TESTING=OFF`
-4. `sudo cmake --build build/ --target install`
+3. `git checkout v2.13.2`
+4. `cmake -Bbuild -H. -DBUILD_TESTING=OFF`
+5. `sudo cmake --build build/ --target install`
 
 ### On GNU/Linux
 The instructions should be the same as for Windows above.
