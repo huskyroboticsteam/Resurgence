@@ -33,6 +33,7 @@ list(APPEND RoverCommonTest
   Util.cpp
   simulator/utils.cpp
   filters/PoseEstimator.cpp
+  filters/PoseEstimatorLinear.cpp
   )
 
 list(APPEND RoverCommon
