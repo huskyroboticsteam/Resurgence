@@ -3,7 +3,6 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
-#include "../math/DiffEq.h"
 #include "KalmanFilterBase.h"
 #include "StateSpaceUtil.h"
 
@@ -29,17 +28,17 @@ public:
 
 	void predict(const Eigen::Matrix<double, numInputs, 1> &input) override
 	{
-		matrix_t contA = bifunctionJacobianX(stateFunc, this->xHat, input);
+		matrix_t contA = StateSpace::stateFuncJacobian(stateFunc, this->xHat, input);
 		matrix_t discA, discQ;
 		StateSpace::discretizeAQ(contA, Q, discA, discQ, dt);
 
-		this->xHat = bifunctionRungeKutta(stateFunc, this->xHat, input, dt);
+		this->xHat = StateSpace::integrateStateFunc(stateFunc, this->xHat, input, dt);
 		this->P = discA * this->P * discA.transpose() + discQ;
 	}
 
 	void correct(const Eigen::Matrix<double, numStates, 1> &measurement) override
 	{
-		matrix_t C = unifunctionJacobianX(measurementFunc, this->xHat); // output matrix
+		matrix_t C = StateSpace::outputFuncJacobian(measurementFunc, this->xHat); // output matrix
 
 		matrix_t discR = StateSpace::discretizeR(R, dt);
 		matrix_t S = C * this->P * C.transpose() + discR; // residual covariance

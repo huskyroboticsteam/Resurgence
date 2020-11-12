@@ -46,10 +46,10 @@ void PoseEstimator::reset(const Eigen::Vector3d &pose)
 
 Eigen::Matrix3d PoseEstimator::getEstimateCovarianceMat() const
 {
-	return kf.getEstimateCovarianceMat();
+	return ekf.getEstimateCovarianceMat();
 }
 
 pose_t PoseEstimator::getPose() const
 {
-	return kf.getState();
+	return ekf.getState();
 }
