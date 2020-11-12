@@ -11,6 +11,7 @@ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/include/eigen3
 git submodule update --init --recursive
 git clone https://github.com/catchorg/Catch2.git
 cd ./Catch2
+git checkout v2.13.2
 cmake -B./build -H. -DBUILD_TESTING=OFF
 cmake --build ./build/ --target install
 cd ..

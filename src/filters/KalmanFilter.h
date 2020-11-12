@@ -26,7 +26,7 @@ public:
 	 * @return A Kalman Filter built for the specified system.
 	 */
 	static KalmanFilter
-	createCont(const Eigen::Matrix<double, numStates, numStates> &systemMat,
+	createContinuous(const Eigen::Matrix<double, numStates, numStates> &systemMat,
 			   const Eigen::Matrix<double, numStates, numInputs> &inputMat,
 			   const Eigen::Matrix<double, numStates, numStates> &outputMat,
 			   const Eigen::Matrix<double, numStates, 1> &stateStdDevs,
@@ -72,7 +72,7 @@ public:
 	 * @return A Kalman Filter built for the specified system.
 	 */
 	static KalmanFilter
-	createDisc(const Eigen::Matrix<double, numStates, numStates> &systemMat,
+	createDiscrete(const Eigen::Matrix<double, numStates, numStates> &systemMat,
 			   const Eigen::Matrix<double, numStates, numInputs> &inputMat,
 			   const Eigen::Matrix<double, numStates, numStates> &outputMat,
 			   const Eigen::Matrix<double, numStates, 1> &stateStdDevs,
