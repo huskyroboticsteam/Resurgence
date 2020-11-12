@@ -23,10 +23,11 @@ void discreteToContinuous(Eigen::Matrix<double, numStates, numStates> &A,
 						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
 {
 	// Reference paper: https://doi.org/10.1016/0307-904X(80)90177-8
-	auto G = A;
-	auto H = B;
-	A = G.log() / dt;
-	B = A * (G - Eigen::Matrix<double, numStates, numStates>::Identity()).inverse() * H;
+	auto discA = A;
+	auto discB = B;
+	A = discA.log() / dt;
+	B = A * (discA - Eigen::Matrix<double, numStates, numStates>::Identity()).inverse() *
+		discB;
 }
 
 template <int numStates, int numInputs>
@@ -47,6 +48,13 @@ void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
 	B = exp.template block<numStates, numInputs>(0, numStates);
 }
 
+template <int numStates>
+Eigen::Matrix<double, numStates, numStates> discretizeA(const Eigen::Matrix<double, numStates, numStates> &contA, double dt)
+{
+	// Derived from equations in discreteToContinuous()
+	return (contA * dt).exp();
+}
+
 // contA is continuous system matrix, contQ is continuous process covariance matrix
 template <int numStates>
 void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
@@ -62,8 +70,9 @@ void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
 	M.template block<numStates, numStates>(0, numStates) = contQ;
 	M.template block<numStates, numStates>(numStates, 0).setZero();
 	M.template block<numStates, numStates>(numStates, numStates) = contA.transpose();
+	M *= dt;
 
-	Eigen::Matrix<double, numStates * 2, numStates * 2> G = (M * dt).exp();
+	Eigen::Matrix<double, numStates * 2, numStates * 2> G = M.exp();
 
 	Eigen::Matrix<double, numStates, numStates> AinvQ =
 		G.block(0, numStates, numStates, numStates); // this is discA^-1 * Q
@@ -83,6 +92,38 @@ discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
 	Eigen::Matrix<double, numStates, numStates> discQ;
 	discretizeAQ(contA, contQ, discA, discQ, dt);
 	return discQ;
+}
+
+template <int numStates>
+Eigen::Matrix<double, numStates, numStates>
+discretizeQApprox(const Eigen::Matrix<double, numStates, numStates> &contA,
+				  const Eigen::Matrix<double, numStates, numStates> &contQ, double dt,
+				  int degree = 5)
+{
+	using matrix_t = Eigen::Matrix<double, numStates, numStates>;
+	const matrix_t Atrans = contA.transpose(); // A^T
+
+	matrix_t AinvQ = matrix_t::Zero(); // after iteration, this will equal A^-1 * Q
+
+	double coeff = 1;
+	matrix_t AtransN = matrix_t::Identity(); // (A^T)^(n-1)
+	matrix_t lastTerm = matrix_t::Zero(); // last term in the series before multiplied by coeff
+
+	// derived from e^(A*t)=I+A+A^2/2...
+	// uses the first several terms for the matrix exponential
+	for (int i = 1; i <= degree; i++)
+	{
+		coeff *= dt / i;
+		lastTerm = -contA * lastTerm + contQ * AtransN;
+		AtransN *= Atrans;
+		AinvQ += coeff * lastTerm;
+	}
+
+	matrix_t discA = discretizeA(contA, dt);
+	matrix_t discQ = discA * AinvQ; // A * A^-1 * Q = Q
+
+	// make Q symmetric again (floating point rounding error may have shifted it)
+	return (discQ + discQ.transpose()) / 2.0;
 }
 
 // R is measurement covariance matrix
@@ -132,7 +173,7 @@ DARE(const Eigen::Matrix<double, numStates, numStates> &A0,
 
 template <typename T, typename U>
 T integrateStateFunc(std::function<T(const T &, const U &)> f, const T &x, const U &u,
-					   double dt)
+					 double dt)
 {
 	// Reference:
 	// https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#The_Runge%E2%80%93Kutta_method
@@ -148,7 +189,7 @@ template <int size, int sizeU>
 Eigen::Matrix<double, size, size> stateFuncJacobian(
 	std::function<Eigen::Matrix<double, size, 1>(const Eigen::Matrix<double, size, 1> &,
 												 const Eigen::Matrix<double, sizeU, 1> &)>
-	f,
+		f,
 	const Eigen::Matrix<double, size, 1> &x, const Eigen::Matrix<double, sizeU, 1> &u)
 {
 	Eigen::Matrix<double, size, size> jacobian;
