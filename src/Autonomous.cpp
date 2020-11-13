@@ -10,14 +10,15 @@ constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 
-Autonomous::Autonomous(PointXY _target)
-	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 0.1), state(0),
-	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
+Autonomous::Autonomous(PointXY _target, double controlHz)
+	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
+	  state(0), targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
 	  landmarkFilter()
 {
 }
 
-Autonomous::Autonomous(PointXY _target, const pose_t &startPose) : Autonomous(_target)
+Autonomous::Autonomous(PointXY _target, double controlHz, const pose_t &startPose)
+	: Autonomous(_target, controlHz)
 {
 	poseEstimator.reset(startPose);
 	calibrated = true;

@@ -17,8 +17,8 @@
 class Autonomous
 {
 public:
-	explicit Autonomous(PointXY);
-	Autonomous(PointXY target, const pose_t &startPose);
+	explicit Autonomous(PointXY target, double controlHz);
+	Autonomous(PointXY target, double controlHz, const pose_t &startPose);
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	std::pair<float, float> getDirections(float currHeading);
