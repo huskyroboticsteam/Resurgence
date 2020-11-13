@@ -88,6 +88,8 @@ public:
 		matrix P = DARE(systemMat.transpose(), outputMat.transpose(), stateCovariance,
 						measurementCovariance);
 
+		// The following math is derived from the asymptotic form:
+		// https://en.wikipedia.org/wiki/Kalman_filter#Asymptotic_form
 		matrix S = outputMat * P * outputMat.transpose() + measurementCovariance;
 		// This is the Kalman gain matrix, used to weight the GPS data against the model data
 		matrix gainMatrix =
