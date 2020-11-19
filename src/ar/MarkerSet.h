@@ -7,50 +7,11 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core.hpp>
 
+#include "Marker.h"
+
 namespace AR
 {
-/**
-   A class to represent the pattern that may appear on a physical AR tag, NOT a physical
-   instance of a tag itself; those are represented by the Tag class. Markers are square
-   patterns of either black or white pixels, usually with a border on the outside and a data
-   region inside the border. Markers should be unique and referred to by an ID, which may or
-   may not be actually encoded in their data.
 
-   You should likely not have to construct any instances of this class yourself.
- */
-class Marker
-{
-private:
-	/**
-	   The width in pixels of the data region of each marker. Does not include the border.
-	 */
-	uint8_t data_region_size;
-	/**
-	   The width in pixels of the border of the marker. Note that this is only for ONE side of
-	   the square; if the border is 1 pixel wide, then the marker's total size will be the data
-	   region size + 2, for each border.
-	 */
-	uint8_t border_size;
-	/**
-	   The ID of the marker. Note that this need not actually be encoded in the data of the
-	   marker, just a unique ID to distinguish this marker from the others.
-	 */
-	int id;
-	/**
-	   The actual bits stored in the data region of the marker, NOT including the border.
-	 */
-	cv::Mat data_bits;
-
-public:
-	/**
-	   Creates a marker, with the given data region size, border size, data bits, and id.
-	 */
-	Marker(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int id);
-	uint8_t getDataRegionSize() const;
-	uint8_t getBorderSize() const;
-	std::shared_ptr<cv::Mat> getDataBits() const;
-	int getId() const;
-};
 
 /**
    Represents a "set" of markers used for a competition, containing the markers that should be
@@ -88,5 +49,50 @@ public:
 	std::vector<Marker> getMarkers() const;
 	bool isIDMapped(int id) const;
 };
+
+namespace Markers
+{
+/**
+   Enum of marker names for URC.
+ */
+enum URCMarkerName
+{
+	LEG1,
+	LEG2,
+	LEG3,
+	LEG4_L,
+	LEG4_R,
+	LEG5_L,
+	LEG5_R,
+	LEG6_L,
+	LEG6_R,
+	LEG7_L,
+	LEG7_R
+};
+
+/**
+   Enum of marker names for CIRC.
+
+   NOTE: I currently have no information about what the markers will represent for CIRC and
+   which marker IDs are important. Will update when I get more information about that. As of
+   right now, all members of this enum are placeholders.
+ */
+enum CIRCMarkerName
+{
+	CIRCMarker1,
+	CIRCMarker2
+};
+
+/**
+   Returns the set of markers that will be used in URC.
+*/
+const std::shared_ptr<MarkerSet<URCMarkerName>> URC_MARKERS();
+
+/**
+   Returns the set of markers that will be used in CIRC.
+*/
+const std::shared_ptr<MarkerSet<CIRCMarkerName>> CIRC_MARKERS();
+
+} // namespace Markers
 
 } // namespace AR
