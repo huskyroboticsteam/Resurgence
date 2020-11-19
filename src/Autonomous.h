@@ -17,8 +17,8 @@
 class Autonomous
 {
 public:
-	explicit Autonomous(PointXY target, double controlHz);
-	Autonomous(PointXY target, double controlHz, const pose_t &startPose);
+	explicit Autonomous(const URCLeg &target, double controlHz);
+	Autonomous(const URCLeg &target, double controlHz, const pose_t &startPose);
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	std::pair<float, float> getDirections(float currHeading);
@@ -28,7 +28,7 @@ public:
 	void autonomyIter();
 
 private:
-	PointXY target;
+	URCLeg target;
 	PoseEstimator poseEstimator;
 	RollingAvgFilter<5,3> landmarkFilter;
 	bool calibrated = false;
