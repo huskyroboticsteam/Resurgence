@@ -28,8 +28,8 @@ int main(int argc, char **argv)
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communcation from the base station
-    PointXY target { 3.14, 2.71 };
-    Autonomous autonomous(target, CONTROL_HZ);
+    int urc_leg = 1;
+    Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp0, tp_start;
     for(;;)
