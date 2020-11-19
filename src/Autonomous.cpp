@@ -11,7 +11,9 @@ constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 
 Autonomous::Autonomous(PointXY _target, double controlHz)
-	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
+	: target(_target),
+	  poseEstimator((Eigen::Matrix<double, 5, 1>() << 0.8, 0.8, 0.6, 0.1, 0.1).finished(),
+					{2, 2, PI / 24}, 9999, 1.0 / controlHz),
 	  state(0), targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
 	  landmarkFilter()
 {
