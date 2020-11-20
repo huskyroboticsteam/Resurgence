@@ -10,7 +10,7 @@ constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 
-Autonomous::Autonomous(PointXY _target, double controlHz)
+Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: target(_target),
 	  poseEstimator((Eigen::Matrix<double, 5, 1>() << 0.8, 0.8, 0.6, 0.1, 0.1).finished(),
 					{2, 2, PI / 24}, 9999, 1.0 / controlHz),
@@ -19,7 +19,7 @@ Autonomous::Autonomous(PointXY _target, double controlHz)
 {
 }
 
-Autonomous::Autonomous(PointXY _target, double controlHz, const pose_t &startPose)
+Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &startPose)
 	: Autonomous(_target, controlHz)
 {
 	poseEstimator.reset(startPose);
@@ -35,8 +35,8 @@ bool Autonomous::arrived(const pose_t &pose) const
 {
 	double currX = pose[0];
 	double currY = pose[1];
-	return util::almostEqual(currX, (double)target.x, 0.5) &&
-		   util::almostEqual(currY, (double)target.y, 0.5);
+	return util::almostEqual(currX, (double)target.approx_GPS(0), 0.5) &&
+		   util::almostEqual(currY, (double)target.approx_GPS(1), 0.5);
 }
 
 std::vector<PointXY> Autonomous::points_tToPointXYs(const points_t &pnts) const
@@ -51,8 +51,8 @@ std::vector<PointXY> Autonomous::points_tToPointXYs(const points_t &pnts) const
 
 double Autonomous::angleToTarget(const pose_t &gpsPose) const
 {
-	float dy = target.y - (float)gpsPose(1);
-	float dx = target.x - (float)gpsPose(0);
+	float dy = target.approx_GPS(1) - (float)gpsPose(1);
+	float dx = target.approx_GPS(0) - (float)gpsPose(0);
 	double theta = std::atan2(dy, dx);
 	return theta - gpsPose(2);
 }
@@ -134,7 +134,7 @@ void Autonomous::autonomyIter()
 
 	// get landmark data and filter out invalid data points
 	points_t landmarks = readLandmarks();
-	point_t firstLandmark = landmarks[0];
+	point_t leftPostLandmark = landmarks[target.left_post_id];
 
 	// get the latest pose estimation
 	poseEstimator.correct(gps);
@@ -150,12 +150,12 @@ void Autonomous::autonomyIter()
 	}
 	else
 	{
-		PointXY driveTarget = target;
-		if (dist(target, point_tToPointXY(pose)) < 25)
+		PointXY driveTarget = getTarget();
+		if (dist(driveTarget, point_tToPointXY(pose)) < 25)
 		{
 			// if we have some existing data or new data, set the target using the landmark
 			// data
-			bool landmarkVisible = firstLandmark[2] != 0;
+			bool landmarkVisible = leftPostLandmark[2] != 0;
 			if (landmarkFilter.getSize() > 0 || landmarkVisible)
 			{
 				if (!landmarkVisible)
@@ -167,7 +167,7 @@ void Autonomous::autonomyIter()
 				{
 					// transform and add the new data to the filter
 					transform_t invTransform = toTransform(pose).inverse();
-					point_t landmarkMapSpace = invTransform * firstLandmark;
+					point_t landmarkMapSpace = invTransform * leftPostLandmark;
 					// the filtering is done on the target in map space to reduce any phase lag
 					// caused by filtering
 					driveTarget = point_tToPointXY(landmarkFilter.get(landmarkMapSpace));
@@ -194,17 +194,17 @@ void Autonomous::autonomyIter()
 double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 {
 	double dtheta;
-	if (lidar.empty())
-	{
-		dtheta = angleToTarget(gpsPose);
-	}
-	else
-	{
-		const std::vector<PointXY> &ref = points_tToPointXYs(lidar);
-		PointXY direction = pather.getPath(ref, (float)gpsPose(0), (float)gpsPose(1), target);
-		float theta = std::atan2(direction.y, direction.x);
-		dtheta = static_cast<double>(theta) - gpsPose(2);
-	}
+	// if (lidar.empty())
+	//{
+	dtheta = angleToTarget(gpsPose);
+	//}
+	// else
+	//{
+	//	const std::vector<PointXY> &ref = points_tToPointXYs(lidar);
+	//	PointXY direction = pather.getPath(ref, (float)gpsPose(0), (float)gpsPose(1), target);
+	//	float theta = std::atan2(direction.y, direction.x);
+	//	dtheta = static_cast<double>(theta) - gpsPose(2);
+	//}
 	return dtheta;
 }
 
@@ -274,8 +274,8 @@ std::pair<float, float> Autonomous::stateTurn(float currHeading,
 		else
 		{ // calculate angle to obstacle
 			PointXY robotPos = worldData->getGPS();
-			float x = target.x - robotPos.x;
-			float y = target.y - robotPos.y;
+			float x = target.approx_GPS(0) - robotPos.x;
+			float y = target.approx_GPS(1) - robotPos.y;
 			targetHeading = atan2f(y, x) * (180 / PI);
 			targetHeading = 360 - targetHeading + 90;
 			rightTurn = true; // next turn will turn right
@@ -307,5 +307,5 @@ std::pair<float, float> Autonomous::stateBackwards(float currHeading,
 
 PointXY Autonomous::getTarget()
 {
-	return target;
+	return PointXY{(float)target.approx_GPS(0), (float)target.approx_GPS(1)};
 }
