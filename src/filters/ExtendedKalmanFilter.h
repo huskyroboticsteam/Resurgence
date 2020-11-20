@@ -19,8 +19,8 @@ public:
 		const std::function<state_t(const state_t &)> &measurementFunc,
 		const state_t &stateStdDevs, const state_t &measurementStdDevs, double dt)
 		: stateFunc(stateFunc), measurementFunc(measurementFunc),
-		  Q(StateSpace::template createCovarianceMatrix<numStates>(stateStdDevs)),
-		  R(StateSpace::template createCovarianceMatrix<numStates>(measurementStdDevs)), dt(dt)
+		  Q(StateSpace::createCovarianceMatrix<numStates>(stateStdDevs)),
+		  R(StateSpace::createCovarianceMatrix<numStates>(measurementStdDevs)), dt(dt)
 	{
 		this->P = matrix_t::Zero();
 		this->xHat = state_t::Zero();
