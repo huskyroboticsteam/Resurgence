@@ -27,14 +27,14 @@ namespace AR
 template <class IDMapping_t> class MarkerSet
 {
 private:
-	cv::aruco::Dictionary dict;
+	cv::Ptr<cv::aruco::Dictionary> dict;
 	std::vector<Marker> markers;
 	float physical_size;
 	uint8_t data_region_size;
 	uint8_t border_size;
 	std::unordered_map<int, IDMapping_t> id_mappings;
 	void init(uint8_t data_region_size, uint8_t border_size, float physical_size,
-			  cv::aruco::Dictionary markerDict);
+			  cv::Ptr<cv::aruco::Dictionary> markerDict);
 
 public:
 	MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
@@ -42,7 +42,7 @@ public:
 	MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
 			  cv::Ptr<cv::aruco::Dictionary> markerDictPtr);
 	bool addIDMapping(int id, IDMapping_t mapping);
-	cv::aruco::Dictionary getDict() const;
+	cv::Ptr<cv::aruco::Dictionary> getDict() const;
 	uint8_t getDataRegionSize() const;
 	uint8_t getBorderSize() const;
 	float getPhysicalSize() const;

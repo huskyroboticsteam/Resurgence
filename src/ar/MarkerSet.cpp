@@ -22,7 +22,8 @@ template <class IDMapping_t>
 MarkerSet<IDMapping_t>::MarkerSet(uint8_t data_region_size, uint8_t border_size,
 								  float physical_size, ar_dict markerDict)
 {
-	init(data_region_size, border_size, physical_size, markerDict);
+	ar_dict* dict_ = new ar_dict(markerDict);
+	init(data_region_size, border_size, physical_size, ar_dict_ptr(dict));
 }
 
 template <class IDMapping_t>
@@ -30,12 +31,12 @@ MarkerSet<IDMapping_t>::MarkerSet(uint8_t data_region_size, uint8_t border_size,
 								  float physical_size, ar_dict_ptr markerDictPtr)
 {
 	assert(markerDictPtr);
-	init(data_region_size, border_size, physical_size, *markerDictPtr);
+	init(data_region_size, border_size, physical_size, markerDictPtr);
 }
 
 template <class IDMapping_t>
 void MarkerSet<IDMapping_t>::init(uint8_t data_region_size, uint8_t border_size,
-								  float physical_size, ar_dict markerDict)
+								  float physical_size, ar_dict_ptr markerDict)
 {
 	assert(data_region_size > 0);
 	assert(border_size > 0);
@@ -46,7 +47,7 @@ void MarkerSet<IDMapping_t>::init(uint8_t data_region_size, uint8_t border_size,
 	this->dict = markerDict;
 
 	std::vector<Marker> markerVec;
-	cv::Mat bytesList = dict.bytesList;
+	cv::Mat bytesList = dict->bytesList;
 	for (size_t i = 0; i < bytesList.rows; i++)
 	{
 		cv::Mat row = bytesList.row(i);
@@ -68,7 +69,7 @@ bool MarkerSet<IDMapping_t>::addIDMapping(int id, IDMapping_t mapping){
 }
 
 template <class IDMapping_t>
-ar_dict MarkerSet<IDMapping_t>::getDict() const {
+ar_dict_ptr MarkerSet<IDMapping_t>::getDict() const {
 	return this->dict;
 }
 
