@@ -78,6 +78,6 @@ public:
 	}
 
 private:
-	KalmanFilter<3,3> kf;
+	KalmanFilter<3,3,3> kf;
 	double dt;
 };

@@ -204,17 +204,17 @@ Eigen::Matrix<double, size, size> stateFuncJacobian(
 	return jacobian;
 }
 
-template <int size>
-Eigen::Matrix<double, size, size> outputFuncJacobian(
-	std::function<Eigen::Matrix<double, size, 1>(const Eigen::Matrix<double, size, 1> &)> f,
-	const Eigen::Matrix<double, size, 1> &x)
+template <int numStates, int numOutputs>
+Eigen::Matrix<double, numOutputs, numStates> outputFuncJacobian(
+	std::function<Eigen::Matrix<double, numOutputs, 1>(const Eigen::Matrix<double, numStates, 1> &)> f,
+	const Eigen::Matrix<double, numStates, 1> &x)
 {
-	Eigen::Matrix<double, size, size> jacobian;
-	for (int i = 0; i < size; i++)
+	Eigen::Matrix<double, numOutputs, numStates> jacobian;
+	for (int i = 0; i < numStates; i++)
 	{
-		Eigen::Matrix<double, size, 1> delta = Eigen::Matrix<double, size, 1>::Zero();
+		Eigen::Matrix<double, numStates, 1> delta = Eigen::Matrix<double, numStates, 1>::Zero();
 		delta[i] = epsilon;
-		Eigen::Matrix<double, size, 1> derivative =
+		Eigen::Matrix<double, numOutputs, 1> derivative =
 			(f(x + delta) - f(x - delta)) / (2 * epsilon);
 		jacobian.col(i) = derivative;
 	}

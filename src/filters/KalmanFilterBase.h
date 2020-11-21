@@ -2,7 +2,7 @@
 
 #include <Eigen/Core>
 
-template <int numStates, int numInputs>
+template <int numStates, int numInputs, int numOutputs>
 class KalmanFilterBase {
 public:
 	/**
@@ -11,7 +11,7 @@ public:
 	 *
 	 * @param measurement The measurement to use to correct the filter.
 	 */
-	virtual void correct(const Eigen::Matrix<double, numStates, 1> &measurement) = 0;
+	virtual void correct(const Eigen::Matrix<double, numOutputs, 1> &measurement) = 0;
 
 	/**
 	 * Use the model to predict the next system state, given the current inputs.

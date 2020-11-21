@@ -5,7 +5,7 @@ typedef Eigen::Vector3d vector;
 
 PoseEstimatorLinear::PoseEstimatorLinear(const Eigen::Vector3d &stateStdDevs,
 							 const Eigen::Vector3d &measurementStdDevs, double dt)
-	: kf(KalmanFilter<3, 3>::createDiscrete(matrix::Identity(), matrix::Identity(),
+	: kf(KalmanFilter<3, 3, 3>::createDiscrete(matrix::Identity(), matrix::Identity(),
 										matrix::Identity(), stateStdDevs, measurementStdDevs,
 										dt)),
 	  dt(dt)

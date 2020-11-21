@@ -2,9 +2,6 @@
 
 #include "../simulator/constants.h"
 
-typedef Eigen::Matrix3d matrix;
-typedef Eigen::Vector3d vector;
-
 const double wheelBase = NavSim::ROBOT_WHEEL_BASE;
 
 double rateLimit(double curr, double target, double maxROC, double dt, double &roc)
@@ -60,9 +57,10 @@ statevec_t PoseEstimator::stateFunc(const statevec_t &x, const Eigen::Vector2d &
 	return stateDerivative;
 }
 
-statevec_t PoseEstimator::measurementFunc(const statevec_t &x) const
+Eigen::Vector3d PoseEstimator::measurementFunc(const statevec_t &x) const
 {
-	return x;
+	Eigen::Vector3d ret = x.block<3, 1>(0, 0);
+	return ret;
 }
 
 PoseEstimator::PoseEstimator(const statevec_t &stateStdDevs,
@@ -71,7 +69,7 @@ PoseEstimator::PoseEstimator(const statevec_t &stateStdDevs,
 	: ekf([this](const statevec_t &x,
 				 const Eigen::Vector2d &u) { return this->stateFunc(x, u); },
 		  [this](const statevec_t &x) { return this->measurementFunc(x); }, stateStdDevs,
-		  poseToState(measurementStdDevs), dt),
+		  measurementStdDevs, dt),
 	  maxWheelAccel(maxWheelAccel), dt(dt)
 {
 }
@@ -86,9 +84,7 @@ void PoseEstimator::predict(double thetaVel, double xVel)
 void PoseEstimator::correct(const transform_t &measurement)
 {
 	pose_t pose = toPose(measurement, getPose()[2]);
-	statevec_t state = ekf.getState();
-	state.block<3,1>(0, 0) = pose;
-	ekf.correct(state);
+	ekf.correct(pose);
 }
 
 void PoseEstimator::reset()

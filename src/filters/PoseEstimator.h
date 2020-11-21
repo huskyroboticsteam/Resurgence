@@ -71,10 +71,10 @@ public:
 	pose_t getPose() const;
 
 private:
-	ExtendedKalmanFilter<5,2> ekf;
+	ExtendedKalmanFilter<5,2,3> ekf;
 	double dt;
 	double maxWheelAccel;
 
 	statevec_t stateFunc(const statevec_t &x, const Eigen::Vector2d &u) const;
-	statevec_t measurementFunc(const statevec_t &x) const;
+	Eigen::Vector3d measurementFunc(const statevec_t &x) const;
 };
