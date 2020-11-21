@@ -1,23 +1,18 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <opencv2/core.hpp>
+#include <opencv2/aruco.hpp>
 
 #include "CameraParams.h"
 #include "Tag.h"
 
 namespace AR
 {
-struct DetectorParams
-{
-	CameraParams camera_params = AR::Params::DEFAULT_PARAMS;
-	int canny_thresh_1 = 50;
-	int canny_thresh_2 = 120;
-	int blur_size = 5;
-	double tag_size = 200.0;
-};
 
+// TODO: determine if we need this or restructure it
 struct DetectorOutput
 {
 	cv::Mat grayscale_mat;
@@ -26,6 +21,19 @@ struct DetectorOutput
 	std::vector<std::vector<cv::Point2f>> rejected_corners;
 };
 
-std::vector<Tag> detectTags(cv::Mat input, DetectorParams params, DetectorOutput &output);
+template <class MarkerName_t>
+class Detector
+{
+private:
+	std::shared_ptr<MarkerSet<MarkerName_t>> marker_set_;
+	CameraParams camera_params_;
+	cv::Ptr<cv::aruco::DetectorParameters> detector_params_;
+
+public:
+	Detector(std::shared_ptr<MarkerSet<MarkerName_t>> marker_set, CameraParams camera_params,
+			 cv::Ptr<cv::aruco::DetectorParameters> detector_params =
+				 cv::aruco::DetectorParameters::create());
+	std::vector<Tag> detectTags(const cv::Mat &input);
+};
 
 } // namespace AR

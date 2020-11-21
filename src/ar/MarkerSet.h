@@ -46,6 +46,7 @@ public:
 	uint8_t getDataRegionSize() const;
 	uint8_t getBorderSize() const;
 	float getPhysicalSize() const;
+	// TODO: add some way to get a marker by ID
 	std::vector<Marker> getMarkers() const;
 	bool isIDMapped(int id) const;
 };
