@@ -67,6 +67,8 @@ public:
 	 */
 	void reset(const pose_t &pose);
 
+	void reset(const pose_t &pose, const pose_t &stdDevs);
+
 	/**
 	 * Gets the current state estimate.
 	 *

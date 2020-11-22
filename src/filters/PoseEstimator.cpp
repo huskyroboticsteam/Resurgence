@@ -8,8 +8,8 @@ statevec_t PoseEstimator::stateFunc(const statevec_t &x, const Eigen::Vector2d &
 {
 	double theta = x(2, 0);
 
-	double rVel = u(1) + 0.5 * wheelBase * u(0);
-	double lVel = u(1) - 0.5 * wheelBase * u(0);
+	double lVel = u(0);
+	double rVel = u(1);
 
 	double xVel = (lVel + rVel) / 2.0;
 	double thetaVel = (rVel - lVel) / wheelBase;
@@ -25,12 +25,12 @@ Eigen::Vector3d PoseEstimator::measurementFunc(const statevec_t &x) const
 	return ret;
 }
 
-PoseEstimator::PoseEstimator(const statevec_t &stateStdDevs,
+PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputStdDevs,
 							 const Eigen::Vector3d &measurementStdDevs,
 							 double dt)
 	: ekf([this](const statevec_t &x,
 				 const Eigen::Vector2d &u) { return this->stateFunc(x, u); },
-		  [this](const statevec_t &x) { return this->measurementFunc(x); }, stateStdDevs,
+		  [this](const statevec_t &x) { return this->measurementFunc(x); }, inputStdDevs,
 		  measurementStdDevs, dt),
 	  dt(dt)
 {
@@ -38,8 +38,10 @@ PoseEstimator::PoseEstimator(const statevec_t &stateStdDevs,
 
 void PoseEstimator::predict(double thetaVel, double xVel)
 {
+	double lVel = xVel - 0.5 * wheelBase * thetaVel;
+	double rVel = xVel + 0.5 * wheelBase * thetaVel;
 	Eigen::Vector2d u;
-	u << thetaVel, xVel;
+	u << lVel, rVel;
 	ekf.predict(u);
 }
 
@@ -57,6 +59,10 @@ void PoseEstimator::reset()
 void PoseEstimator::reset(const pose_t &pose)
 {
 	ekf.reset(pose);
+}
+
+void PoseEstimator::reset(const pose_t &pose, const pose_t &stdDevs) {
+	ekf.reset(pose, stdDevs);
 }
 
 Eigen::Matrix<double, 3, 3> PoseEstimator::getEstimateCovarianceMat() const

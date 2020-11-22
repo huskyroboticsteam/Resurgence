@@ -37,3 +37,7 @@ void PoseEstimatorLinear::reset(const Eigen::Vector3d &pose)
 {
 	kf.reset(pose);
 }
+
+void PoseEstimatorLinear::reset(const pose_t &pose, const pose_t &stdDevs) {
+	kf.reset(pose, stdDevs);
+}

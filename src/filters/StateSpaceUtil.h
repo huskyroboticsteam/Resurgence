@@ -186,7 +186,7 @@ T integrateStateFunc(std::function<T(const T &, const U &)> f, const T &x, const
 }
 
 template <int size, int sizeU>
-Eigen::Matrix<double, size, size> stateFuncJacobian(
+Eigen::Matrix<double, size, size> stateFuncJacobianX(
 	std::function<Eigen::Matrix<double, size, 1>(const Eigen::Matrix<double, size, 1> &,
 												 const Eigen::Matrix<double, sizeU, 1> &)>
 		f,
@@ -199,6 +199,25 @@ Eigen::Matrix<double, size, size> stateFuncJacobian(
 		delta[i] = epsilon;
 		Eigen::Matrix<double, size, 1> derivative =
 			(f(x + delta, u) - f(x - delta, u)) / (2 * epsilon);
+		jacobian.col(i) = derivative;
+	}
+	return jacobian;
+}
+
+template <int size, int sizeU>
+Eigen::Matrix<double, size, sizeU> stateFuncJacobianU(
+	std::function<Eigen::Matrix<double, size, 1>(const Eigen::Matrix<double, size, 1> &,
+												 const Eigen::Matrix<double, sizeU, 1> &)>
+	f,
+	const Eigen::Matrix<double, size, 1> &x, const Eigen::Matrix<double, sizeU, 1> &u)
+{
+	Eigen::Matrix<double, size, sizeU> jacobian;
+	for (int i = 0; i < sizeU; i++)
+	{
+		Eigen::Matrix<double, sizeU, 1> delta = Eigen::Matrix<double, sizeU, 1>::Zero();
+		delta[i] = epsilon;
+		Eigen::Matrix<double, size, 1> derivative =
+			(f(x, u + delta) - f(x, u - delta)) / (2 * epsilon);
 		jacobian.col(i) = derivative;
 	}
 	return jacobian;

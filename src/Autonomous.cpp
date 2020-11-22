@@ -9,10 +9,12 @@
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
+const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24}; // if this changes, change numSamples
+constexpr int numSamples = 62; // yields calculated mean within +-0.5m with 95% confidence
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
-	  state(0), targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
+	: target(_target), poseEstimator({2, 2}, gpsStdDev, 1.0 / controlHz), state(0),
+	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
 	  landmarkFilter()
 {
 }
@@ -58,8 +60,7 @@ double Autonomous::angleToTarget(const pose_t &gpsPose) const
 bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &out)
 {
 	poses.push_back(pose);
-	// 62 samples with 2m std dev and 95% confidence interval gives about +-0.5m
-	if (poses.size() == 62)
+	if (poses.size() == numSamples)
 	{
 		pose_t sum;
 		for (const pose_t &p : poses)
@@ -119,7 +120,8 @@ void Autonomous::autonomyIter()
 		pose_t out;
 		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
 		{
-			poseEstimator.reset(out);
+			// the standard error of the calculated mean is the std dev of the mean
+			poseEstimator.reset(out, gpsStdDev / sqrt((double)numSamples));
 			calibrated = true;
 			calibrationPoses.clear();
 			std::cout << "Pose:\n" << out << std::endl;

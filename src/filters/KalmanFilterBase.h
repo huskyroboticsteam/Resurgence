@@ -2,8 +2,10 @@
 
 #include <Eigen/Core>
 
-template <int numStates, int numInputs, int numOutputs>
-class KalmanFilterBase {
+#include "StateSpaceUtil.h"
+
+template <int numStates, int numInputs, int numOutputs> class KalmanFilterBase
+{
 public:
 	/**
 	 * Correct the state estimate with measurement data.
@@ -21,6 +23,14 @@ public:
 	virtual void predict(const Eigen::Matrix<double, numInputs, 1> &input) = 0;
 
 	/**
+	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
+	 */
+	void reset()
+	{
+		reset(Eigen::Matrix<double, numStates, 1>::Zero());
+	}
+
+	/**
 	 * Sets the state estimate to the supplied vector and resets the estimate covariance
 	 * matrix.
 	 *
@@ -28,16 +38,36 @@ public:
 	 */
 	void reset(const Eigen::Matrix<double, numStates, 1> &state)
 	{
-		xHat = state;
-		P = Eigen::Matrix<double, numStates, numStates>::Zero();
+		Eigen::Matrix<double, numStates, numStates> zero =
+			Eigen::Matrix<double, numStates, numStates>::Zero();
+		reset(state, zero);
 	}
 
 	/**
-	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
+	 * Sets the state estimate to the supplied vector with the given uncertainty.
+	 *
+	 * @param state The state to set the vector to.
+	 * @param stdDevs The standard deviation of the measurement of each element in the state
+	 * vector.
 	 */
-	void reset()
+	void reset(const Eigen::Matrix<double, numStates, 1> &state,
+			   const Eigen::Matrix<double, numStates, 1> &stdDevs)
 	{
-		reset(Eigen::Matrix<double, numStates, 1>::Zero());
+		reset(state, StateSpace::createCovarianceMatrix(stdDevs));
+	}
+
+	/**
+	 * Sets the state estimate to the supplied vector and the estimate covariance matrix to the
+	 * supplied matrix.
+	 *
+	 * @param state
+	 * @param estCovMat
+	 */
+	void reset(const Eigen::Matrix<double, numStates, 1> &state,
+			   const Eigen::Matrix<double, numStates, numStates> &estCovMat)
+	{
+		xHat = state;
+		P = estCovMat;
 	}
 
 	/**

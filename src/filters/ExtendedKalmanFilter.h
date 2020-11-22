@@ -29,7 +29,7 @@ public:
 	void predict(const Eigen::Matrix<double, numInputs, 1> &input) override
 	{
 		Eigen::Matrix<double, numStates, numStates> contA =
-			StateSpace::stateFuncJacobian(stateFunc, this->xHat, input);
+			StateSpace::stateFuncJacobianX(stateFunc, this->xHat, input);
 		Eigen::Matrix<double, numStates, numStates> discA, discQ;
 		StateSpace::discretizeAQ(contA, Q, discA, discQ, dt);
 
@@ -54,7 +54,7 @@ public:
 		this->P = (Eigen::Matrix<double, numStates, numStates>::Identity() - K * C) * this->P;
 	}
 
-private:
+protected:
 	std::function<state_t(const state_t &, const input_t &)> stateFunc;
 	std::function<output_t(const state_t &)> measurementFunc;
 	// process noise and measurement noise covariance matrices

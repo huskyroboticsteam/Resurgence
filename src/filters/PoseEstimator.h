@@ -3,7 +3,7 @@
 #include <Eigen/Core>
 
 #include "../simulator/utils.h"
-#include "ExtendedKalmanFilter.h"
+#include "ExtendedKalmanFilterControlNoise.h"
 
 using statevec_t = Eigen::Matrix<double, 3, 1>;
 
@@ -23,7 +23,7 @@ public:
 	 * 							 This represents noise in the measurements.
 	 * @param dt The time in seconds between updates. Used to discretize the system model.
 	 */
-	PoseEstimator(const statevec_t &stateStdDevs,
+	PoseEstimator(const Eigen::Vector2d &inputStdDevs,
 				  const Eigen::Vector3d &measurementStdDevs, double dt);
 
 	/**
@@ -64,6 +64,15 @@ public:
 	void reset(const pose_t &pose);
 
 	/**
+	 * Sets the state estimate to the supplied vector and sets the estimate covariance matrix
+	 * to reflect the given uncertainty.
+	 *
+	 * @param pose The pose to which the state estimate will be set.
+	 * @param stdDevs The standard deviation for each element in the pose.
+	 */
+	void reset(const pose_t &pose, const pose_t &stdDevs);
+
+	/**
 	 * Gets the current state estimate.
 	 *
 	 * @return The state estimate.
@@ -71,9 +80,8 @@ public:
 	pose_t getPose() const;
 
 private:
-	ExtendedKalmanFilter<3,2,3> ekf;
+	ExtendedKalmanFilterControlNoise<3, 2, 3> ekf;
 	double dt;
-	double maxWheelAccel;
 
 	statevec_t stateFunc(const statevec_t &x, const Eigen::Vector2d &u) const;
 	Eigen::Vector3d measurementFunc(const statevec_t &x) const;
