@@ -5,7 +5,7 @@
 #include "../simulator/utils.h"
 #include "ExtendedKalmanFilter.h"
 
-using statevec_t = Eigen::Matrix<double, 5, 1>;
+using statevec_t = Eigen::Matrix<double, 3, 1>;
 
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
@@ -24,7 +24,7 @@ public:
 	 * @param dt The time in seconds between updates. Used to discretize the system model.
 	 */
 	PoseEstimator(const statevec_t &stateStdDevs,
-				  const Eigen::Vector3d &measurementStdDevs, double maxWheelAccel, double dt);
+				  const Eigen::Vector3d &measurementStdDevs, double dt);
 
 	/**
 	 * Correct the pose estimation with measurement data.
@@ -48,7 +48,7 @@ public:
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
 	 */
-	Eigen::Matrix<double, 5, 5> getEstimateCovarianceMat() const;
+	Eigen::Matrix<double, 3, 3> getEstimateCovarianceMat() const;
 
 	/**
 	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
@@ -71,7 +71,7 @@ public:
 	pose_t getPose() const;
 
 private:
-	ExtendedKalmanFilter<5,2,3> ekf;
+	ExtendedKalmanFilter<3,2,3> ekf;
 	double dt;
 	double maxWheelAccel;
 
