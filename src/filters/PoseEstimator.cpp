@@ -4,7 +4,7 @@
 
 const double wheelBase = NavSim::ROBOT_WHEEL_BASE;
 
-statevec_t PoseEstimator::stateFunc(const statevec_t &x, const Eigen::Vector2d &u) const
+statevec_t stateFunc(const statevec_t &x, const Eigen::Vector2d &u)
 {
 	double theta = x(2, 0);
 
@@ -19,21 +19,53 @@ statevec_t PoseEstimator::stateFunc(const statevec_t &x, const Eigen::Vector2d &
 	return stateDerivative;
 }
 
-Eigen::Vector3d PoseEstimator::measurementFunc(const statevec_t &x) const
+Eigen::Vector3d measurementFunc(const statevec_t &x)
 {
-	Eigen::Vector3d ret = x.block<3, 1>(0, 0);
-	return ret;
+	return x;
+}
+
+Eigen::Matrix<double, numStates, numStates> stateFuncJacobianX(const statevec_t &x,
+															   const Eigen::Vector2d &u)
+{
+	double theta = x(2);
+	double lVel = u(0);
+	double rVel = u(1);
+
+	Eigen::Matrix<double, numStates, numStates> jacobian;
+	jacobian.setZero();
+	double sinTheta = sin(theta);
+	double cosTheta = cos(theta);
+	jacobian(0, 2) = -sinTheta * (lVel + rVel) / 2.0;
+	jacobian(1, 2) = cosTheta * (lVel + rVel) / 2.0;
+
+	return jacobian;
+}
+
+Eigen::Matrix<double, numStates, 2> stateFuncJacobianU(const statevec_t &x,
+													   const Eigen::Vector2d &u)
+{
+	double theta = x(2);
+
+	double sinTheta = sin(theta);
+	double cosTheta = cos(theta);
+	Eigen::Matrix<double, numStates, 2> jacobian;
+	jacobian << cosTheta / 2.0, cosTheta / 2.0, sinTheta / 2.0, sinTheta / 2.0,
+		-1.0 / wheelBase, 1.0 / wheelBase;
+
+	return jacobian;
 }
 
 PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputStdDevs,
-							 const Eigen::Vector3d &measurementStdDevs,
-							 double dt)
-	: ekf([this](const statevec_t &x,
-				 const Eigen::Vector2d &u) { return this->stateFunc(x, u); },
-		  [this](const statevec_t &x) { return this->measurementFunc(x); }, inputStdDevs,
-		  measurementStdDevs, dt),
-	  dt(dt)
+							 const Eigen::Vector3d &measurementStdDevs, double dt)
+	: ekf(stateFunc, measurementFunc, inputStdDevs, measurementStdDevs, dt), dt(dt)
 {
+	ekf.stateFuncJacobianX = stateFuncJacobianX;
+	ekf.stateFuncJacobianU = stateFuncJacobianU;
+	ekf.outputFuncJacobian = [](const statevec_t &x) {
+		Eigen::Matrix<double, numStates, numStates> jacobian =
+			Eigen::Matrix<double, numStates, numStates>::Identity();
+		return jacobian;
+	};
 }
 
 void PoseEstimator::predict(double thetaVel, double xVel)
@@ -61,7 +93,8 @@ void PoseEstimator::reset(const pose_t &pose)
 	ekf.reset(pose);
 }
 
-void PoseEstimator::reset(const pose_t &pose, const pose_t &stdDevs) {
+void PoseEstimator::reset(const pose_t &pose, const pose_t &stdDevs)
+{
 	ekf.reset(pose, stdDevs);
 }
 

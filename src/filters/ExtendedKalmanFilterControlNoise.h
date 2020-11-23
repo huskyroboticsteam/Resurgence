@@ -29,9 +29,9 @@ public:
 		auto stateFunc = this->stateFunc;
 		double dt = this->dt;
 		Eigen::Matrix<double, numStates, numStates> contA =
-			StateSpace::stateFuncJacobianX(stateFunc, this->xHat, input);
+			this->getStateFuncJacobianX(stateFunc, this->xHat, input);
 		Eigen::Matrix<double, numStates, numInputs> V =
-			StateSpace::stateFuncJacobianU(stateFunc, this->xHat, input);
+			getStateFuncJacobianU(stateFunc, this->xHat, input);
 		Eigen::Matrix<double, numStates, numStates> contQ = V * M * V.transpose();
 
 		Eigen::Matrix<double, numStates, numStates> discA, discQ;
@@ -41,6 +41,24 @@ public:
 		this->P = discA * this->P * discA.transpose() + discQ;
 	}
 
+	std::function<Eigen::Matrix<double, numStates, numInputs>(const state_t &,
+															  const input_t &)>
+		stateFuncJacobianU;
+
 private:
 	Eigen::Matrix<double, numInputs, numInputs> M;
+
+	Eigen::Matrix<double, numStates, numInputs>
+	getStateFuncJacobianU(std::function<state_t(const state_t &, const input_t &)> f,
+						  const state_t &x, const input_t &u)
+	{
+		if (stateFuncJacobianU)
+		{
+			return stateFuncJacobianU(x, u);
+		}
+		else
+		{
+			return StateSpace::stateFuncJacobianU(f, x, u);
+		}
+	}
 };

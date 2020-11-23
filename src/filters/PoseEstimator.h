@@ -5,7 +5,11 @@
 #include "../simulator/utils.h"
 #include "ExtendedKalmanFilterControlNoise.h"
 
-using statevec_t = Eigen::Matrix<double, 3, 1>;
+namespace
+{
+constexpr int numStates = 3;
+using statevec_t = Eigen::Matrix<double, numStates, 1>;
+}
 
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
@@ -48,7 +52,7 @@ public:
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
 	 */
-	Eigen::Matrix<double, 3, 3> getEstimateCovarianceMat() const;
+	Eigen::Matrix<double, numStates, numStates> getEstimateCovarianceMat() const;
 
 	/**
 	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
@@ -80,9 +84,6 @@ public:
 	pose_t getPose() const;
 
 private:
-	ExtendedKalmanFilterControlNoise<3, 2, 3> ekf;
+	ExtendedKalmanFilterControlNoise<numStates, 2, 3> ekf;
 	double dt;
-
-	statevec_t stateFunc(const statevec_t &x, const Eigen::Vector2d &u) const;
-	Eigen::Vector3d measurementFunc(const statevec_t &x) const;
 };

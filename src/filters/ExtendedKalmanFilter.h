@@ -29,7 +29,7 @@ public:
 	void predict(const Eigen::Matrix<double, numInputs, 1> &input) override
 	{
 		Eigen::Matrix<double, numStates, numStates> contA =
-			StateSpace::stateFuncJacobianX(stateFunc, this->xHat, input);
+			getStateFuncJacobianX(stateFunc, this->xHat, input);
 		Eigen::Matrix<double, numStates, numStates> discA, discQ;
 		StateSpace::discretizeAQ(contA, Q, discA, discQ, dt);
 
@@ -40,7 +40,7 @@ public:
 	void correct(const Eigen::Matrix<double, numOutputs, 1> &measurement) override
 	{
 		Eigen::Matrix<double, numOutputs, numStates> C =
-			StateSpace::outputFuncJacobian(measurementFunc, this->xHat); // output matrix
+			getOutputFuncJacobian(measurementFunc, this->xHat); // output matrix
 
 		Eigen::Matrix<double, numOutputs, numOutputs> discR = StateSpace::discretizeR(R, dt);
 		Eigen::Matrix<double, numOutputs, numOutputs> S =
@@ -54,6 +54,13 @@ public:
 		this->P = (Eigen::Matrix<double, numStates, numStates>::Identity() - K * C) * this->P;
 	}
 
+	// manually set this to provide an analytic solution to the jacobian
+	std::function<Eigen::Matrix<double, numStates, numStates>(const state_t &,
+															  const input_t &)>
+		stateFuncJacobianX;
+	std::function<Eigen::Matrix<double, numOutputs, numStates>(const state_t &)>
+		outputFuncJacobian;
+
 protected:
 	std::function<state_t(const state_t &, const input_t &)> stateFunc;
 	std::function<output_t(const state_t &)> measurementFunc;
@@ -61,4 +68,32 @@ protected:
 	Eigen::Matrix<double, numStates, numStates> Q;
 	Eigen::Matrix<double, numOutputs, numOutputs> R;
 	double dt;
+
+	Eigen::Matrix<double, numStates, numStates>
+	getStateFuncJacobianX(std::function<state_t(const state_t &, const input_t &)> f,
+						  const state_t &x, const input_t &u)
+	{
+		if (stateFuncJacobianX)
+		{
+			return stateFuncJacobianX(x, u);
+		}
+		else
+		{
+			return StateSpace::stateFuncJacobianX(f, x, u);
+		}
+	}
+
+	Eigen::Matrix<double, numOutputs, numStates>
+	getOutputFuncJacobian(std::function<output_t(const state_t &)> f,
+						  const state_t &x)
+	{
+		if (outputFuncJacobian)
+		{
+			return outputFuncJacobian(x);
+		}
+		else
+		{
+			return StateSpace::outputFuncJacobian(f, x);
+		}
+	}
 };
