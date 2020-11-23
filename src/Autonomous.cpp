@@ -13,7 +13,7 @@ const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24}; // if this changes, change nu
 constexpr int numSamples = 62; // yields calculated mean within +-0.5m with 95% confidence
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: target(_target), poseEstimator({2, 2}, gpsStdDev, 1.0 / controlHz), state(0),
+	: target(_target), poseEstimator({0.8, 0.8}, gpsStdDev, 1.0 / controlHz), state(0),
 	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
 	  landmarkFilter()
 {
@@ -178,6 +178,10 @@ void Autonomous::autonomyIter()
 		double thetaVel = getThetaVel(driveTarget, pose, thetaErr);
 		double driveSpeed =
 			abs(thetaErr) < PI / 4 ? DRIVE_SPEED : 0; // don't drive forward if pointing away
+
+		if (dist(point_tToPointXY(pose), driveTarget) < 4) {
+			driveSpeed /= 3.0;
+		}
 
 		if (!Globals::E_STOP)
 		{
