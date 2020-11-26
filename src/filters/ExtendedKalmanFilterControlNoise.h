@@ -26,19 +26,21 @@ public:
 
 	void predict(const Eigen::Matrix<double, numInputs, 1> &input) override
 	{
+		// TODO: This definitely shouldn't be hard coded. Make it configurable
+		// In fact, this entire class can be folded into the regular EKF class with some work
+		// TODO: Redefine statefunc and outputfunc to take w and v
+		Eigen::Vector2d stds = {30*0.04*sqrt(abs(input(0))), 30*0.04*sqrt(abs(input(1)))};
+		Eigen::Matrix<double, 2, 2> M = StateSpace::createCovarianceMatrix(stds);
+
 		auto stateFunc = this->stateFunc;
-		double dt = this->dt;
-		Eigen::Matrix<double, numStates, numStates> contA =
+		Eigen::Matrix<double, numStates, numStates> F =
 			this->getStateFuncJacobianX(stateFunc, this->xHat, input);
 		Eigen::Matrix<double, numStates, numInputs> V =
 			getStateFuncJacobianU(stateFunc, this->xHat, input);
-		Eigen::Matrix<double, numStates, numStates> contQ = V * M * V.transpose();
+		Eigen::Matrix<double, numStates, numStates> Q = V * M * V.transpose();
 
-		Eigen::Matrix<double, numStates, numStates> discA, discQ;
-		StateSpace::discretizeAQ(contA, contQ, discA, discQ, dt);
-
-		this->xHat = StateSpace::integrateStateFunc(stateFunc, this->xHat, input, dt);
-		this->P = discA * this->P * discA.transpose() + discQ;
+		this->xHat = stateFunc(this->xHat, input);
+		this->P = F * this->P * F.transpose() + Q;
 	}
 
 	std::function<Eigen::Matrix<double, numStates, numInputs>(const state_t &,

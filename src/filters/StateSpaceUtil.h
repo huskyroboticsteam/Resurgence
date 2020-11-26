@@ -18,6 +18,13 @@ createCovarianceMatrix(const Eigen::Matrix<double, size, 1> &stdDevs)
 	return mat;
 }
 
+template <int numStates>
+Eigen::Matrix<double, numStates, numStates>
+discreteToContinuous(const Eigen::Matrix<double, numStates, numStates> &A, double dt)
+{
+	return A.log() / dt;
+}
+
 template <int numStates, int numInputs>
 void discreteToContinuous(Eigen::Matrix<double, numStates, numStates> &A,
 						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
@@ -49,7 +56,8 @@ void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
 }
 
 template <int numStates>
-Eigen::Matrix<double, numStates, numStates> discretizeA(const Eigen::Matrix<double, numStates, numStates> &contA, double dt)
+Eigen::Matrix<double, numStates, numStates>
+discretizeA(const Eigen::Matrix<double, numStates, numStates> &contA, double dt)
 {
 	// Derived from equations in discreteToContinuous()
 	return (contA * dt).exp();
@@ -208,7 +216,7 @@ template <int size, int sizeU>
 Eigen::Matrix<double, size, sizeU> stateFuncJacobianU(
 	std::function<Eigen::Matrix<double, size, 1>(const Eigen::Matrix<double, size, 1> &,
 												 const Eigen::Matrix<double, sizeU, 1> &)>
-	f,
+		f,
 	const Eigen::Matrix<double, size, 1> &x, const Eigen::Matrix<double, sizeU, 1> &u)
 {
 	Eigen::Matrix<double, size, sizeU> jacobian;
@@ -224,14 +232,17 @@ Eigen::Matrix<double, size, sizeU> stateFuncJacobianU(
 }
 
 template <int numStates, int numOutputs>
-Eigen::Matrix<double, numOutputs, numStates> outputFuncJacobian(
-	std::function<Eigen::Matrix<double, numOutputs, 1>(const Eigen::Matrix<double, numStates, 1> &)> f,
-	const Eigen::Matrix<double, numStates, 1> &x)
+Eigen::Matrix<double, numOutputs, numStates>
+outputFuncJacobian(std::function<Eigen::Matrix<double, numOutputs, 1>(
+					   const Eigen::Matrix<double, numStates, 1> &)>
+					   f,
+				   const Eigen::Matrix<double, numStates, 1> &x)
 {
 	Eigen::Matrix<double, numOutputs, numStates> jacobian;
 	for (int i = 0; i < numStates; i++)
 	{
-		Eigen::Matrix<double, numStates, 1> delta = Eigen::Matrix<double, numStates, 1>::Zero();
+		Eigen::Matrix<double, numStates, 1> delta =
+			Eigen::Matrix<double, numStates, 1>::Zero();
 		delta[i] = epsilon;
 		Eigen::Matrix<double, numOutputs, 1> derivative =
 			(f(x + delta) - f(x - delta)) / (2 * epsilon);
