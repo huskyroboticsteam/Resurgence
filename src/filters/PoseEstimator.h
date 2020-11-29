@@ -3,13 +3,13 @@
 #include <Eigen/Core>
 
 #include "../simulator/utils.h"
-#include "ExtendedKalmanFilterControlNoise.h"
+#include "ExtendedKalmanFilter.h"
 
 namespace
 {
 constexpr int numStates = 3;
 using statevec_t = Eigen::Matrix<double, numStates, 1>;
-}
+} // namespace
 
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
@@ -27,7 +27,7 @@ public:
 	 * 							 This represents noise in the measurements.
 	 * @param dt The time in seconds between updates. Used to discretize the system model.
 	 */
-	PoseEstimator(const Eigen::Vector2d &inputStdDevs,
+	PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 				  const Eigen::Vector3d &measurementStdDevs, double dt);
 
 	/**
@@ -84,6 +84,6 @@ public:
 	pose_t getPose() const;
 
 private:
-	ExtendedKalmanFilterControlNoise<numStates, 2, 3> ekf;
+	ExtendedKalmanFilter<numStates, 2, 3, 2, 3> ekf;
 	double dt;
 };

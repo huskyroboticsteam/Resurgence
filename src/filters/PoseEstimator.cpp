@@ -4,14 +4,16 @@
 
 const double wheelBase = NavSim::ROBOT_WHEEL_BASE;
 
-statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u)
+statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u,
+					 const Eigen::Vector2d &w)
 {
+	Eigen::Vector2d input = u + w;
 	double theta = x(2);
 
 	Eigen::Matrix<double, 3, 2> trf;
 	trf << 0.5, 0.5, 0, 0, -1 / wheelBase, 1 / wheelBase;
 
-	Eigen::Vector3d localUpdate = trf * u * dt;
+	Eigen::Vector3d localUpdate = trf * input * dt;
 
 	double cosTheta = cos(theta);
 	double sinTheta = sin(theta);
@@ -29,28 +31,39 @@ statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u)
 	{
 		double sinDTheta = sin(dTheta);
 		double cosDTheta = cos(dTheta);
-		B << sinDTheta, cosDTheta-1, 0, 1-cosDTheta, sinDTheta, 0, 0, 0, dTheta;
+		B << sinDTheta, cosDTheta - 1, 0, 1 - cosDTheta, sinDTheta, 0, 0, 0, dTheta;
 		B /= dTheta;
 	}
 
 	return x + A * B * localUpdate;
 }
 
-Eigen::Vector3d measurementFunc(const statevec_t &x)
+Eigen::Vector3d measurementFunc(const statevec_t &x, const statevec_t &v)
 {
-	return x;
+	return x + v;
 }
 
-
-PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputStdDevs,
+PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 							 const Eigen::Vector3d &measurementStdDevs, double dt)
-	: ekf([dt](const statevec_t &x, const Eigen::Vector2d &u) { return stateFunc(dt, x, u); },
-		  measurementFunc, inputStdDevs, measurementStdDevs, dt),
+	: ekf([dt](const statevec_t &x, const Eigen::Vector2d &u,
+			   const Eigen::Vector2d &w) { return stateFunc(dt, x, u, w); },
+		  measurementFunc,
+		  NoiseCovMat<numStates, 2, 2>([inputNoiseGains](const statevec_t &x, const Eigen::Vector2d &u) {
+			  Eigen::Vector2d stds = inputNoiseGains.array() * u.array().abs().sqrt();
+			  Eigen::Matrix<double, 2, 2> Q = StateSpace::createCovarianceMatrix(stds);
+			  return Q;
+		  }),
+		  NoiseCovMat<numStates, numStates, numStates>(measurementStdDevs), dt),
 	  dt(dt)
 {
-//	ekf.stateFuncJacobianX = stateFuncJacobianX;
-//	ekf.stateFuncJacobianU = stateFuncJacobianU;
-	ekf.outputFuncJacobian = [](const statevec_t &x) {
+	//	ekf.stateFuncJacobianX = stateFuncJacobianX;
+	//	ekf.stateFuncJacobianU = stateFuncJacobianU;
+	ekf.outputFuncJacobianX = [](const statevec_t &x, const statevec_t &v) {
+		Eigen::Matrix<double, numStates, numStates> jacobian =
+			Eigen::Matrix<double, numStates, numStates>::Identity();
+		return jacobian;
+	};
+	ekf.outputFuncJacobianV = [](const statevec_t &x, const statevec_t &v) {
 		Eigen::Matrix<double, numStates, numStates> jacobian =
 			Eigen::Matrix<double, numStates, numStates>::Identity();
 		return jacobian;

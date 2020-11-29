@@ -10,10 +10,10 @@ constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24}; // if this changes, change numSamples
-constexpr int numSamples = 62; // yields calculated mean within +-0.5m with 95% confidence
+constexpr int numSamples = 5; // yields calculated mean within +-1.8m with 95% confidence
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: target(_target), poseEstimator({0.8, 0.8}, gpsStdDev, 1.0 / controlHz), state(0),
+	: target(_target), poseEstimator({1.2, 1.2}, gpsStdDev, 1.0 / controlHz), state(0),
 	  targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
 	  landmarkFilter()
 {
@@ -116,7 +116,6 @@ void Autonomous::autonomyIter()
 	// If we haven't calibrated position, do so now
 	if (!calibrated)
 	{
-		std::cout << "Calibrating..." << std::endl;
 		pose_t out;
 		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
 		{
@@ -124,7 +123,6 @@ void Autonomous::autonomyIter()
 			poseEstimator.reset(out, gpsStdDev / sqrt((double)numSamples));
 			calibrated = true;
 			calibrationPoses.clear();
-			std::cout << "Pose:\n" << out << std::endl;
 		}
 		else
 		{
