@@ -5,11 +5,8 @@
 #include "../simulator/utils.h"
 #include "ExtendedKalmanFilter.h"
 
-namespace
-{
 constexpr int numStates = 3;
 using statevec_t = Eigen::Matrix<double, numStates, 1>;
-} // namespace
 
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.

@@ -2,6 +2,8 @@
 
 #include "../simulator/constants.h"
 
+namespace
+{
 const double wheelBase = NavSim::ROBOT_WHEEL_BASE;
 
 statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u,
@@ -42,17 +44,19 @@ Eigen::Vector3d measurementFunc(const statevec_t &x, const statevec_t &v)
 {
 	return x + v;
 }
+} // namespace
 
 PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 							 const Eigen::Vector3d &measurementStdDevs, double dt)
 	: ekf([dt](const statevec_t &x, const Eigen::Vector2d &u,
 			   const Eigen::Vector2d &w) { return stateFunc(dt, x, u, w); },
 		  measurementFunc,
-		  NoiseCovMat<numStates, 2, 2>([inputNoiseGains](const statevec_t &x, const Eigen::Vector2d &u) {
-			  Eigen::Vector2d stds = inputNoiseGains.array() * u.array().abs().sqrt();
-			  Eigen::Matrix<double, 2, 2> Q = StateSpace::createCovarianceMatrix(stds);
-			  return Q;
-		  }),
+		  NoiseCovMat<numStates, 2, 2>(
+			  [inputNoiseGains](const statevec_t &x, const Eigen::Vector2d &u) {
+				  Eigen::Vector2d stds = inputNoiseGains.array() * u.array().abs().sqrt();
+				  Eigen::Matrix<double, 2, 2> Q = StateSpace::createCovarianceMatrix(stds);
+				  return Q;
+			  }),
 		  NoiseCovMat<numStates, numStates, numStates>(measurementStdDevs), dt),
 	  dt(dt)
 {

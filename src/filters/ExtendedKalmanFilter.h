@@ -6,11 +6,6 @@
 #include "KalmanFilterBase.h"
 #include "StateSpaceUtil.h"
 
-namespace
-{
-constexpr double epsilon = 1e-5;
-}
-
 template <int numStates, int size, int paramSize> class NoiseCovMat
 {
 public:
@@ -123,6 +118,7 @@ protected:
 	NoiseCovMat<numStates, processNoiseDim, numInputs> Q;
 	NoiseCovMat<numStates, outputNoiseDim, numOutputs> R;
 	double dt;
+	static constexpr double epsilon = 1e-5;
 
 	Eigen::Matrix<double, numStates, numStates>
 	getStateFuncJacobianX(const statefunc_t &f, const state_t &x, const input_t &u)
