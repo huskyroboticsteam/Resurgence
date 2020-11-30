@@ -51,7 +51,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 {
 	poses.push_back(pose);
 	// 62 samples with 2m std dev and 95% confidence interval gives about +-0.5m
-	if (poses.size() == 62)
+	if (poses.size() == 5)
 	{
 		pose_t sum;
 		for (const pose_t &p : poses)
@@ -175,7 +175,7 @@ void Autonomous::autonomyIter()
 
 			std::cout << "ThetaVel: " << thetaVel << " DriveVel: " << driveSpeed
 						<< " thetaErr: " << thetaErr << " targetX: " << driveTarget(0)
-						<< " targetY: " << driveTarget(0) << std::endl;
+						<< " targetY: " << driveTarget(1) << std::endl;
 		}
 	}
 }
