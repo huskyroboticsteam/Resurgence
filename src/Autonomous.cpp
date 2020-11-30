@@ -18,7 +18,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		targetHeading(-1),
 		forwardCount(-1),
 		rightTurn(false),
-		calibrated(true),
+		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter()
 {
