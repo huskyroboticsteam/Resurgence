@@ -58,8 +58,6 @@ public:
 		const NoiseCovMat<numStates, outputNoiseDim, numOutputs> &outputNoise, double dt)
 		: stateFunc(stateFunc), outputFunc(outputFunc), Q(processNoise), R(outputNoise), dt(dt)
 	{
-		this->P = Eigen::Matrix<double, numStates, numStates>::Zero();
-		this->xHat = state_t::Zero();
 	}
 
 	void predict(const Eigen::Matrix<double, numInputs, 1> &input) override

@@ -133,7 +133,5 @@ private:
 				 const Eigen::Matrix<double, numStates, numOutputs> &K)
 		: A(A), B(B), C(C), Q(Q), R(R), K(K)
 	{
-		this->P = Eigen::Matrix<double, numStates, numStates> ::Zero();
-		this->xHat = Eigen::Matrix<double, numStates, 1> ::Zero();
 	}
 };

@@ -7,6 +7,12 @@
 template <int numStates, int numInputs, int numOutputs> class KalmanFilterBase
 {
 public:
+	KalmanFilterBase()
+		: xHat(Eigen::Matrix<double, numStates, 1>::Zero()),
+		  P(Eigen::Matrix<double, numStates, numStates>::Identity() * 1e5)
+	{
+	}
+
 	/**
 	 * Correct the state estimate with measurement data.
 	 * The measurement should be in the same space as the state.
@@ -23,7 +29,8 @@ public:
 	virtual void predict(const Eigen::Matrix<double, numInputs, 1> &input) = 0;
 
 	/**
-	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
+	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix to
+	 * a diagonal matrix with large values.
 	 */
 	void reset()
 	{
@@ -32,15 +39,15 @@ public:
 
 	/**
 	 * Sets the state estimate to the supplied vector and resets the estimate covariance
-	 * matrix.
+	 * matrix to a diagonal matrix with large values.
 	 *
 	 * @param state The state to which the state estimate will be set.
 	 */
 	void reset(const Eigen::Matrix<double, numStates, 1> &state)
 	{
-		Eigen::Matrix<double, numStates, numStates> zero =
-			Eigen::Matrix<double, numStates, numStates>::Zero();
-		reset(state, zero);
+		Eigen::Matrix<double, numStates, numStates> newP =
+			Eigen::Matrix<double, numStates, numStates>::Identity() * 1e5;
+		reset(state, newP);
 	}
 
 	/**
