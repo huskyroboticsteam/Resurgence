@@ -85,7 +85,7 @@ void PoseEstimator::predict(double thetaVel, double xVel)
 
 void PoseEstimator::correct(const transform_t &measurement)
 {
-	pose_t pose = toPose(measurement, getPose()[2]);
+	pose_t pose = toPose(measurement, getPose()(2));
 	ekf.correct(pose);
 }
 

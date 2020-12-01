@@ -10,7 +10,7 @@ constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24}; // if this changes, change numSamples
-constexpr int numSamples = 5; // yields calculated mean within +-1.8m with 95% confidence
+constexpr int numSamples = 1; // yields calculated mean within +-1.8m with 95% confidence
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: target(_target), poseEstimator({1.2, 1.2}, gpsStdDev, 1.0 / controlHz), state(0),
@@ -90,11 +90,11 @@ double transformAngle(double currAngle, double targetAngle)
 
 double getThetaVel(const PointXY &target, const pose_t &pose, double &thetaErr)
 {
-	double dx = target.x - pose[0];
-	double dy = target.y - pose[1];
+	double dx = target.x - pose(0);
+	double dy = target.y - pose(1);
 	double targetAngle = atan2(dy, dx);
-	targetAngle = transformAngle(pose[2], targetAngle);
-	thetaErr = targetAngle - pose[2];
+	targetAngle = transformAngle(pose(2), targetAngle);
+	thetaErr = targetAngle - pose(2);
 
 	return KP_ANGLE * thetaErr;
 }
@@ -153,7 +153,7 @@ void Autonomous::autonomyIter()
 		{
 			// if we have some existing data or new data, set the target using the landmark
 			// data
-			bool landmarkVisible = leftPostLandmark[2] != 0;
+			bool landmarkVisible = leftPostLandmark(2) != 0;
 			if (landmarkFilter.getSize() > 0 || landmarkVisible)
 			{
 				if (!landmarkVisible)
@@ -177,7 +177,8 @@ void Autonomous::autonomyIter()
 		double driveSpeed =
 			abs(thetaErr) < PI / 4 ? DRIVE_SPEED : 0; // don't drive forward if pointing away
 
-		if (dist(point_tToPointXY(pose), driveTarget) < 4) {
+		if (dist(point_tToPointXY(pose), driveTarget) < 4)
+		{
 			driveSpeed /= 3.0;
 		}
 
