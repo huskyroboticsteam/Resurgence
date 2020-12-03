@@ -21,7 +21,7 @@ public:
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	// Gets the target's coordinate
-	pose_t getTarget();
+	pose_t getTargetPose();
 	void autonomyIter();
 
 private:

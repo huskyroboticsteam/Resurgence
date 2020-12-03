@@ -141,17 +141,19 @@ void Autonomous::autonomyIter()
 	}
 	else
 	{
-		pose_t driveTarget = getTarget();
+		pose_t driveTarget = getTargetPose();
 
 		// if we have some existing data or new data, set the target using the landmark
 		// data
 		bool landmarkVisible = leftPostLandmark[2] != 0;
 		if (landmarkFilter.getSize() > 0 || landmarkVisible)
 		{
+      // TODO shift the target location and orientation to align
+      // with the gate and/or avoid crashing into the post.
 			if (!landmarkVisible)
 			{
 				// we have no new data, so use the data already in the filter
-				driveTarget = landmarkFilter.get();
+				driveTarget.topRows(2) = landmarkFilter.get().topRows(2);
 			}
 			else
 			{
@@ -160,7 +162,7 @@ void Autonomous::autonomyIter()
 				point_t landmarkMapSpace = invTransform * leftPostLandmark;
 				// the filtering is done on the target in map space to reduce any phase lag
 				// caused by filtering
-				driveTarget = landmarkFilter.get(landmarkMapSpace);
+				driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
 			}
 		}
 		double thetaErr;
@@ -187,7 +189,7 @@ double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 	return dtheta;
 }
 
-pose_t Autonomous::getTarget()
+pose_t Autonomous::getTargetPose()
 {
 	pose_t ret { target.approx_GPS(0), target.approx_GPS(1), 0.0 };
 	return ret;
