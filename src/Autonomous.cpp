@@ -9,8 +9,8 @@
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
-const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24}; // if this changes, change numSamples
-constexpr int numSamples = 1; // yields calculated mean within +-1.8m with 95% confidence
+const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
+constexpr int numSamples = 1;
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: target(_target), poseEstimator({1.2, 1.2}, gpsStdDev, 1.0 / controlHz), state(0),

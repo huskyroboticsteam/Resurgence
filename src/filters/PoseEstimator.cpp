@@ -9,7 +9,10 @@ const double wheelBase = NavSim::ROBOT_WHEEL_BASE;
 statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u,
 					 const Eigen::Vector2d &w)
 {
-	Eigen::Vector2d input = u + w;
+	// Instead of using euler integration, we can represent the pose update as a twist
+	// and then apply that twist to the current pose. Derived from differential drive kinematics.
+	// This will be more accurate than euler integration at slower update rates.
+	Eigen::Vector2d input = u + w; // noise is applied to the input vector
 	double theta = x(2);
 
 	Eigen::Matrix<double, 3, 2> trf;
@@ -24,6 +27,7 @@ statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u,
 
 	double dTheta = localUpdate(2);
 	Eigen::Matrix3d B;
+	// If dTheta is close to 0 use the taylor series approximation
 	if (abs(dTheta) <= 1e-9)
 	{
 		B << 1 - dTheta * dTheta / 6.0, -dTheta / 2.0, 0, dTheta / 2.0,
@@ -42,7 +46,7 @@ statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u,
 
 Eigen::Vector3d measurementFunc(const statevec_t &x, const statevec_t &v)
 {
-	return x + v;
+	return x + v; // noise is applied to the measured position
 }
 } // namespace
 

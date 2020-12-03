@@ -4,11 +4,22 @@
 #include <Eigen/LU>
 #include <unsupported/Eigen/MatrixFunctions>
 
+/**
+ * Collection of utility methods for use with state space applications.
+ */
 namespace StateSpace
 {
 
 constexpr double epsilon = 1e-5;
 
+/**
+ * Create a covariance matrix modelling independent variables with the given standard
+ * deviations.
+ *
+ * @tparam size The dimension of the noise.
+ * @param stdDevs The standard deviation of each element.
+ * @return A size x size covariance matrix.
+ */
 template <int size>
 Eigen::Matrix<double, size, size>
 createCovarianceMatrix(const Eigen::Matrix<double, size, 1> &stdDevs)
@@ -18,6 +29,14 @@ createCovarianceMatrix(const Eigen::Matrix<double, size, 1> &stdDevs)
 	return mat;
 }
 
+/**
+ * Convert a discrete time system matrix to continuous time.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param A The discrete time system matrix.
+ * @param dt The time in seconds between updates.
+ * @return An equivalent continuous time system matrix.
+ */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
 discreteToContinuous(const Eigen::Matrix<double, numStates, numStates> &A, double dt)
@@ -25,6 +44,16 @@ discreteToContinuous(const Eigen::Matrix<double, numStates, numStates> &A, doubl
 	return A.log() / dt;
 }
 
+/**
+ * Convert discrete time system and input matrices to continuous time.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param A A reference to the discrete time system matrix. It will be replaced with the
+ * continuous time equivalent.
+ * @param B A reference to the discrete time input matrix. It will be replaced with the
+ * continuous time equivalent.
+ * @param dt The time in seconds between updates.
+ */
 template <int numStates, int numInputs>
 void discreteToContinuous(Eigen::Matrix<double, numStates, numStates> &A,
 						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
@@ -37,6 +66,16 @@ void discreteToContinuous(Eigen::Matrix<double, numStates, numStates> &A,
 		discB;
 }
 
+/**
+ * Convert continuous time system and input matrices to discrete time.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param A A reference to the continuous time system matrix. It will be replaced with the
+ * discrete time equivalent.
+ * @param B A reference to the continuous time input matrix. It will be replaced with the
+ * discrete time equivalent.
+ * @param dt The time in seconds between updates.
+ */
 template <int numStates, int numInputs>
 void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
 						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
@@ -55,6 +94,14 @@ void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
 	B = exp.template block<numStates, numInputs>(0, numStates);
 }
 
+/**
+ * Convert a continuous time system matrix to discrete time.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param contA The continuous time system matrix.
+ * @param dt The time in seconds between updates.
+ * @return An equivalent discrete time system matrix.
+ */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
 discretizeA(const Eigen::Matrix<double, numStates, numStates> &contA, double dt)
@@ -63,7 +110,17 @@ discretizeA(const Eigen::Matrix<double, numStates, numStates> &contA, double dt)
 	return (contA * dt).exp();
 }
 
-// contA is continuous system matrix, contQ is continuous process covariance matrix
+/**
+ * Convert a continuous time system matrix and additive process noise matrix to discrete time.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param contA A reference to the continuous time system matrix.
+ * @param contQ A reference to the continuous time additive process noise matrix.
+ * @param discA A reference to a matrix where the discrete time system matrix will be stored.
+ * @param discQ A reference to a matrix where the discrete process noise covariance matrix will
+ * be stored.
+ * @param dt The time in seconds between updates.
+ */
 template <int numStates>
 void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
 				  const Eigen::Matrix<double, numStates, numStates> &contQ,
@@ -90,7 +147,15 @@ void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
 	discQ = (q + q.transpose()) / 2.0; // make Q symmetric again if it became asymmetric
 }
 
-// contA is continuous system matrix, contQ is continuous process covariance matrix
+/**
+ * Discretizes a continuous time additive process noise covariance matrix.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param contA The continuous time system matrix.
+ * @param contQ The continuous time process noise covariance matrix.
+ * @param dt The time in second between updates.
+ * @return The discrete time process noise covariance matrix.
+ */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
 discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
@@ -102,39 +167,14 @@ discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
 	return discQ;
 }
 
-template <int numStates>
-Eigen::Matrix<double, numStates, numStates>
-discretizeQApprox(const Eigen::Matrix<double, numStates, numStates> &contA,
-				  const Eigen::Matrix<double, numStates, numStates> &contQ, double dt,
-				  int degree = 5)
-{
-	using matrix_t = Eigen::Matrix<double, numStates, numStates>;
-	const matrix_t Atrans = contA.transpose(); // A^T
-
-	matrix_t AinvQ = matrix_t::Zero(); // after iteration, this will equal A^-1 * Q
-
-	double coeff = 1;
-	matrix_t AtransN = matrix_t::Identity(); // (A^T)^(n-1)
-	matrix_t lastTerm = matrix_t::Zero(); // last term in the series before multiplied by coeff
-
-	// derived from e^(A*t)=I+A+A^2/2...
-	// uses the first several terms for the matrix exponential
-	for (int i = 1; i <= degree; i++)
-	{
-		coeff *= dt / i;
-		lastTerm = -contA * lastTerm + contQ * AtransN;
-		AtransN *= Atrans;
-		AinvQ += coeff * lastTerm;
-	}
-
-	matrix_t discA = discretizeA(contA, dt);
-	matrix_t discQ = discA * AinvQ; // A * A^-1 * Q = Q
-
-	// make Q symmetric again (floating point rounding error may have shifted it)
-	return (discQ + discQ.transpose()) / 2.0;
-}
-
-// R is measurement covariance matrix
+/**
+ * Discretizes a continuous time additive output noise covariance matrix.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param contR The continuous time output noise covariance matrix.
+ * @param dt The time in seconds between updates.
+ * @return The discrete time output noise covariance matrix.
+ */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
 discretizeR(const Eigen::Matrix<double, numStates, numStates> &contR, double dt)
@@ -144,6 +184,18 @@ discretizeR(const Eigen::Matrix<double, numStates, numStates> &contR, double dt)
 
 // Solves Discrete-time Algebraic Riccati Equation to calculate asymptotic error covariance
 // matrix This can be used to calculate the optimal Kalman gain matrix
+/**
+ * Solves the Discrete-time Algebraic Riccati Equation to calculate the asymptotic
+ * estimate error covariance matrix. (P_inf) This can be used to calculate the optimal
+ * Kalman gain matrix.
+ *
+ * @tparam numStates The number of states in the system.
+ * @param A0 The discrete time system matrix.
+ * @param Ctrans The transpose of the discrete time output matrix.
+ * @param Q The discrete time additive process noise covariance matrix.
+ * @param R The discrete time additive output noise covariance matrix.
+ * @return The asymptotic estimate error covariance matrix.
+ */
 template <int numStates>
 static Eigen::Matrix<double, numStates, numStates>
 DARE(const Eigen::Matrix<double, numStates, numStates> &A0,
@@ -177,77 +229,5 @@ DARE(const Eigen::Matrix<double, numStates, numStates> &A0,
 	} while ((H - lastH).norm() / H.norm() >= 1e-4);
 
 	return H;
-}
-
-template <typename T, typename U>
-T integrateStateFunc(std::function<T(const T &, const U &)> f, const T &x, const U &u,
-					 double dt)
-{
-	// Reference:
-	// https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#The_Runge%E2%80%93Kutta_method
-	double halfDt = dt / 2;
-	T k1 = f(x, u);
-	T k2 = f(x + halfDt * k1, u);
-	T k3 = f(x + halfDt * k2, u);
-	T k4 = f(x + dt * k3, u);
-	return x + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
-}
-
-template <int size, int sizeU>
-Eigen::Matrix<double, size, size> stateFuncJacobianX(
-	std::function<Eigen::Matrix<double, size, 1>(const Eigen::Matrix<double, size, 1> &,
-												 const Eigen::Matrix<double, sizeU, 1> &)>
-		f,
-	const Eigen::Matrix<double, size, 1> &x, const Eigen::Matrix<double, sizeU, 1> &u)
-{
-	Eigen::Matrix<double, size, size> jacobian;
-	for (int i = 0; i < size; i++)
-	{
-		Eigen::Matrix<double, size, 1> delta = Eigen::Matrix<double, size, 1>::Zero();
-		delta[i] = epsilon;
-		Eigen::Matrix<double, size, 1> derivative =
-			(f(x + delta, u) - f(x - delta, u)) / (2 * epsilon);
-		jacobian.col(i) = derivative;
-	}
-	return jacobian;
-}
-
-template <int size, int sizeU>
-Eigen::Matrix<double, size, sizeU> stateFuncJacobianU(
-	std::function<Eigen::Matrix<double, size, 1>(const Eigen::Matrix<double, size, 1> &,
-												 const Eigen::Matrix<double, sizeU, 1> &)>
-		f,
-	const Eigen::Matrix<double, size, 1> &x, const Eigen::Matrix<double, sizeU, 1> &u)
-{
-	Eigen::Matrix<double, size, sizeU> jacobian;
-	for (int i = 0; i < sizeU; i++)
-	{
-		Eigen::Matrix<double, sizeU, 1> delta = Eigen::Matrix<double, sizeU, 1>::Zero();
-		delta[i] = epsilon;
-		Eigen::Matrix<double, size, 1> derivative =
-			(f(x, u + delta) - f(x, u - delta)) / (2 * epsilon);
-		jacobian.col(i) = derivative;
-	}
-	return jacobian;
-}
-
-template <int numStates, int numOutputs>
-Eigen::Matrix<double, numOutputs, numStates>
-outputFuncJacobian(std::function<Eigen::Matrix<double, numOutputs, 1>(
-					   const Eigen::Matrix<double, numStates, 1> &)>
-					   f,
-				   const Eigen::Matrix<double, numStates, 1> &x)
-{
-	Eigen::Matrix<double, numOutputs, numStates> jacobian;
-	for (int i = 0; i < numStates; i++)
-	{
-		Eigen::Matrix<double, numStates, 1> delta =
-			Eigen::Matrix<double, numStates, 1>::Zero();
-		delta[i] = epsilon;
-		Eigen::Matrix<double, numOutputs, 1> derivative =
-			(f(x + delta) - f(x - delta)) / (2 * epsilon);
-		jacobian.col(i) = derivative;
-	}
-	return jacobian;
 }
 } // namespace StateSpace
