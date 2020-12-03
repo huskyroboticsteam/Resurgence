@@ -2,6 +2,7 @@
 
 #include <Eigen/LU>
 #include <cmath>
+#include <iostream>
 
 #include "Globals.h"
 #include "simulator/world_interface.h"
@@ -11,9 +12,15 @@ constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: target(_target), poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
-	  state(0), targetHeading(-1), forwardCount(-1), rightTurn(false), calibrated(false),
-	  landmarkFilter()
+	: target(_target),
+		poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
+		state(0),
+		targetHeading(-1),
+		forwardCount(-1),
+		rightTurn(false),
+		calibrated(false),
+		calibrationPoses({}),
+		landmarkFilter()
 {
 }
 
@@ -24,27 +31,12 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &st
 	calibrated = true;
 }
 
-PointXY Autonomous::point_tToPointXY(const point_t &pnt) const
-{
-	return PointXY{static_cast<float>(pnt(0)), static_cast<float>(pnt(1))};
-}
-
 bool Autonomous::arrived(const pose_t &pose) const
 {
 	double currX = pose[0];
 	double currY = pose[1];
 	return util::almostEqual(currX, (double)target.approx_GPS(0), 0.5) &&
-		   util::almostEqual(currY, (double)target.approx_GPS(1), 0.5);
-}
-
-std::vector<PointXY> Autonomous::points_tToPointXYs(const points_t &pnts) const
-{
-	std::vector<PointXY> res;
-	for (const point_t &pnt : pnts)
-	{
-		res.push_back(point_tToPointXY(pnt));
-	}
-	return res;
+			 util::almostEqual(currY, (double)target.approx_GPS(1), 0.5);
 }
 
 double Autonomous::angleToTarget(const pose_t &gpsPose) const
@@ -59,7 +51,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 {
 	poses.push_back(pose);
 	// 62 samples with 2m std dev and 95% confidence interval gives about +-0.5m
-	if (poses.size() == 62)
+	if (poses.size() == 5)
 	{
 		pose_t sum;
 		for (const pose_t &p : poses)
@@ -87,20 +79,21 @@ double transformAngle(double currAngle, double targetAngle)
 	return currAngle + ((absDist > (range / 2)) ? -sign * (range - absDist) : dist);
 }
 
-double getThetaVel(const PointXY &target, const pose_t &pose, double &thetaErr)
+double getThetaVel(const point_t &target, const pose_t &pose, double &thetaErr)
 {
-	double dx = target.x - pose[0];
-	double dy = target.y - pose[1];
+	double dx = target(0) - pose(0);
+	double dy = target(1) - pose(1);
 	double targetAngle = atan2(dy, dx);
-	targetAngle = transformAngle(pose[2], targetAngle);
-	thetaErr = targetAngle - pose[2];
+	targetAngle = transformAngle(pose(2), targetAngle);
+	thetaErr = targetAngle - pose(2);
 
 	return KP_ANGLE * thetaErr;
 }
 
-double dist(const PointXY &p1, const PointXY &p2)
+double dist(const point_t &p1, const point_t &p2)
 {
-	return std::hypot(p1.x - p2.x, p1.y - p2.y);
+	// TODO do we want to weight the theta difference differently?
+	return (p1-p2).norm();
 }
 
 void Autonomous::autonomyIter()
@@ -142,34 +135,34 @@ void Autonomous::autonomyIter()
 	{
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
-				  << std::endl;
+					<< std::endl;
 		landmarkFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
 	else
 	{
-		PointXY driveTarget = getTarget();
-		if (dist(driveTarget, point_tToPointXY(pose)) < 25)
+		pose_t driveTarget = getTargetPose();
+
+		// if we have some existing data or new data, set the target using the landmark
+		// data
+		bool landmarkVisible = leftPostLandmark[2] != 0;
+		if (landmarkFilter.getSize() > 0 || landmarkVisible)
 		{
-			// if we have some existing data or new data, set the target using the landmark
-			// data
-			bool landmarkVisible = leftPostLandmark[2] != 0;
-			if (landmarkFilter.getSize() > 0 || landmarkVisible)
+      // TODO shift the target location and orientation to align
+      // with the gate and/or avoid crashing into the post.
+			if (!landmarkVisible)
 			{
-				if (!landmarkVisible)
-				{
-					// we have no new data, so use the data already in the filter
-					driveTarget = point_tToPointXY(landmarkFilter.get());
-				}
-				else
-				{
-					// transform and add the new data to the filter
-					transform_t invTransform = toTransform(pose).inverse();
-					point_t landmarkMapSpace = invTransform * leftPostLandmark;
-					// the filtering is done on the target in map space to reduce any phase lag
-					// caused by filtering
-					driveTarget = point_tToPointXY(landmarkFilter.get(landmarkMapSpace));
-				}
+				// we have no new data, so use the data already in the filter
+				driveTarget.topRows(2) = landmarkFilter.get().topRows(2);
+			}
+			else
+			{
+				// transform and add the new data to the filter
+				transform_t invTransform = toTransform(pose).inverse();
+				point_t landmarkMapSpace = invTransform * leftPostLandmark;
+				// the filtering is done on the target in map space to reduce any phase lag
+				// caused by filtering
+				driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
 			}
 		}
 		double thetaErr;
@@ -183,8 +176,8 @@ void Autonomous::autonomyIter()
 			poseEstimator.predict(thetaVel, driveSpeed);
 
 			std::cout << "ThetaVel: " << thetaVel << " DriveVel: " << driveSpeed
-					  << " thetaErr: " << thetaErr << " targetX: " << driveTarget.x
-					  << " targetY: " << driveTarget.y << std::endl;
+						<< " thetaErr: " << thetaErr << " targetX: " << driveTarget(0)
+						<< " targetY: " << driveTarget(1) << std::endl;
 		}
 	}
 }
@@ -192,118 +185,12 @@ void Autonomous::autonomyIter()
 double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 {
 	double dtheta;
-	//if (lidar.empty())
-	//{
-		dtheta = angleToTarget(gpsPose);
-	//}
-	//else
-	//{
-	//	const std::vector<PointXY> &ref = points_tToPointXYs(lidar);
-	//	PointXY direction = pather.getPath(ref, (float)gpsPose(0), (float)gpsPose(1), target);
-	//	float theta = std::atan2(direction.y, direction.x);
-	//	dtheta = static_cast<double>(theta) - gpsPose(2);
-	//}
+	dtheta = angleToTarget(gpsPose);
 	return dtheta;
 }
 
-void Autonomous::setWorldData(std::shared_ptr<WorldData> wdata)
+pose_t Autonomous::getTargetPose()
 {
-	this->worldData = wdata;
-}
-
-std::pair<float, float> Autonomous::getDirections(float currHeading)
-{
-	std::pair<float, float> directions; // heading, speed
-	if (state == 1)
-	{
-		return stateForwards(currHeading, directions);
-	}
-	if (state == 0)
-	{
-		return stateTurn(currHeading, directions);
-	}
-	if (state == -1)
-	{
-		return stateBackwards(currHeading, directions);
-	}
-}
-
-std::pair<float, float> Autonomous::stateForwards(float currHeading,
-												  std::pair<float, float> directions)
-{
-	float speed = worldData->targetDistance();
-	if (!worldData->lidarSees() || speed != 1)
-	{ // no obstacles in front
-		if (forwardCount > 0 || forwardCount < 0)
-		{ // move forward
-			directions = std::make_pair(currHeading, speed);
-			state = 1;
-			forwardCount--;
-			return directions;
-		}
-		else
-		{ // moved forwards for a set number of times, now turn
-			forwardCount = -1;
-			rightTurn =
-				false; // moved forward enough times without obstruction, next turn to target
-			return stateTurn(currHeading, directions);
-		}
-	}
-	else
-	{ // lidar now sees something
-		return stateBackwards(currHeading, directions);
-	}
-}
-
-std::pair<float, float> Autonomous::stateTurn(float currHeading,
-											  std::pair<float, float> directions)
-{
-	if ((state == 0) && (currHeading == targetHeading))
-	{ // done turning
-		return stateForwards(currHeading, directions);
-	}
-	else
-	{ // find heading to turn to
-		if (rightTurn || forwardCount > 0)
-		{ // turn right if last turn was towards target or was obstructed when moving forwards
-			targetHeading = currHeading + 45;
-			forwardCount = 5; // reset forward count
-		}
-		else
-		{ // calculate angle to obstacle
-			PointXY robotPos = worldData->getGPS();
-			float x = target.approx_GPS(0) - robotPos.x;
-			float y = target.approx_GPS(1) - robotPos.y;
-			targetHeading = atan2f(y, x) * (180 / PI);
-			targetHeading = 360 - targetHeading + 90;
-			rightTurn = true; // next turn will turn right
-		}
-		if (targetHeading > 360)
-		{ // fixing angles over 360
-			targetHeading = targetHeading - 360;
-		}
-		directions = std::make_pair(targetHeading, 0);
-		state = 0;
-		return directions;
-	}
-}
-
-std::pair<float, float> Autonomous::stateBackwards(float currHeading,
-												   std::pair<float, float> directions)
-{
-	if (worldData->lidarSees())
-	{ // back up
-		directions = std::make_pair(currHeading, -1);
-		state = -1;
-		return directions;
-	}
-	else
-	{ // done backing up, now turn
-		return stateTurn(currHeading, directions);
-	}
-}
-
-PointXY Autonomous::getTarget()
-{
-	return PointXY { (float)target.approx_GPS(0), (float)target.approx_GPS(1) };
+	pose_t ret { target.approx_GPS(0), target.approx_GPS(1), 0.0 };
+	return ret;
 }

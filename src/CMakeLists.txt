@@ -75,8 +75,6 @@ add_executable(tests
   Networking/NetworkingStubs.cpp
   Networking/real_world_interface.cpp
   # Autonomy tests
-  SimpleAutonomousTester.cpp
-  FakeMap.cpp
   mapping/ValidatorTest.cpp
   mapping/ObjectValidator.cpp
   mapping/EKFSlam/EKFSlam.cpp
