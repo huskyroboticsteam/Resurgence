@@ -81,7 +81,7 @@ double transformAngle(double currAngle, double targetAngle)
 	return currAngle + ((absDist > (range / 2)) ? -sign * (range - absDist) : dist);
 }
 
-double Autonomous::getLinearVel(const pose_t &target, const pose_t &pose, double &thetaErr) {
+double Autonomous::getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const {
 	double speed = DRIVE_SPEED;
 	if (dist(target, pose, 0) < 1.0) {
 		// We should drive slower near the goal so that we don't overshoot the target
@@ -96,7 +96,7 @@ double Autonomous::getLinearVel(const pose_t &target, const pose_t &pose, double
 	return speed;
 }
 
-double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr)
+double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const
 {
 	// If we're within 20cm of the target location, we want to turn the rover until
 	// we reach the target orientation. Otherwise, we want to turn the rover to

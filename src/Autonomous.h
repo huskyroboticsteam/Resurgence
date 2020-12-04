@@ -42,8 +42,8 @@ private:
 	double angleToTarget(const pose_t &gpsPose) const;
 	bool arrived(const pose_t &pose) const;
 
-	double getLinearVel(const pose_t &target, const pose_t &pose, double &thetaErr);
-	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr);
+	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
+	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
 
 	ObstacleMap obsMap;
 	Pather2 pather;
