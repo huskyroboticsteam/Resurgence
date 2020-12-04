@@ -11,16 +11,14 @@ constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 
+
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: target(_target),
 		poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
-		state(0),
-		targetHeading(-1),
-		forwardCount(-1),
-		rightTurn(false),
 		calibrated(false),
 		calibrationPoses({}),
-		landmarkFilter()
+		landmarkFilter(),
+		state(NavState::INIT)
 {
 }
 
@@ -31,12 +29,16 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &st
 	calibrated = true;
 }
 
+double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
+{
+	pose_t diff = p1 - p2;
+	diff(2) *= theta_weight;
+	return diff.norm();
+}
+
 bool Autonomous::arrived(const pose_t &pose) const
 {
-	double currX = pose[0];
-	double currY = pose[1];
-	return util::almostEqual(currX, (double)target.approx_GPS(0), 0.5) &&
-			 util::almostEqual(currY, (double)target.approx_GPS(1), 0.5);
+	return dist(pose, getTargetPose(), 1.0) < 0.5;
 }
 
 double Autonomous::angleToTarget(const pose_t &gpsPose) const
@@ -79,21 +81,36 @@ double transformAngle(double currAngle, double targetAngle)
 	return currAngle + ((absDist > (range / 2)) ? -sign * (range - absDist) : dist);
 }
 
-double getThetaVel(const point_t &target, const pose_t &pose, double &thetaErr)
+double Autonomous::getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const {
+	double speed = DRIVE_SPEED;
+	if (dist(target, pose, 0) < 1.0) {
+		// We should drive slower near the goal so that we don't overshoot the target
+		// (given our relatively low control frequency of 10 Hz)
+		speed = DRIVE_SPEED / 3;
+	}
+	if (abs(thetaErr) > PI / 4 || state == NavState::NEAR_TARGET_POSE) {
+		// don't drive forward if pointing away
+		// or if we're already very close to the target
+		speed = 0;
+	}
+	return speed;
+}
+
+double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const
 {
-	double dx = target(0) - pose(0);
-	double dy = target(1) - pose(1);
-	double targetAngle = atan2(dy, dx);
+	// If we're within 20cm of the target location, we want to turn the rover until
+	// we reach the target orientation. Otherwise, we want to turn the rover to
+	// aim it at the target location.
+	double targetAngle = target(2);
+	if (state == NavState::INIT) {
+		double dx = target(0) - pose(0);
+		double dy = target(1) - pose(1);
+		targetAngle = atan2(dy, dx);
+	}
 	targetAngle = transformAngle(pose(2), targetAngle);
 	thetaErr = targetAngle - pose(2);
 
 	return KP_ANGLE * thetaErr;
-}
-
-double dist(const point_t &p1, const point_t &p2)
-{
-	// TODO do we want to weight the theta difference differently?
-	return (p1-p2).norm();
 }
 
 void Autonomous::autonomyIter()
@@ -148,8 +165,8 @@ void Autonomous::autonomyIter()
 		bool landmarkVisible = leftPostLandmark[2] != 0;
 		if (landmarkFilter.getSize() > 0 || landmarkVisible)
 		{
-      // TODO shift the target location and orientation to align
-      // with the gate and/or avoid crashing into the post.
+			// TODO shift the target location and orientation to align
+			// with the gate and/or avoid crashing into the post.
 			if (!landmarkVisible)
 			{
 				// we have no new data, so use the data already in the filter
@@ -165,10 +182,19 @@ void Autonomous::autonomyIter()
 				driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
 			}
 		}
+
+		double d = dist(driveTarget, pose, 0);
+		// There's an overlap where either state might apply, to prevent rapidly switching
+		// back and forth between these two states.
+		if (d < 0.2) {
+			state = NavState::NEAR_TARGET_POSE;
+		}
+		if (d > 0.5) {
+			state = NavState::INIT;
+		}
 		double thetaErr;
 		double thetaVel = getThetaVel(driveTarget, pose, thetaErr);
-		double driveSpeed =
-			abs(thetaErr) < PI / 4 ? DRIVE_SPEED : 0; // don't drive forward if pointing away
+		double driveSpeed = getLinearVel(driveTarget, pose, thetaErr);
 
 		if (!Globals::E_STOP)
 		{
@@ -189,7 +215,7 @@ double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 	return dtheta;
 }
 
-pose_t Autonomous::getTargetPose()
+pose_t Autonomous::getTargetPose() const
 {
 	pose_t ret { target.approx_GPS(0), target.approx_GPS(1), 0.0 };
 	return ret;

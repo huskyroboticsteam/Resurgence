@@ -13,6 +13,11 @@
 #include "lidar/PointCloudProcessing.h"
 #include "simulator/utils.h"
 
+enum NavState {
+	INIT,
+	NEAR_TARGET_POSE
+};
+
 class Autonomous
 {
 public:
@@ -21,24 +26,24 @@ public:
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	// Gets the target's coordinate
-	pose_t getTargetPose();
+	pose_t getTargetPose() const;
 	void autonomyIter();
 
 private:
 	URCLeg target;
 	PoseEstimator poseEstimator;
-	int state;	// 1 is move forwards, 0 is turning, -1 is back up
-	float targetHeading;
-	int forwardCount; // Counter for how many times to move forwards after a set turn
-	bool rightTurn;	// boolean for turning right or turning towards target
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
 	RollingAvgFilter<5,3> landmarkFilter;
+	NavState state;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
 	double angleToTarget(const pose_t &gpsPose) const;
 	bool arrived(const pose_t &pose) const;
+
+	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
+	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
 
 	ObstacleMap obsMap;
 	Pather2 pather;
