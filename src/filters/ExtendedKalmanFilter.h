@@ -26,7 +26,7 @@ public:
 	 *
 	 * @param stdDevs The standard deviations of each element.
 	 */
-	NoiseCovMat(const Eigen::Matrix<double, size, 1> &stdDevs)
+	explicit NoiseCovMat(const Eigen::Matrix<double, size, 1> &stdDevs)
 		: NoiseCovMat(StateSpace::createCovarianceMatrix(stdDevs))
 	{
 	}
@@ -227,7 +227,7 @@ private:
 			Eigen::Matrix<double, numStates, processNoiseDim> jacobian;
 			for (int i = 0; i < processNoiseDim; i++)
 			{
-				processnoise_t delta = processnoise_t ::Zero();
+				processnoise_t delta = processnoise_t::Zero();
 				delta[i] = epsilon;
 				state_t derivative = (f(x, u, w + delta) - f(x, u, w - delta)) / (2 * epsilon);
 				jacobian.col(i) = derivative;
@@ -239,7 +239,7 @@ private:
 	Eigen::Matrix<double, numOutputs, numStates> getOutputFuncJacobianX(const outputfunc_t &f,
 																		const state_t &x) const
 	{
-		outputnoise_t v = outputnoise_t ::Zero();
+		outputnoise_t v = outputnoise_t::Zero();
 		// If we have an analytic solution, use that
 		if (outputFuncJacobianX)
 		{
@@ -262,7 +262,7 @@ private:
 	Eigen::Matrix<double, numOutputs, outputNoiseDim>
 	getOutputFuncJacobianV(const outputfunc_t &f, const state_t &x) const
 	{
-		outputnoise_t v = outputnoise_t ::Zero();
+		outputnoise_t v = outputnoise_t::Zero();
 		// If we have an analytic solution, use that
 		if (outputFuncJacobianV)
 		{

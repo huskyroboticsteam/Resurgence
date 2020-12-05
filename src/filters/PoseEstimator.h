@@ -26,7 +26,7 @@ public:
 	 * @param measurementStdDevs The standard deviations for each of the measurement elements.
 	 * 							 This represents additive noise in the measurements.
 	 * @param wheelBase The distance between the left and right wheels.
-	 * @param dt The time in seconds between updates. Used to discretize the system model.
+	 * @param dt The time in seconds between updates.
 	 */
 	PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 				  const Eigen::Vector3d &measurementStdDevs, double wheelBase, double dt);
