@@ -4,11 +4,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
-enable_testing()
-
-find_package(Catch2 REQUIRED)
-
 find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
@@ -67,7 +64,7 @@ add_executable(tests
   ${RoverCommonTest}
   Tests.cpp
   # AR Detection tests
-  ar/TagUnitTests.cpp
+  # ar/ARUnitTests.cpp
   ar/Tag.cpp
   # CAN tests
   Networking/tests.cpp
@@ -117,7 +114,7 @@ add_executable(visualizer_test
   )
 
 list(APPEND simulator_libs
-  sfml-graphics sfml-window sfml-system pthread)
+  sfml-graphics sfml-window sfml-system pthread Eigen3::Eigen)
 
 # My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
 find_package(Eigen3 REQUIRED)
@@ -134,6 +131,7 @@ include(CTest)
 include(Catch)
 target_link_libraries(tests Catch2::Catch2)
 target_link_libraries(tests ${OpenCV_LIBS})
+target_link_libraries(tests Eigen3::Eigen)
 catch_discover_tests(tests)
 
 add_executable(Server
@@ -141,6 +139,7 @@ add_executable(Server
 
 add_executable(TCPClient
   Networking/TCPClient.cpp)
+target_link_libraries(TCPClient Eigen3::Eigen)
 
 add_executable(FakeBaseStation
   Networking/FakeBaseStation.cpp)
