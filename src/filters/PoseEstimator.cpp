@@ -2,6 +2,9 @@
 
 #include "../simulator/constants.h"
 
+// Note: The state vector is defined as [x, y, theta].
+// The input vector is defined as [lVel, rVel].
+
 namespace
 {
 const double wheelBase = NavSim::ROBOT_WHEEL_BASE;
@@ -18,10 +21,14 @@ statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u,
 	Eigen::Matrix<double, 3, 2> trf;
 	trf << 0.5, 0.5, 0, 0, -1 / wheelBase, 1 / wheelBase;
 
+	// This represents [deltaX, 0, deltaTheta]
+	// however, this is "pre-transform". We will now transform it to give a more accurate
+	// deltaX and deltaY.
 	Eigen::Vector3d localUpdate = trf * input * dt;
 
 	double cosTheta = cos(theta);
 	double sinTheta = sin(theta);
+	// This matrix transforms from local space to map space.
 	Eigen::Matrix3d A;
 	A << cosTheta, -sinTheta, 0, sinTheta, cosTheta, 0, 0, 0, 1;
 
@@ -57,6 +64,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 		  measurementFunc,
 		  NoiseCovMat<numStates, 2, 2>(
 			  [inputNoiseGains](const statevec_t &x, const Eigen::Vector2d &u) {
+				  // TODO: verify this noise model on an actual robot
 				  Eigen::Vector2d stds = inputNoiseGains.array() * u.array().abs().sqrt();
 				  Eigen::Matrix<double, 2, 2> Q = StateSpace::createCovarianceMatrix(stds);
 				  return Q;
@@ -64,8 +72,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 		  NoiseCovMat<numStates, numStates, numStates>(measurementStdDevs), dt),
 	  dt(dt)
 {
-	//	ekf.stateFuncJacobianX = stateFuncJacobianX;
-	//	ekf.stateFuncJacobianU = stateFuncJacobianU;
+	// define the analytical solutions to the jacobians
 	ekf.outputFuncJacobianX = [](const statevec_t &x, const statevec_t &v) {
 		Eigen::Matrix<double, numStates, numStates> jacobian =
 			Eigen::Matrix<double, numStates, numStates>::Identity();
@@ -80,6 +87,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 
 void PoseEstimator::predict(double thetaVel, double xVel)
 {
+	// convert xVel, thetaVel to wheel velocities
 	double lVel = xVel - 0.5 * wheelBase * thetaVel;
 	double rVel = xVel + 0.5 * wheelBase * thetaVel;
 	Eigen::Vector2d u;

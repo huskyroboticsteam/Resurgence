@@ -8,8 +8,10 @@
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
  * The tracked states are x, y, and heading. All of these states are in map space.
+ * In most cases, you should probably use PoseEstimator instead. However, I don't think we
+ * should delete this until we confirm that PoseEstimator works on a real robot.
  */
-class PoseEstimatorLinear
+class [[deprecated]] PoseEstimatorLinear
 {
 public:
 	/**

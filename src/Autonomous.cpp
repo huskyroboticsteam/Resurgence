@@ -15,7 +15,7 @@ constexpr int numSamples = 1;
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: target(_target),
-		poseEstimator({1.2, 1.2}, gpsStdDev, 1.0 / controlHz),
+		poseEstimator({1.5, 1.5}, gpsStdDev, 1.0 / controlHz),
 		state(0),
 		targetHeading(-1),
 		forwardCount(-1),
