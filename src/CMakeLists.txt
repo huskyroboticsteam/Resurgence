@@ -114,7 +114,7 @@ add_executable(visualizer_test
   )
 
 list(APPEND simulator_libs
-  sfml-graphics sfml-window sfml-system X11 pthread Eigen3::Eigen)
+  sfml-graphics sfml-window sfml-system pthread Eigen3::Eigen)
 
 # My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
 find_package(Eigen3 REQUIRED)
