@@ -1,4 +1,4 @@
-#include "Eigen/Dense"
+#include <Eigen/Dense>
 
 class StateVector : public Eigen::VectorXd {
    public:
