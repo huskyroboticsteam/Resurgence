@@ -29,6 +29,7 @@ list(APPEND RoverCommonTest
   Autonomous.cpp
   Util.cpp
   simulator/utils.cpp
+  simulator/plan.cpp
   filters/PoseEstimator.cpp
   )
 

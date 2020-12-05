@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communcation from the base station
-    int urc_leg = 2;
+    int urc_leg = 5;
     Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp0, tp_start;
@@ -49,6 +49,8 @@ int main(int argc, char **argv)
         long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
         if (desiredUsecs - elapsedUsecs > 0) {
             usleep(desiredUsecs - elapsedUsecs);
+        } else {
+            std::cout << "Can't keep up with control frequency! Desired " << desiredUsecs/1000 << " elapsed " << elapsedUsecs/1000 << std::endl;
         }
     }
     return 0;
