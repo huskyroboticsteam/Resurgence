@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "mapper.h"
-#include "Eigen/Dense"
+#include <Eigen/Dense>
 #include "measurement_package.h"
 #include "helper/chisquare.h"
 #include "helper/matplotlibcpp.h"
