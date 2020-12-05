@@ -1,51 +1,50 @@
 #pragma once
 
-#include <vector>
 #include <cmath>
 #include <memory>
-#include "lidar/PointCloudProcessing.h"
-#include "WorldData.h"
-#include "FakeMap.h"
+#include <vector>
+
 #include "Pathfinding/ObstacleMap.h"
 #include "Pathfinding/Pather2.h"
-#include "simulator/utils.h"
 #include "Util.h"
+#include "WorldData.h"
+#include "filters/PoseEstimator.h"
+#include "filters/RollingAvgFilter.h"
+#include "lidar/PointCloudProcessing.h"
+#include "simulator/utils.h"
+
+enum NavState {
+	INIT,
+	NEAR_TARGET_POSE
+};
 
 class Autonomous
 {
 public:
-    Autonomous(PointXY);
-    //Returns a pair of floats, in heading, speed
-    //Accepts current heading of the robot as parameter
-    std::pair<float, float> getDirections(float currHeading);
-    //Gets the target's coordinate
-    PointXY getTarget();
-    void setWorldData(std::shared_ptr<WorldData>);
-    void autonomyIter();
+	explicit Autonomous(const URCLeg &target, double controlHz);
+	Autonomous(const URCLeg &target, double controlHz, const pose_t &startPose);
+	// Returns a pair of floats, in heading, speed
+	// Accepts current heading of the robot as parameter
+	// Gets the target's coordinate
+	pose_t getTargetPose() const;
+	void autonomyIter();
 
 private:
-    PointXY target;
-    float targetHeading;
-    int state;         //1 is move forwards, 0 is turning, -1 is back up
-    bool rightTurn; //boolean for turning right or turning towards target
-    int forwardCount; //Counter for how many times to move forwards after a set turn
-    std::shared_ptr<WorldData> worldData;
-    std::pair<float, float> stateForwards(float currHeading, std::pair<float, float> directions);
-    std::pair<float, float> stateTurn(float currHeading, std::pair<float, float> directions);
-    std::pair<float, float> stateBackwards(float currHeading, std::pair<float, float> directions);
+	URCLeg target;
+	PoseEstimator poseEstimator;
+	bool calibrated = false;
+	std::vector<pose_t> calibrationPoses{};
+	RollingAvgFilter<5,3> landmarkFilter;
+	NavState state;
 
-    // not guarenteed to have localization
-    double currHeading;
-    
-    //determine direction for robot at any given iteration
-    double pathDirection(points_t lidar, pose_t gpsPose);
-    double angleToTarget(pose_t gpsPose);
-    bool arrived(pose_t gpsPose);
+	// determine direction for robot at any given iteration
+	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
+	double angleToTarget(const pose_t &gpsPose) const;
+	bool arrived(const pose_t &pose) const;
 
-    //helpers to use simulator utils types
-    PointXY point_tToPointXY(point_t pnt);
-    const std::vector<PointXY> points_tToPointXYs(points_t pnts);
-    
-    ObstacleMap obsMap;
-    Pather2 pather;
+	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
+	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
+
+	ObstacleMap obsMap;
+	Pather2 pather;
 };
