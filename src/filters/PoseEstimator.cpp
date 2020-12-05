@@ -1,15 +1,11 @@
 #include "PoseEstimator.h"
 
-#include "../simulator/constants.h"
-
 // Note: The state vector is defined as [x, y, theta].
 // The input vector is defined as [lVel, rVel].
 
 namespace
 {
-const double wheelBase = NavSim::ROBOT_WHEEL_BASE;
-
-statevec_t stateFunc(double dt, const statevec_t &x, const Eigen::Vector2d &u,
+statevec_t stateFunc(double wheelBase, double dt, const statevec_t &x, const Eigen::Vector2d &u,
 					 const Eigen::Vector2d &w)
 {
 	// Instead of using euler integration, we can represent the pose update as a twist
@@ -58,9 +54,9 @@ Eigen::Vector3d measurementFunc(const statevec_t &x, const statevec_t &v)
 } // namespace
 
 PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
-							 const Eigen::Vector3d &measurementStdDevs, double dt)
-	: ekf([dt](const statevec_t &x, const Eigen::Vector2d &u,
-			   const Eigen::Vector2d &w) { return stateFunc(dt, x, u, w); },
+							 const Eigen::Vector3d &measurementStdDevs, double wheelBase, double dt)
+	: ekf([wheelBase, dt](const statevec_t &x, const Eigen::Vector2d &u,
+			   const Eigen::Vector2d &w) { return stateFunc(wheelBase, dt, x, u, w); },
 		  measurementFunc,
 		  NoiseCovMat<numStates, 2, 2>(
 			  [inputNoiseGains](const statevec_t &x, const Eigen::Vector2d &u) {
@@ -70,6 +66,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 				  return Q;
 			  }),
 		  NoiseCovMat<numStates, numStates, numStates>(measurementStdDevs), dt),
+	  wheelBase(wheelBase),
 	  dt(dt)
 {
 	// define the analytical solutions to the jacobians

@@ -25,10 +25,11 @@ public:
 	 * wheel velocity.
 	 * @param measurementStdDevs The standard deviations for each of the measurement elements.
 	 * 							 This represents additive noise in the measurements.
+	 * @param wheelBase The distance between the left and right wheels.
 	 * @param dt The time in seconds between updates. Used to discretize the system model.
 	 */
 	PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
-				  const Eigen::Vector3d &measurementStdDevs, double dt);
+				  const Eigen::Vector3d &measurementStdDevs, double wheelBase, double dt);
 
 	/**
 	 * Correct the pose estimation with measurement data.
@@ -90,5 +91,6 @@ public:
 
 private:
 	ExtendedKalmanFilter<numStates, 2, 3, 2, 3> ekf;
+	double wheelBase;
 	double dt;
 };
