@@ -32,7 +32,13 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &st
 double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 {
 	pose_t diff = p1 - p2;
-	diff(2) *= theta_weight;
+	// angles are modular in nature, so wrap at 2pi radians
+	double thetaDiff = std::fmod(abs(diff(2)), 2 * PI);
+	// change domain from [0, 2pi) to (-pi, pi]
+	if (thetaDiff > PI) {
+		thetaDiff -= 2 * PI;
+	}
+	diff(2) = thetaDiff * theta_weight;
 	return diff.norm();
 }
 
