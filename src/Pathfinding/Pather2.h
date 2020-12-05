@@ -20,6 +20,7 @@ public:
 
     // returns full path
     std::queue<PointXY> BFS(PointXY dest);
+    void updateMap(const std::vector<PointXY>& obstacles, float robotX, float robotY);
     
     PointXY mainBFS(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest);
 

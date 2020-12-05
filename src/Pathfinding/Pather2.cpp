@@ -95,9 +95,13 @@ std::queue<PointXY> Pather2::BFS(PointXY dest){
     return error;
 }
  
+void Pather2::updateMap(const std::vector<PointXY>& obstacles, float robotX, float robotY) {
+  obsMap.update(obstacles, robotX, robotY);
+}
+
 // helper BFS method to return first point in path
 PointXY Pather2::mainBFS(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest) {
-    obsMap.update(obstacles, robotX, robotY);
+    updateMap(obstacles, robotX, robotY);
     std::queue<PointXY> path = BFS(dest);
     return path.front();
 }
@@ -206,7 +210,6 @@ PointXY Pather2::relocateDestination(PointXY dest, int shrink_constant){
    }
    return dest;
 }
- 
  
 PointXY Pather2::getPath(const std::vector<PointXY>& obstacles, float robotX, float robotY, PointXY dest){
     PointXY rslt = mainBFS(obstacles, robotX, robotY, dest);

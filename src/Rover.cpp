@@ -1,3 +1,7 @@
+#include <time.h>
+#include <sys/time.h>
+#include <ctime>
+
 #include "CommandLineOptions.h"
 #include "Globals.h"
 #include "Networking/NetworkConstants.h"
@@ -14,6 +18,8 @@ void InitializeRover()
     InitializeBaseStationSocket();
 }
 
+const double CONTROL_HZ = 10.0;
+
 int main(int argc, char **argv)
 {
     world_interface_init();
@@ -22,11 +28,13 @@ int main(int argc, char **argv)
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communcation from the base station
-    PointXY target { 3.14, 2.71 };
-    Autonomous autonomous(target);
+    int urc_leg = 2;
+    Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
     char buffer[MAXLINE];
+    struct timeval tp0, tp_start;
     for(;;)
     {
+        gettimeofday(&tp_start, NULL);
         if (recvCANPacket(&packet) != 0) {
             ParseCANPacket(packet);
         }
@@ -35,6 +43,13 @@ int main(int argc, char **argv)
             ParseBaseStationPacket(buffer);
         }
         autonomous.autonomyIter();
+
+        gettimeofday(&tp0, NULL);
+        long elapsedUsecs = (tp0.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp0.tv_usec - tp_start.tv_usec);
+        long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
+        if (desiredUsecs - elapsedUsecs > 0) {
+            usleep(desiredUsecs - elapsedUsecs);
+        }
     }
     return 0;
 }

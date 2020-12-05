@@ -20,6 +20,7 @@ list(APPEND RoverCommonTest
   Networking/IK.cpp
   Networking/ParseCAN.cpp
   Networking/log.cpp
+  Networking/motor_interface.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/PortTemplate.c
@@ -28,6 +29,7 @@ list(APPEND RoverCommonTest
   Autonomous.cpp
   Util.cpp
   simulator/utils.cpp
+  filters/PoseEstimator.cpp
   )
 
 list(APPEND RoverCommon
@@ -61,7 +63,6 @@ add_executable(RoverSim
 add_executable(tests
   ${RoverCommonTest}
   Tests.cpp
-  simulator/noop_world.cpp
   # AR Detection tests
   # ar/ARUnitTests.cpp
   ar/Tag.cpp
@@ -69,9 +70,8 @@ add_executable(tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
   Networking/NetworkingStubs.cpp
+  Networking/real_world_interface.cpp
   # Autonomy tests
-  SimpleAutonomousTester.cpp
-  FakeMap.cpp
   mapping/ValidatorTest.cpp
   mapping/ObjectValidator.cpp
   mapping/EKFSlam/EKFSlam.cpp
@@ -106,13 +106,24 @@ add_executable(simulator_navigation_demo
   simulator/world.cpp
   )
 
-list(APPEND simulator_libs
-  sfml-graphics sfml-window sfml-system X11 pthread Eigen3::Eigen)
+add_executable(visualizer_test
+  Pathfinding/visualizer_test.cpp
+  Pathfinding/Visualizer.cpp
+  Pathfinding/Pather2.cpp
+  Pathfinding/ObstacleMap.cpp
+  )
 
-target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS} Eigen3::Eigen)
-target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS} Eigen3::Eigen)
-target_link_libraries(Rover ${OpenCV_LIBS} Eigen3::Eigen)
-target_link_libraries(RoverNoCAN ${OpenCV_LIBS} Eigen3::Eigen)
+list(APPEND simulator_libs
+  sfml-graphics sfml-window sfml-system pthread Eigen3::Eigen)
+
+# My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
+target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
+target_link_libraries(Rover ${OpenCV_LIBS})
+target_link_libraries(visualizer_test ${OpenCV_LIBS})
 target_link_libraries(RoverSim ${OpenCV_LIBS} ${simulator_libs})
 target_link_libraries(simulator_navigation_demo ${simulator_libs})
 
