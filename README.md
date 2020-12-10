@@ -10,6 +10,12 @@ Note: Terminal commands to perform many of these steps can be found in the file
 `tests-docker-action/entrypoint.sh`, which is used to automatically set up an
 Ubuntu computer in order to run our integration tests.
 
+**Note for Windows users:** It is highly recommended you use Windows Subsystem
+for Linux or a VM with a GNU/Linux distribution installed. If you are going to
+need USB hardware access (e.g. cameras, LIDAR, etc.) then it is highly
+recommended to use a VM, because WSL does not currently support hardware
+access.
+
 ## Install OpenCV
 OpenCV is a computer vision library that's used for the AR tag detection code
 and as such is needed to compile the project.
@@ -21,9 +27,13 @@ We need an extra module (ARUco) for OpenCV for the AR tag detection code which
 is not bundled with OpenCV, so you will have to install that module before
 building OpenCV. The below instructions will cover this.
 
-### On Windows (with Windows Subsystem for Linux)
-Open the WSL terminal and run the following commands (you can paste with right
-click):
+### On GNU/Linux (including Windows Subsystem for Linux)
+
+Open your terminal and execute the following commands. If you are using a
+GNU/Linux distribution natively or in a VM, you can often paste with
+`CTRL+SHIFT+v`. If you are using Windows Subsystem for Linux, these commands
+should be executed in your WSL terminal, and you can paste with right click.
+
 1. `sudo apt update && sudo apt -y dist-upgrade`
 2. `sudo apt install unzip git cmake g++ libgtk2.0-dev pkg-config libavcodec-dev
    libavformat-dev libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev
@@ -34,9 +44,18 @@ Now, to install the extra modules:
 3. `git clone https://github.com/opencv/opencv_contrib`
 4. `cd opencv_contrib`
 5. `git checkout 3.4.7`
+
+We will do the next two steps because the contrib repository comes with many
+extra modules, and we only need the one for ARUco. Copying it into its own
+directory will allow us to only build and include that one module instead of
+having to build all of them.
+
 6. `mkdir selected_modules`
 7. `cp -r modules/aruco selected_modules/`
-8. `cd`
+
+Return to your original directory.
+
+8. `cd ..`
 
 Now, to install and build OpenCV, with the extra modules:
 
@@ -50,16 +69,10 @@ Now, to install and build OpenCV, with the extra modules:
 15. `make -j$(nproc)` (The command `nproc` here will return the number of CPU
    cores on your computer, and will enable `make` to build in parallel, which
    will make the build process go faster.) This step will take a long
-   time and use nearly 100% CPU for that entire time, so be warned.
+   time and use nearly 100% CPU for that entire time, so be warned. If you are a
+   VM user, this process can go faster if you allocate more processor cores to
+   your VM.
 16. `sudo make install`
-   
-### On GNU/Linux
-If you are using a GNU/Linux distribution that supports APT, the instructions
-should be the same as for Windows above. If you are using a different
-distribution, the only steps that should be different are the first two, which
-are installing libraries and utilities OpenCV depends on. In this case you
-should install those libraries and utilities with your distribution's package
-manager.
 
 ### On Mac
 There is a Homebrew package available for OpenCV on Mac OS. Open the Terminal
@@ -74,16 +87,15 @@ These instructions assume you've followed the steps above to set up OpenCV,
 which should also set up some things in the process like the C++ compiler and
 CMake, or Homebrew for Mac users.
 
-### On Windows (with Windows Subsystem for Linux)
-Open the WSL terminal and run the following commands:
+### On GNU/Linux (including Windows Subsystem for Linux)
+Execute the following commands in your terminal:
 1. `git clone https://github.com/catchorg/Catch2.git`
 2. `cd Catch2`
-3. `git checkout v2.13.2`
-4. `cmake -Bbuild -H. -DBUILD_TESTING=OFF`
-5. `sudo cmake --build build/ --target install`
-
-### On GNU/Linux
-The instructions should be the same as for Windows above.
+3. `git checkout v2.13.3`
+4. `mkdir build`
+5. `cd build`
+6. `cmake -H.. -DBUILD_TESTING=OFF`
+7. `sudo cmake --build . --target install`
 
 ### On Mac
 There is a Homebrew package for Catch2 as well. Open the Terminal and run this
@@ -105,14 +117,6 @@ sudo make install
 
 Follow instructions in `src/simulator/README.md`, or just execute the commands
 from `tests-docker-action/entrypoint.sh`.
-
-## Setup CMake
-CMake is a tool we use that helps us compile our project with the libraries we
-use. This assumes that you have Ubuntu installed and configured.
-
-If you are using Windows, type this into your Ubuntu terminal and hit "return"
-to install the necessary files:
-`sudo apt install cmake g++ git`
 
 ## Setup Project Repository
 This step will require you to have CMake and Git. If you've followed the above
