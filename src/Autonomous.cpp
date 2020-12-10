@@ -211,9 +211,7 @@ void Autonomous::autonomyIter()
 			plan = getPlan(lidar_scan, point_t_goal, goal_radius);
 		}
 
-		int c;
-		while ((c = viz_window.pollWindowEvent()) != -1) {}
-		transform_t curr_odom = readOdom();
+		while (viz_window.pollWindowEvent() != -1) {}
 		viz_window.drawPoints(transformReadings(lidar_scan, VIZ_BASE_TF), sf::Color::Red, 3);
 		drawPose(pose, pose, sf::Color::Black);
 
