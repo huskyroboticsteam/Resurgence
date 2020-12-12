@@ -6,8 +6,8 @@
 #include "KalmanFilterBase.h"
 #include "StateSpaceUtil.h"
 
-template <int numStates, int numInputs, int numOutputs>
-class KalmanFilter : public KalmanFilterBase<numStates, numInputs, numOutputs>
+template <int stateDim, int inputDim, int outputDim>
+class KalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim>
 {
 public:
 	/**
@@ -26,30 +26,30 @@ public:
 	 * @return A Kalman Filter built for the specified system.
 	 */
 	static KalmanFilter
-	createContinuous(const Eigen::Matrix<double, numStates, numStates> &systemMat,
-					 const Eigen::Matrix<double, numStates, numInputs> &inputMat,
-					 const Eigen::Matrix<double, numOutputs, numStates> &outputMat,
-					 const Eigen::Matrix<double, numStates, 1> &stateStdDevs,
-					 const Eigen::Matrix<double, numOutputs, 1> &measurementStdDevs, double dt)
+	createContinuous(const Eigen::Matrix<double, stateDim, stateDim> &systemMat,
+					 const Eigen::Matrix<double, stateDim, inputDim> &inputMat,
+					 const Eigen::Matrix<double, outputDim, stateDim> &outputMat,
+					 const Eigen::Matrix<double, stateDim, 1> &stateStdDevs,
+					 const Eigen::Matrix<double, outputDim, 1> &measurementStdDevs, double dt)
 	{
-		Eigen::Matrix<double, numStates, numStates> stateCovarianceCont = StateSpace::createCovarianceMatrix(stateStdDevs);
-		Eigen::Matrix<double, numOutputs, numOutputs> measurementCovarianceCont =
+		Eigen::Matrix<double, stateDim, stateDim> stateCovarianceCont = StateSpace::createCovarianceMatrix(stateStdDevs);
+		Eigen::Matrix<double, outputDim, outputDim> measurementCovarianceCont =
 			StateSpace::createCovarianceMatrix(measurementStdDevs);
 
-		Eigen::Matrix<double, numStates, numStates> discA = systemMat;
-		Eigen::Matrix<double, numStates, numInputs> discB = inputMat;
+		Eigen::Matrix<double, stateDim, stateDim> discA = systemMat;
+		Eigen::Matrix<double, stateDim, inputDim> discB = inputMat;
 		StateSpace::continuousToDiscrete(discA, discB, dt);
 
-		Eigen::Matrix<double, numStates, numStates> stateCovariance = StateSpace::discretizeQ(systemMat, stateCovarianceCont, dt);
-		Eigen::Matrix<double, numOutputs, numOutputs> measurementCovariance = StateSpace::discretizeR(measurementCovarianceCont, dt);
+		Eigen::Matrix<double, stateDim, stateDim> stateCovariance = StateSpace::discretizeQ(systemMat, stateCovarianceCont, dt);
+		Eigen::Matrix<double, outputDim, outputDim> measurementCovariance = StateSpace::discretizeR(measurementCovarianceCont, dt);
 
 		// solve DARE for asymptotic state error covariance matrix
-		Eigen::Matrix<double, numStates, numStates> P = StateSpace::DARE(discA.transpose(), outputMat.transpose(), stateCovariance,
+		Eigen::Matrix<double, stateDim, stateDim> P = StateSpace::DARE(discA.transpose(), outputMat.transpose(), stateCovariance,
 									measurementCovariance);
 
-		Eigen::Matrix<double, numOutputs, numOutputs> S = outputMat * P * outputMat.transpose() + measurementCovariance;
+		Eigen::Matrix<double, outputDim, outputDim> S = outputMat * P * outputMat.transpose() + measurementCovariance;
 		// This is the Kalman gain matrix, used to weight the GPS data against the model data
-		Eigen::Matrix<double, numStates, numOutputs> gainMatrix =
+		Eigen::Matrix<double, stateDim, outputDim> gainMatrix =
 			S.transpose().colPivHouseholderQr().solve((outputMat * P.transpose()).transpose());
 
 		return KalmanFilter(discA, discB, outputMat, stateCovariance, measurementCovariance,
@@ -72,65 +72,65 @@ public:
 	 * @return A Kalman Filter built for the specified system.
 	 */
 	static KalmanFilter
-	createDiscrete(const Eigen::Matrix<double, numStates, numStates> &systemMat,
-				   const Eigen::Matrix<double, numStates, numInputs> &inputMat,
-				   const Eigen::Matrix<double, numOutputs, numStates> &outputMat,
-				   const Eigen::Matrix<double, numStates, 1> &stateStdDevs,
-				   const Eigen::Matrix<double, numOutputs, 1> &measurementStdDevs, double dt)
+	createDiscrete(const Eigen::Matrix<double, stateDim, stateDim> &systemMat,
+				   const Eigen::Matrix<double, stateDim, inputDim> &inputMat,
+				   const Eigen::Matrix<double, outputDim, stateDim> &outputMat,
+				   const Eigen::Matrix<double, stateDim, 1> &stateStdDevs,
+				   const Eigen::Matrix<double, outputDim, 1> &measurementStdDevs, double dt)
 	{
-		Eigen::Matrix<double, numStates, numStates> stateCovarianceCont = StateSpace::createCovarianceMatrix(stateStdDevs);
-		Eigen::Matrix<double, numOutputs, numOutputs> measurementCovarianceCont =
+		Eigen::Matrix<double, stateDim, stateDim> stateCovarianceCont = StateSpace::createCovarianceMatrix(stateStdDevs);
+		Eigen::Matrix<double, outputDim, outputDim> measurementCovarianceCont =
 			StateSpace::createCovarianceMatrix(measurementStdDevs);
 
-		Eigen::Matrix<double, numStates, numStates> contA = systemMat;
-		Eigen::Matrix<double, numStates, numInputs> contB = inputMat;
+		Eigen::Matrix<double, stateDim, stateDim> contA = systemMat;
+		Eigen::Matrix<double, stateDim, inputDim> contB = inputMat;
 		StateSpace::discreteToContinuous(contA, contB, dt);
 
-		Eigen::Matrix<double, numStates, numStates> stateCovariance = StateSpace::discretizeQ(contA, stateCovarianceCont, dt);
-		Eigen::Matrix<double, numOutputs, numOutputs> measurementCovariance = StateSpace::discretizeR(measurementCovarianceCont, dt);
+		Eigen::Matrix<double, stateDim, stateDim> stateCovariance = StateSpace::discretizeQ(contA, stateCovarianceCont, dt);
+		Eigen::Matrix<double, outputDim, outputDim> measurementCovariance = StateSpace::discretizeR(measurementCovarianceCont, dt);
 
 		// solve DARE for asymptotic state error covariance matrix
-		Eigen::Matrix<double, numStates, numStates> P = StateSpace::DARE(systemMat.transpose().eval(), outputMat.transpose().eval(),
+		Eigen::Matrix<double, stateDim, stateDim> P = StateSpace::DARE(systemMat.transpose().eval(), outputMat.transpose().eval(),
 									stateCovariance, measurementCovariance);
 
 		// The following math is derived from the asymptotic form:
 		// https://en.wikipedia.org/wiki/Kalman_filter#Asymptotic_form
-		Eigen::Matrix<double, numOutputs, numOutputs> S = outputMat * P * outputMat.transpose() + measurementCovariance;
+		Eigen::Matrix<double, outputDim, outputDim> S = outputMat * P * outputMat.transpose() + measurementCovariance;
 		// This is the Kalman gain matrix, used to weight the GPS data against the model data
-		Eigen::Matrix<double, numStates, numOutputs> gainMatrix =
+		Eigen::Matrix<double, stateDim, outputDim> gainMatrix =
 			S.transpose().colPivHouseholderQr().solve(outputMat * P.transpose()).transpose();
 
 		return KalmanFilter(systemMat, inputMat, outputMat, stateCovariance,
 							measurementCovariance, gainMatrix);
 	}
 
-	void correct(const Eigen::Matrix<double, numStates, 1> &measurement) override
+	void correct(const Eigen::Matrix<double, stateDim, 1> &measurement) override
 	{
 		this->xHat = this->xHat + K * (measurement - C * this->xHat);
-		this->P = (Eigen::Matrix<double, numStates, numStates>::Identity() - K * C) * this->P;
+		this->P = (Eigen::Matrix<double, stateDim, stateDim>::Identity() - K * C) * this->P;
 	}
 
-	void predict(const Eigen::Matrix<double, numInputs, 1> &input) override
+	void predict(const Eigen::Matrix<double, inputDim, 1> &input) override
 	{
 		this->xHat = A * this->xHat + B * input;
 		this->P = A * this->P * A.transpose() + Q;
 	}
 
 private:
-	Eigen::Matrix<double, numStates, numStates> A;
-	Eigen::Matrix<double, numStates, numInputs> B;
-	Eigen::Matrix<double, numInputs, numStates> C;
-	Eigen::Matrix<double, numStates, numStates> Q;
-	Eigen::Matrix<double, numOutputs, numOutputs> R;
-	Eigen::Matrix<double, numStates, numOutputs> K;
+	Eigen::Matrix<double, stateDim, stateDim> A;
+	Eigen::Matrix<double, stateDim, inputDim> B;
+	Eigen::Matrix<double, inputDim, stateDim> C;
+	Eigen::Matrix<double, stateDim, stateDim> Q;
+	Eigen::Matrix<double, outputDim, outputDim> R;
+	Eigen::Matrix<double, stateDim, outputDim> K;
 
 	// Assumes all discrete matrices
-	KalmanFilter(const Eigen::Matrix<double, numStates, numStates> &A,
-				 const Eigen::Matrix<double, numStates, numInputs> &B,
-				 const Eigen::Matrix<double, numInputs, numStates> &C,
-				 const Eigen::Matrix<double, numStates, numStates> &Q,
-				 const Eigen::Matrix<double, numOutputs, numOutputs> &R,
-				 const Eigen::Matrix<double, numStates, numOutputs> &K)
+	KalmanFilter(const Eigen::Matrix<double, stateDim, stateDim> &A,
+				 const Eigen::Matrix<double, stateDim, inputDim> &B,
+				 const Eigen::Matrix<double, inputDim, stateDim> &C,
+				 const Eigen::Matrix<double, stateDim, stateDim> &Q,
+				 const Eigen::Matrix<double, outputDim, outputDim> &R,
+				 const Eigen::Matrix<double, stateDim, outputDim> &K)
 		: A(A), B(B), C(C), Q(Q), R(R), K(K)
 	{
 	}

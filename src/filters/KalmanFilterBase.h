@@ -4,12 +4,12 @@
 
 #include "StateSpaceUtil.h"
 
-template <int numStates, int numInputs, int numOutputs> class KalmanFilterBase
+template <int stateDim, int inputDim, int outputDim> class KalmanFilterBase
 {
 public:
 	KalmanFilterBase()
-		: xHat(Eigen::Matrix<double, numStates, 1>::Zero()),
-		  P(Eigen::Matrix<double, numStates, numStates>::Identity() * 1e5)
+		: xHat(Eigen::Matrix<double, stateDim, 1>::Zero()),
+		  P(Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5)
 	{
 	}
 
@@ -19,14 +19,14 @@ public:
 	 *
 	 * @param measurement The measurement to use to correct the filter.
 	 */
-	virtual void correct(const Eigen::Matrix<double, numOutputs, 1> &measurement) = 0;
+	virtual void correct(const Eigen::Matrix<double, outputDim, 1> &measurement) = 0;
 
 	/**
 	 * Use the model to predict the next system state, given the current inputs.
 	 *
 	 * @param input The current inputs to the system.
 	 */
-	virtual void predict(const Eigen::Matrix<double, numInputs, 1> &input) = 0;
+	virtual void predict(const Eigen::Matrix<double, inputDim, 1> &input) = 0;
 
 	/**
 	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix to
@@ -34,7 +34,7 @@ public:
 	 */
 	void reset()
 	{
-		reset(Eigen::Matrix<double, numStates, 1>::Zero());
+		reset(Eigen::Matrix<double, stateDim, 1>::Zero());
 	}
 
 	/**
@@ -43,10 +43,10 @@ public:
 	 *
 	 * @param state The state to which the state estimate will be set.
 	 */
-	void reset(const Eigen::Matrix<double, numStates, 1> &state)
+	void reset(const Eigen::Matrix<double, stateDim, 1> &state)
 	{
-		Eigen::Matrix<double, numStates, numStates> newP =
-			Eigen::Matrix<double, numStates, numStates>::Identity() * 1e5;
+		Eigen::Matrix<double, stateDim, stateDim> newP =
+			Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5;
 		reset(state, newP);
 	}
 
@@ -57,8 +57,8 @@ public:
 	 * @param stdDevs The standard deviation of the measurement of each element in the state
 	 * vector.
 	 */
-	void reset(const Eigen::Matrix<double, numStates, 1> &state,
-			   const Eigen::Matrix<double, numStates, 1> &stdDevs)
+	void reset(const Eigen::Matrix<double, stateDim, 1> &state,
+			   const Eigen::Matrix<double, stateDim, 1> &stdDevs)
 	{
 		reset(state, StateSpace::createCovarianceMatrix(stdDevs));
 	}
@@ -70,8 +70,8 @@ public:
 	 * @param state
 	 * @param estCovMat
 	 */
-	void reset(const Eigen::Matrix<double, numStates, 1> &state,
-			   const Eigen::Matrix<double, numStates, numStates> &estCovMat)
+	void reset(const Eigen::Matrix<double, stateDim, 1> &state,
+			   const Eigen::Matrix<double, stateDim, stateDim> &estCovMat)
 	{
 		xHat = state;
 		P = estCovMat;
@@ -82,7 +82,7 @@ public:
 	 *
 	 * @return The state estimate.
 	 */
-	Eigen::Matrix<double, numStates, 1> getState() const
+	Eigen::Matrix<double, stateDim, 1> getState() const
 	{
 		return xHat;
 	}
@@ -93,12 +93,12 @@ public:
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
 	 */
-	Eigen::Matrix<double, numStates, numStates> getEstimateCovarianceMat() const
+	Eigen::Matrix<double, stateDim, stateDim> getEstimateCovarianceMat() const
 	{
 		return P;
 	}
 
 protected:
-	Eigen::Matrix<double, numStates, numStates> P;
-	Eigen::Matrix<double, numStates, 1> xHat;
+	Eigen::Matrix<double, stateDim, stateDim> P;
+	Eigen::Matrix<double, stateDim, 1> xHat;
 };
