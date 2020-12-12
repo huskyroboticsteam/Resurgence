@@ -11,13 +11,15 @@
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
+const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
+constexpr int numSamples = 1;
 
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: viz_window("Planning visualization"),
 		target(_target),
-		poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
+		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter(),
@@ -73,8 +75,7 @@ double Autonomous::angleToTarget(const pose_t &gpsPose) const
 bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &out)
 {
 	poses.push_back(pose);
-	// 62 samples with 2m std dev and 95% confidence interval gives about +-0.5m
-	if (poses.size() == 5)
+	if (poses.size() == numSamples)
 	{
 		pose_t sum;
 		for (const pose_t &p : poses)
@@ -146,14 +147,13 @@ void Autonomous::autonomyIter()
 	// If we haven't calibrated position, do so now
 	if (!calibrated)
 	{
-		std::cout << "Calibrating..." << std::endl;
 		pose_t out;
 		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
 		{
-			poseEstimator.reset(out);
+			// the standard error of the calculated mean is the std dev of the mean
+			poseEstimator.reset(out, gpsStdDev / sqrt((double)numSamples));
 			calibrated = true;
 			calibrationPoses.clear();
-			std::cout << "Pose:\n" << out << std::endl;
 		}
 		else
 		{
@@ -173,7 +173,7 @@ void Autonomous::autonomyIter()
 	{
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
-					<< std::endl;
+				  << std::endl;
 		landmarkFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
@@ -183,7 +183,7 @@ void Autonomous::autonomyIter()
 
 		// if we have some existing data or new data, set the target using the landmark
 		// data
-		bool landmarkVisible = leftPostLandmark[2] != 0;
+		bool landmarkVisible = leftPostLandmark(2) != 0;
 		if (landmarkFilter.getSize() > 0 || landmarkVisible)
 		{
 			// TODO shift the target location and orientation to align
@@ -278,6 +278,6 @@ double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 
 pose_t Autonomous::getTargetPose() const
 {
-	pose_t ret { target.approx_GPS(0), target.approx_GPS(1), 0.0 };
+	pose_t ret{target.approx_GPS(0), target.approx_GPS(1), 0.0};
 	return ret;
 }

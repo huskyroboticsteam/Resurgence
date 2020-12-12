@@ -10,6 +10,8 @@ namespace Constants
     constexpr double SHOULDER_LENGTH = 0.6; //placeholder(m)
     constexpr double ELBOW_LENGTH = 0.7; //placeholder(m)
 
+	constexpr double WHEEL_BASE = 2./3.;
+
     // Joint limits
     constexpr double ARM_BASE_MIN = -M_PI/2;
     constexpr double ARM_BASE_MAX = M_PI/2;
