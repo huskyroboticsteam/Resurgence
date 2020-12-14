@@ -115,6 +115,8 @@ add_executable(visualizer_test
   Pathfinding/ObstacleMap.cpp
   )
 
+add_subdirectory(ar)
+
 list(APPEND sfml_libs
   sfml-graphics sfml-window sfml-system pthread Eigen3::Eigen)
 
