@@ -3,7 +3,10 @@
 #include <Eigen/Core>
 
 #include "../simulator/utils.h"
-#include "KalmanFilter.h"
+#include "ExtendedKalmanFilter.h"
+
+constexpr int numStates = 3;
+using statevec_t = Eigen::Matrix<double, numStates, 1>;
 
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
@@ -15,14 +18,18 @@ public:
 	/**
 	 * Create a new Pose Estimator.
 	 *
-	 * @param stateStdDevs The standard deviations for each of the state elements.
-	 * 					   This represents noise in the system model.
+	 * @param inputNoiseGains The gain for the noise in each dimension of the input space.
+	 * This pose estimator models process noise as noise applied to the wheel velocities
+	 * with standard deviation proportional to the wheel velocity. The standard deviation of
+	 * the noise is modelled as k * sqrt(abs(v)) where k is the input noise gain and v is the
+	 * wheel velocity.
 	 * @param measurementStdDevs The standard deviations for each of the measurement elements.
-	 * 							 This represents noise in the measurements.
-	 * @param dt The time in seconds between updates. Used to discretize the system model.
+	 * 							 This represents additive noise in the measurements.
+	 * @param wheelBase The distance between the left and right wheels.
+	 * @param dt The time in seconds between updates.
 	 */
-	PoseEstimator(const Eigen::Vector3d &stateStdDevs,
-				  const Eigen::Vector3d &measurementStdDevs, double dt);
+	PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
+				  const Eigen::Vector3d &measurementStdDevs, double wheelBase, double dt);
 
 	/**
 	 * Correct the pose estimation with measurement data.
@@ -46,23 +53,34 @@ public:
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
 	 */
-	Eigen::Matrix3d getEstimateCovarianceMat() const;
+	Eigen::Matrix<double, numStates, numStates> getEstimateCovarianceMat() const;
 
 	/**
-	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
+	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix
+	 * to a diagonal matrix with large values to reflect complete uncertainty in the current
+	 * pose. If you have any information about the current pose, use reset(const pose_t &,
+	 * const pose_t &)
 	 */
-	void reset()
-	{
-		reset(Eigen::Vector3d::Zero());
-	}
+	void reset();
 
 	/**
-	 * Sets the state estimate to the supplied vector and resets the estimate covariance
-	 * matrix.
+	 * Sets the state estimate to the supplied vector and resets the estimate covariance matrix
+	 * to a diagonal matrix with large values to reflect complete uncertainty in the current
+	 * pose. If you have any information about the current pose, use reset(const pose_t &,
+	 * const pose_t &)
 	 *
 	 * @param pose The pose to which the state estimate will be set.
 	 */
 	void reset(const pose_t &pose);
+
+	/**
+	 * Sets the state estimate to the supplied vector and sets the estimate covariance matrix
+	 * to reflect the given uncertainty.
+	 *
+	 * @param pose The pose to which the state estimate will be set.
+	 * @param stdDevs The standard deviation for each element in the pose.
+	 */
+	void reset(const pose_t &pose, const pose_t &stdDevs);
 
 	/**
 	 * Gets the current state estimate.
@@ -72,6 +90,7 @@ public:
 	pose_t getPose() const;
 
 private:
-	KalmanFilter<3,3> kf;
+	ExtendedKalmanFilter<numStates, 2, 3, 2, 3> ekf;
+	double wheelBase;
 	double dt;
 };

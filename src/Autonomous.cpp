@@ -6,19 +6,28 @@
 
 #include "Globals.h"
 #include "simulator/world_interface.h"
+#include "simulator/constants.h"
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
+const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
+constexpr int numSamples = 1;
 
+const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: target(_target),
-		poseEstimator({0.8, 0.8, 0.6}, {2, 2, PI / 24}, 1.0 / controlHz),
+	: viz_window("Planning visualization"),
+		target(_target),
+		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter(),
-		state(NavState::INIT)
+		state(NavState::INIT),
+		clock_counter(0),
+		plan(0,2),
+		plan_base({0,0,0}),
+		plan_idx(0)
 {
 }
 
@@ -32,8 +41,22 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &st
 double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 {
 	pose_t diff = p1 - p2;
-	diff(2) *= theta_weight;
+	// angles are modular in nature, so wrap at 2pi radians
+	double thetaDiff = std::fmod(abs(diff(2)), 2 * PI);
+	// change domain from [0, 2pi) to (-pi, pi]
+	if (thetaDiff > PI) {
+		thetaDiff -= 2 * PI;
+	}
+	diff(2) = thetaDiff * theta_weight;
 	return diff.norm();
+}
+
+void Autonomous::drawPose(pose_t &pose, pose_t &current_pose, sf::Color c)
+{
+	// Both poses are given in the same frame. (usually GPS frame)
+	// `current_pose` is the current location of the robot, `pose` is the pose we wish to draw
+	transform_t inv_curr = toTransform(current_pose).inverse();
+	viz_window.drawRobot(toTransform(pose) * inv_curr * VIZ_BASE_TF, c);
 }
 
 bool Autonomous::arrived(const pose_t &pose) const
@@ -52,8 +75,7 @@ double Autonomous::angleToTarget(const pose_t &gpsPose) const
 bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &out)
 {
 	poses.push_back(pose);
-	// 62 samples with 2m std dev and 95% confidence interval gives about +-0.5m
-	if (poses.size() == 5)
+	if (poses.size() == numSamples)
 	{
 		pose_t sum;
 		for (const pose_t &p : poses)
@@ -125,14 +147,13 @@ void Autonomous::autonomyIter()
 	// If we haven't calibrated position, do so now
 	if (!calibrated)
 	{
-		std::cout << "Calibrating..." << std::endl;
 		pose_t out;
 		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
 		{
-			poseEstimator.reset(out);
+			// the standard error of the calculated mean is the std dev of the mean
+			poseEstimator.reset(out, gpsStdDev / sqrt((double)numSamples));
 			calibrated = true;
 			calibrationPoses.clear();
-			std::cout << "Pose:\n" << out << std::endl;
 		}
 		else
 		{
@@ -152,7 +173,7 @@ void Autonomous::autonomyIter()
 	{
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
-					<< std::endl;
+				  << std::endl;
 		landmarkFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
@@ -162,7 +183,7 @@ void Autonomous::autonomyIter()
 
 		// if we have some existing data or new data, set the target using the landmark
 		// data
-		bool landmarkVisible = leftPostLandmark[2] != 0;
+		bool landmarkVisible = leftPostLandmark(2) != 0;
 		if (landmarkFilter.getSize() > 0 || landmarkVisible)
 		{
 			// TODO shift the target location and orientation to align
@@ -183,6 +204,50 @@ void Autonomous::autonomyIter()
 			}
 		}
 
+		const points_t lidar_scan = readLidarScan();
+		bool should_replan = ((clock_counter++) % 20 == 0); // TODO make this configurable
+		if (should_replan) {
+			plan_base = pose;
+			plan_idx = 0;
+			point_t point_t_goal;
+			point_t_goal.topRows(2) = driveTarget.topRows(2);
+			point_t_goal(2) = 1.0;
+			point_t_goal = toTransform(pose) * point_t_goal;
+			double goal_radius = 2.0;
+			plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+		}
+
+		while (viz_window.pollWindowEvent() != -1) {}
+		viz_window.drawPoints(transformReadings(lidar_scan, VIZ_BASE_TF), sf::Color::Red, 3);
+		drawPose(pose, pose, sf::Color::Black);
+
+		int plan_size = plan.rows();
+		if (plan_size == 0 && dist(driveTarget, pose, 1.0) < 2.0) {
+			// We're probably within planning resolution of the goal,
+			// so using the goal as the drive target makes sense.
+		} else {
+			// Roll out the plan until we find a target pose a certain distance in front
+			// of the robot. (This code also handles visualizing the plan.)
+			pose_t plan_pose = plan_base;
+			drawPose(plan_pose, pose, sf::Color::Red);
+			bool found_target = false;
+			for (int i = 0; i < plan_size; i++) {
+				action_t action = plan.row(i);
+				plan_pose(2) += action(0);
+				plan_pose(0) += action(1) * cos(plan_pose(2));
+				plan_pose(1) += action(1) * sin(plan_pose(2));
+				if (i >= plan_idx && !found_target && dist(plan_pose, pose, 1.0) > 5.0) {
+					found_target = true;
+					plan_idx = i;
+					driveTarget = plan_pose;
+					drawPose(plan_pose, pose, sf::Color::Blue);
+				} else {
+					drawPose(plan_pose, pose, sf::Color::Red);
+				}
+			}
+		}
+		viz_window.display();
+
 		double d = dist(driveTarget, pose, 0);
 		// There's an overlap where either state might apply, to prevent rapidly switching
 		// back and forth between these two states.
@@ -200,10 +265,6 @@ void Autonomous::autonomyIter()
 		{
 			setCmdVel(thetaVel, driveSpeed);
 			poseEstimator.predict(thetaVel, driveSpeed);
-
-			std::cout << "ThetaVel: " << thetaVel << " DriveVel: " << driveSpeed
-						<< " thetaErr: " << thetaErr << " targetX: " << driveTarget(0)
-						<< " targetY: " << driveTarget(1) << std::endl;
 		}
 	}
 }
@@ -217,6 +278,6 @@ double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 
 pose_t Autonomous::getTargetPose() const
 {
-	pose_t ret { target.approx_GPS(0), target.approx_GPS(1), 0.0 };
+	pose_t ret{target.approx_GPS(0), target.approx_GPS(1), 0.0};
 	return ret;
 }

@@ -29,7 +29,10 @@ list(APPEND RoverCommonTest
   Autonomous.cpp
   Util.cpp
   simulator/utils.cpp
+  simulator/plan.cpp
+  simulator/graphics.cpp
   filters/PoseEstimator.cpp
+  filters/PoseEstimatorLinear.cpp
   )
 
 list(APPEND RoverCommon
@@ -56,7 +59,6 @@ add_executable(RoverSim
   #simulator/plan.cpp
   #simulator/search.cpp
   simulator/utils.cpp
-  simulator/graphics.cpp
   simulator/simulator_world.cpp
   simulator/world.cpp)
 
@@ -113,7 +115,9 @@ add_executable(visualizer_test
   Pathfinding/ObstacleMap.cpp
   )
 
-list(APPEND simulator_libs
+add_subdirectory(ar)
+
+list(APPEND sfml_libs
   sfml-graphics sfml-window sfml-system pthread Eigen3::Eigen)
 
 # My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
@@ -123,9 +127,12 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS})
+target_link_libraries(RoverNoCAN ${sfml_libs})
+target_link_libraries(Rover ${sfml_libs})
 target_link_libraries(visualizer_test ${OpenCV_LIBS})
-target_link_libraries(RoverSim ${OpenCV_LIBS} ${simulator_libs})
-target_link_libraries(simulator_navigation_demo ${simulator_libs})
+target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs})
+target_link_libraries(simulator_navigation_demo ${sfml_libs})
+target_link_libraries(tests ${sfml_libs})
 
 include(CTest)
 include(Catch)
