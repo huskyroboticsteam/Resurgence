@@ -44,7 +44,7 @@ pose_t DiffDriveKinematics::getLocalPoseUpdate(const wheelvel_t &wheelVel, doubl
 pose_t DiffDriveKinematics::getPoseUpdate(const wheelvel_t &wheelVel, double heading,
 										  double dt) const
 {
-	return toTransformRotateFirst(0, 0, heading) * getLocalPoseUpdate(wheelVel, dt);
+	return toTransformRotateFirst(0, 0, -heading) * getLocalPoseUpdate(wheelVel, dt);
 }
 
 pose_t DiffDriveKinematics::getNextPose(const wheelvel_t &wheelVel, const pose_t &pose,
