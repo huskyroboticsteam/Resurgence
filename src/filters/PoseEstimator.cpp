@@ -5,46 +5,12 @@
 
 namespace
 {
-statevec_t stateFunc(double wheelBase, double dt, const statevec_t &x, const Eigen::Vector2d &u,
-					 const Eigen::Vector2d &w)
+statevec_t stateFunc(const DiffDriveKinematics &kinematics, double dt, const statevec_t &x,
+					 const Eigen::Vector2d &u, const Eigen::Vector2d &w)
 {
-	// Instead of using euler integration, we can represent the pose update as a twist
-	// and then apply that twist to the current pose. Derived from differential drive kinematics.
-	// This will be more accurate than euler integration at slower update rates.
 	Eigen::Vector2d input = u + w; // noise is applied to the input vector
-	double theta = x(2);
-
-	Eigen::Matrix<double, 3, 2> trf;
-	trf << 0.5, 0.5, 0, 0, -1 / wheelBase, 1 / wheelBase;
-
-	// This represents [deltaX, 0, deltaTheta]
-	// however, this is "pre-transform". We will now transform it to give a more accurate
-	// deltaX and deltaY.
-	Eigen::Vector3d localUpdate = trf * input * dt;
-
-	double cosTheta = cos(theta);
-	double sinTheta = sin(theta);
-	// This matrix transforms from local space to map space.
-	Eigen::Matrix3d A;
-	A << cosTheta, -sinTheta, 0, sinTheta, cosTheta, 0, 0, 0, 1;
-
-	double dTheta = localUpdate(2);
-	Eigen::Matrix3d B;
-	// If dTheta is close to 0 use the taylor series approximation
-	if (abs(dTheta) <= 1e-9)
-	{
-		B << 1 - dTheta * dTheta / 6.0, -dTheta / 2.0, 0, dTheta / 2.0,
-			1 - dTheta * dTheta / 6.0, 0, 0, 0, 1;
-	}
-	else
-	{
-		double sinDTheta = sin(dTheta);
-		double cosDTheta = cos(dTheta);
-		B << sinDTheta, cosDTheta - 1, 0, 1 - cosDTheta, sinDTheta, 0, 0, 0, dTheta;
-		B /= dTheta;
-	}
-
-	return x + A * B * localUpdate;
+	wheelvel_t wheelVel{input(0), input(1)};
+	return kinematics.getNextPose(wheelVel, x, dt);
 }
 
 Eigen::Vector3d measurementFunc(const statevec_t &x, const statevec_t &v)
@@ -54,9 +20,12 @@ Eigen::Vector3d measurementFunc(const statevec_t &x, const statevec_t &v)
 } // namespace
 
 PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
-							 const Eigen::Vector3d &measurementStdDevs, double wheelBase, double dt)
-	: ekf([wheelBase, dt](const statevec_t &x, const Eigen::Vector2d &u,
-			   const Eigen::Vector2d &w) { return stateFunc(wheelBase, dt, x, u, w); },
+							 const Eigen::Vector3d &measurementStdDevs, double wheelBase,
+							 double dt)
+	: ekf(
+		  [this](const statevec_t &x, const Eigen::Vector2d &u, const Eigen::Vector2d &w) {
+			  return stateFunc(this->kinematics, this->dt, x, u, w);
+		  },
 		  measurementFunc,
 		  NoiseCovMat<numStates, 2, 2>(
 			  [inputNoiseGains](const statevec_t &x, const Eigen::Vector2d &u) {
@@ -66,8 +35,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 				  return Q;
 			  }),
 		  NoiseCovMat<numStates, numStates, numStates>(measurementStdDevs), dt),
-	  wheelBase(wheelBase),
-	  dt(dt)
+	  kinematics(wheelBase), dt(dt)
 {
 	// define the analytical solutions to the jacobians
 	ekf.outputFuncJacobianX = [](const statevec_t &x, const statevec_t &v) {
@@ -85,10 +53,9 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
 void PoseEstimator::predict(double thetaVel, double xVel)
 {
 	// convert xVel, thetaVel to wheel velocities
-	double lVel = xVel - 0.5 * wheelBase * thetaVel;
-	double rVel = xVel + 0.5 * wheelBase * thetaVel;
+	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(xVel, thetaVel);
 	Eigen::Vector2d u;
-	u << lVel, rVel;
+	u << wheelVels.lVel, wheelVels.rVel;
 	ekf.predict(u);
 }
 
