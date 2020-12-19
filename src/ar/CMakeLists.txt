@@ -1,8 +1,17 @@
 find_package(OpenCV REQUIRED)
-add_executable(ar_test
+
+add_executable(ar_tester
   ARTester.cpp
   Detector.cpp
   Tag.cpp
   ../Util.cpp)
-target_link_libraries(ar_test ${OpenCV_LIBS})
-set_property(TARGET ar_test PROPERTY CXX_STANDARD 14)
+
+add_executable(calibration
+  calibration.cpp)
+
+target_link_libraries(ar_tester ${OpenCV_LIBS})
+target_link_libraries(calibration ${OpenCV_LIBS})
+
+set_property(TARGET ar_tester PROPERTY CXX_STANDARD 14)
+set_property(TARGET ar_tester PROPERTY EXCLUDE_FROM_ALL true)
+set_property(TARGET calibration PROPERTY EXCLUDE_FROM_ALL true)
