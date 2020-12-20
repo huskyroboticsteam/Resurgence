@@ -48,18 +48,6 @@ public:
 	 * Calculate the pose update in the local reference frame assuming the left and right
 	 * wheels have constant velocity.
 	 *
-	 * @param lVel The constant velocity of the left wheel.
-	 * @param rVel The constant velocity of the right wheel.
-	 * @param dt The elapsed time in seconds for which the update is calculated. The robot
-	 * has been moving at the specified velocity for this much time.
-	 * @return
-	 */
-	pose_t getLocalPoseUpdate(double lVel, double rVel, double dt) const;
-
-	/**
-	 * Calculate the pose update in the local reference frame assuming the left and right
-	 * wheels have constant velocity.
-	 *
 	 * @param wheelVel The velocities of the wheels.
 	 * @param dt The elapsed time in seconds for which the update is calculated. The robot
 	 * has been moving at the specified velocity for this much time.

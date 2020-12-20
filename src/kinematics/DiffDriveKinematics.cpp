@@ -15,8 +15,15 @@ wheelvel_t DiffDriveKinematics::robotVelToWheelVel(double xVel, double thetaVel)
 	return {xVel - 0.5 * wheelBaseWidth * thetaVel, xVel + 0.5 * wheelBaseWidth * thetaVel};
 }
 
-pose_t DiffDriveKinematics::getLocalPoseUpdate(double lVel, double rVel, double dt) const
+pose_t DiffDriveKinematics::getLocalPoseUpdate(const wheelvel_t &wheelVel, double dt) const
 {
+	double lVel = wheelVel.lVel;
+	double rVel = wheelVel.rVel;
+
+	// Instead of using euler integration, we can represent the pose update as a twist
+	// and then apply that twist to the current pose. Derived from differential drive
+	// kinematics. This will be more accurate than euler integration at slower update rates.
+
 	double forward = (lVel + rVel) * 0.5 * dt; // distance the robot drove along a circle
 	double dTheta = (rVel - lVel) / wheelBaseWidth * dt; // the change in heading
 
@@ -34,11 +41,6 @@ pose_t DiffDriveKinematics::getLocalPoseUpdate(double lVel, double rVel, double 
 	}
 
 	return {dx, dy, dTheta};
-}
-
-pose_t DiffDriveKinematics::getLocalPoseUpdate(const wheelvel_t &wheelVel, double dt) const
-{
-	return getLocalPoseUpdate(wheelVel.lVel, wheelVel.rVel, dt);
 }
 
 pose_t DiffDriveKinematics::getPoseUpdate(const wheelvel_t &wheelVel, double heading,
