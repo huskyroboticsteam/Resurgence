@@ -33,6 +33,7 @@ list(APPEND RoverCommonTest
   simulator/graphics.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
+  kinematics/DiffDriveKinematics.cpp
   )
 
 list(APPEND RoverCommon
