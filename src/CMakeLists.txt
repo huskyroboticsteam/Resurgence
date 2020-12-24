@@ -82,6 +82,7 @@ add_executable(tests
   # Pathfinding Tests
   ../tests/Pathfinding/ObstacleMapTest.cpp
   # ../tests/Pathfinding/PatherTest.cpp
+  ../tests/kinematics/DiffDriveKinematicsTest.cpp
   )
 
 add_executable(lidar_vis
