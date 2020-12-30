@@ -90,6 +90,6 @@ public:
 
 private:
 	Eigen::Matrix<double, numDims, numPoints> data; // represents a circular buffer
-	int size;
-	int index;
+	int size = 0;
+	int index = 0;
 };
