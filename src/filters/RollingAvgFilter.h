@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <vector>
 
 /**
  * Implements a rolling average filter of the specified type. Can only use double vectors.
