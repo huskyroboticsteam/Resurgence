@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <vector>
 
 /**
  * Implements a rolling average filter of the specified type. Can only use double vectors.
@@ -17,7 +16,7 @@ public:
 	 */
 	Eigen::Matrix<double, numDims, 1> get() const
 	{
-		Eigen::Matrix<double, numDims, 1> ret;
+		Eigen::Matrix<double, numDims, 1> ret = Eigen::Matrix<double, numDims, 1>::Zero();
 		if (size == 0)
 		{
 			return ret;
@@ -89,7 +88,7 @@ public:
 	}
 
 private:
-	Eigen::Matrix<double, numDims, numPoints> data; // represents a circular buffer
+	Eigen::Matrix<double, numDims, numPoints> data; // ring buffer, starts with garbage data
 	int size = 0;
 	int index = 0;
 };
