@@ -27,7 +27,8 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		clock_counter(0),
 		plan(0,2),
 		plan_base({0,0,0}),
-		plan_idx(0)
+		plan_idx(0),
+		searchPatternTheta(PI)
 {
 }
 
@@ -124,7 +125,8 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 	// we reach the target orientation. Otherwise, we want to turn the rover to
 	// aim it at the target location.
 	double targetAngle = target(2);
-	if (state == NavState::INIT) {
+	if (state == NavState::INIT || state == NavState::SEARCH_PATTERN)
+	{
 		double dx = target(0) - pose(0);
 		double dy = target(1) - pose(1);
 		targetAngle = atan2(dy, dx);
@@ -202,6 +204,29 @@ void Autonomous::autonomyIter()
 				// caused by filtering
 				driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
 			}
+			if (state == NavState::SEARCH_PATTERN)
+			{
+				// Currently in a search pattern and landmark has been seen, can exit search
+				state = NavState::INIT;
+			}
+		}
+		else if (state == NavState::SEARCH_PATTERN)
+		{
+			// No landmark has been seen and we are in a search pattern
+			// The search follows the spiral expressed in polar coordinates as r = theta
+			// Set the drive target to the next point in the search pattern
+			double targetX = searchPatternTheta * cos(searchPatternTheta)
+							 + target.approx_GPS(0);
+			double targetY = searchPatternTheta * sin(searchPatternTheta)
+							 + target.approx_GPS(1);
+			double targetAngle = fmod(searchPatternTheta + 2 * PI, 2 * PI);
+			// change domain from [0, 2pi) to (-pi, pi]
+			if (targetAngle > PI)
+			{
+				targetAngle -= 2 * PI;
+			}
+			pose_t nextSearchPoint{targetX, targetY, targetAngle};
+			driveTarget = nextSearchPoint;
 		}
 
 		const points_t lidar_scan = readLidarScan();
@@ -249,12 +274,26 @@ void Autonomous::autonomyIter()
 		viz_window.display();
 
 		double d = dist(driveTarget, pose, 0);
+		// If in search pattern and current search point has been reached, increment
+		// searchPatternTheta to advance to next point
+		if (d < 0.2 && state == NavState::SEARCH_PATTERN) {
+			searchPatternTheta += PI / 4;
+		}
+		if (d < 0.2 && landmarkFilter.getSize() == 0 && !landmarkVisible)
+		{
+			// Close to GPS target but no landmark in sight, should use search pattern
+			state = NavState::SEARCH_PATTERN;
+		}
 		// There's an overlap where either state might apply, to prevent rapidly switching
 		// back and forth between these two states.
-		if (d < 0.2) {
+		// We also don't want to switch into one of these two states if we're currently in a
+		// search pattern.
+		if (d < 0.2 && state == NavState::INIT)
+		{
 			state = NavState::NEAR_TARGET_POSE;
 		}
-		if (d > 0.5) {
+		if (d > 0.5 && state == NavState::NEAR_TARGET_POSE)
+		{
 			state = NavState::INIT;
 		}
 		double thetaErr;

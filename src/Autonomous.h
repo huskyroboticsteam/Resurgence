@@ -17,7 +17,8 @@
 
 enum NavState {
 	INIT,
-	NEAR_TARGET_POSE
+	NEAR_TARGET_POSE,
+	SEARCH_PATTERN
 };
 
 class Autonomous
@@ -43,6 +44,7 @@ private:
 	plan_t plan;
 	pose_t plan_base;
 	int plan_idx;
+	float searchPatternTheta;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
