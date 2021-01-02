@@ -225,6 +225,20 @@ void Autonomous::autonomyIter()
 				state = NavState::INIT;
 			}
 		}
+		// If the target has a second post we can see and we haven't seen the first post yet,
+		// use the second post as the drive target without adding it to the filter
+		else if (target.right_post_id != -1 && landmarks[target.right_post_id](2) != 0)
+		{
+			point_t rightPostLandmark = landmarks[target.right_post_id];
+			// transform and add the new data to the filter
+			transform_t invTransform = toTransform(pose).inverse();
+			point_t landmarkMapSpace = invTransform * rightPostLandmark;
+			// the filtering is done on the target in map space to reduce any phase lag
+			// caused by filtering
+			driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
+			// clear the filter so the second post is removed from it
+			landmarkFilter.reset();
+		}
 		// If we are in a search pattern, set the drive target to the next search point
 		else if (state == NavState::SEARCH_PATTERN)
 		{
