@@ -33,7 +33,7 @@ TEST_CASE("RollingAvgFilter Test 1D")
 	REQUIRE(filter.get()(0) == 6_a);
 
 	filter.get(create1D(-3));
-	REQUIRE(filter.get()(0) == 0_a);
+	REQUIRE(filter.get()(0) == Approx(0).margin(1e-9));
 }
 
 TEST_CASE("RollingAvgFilter Test 3D")
@@ -43,8 +43,8 @@ TEST_CASE("RollingAvgFilter Test 3D")
 	filter.get(create3D(1, 1, 1));
 	filter.get(create3D(2, 2, 2));
 	filter.get(create3D(3, 3, 3));
-	REQUIRE((filter.get() - create3D(2, 2, 2)).norm() == 0_a);
+	REQUIRE((filter.get() - create3D(2, 2, 2)).norm() == Approx(0).margin(1e-9));
 
 	filter.get(create3D(4, 4, 4));
-	REQUIRE((filter.get() - create3D(3, 3, 3)).norm() == 0_a);
+	REQUIRE((filter.get() - create3D(3, 3, 3)).norm() == Approx(0).margin(1e-9));
 }
