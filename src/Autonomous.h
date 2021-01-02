@@ -35,7 +35,7 @@ public:
 private:
 	MyWindow viz_window;
 	URCLeg target;
-	pose_t driveTarget;
+	pose_t searchTarget;
 	PoseEstimator poseEstimator;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
