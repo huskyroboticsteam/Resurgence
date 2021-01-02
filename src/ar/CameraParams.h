@@ -100,6 +100,21 @@ constexpr double _webcam_1080_dist[] = {-2.1266729721561975e-02, -3.176756646201
 const CameraParams WEBCAM_1080_PARAMS(cv::Mat(3, 3, CV_64F, *_webcam_1080_params),
 									  cv::Mat(5, 1, CV_64F, *_webcam_1080_dist));
 // -------------------------------------
+
+
+// -------------------------------------
+// Winston's Webcam, 640x480, scale in m
+// -------------------------------------
+constexpr double _winston_webcam_640_params[] = {6.2703337187188697e+02, 0., 3.2677375666624550e+02,
+ 												0., 6.2703337187188697e+02, 2.3701509360183852e+02, 
+												0., 0., 1.};
+constexpr double _winston_webcam_640_dist[] = {8.7938715033125687e-03, 1.6438593467138751e-01,
+       										  1.9323488037337649e-04, -3.7075323762211791e-03,
+       										  -1.1096023248348679e+00};
+
+const CameraParams WINSTON_WEBCAM_640_PARAMS(cv::Mat(3, 3, CV_64F, *_winston_webcam_640_params),
+									  cv::Mat(5, 1, CV_64F, *_winston_webcam_640_dist));
+// -------------------------------------
 }
 // clang-format on
 
