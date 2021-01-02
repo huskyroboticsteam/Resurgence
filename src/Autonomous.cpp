@@ -11,10 +11,6 @@
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
-constexpr double SEARCH_THETA_INCREMENT = PI / 4;
-const Eigen::Matrix2d searchPatternTransform =
-	(Eigen::Matrix2d() << cos(SEARCH_THETA_INCREMENT), -sin(SEARCH_THETA_INCREMENT),
-	 					  sin(SEARCH_THETA_INCREMENT), cos(SEARCH_THETA_INCREMENT)).finished();
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
 
@@ -23,7 +19,7 @@ const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,Nav
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: viz_window("Planning visualization"),
 		target(_target),
-		searchTarget({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 4}),
+		searchTarget({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
@@ -32,7 +28,8 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		clock_counter(0),
 		plan(0,2),
 		plan_base({0,0,0}),
-		plan_idx(0)
+		plan_idx(0),
+		searchThetaIncrement(PI / 4)
 {
 }
 
@@ -272,22 +269,26 @@ void Autonomous::autonomyIter()
 		viz_window.display();
 
 		double d = dist(driveTarget, pose, 0);
-		if (state == NavState::SEARCH_PATTERN && dist(searchTarget, pose, 0) < 0.5)
+		if (state == NavState::SEARCH_PATTERN && dist(searchTarget, pose, 0.0) < 0.5)
 		{
 			// Current search point has been reached, set the search target to the
 			// next point in the search pattern
 			searchTarget -= target.approx_GPS;
 			double radius = hypot(searchTarget(0), searchTarget(1));
-			double scale = (radius + SEARCH_THETA_INCREMENT) / radius;
-			searchTarget.topRows(2) = searchPatternTransform * searchTarget.topRows(2) * scale;
+			double scale = (radius + searchThetaIncrement) / radius;
+			searchTarget.topRows(2) =
+				(Eigen::Matrix2d() << cos(searchThetaIncrement), -sin(searchThetaIncrement),
+									  sin(searchThetaIncrement), cos(searchThetaIncrement)).finished()
+				* searchTarget.topRows(2) * scale;
 			searchTarget += target.approx_GPS;
-			searchTarget(2) += SEARCH_THETA_INCREMENT;
+			searchTarget(2) += searchThetaIncrement;
 			if (searchTarget(2) > PI)
 			{
 				searchTarget(2) -= 2 * PI;
+				searchThetaIncrement = PI / ((int) (PI / searchThetaIncrement + 4));
 			}
 		}
-		if (dist(target.approx_GPS, pose, 0) < 0.2 && landmarkFilter.getSize() == 0 && !landmarkVisible)
+		if (dist(target.approx_GPS, pose, 0.0) < 0.2 && landmarkFilter.getSize() == 0 && !landmarkVisible)
 		{
 			// Close to GPS target but no landmark in sight, should use search pattern
 			state = NavState::SEARCH_PATTERN;
