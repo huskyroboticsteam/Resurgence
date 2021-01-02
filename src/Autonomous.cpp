@@ -19,7 +19,7 @@ const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,Nav
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: viz_window("Planning visualization"),
 		target(_target),
-		searchTarget({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
+		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
@@ -30,8 +30,8 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_base({0,0,0}),
 		plan_idx(0),
 		should_replan(true),
-		searchThetaIncrement(PI / 4),
-		alreadyArrived(false)
+		search_theta_increment(PI / 4),
+		already_arrived(false)
 {
 }
 
@@ -180,9 +180,9 @@ void Autonomous::autonomyIter()
 	poseEstimator.correct(gps);
 	pose_t pose = poseEstimator.getPose();
 
-	if (alreadyArrived || arrived(pose))
+	if (already_arrived || arrived(pose))
 	{
-		alreadyArrived = true;
+		already_arrived = true;
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 				  << std::endl;
@@ -242,7 +242,7 @@ void Autonomous::autonomyIter()
 		// If we are in a search pattern, set the drive target to the next search point
 		else if (state == NavState::SEARCH_PATTERN)
 		{
-			driveTarget = searchTarget;
+			driveTarget = search_target;
 		}
 
 		const points_t lidar_scan = readLidarScan();
@@ -291,25 +291,30 @@ void Autonomous::autonomyIter()
 		viz_window.display();
 
 		double d = dist(driveTarget, pose, 0);
-		if (state == NavState::SEARCH_PATTERN && dist(searchTarget, pose, 0.0) < 0.5)
+		if (state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)
 		{
 			// Current search point has been reached
 			// Replan to avoid waiting at current search point
 			should_replan = true;
 			// Set the search target to the next point in the search pattern
-			searchTarget -= target.approx_GPS;
-			double radius = hypot(searchTarget(0), searchTarget(1));
-			double scale = (radius + searchThetaIncrement) / radius;
-			searchTarget.topRows(2) =
-				(Eigen::Matrix2d() << cos(searchThetaIncrement), -sin(searchThetaIncrement),
-									  sin(searchThetaIncrement), cos(searchThetaIncrement)).finished()
-				* searchTarget.topRows(2) * scale;
-			searchTarget += target.approx_GPS;
-			searchTarget(2) += searchThetaIncrement;
-			if (searchTarget(2) > PI)
+			search_target -= target.approx_GPS;
+			double radius = hypot(search_target(0), search_target(1));
+			double scale = (radius + search_theta_increment) / radius;
+			// Rotate the target counterclockwise by the theta increment
+			search_target.topRows(2) =
+				(Eigen::Matrix2d() << cos(search_theta_increment), -sin(search_theta_increment),
+									  sin(search_theta_increment), cos(search_theta_increment)).finished()
+				* search_target.topRows(2) * scale;
+			search_target += target.approx_GPS;
+			// Adjust the target angle
+			search_target(2) += search_theta_increment;
+			if (search_target(2) > PI)
 			{
-				searchTarget(2) -= 2 * PI;
-				searchThetaIncrement = PI / ((int) (PI / searchThetaIncrement + 4));
+				search_target(2) -= 2 * PI;
+				// Decrease the theta increment every time a full rotation is made so the
+				// spiral shape is followed better
+				// This increases the denominator of the theta increment by 4
+				search_theta_increment = PI / ((int) (PI / search_theta_increment + 4));
 			}
 		}
 		if (state != NavState::SEARCH_PATTERN && dist(target.approx_GPS, pose, 0.0) < 0.2 &&
