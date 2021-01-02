@@ -35,6 +35,7 @@ public:
 private:
 	MyWindow viz_window;
 	URCLeg target;
+	pose_t driveTarget;
 	PoseEstimator poseEstimator;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
@@ -44,7 +45,6 @@ private:
 	plan_t plan;
 	pose_t plan_base;
 	int plan_idx;
-	float searchPatternTheta;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);

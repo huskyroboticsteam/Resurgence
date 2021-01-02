@@ -11,6 +11,10 @@
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
+constexpr double SEARCH_THETA_INCREMENT = PI / 4;
+const Eigen::Matrix2d searchPatternTransform =
+	(Eigen::Matrix2d() << cos(SEARCH_THETA_INCREMENT), -sin(SEARCH_THETA_INCREMENT),
+	 					  sin(SEARCH_THETA_INCREMENT), cos(SEARCH_THETA_INCREMENT)).finished();
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
 
@@ -19,6 +23,7 @@ const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,Nav
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: viz_window("Planning visualization"),
 		target(_target),
+		driveTarget({target.approx_GPS(0), target.approx_GPS(1), 0.0}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
@@ -27,8 +32,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		clock_counter(0),
 		plan(0,2),
 		plan_base({0,0,0}),
-		plan_idx(0),
-		searchPatternTheta(PI)
+		plan_idx(0)
 {
 }
 
@@ -62,14 +66,14 @@ void Autonomous::drawPose(pose_t &pose, pose_t &current_pose, sf::Color c)
 
 bool Autonomous::arrived(const pose_t &pose) const
 {
-	return dist(pose, getTargetPose(), 1.0) < 0.5;
+	return landmarkFilter.getSize() > 0 && dist(pose, driveTarget, 1.0) < 0.5;
 }
 
 double Autonomous::angleToTarget(const pose_t &gpsPose) const
 {
-	float dy = target.approx_GPS(1) - (float)gpsPose(1);
-	float dx = target.approx_GPS(0) - (float)gpsPose(0);
-	double theta = std::atan2(dy, dx);
+	float dy = driveTarget(1) - (float)gpsPose(1);
+	float dx = driveTarget(0) - (float)gpsPose(0);
+	double theta = atan2(dy, dx);
 	return theta - gpsPose(2);
 }
 
@@ -181,8 +185,6 @@ void Autonomous::autonomyIter()
 	}
 	else
 	{
-		pose_t driveTarget = getTargetPose();
-
 		// if we have some existing data or new data, set the target using the landmark
 		// data
 		bool landmarkVisible = leftPostLandmark(2) != 0;
@@ -209,24 +211,6 @@ void Autonomous::autonomyIter()
 				// Currently in a search pattern and landmark has been seen, can exit search
 				state = NavState::INIT;
 			}
-		}
-		else if (state == NavState::SEARCH_PATTERN)
-		{
-			// No landmark has been seen and we are in a search pattern
-			// The search follows the spiral expressed in polar coordinates as r = theta
-			// Set the drive target to the next point in the search pattern
-			double targetX = searchPatternTheta * cos(searchPatternTheta)
-							 + target.approx_GPS(0);
-			double targetY = searchPatternTheta * sin(searchPatternTheta)
-							 + target.approx_GPS(1);
-			double targetAngle = fmod(searchPatternTheta + 2 * PI, 2 * PI);
-			// change domain from [0, 2pi) to (-pi, pi]
-			if (targetAngle > PI)
-			{
-				targetAngle -= 2 * PI;
-			}
-			pose_t nextSearchPoint{targetX, targetY, targetAngle};
-			driveTarget = nextSearchPoint;
 		}
 
 		const points_t lidar_scan = readLidarScan();
@@ -274,15 +258,25 @@ void Autonomous::autonomyIter()
 		viz_window.display();
 
 		double d = dist(driveTarget, pose, 0);
-		// If in search pattern and current search point has been reached, increment
-		// searchPatternTheta to advance to next point
 		if (d < 0.2 && state == NavState::SEARCH_PATTERN) {
-			searchPatternTheta += PI / 4;
+			// Current search point has been reached, set the drive target to the
+			// next point in the search pattern
+			driveTarget -= target.approx_GPS;
+			double radius = hypot(driveTarget(0), driveTarget(1));
+			double scale = (radius + SEARCH_THETA_INCREMENT) / radius;
+			driveTarget.topRows(2) = searchPatternTransform * driveTarget.topRows(2) * scale;
+			driveTarget += target.approx_GPS;
+			driveTarget(2) += SEARCH_THETA_INCREMENT;
+			if (driveTarget(2) > PI)
+			{
+				driveTarget(2) -= 2 * PI;
+			}
 		}
 		if (d < 0.2 && landmarkFilter.getSize() == 0 && !landmarkVisible)
 		{
 			// Close to GPS target but no landmark in sight, should use search pattern
 			state = NavState::SEARCH_PATTERN;
+			driveTarget = {target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2};
 		}
 		// There's an overlap where either state might apply, to prevent rapidly switching
 		// back and forth between these two states.
@@ -317,6 +311,5 @@ double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 
 pose_t Autonomous::getTargetPose() const
 {
-	pose_t ret{target.approx_GPS(0), target.approx_GPS(1), 0.0};
-	return ret;
+	return driveTarget;
 }
