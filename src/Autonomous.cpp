@@ -29,7 +29,9 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan(0,2),
 		plan_base({0,0,0}),
 		plan_idx(0),
-		searchThetaIncrement(PI / 4)
+		should_replan(true),
+		searchThetaIncrement(PI / 4),
+		alreadyArrived(false)
 {
 }
 
@@ -178,8 +180,9 @@ void Autonomous::autonomyIter()
 	poseEstimator.correct(gps);
 	pose_t pose = poseEstimator.getPose();
 
-	if (arrived(pose))
+	if (alreadyArrived || arrived(pose))
 	{
+		alreadyArrived = true;
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 				  << std::endl;
@@ -204,6 +207,11 @@ void Autonomous::autonomyIter()
 			}
 			else
 			{
+				if (landmarkFilter.getSize() == 0)
+				{
+					// Replan if this is the first landmark we have seen
+					should_replan = true;
+				}
 				// transform and add the new data to the filter
 				transform_t invTransform = toTransform(pose).inverse();
 				point_t landmarkMapSpace = invTransform * leftPostLandmark;
@@ -217,18 +225,18 @@ void Autonomous::autonomyIter()
 				state = NavState::INIT;
 			}
 		}
-
 		// If we are in a search pattern, set the drive target to the next search point
-		if (state == NavState::SEARCH_PATTERN)
+		else if (state == NavState::SEARCH_PATTERN)
 		{
 			driveTarget = searchTarget;
 		}
 
 		const points_t lidar_scan = readLidarScan();
-		bool should_replan = ((clock_counter++) % 20 == 0); // TODO make this configurable
+		should_replan |= ((clock_counter++) % 20 == 0); // TODO make this configurable
 		if (should_replan) {
 			plan_base = pose;
 			plan_idx = 0;
+			should_replan = false;
 			point_t point_t_goal;
 			point_t_goal.topRows(2) = driveTarget.topRows(2);
 			point_t_goal(2) = 1.0;
@@ -271,8 +279,10 @@ void Autonomous::autonomyIter()
 		double d = dist(driveTarget, pose, 0);
 		if (state == NavState::SEARCH_PATTERN && dist(searchTarget, pose, 0.0) < 0.5)
 		{
-			// Current search point has been reached, set the search target to the
-			// next point in the search pattern
+			// Current search point has been reached
+			// Replan to avoid waiting at current search point
+			should_replan = true;
+			// Set the search target to the next point in the search pattern
 			searchTarget -= target.approx_GPS;
 			double radius = hypot(searchTarget(0), searchTarget(1));
 			double scale = (radius + searchThetaIncrement) / radius;
@@ -288,9 +298,12 @@ void Autonomous::autonomyIter()
 				searchThetaIncrement = PI / ((int) (PI / searchThetaIncrement + 4));
 			}
 		}
-		if (dist(target.approx_GPS, pose, 0.0) < 0.2 && landmarkFilter.getSize() == 0 && !landmarkVisible)
+		if (state != NavState::SEARCH_PATTERN && dist(target.approx_GPS, pose, 0.0) < 0.2 &&
+			landmarkFilter.getSize() == 0 && !landmarkVisible)
 		{
 			// Close to GPS target but no landmark in sight, should use search pattern
+			// Replan so the search starts faster
+			should_replan = true;
 			state = NavState::SEARCH_PATTERN;
 		}
 		// There's an overlap where either state might apply, to prevent rapidly switching

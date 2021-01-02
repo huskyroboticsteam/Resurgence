@@ -45,7 +45,9 @@ private:
 	plan_t plan;
 	pose_t plan_base;
 	int plan_idx;
+	bool should_replan;
 	double searchThetaIncrement;
+	bool alreadyArrived;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
