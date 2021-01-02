@@ -6,6 +6,7 @@ project(Rover LANGUAGES CXX C)
 
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(Threads REQUIRED)
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
