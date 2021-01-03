@@ -4,6 +4,9 @@
 
 namespace AR
 {
+// TODO: rework this so it doesn't use a lot of gross global variables and doesn't expose the
+// arrays
+
 /**
   Camera parameters are obtained from camera calibration and are unique to and constant for
   every camera.
@@ -105,15 +108,29 @@ const CameraParams WEBCAM_1080_PARAMS(cv::Mat(3, 3, CV_64F, *_webcam_1080_params
 // -------------------------------------
 // Winston's Webcam, 640x480, scale in m
 // -------------------------------------
-constexpr double _winston_webcam_640_params[] = {6.2703337187188697e+02, 0., 3.2677375666624550e+02,
+constexpr double _winston_webcam_480_params[] = {6.2703337187188697e+02, 0., 3.2677375666624550e+02,
  												0., 6.2703337187188697e+02, 2.3701509360183852e+02, 
 												0., 0., 1.};
-constexpr double _winston_webcam_640_dist[] = {8.7938715033125687e-03, 1.6438593467138751e-01,
+constexpr double _winston_webcam_480_dist[] = {8.7938715033125687e-03, 1.6438593467138751e-01,
        										  1.9323488037337649e-04, -3.7075323762211791e-03,
        										  -1.1096023248348679e+00};
 
-const CameraParams WINSTON_WEBCAM_640_PARAMS(cv::Mat(3, 3, CV_64F, *_winston_webcam_640_params),
-									  cv::Mat(5, 1, CV_64F, *_winston_webcam_640_dist));
+const CameraParams WINSTON_WEBCAM_480_PARAMS(cv::Mat(3, 3, CV_64F, *_winston_webcam_480_params),
+											 cv::Mat(5, 1, CV_64F, *_winston_webcam_480_dist));
+// -------------------------------------
+
+// --------------------------------------
+// Evan's new webcam, 640x480, scale in m
+// --------------------------------------
+constexpr double _evan_new_webcam_480_params[] = {2.8163054058138857e+02, 0., 3.1986287258182375e+02,
+												  0., 6.5147998226038069e+01, 2.4050723303632392e+02,
+												  0., 0., 1.};
+constexpr double _evan_new_webcam_480_dist[] = {-3.6842153449902861e-03, -8.3861698098247113e-05,
+												-7.1088419024984209e-03, -4.1784556258417084e-04,
+												3.0386330418980679e-07};
+
+const CameraParams WINSTON_WEBCAM_640_PARAMS(cv::Mat(3, 3, CV_64F, *_winston_webcam_480_params),
+											 cv::Mat(5, 1, CV_64F, *_winston_webcam_480_dist));
 // -------------------------------------
 }
 // clang-format on
