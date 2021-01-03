@@ -1,13 +1,5 @@
 #include "Tag.h"
 
-#include <cassert>
-#include <cmath>
-#include <iostream>
-
-#include <opencv2/calib3d.hpp>
-
-#include "../Util.h"
-
 namespace AR
 {
 

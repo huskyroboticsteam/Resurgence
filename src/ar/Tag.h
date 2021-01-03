@@ -1,11 +1,8 @@
 #pragma once
 
-#include <vector>
-
 #include <opencv2/core.hpp>
 
-#include "CameraParams.h"
-#include "MarkerSet.h"
+#include "Marker.h"
 
 namespace AR
 {
