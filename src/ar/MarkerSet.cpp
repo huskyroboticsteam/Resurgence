@@ -18,25 +18,22 @@ namespace AR
 
 
 ///////// MarkerSet class implementation //////////////
-template <class IDMapping_t>
-MarkerSet<IDMapping_t>::MarkerSet(uint8_t data_region_size, uint8_t border_size,
-								  float physical_size, ar_dict markerDict)
+MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size,
+					 float physical_size, ar_dict markerDict)
 {
 	ar_dict* dict_ = new ar_dict(markerDict);
 	init(data_region_size, border_size, physical_size, ar_dict_ptr(dict));
 }
 
-template <class IDMapping_t>
-MarkerSet<IDMapping_t>::MarkerSet(uint8_t data_region_size, uint8_t border_size,
-								  float physical_size, ar_dict_ptr markerDictPtr)
+MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size,
+					 float physical_size, ar_dict_ptr markerDictPtr)
 {
 	assert(markerDictPtr);
 	init(data_region_size, border_size, physical_size, markerDictPtr);
 }
 
-template <class IDMapping_t>
-void MarkerSet<IDMapping_t>::init(uint8_t data_region_size, uint8_t border_size,
-								  float physical_size, ar_dict_ptr markerDict)
+void MarkerSet::init(uint8_t data_region_size, uint8_t border_size,
+					 float physical_size, ar_dict_ptr markerDict)
 {
 	assert(data_region_size > 0);
 	assert(border_size > 0);
@@ -58,8 +55,7 @@ void MarkerSet<IDMapping_t>::init(uint8_t data_region_size, uint8_t border_size,
 	this->markers = markerVec;
 }
 
-template <class IDMapping_t>
-bool MarkerSet<IDMapping_t>::addIDMapping(int id, IDMapping_t mapping){
+bool MarkerSet::addIDMapping(int id, int mapping){
 	if(this->id_mappings.find(id) != this->id_mappings.end()){
 		this->id_mappings[id] = mapping;
 		return true;
@@ -68,33 +64,43 @@ bool MarkerSet<IDMapping_t>::addIDMapping(int id, IDMapping_t mapping){
 	}
 }
 
-template <class IDMapping_t>
-ar_dict_ptr MarkerSet<IDMapping_t>::getDict() const {
+int MarkerSet::getIDMapping(int id){
+	return this->id_mappings[id];
+}
+
+int& MarkerSet::operator[](int id){
+	return this->id_mappings[id];
+}
+
+template<class IDMapping_t>
+IDMapping_t MarkerSet::getIDMapping(int id){
+	return static_cast<IDMapping_t>(this->id_mappings[id]);
+}
+
+ar_dict_ptr MarkerSet::getDict() const {
 	return this->dict;
 }
 
-template <class IDMapping_t>
-uint8_t MarkerSet<IDMapping_t>::getDataRegionSize() const {
+uint8_t MarkerSet::getDataRegionSize() const {
 	return this->data_region_size;
 }
 
-template <class IDMapping_t>
-uint8_t MarkerSet<IDMapping_t>::getBorderSize() const {
+uint8_t MarkerSet::getBorderSize() const {
 	return this->border_size;
 }
 
-template <class IDMapping_t>
-float MarkerSet<IDMapping_t>::getPhysicalSize() const {
+
+float MarkerSet::getPhysicalSize() const {
 	return this->physical_size;
 }
 
-template <class IDMapping_t>
-std::vector<Marker> MarkerSet<IDMapping_t>::getMarkers() const {
+
+std::vector<Marker> MarkerSet::getMarkers() const {
 	return this->markers;
 }
 
-template <class IDMapping_t>
-bool MarkerSet<IDMapping_t>::isIDMapped(int id) const {
+
+bool MarkerSet::isIDMapped(int id) const {
 	return this->id_mappings.count(id) == 1;
 }
 
@@ -183,11 +189,11 @@ cv::Mat makeAlvarBytesList(uint8_t marker_array[ALVAR_COUNT][BIT_ARR_SIZE])
 /**
    Constructs the URC marker set
  */
-MarkerSet<URCMarkerName> makeURCSet()
+MarkerSet makeURCSet()
 {
 	static const cv::aruco::Dictionary alvar_dict(makeAlvarBytesList(__alvar_markers),
 												  ALVAR_BIT_SIZE, 1);
-	MarkerSet<URCMarkerName> set(ALVAR_BIT_SIZE, ALVAR_BORDER_SIZE,
+	MarkerSet set(ALVAR_BIT_SIZE, ALVAR_BORDER_SIZE,
 								 ALVAR_PHYS_SIZE, alvar_dict);
 	set.addIDMapping(0, LEG1);
 	// TODO: add all mappings
@@ -197,27 +203,27 @@ MarkerSet<URCMarkerName> makeURCSet()
 /**
    Constructs the CIRC marker set
  */
-MarkerSet<CIRCMarkerName> makeCIRCSet()
+MarkerSet makeCIRCSet()
 {
 	static const cv::Ptr<cv::aruco::Dictionary> circ_dict_ptr =
 	cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-	MarkerSet<CIRCMarkerName> set(ARUCO_BIT_SIZE, ARUCO_BORDER_SIZE,
+	MarkerSet set(ARUCO_BIT_SIZE, ARUCO_BORDER_SIZE,
 								  ARUCO_PHYS_SIZE, circ_dict_ptr);
 	set.addIDMapping(0, CIRCMarker1);
 	// TODO: add all mappings
 	return set;
 }
 
-const std::shared_ptr<MarkerSet<URCMarkerName>> URC_MARKERS()
+const std::shared_ptr<MarkerSet> URC_MARKERS()
 {
-	static const MarkerSet<URCMarkerName> URC_SET = makeURCSet();
-	return std::make_shared<MarkerSet<URCMarkerName>>(URC_SET);
+	static const MarkerSet URC_SET = makeURCSet();
+	return std::make_shared<MarkerSet>(URC_SET);
 }
 
-const std::shared_ptr<MarkerSet<CIRCMarkerName>> CIRC_MARKERS()
+const std::shared_ptr<MarkerSet> CIRC_MARKERS()
 {
-	static const MarkerSet<CIRCMarkerName> CIRC_SET = makeCIRCSet();
-	return std::make_shared<MarkerSet<CIRCMarkerName>>(CIRC_SET);
+	static const MarkerSet CIRC_SET = makeCIRCSet();
+	return std::make_shared<MarkerSet>(CIRC_SET);
 }
 
 }; // namespace Markers

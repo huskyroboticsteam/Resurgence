@@ -24,7 +24,7 @@ namespace AR
    Note that you should probably not need to construct any instances of this class yourself;
    Markers.h will contain predefined MarkerSets that you should use.
  */
-template <class IDMapping_t> class MarkerSet
+class MarkerSet
 {
 private:
 	cv::Ptr<cv::aruco::Dictionary> dict;
@@ -32,7 +32,7 @@ private:
 	float physical_size;
 	uint8_t data_region_size;
 	uint8_t border_size;
-	std::unordered_map<int, IDMapping_t> id_mappings;
+	std::unordered_map<int, int> id_mappings;
 	void init(uint8_t data_region_size, uint8_t border_size, float physical_size,
 			  cv::Ptr<cv::aruco::Dictionary> markerDict);
 
@@ -41,7 +41,10 @@ public:
 			  cv::aruco::Dictionary markerDict);
 	MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
 			  cv::Ptr<cv::aruco::Dictionary> markerDictPtr);
-	bool addIDMapping(int id, IDMapping_t mapping);
+	bool addIDMapping(int id, int mapping);
+	int getIDMapping(int id);
+	template<class IDMapping_t>
+	IDMapping_t getIDMapping(int id);
 	cv::Ptr<cv::aruco::Dictionary> getDict() const;
 	uint8_t getDataRegionSize() const;
 	uint8_t getBorderSize() const;
@@ -49,6 +52,7 @@ public:
 	// TODO: add some way to get a marker by ID
 	std::vector<Marker> getMarkers() const;
 	bool isIDMapped(int id) const;
+	int& operator[](int id);
 };
 
 namespace Markers
@@ -87,12 +91,12 @@ enum CIRCMarkerName
 /**
    Returns the set of markers that will be used in URC.
 */
-const std::shared_ptr<MarkerSet<URCMarkerName>> URC_MARKERS();
+const std::shared_ptr<MarkerSet> URC_MARKERS();
 
 /**
    Returns the set of markers that will be used in CIRC.
 */
-const std::shared_ptr<MarkerSet<CIRCMarkerName>> CIRC_MARKERS();
+const std::shared_ptr<MarkerSet> CIRC_MARKERS();
 
 } // namespace Markers
 
