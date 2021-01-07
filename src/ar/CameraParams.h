@@ -129,8 +129,8 @@ constexpr double _evan_new_webcam_480_dist[] = {-3.6842153449902861e-03, -8.3861
 												-7.1088419024984209e-03, -4.1784556258417084e-04,
 												3.0386330418980679e-07};
 
-const CameraParams WINSTON_WEBCAM_640_PARAMS(cv::Mat(3, 3, CV_64F, *_winston_webcam_480_params),
-											 cv::Mat(5, 1, CV_64F, *_winston_webcam_480_dist));
+const CameraParams EVAN_NEW_WEBCAM_480_PARAMS(cv::Mat(3, 3, CV_64F, *_evan_new_webcam_480_params),
+											 cv::Mat(5, 1, CV_64F, *_evan_new_webcam_480_dist));
 // -------------------------------------
 }
 // clang-format on
