@@ -132,6 +132,19 @@ constexpr double _evan_new_webcam_480_dist[] = {-3.6842153449902861e-03, -8.3861
 const CameraParams EVAN_NEW_WEBCAM_480_PARAMS(cv::Mat(3, 3, CV_64F, *_evan_new_webcam_480_params),
 											 cv::Mat(5, 1, CV_64F, *_evan_new_webcam_480_dist));
 // -------------------------------------
+// --------------------------------------
+// Robot top webcamera, 640x480, scale in m
+// --------------------------------------
+constexpr double _robot_top_webcam_480_params[] = {6.4140478114760754e+02, 0., 3.3489433405024562e+02, 
+												0., 6.4140478114760754e+02, 2.4549088452431096e+02, 
+												0.,0., 1.};
+constexpr double _robot_top_webcam_480_dist[] = {-4.5423809818390071e-01, 3.2556375646404534e-01,
+       											6.0432508258992704e-04, -1.1136436683798529e-03,
+       											-2.5321322863141504e-01};
+
+const CameraParams ROBOT_TOP_WEBCAM_480_PARAMS(cv::Mat(3, 3, CV_64F, *_robot_top_webcam_480_params),
+											 cv::Mat(5, 1, CV_64F, *_robot_top_webcam_480_dist));
+// -------------------------------------
 }
 // clang-format on
 
