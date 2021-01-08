@@ -77,7 +77,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 	poses.push_back(pose);
 	if (poses.size() == numSamples)
 	{
-		pose_t sum;
+		pose_t sum = pose_t::Zero();
 		for (const pose_t &p : poses)
 		{
 			sum += p;
