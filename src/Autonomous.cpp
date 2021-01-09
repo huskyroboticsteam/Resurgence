@@ -19,6 +19,7 @@ const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,Nav
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: viz_window("Planning visualization"),
 		target(_target),
+		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
@@ -27,7 +28,10 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		clock_counter(0),
 		plan(0,2),
 		plan_base({0,0,0}),
-		plan_idx(0)
+		plan_idx(0),
+		should_replan(true),
+		search_theta_increment(PI / 4),
+		already_arrived(false)
 {
 }
 
@@ -61,7 +65,13 @@ void Autonomous::drawPose(pose_t &pose, pose_t &current_pose, sf::Color c)
 
 bool Autonomous::arrived(const pose_t &pose) const
 {
-	return dist(pose, getTargetPose(), 1.0) < 0.5;
+	if (landmarkFilter.getSize() == 0)
+	{
+		return false;
+	}
+	pose_t target = getTargetPose();
+	target.topRows(2) = landmarkFilter.get().topRows(2);
+	return dist(pose, target, 1.0) < 0.5;
 }
 
 double Autonomous::angleToTarget(const pose_t &gpsPose) const
@@ -77,7 +87,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 	poses.push_back(pose);
 	if (poses.size() == numSamples)
 	{
-		pose_t sum;
+		pose_t sum = pose_t::Zero();
 		for (const pose_t &p : poses)
 		{
 			sum += p;
@@ -124,7 +134,8 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 	// we reach the target orientation. Otherwise, we want to turn the rover to
 	// aim it at the target location.
 	double targetAngle = target(2);
-	if (state == NavState::INIT) {
+	if (state == NavState::INIT || state == NavState::SEARCH_PATTERN)
+	{
 		double dx = target(0) - pose(0);
 		double dy = target(1) - pose(1);
 		targetAngle = atan2(dy, dx);
@@ -169,8 +180,9 @@ void Autonomous::autonomyIter()
 	poseEstimator.correct(gps);
 	pose_t pose = poseEstimator.getPose();
 
-	if (arrived(pose))
+	if (already_arrived || arrived(pose))
 	{
+		already_arrived = true;
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 				  << std::endl;
@@ -195,6 +207,11 @@ void Autonomous::autonomyIter()
 			}
 			else
 			{
+				if (landmarkFilter.getSize() == 0)
+				{
+					// Replan if this is the first landmark we have seen
+					should_replan = true;
+				}
 				// transform and add the new data to the filter
 				transform_t invTransform = toTransform(pose).inverse();
 				point_t landmarkMapSpace = invTransform * leftPostLandmark;
@@ -202,13 +219,38 @@ void Autonomous::autonomyIter()
 				// caused by filtering
 				driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
 			}
+			if (state == NavState::SEARCH_PATTERN)
+			{
+				// Currently in a search pattern and landmark has been seen, can exit search
+				state = NavState::INIT;
+			}
+		}
+		// If the target has a second post we can see and we haven't seen the first post yet,
+		// use the second post as the drive target without adding it to the filter
+		else if (target.right_post_id != -1 && landmarks[target.right_post_id](2) != 0)
+		{
+			point_t rightPostLandmark = landmarks[target.right_post_id];
+			// transform and add the new data to the filter
+			transform_t invTransform = toTransform(pose).inverse();
+			point_t landmarkMapSpace = invTransform * rightPostLandmark;
+			// the filtering is done on the target in map space to reduce any phase lag
+			// caused by filtering
+			driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
+			// clear the filter so the second post is removed from it
+			landmarkFilter.reset();
+		}
+		// If we are in a search pattern, set the drive target to the next search point
+		else if (state == NavState::SEARCH_PATTERN)
+		{
+			driveTarget = search_target;
 		}
 
 		const points_t lidar_scan = readLidarScan();
-		bool should_replan = ((clock_counter++) % 20 == 0); // TODO make this configurable
+		should_replan |= ((clock_counter++) % 20 == 0); // TODO make this configurable
 		if (should_replan) {
 			plan_base = pose;
 			plan_idx = 0;
+			should_replan = false;
 			point_t point_t_goal;
 			point_t_goal.topRows(2) = driveTarget.topRows(2);
 			point_t_goal(2) = 1.0;
@@ -249,12 +291,50 @@ void Autonomous::autonomyIter()
 		viz_window.display();
 
 		double d = dist(driveTarget, pose, 0);
+		if (state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)
+		{
+			// Current search point has been reached
+			// Replan to avoid waiting at current search point
+			should_replan = true;
+			// Set the search target to the next point in the search pattern
+			search_target -= target.approx_GPS;
+			double radius = hypot(search_target(0), search_target(1));
+			double scale = (radius + search_theta_increment) / radius;
+			// Rotate the target counterclockwise by the theta increment
+			search_target.topRows(2) =
+				(Eigen::Matrix2d() << cos(search_theta_increment), -sin(search_theta_increment),
+									  sin(search_theta_increment), cos(search_theta_increment)).finished()
+				* search_target.topRows(2) * scale;
+			search_target += target.approx_GPS;
+			// Adjust the target angle
+			search_target(2) += search_theta_increment;
+			if (search_target(2) > PI)
+			{
+				search_target(2) -= 2 * PI;
+				// Decrease the theta increment every time a full rotation is made so the
+				// spiral shape is followed better
+				// This increases the denominator of the theta increment by 4
+				search_theta_increment = PI / ((int) (PI / search_theta_increment + 4));
+			}
+		}
+		if (state != NavState::SEARCH_PATTERN && dist(target.approx_GPS, pose, 0.0) < 0.2 &&
+			landmarkFilter.getSize() == 0 && !landmarkVisible)
+		{
+			// Close to GPS target but no landmark in sight, should use search pattern
+			// Replan so the search starts faster
+			should_replan = true;
+			state = NavState::SEARCH_PATTERN;
+		}
 		// There's an overlap where either state might apply, to prevent rapidly switching
 		// back and forth between these two states.
-		if (d < 0.2) {
+		// We also don't want to switch into one of these two states if we're currently in a
+		// search pattern.
+		if (d < 0.2 && state == NavState::INIT)
+		{
 			state = NavState::NEAR_TARGET_POSE;
 		}
-		if (d > 0.5) {
+		if (d > 0.5 && state == NavState::NEAR_TARGET_POSE)
+		{
 			state = NavState::INIT;
 		}
 		double thetaErr;
