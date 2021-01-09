@@ -17,7 +17,8 @@
 
 enum NavState {
 	INIT,
-	NEAR_TARGET_POSE
+	NEAR_TARGET_POSE,
+	SEARCH_PATTERN
 };
 
 class Autonomous
@@ -34,6 +35,7 @@ public:
 private:
 	MyWindow viz_window;
 	URCLeg target;
+	pose_t search_target;
 	PoseEstimator poseEstimator;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
@@ -43,6 +45,9 @@ private:
 	plan_t plan;
 	pose_t plan_base;
 	int plan_idx;
+	bool should_replan;
+	double search_theta_increment;
+	bool already_arrived;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
