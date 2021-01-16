@@ -18,7 +18,10 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 constexpr bool EXTRA_WINDOWS = true;
 
 // Set to whichever camera params should be used
-const AR::Params PARAMS = AR::Params::ROBOT_TOP_WEBCAM_480;
+const AR::CameraParams PARAMS = AR::getCameraParams(AR::Params::ROBOT_TOP_WEBCAM_480);
+
+// Set to whichever MarkerSet should be used (CIRC/URC)
+const std::shared_ptr<AR::MarkerSet> MARKER_SET = AR::Markers::CIRC_MARKERS();
 
 int camera_id = 0;
 
@@ -75,7 +78,7 @@ int main(int argc, char *argv[])
 	cv::createTrackbar(THRESH2_TRACKBAR_NAME, ORIG_WINDOW_NAME, &thresh2_val, 256);
 	cv::createTrackbar(BLUR_TRACKBAR_NAME, ORIG_WINDOW_NAME, &blur_val, 10);
 
-	AR::Detector detector(PARAMS);
+	AR::Detector detector(MARKER_SET, PARAMS);
 
 	double loop_num = 0.0;
 	long double total_time = 0.0;
@@ -122,8 +125,7 @@ int main(int argc, char *argv[])
 
 		// Passes frame to the detector class.
 		// Tags will be located and returned.
-		std::vector<AR::Tag> tags = detector.findTags(frame, gray, edges, quad_corners,
-													  thresh_val, thresh2_val, blur_val);
+		std::vector<AR::Tag> tags = detector.detectTags(frame);
 
 		// Draws a green line around all quadrilateral shapes found in the image (debugging
 		// purposes)
@@ -140,11 +142,7 @@ int main(int argc, char *argv[])
 		// Projects a cube onto the tag to debug TVec and RVec
 		for (AR::Tag tag : tags)
 		{
-			std::cout << "Tag ID: " << tag.getID() << std::endl;
-			std::vector<cv::Point> corners = tag.getCorners();
-			corners.push_back(corners[0]);
-			cv::drawMarker(frame, tag.getCenter(), cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 15,
-						   2, cv::FILLED);
+			std::cout << "Tag ID: " << tag.getMarker().getId() << std::endl;
 			std::vector<cv::Point2d> cubePoints =
 				projectCube(0.2, tag.getRVec(), tag.getTVec());
 			std::cout << "rvec: " << tag.getRVec() << std::endl;
