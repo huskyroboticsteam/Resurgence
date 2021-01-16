@@ -13,18 +13,16 @@
 namespace AR
 {
 
-template <class MarkerName_t>
-Detector<MarkerName_t>::Detector(std::shared_ptr<MarkerSet<MarkerName_t>> marker_set,
-								 CameraParams camera_params,
-								 cv::Ptr<cv::aruco::DetectorParameters> detector_params)
+Detector::Detector(std::shared_ptr<MarkerSet> marker_set,
+				   CameraParams camera_params,
+				   cv::Ptr<cv::aruco::DetectorParameters> detector_params)
 	: marker_set_(marker_set), camera_params_(camera_params), detector_params_(detector_params)
 {
 	assert(marker_set != nullptr);
 	assert(detector_params != nullptr);
 }
 
-template <class MarkerName_t>
-std::vector<Tag> Detector<MarkerName_t>::detectTags(const cv::Mat &input)
+std::vector<Tag> Detector::detectTags(const cv::Mat &input)
 {
 	std::vector<std::vector<cv::Point2d>> corners;
 	std::vector<int> ids;

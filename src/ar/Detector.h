@@ -7,6 +7,7 @@
 #include <opencv2/aruco.hpp>
 
 #include "CameraParams.h"
+#include "MarkerSet.h"
 #include "Tag.h"
 
 namespace AR
@@ -21,16 +22,15 @@ struct DetectorOutput
 	std::vector<std::vector<cv::Point2f>> rejected_corners;
 };
 
-template <class MarkerName_t>
 class Detector
 {
 private:
-	std::shared_ptr<MarkerSet<MarkerName_t>> marker_set_;
+	std::shared_ptr<MarkerSet> marker_set_;
 	CameraParams camera_params_;
 	cv::Ptr<cv::aruco::DetectorParameters> detector_params_;
 
 public:
-	Detector(std::shared_ptr<MarkerSet<MarkerName_t>> marker_set, CameraParams camera_params,
+	Detector(std::shared_ptr<MarkerSet> marker_set, CameraParams camera_params,
 			 cv::Ptr<cv::aruco::DetectorParameters> detector_params =
 				 cv::aruco::DetectorParameters::create());
 	std::vector<Tag> detectTags(const cv::Mat &input);
