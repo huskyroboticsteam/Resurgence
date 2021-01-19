@@ -87,7 +87,8 @@ add_executable(tests
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
   ../tests/filters/RollingAvgFilterTest.cpp
   ../tests/filters/EKFTest.cpp
-  ../tests/filters/StateSpaceUtilsTest.cpp)
+  ../tests/filters/StateSpaceUtilsTest.cpp
+  ../tests/worldmap/TrICPTest.cpp)
 
 add_executable(lidar_vis
     lidar/MainVis.cpp
