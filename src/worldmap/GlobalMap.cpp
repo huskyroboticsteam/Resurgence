@@ -22,8 +22,7 @@ void GlobalMap::addPoints(const transform_t &trf, const points_t &toAdd)
 		}
 	}
 
-	points_t corrected = correctPointCloud(transformed);
-
+	points_t corrected = points.empty() ? transformed : correctPointCloud(transformed);
 	points.insert(points.end(), corrected.begin(), corrected.end()); // append to global map
 }
 

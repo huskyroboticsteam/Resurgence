@@ -4,22 +4,22 @@
 
 void heapify(PointPair arr[], int len, int i)
 {
-	int largest = i;
+	int smallest = i;
 	int l = 2 * i + 1;
-	int r = r * i + 2;
-	if (l < len && arr[i].dist > arr[largest].dist)
+	int r = 2 * i + 2;
+	if (l < len && arr[l].dist < arr[smallest].dist)
 	{
-		largest = l;
+		smallest = l;
 	}
-	if (r < len && arr[i].dist < arr[largest].dist)
+	if (r < len && arr[r].dist < arr[smallest].dist)
 	{
-		largest = r;
+		smallest = r;
 	}
 
-	if (largest != i)
+	if (smallest != i)
 	{
-		std::swap(arr[i], arr[largest]);
-		heapify(arr, len, largest);
+		std::swap(arr[i], arr[smallest]);
+		heapify(arr, len, smallest);
 	}
 }
 
@@ -89,7 +89,7 @@ points_t TrICP::iterate(const points_t &sample, int N, double &S) const
 		const point_t &point = sample[i];
 		point_t closest = map.getClosest(point);
 		double dist = (point - closest).norm();
-		struct PointPair pair
+		PointPair pair
 		{
 			closest, point, dist
 		};
@@ -117,17 +117,21 @@ points_t TrICP::iterate(const points_t &sample, int N, double &S) const
 
 transform_t TrICP::computeTransformation(const std::vector<PointPair> &pairs)
 {
+	// TODO: I think this is wrong. Adjust to disallow shear/scaling
 	// points is map, sample is new lidar sample (N samples that correspond)
 	// M * A = B (A is sample, B is world map)
 	// A^T * M^T = B^T, solve for M^T
 	int size = pairs.size();
 	Eigen::Matrix<double, Eigen::Dynamic, 3> A(size, 3);
-	Eigen::Matrix<double, Eigen::Dynamic, 3> B(size, 3);
+	Eigen::Matrix<double, Eigen::Dynamic, 2> B(size, 2);
 	for (int i = 0; i < pairs.size(); i++)
 	{
 		A.row(i) = pairs[i].samplePoint;
-		B.row(i) = pairs[i].mapPoint;
+		Eigen::Vector2d v = {pairs[i].mapPoint(0), pairs[i].mapPoint(1)};
+		B.row(i) = v;//pairs[i].mapPoint.topRows<2>();
 	}
-	Eigen::Matrix3d trfTrans = A.colPivHouseholderQr().solve(B);
-	return trfTrans.transpose();
+	Eigen::Matrix<double, 3, 2> trfTrans = A.colPivHouseholderQr().solve(B);
+	transform_t trf = transform_t::Identity();
+	trf.block<2,3>(0,0) = trfTrans.transpose();
+	return trf;
 }
