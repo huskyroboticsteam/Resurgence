@@ -45,49 +45,43 @@ std::vector<PointPair> heapsort(PointPair arr[], int len, int minNum)
 	return ret;
 }
 
-TrICP::TrICP(const GlobalMap &map, double overlap, int maxIter)
-	: map(map), overlap(overlap), maxIter(maxIter)
+TrICP::TrICP(const GlobalMap &map, double overlap, int maxIter, double relErrChangeThresh)
+	: map(map), overlap(overlap), maxIter(maxIter), relErrChangeThresh(relErrChangeThresh)
 {
 }
 
 points_t TrICP::correct(const points_t &sample)
 {
-	if (map.getPoints().empty())
+	if (sample.empty() || map.getPoints().empty())
 	{
 		return sample;
 	}
 	int i = 0;
-	double oldS = 1e10;
-	double S = oldS;
+	double S = 1e9;
+	double oldS;
 	points_t points = sample;
 	int N = static_cast<int>(overlap * sample.size());
-	while (!isDone(i, S))
-	{
+	do {
+		i++;
+		oldS = S;
 		points = iterate(points, N, S);
-	}
+	} while (!isDone(i, S, oldS, N));
+
+	return points;
 }
 
-bool TrICP::isDone(int numIter, double S)
+bool TrICP::isDone(int numIter, double S, double oldS, int N) const
 {
+	double err = S / N;
+	double prevErr = oldS / N;
+	if (err <= 1e-9) {
+		return true;
+	}
+	double relErrChange = abs(err - prevErr) / err;
+	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
 }
 
-transform_t TrICP::computeTransformation(const std::vector<PointPair> &pairs)
-{
-	// points is map, sample is new lidar sample (N samples that correspond)
-	// M * A = B
-	// A^T * M^T = B^T, solve for M^T
-	int size = pairs.size();
-	Eigen::Matrix<double, Eigen::Dynamic, 3> A(size, 3);
-	Eigen::Matrix<double, Eigen::Dynamic, 3> B(size, 3);
-	for (int i = 0; i < pairs.size(); i++)
-	{
-		A.row(i) = pairs[i].samplePoint;
-		B.row(i) = pairs[i].mapPoint;
-	}
-	Eigen::Matrix3d trfTrans = A.colPivHouseholderQr().solve(B);
-	return trfTrans.transpose();
-}
-points_t TrICP::iterate(const points_t &sample, int N, double &S)
+points_t TrICP::iterate(const points_t &sample, int N, double &S) const
 {
 	PointPair pairs[sample.size()];
 	for (int i = 0; i < sample.size(); i++)
@@ -119,4 +113,21 @@ points_t TrICP::iterate(const points_t &sample, int N, double &S)
 		ret.push_back(trf * point);
 	}
 	return ret;
+}
+
+transform_t TrICP::computeTransformation(const std::vector<PointPair> &pairs)
+{
+	// points is map, sample is new lidar sample (N samples that correspond)
+	// M * A = B (A is sample, B is world map)
+	// A^T * M^T = B^T, solve for M^T
+	int size = pairs.size();
+	Eigen::Matrix<double, Eigen::Dynamic, 3> A(size, 3);
+	Eigen::Matrix<double, Eigen::Dynamic, 3> B(size, 3);
+	for (int i = 0; i < pairs.size(); i++)
+	{
+		A.row(i) = pairs[i].samplePoint;
+		B.row(i) = pairs[i].mapPoint;
+	}
+	Eigen::Matrix3d trfTrans = A.colPivHouseholderQr().solve(B);
+	return trfTrans.transpose();
 }

@@ -27,10 +27,9 @@ void GlobalMap::addPoints(const transform_t &trf, const points_t &toAdd)
 	points.insert(points.end(), corrected.begin(), corrected.end()); // append to global map
 }
 
-// https://www.researchgate.net/publication/3974183_The_Trimmed_Iterative_Closest_Point_algorithm
 points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
 {
-	TrICP icp(*this);
+	TrICP icp(*this, 0.4, 10, 0.01);
 	return icp.correct(pointCloud);
 }
 
