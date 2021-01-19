@@ -35,6 +35,7 @@ list(APPEND RoverCommonTest
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
   worldmap/GlobalMap.cpp
+  worldmap/TrICP.cpp
   )
 
 list(APPEND RoverCommon

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <Eigen/Core>
 #include "../simulator/utils.h"
 
 class GlobalMap
@@ -9,8 +8,9 @@ class GlobalMap
 public:
 	GlobalMap();
 	void addPoints(const transform_t &trf, const points_t &points);
-	points_t getPoints() const;
+	const points_t &getPoints() const;
+	point_t getClosest(const point_t &point) const;
 private:
 	points_t points;
-	static points_t correctPointCloud(const points_t &pointCloud);
+	points_t correctPointCloud(const points_t &pointCloud);
 };
