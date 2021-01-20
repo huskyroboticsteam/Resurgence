@@ -61,7 +61,8 @@ points_t TrICP::correct(const points_t &sample)
 	double oldS;
 	points_t points = sample;
 	int N = static_cast<int>(overlap * sample.size());
-	do {
+	do
+	{
 		i++;
 		oldS = S;
 		points = iterate(points, N, S);
@@ -74,7 +75,8 @@ bool TrICP::isDone(int numIter, double S, double oldS, int N) const
 {
 	double err = S / N;
 	double prevErr = oldS / N;
-	if (err <= 1e-9) {
+	if (err <= 1e-9)
+	{
 		return true;
 	}
 	double relErrChange = abs(err - prevErr) / err;
@@ -89,10 +91,7 @@ points_t TrICP::iterate(const points_t &sample, int N, double &S) const
 		const point_t &point = sample[i];
 		point_t closest = map.getClosest(point);
 		double dist = (point - closest).norm();
-		PointPair pair
-		{
-			closest, point, dist
-		};
+		PointPair pair{closest, point, dist};
 		pairs[i] = pair;
 	}
 
@@ -117,21 +116,46 @@ points_t TrICP::iterate(const points_t &sample, int N, double &S) const
 
 transform_t TrICP::computeTransformation(const std::vector<PointPair> &pairs)
 {
-	// TODO: I think this is wrong. Adjust to disallow shear/scaling
-	// points is map, sample is new lidar sample (N samples that correspond)
-	// M * A = B (A is sample, B is world map)
-	// A^T * M^T = B^T, solve for M^T
-	int size = pairs.size();
-	Eigen::Matrix<double, Eigen::Dynamic, 3> A(size, 3);
-	Eigen::Matrix<double, Eigen::Dynamic, 2> B(size, 2);
+	/*
+	 * We need to find an affine transformation that maps points in the sample to points in
+	 * the map. This transformation is restricted, as only rotations and translations are
+	 * permitted. Shearing and scaling is invalid.
+	 *
+	 * Instead of calculating the affine transformation directly, we'll calculate the
+	 * parameters directly. We have 3: translate x, translate y, rotate. This manifests as 4
+	 * variables: cosTheta, sinTheta, dx, dy. (can't directly calculate theta)
+	 *
+	 * This results in 2 equations per pair of points.
+	 */
+	size_t size = 2 * pairs.size();
+	Eigen::Matrix<double, Eigen::Dynamic, 4> A(size, 4);
+	Eigen::Matrix<double, Eigen::Dynamic, 1> B(size, 1);
 	for (int i = 0; i < pairs.size(); i++)
 	{
-		A.row(i) = pairs[i].samplePoint;
-		Eigen::Vector2d v = {pairs[i].mapPoint(0), pairs[i].mapPoint(1)};
-		B.row(i) = v;//pairs[i].mapPoint.topRows<2>();
+		int index = 2 * i;
+		point_t from = pairs[i].samplePoint;
+		point_t to = pairs[i].mapPoint;
+		// x' = cosTheta * x - sinTheta * y + dx;
+		Eigen::RowVector4d row1 = {from(0), -from(1), 1, 0};
+		// y' = cosTheta * y + sinTheta * x + dy;
+		Eigen::RowVector4d row2 = {from(1), from(0), 0, 1};
+		A.row(index) = row1;
+		A.row(index + 1) = row2;
+		// first equation is for x', second is for y'
+		B.block<2, 1>(index, 0) = to.topRows<2>();
 	}
-	Eigen::Matrix<double, 3, 2> trfTrans = A.colPivHouseholderQr().solve(B);
-	transform_t trf = transform_t::Identity();
-	trf.block<2,3>(0,0) = trfTrans.transpose();
+	// Least-squares solution. This vector is [cosTheta, sinTheta, dx, dy]
+	Eigen::Matrix<double, 4, 1> parameters = A.colPivHouseholderQr().solve(B);
+	double cosThetaApprox = parameters(0);
+	double sinThetaApprox = parameters(1);
+	double deltaX = parameters(2);
+	double deltaY = parameters(3);
+	// atan2 1) reconciles the different thetas in cosTheta and sinTheta (due to approximation)
+	// and 2) gets rid of any scale factors
+	double theta = atan2(sinThetaApprox, cosThetaApprox);
+	double cosTheta = cos(theta);
+	double sinTheta = sin(theta);
+	transform_t trf;
+	trf << cosTheta, -sinTheta, deltaX, sinTheta, cosTheta, deltaY, 0, 0, 1;
 	return trf;
 }
