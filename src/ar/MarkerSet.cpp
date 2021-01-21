@@ -16,24 +16,23 @@ using mat_ptr = cv::Ptr<cv::Mat>;
 namespace AR
 {
 
-
 ///////// MarkerSet class implementation //////////////
-MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size,
-					 float physical_size, ar_dict markerDict)
+MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
+					 ar_dict markerDict)
 {
-	ar_dict* dict_ = new ar_dict(markerDict);
+	ar_dict *dict_ = new ar_dict(markerDict);
 	init(data_region_size, border_size, physical_size, ar_dict_ptr(dict));
 }
 
-MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size,
-					 float physical_size, ar_dict_ptr markerDictPtr)
+MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
+					 ar_dict_ptr markerDictPtr)
 {
 	assert(markerDictPtr);
 	init(data_region_size, border_size, physical_size, markerDictPtr);
 }
 
-void MarkerSet::init(uint8_t data_region_size, uint8_t border_size,
-					 float physical_size, ar_dict_ptr markerDict)
+void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physical_size,
+					 ar_dict_ptr markerDict)
 {
 	assert(data_region_size > 0);
 	assert(border_size > 0);
@@ -55,52 +54,61 @@ void MarkerSet::init(uint8_t data_region_size, uint8_t border_size,
 	this->markers = markerVec;
 }
 
-bool MarkerSet::addIDMapping(int id, int mapping){
-	if(this->id_mappings.find(id) != this->id_mappings.end()){
+bool MarkerSet::addIDMapping(int id, int mapping)
+{
+	if (this->id_mappings.find(id) != this->id_mappings.end())
+	{
 		this->id_mappings[id] = mapping;
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }
 
-int MarkerSet::getIDMapping(int id){
+int MarkerSet::getIDMapping(int id)
+{
 	return this->id_mappings[id];
 }
 
-int& MarkerSet::operator[](int id){
+int &MarkerSet::operator[](int id)
+{
 	return this->id_mappings[id];
 }
 
-template<class IDMapping_t>
-IDMapping_t MarkerSet::getIDMapping(int id){
+template <class IDMapping_t> IDMapping_t MarkerSet::getIDMapping(int id)
+{
 	return static_cast<IDMapping_t>(this->id_mappings[id]);
 }
 
-ar_dict_ptr MarkerSet::getDict() const {
+ar_dict_ptr MarkerSet::getDict() const
+{
 	return this->dict;
 }
 
-uint8_t MarkerSet::getDataRegionSize() const {
+uint8_t MarkerSet::getDataRegionSize() const
+{
 	return this->data_region_size;
 }
 
-uint8_t MarkerSet::getBorderSize() const {
+uint8_t MarkerSet::getBorderSize() const
+{
 	return this->border_size;
 }
 
-
-float MarkerSet::getPhysicalSize() const {
+float MarkerSet::getPhysicalSize() const
+{
 	return this->physical_size;
 }
 
-
-std::vector<Marker> MarkerSet::getMarkers() const {
+std::vector<Marker> MarkerSet::getMarkers() const
+{
 	return this->markers;
 }
 
-
-bool MarkerSet::isIDMapped(int id) const {
+bool MarkerSet::isIDMapped(int id) const
+{
 	return this->id_mappings.count(id) == 1;
 }
 
@@ -277,8 +285,8 @@ MarkerSet makeURCSet()
 {
 	static const cv::aruco::Dictionary alvar_dict(makeAlvarBytesList(__alvar_markers),
 												  ALVAR_BIT_SIZE, 1);
-	MarkerSet set(ALVAR_BIT_SIZE, ALVAR_BORDER_SIZE,
-								 ALVAR_PHYS_SIZE, alvar_dict);
+	MarkerSet set(ALVAR_BIT_SIZE, ALVAR_BORDER_SIZE, ALVAR_PHYS_SIZE, alvar_dict);
+
 	set.addIDMapping(0, LEG1);
 	set.addIDMapping(1, LEG2);
 	set.addIDMapping(2, LEG3);
@@ -300,9 +308,8 @@ MarkerSet makeURCSet()
 MarkerSet makeCIRCSet()
 {
 	static const cv::Ptr<cv::aruco::Dictionary> circ_dict_ptr =
-	cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-	MarkerSet set(ARUCO_BIT_SIZE, ARUCO_BORDER_SIZE,
-								  ARUCO_PHYS_SIZE, circ_dict_ptr);
+		cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+	MarkerSet set(ARUCO_BIT_SIZE, ARUCO_BORDER_SIZE, ARUCO_PHYS_SIZE, circ_dict_ptr);
 	set.addIDMapping(0, CIRCMarker1);
 	// TODO: add all mappings
 	return set;
