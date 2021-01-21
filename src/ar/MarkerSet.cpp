@@ -250,6 +250,8 @@ uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
  	 1, 0, 1, 0, 1,
  	 0, 0, 1, 1, 0,
  	 1, 1, 1, 0, 1}
+
+	// clang-format on
 };
 
 /**
@@ -278,7 +280,17 @@ MarkerSet makeURCSet()
 	MarkerSet set(ALVAR_BIT_SIZE, ALVAR_BORDER_SIZE,
 								 ALVAR_PHYS_SIZE, alvar_dict);
 	set.addIDMapping(0, LEG1);
-	// TODO: add all mappings
+	set.addIDMapping(1, LEG2);
+	set.addIDMapping(2, LEG3);
+	set.addIDMapping(3, LEG4_L);
+	set.addIDMapping(4, LEG4_R);
+	set.addIDMapping(5, LEG5_L);
+	set.addIDMapping(6, LEG5_R);
+	set.addIDMapping(7, LEG6_L);
+	set.addIDMapping(8, LEG6_R);
+	set.addIDMapping(9, LEG7_L);
+	set.addIDMapping(10, LEG7_R);
+
 	return set;
 }
 
