@@ -5,12 +5,12 @@
 #include <cstdint>
 #include <cassert>
 
-using mat_ptr = std::shared_ptr<cv::Mat>;
+using mat_ptr = cv::Ptr<cv::Mat>;
 
 ///////// Marker class implementation ///////////////
 Marker::Marker(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int id)
 	: data_region_size(data_region_size), border_size(border_size), id(id),
-	  data_bits(std::shared_ptr<cv::Mat>(new cv::Mat(bits)))
+	  data_bits(cv::Ptr<cv::Mat>(new cv::Mat(bits)))
 {
 	assert(data_region_size > 0);
 	assert(border_size > 0);

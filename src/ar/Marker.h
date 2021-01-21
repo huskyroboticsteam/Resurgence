@@ -34,7 +34,7 @@ private:
 	/**
 	   The actual bits stored in the data region of the marker, NOT including the border.
 	 */
-	const std::shared_ptr<cv::Mat> data_bits;
+	cv::Ptr<cv::Mat> data_bits;
 
 public:
 	/**
@@ -43,6 +43,6 @@ public:
 	Marker(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int id);
 	uint8_t getDataRegionSize() const;
 	uint8_t getBorderSize() const;
-	const std::shared_ptr<cv::Mat> getDataBits() const;
+	const cv::Ptr<cv::Mat> getDataBits() const;
 	int getId() const;
 };

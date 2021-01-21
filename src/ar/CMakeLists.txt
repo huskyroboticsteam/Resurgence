@@ -5,6 +5,8 @@ add_executable(ar_tester
   ARTester.cpp
   CameraParams.cpp
   Detector.cpp
+  MarkerSet.cpp
+  Marker.cpp
   Tag.cpp
   ../ThreadedCapture.cpp
   ../Util.cpp)

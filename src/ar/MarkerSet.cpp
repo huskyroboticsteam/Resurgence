@@ -11,7 +11,7 @@
 
 using ar_dict = cv::aruco::Dictionary;
 using ar_dict_ptr = cv::Ptr<cv::aruco::Dictionary>;
-using mat_ptr = std::shared_ptr<cv::Mat>;
+using mat_ptr = cv::Ptr<cv::Mat>;
 
 namespace AR
 {
