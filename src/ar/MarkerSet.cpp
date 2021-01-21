@@ -109,7 +109,7 @@ namespace Markers
 
 // Constants - please note that these are only used internally.
 /** The number of ALVAR markers stored in the data array. */
-constexpr size_t ALVAR_COUNT = 4;
+constexpr size_t ALVAR_COUNT = 18;
 /** The size in pixels of the data region of an ALVAR marker. */
 constexpr size_t ALVAR_BIT_SIZE = 5;
 /** The border size in pixels of one side of an ALVAR marker. */
@@ -142,12 +142,6 @@ uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
 
 	// clang-format off
 
-	// ALVAR Marker 1
-	{1,1,0,1,1,
-	 1,1,0,1,1,
-	 1,0,1,0,1,
-	 1,1,1,1,1,
-	 1,1,1,1,1},
 	// ALVAR Marker 0
 	{1,1,0,1,1,
 	 1,1,0,1,1,
@@ -158,6 +152,12 @@ uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
 	{1,1,0,1,1,
 	 1,1,0,1,1,
 	 1,0,1,0,1,
+	 0,0,1,1,0,
+	 1,1,1,0,1},
+	// ALVAR Marker 2
+	{1,1,0,1,1,
+	 1,1,0,1,1,
+	 1,0,1,0,1,
 	 1,0,1,1,0,
 	 1,0,1,1,0},
 	// ALVAR Marker 3
@@ -165,7 +165,37 @@ uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
 	 1,1,0,1,1,
 	 1,0,1,0,1,
 	 0,1,1,1,1,
-	 1,0,1,0,0}
+	 1,0,1,0,0},
+	// ALVAR Marker 4
+	{1,1,0,1,1,
+	 1,1,0,1,1,
+	 1,0,1,0,1,
+	 0,1,1,1,0,
+	 0,1,1,1,0},
+	// ALVAR Marker 5
+	{1,1,0,1,1,
+	 1,1,0,1,1,
+	 1,0,1,0,1,
+	 1,0,1,1,1,
+	 0,1,1,0,0},
+	// ALVAR Marker 6
+	{1,1,0,1,1,
+	 1,1,0,1,1,
+	 1,0,1,0,1,
+	 0,0,1,1,1,
+	 0,0,1,1,1},
+	// ALVAR Marker 7
+	{1,1,0,1,1,
+	 1,1,0,1,1,
+	 1,0,1,0,1,
+	 1,1,1,1,0,
+	 0,0,1,0,1},
+	// ALVAR Marker 8
+	{1,1,0,1,1,
+	 1,1,0,1,1,
+	 1,0,1,0,1,
+	 0,0,1,0,1,
+	 1,1,1,1,0}
 	// TODO: will add more markers later. this is just to get it started
 	// clang-format on
 };
