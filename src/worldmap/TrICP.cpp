@@ -30,16 +30,12 @@ std::vector<PointPair> heapsort(PointPair arr[], int len, int minNum)
 		heapify(arr, len, i);
 	}
 
-	for (int i = len - 1; i > len - 1 - minNum; i--)
-	{
-		std::swap(arr[0], arr[i]);
-		heapify(arr, i, 0);
-	}
-
 	std::vector<PointPair> ret;
 	for (int i = len - 1; i > len - 1 - minNum; i--)
 	{
-		ret.push_back(arr[i]);
+		ret.push_back(arr[0]);
+		std::swap(arr[0], arr[i]);
+		heapify(arr, i, 0);
 	}
 
 	return ret;
@@ -57,33 +53,32 @@ points_t TrICP::correct(const points_t &sample)
 		return sample;
 	}
 	int i = 0;
-	double S = 1e9;
-	double oldS;
+	double mse = 1e9;
+	double oldMSE;
 	points_t points = sample;
-	int N = static_cast<int>(overlap * sample.size());
+	int N = std::min(static_cast<int>(map.getPoints().size()),
+					 static_cast<int>(overlap * sample.size()));
 	do
 	{
 		i++;
-		oldS = S;
-		points = iterate(points, N, S);
-	} while (!isDone(i, S, oldS, N));
+		oldMSE = mse;
+		points = iterate(points, N, mse);
+	} while (!isDone(i, mse, oldMSE));
 
 	return points;
 }
 
-bool TrICP::isDone(int numIter, double S, double oldS, int N) const
+bool TrICP::isDone(int numIter, double mse, double oldMSE) const
 {
-	double err = S / N;
-	double prevErr = oldS / N;
-	if (err <= 1e-9)
+	if (mse <= 1e-9)
 	{
 		return true;
 	}
-	double relErrChange = abs(err - prevErr) / err;
+	double relErrChange = abs(mse - oldMSE) / mse;
 	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
 }
 
-points_t TrICP::iterate(const points_t &sample, int N, double &S) const
+points_t TrICP::iterate(const points_t &sample, int N, double &mse) const
 {
 	PointPair pairs[sample.size()];
 	for (int i = 0; i < sample.size(); i++)
@@ -102,7 +97,7 @@ points_t TrICP::iterate(const points_t &sample, int N, double &S) const
 	{
 		newS += pair.dist * pair.dist;
 	}
-	S = newS;
+	mse = newS / N;
 
 	transform_t trf = computeTransformation(closestPairs);
 

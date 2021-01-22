@@ -21,6 +21,6 @@ private:
 	int maxIter;
 	double relErrChangeThresh;
 	static transform_t computeTransformation(const std::vector<PointPair> &pairs);
-	points_t iterate(const points_t &sample, int N, double &S) const;
-	bool isDone(int numIter, double S, double oldS, int N) const;
+	points_t iterate(const points_t &sample, int N, double &mse) const;
+	bool isDone(int numIter, double S, double oldMSE) const;
 };
