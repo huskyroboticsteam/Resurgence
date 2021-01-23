@@ -2,7 +2,6 @@
 
 #include <Eigen/LU>
 #include <Eigen/SVD>
-#include <iostream>
 
 void heapify(PointPair arr[], int len, int i)
 {
