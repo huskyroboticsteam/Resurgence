@@ -1,4 +1,5 @@
 #include "GlobalMap.h"
+
 #include "TrICP.h"
 
 GlobalMap::GlobalMap() : points()
@@ -28,8 +29,9 @@ void GlobalMap::addPoints(const transform_t &trf, const points_t &toAdd)
 
 points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
 {
-	TrICP icp(*this, 0.4, 10, 0.01);
-	return icp.correct(pointCloud);
+	TrICP icp(0.4, 10, 0.01);
+	return icp.correct(pointCloud,
+					   std::bind(&GlobalMap::getClosest, this, std::placeholders::_1));
 }
 
 point_t GlobalMap::getClosest(const point_t &point) const
@@ -41,9 +43,11 @@ point_t GlobalMap::getClosest(const point_t &point) const
 	// TODO: optimize with geohashing
 	point_t closest = points[0];
 	double minDist = (point - closest).norm();
-	for (int i = 1; i < points.size(); i++) {
+	for (int i = 1; i < points.size(); i++)
+	{
 		double dist = (point - points[i]).norm();
-		if (dist < minDist) {
+		if (dist < minDist)
+		{
 			minDist = dist;
 			closest = points[i];
 		}

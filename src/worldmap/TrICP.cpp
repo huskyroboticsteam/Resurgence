@@ -42,14 +42,15 @@ std::vector<PointPair> heapsort(PointPair arr[], int len, int minNum)
 	return ret;
 }
 
-TrICP::TrICP(const GlobalMap &map, double overlap, int maxIter, double relErrChangeThresh)
-	: map(map), overlap(overlap), maxIter(maxIter), relErrChangeThresh(relErrChangeThresh)
+TrICP::TrICP(double overlap, int maxIter, double relErrChangeThresh)
+	: overlap(overlap), maxIter(maxIter), relErrChangeThresh(relErrChangeThresh)
 {
 }
 
-points_t TrICP::correct(const points_t &sample)
+points_t TrICP::correct(const points_t &sample,
+						const std::function<point_t(const point_t &)> &getClosest)
 {
-	if (sample.empty() || map.getPoints().empty())
+	if (sample.empty())
 	{
 		return sample;
 	}
@@ -57,13 +58,12 @@ points_t TrICP::correct(const points_t &sample)
 	double mse = 1e9;
 	double oldMSE;
 	points_t points = sample;
-	int N = std::min(static_cast<int>(map.getPoints().size()),
-					 static_cast<int>(overlap * sample.size()));
+	int N = static_cast<int>(overlap * sample.size());
 	do
 	{
 		i++;
 		oldMSE = mse;
-		points = iterate(points, N, mse);
+		points = iterate(points, N, getClosest, mse);
 	} while (!isDone(i, mse, oldMSE));
 
 	return points;
@@ -79,15 +79,17 @@ bool TrICP::isDone(int numIter, double mse, double oldMSE) const
 	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
 }
 
-points_t TrICP::iterate(const points_t &sample, int N, double &mse) const
+points_t TrICP::iterate(const points_t &sample, int N,
+						const std::function<point_t(const point_t &)> &getClosest,
+						double &mse) const
 {
 	PointPair pairs[sample.size()];
 	for (int i = 0; i < sample.size(); i++)
 	{
 		const point_t &point = sample[i];
-		point_t closest = map.getClosest(point);
-		double dist = (point - closest).norm();
-		PointPair pair{closest, point, dist};
+		point_t closestPoint = getClosest(point);
+		double dist = (point - closestPoint).norm();
+		PointPair pair{closestPoint, point, dist};
 		pairs[i] = pair;
 	}
 
