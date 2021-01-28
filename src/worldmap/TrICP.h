@@ -8,12 +8,12 @@ class TrICP
 public:
 	explicit TrICP(int maxIter, double relErrChangeThresh,
 				   std::function<point_t(const point_t &)> getClosest);
-	points_t correct(const points_t &sample, double overlap);
+	transform_t correct(const points_t &sample, double overlap);
 
 private:
 	int maxIter;
 	double relErrChangeThresh;
 	std::function<point_t(const point_t &)> getClosest;
-	points_t iterate(const points_t &sample, int N, double &mse) const;
+	transform_t iterate(points_t &sample, int N, double &mse) const;
 	bool isDone(int numIter, double S, double oldMSE) const;
 };

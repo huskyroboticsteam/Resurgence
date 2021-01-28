@@ -39,18 +39,10 @@ TEST_CASE("Trimmed ICP")
 	globalMap.addPoints(transform_t::Identity(), map);
 
 	TrICP icp(25, 0.005, std::bind(&GlobalMap::getClosest, &globalMap, std::placeholders::_1));
-	points_t corrected = icp.correct(sample, 0.3);
+	// approximate the transform used to create the sample
+	transform_t trfApprox = icp.correct(sample, 0.3);
 
-	double mse = 0;
-	for (int i = 0; i < corrected.size(); i++)
-	{
-		point_t point = corrected[i];
-		point_t truth = truths[i];
-		mse += pow((point - truth).norm(), 2);
-	}
-
-	mse /= corrected.size();
-
-	std::cout << "MSE: " << mse << std::endl;
-	REQUIRE(mse <= 0.7); // threshold is arbitrary, in this test the error is usually far lower
+	double mse =(trf-trfApprox).array().square().mean();
+	std::cout << "TrICP MSE: " << mse << std::endl;
+	CHECK(mse == Approx(0).margin(1e-3));
 }

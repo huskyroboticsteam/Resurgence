@@ -1,19 +1,22 @@
 #include "GlobalMap.h"
 
-#include "TrICP.h"
-
-GlobalMap::GlobalMap() : points()
+GlobalMap::GlobalMap() : points(), trf(transform_t::Identity()),
+	  icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
 }
 
-const points_t &GlobalMap::getPoints() const
+points_t GlobalMap::getPoints() const
 {
-	return points;
+	points_t corrected = points;
+	for (point_t &p : corrected) {
+		p = trf * p;
+	}
+	return corrected;
 }
 
-void GlobalMap::addPoints(const transform_t &trf, const points_t &toAdd)
+void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd)
 {
-	transform_t trfInv = trf.inverse();
+	transform_t trfInv = robotTrf.inverse();
 	points_t transformed;
 	for (const point_t &point : toAdd)
 	{
@@ -23,33 +26,45 @@ void GlobalMap::addPoints(const transform_t &trf, const points_t &toAdd)
 		}
 	}
 
-	points_t corrected = points.empty() ? transformed : correctPointCloud(transformed);
-	points.insert(points.end(), corrected.begin(), corrected.end()); // append to global map
+	if (!points.empty()) {
+		transform_t mapAdjustment = icp.correct(transformed, 0.4);
+		// instead of adjusting the entire map right now, store the transformation
+		trf = mapAdjustment * trf;
+		transform_t mapInv = trf.inverse();
+		for (point_t &p : transformed) {
+			p = mapInv * p;
+		}
+	}
+
+	points.insert(points.end(), transformed.begin(), transformed.end()); // append to global map
 }
 
-points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
-{
-	TrICP icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1));
-	return icp.correct(pointCloud, 0.4);
-}
+//points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
+//{
+//	TrICP icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1));
+//	return icp.correct(pointCloud, 0.4);
+//}
 
 point_t GlobalMap::getClosest(const point_t &point) const
 {
+	// convert the lookup point to "naive" map space
+	point_t p = trf.inverse() * point;
 	if (points.empty())
 	{
 		return {0, 0, 0};
 	}
 	// TODO: optimize with geohashing
 	point_t closest = points[0];
-	double minDist = (point - closest).norm();
+	double minDist = (p - closest).norm();
 	for (int i = 1; i < points.size(); i++)
 	{
-		double dist = (point - points[i]).norm();
+		double dist = (p - points[i]).norm();
 		if (dist < minDist)
 		{
 			minDist = dist;
 			closest = points[i];
 		}
 	}
-	return closest;
+	// convert back to "corrected" map space
+	return trf * closest;
 }

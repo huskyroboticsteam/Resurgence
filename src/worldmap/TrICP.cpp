@@ -109,25 +109,27 @@ TrICP::TrICP(int maxIter, double relErrChangeThresh,
 {
 }
 
-points_t TrICP::correct(const points_t &sample, double overlap)
+transform_t TrICP::correct(const points_t &sample, double overlap)
 {
 	if (sample.empty())
 	{
-		return sample;
+		return transform_t::Identity();
 	}
 	int i = 0;
 	double mse = 1e9;
 	double oldMSE;
 	points_t points = sample;
+	transform_t trf = transform_t::Identity();
 	int N = static_cast<int>(overlap * sample.size());
 	do
 	{
 		i++;
 		oldMSE = mse;
-		points = iterate(points, N, mse);
+		transform_t t = iterate(points, N, mse);
+		trf = t * trf;
 	} while (!isDone(i, mse, oldMSE));
 
-	return points;
+	return trf.inverse();
 }
 
 bool TrICP::isDone(int numIter, double mse, double oldMSE) const
@@ -140,7 +142,7 @@ bool TrICP::isDone(int numIter, double mse, double oldMSE) const
 	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
 }
 
-points_t TrICP::iterate(const points_t &sample, int N, double &mse) const
+transform_t TrICP::iterate(points_t &sample, int N, double &mse) const
 {
 	PointPair pairs[sample.size()];
 	for (int i = 0; i < sample.size(); i++)
@@ -163,10 +165,9 @@ points_t TrICP::iterate(const points_t &sample, int N, double &mse) const
 
 	transform_t trf = computeTransformation(closestPairs);
 
-	points_t ret;
-	for (const point_t &point : sample)
+	for (point_t &point : sample)
 	{
-		ret.push_back(trf * point);
+		point = trf * point;
 	}
-	return ret;
+	return trf;
 }
