@@ -10,7 +10,7 @@ namespace
 {
 double rand(double low, double high)
 {
-	return low + (::rand() / (RAND_MAX / (high - low)));
+	return low + (::rand() / (RAND_MAX / (high - low))); // NOLINT(cert-msc50-cpp)
 }
 } // namespace
 
@@ -20,7 +20,7 @@ TEST_CASE("Trimmed ICP")
 	points_t sample;
 	points_t truths;
 	transform_t trf = toTransformRotateFirst(0.1, -0.25, M_PI / 24);
-	srand(time(nullptr));
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 	for (int i = 0; i < 150; i++)
 	{
 		double x1 = rand(-6, 2);
@@ -38,9 +38,8 @@ TEST_CASE("Trimmed ICP")
 	GlobalMap globalMap;
 	globalMap.addPoints(transform_t::Identity(), map);
 
-	TrICP icp(0.3, 25, 0.005);
-	points_t corrected = icp.correct(
-		sample, std::bind(&GlobalMap::getClosest, &globalMap, std::placeholders::_1));
+	TrICP icp(25, 0.005, std::bind(&GlobalMap::getClosest, &globalMap, std::placeholders::_1));
+	points_t corrected = icp.correct(sample, 0.3);
 
 	double mse = 0;
 	for (int i = 0; i < corrected.size(); i++)

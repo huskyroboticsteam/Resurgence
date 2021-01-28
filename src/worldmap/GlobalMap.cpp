@@ -29,9 +29,8 @@ void GlobalMap::addPoints(const transform_t &trf, const points_t &toAdd)
 
 points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
 {
-	TrICP icp(0.4, 10, 0.01);
-	return icp.correct(pointCloud,
-					   std::bind(&GlobalMap::getClosest, this, std::placeholders::_1));
+	TrICP icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1));
+	return icp.correct(pointCloud, 0.4);
 }
 
 point_t GlobalMap::getClosest(const point_t &point) const

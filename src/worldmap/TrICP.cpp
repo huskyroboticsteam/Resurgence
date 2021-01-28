@@ -3,6 +3,13 @@
 #include <Eigen/LU>
 #include <Eigen/SVD>
 
+struct PointPair // NOLINT(cppcoreguidelines-pro-type-member-init)
+{
+	point_t mapPoint;
+	point_t samplePoint;
+	double dist;
+};
+
 void heapify(PointPair arr[], int len, int i)
 {
 	int smallest = i;
@@ -42,77 +49,7 @@ std::vector<PointPair> heapsort(PointPair arr[], int len, int minNum)
 	return ret;
 }
 
-TrICP::TrICP(double overlap, int maxIter, double relErrChangeThresh)
-	: overlap(overlap), maxIter(maxIter), relErrChangeThresh(relErrChangeThresh)
-{
-}
-
-points_t TrICP::correct(const points_t &sample,
-						const std::function<point_t(const point_t &)> &getClosest)
-{
-	if (sample.empty())
-	{
-		return sample;
-	}
-	int i = 0;
-	double mse = 1e9;
-	double oldMSE;
-	points_t points = sample;
-	int N = static_cast<int>(overlap * sample.size());
-	do
-	{
-		i++;
-		oldMSE = mse;
-		points = iterate(points, N, getClosest, mse);
-	} while (!isDone(i, mse, oldMSE));
-
-	return points;
-}
-
-bool TrICP::isDone(int numIter, double mse, double oldMSE) const
-{
-	if (mse <= 1e-9)
-	{
-		return true;
-	}
-	double relErrChange = abs(mse - oldMSE) / mse;
-	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
-}
-
-points_t TrICP::iterate(const points_t &sample, int N,
-						const std::function<point_t(const point_t &)> &getClosest,
-						double &mse) const
-{
-	PointPair pairs[sample.size()];
-	for (int i = 0; i < sample.size(); i++)
-	{
-		const point_t &point = sample[i];
-		point_t closestPoint = getClosest(point);
-		double dist = (point - closestPoint).norm();
-		PointPair pair{closestPoint, point, dist};
-		pairs[i] = pair;
-	}
-
-	std::vector<PointPair> closestPairs = heapsort(pairs, sample.size(), N);
-
-	double newS = 0;
-	for (const PointPair &pair : closestPairs)
-	{
-		newS += pair.dist * pair.dist;
-	}
-	mse = newS / N;
-
-	transform_t trf = computeTransformation(closestPairs);
-
-	points_t ret;
-	for (const point_t &point : sample)
-	{
-		ret.push_back(trf * point);
-	}
-	return ret;
-}
-
-transform_t TrICP::computeTransformation(const std::vector<PointPair> &pairs)
+transform_t computeTransformation(const std::vector<PointPair> &pairs)
 {
 	/*
 	 * We need to find an affine transformation that maps points in the sample to points in
@@ -163,4 +100,73 @@ transform_t TrICP::computeTransformation(const std::vector<PointPair> &pairs)
 	trf.topLeftCorner<2, 2>() = R;
 	trf.topRightCorner<2, 1>() = translation;
 	return trf;
+}
+
+TrICP::TrICP(int maxIter, double relErrChangeThresh,
+			 std::function<point_t(const point_t &)> getClosest)
+	: maxIter(maxIter), relErrChangeThresh(relErrChangeThresh),
+	  getClosest(std::move(getClosest))
+{
+}
+
+points_t TrICP::correct(const points_t &sample, double overlap)
+{
+	if (sample.empty())
+	{
+		return sample;
+	}
+	int i = 0;
+	double mse = 1e9;
+	double oldMSE;
+	points_t points = sample;
+	int N = static_cast<int>(overlap * sample.size());
+	do
+	{
+		i++;
+		oldMSE = mse;
+		points = iterate(points, N, mse);
+	} while (!isDone(i, mse, oldMSE));
+
+	return points;
+}
+
+bool TrICP::isDone(int numIter, double mse, double oldMSE) const
+{
+	if (mse <= 1e-9)
+	{
+		return true;
+	}
+	double relErrChange = abs(mse - oldMSE) / mse;
+	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
+}
+
+points_t TrICP::iterate(const points_t &sample, int N, double &mse) const
+{
+	PointPair pairs[sample.size()];
+	for (int i = 0; i < sample.size(); i++)
+	{
+		const point_t &point = sample[i];
+		point_t closestPoint = getClosest(point);
+		double dist = (point - closestPoint).norm();
+		PointPair pair{closestPoint, point, dist};
+		pairs[i] = pair;
+	}
+
+	std::vector<PointPair> closestPairs = heapsort(pairs, sample.size(), N);
+
+	double newS = 0;
+	for (const PointPair &pair : closestPairs)
+	{
+		newS += pair.dist * pair.dist;
+	}
+	mse = newS / N;
+
+	transform_t trf = computeTransformation(closestPairs);
+
+	points_t ret;
+	for (const point_t &point : sample)
+	{
+		ret.push_back(trf * point);
+	}
+	return ret;
 }
