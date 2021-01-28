@@ -88,7 +88,8 @@ add_executable(tests
   ../tests/filters/RollingAvgFilterTest.cpp
   ../tests/filters/EKFTest.cpp
   ../tests/filters/StateSpaceUtilsTest.cpp
-  ../tests/worldmap/TrICPTest.cpp)
+  ../tests/worldmap/TrICPTest.cpp
+  ../tests/worldmap/GlobalMapTest.cpp)
 
 add_executable(lidar_vis
     lidar/MainVis.cpp

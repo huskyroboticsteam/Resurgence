@@ -36,7 +36,7 @@ TEST_CASE("Trimmed ICP")
 	}
 
 	GlobalMap globalMap;
-	globalMap.addPoints(transform_t::Identity(), map);
+	globalMap.addPoints(transform_t::Identity(), map, 1);
 
 	TrICP icp(25, 0.005, std::bind(&GlobalMap::getClosest, &globalMap, std::placeholders::_1));
 	// approximate the transform used to create the sample
@@ -44,5 +44,5 @@ TEST_CASE("Trimmed ICP")
 
 	double mse =(trf-trfApprox).array().square().mean();
 	std::cout << "TrICP MSE: " << mse << std::endl;
-	CHECK(mse == Approx(0).margin(1e-3));
+	CHECK(mse == Approx(0).margin(0.01));
 }

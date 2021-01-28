@@ -14,7 +14,7 @@ points_t GlobalMap::getPoints() const
 	return corrected;
 }
 
-void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd)
+void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, double overlap)
 {
 	transform_t trfInv = robotTrf.inverse();
 	points_t transformed;
@@ -27,7 +27,7 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd)
 	}
 
 	if (!points.empty()) {
-		transform_t mapAdjustment = icp.correct(transformed, 0.4);
+		transform_t mapAdjustment = icp.correct(transformed, overlap);
 		// instead of adjusting the entire map right now, store the transformation
 		trf = mapAdjustment * trf;
 		transform_t mapInv = trf.inverse();
