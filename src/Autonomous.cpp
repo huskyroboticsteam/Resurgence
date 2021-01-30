@@ -10,7 +10,7 @@
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
-constexpr double DRIVE_SPEED = 8;
+constexpr double DRIVE_SPEED = 3;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
 
@@ -278,6 +278,13 @@ void Autonomous::autonomyIter()
 				plan_pose(2) += action(0);
 				plan_pose(0) += action(1) * cos(plan_pose(2));
 				plan_pose(1) += action(1) * sin(plan_pose(2));
+				transform_t tf_lidar_base = toTransform(pose);
+				transform_t tf_plan_pose = toTransform(plan_pose) * tf_lidar_base.inverse();
+				if (collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
+					// We'll replan next timestep
+					// TODO this might not be safe if the collision is on the very next timestep
+					should_replan = true; 
+				}
 				if (i >= plan_idx && !found_target && dist(plan_pose, pose, 1.0) > 5.0) {
 					found_target = true;
 					plan_idx = i;
