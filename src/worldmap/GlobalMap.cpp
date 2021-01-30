@@ -1,6 +1,8 @@
 #include "GlobalMap.h"
 
-GlobalMap::GlobalMap() : points(), trf(transform_t::Identity()),
+GlobalMap::GlobalMap()
+	: points(), adjustmentTransform(transform_t::Identity()),
+	  adjustmentTransformInv(transform_t::Identity()),
 	  icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
 }
@@ -8,8 +10,9 @@ GlobalMap::GlobalMap() : points(), trf(transform_t::Identity()),
 points_t GlobalMap::getPoints() const
 {
 	points_t corrected = points;
-	for (point_t &p : corrected) {
-		p = trf * p;
+	for (point_t &p : corrected)
+	{
+		p = adjustmentTransform * p;
 	}
 	return corrected;
 }
@@ -26,20 +29,23 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 		}
 	}
 
-	if (!points.empty()) {
+	if (!points.empty())
+	{
 		transform_t mapAdjustment = icp.correct(transformed, overlap);
 		// instead of adjusting the entire map right now, store the transformation
-		trf = mapAdjustment * trf;
-		transform_t mapInv = trf.inverse();
-		for (point_t &p : transformed) {
-			p = mapInv * p;
+		adjustmentTransform = mapAdjustment * adjustmentTransform;
+		adjustmentTransformInv = adjustmentTransform.inverse();
+		for (point_t &p : transformed)
+		{
+			p = adjustmentTransformInv * p;
 		}
 	}
 
-	points.insert(points.end(), transformed.begin(), transformed.end()); // append to global map
+	points.insert(points.end(), transformed.begin(),
+				  transformed.end()); // append to global map
 }
 
-//points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
+// points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
 //{
 //	TrICP icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1));
 //	return icp.correct(pointCloud, 0.4);
@@ -48,7 +54,7 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 point_t GlobalMap::getClosest(const point_t &point) const
 {
 	// convert the lookup point to "naive" map space
-	point_t p = trf.inverse() * point;
+	point_t p = adjustmentTransformInv * point;
 	if (points.empty())
 	{
 		return {0, 0, 0};
@@ -66,5 +72,5 @@ point_t GlobalMap::getClosest(const point_t &point) const
 		}
 	}
 	// convert back to "corrected" map space
-	return trf * closest;
+	return adjustmentTransform * closest;
 }

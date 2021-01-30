@@ -13,6 +13,7 @@ public:
 	point_t getClosest(const point_t &point) const;
 private:
 	points_t points;
-	transform_t trf;
+	transform_t adjustmentTransform;
+	transform_t adjustmentTransformInv;
 	TrICP icp;
 };
