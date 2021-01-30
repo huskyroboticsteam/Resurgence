@@ -6,6 +6,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/core/utility.hpp>
 
 #include "../ThreadedCapture.h"
 #include "Detector.h"
@@ -18,10 +19,13 @@ const std::string BLUR_TRACKBAR_NAME = "Blur";
 constexpr bool EXTRA_WINDOWS = true;
 
 // Set to whichever camera params should be used
-const AR::CameraParams PARAMS = AR::getCameraParams(AR::Params::ROBOT_TOP_WEBCAM_480);
+AR::CameraParams PARAMS = AR::getCameraParams(AR::Params::ROBOT_TOP_WEBCAM_480);
 
 // Set to whichever MarkerSet should be used (CIRC/URC)
-const std::shared_ptr<AR::MarkerSet> MARKER_SET = AR::Markers::CIRC_MARKERS();
+std::shared_ptr<AR::MarkerSet> MARKER_SET = AR::Markers::URC_MARKERS();
+
+const std::string keys = "{@params       | 0 | }"
+						 "{@marker_set   | 0 | }";
 
 int camera_id = 0;
 
@@ -46,6 +50,43 @@ std::vector<cv::Point2d> projectCube(double len, cv::Vec3d rvec, cv::Vec3d tvec)
 
 int main(int argc, char *argv[])
 {
+	cv::CommandLineParser parser(argc, argv, keys);
+
+	int camera_param_num = parser.get<int>(0);
+	int marker_set_num = parser.get<int>(1);
+
+	AR::Params camera_to_use = AR::Params::ROBOT_TOP_WEBCAM_480;
+
+	if (marker_set_num == 1) {
+		MARKER_SET = AR::Markers::CIRC_MARKERS();
+	}
+
+	switch(camera_param_num) {
+		case 0 :
+			camera_to_use = AR::Params::WINSTON_WEBCAM_480;
+			break;
+		case 1 :
+			camera_to_use = AR::Params::WEBCAM_1080;
+			break;
+		case 2 :
+			camera_to_use = AR::Params::WEBCAM_720;
+			break;
+		case 3 :
+			camera_to_use = AR::Params::LAPTOP;
+			break;
+		case 4 :
+			camera_to_use = AR::Params::WEBCAM;
+			break;
+		case 5 :
+			camera_to_use = AR::Params::EVAN_NEW_WEBCAM_480;
+			break;
+		case 6 :
+			camera_to_use = AR::Params::ROBOT_TOP_WEBCAM_480;
+			break;
+	}
+
+	PARAMS = AR::getCameraParams(camera_to_use);
+
 	if (argc > 1)
 	{
 		camera_id = std::stoi(argv[1]);
