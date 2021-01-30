@@ -200,14 +200,6 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		// Opens up a window to display frames
-		cv::imshow(ORIG_WINDOW_NAME, frame);
-		if (EXTRA_WINDOWS)
-		{
-			cv::imshow("Gray", gray);
-			cv::imshow("Edges", edges);
-		}
-
 		if (cv::waitKey(1) == 'q')
 			break;
 
