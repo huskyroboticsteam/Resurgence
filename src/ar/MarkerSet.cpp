@@ -69,7 +69,7 @@ bool MarkerSet::addIDMapping(int id, int mapping)
 
 int MarkerSet::getIDMapping(int id)
 {
-	return this->id_mappings[id];
+	return this->id_mappings.at(id);
 }
 
 int &MarkerSet::operator[](int id)
@@ -79,7 +79,7 @@ int &MarkerSet::operator[](int id)
 
 template <class IDMapping_t> IDMapping_t MarkerSet::getIDMapping(int id)
 {
-	return static_cast<IDMapping_t>(this->id_mappings[id]);
+	return static_cast<IDMapping_t>(this->id_mappings.at(id));
 }
 
 ar_dict_ptr MarkerSet::getDict() const
@@ -110,6 +110,26 @@ std::vector<Marker> MarkerSet::getMarkers() const
 bool MarkerSet::isIDMapped(int id) const
 {
 	return this->id_mappings.count(id) == 1;
+}
+
+bool MarkerSet::getMarkerByID(int id, Marker &out) const
+{
+	if (id < 0 || id > markers.size())
+	{
+		return false;
+	}
+	out = markers[id];
+	return true;
+}
+
+bool MarkerSet::getMarkerByMappedID(int id, Marker &out) const
+{
+	if (!isIDMapped(id))
+	{
+		return false;
+	}
+	out = markers[this->id_mappings.at(id)];
+	return true;
 }
 
 namespace Markers
