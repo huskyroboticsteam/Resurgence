@@ -3,6 +3,8 @@
 #include <Eigen/LU>
 #include <cmath>
 #include <iostream>
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/point.hpp>
 
 #include "Globals.h"
 #include "simulator/world_interface.h"
@@ -13,11 +15,16 @@ constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
+const rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("autonomous.cpp");
+////const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub = node->create_publisher<geometry_msgs::msg::Point>("plan_viz", 10);
+const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("current_pose", 10);
+const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("next_pose", 10);
+////const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr lidar_pub = node->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 10);
 
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: viz_window("Planning visualization"),
+	: //viz_window("Planning visualization"),
 		target(_target),
 		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
@@ -55,12 +62,12 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	return diff.norm();
 }
 
-void Autonomous::drawPose(pose_t &pose, pose_t &current_pose, sf::Color c)
+pose_t Autonomous::poseToDraw(pose_t &pose, pose_t &current_pose)
 {
 	// Both poses are given in the same frame. (usually GPS frame)
 	// `current_pose` is the current location of the robot, `pose` is the pose we wish to draw
 	transform_t inv_curr = toTransform(current_pose).inverse();
-	viz_window.drawRobot(toTransform(pose) * inv_curr * VIZ_BASE_TF, c);
+	return toPose(toTransform(pose) * inv_curr * VIZ_BASE_TF, 0);
 }
 
 bool Autonomous::arrived(const pose_t &pose) const
@@ -259,9 +266,17 @@ void Autonomous::autonomyIter()
 			plan = getPlan(lidar_scan, point_t_goal, goal_radius);
 		}
 
-		while (viz_window.pollWindowEvent() != -1) {}
-		viz_window.drawPoints(transformReadings(lidar_scan, VIZ_BASE_TF), sf::Color::Red, 3);
-		drawPose(pose, pose, sf::Color::Black);
+		// while (viz_window.pollWindowEvent() != -1) {}
+		// viz_window.drawPoints(transformReadings(lidar_scan, VIZ_BASE_TF), sf::Color::Red, 3);
+		// drawPose(pose, pose, sf::Color::Black);
+		////const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
+		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
+		////lidar_pub->publish(0);//lidar_scan_transformed);
+		auto curr_pose_message = geometry_msgs::msg::Point();
+		curr_pose_message.x = curr_pose_transformed(0);
+		curr_pose_message.y = curr_pose_transformed(1);
+		curr_pose_message.z = curr_pose_transformed(2);
+		curr_pose_pub->publish(curr_pose_message);
 
 		int plan_size = plan.rows();
 		if (plan_size == 0 && dist(driveTarget, pose, 1.0) < 2.0) {
@@ -271,7 +286,9 @@ void Autonomous::autonomyIter()
 			// Roll out the plan until we find a target pose a certain distance in front
 			// of the robot. (This code also handles visualizing the plan.)
 			pose_t plan_pose = plan_base;
-			drawPose(plan_pose, pose, sf::Color::Red);
+			// drawPose(plan_pose, pose, sf::Color::Red);
+			////std::vector<transform_t> plan_poses;
+			//plan_poses.push_back(poseToDraw(plan_pose, pose));
 			bool found_target = false;
 			for (int i = 0; i < plan_size; i++) {
 				action_t action = plan.row(i);
@@ -282,13 +299,23 @@ void Autonomous::autonomyIter()
 					found_target = true;
 					plan_idx = i;
 					driveTarget = plan_pose;
-					drawPose(plan_pose, pose, sf::Color::Blue);
+					// drawPose(plan_pose, pose, sf::Color::Blue);
+					const pose_t next_pose_transformed = poseToDraw(plan_pose, pose);
+					auto next_pose_message = geometry_msgs::msg::Point();
+					next_pose_message.x = next_pose_transformed(0);
+					next_pose_message.y = next_pose_transformed(1);
+					next_pose_message.z = next_pose_transformed(2);
+					next_pose_pub->publish(next_pose_message);
 				} else {
-					drawPose(plan_pose, pose, sf::Color::Red);
+					// drawPose(plan_pose, pose, sf::Color::Red);
+					////plan_poses.push_back(poseToDraw(plan_pose, pose));
 				}
 			}
+			//std::unique_ptr<std::vector<pose_t>> plan_poses_ptr = std::make_unique<std::vector<pose_t>>(plan_poses);
+			////const std::vector<transform_t> plan_poses_clone(plan_poses);
+			////plan_pub->publish(0);//plan_poses_clone);
 		}
-		viz_window.display();
+		// viz_window.display();
 
 		double d = dist(driveTarget, pose, 0);
 		if (state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)

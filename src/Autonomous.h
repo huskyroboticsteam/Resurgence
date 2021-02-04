@@ -33,7 +33,7 @@ public:
 	void autonomyIter();
 
 private:
-	MyWindow viz_window;
+	// MyWindow viz_window;
 	URCLeg target;
 	pose_t search_target;
 	PoseEstimator poseEstimator;
@@ -56,7 +56,7 @@ private:
 
 	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
-	void drawPose(pose_t &pose, pose_t &current_pose, sf::Color c);
+	pose_t poseToDraw(pose_t &pose, pose_t &current_pose);
 
 	ObstacleMap obsMap;
 	Pather2 pather;
