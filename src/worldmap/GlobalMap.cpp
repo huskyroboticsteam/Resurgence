@@ -3,7 +3,7 @@
 GlobalMap::GlobalMap()
 	: points(), adjustmentTransform(transform_t::Identity()),
 	  adjustmentTransformInv(transform_t::Identity()),
-	  icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
+	  icp(25, 0.005, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
 }
 
@@ -41,8 +41,8 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 		}
 	}
 
-	points.insert(points.end(), transformed.begin(),
-				  transformed.end()); // append to global map
+	// append to global map
+	points.insert(points.end(), transformed.begin(), transformed.end());
 }
 
 // points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
