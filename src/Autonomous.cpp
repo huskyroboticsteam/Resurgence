@@ -79,6 +79,15 @@ pose_t Autonomous::poseToDraw(pose_t &pose, pose_t &current_pose)
 	return toPose(toTransform(pose) * inv_curr * VIZ_BASE_TF, 0);
 }
 
+void publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher)
+{
+	auto message = geometry_msgs::msg::Point();
+	message.x = pose(0);
+	message.y = pose(1);
+	message.z = pose(2);
+	publisher->publish(message);
+}
+
 bool Autonomous::arrived(const pose_t &pose) const
 {
 	if (landmarkFilter.getSize() == 0)
@@ -280,29 +289,17 @@ void Autonomous::autonomyIter()
 		// drawPose(pose, pose, sf::Color::Black);
 
 		// Send message to clear previous lidar points
-		auto lidar_clear = geometry_msgs::msg::Point();
-		lidar_clear.x = NAN;
-		lidar_clear.y = NAN;
-		lidar_clear.z = NAN;
-		lidar_pub->publish(lidar_clear);
+		publish({NAN, NAN, NAN}, lidar_pub);
 
 		// Send lidar points
 		const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
 		for (point_t point : lidar_scan_transformed)
 		{
-			auto lidar_message = geometry_msgs::msg::Point();
-			lidar_message.x = point(0);
-			lidar_message.y = point(1);
-			lidar_message.z = point(2);
-			lidar_pub->publish(lidar_message);
+			publish(point, lidar_pub);
 		}
 
 		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
-		auto curr_pose_message = geometry_msgs::msg::Point();
-		curr_pose_message.x = curr_pose_transformed(0);
-		curr_pose_message.y = curr_pose_transformed(1);
-		curr_pose_message.z = curr_pose_transformed(2);
-		curr_pose_pub->publish(curr_pose_message);
+		publish(curr_pose_transformed, curr_pose_pub);
 
 		int plan_size = plan.rows();
 		if (plan_size == 0 && dist(driveTarget, pose, 1.0) < 2.0) {
@@ -315,18 +312,11 @@ void Autonomous::autonomyIter()
 			// drawPose(plan_pose, pose, sf::Color::Red);
 
 			// Send message to clear previous plan poses
-			auto clear_plan_pose = geometry_msgs::msg::Point();
-			clear_plan_pose.x = NAN;
-			clear_plan_pose.y = NAN;
-			clear_plan_pose.z = NAN;
-			plan_pub->publish(clear_plan_pose);
+			publish({NAN, NAN, NAN}, plan_pub);
 
 			// Send starting plan_pose
-			auto start_plan_pose = geometry_msgs::msg::Point();
-			start_plan_pose.x = plan_pose(0);
-			start_plan_pose.y = plan_pose(1);
-			start_plan_pose.z = plan_pose(2);
-			plan_pub->publish(start_plan_pose);
+			const pose_t start_plan_pose_transformed = poseToDraw(plan_pose, pose);
+			publish(start_plan_pose_transformed, plan_pub);
 
 			bool found_target = false;
 			for (int i = 0; i < plan_size; i++) {
@@ -340,19 +330,12 @@ void Autonomous::autonomyIter()
 					driveTarget = plan_pose;
 					// drawPose(plan_pose, pose, sf::Color::Blue);
 					const pose_t next_pose_transformed = poseToDraw(plan_pose, pose);
-					auto next_pose_message = geometry_msgs::msg::Point();
-					next_pose_message.x = next_pose_transformed(0);
-					next_pose_message.y = next_pose_transformed(1);
-					next_pose_message.z = next_pose_transformed(2);
-					next_pose_pub->publish(next_pose_message);
+					publish(next_pose_transformed, next_pose_pub);
 				} else {
 					// drawPose(plan_pose, pose, sf::Color::Red);
 					// Send current plan_pose
-					auto curr_plan_pose = geometry_msgs::msg::Point();
-					curr_plan_pose.x = plan_pose(0);
-					curr_plan_pose.y = plan_pose(1);
-					curr_plan_pose.z = plan_pose(2);
-					plan_pub->publish(curr_plan_pose);
+					const pose_t curr_plan_transformed = poseToDraw(plan_pose, pose);
+					publish(curr_plan_transformed, plan_pub);
 				}
 			}
 		}
