@@ -69,6 +69,14 @@ add_executable(RoverSim
   simulator/simulator_world.cpp
   simulator/world.cpp)
 
+add_executable(PlanViz
+  ${RoverCommonTest}
+  PlanViz.cpp
+  Networking/CANStubs.cpp
+  simulator/simulator_world.cpp
+  simulator/world.cpp
+  Networking/Network.cpp)
+
 add_executable(tests
   ${RoverCommonTest}
   Tests.cpp
@@ -143,6 +151,7 @@ target_link_libraries(visualizer_test ${OpenCV_LIBS})
 target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 target_link_libraries(simulator_navigation_demo ${sfml_libs})
 target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(PlanViz ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 
 include(CTest)
 include(Catch)
@@ -172,6 +181,7 @@ add_executable(FakeCANBoard
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
 set_property(TARGET RoverNoCAN PROPERTY CXX_STANDARD 14)
 set_property(TARGET RoverSim PROPERTY CXX_STANDARD 14)
+set_property(TARGET PlanViz PROPERTY CXX_STANDARD 14)
 set_property(TARGET tests PROPERTY CXX_STANDARD 14)
 set_property(TARGET lidar_vis PROPERTY CXX_STANDARD 14)
 set_property(TARGET lidarOnlyTest PROPERTY CXX_STANDARD 14)

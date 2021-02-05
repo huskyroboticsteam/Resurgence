@@ -298,6 +298,9 @@ void Autonomous::autonomyIter()
 			publish(point, lidar_pub);
 		}
 
+		// Send message that all lidar points have been sent
+		publish({INFINITY, INFINITY, INFINITY}, lidar_pub);
+
 		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
 		publish(curr_pose_transformed, curr_pose_pub);
 
@@ -338,6 +341,8 @@ void Autonomous::autonomyIter()
 					publish(curr_plan_transformed, plan_pub);
 				}
 			}
+			// Send message that all plan poses have been sent
+			publish({INFINITY, INFINITY, INFINITY}, plan_pub);
 		}
 		// viz_window.display();
 
