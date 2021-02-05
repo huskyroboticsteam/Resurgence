@@ -3,6 +3,8 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/point.hpp>
 
 #include "Pathfinding/ObstacleMap.h"
 #include "Pathfinding/Pather2.h"
@@ -48,6 +50,11 @@ private:
 	bool should_replan;
 	double search_theta_increment;
 	bool already_arrived;
+	rclcpp::Node::SharedPtr node;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr lidar_pub;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);

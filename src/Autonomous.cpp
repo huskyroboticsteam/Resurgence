@@ -3,8 +3,7 @@
 #include <Eigen/LU>
 #include <cmath>
 #include <iostream>
-#include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/point.hpp>
+#include <csignal>
 
 #include "Globals.h"
 #include "simulator/world_interface.h"
@@ -15,13 +14,14 @@ constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 8;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
-const rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("autonomous.cpp");
-////const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub = node->create_publisher<geometry_msgs::msg::Point>("plan_viz", 10);
-const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("current_pose", 10);
-const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("next_pose", 10);
-////const rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr lidar_pub = node->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 10);
 
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
+
+void stop(int signum)
+{
+	rclcpp::shutdown();
+	raise(SIGTERM);
+}
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: //viz_window("Planning visualization"),
@@ -40,6 +40,15 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		search_theta_increment(PI / 4),
 		already_arrived(false)
 {
+	// Ctrl+C isn't recognized without this line, rclcpp might override the signal
+	signal(SIGINT, stop);
+	// Initialize ROS without any commandline arguments
+	rclcpp::init(0, nullptr);
+	node = std::make_shared<rclcpp::Node>("autonomous");
+	plan_pub = node->create_publisher<geometry_msgs::msg::Point>("plan_viz", 10);
+	curr_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("current_pose", 10);
+	next_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("next_pose", 10);
+	lidar_pub = node->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 10);
 }
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &startPose)
@@ -269,9 +278,26 @@ void Autonomous::autonomyIter()
 		// while (viz_window.pollWindowEvent() != -1) {}
 		// viz_window.drawPoints(transformReadings(lidar_scan, VIZ_BASE_TF), sf::Color::Red, 3);
 		// drawPose(pose, pose, sf::Color::Black);
-		////const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
+
+		// Send message to clear previous lidar points
+		auto lidar_clear = geometry_msgs::msg::Point();
+		lidar_clear.x = NAN;
+		lidar_clear.y = NAN;
+		lidar_clear.z = NAN;
+		lidar_pub->publish(lidar_clear);
+
+		// Send lidar points
+		const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
+		for (point_t point : lidar_scan_transformed)
+		{
+			auto lidar_message = geometry_msgs::msg::Point();
+			lidar_message.x = point(0);
+			lidar_message.y = point(1);
+			lidar_message.z = point(2);
+			lidar_pub->publish(lidar_message);
+		}
+
 		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
-		////lidar_pub->publish(0);//lidar_scan_transformed);
 		auto curr_pose_message = geometry_msgs::msg::Point();
 		curr_pose_message.x = curr_pose_transformed(0);
 		curr_pose_message.y = curr_pose_transformed(1);
@@ -287,8 +313,21 @@ void Autonomous::autonomyIter()
 			// of the robot. (This code also handles visualizing the plan.)
 			pose_t plan_pose = plan_base;
 			// drawPose(plan_pose, pose, sf::Color::Red);
-			////std::vector<transform_t> plan_poses;
-			//plan_poses.push_back(poseToDraw(plan_pose, pose));
+
+			// Send message to clear previous plan poses
+			auto clear_plan_pose = geometry_msgs::msg::Point();
+			clear_plan_pose.x = NAN;
+			clear_plan_pose.y = NAN;
+			clear_plan_pose.z = NAN;
+			plan_pub->publish(clear_plan_pose);
+
+			// Send starting plan_pose
+			auto start_plan_pose = geometry_msgs::msg::Point();
+			start_plan_pose.x = plan_pose(0);
+			start_plan_pose.y = plan_pose(1);
+			start_plan_pose.z = plan_pose(2);
+			plan_pub->publish(start_plan_pose);
+
 			bool found_target = false;
 			for (int i = 0; i < plan_size; i++) {
 				action_t action = plan.row(i);
@@ -308,12 +347,14 @@ void Autonomous::autonomyIter()
 					next_pose_pub->publish(next_pose_message);
 				} else {
 					// drawPose(plan_pose, pose, sf::Color::Red);
-					////plan_poses.push_back(poseToDraw(plan_pose, pose));
+					// Send current plan_pose
+					auto curr_plan_pose = geometry_msgs::msg::Point();
+					curr_plan_pose.x = plan_pose(0);
+					curr_plan_pose.y = plan_pose(1);
+					curr_plan_pose.z = plan_pose(2);
+					plan_pub->publish(curr_plan_pose);
 				}
 			}
-			//std::unique_ptr<std::vector<pose_t>> plan_poses_ptr = std::make_unique<std::vector<pose_t>>(plan_poses);
-			////const std::vector<transform_t> plan_poses_clone(plan_poses);
-			////plan_pub->publish(0);//plan_poses_clone);
 		}
 		// viz_window.display();
 
