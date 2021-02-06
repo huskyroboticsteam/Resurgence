@@ -273,13 +273,13 @@ void Autonomous::autonomyIter()
 			pose_t plan_pose = plan_base;
 			drawPose(plan_pose, pose, sf::Color::Red);
 			bool found_target = false;
+			transform_t lidar_base_inv = toTransform(pose).inverse();
 			for (int i = 0; i < plan_size; i++) {
 				action_t action = plan.row(i);
 				plan_pose(2) += action(0);
 				plan_pose(0) += action(1) * cos(plan_pose(2));
 				plan_pose(1) += action(1) * sin(plan_pose(2));
-				transform_t tf_lidar_base = toTransform(pose);
-				transform_t tf_plan_pose = toTransform(plan_pose) * tf_lidar_base.inverse();
+				transform_t tf_plan_pose = toTransform(plan_pose) * lidar_base_inv;
 				if (collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
 					// We'll replan next timestep
 					// TODO this might not be safe if the collision is on the very next timestep
