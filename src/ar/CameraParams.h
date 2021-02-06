@@ -25,6 +25,7 @@ private:
 
 public:
 	CameraParams(cv::Mat camera_params, cv::Mat dist_coeff);
+	CameraParams(const CameraParams& other);
 	/**
 	   Gets the camera matrix associated with this set of camera parameters.
 	 */

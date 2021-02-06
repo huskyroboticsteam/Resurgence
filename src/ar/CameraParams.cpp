@@ -9,6 +9,14 @@ CameraParams::CameraParams(cv::Mat camera_params, cv::Mat dist_coeff)
 	_dist_coeff = dist_coeff;
 }
 
+CameraParams::CameraParams(const CameraParams& other){
+	cv::Mat newCam, newDist;
+	other._camera_params.copyTo(newCam);
+	other._dist_coeff.copyTo(newDist);
+	this->_camera_params = newCam;
+	this->_dist_coeff = newDist;
+}
+
 cv::Mat CameraParams::getCameraParams() const
 {
 	return _camera_params;

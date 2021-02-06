@@ -21,7 +21,7 @@ MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physic
 					 ar_dict markerDict)
 {
 	ar_dict *dict_ = new ar_dict(markerDict);
-	init(data_region_size, border_size, physical_size, ar_dict_ptr(dict));
+	init(data_region_size, border_size, physical_size, ar_dict_ptr(dict_));
 }
 
 MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
@@ -43,7 +43,8 @@ void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physic
 	this->dict = markerDict;
 
 	std::vector<Marker> markerVec;
-	cv::Mat bytesList = dict->bytesList;
+	cv::Mat bytesList;
+	dict->bytesList.copyTo(bytesList);
 	for (size_t i = 0; i < bytesList.rows; i++)
 	{
 		cv::Mat row = bytesList.row(i);
@@ -293,7 +294,7 @@ cv::Mat makeAlvarBytesList(uint8_t marker_array[ALVAR_COUNT][BIT_ARR_SIZE])
 	{
 		uint8_t *current_marker = marker_array[m];
 		cv::Mat current_marker_mat = cv::Mat(size, CV_8UC1, current_marker);
-		bytes_list.push_back(current_marker_mat);
+		bytes_list.push_back(cv::aruco::Dictionary::getByteListFromBits(current_marker_mat));
 	}
 	return bytes_list;
 }
