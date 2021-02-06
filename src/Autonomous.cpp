@@ -261,8 +261,8 @@ void Autonomous::autonomyIter()
 			double new_plan_cost = planCostFromIndex(new_plan, 0);
 			// we want a significant improvement to avoid thrash
 			if (new_plan_cost < plan_cost * 0.8) {
-        plan_idx = 0;
-        plan_base = pose;
+				plan_idx = 0;
+				plan_base = pose;
 				plan_cost = new_plan_cost;
 				plan = new_plan;
 				time_since_plan = 0;
