@@ -70,12 +70,9 @@ add_executable(RoverSim
   simulator/world.cpp)
 
 add_executable(PlanViz
-  ${RoverCommonTest}
   PlanViz.cpp
-  Networking/CANStubs.cpp
-  simulator/simulator_world.cpp
-  simulator/world.cpp
-  Networking/Network.cpp)
+  simulator/utils.cpp
+  simulator/graphics.cpp)
 
 add_executable(tests
   ${RoverCommonTest}
