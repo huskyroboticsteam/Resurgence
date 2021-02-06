@@ -118,6 +118,53 @@ sudo make install
 Follow instructions in `src/simulator/README.md`, or just execute the commands
 from `tests-docker-action/entrypoint.sh`.
 
+## Install ROS (planning visualization)
+
+### On Ubuntu (Including Windows Subsystem for Linux)
+
+Make sure you have a locale which supports UTF-8:
+
+```bash
+locale  # check for UTF-8
+```
+
+If your locale does not support UTF-8, run the following commands:
+
+```bash
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+locale  # verify settings
+```
+
+Set up the ROS apt repositories:
+
+```bash
+sudo apt update && sudo apt install curl gnupg2 lsb-release
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+sudo apt update
+```
+
+Ubuntu 18.04 and 20.04 support different ROS distributions, so replace `<version>` in the commands below with the appropriate version for your system.
+
+18.04: `dashing`  
+20.04: `foxy`  
+
+```bash
+sudo apt install ros-<version>-ros-base
+source /opt/ros/<version>/setup.bash
+echo "source /opt/ros/<version>/setup.bash" >> ~/.bashrc
+```
+
+### On other systems (not tested)
+
+Follow the instructions here: https://index.ros.org/doc/ros2/Installation/Foxy/
+
+If your system doesn't support ROS Foxy, install ROS Dashing by following the instructions here: https://index.ros.org/doc/ros2/Installation/Dashing/
+
 ## Setup Project Repository
 This step will require you to have CMake and Git. If you've followed the above
 OpenCV setup instructions, you should have these installed already. The
