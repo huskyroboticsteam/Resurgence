@@ -23,7 +23,7 @@ enum NavState {
 	SEARCH_PATTERN
 };
 
-class Autonomous
+class Autonomous : rclcpp::Node
 {
 public:
 	explicit Autonomous(const URCLeg &target, double controlHz);
@@ -49,7 +49,6 @@ private:
 	int plan_idx;
 	double search_theta_increment;
 	bool already_arrived;
-	rclcpp::Node::SharedPtr node;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;

@@ -3,7 +3,6 @@
 #include <Eigen/LU>
 #include <cmath>
 #include <iostream>
-#include <csignal>
 
 #include "Globals.h"
 #include "simulator/world_interface.h"
@@ -22,14 +21,9 @@ constexpr int REPLAN_PERIOD = 20;
 
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
-void closeSim(int signum)
-{
-	rclcpp::shutdown();
-	raise(SIGTERM);
-}
-
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: target(_target),
+	: Node("autonomous"),
+		target(_target),
 		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
@@ -42,18 +36,12 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_base({0,0,0}),
 		plan_idx(0),
 		search_theta_increment(PI / 4),
-		already_arrived(false)
+		already_arrived(false),
+		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
+		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
+		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
+		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100))
 {
-	// Ctrl+C doesn't stop the simulation without this line
-	signal(SIGINT, closeSim);
-
-	// Initialize ROS without any commandline arguments
-	rclcpp::init(0, nullptr);
-	node = std::make_shared<rclcpp::Node>("autonomous");
-	plan_pub = node->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100);
-	curr_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("current_pose", 100);
-	next_pose_pub = node->create_publisher<geometry_msgs::msg::Point>("next_pose", 100);
-	lidar_pub = node->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100);
 }
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &startPose)
@@ -126,10 +114,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 		out = sum;
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 double transformAngle(double currAngle, double targetAngle)
@@ -294,9 +279,6 @@ void Autonomous::autonomyIter()
 			}
 		}
 
-		// Send message to visualization to clear previous data
-		publish({NAN, NAN, NAN}, plan_pub);
-
 		// Send lidar points to visualization
 		const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
 		for (point_t point : lidar_scan_transformed)
@@ -358,7 +340,7 @@ void Autonomous::autonomyIter()
 		}
 
 		// Send message to visualization that all data has been sent
-		publish({INFINITY, INFINITY, INFINITY}, plan_pub);
+		publish({NAN, NAN, NAN}, plan_pub);
 
 		double d = dist(driveTarget, pose, 0);
 		if (state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)
