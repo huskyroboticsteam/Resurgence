@@ -91,7 +91,7 @@ CMake, or Homebrew for Mac users.
 Execute the following commands in your terminal:
 1. `git clone https://github.com/catchorg/Catch2.git`
 2. `cd Catch2`
-3. `git checkout v2.13.3`
+3. `git checkout v2.13.4`
 4. `mkdir build`
 5. `cd build`
 6. `cmake -H.. -DBUILD_TESTING=OFF`
