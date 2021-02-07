@@ -42,11 +42,11 @@ private:
 	std::vector<pose_t> calibrationPoses{};
 	RollingAvgFilter<5,3> landmarkFilter;
 	NavState state;
-	int clock_counter;
+	int time_since_plan;
 	plan_t plan;
+	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
-	bool should_replan;
 	double search_theta_increment;
 	bool already_arrived;
 	rclcpp::Node::SharedPtr node;

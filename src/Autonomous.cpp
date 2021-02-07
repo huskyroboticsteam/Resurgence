@@ -15,6 +15,11 @@ constexpr double DRIVE_SPEED = 3;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
 
+constexpr double FOLLOW_DIST = 5.0;
+constexpr double PLAN_COLLISION_STOP_DIST = 2.0;
+constexpr double INFINITE_COST = 1e10;
+constexpr int REPLAN_PERIOD = 20;
+
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 void closeSim(int signum)
@@ -31,11 +36,11 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		calibrationPoses({}),
 		landmarkFilter(),
 		state(NavState::INIT),
-		clock_counter(0),
+		time_since_plan(0),
 		plan(0,2),
+		plan_cost(INFINITE_COST),
 		plan_base({0,0,0}),
 		plan_idx(0),
-		should_replan(true),
 		search_theta_increment(PI / 4),
 		already_arrived(false)
 {
@@ -210,7 +215,7 @@ void Autonomous::autonomyIter()
 		already_arrived = true;
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
-				  << std::endl;
+					<< std::endl;
 		landmarkFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
@@ -235,7 +240,7 @@ void Autonomous::autonomyIter()
 				if (landmarkFilter.getSize() == 0)
 				{
 					// Replan if this is the first landmark we have seen
-					should_replan = true;
+					plan_cost = INFINITE_COST;
 				}
 				// transform and add the new data to the filter
 				transform_t invTransform = toTransform(pose).inverse();
@@ -271,17 +276,22 @@ void Autonomous::autonomyIter()
 		}
 
 		const points_t lidar_scan = readLidarScan();
-		should_replan |= ((clock_counter++) % 20 == 0); // TODO make this configurable
-		if (should_replan) {
-			plan_base = pose;
-			plan_idx = 0;
-			should_replan = false;
+		if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
 			point_t point_t_goal;
 			point_t_goal.topRows(2) = driveTarget.topRows(2);
 			point_t_goal(2) = 1.0;
 			point_t_goal = toTransform(pose) * point_t_goal;
 			double goal_radius = 2.0;
-			plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+			plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+			double new_plan_cost = planCostFromIndex(new_plan, 0);
+			// we want a significant improvement to avoid thrash
+			if (new_plan_cost < plan_cost * 0.8) {
+				plan_idx = 0;
+				plan_base = pose;
+				plan_cost = new_plan_cost;
+				plan = new_plan;
+				time_since_plan = 0;
+			}
 		}
 
 		// Send message to visualization to clear previous data
@@ -321,12 +331,20 @@ void Autonomous::autonomyIter()
 				transform_t tf_plan_pose = toTransform(plan_pose) * lidar_base_inv;
 				if (collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
 					// We'll replan next timestep
-					// TODO this might not be safe if the collision is on the very next timestep
-					should_replan = true; 
+					// TODO strictly speaking, we don't need to replan if the collision happened
+					// on a part of the plan that we've already passed. But I'm not quite sure how
+					// to algorithmically decide which parts of the plan we've already passed.
+					plan_cost = INFINITE_COST;
+					// TODO we should have a more sophisticated way of deciding whether a collision
+					// is imminent.
+					if (dist(plan_pose, pose, 0.0) < PLAN_COLLISION_STOP_DIST) {
+						driveTarget = pose; // Don't move
+					}
 				}
-				if (i >= plan_idx && !found_target && dist(plan_pose, pose, 1.0) > 5.0) {
+				if (i >= plan_idx && !found_target && dist(plan_pose, pose, 1.0) > FOLLOW_DIST) {
 					found_target = true;
 					plan_idx = i;
+					plan_cost = planCostFromIndex(plan, i);
 					driveTarget = plan_pose;
 					// Send next target pose to visualization
 					const pose_t next_pose_transformed = poseToDraw(plan_pose, pose);
@@ -347,7 +365,7 @@ void Autonomous::autonomyIter()
 		{
 			// Current search point has been reached
 			// Replan to avoid waiting at current search point
-			should_replan = true;
+			plan_cost = INFINITE_COST;
 			// Set the search target to the next point in the search pattern
 			search_target -= target.approx_GPS;
 			double radius = hypot(search_target(0), search_target(1));
@@ -355,7 +373,7 @@ void Autonomous::autonomyIter()
 			// Rotate the target counterclockwise by the theta increment
 			search_target.topRows(2) =
 				(Eigen::Matrix2d() << cos(search_theta_increment), -sin(search_theta_increment),
-									  sin(search_theta_increment), cos(search_theta_increment)).finished()
+										sin(search_theta_increment), cos(search_theta_increment)).finished()
 				* search_target.topRows(2) * scale;
 			search_target += target.approx_GPS;
 			// Adjust the target angle
@@ -374,7 +392,7 @@ void Autonomous::autonomyIter()
 		{
 			// Close to GPS target but no landmark in sight, should use search pattern
 			// Replan so the search starts faster
-			should_replan = true;
+			plan_cost = INFINITE_COST;
 			state = NavState::SEARCH_PATTERN;
 		}
 		// There's an overlap where either state might apply, to prevent rapidly switching
