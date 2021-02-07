@@ -1,4 +1,4 @@
-FROM uwhuskyrobots/rover-test-deps
+FROM uwhuskyrobots/rover-test-deps-ros
 
 COPY . .
 
