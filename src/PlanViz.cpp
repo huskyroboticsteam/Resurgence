@@ -53,12 +53,12 @@ private:
 		}
 	}
 
+	points_t lidar_scan;
+	MyWindow viz_window;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr plan_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr curr_pose_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr next_pose_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr lidar_sub;
-	points_t lidar_scan;
-	MyWindow viz_window;
 };
 
 int main(int argc, char **argv)
