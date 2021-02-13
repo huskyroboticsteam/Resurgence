@@ -24,10 +24,11 @@ Detector::Detector(std::shared_ptr<MarkerSet> marker_set,
 
 std::vector<Tag> Detector::detectTags(const cv::Mat &input)
 {
-	std::vector<std::vector<cv::Point2d>> corners;
+	std::vector<std::vector<cv::Point2f>> corners;
 	std::vector<int> ids;
 	cv::aruco::detectMarkers(input, this->marker_set_->getDict(), corners, ids,
 							 this->detector_params_);
+	int id_count = ids.size();
 
 	std::vector<cv::Vec3d> rvecs, tvecs;
 	cv::aruco::estimatePoseSingleMarkers(corners, this->marker_set_->getPhysicalSize(),

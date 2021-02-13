@@ -144,7 +144,7 @@ constexpr size_t ALVAR_BIT_SIZE = 5;
 /** The border size in pixels of one side of an ALVAR marker. */
 constexpr size_t ALVAR_BORDER_SIZE = 2;
 /** The physical size (in mm) of an ALVAR marker. */
-constexpr size_t ALVAR_PHYS_SIZE = 200;
+constexpr float ALVAR_PHYS_SIZE = 0.2;
 /** The bit array size for one ALVAR marker, equal to the bit size squared. */
 constexpr size_t BIT_ARR_SIZE = ALVAR_BIT_SIZE * ALVAR_BIT_SIZE;
 
@@ -153,7 +153,7 @@ constexpr size_t ARUCO_BIT_SIZE = 4;
 /** The border size in pixels of one side of an ARUco marker. */
 constexpr size_t ARUCO_BORDER_SIZE = 1;
 /** The physical size (in mm) of an ARUco marker. */
-constexpr size_t ARUCO_PHYS_SIZE = 100; // we don't know this yet, change later
+constexpr float ARUCO_PHYS_SIZE = 0.1; // we don't know this yet, change later
 
 /**
    2D array of the bits in the ALVAR markers, used in URC. Each marker is 5x5, not
