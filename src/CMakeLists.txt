@@ -29,7 +29,7 @@ list(APPEND RoverCommonTest
   Networking/motor_interface.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
-  HindsightCAN/PortTemplate.c
+  HindsightCAN/PortFiles/PortTemplate.c
   Pathfinding/ObstacleMap.cpp
   Pathfinding/Pather2.cpp
   Autonomous.cpp
@@ -173,7 +173,7 @@ add_executable(FakeCANBoard
   Networking/TestPackets.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
-  HindsightCAN/PortTemplate.c)
+  HindsightCAN/PortFiles/PortTemplate.c)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
 set_property(TARGET RoverNoCAN PROPERTY CXX_STANDARD 14)
