@@ -19,6 +19,9 @@ points_t GlobalMap::getPoints() const
 
 void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, double overlap)
 {
+	if (toAdd.empty()) {
+		return;
+	}
 	transform_t trfInv = robotTrf.inverse();
 	points_t transformed;
 	for (const point_t &point : toAdd)
@@ -31,10 +34,12 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 
 	if (!points.empty())
 	{
-		transform_t mapAdjustment = icp.correct(transformed, overlap);
-		// instead of adjusting the entire map right now, store the transformation
-		adjustmentTransform = mapAdjustment * adjustmentTransform;
-		adjustmentTransformInv = adjustmentTransform.inverse();
+		if (overlap > 0) {
+			transform_t mapAdjustment = icp.correct(transformed, overlap);
+			// instead of adjusting the entire map right now, store the transformation
+			adjustmentTransform = mapAdjustment * adjustmentTransform;
+			adjustmentTransformInv = adjustmentTransform.inverse();
+		}
 		for (point_t &p : transformed)
 		{
 			p = adjustmentTransformInv * p;
