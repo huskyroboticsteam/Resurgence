@@ -111,7 +111,7 @@ TrICP::TrICP(int maxIter, double relErrChangeThresh,
 
 transform_t TrICP::correct(const points_t &sample, double overlap)
 {
-	if (sample.empty())
+	if (sample.empty() || overlap == 0)
 	{
 		return transform_t::Identity();
 	}

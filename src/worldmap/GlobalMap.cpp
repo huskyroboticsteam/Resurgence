@@ -1,9 +1,10 @@
 #include "GlobalMap.h"
 
-GlobalMap::GlobalMap()
+GlobalMap::GlobalMap(int maxIter, double relErrChangeThresh)
 	: points(), adjustmentTransform(transform_t::Identity()),
 	  adjustmentTransformInv(transform_t::Identity()),
-	  icp(25, 0.005, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
+	  icp(maxIter, relErrChangeThresh,
+		  std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
 }
 
@@ -19,7 +20,8 @@ points_t GlobalMap::getPoints() const
 
 void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, double overlap)
 {
-	if (toAdd.empty()) {
+	if (toAdd.empty())
+	{
 		return;
 	}
 	transform_t trfInv = robotTrf.inverse();
@@ -34,7 +36,8 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 
 	if (!points.empty())
 	{
-		if (overlap > 0) {
+		if (overlap > 0)
+		{
 			transform_t mapAdjustment = icp.correct(transformed, overlap);
 			// instead of adjusting the entire map right now, store the transformation
 			adjustmentTransform = mapAdjustment * adjustmentTransform;
@@ -49,12 +52,6 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 	// append to global map
 	points.insert(points.end(), transformed.begin(), transformed.end());
 }
-
-// points_t GlobalMap::correctPointCloud(const points_t &pointCloud)
-//{
-//	TrICP icp(10, 0.01, std::bind(&GlobalMap::getClosest, this, std::placeholders::_1));
-//	return icp.correct(pointCloud, 0.4);
-//}
 
 point_t GlobalMap::getClosest(const point_t &point) const
 {
