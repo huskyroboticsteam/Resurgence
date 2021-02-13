@@ -52,14 +52,13 @@ std::vector<PointPair> heapsort(PointPair arr[], int len, int minNum)
 transform_t computeTransformation(const std::vector<PointPair> &pairs)
 {
 	/*
-	 * We need to find an affine transformation that maps points in the sample to points in
-	 * the map. This transformation is restricted, as only rotations and translations are
-	 * permitted. Shearing and scaling is invalid.
+	 * We need to find a rigid transformation that maps points in the sample to points in
+	 * the map. This transformation is not a regular affine, as only rotations and translations
+	 * are permitted.
 	 *
 	 * We can do this with the Kabsch algorithm.
 	 * https://en.wikipedia.org/wiki/Kabsch_algorithm
 	 */
-	// TODO: Maybe transform the map to match the data sample?
 	Eigen::Vector2d mapCentroid = Eigen::Vector2d::Zero();
 	Eigen::Vector2d sampleCentroid = Eigen::Vector2d::Zero();
 
