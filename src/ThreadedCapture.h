@@ -45,6 +45,10 @@ private:
 	   The internal loop that refreshes the camera, runs in a separate thread
 	 */
 	void readLoop();
+	/**
+	   The number of the current frame.
+	 */
+	size_t frame_num;
 public:
 	~ThreadedCapture();
 	ThreadedCapture();
@@ -54,6 +58,11 @@ public:
 	   should be set AFTER calling ThreadedCapture::open.
 	 */
 	bool set(cv::VideoCaptureProperties prop, double value);
+	/**
+	   Gets a property from the underlying VideoCapture. Can be used equivalently to
+	   VideoCapture::get.
+	 */
+	double get(cv::VideoCaptureProperties prop);
 	/**
 	   Opens the camera and begins the capture thread.
 	   @param cam_id The camera ID, if set to 0, the system will use the default camera.
@@ -65,8 +74,17 @@ public:
 	   Reads the current frame.
 	   @param frame A reference to an OpenCV Mat object, into which the current frame will
 	   be stored.
+	   @return Returns the number of the frame read.
 	 */
-	void read(cv::Mat& frame);
+	size_t read(cv::Mat& frame);
+	/**
+	   Returns whether or not the capture object has a new frame, relative to the frame number
+	   given.
+	   @param last_num The number of the last frame read.
+	   @return true if a new frame (relative to last_num) has been read, and false if not
+	   (i.e. if the current frame number is the same as last_num).
+	 */
+	bool hasNewFrame(size_t last_num);
 };
 
 }
