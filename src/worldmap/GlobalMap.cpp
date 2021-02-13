@@ -1,5 +1,20 @@
 #include "GlobalMap.h"
 
+/*
+ * Since the map is transformed to fit the sample, and there might be a lot of points in the
+ * global map, we don't transform the entire map with each sample. Instead, we only transform
+ * the map when it is requested by the client.
+ *
+ * We have a notion of "naive" map space and "corrected" map space. Both are in the map
+ * reference frame, but "naive" map space is when every sample is transformed to fit the first,
+ * while the "corrected" map space is when every sample is transformed to fit the last.
+ * The "corrected" map space is so named because it most correctly matches the robot's
+ * pose estimation.
+ *
+ * Points are stored in "naive" map space, and the adjustmentTransform transformation maps
+ * from "naive" to "corrected" map space.
+ */
+
 GlobalMap::GlobalMap(int maxIter, double relErrChangeThresh)
 	: points(), adjustmentTransform(transform_t::Identity()),
 	  adjustmentTransformInv(transform_t::Identity()),
