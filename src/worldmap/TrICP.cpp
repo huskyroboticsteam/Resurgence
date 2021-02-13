@@ -31,7 +31,8 @@ void heapify(PointPair arr[], int len, int i)
 	}
 }
 
-std::vector<PointPair> heapsort(PointPair arr[], int len, int minNum)
+// get some of the point pairs with the least distance using heapsort
+std::vector<PointPair> getMinN(PointPair *arr, int len, int minNum)
 {
 	for (int i = len / 2 - 1; i >= 0; i--)
 	{
@@ -153,7 +154,7 @@ transform_t TrICP::iterate(points_t &sample, int N, double &mse) const
 		pairs[i] = pair;
 	}
 
-	std::vector<PointPair> closestPairs = heapsort(pairs, sample.size(), N);
+	std::vector<PointPair> closestPairs = getMinN(pairs, sample.size(), N);
 
 	double newS = 0;
 	for (const PointPair &pair : closestPairs)
