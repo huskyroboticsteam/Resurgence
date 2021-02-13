@@ -1,6 +1,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <ctime>
+#include <csignal>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -18,16 +19,25 @@ void InitializeRover()
     InitializeBaseStationSocket();
 }
 
+void closeSim(int signum)
+{
+	rclcpp::shutdown();
+	raise(SIGTERM);
+}
+
 const double CONTROL_HZ = 10.0;
 
 int main(int argc, char **argv)
 {
     world_interface_init();
+	rclcpp::init(0, nullptr);
+	// Ctrl+C doesn't stop the simulation without this line
+	signal(SIGINT, closeSim);
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover();
     CANPacket packet;
     // Target location for autonomous navigation
-    // Eventually this will be set by communcation from the base station
+    // Eventually this will be set by communication from the base station
     int urc_leg = 5;
     Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
     char buffer[MAXLINE];

@@ -22,7 +22,7 @@ constexpr int REPLAN_PERIOD = 20;
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: viz_window("Planning visualization"),
+	: Node("autonomous"),
 		target(_target),
 		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
@@ -36,7 +36,11 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_base({0,0,0}),
 		plan_idx(0),
 		search_theta_increment(PI / 4),
-		already_arrived(false)
+		already_arrived(false),
+		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
+		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
+		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
+		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100))
 {
 }
 
@@ -60,12 +64,21 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	return diff.norm();
 }
 
-void Autonomous::drawPose(pose_t &pose, pose_t &current_pose, sf::Color c)
+pose_t Autonomous::poseToDraw(pose_t &pose, pose_t &current_pose) const
 {
 	// Both poses are given in the same frame. (usually GPS frame)
 	// `current_pose` is the current location of the robot, `pose` is the pose we wish to draw
 	transform_t inv_curr = toTransform(current_pose).inverse();
-	viz_window.drawRobot(toTransform(pose) * inv_curr * VIZ_BASE_TF, c);
+	return toPose(toTransform(pose) * inv_curr * VIZ_BASE_TF, 0);
+}
+
+void Autonomous::publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const
+{
+	auto message = geometry_msgs::msg::Point();
+	message.x = pose(0);
+	message.y = pose(1);
+	message.z = pose(2);
+	publisher->publish(message);
 }
 
 bool Autonomous::arrived(const pose_t &pose) const
@@ -101,10 +114,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 		out = sum;
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 double transformAngle(double currAngle, double targetAngle)
@@ -269,9 +279,16 @@ void Autonomous::autonomyIter()
 			}
 		}
 
-		while (viz_window.pollWindowEvent() != -1) {}
-		viz_window.drawPoints(transformReadings(lidar_scan, VIZ_BASE_TF), sf::Color::Red, 3);
-		drawPose(pose, pose, sf::Color::Black);
+		// Send lidar points to visualization
+		const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
+		for (point_t point : lidar_scan_transformed)
+		{
+			publish(point, lidar_pub);
+		}
+
+		// Send current pose to visualization
+		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
+		publish(curr_pose_transformed, curr_pose_pub);
 
 		int plan_size = plan.rows();
 		if (plan_size == 0 && dist(driveTarget, pose, 1.0) < 2.0) {
@@ -281,7 +298,11 @@ void Autonomous::autonomyIter()
 			// Roll out the plan until we find a target pose a certain distance in front
 			// of the robot. (This code also handles visualizing the plan.)
 			pose_t plan_pose = plan_base;
-			drawPose(plan_pose, pose, sf::Color::Red);
+
+			// Send starting plan_pose
+			const pose_t start_plan_pose_transformed = poseToDraw(plan_pose, pose);
+			publish(start_plan_pose_transformed, plan_pub);
+
 			bool found_target = false;
 			transform_t lidar_base_inv = toTransform(pose).inverse();
 			for (int i = 0; i < plan_size; i++) {
@@ -307,13 +328,19 @@ void Autonomous::autonomyIter()
 					plan_idx = i;
 					plan_cost = planCostFromIndex(plan, i);
 					driveTarget = plan_pose;
-					drawPose(plan_pose, pose, sf::Color::Blue);
+					// Send next target pose to visualization
+					const pose_t next_pose_transformed = poseToDraw(plan_pose, pose);
+					publish(next_pose_transformed, next_pose_pub);
 				} else {
-					drawPose(plan_pose, pose, sf::Color::Red);
+					// Send current plan_pose to visualization
+					const pose_t curr_plan_transformed = poseToDraw(plan_pose, pose);
+					publish(curr_plan_transformed, plan_pub);
 				}
 			}
 		}
-		viz_window.display();
+
+		// Send message to visualization that all data has been sent
+		publish({NAN, NAN, NAN}, plan_pub);
 
 		double d = dist(driveTarget, pose, 0);
 		if (state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)

@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
+cmake_policy(SET CMP0057 NEW)
 set(CMAKE_CXX_STANDARD 11) # For the json library
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -6,6 +7,11 @@ project(Rover LANGUAGES CXX C)
 
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
+
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
+include_directories(${rclcpp_INCLUDE_DIRS})
+include_directories(${geometry_msgs_INCLUDE_DIRS})
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
@@ -62,6 +68,11 @@ add_executable(RoverSim
   simulator/utils.cpp
   simulator/simulator_world.cpp
   simulator/world.cpp)
+
+add_executable(PlanViz
+  PlanViz.cpp
+  simulator/utils.cpp
+  simulator/graphics.cpp)
 
 add_executable(tests
   ${RoverCommonTest}
@@ -130,13 +141,14 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
-target_link_libraries(Rover ${OpenCV_LIBS})
-target_link_libraries(RoverNoCAN ${sfml_libs})
+target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(RoverNoCAN ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 target_link_libraries(Rover ${sfml_libs})
 target_link_libraries(visualizer_test ${OpenCV_LIBS})
-target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs})
+target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 target_link_libraries(simulator_navigation_demo ${sfml_libs})
-target_link_libraries(tests ${sfml_libs})
+target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(PlanViz ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 
 include(CTest)
 include(Catch)
@@ -164,5 +176,9 @@ add_executable(FakeCANBoard
   HindsightCAN/PortTemplate.c)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
+set_property(TARGET RoverNoCAN PROPERTY CXX_STANDARD 14)
+set_property(TARGET RoverSim PROPERTY CXX_STANDARD 14)
+set_property(TARGET PlanViz PROPERTY CXX_STANDARD 14)
+set_property(TARGET tests PROPERTY CXX_STANDARD 14)
 set_property(TARGET lidar_vis PROPERTY CXX_STANDARD 14)
 set_property(TARGET lidarOnlyTest PROPERTY CXX_STANDARD 14)
