@@ -3,6 +3,8 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/point.hpp>
 
 #include "Pathfinding/ObstacleMap.h"
 #include "Pathfinding/Pather2.h"
@@ -21,7 +23,7 @@ enum NavState {
 	SEARCH_PATTERN
 };
 
-class Autonomous
+class Autonomous : rclcpp::Node
 {
 public:
 	explicit Autonomous(const URCLeg &target, double controlHz);
@@ -33,7 +35,6 @@ public:
 	void autonomyIter();
 
 private:
-	MyWindow viz_window;
 	URCLeg target;
 	pose_t search_target;
 	PoseEstimator poseEstimator;
@@ -41,13 +42,17 @@ private:
 	std::vector<pose_t> calibrationPoses{};
 	RollingAvgFilter<5,3> landmarkFilter;
 	NavState state;
-	int clock_counter;
+	int time_since_plan;
 	plan_t plan;
+	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
-	bool should_replan;
 	double search_theta_increment;
 	bool already_arrived;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr lidar_pub;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
@@ -56,7 +61,8 @@ private:
 
 	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
-	void drawPose(pose_t &pose, pose_t &current_pose, sf::Color c);
+	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
+	void publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
 
 	ObstacleMap obsMap;
 	Pather2 pather;
