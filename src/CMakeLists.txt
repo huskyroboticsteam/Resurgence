@@ -30,8 +30,6 @@ list(APPEND RoverCommonTest
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/PortTemplate.c
-  Pathfinding/ObstacleMap.cpp
-  Pathfinding/Pather2.cpp
   Autonomous.cpp
   Util.cpp
   simulator/utils.cpp
@@ -92,9 +90,6 @@ add_executable(tests
   mapping/ObjectValidator.cpp
   mapping/EKFSlam/EKFSlam.cpp
   mapping/EKFSlam/tools.cpp
-  # Pathfinding Tests
-  ../tests/Pathfinding/ObstacleMapTest.cpp
-  # ../tests/Pathfinding/PatherTest.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
   ../tests/filters/RollingAvgFilterTest.cpp
   ../tests/filters/EKFTest.cpp
@@ -127,17 +122,10 @@ add_executable(simulator_navigation_demo
   simulator/world.cpp
   )
 
-add_executable(visualizer_test
-  Pathfinding/visualizer_test.cpp
-  Pathfinding/Visualizer.cpp
-  Pathfinding/Pather2.cpp
-  Pathfinding/ObstacleMap.cpp
-  )
-
 add_subdirectory(ar)
 
 list(APPEND sfml_libs
-  sfml-graphics sfml-window sfml-system pthread Eigen3::Eigen)
+  sfml-graphics sfml-window sfml-system pthread)
 
 # My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
 find_package(Eigen3 REQUIRED)
@@ -148,7 +136,6 @@ target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 target_link_libraries(RoverNoCAN ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 target_link_libraries(Rover ${sfml_libs})
-target_link_libraries(visualizer_test ${OpenCV_LIBS})
 target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 target_link_libraries(simulator_navigation_demo ${sfml_libs})
 target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
@@ -158,7 +145,6 @@ include(CTest)
 include(Catch)
 target_link_libraries(tests Catch2::Catch2)
 target_link_libraries(tests ${OpenCV_LIBS})
-target_link_libraries(tests Eigen3::Eigen)
 catch_discover_tests(tests)
 
 add_executable(Server
@@ -166,7 +152,6 @@ add_executable(Server
 
 add_executable(TCPClient
   Networking/TCPClient.cpp)
-target_link_libraries(TCPClient Eigen3::Eigen)
 
 add_executable(FakeBaseStation
   Networking/FakeBaseStation.cpp)
