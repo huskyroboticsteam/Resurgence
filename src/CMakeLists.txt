@@ -19,7 +19,23 @@ enable_testing()
 
 find_package(Catch2 REQUIRED)
 
-list(APPEND RoverCommonTest
+add_library(hindsight_can SHARED
+  HindsightCAN/CANPacket.c
+  HindsightCAN/CANCommon.c
+  HindsightCAN/PortTemplate.c
+  )
+
+add_library(simulator_base SHARED
+  simulator/utils.cpp
+  simulator/world.cpp
+  simulator/graphics.cpp)
+
+add_library(simulator_nav SHARED
+  simulator/plan.cpp
+  simulator/search.cpp
+  )
+
+add_library(rover_common SHARED
   CommandLineOptions.cpp
   Globals.cpp
   Networking/ParseBaseStation.cpp
@@ -27,14 +43,7 @@ list(APPEND RoverCommonTest
   Networking/ParseCAN.cpp
   Networking/log.cpp
   Networking/motor_interface.cpp
-  HindsightCAN/CANPacket.c
-  HindsightCAN/CANCommon.c
-  HindsightCAN/PortTemplate.c
-  Autonomous.cpp
   Util.cpp
-  simulator/utils.cpp
-  simulator/plan.cpp
-  simulator/graphics.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
@@ -42,41 +51,63 @@ list(APPEND RoverCommonTest
   worldmap/TrICP.cpp
   )
 
-list(APPEND RoverCommon
-  Rover.cpp
-  ${RoverCommonTest}
-  Networking/Network.cpp)
+add_library(real_base_station SHARED
+  Networking/Network.cpp
+  )
+
+add_library(simulator_world_interface SHARED
+  simulator/simulator_world.cpp
+  )
+add_library(stub_world_interface SHARED
+  simulator/noop_world.cpp
+  )
+
+add_library(real_can_interface SHARED
+  Networking/CANUtils.cpp
+  )
+add_library(stub_can_interface SHARED
+  Networking/CANStubs.cpp
+  )
+list(APPEND rover_libs
+  rover_common hindsight_can simulator_base simulator_nav)
 
 add_executable(Rover
-  ${RoverCommon}
-  simulator/noop_world.cpp
-  Networking/CANUtils.cpp
+  Rover.cpp
+  Autonomous.cpp
+  )
+target_link_libraries(Rover ${rover_libs}
+  real_base_station
+  real_can_interface
+  stub_world_interface # only for now, until we figure out the real sensor interfaces
   )
 
 add_executable(RoverNoCAN
-  ${RoverCommon}
-  simulator/noop_world.cpp
-  Networking/CANStubs.cpp
+  Rover.cpp
+  Autonomous.cpp
+  )
+target_link_libraries(RoverNoCAN ${rover_libs}
+  real_base_station
+  stub_can_interface
+  stub_world_interface
   )
 
 add_executable(RoverSim
-  ${RoverCommon}
-  Networking/CANStubs.cpp
-  #simulator/navigation.cpp
-  #simulator/plan.cpp
-  #simulator/search.cpp
-  simulator/utils.cpp
-  simulator/simulator_world.cpp
-  simulator/world.cpp)
+  Rover.cpp
+  Autonomous.cpp
+  )
+target_link_libraries(RoverSim ${rover_libs}
+  real_base_station
+  stub_can_interface
+  simulator_world_interface
+  )
 
 add_executable(PlanViz
-  PlanViz.cpp
-  simulator/utils.cpp
-  simulator/graphics.cpp)
+  PlanViz.cpp)
+target_link_libraries(PlanViz simulator_base)
 
 add_executable(tests
-  ${RoverCommonTest}
   Tests.cpp
+  Autonomous.cpp
   # AR Detection tests
   # ar/ARUnitTests.cpp
   ar/Tag.cpp
@@ -87,40 +118,42 @@ add_executable(tests
   Networking/real_world_interface.cpp
   # Autonomy tests
   mapping/ValidatorTest.cpp
-  mapping/ObjectValidator.cpp
-  mapping/EKFSlam/EKFSlam.cpp
-  mapping/EKFSlam/tools.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
   ../tests/filters/RollingAvgFilterTest.cpp
   ../tests/filters/EKFTest.cpp
   ../tests/filters/StateSpaceUtilsTest.cpp
   ../tests/worldmap/TrICPTest.cpp
   ../tests/worldmap/GlobalMapTest.cpp)
+target_link_libraries(tests
+  ${rover_libs}
+  lidar_slam
+  )
 
-add_executable(lidar_vis
-    lidar/MainVis.cpp
+add_library(lidar_base
     lidar/LidarVis.cpp
     lidar/PointCloudProcessing.cpp
     lidar/URGLidar.cpp)
 
-add_executable(lidarOnlyTest
-	mapping/EKFSlam/lidarOnlyTest.cpp
+add_library(lidar_slam
         mapping/EKFSlam/EKFSlam.cpp
         mapping/ObjectValidator.cpp
         mapping/EKFSlam/tools.cpp
-        lidar/LidarVis.cpp
-        lidar/PointCloudProcessing.cpp
-        lidar/URGLidar.cpp)
+        )
+
+add_executable(lidar_vis
+    lidar/MainVis.cpp)
+target_link_libraries(lidar_vis lidar_base)
+
+add_executable(lidarOnlyTest
+        mapping/EKFSlam/lidarOnlyTest.cpp
+        )
+target_link_libraries(lidarOnlyTest lidar_base lidar_slam)
 
 add_executable(simulator_navigation_demo
   simulator/navigation.cpp
-  simulator/plan.cpp
-  simulator/search.cpp
-  simulator/utils.cpp
-  simulator/graphics.cpp
-  simulator/simulator_world.cpp
-  simulator/world.cpp
   )
+target_link_libraries(simulator_navigation_demo
+  simulator_base simulator_nav simulator_world_interface)
 
 add_subdirectory(ar)
 
@@ -158,11 +191,9 @@ add_executable(FakeBaseStation
 
 add_executable(FakeCANBoard
   Networking/FakeCANBoard.cpp
-  Networking/CANUtils.cpp
   Networking/TestPackets.cpp
-  HindsightCAN/CANPacket.c
-  HindsightCAN/CANCommon.c
-  HindsightCAN/PortTemplate.c)
+  )
+target_link_libraries(FakeCANBoard hindsight_can real_can_interface)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
 set_property(TARGET RoverNoCAN PROPERTY CXX_STANDARD 14)
