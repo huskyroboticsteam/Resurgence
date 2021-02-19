@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 cmake_policy(SET CMP0057 NEW)
-set(CMAKE_CXX_STANDARD 11) # For the json library
+set(CMAKE_CXX_STANDARD 14) # 11 For the json library, 14 for ROS2
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
@@ -37,6 +37,8 @@ add_library(simulator_nav SHARED
   )
 
 add_library(rover_common SHARED
+  Rover.cpp
+  Autonomous.cpp
   CommandLineOptions.cpp
   Globals.cpp
   Networking/ParseBaseStation.cpp
@@ -72,30 +74,21 @@ add_library(stub_can_interface SHARED
 list(APPEND rover_libs
   rover_common hindsight_can simulator_base simulator_nav)
 
-add_executable(Rover
-  Rover.cpp
-  Autonomous.cpp
-  )
+add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
   stub_world_interface # only for now, until we figure out the real sensor interfaces
   )
 
-add_executable(RoverNoCAN
-  Rover.cpp
-  Autonomous.cpp
-  )
+add_executable(RoverNoCAN rover_main.cpp)
 target_link_libraries(RoverNoCAN ${rover_libs}
   real_base_station
   stub_can_interface
   stub_world_interface
   )
 
-add_executable(RoverSim
-  Rover.cpp
-  Autonomous.cpp
-  )
+add_executable(RoverSim rover_main.cpp)
 target_link_libraries(RoverSim ${rover_libs}
   real_base_station
   stub_can_interface
@@ -128,6 +121,7 @@ add_executable(tests
 target_link_libraries(tests
   ${rover_libs}
   lidar_slam
+  stub_can_interface
   )
 
 add_library(lidar_base
@@ -195,11 +189,3 @@ add_executable(FakeCANBoard
   Networking/TestPackets.cpp
   )
 target_link_libraries(FakeCANBoard hindsight_can real_can_interface)
-
-set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
-set_property(TARGET RoverNoCAN PROPERTY CXX_STANDARD 14)
-set_property(TARGET RoverSim PROPERTY CXX_STANDARD 14)
-set_property(TARGET PlanViz PROPERTY CXX_STANDARD 14)
-set_property(TARGET tests PROPERTY CXX_STANDARD 14)
-set_property(TARGET lidar_vis PROPERTY CXX_STANDARD 14)
-set_property(TARGET lidarOnlyTest PROPERTY CXX_STANDARD 14)
