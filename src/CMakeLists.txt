@@ -40,6 +40,8 @@ list(APPEND RoverCommonTest
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
+  worldmap/GlobalMap.cpp
+  worldmap/TrICP.cpp
   )
 
 list(APPEND RoverCommon
@@ -96,7 +98,9 @@ add_executable(tests
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
   ../tests/filters/RollingAvgFilterTest.cpp
   ../tests/filters/EKFTest.cpp
-  ../tests/filters/StateSpaceUtilsTest.cpp)
+  ../tests/filters/StateSpaceUtilsTest.cpp
+  ../tests/worldmap/TrICPTest.cpp
+  ../tests/worldmap/GlobalMapTest.cpp)
 
 add_executable(lidar_vis
     lidar/MainVis.cpp
