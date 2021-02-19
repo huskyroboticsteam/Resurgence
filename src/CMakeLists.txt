@@ -22,7 +22,8 @@ find_package(Catch2 REQUIRED)
 add_library(hindsight_can SHARED
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
-  HindsightCAN/PortTemplate.c
+  HindsightCAN/CANMotorUnit.c
+  HindsightCAN/PortFiles/PortTemplate.c
   )
 
 add_library(simulator_base SHARED
