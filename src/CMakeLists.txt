@@ -173,6 +173,7 @@ add_executable(FakeCANBoard
   Networking/TestPackets.cpp
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
+  HindsightCAN/CANMotorUnit.c
   HindsightCAN/PortFiles/PortTemplate.c)
 
 set_property(TARGET Rover PROPERTY CXX_STANDARD 14)
