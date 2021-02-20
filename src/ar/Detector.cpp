@@ -20,6 +20,7 @@ Detector::Detector(std::shared_ptr<MarkerSet> marker_set,
 {
 	assert(marker_set != nullptr);
 	assert(detector_params != nullptr);
+	this->detector_params_->markerBorderBits = marker_set->getBorderSize();
 }
 
 std::vector<Tag> Detector::detectTags(const cv::Mat &input)
