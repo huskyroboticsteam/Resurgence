@@ -42,6 +42,7 @@ list(APPEND RoverCommonTest
   kinematics/DiffDriveKinematics.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
+  worldmap/QuadTree.cpp
   )
 
 list(APPEND RoverCommon

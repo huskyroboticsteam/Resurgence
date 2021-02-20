@@ -75,7 +75,43 @@ std::shared_ptr<QuadTree::Node> & QuadTree::Node::getChildPtr(const point_t &poi
 }
 point_t QuadTree::Node::getClosest(const point_t &point)
 {
-	return point_t();
+	if (levelsToLeaf == 0) {
+		if (points.empty()) {
+			return {0,0,0};
+		} else {
+			point_t closest = {0,0,0};
+			double minDist = 1e9;
+			for (const point_t &p : points) {
+				double dist = (p - point).norm();
+				if (dist < minDist) {
+					closest = p;
+					minDist = dist;
+				}
+			}
+			return closest;
+		}
+	} else {
+		std::shared_ptr<QuadTree::Node> &ptr = getChildPtr(point);
+		if (ptr) {
+			point_t closest = ptr->getClosest(point);
+			double minDist = (point - closest).norm();
+			if (levelsToLeaf == 1) {
+				for (const auto &childPtr : children) {
+					if (childPtr) {
+						point_t p = childPtr->getClosest(point);
+						double dist = (p - point).norm();
+						if (dist < minDist) {
+							minDist = dist;
+							closest = p;
+						}
+					}
+				}
+			}
+			return closest;
+		} else {
+			return {0,0,0};
+		}
+	}
 }
 points_t QuadTree::Node::getPointsWithin(const point_t &point, double dist)
 {
