@@ -27,7 +27,7 @@ void closeSim(int signum)
 
 const double CONTROL_HZ = 10.0;
 
-int main(int argc, char **argv)
+int rover_loop(int argc, char **argv)
 {
     world_interface_init();
 	rclcpp::init(0, nullptr);

@@ -6,8 +6,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
 
-#include "Pathfinding/ObstacleMap.h"
-#include "Pathfinding/Pather2.h"
 #include "Util.h"
 #include "WorldData.h"
 #include "filters/PoseEstimator.h"
@@ -64,6 +62,4 @@ private:
 	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
 	void publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
 
-	ObstacleMap obsMap;
-	Pather2 pather;
 };

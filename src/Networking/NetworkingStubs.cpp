@@ -38,6 +38,15 @@ void sendBaseStationPacket(const std::string &packet)
   base_station_packets.push(packet);
 }
 
+int recvBaseStationPacket(char *buffer)
+{
+  return 0;
+}
+
+bool InitializeBaseStationSocket() {
+  return true;
+}
+
 CANPacket popCANPacket()
 {
   CANPacket p = can_packets.front();
