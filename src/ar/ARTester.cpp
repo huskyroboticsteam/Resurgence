@@ -76,7 +76,6 @@ std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
 			}
 		}
 	}
-	// FIXME: This seems to cause an exception in OpenCV when called.
 	cv::undistortPoints(grid_points, projected_points, PARAMS.getCameraParams(),
 						PARAMS.getDistCoeff());
 	return projected_points;
