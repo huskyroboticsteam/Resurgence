@@ -14,7 +14,7 @@ constexpr double DRIVE_SPEED = 3;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
 
-constexpr double FOLLOW_DIST = 5.0;
+constexpr double FOLLOW_DIST = 2.0;
 constexpr double PLAN_COLLISION_STOP_DIST = 2.0;
 constexpr double INFINITE_COST = 1e10;
 constexpr int REPLAN_PERIOD = 20;
