@@ -19,6 +19,8 @@ constexpr double PLAN_COLLISION_STOP_DIST = 2.0;
 constexpr double INFINITE_COST = 1e10;
 constexpr int REPLAN_PERIOD = 20;
 
+constexpr const char * ROVER_FRAME = "rover";
+
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
@@ -40,7 +42,8 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
 		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
 		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
-		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100))
+		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100)),
+		landmarks_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("landmarks", 100))
 {
 }
 
@@ -194,6 +197,7 @@ void Autonomous::autonomyIter()
 	// get the latest pose estimation
 	poseEstimator.correct(gps);
 	pose_t pose = poseEstimator.getPose();
+	transform_t invTransform = toTransform(pose).inverse();
 
 	if (already_arrived || arrived(pose))
 	{
@@ -228,7 +232,6 @@ void Autonomous::autonomyIter()
 					plan_cost = INFINITE_COST;
 				}
 				// transform and add the new data to the filter
-				transform_t invTransform = toTransform(pose).inverse();
 				point_t landmarkMapSpace = invTransform * leftPostLandmark;
 				// the filtering is done on the target in map space to reduce any phase lag
 				// caused by filtering
@@ -246,7 +249,6 @@ void Autonomous::autonomyIter()
 		{
 			point_t rightPostLandmark = landmarks[target.right_post_id];
 			// transform and add the new data to the filter
-			transform_t invTransform = toTransform(pose).inverse();
 			point_t landmarkMapSpace = invTransform * rightPostLandmark;
 			// the filtering is done on the target in map space to reduce any phase lag
 			// caused by filtering
@@ -285,6 +287,19 @@ void Autonomous::autonomyIter()
 		{
 			publish(point, lidar_pub);
 		}
+		const points_t landmarks_transformed = transformReadings(landmarks, VIZ_BASE_TF);
+
+		auto message = geometry_msgs::msg::PoseArray();
+		message.header.frame_id = ROVER_FRAME; // technically this is in the window frame actually
+		// but we'll figure out our transform situation later
+		for (point_t l : landmarks_transformed) {
+			auto p = geometry_msgs::msg::Pose();
+			p.position.x = l(0);
+			p.position.y = l(1);
+			p.position.z = l(2);
+			message.poses.push_back(p);
+		}
+		landmarks_pub->publish(message);
 
 		// Send current pose to visualization
 		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
@@ -304,13 +319,12 @@ void Autonomous::autonomyIter()
 			publish(start_plan_pose_transformed, plan_pub);
 
 			bool found_target = false;
-			transform_t lidar_base_inv = toTransform(pose).inverse();
 			for (int i = 0; i < plan_size; i++) {
 				action_t action = plan.row(i);
 				plan_pose(2) += action(0);
 				plan_pose(0) += action(1) * cos(plan_pose(2));
 				plan_pose(1) += action(1) * sin(plan_pose(2));
-				transform_t tf_plan_pose = toTransform(plan_pose) * lidar_base_inv;
+				transform_t tf_plan_pose = toTransform(plan_pose) * invTransform;
 				if (collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
 					// We'll replan next timestep
 					// TODO strictly speaking, we don't need to replan if the collision happened
