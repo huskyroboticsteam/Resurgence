@@ -66,7 +66,7 @@ int rover_loop(int argc, char **argv)
         if (recvBaseStationPacket(buffer) != 0) {
             ParseBaseStationPacket(buffer);
         }
-        autonomous.autonomyIter();
+        //autonomous.autonomyIter();
 
         gettimeofday(&tp0, NULL);
         long elapsedUsecs = (tp0.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp0.tv_usec - tp_start.tv_usec);

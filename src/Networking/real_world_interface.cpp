@@ -16,33 +16,16 @@ void world_interface_init() {
   return;
 }
 
-const double WHEEL_BASE = 1.0; // eyeballed
-const double WHEEL_RADIUS = 0.15; // eyeballed
-const double PWM_FOR_1RAD_PER_SEC = 10000; // eyeballed
-/*
-dx = (right + left) / 2
-dtheta = (right - left) / (distance bw wheels)
-
-therefore:
-
-2*dx + (distance bw wheels) * dtheta = 2*right
-2*dx - (distance bw wheels) * dtheta = 2*left
-
-now "right" gives the ground velocity of the wheel, so
-right_angular_vel = right / wheel_radius
-
-right_pwm = right_angular_vel * PWM_FOR_1RAD_PER_SEC
-
-*/
+const double WHEEL_BASE = 1.0; // Distance between left and right wheels. Eyeballed
+const double WHEEL_RADIUS = 0.15; // Eyeballed
+const double PWM_FOR_1RAD_PER_SEC = 10000; // Eyeballed
 
 bool setCmdVel(double dtheta, double dx)
 {
-  double lr = dtheta;
-  double fb = dx;
-  // TODO I'm curious how intuitive it would be to use remote control with wheel velocities rather
-  // than kinematic velocities. That would actually allow the rover to go faster, I think.
-  // Another alternative: add a boolean "wheel_velocities" indicating which mode to use
-  // (if true, the other keys should just be "right" and "left").
+  /* This is the inverse of the formula:
+   *    dx = (right_ground_vel + left_ground_vel) / 2
+   *    dtheta = (right_ground_vel - left_ground_vel) / WHEEL_BASE
+   */
   double right_ground_vel = dx + WHEEL_BASE/2*dtheta;
   double left_ground_vel = dx - WHEEL_BASE/2*dtheta;
   double right_angular_vel = right_ground_vel / WHEEL_RADIUS;
@@ -50,7 +33,7 @@ bool setCmdVel(double dtheta, double dx)
   int16_t right_pwm = (int16_t) (right_angular_vel * PWM_FOR_1RAD_PER_SEC);
   int16_t left_pwm = (int16_t) (left_angular_vel * PWM_FOR_1RAD_PER_SEC);
   // This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
-  int16_t max_pwm = 15000; 
+  int16_t max_pwm = 15000;
   if (abs(right_pwm) > max_pwm) {
     std::cout << "WARNING: requested too-large right PWM " << right_pwm << std::endl;
     right_pwm = max_pwm*(right_pwm < 0 ? -1 : 1);
