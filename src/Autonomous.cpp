@@ -25,10 +25,12 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: Node("autonomous"),
 		target(_target),
 		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
+		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter(),
+		gate_filter(),
 		state(NavState::INIT),
 		time_since_plan(0),
 		plan(0,2),
@@ -87,9 +89,16 @@ bool Autonomous::arrived(const pose_t &pose) const
 	{
 		return false;
 	}
-	pose_t target = getTargetPose();
-	target.topRows(2) = landmarkFilter.get().topRows(2);
-	return dist(pose, target, 1.0) < 0.5;
+	if (target.right_post_id != -1)
+	{
+		return std::isinf(gate_targets.second(0));
+	}
+	else
+	{
+		pose_t target = getTargetPose();
+		target.topRows(2) = landmarkFilter.get().topRows(2);
+		return dist(pose, target, 1.0) < 0.5;
+	}
 }
 
 double Autonomous::angleToTarget(const pose_t &gpsPose) const
@@ -198,15 +207,22 @@ void Autonomous::autonomyIter()
 	if (already_arrived || arrived(pose))
 	{
 		already_arrived = true;
-		std::cout << "arrived at gate" << std::endl;
-		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
-					<< std::endl;
+//		std::cout << "arrived at gate" << std::endl;
+//		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
+//					<< std::endl;
 		landmarkFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
 	else
 	{
 		pose_t driveTarget = getTargetPose();
+
+
+		// If we are in a search pattern, set the drive target to the next search point
+		if (state == NavState::SEARCH_PATTERN)
+		{
+			driveTarget = search_target;
+		}
 
 		// if we have some existing data or new data, set the target using the landmark
 		// data
@@ -240,24 +256,72 @@ void Autonomous::autonomyIter()
 				state = NavState::INIT;
 			}
 		}
-		// If the target has a second post we can see and we haven't seen the first post yet,
-		// use the second post as the drive target without adding it to the filter
-		else if (target.right_post_id != -1 && landmarks[target.right_post_id](2) != 0)
+
+		// The target has a second post we can see
+		if (target.right_post_id != -1 && landmarks[target.right_post_id](2) != 0)
 		{
 			point_t rightPostLandmark = landmarks[target.right_post_id];
-			// transform and add the new data to the filter
+			// transform and add the new data to the gate filter
 			transform_t invTransform = toTransform(pose).inverse();
 			point_t landmarkMapSpace = invTransform * rightPostLandmark;
 			// the filtering is done on the target in map space to reduce any phase lag
 			// caused by filtering
-			driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
-			// clear the filter so the second post is removed from it
-			landmarkFilter.reset();
-		}
-		// If we are in a search pattern, set the drive target to the next search point
-		else if (state == NavState::SEARCH_PATTERN)
-		{
-			driveTarget = search_target;
+			pose_t filtered = gate_filter.get(landmarkMapSpace);
+
+			// we haven't seen the first post yet, use the second post as the drive target
+			if (landmarkFilter.getSize() == 0)
+			{
+				driveTarget.topRows(2) = filtered.topRows(2);
+			}
+			// we have already seen the first post but have not set gate targets yet or have
+			// potentially inaccurate landmark measurements
+			else if (std::isnan(gate_targets.first(0)) || landmarkFilter.getSize() < 5)
+			{
+				point_t post_1 = landmarkFilter.get();
+				point_t post_2 = filtered;
+				point_t center = (post_1 + post_2) / 2;
+				// TODO I think this is messed up fix this
+				double angle = std::atan2(post_1(1) - post_2(1), post_1(0) - post_2(0)) + PI / 2;// - PI / 4;
+				if (angle > PI)
+				{
+					angle -= 2 * PI;
+				}
+				std::cout << "Angle: " << angle << std::endl;
+				pose_t offset{cos(angle), sin(angle), 0};
+				pose_t candidate_1 = center + 2 * offset;
+				pose_t candidate_2 = center - 2 * offset;
+				candidate_1(2) = angle;
+				candidate_2(2) = -angle;
+				if (dist(pose, candidate_1, 0) < dist(pose, candidate_2, 0))
+				{
+					gate_targets = std::make_pair(candidate_1, candidate_2);
+				}
+				else
+				{
+					gate_targets = std::make_pair(candidate_2, candidate_1);
+				}
+				driveTarget = gate_targets.first;
+				// Replan
+				plan_cost = INFINITE_COST;
+			}
+			// we have already seen the first post and have set gate targets
+			else
+			{
+				// Update gate targets
+				if (!std::isinf(gate_targets.first(0)) && dist(pose, gate_targets.first, 1.0) < 0.5 && dist(pose, gate_targets.first, 0.0) < 0.3)
+				{
+					// Arrived at first gate target
+					std::cout << "Arrived at first target, distance " << dist(pose, gate_targets.first, 0.0) << std::endl;
+					gate_targets.first = (pose_t) {INFINITY, INFINITY, INFINITY};
+				}
+				if (std::isinf(gate_targets.first(0)) && !std::isinf(gate_targets.second(0)) && dist(pose, gate_targets.second, 0.0) < 0.3)
+				{
+					// Arrived at second gate target
+					std::cout << "Arrived at second target, distance " << dist(pose, gate_targets.second, 0.0) << std::endl;
+					gate_targets.second = (pose_t) {INFINITY, INFINITY, INFINITY};
+				}
+				driveTarget = std::isinf(gate_targets.first(0)) ? gate_targets.second : gate_targets.first;
+			}
 		}
 
 		const points_t lidar_scan = readLidarScan();

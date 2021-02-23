@@ -37,10 +37,12 @@ public:
 private:
 	URCLeg target;
 	pose_t search_target;
+	std::pair<pose_t, pose_t> gate_targets;
 	PoseEstimator poseEstimator;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
 	RollingAvgFilter<5,3> landmarkFilter;
+	RollingAvgFilter<5,3> gate_filter;
 	NavState state;
 	int time_since_plan;
 	plan_t plan;
