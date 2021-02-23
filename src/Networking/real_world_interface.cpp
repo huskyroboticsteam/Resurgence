@@ -3,6 +3,13 @@
 #include "../simulator/utils.h"
 #include "json.hpp"
 #include "motor_interface.h"
+#include "CANUtils.h"
+
+extern "C"
+{
+    #include "../HindsightCAN/CANMotorUnit.h"
+}
+
 using nlohmann::json;
 
 void world_interface_init() {
@@ -11,7 +18,7 @@ void world_interface_init() {
 
 const double WHEEL_BASE = 0.8; // eyeballed
 const double WHEEL_RADIUS = 0.2; // eyeballed
-const double PWM_FOR_1RAD_PER_SEC = 10000; // eyeballed
+const double PWM_FOR_1RAD_PER_SEC = 8000; // eyeballed
 /*
 dx = (right + left) / 2
 dtheta = (right - left) / (distance bw wheels)
@@ -40,10 +47,10 @@ bool setCmdVel(double dtheta, double dx)
   double left_ground_vel = dx - WHEEL_BASE/2*dtheta;
   double right_angular_vel = right_ground_vel / WHEEL_RADIUS;
   double left_angular_vel = left_ground_vel / WHEEL_RADIUS;
-  int right_pwm = (int) (right_angular_vel * PWM_FOR_1RAD_PER_SEC);
-  int left_pwm = (int) (left_angular_vel * PWM_FOR_1RAD_PER_SEC);
+  int16_t right_pwm = (int16_t) (right_angular_vel * PWM_FOR_1RAD_PER_SEC);
+  int16_t left_pwm = (int16_t) (left_angular_vel * PWM_FOR_1RAD_PER_SEC);
   // This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
-  int max_pwm = 15000; 
+  int16_t max_pwm = 15000; 
   if (abs(right_pwm) > max_pwm) {
     std::cout << "WARNING: requested too-large right PWM " << right_pwm << std::endl;
     right_pwm = max_pwm*(right_pwm < 0 ? -1 : 1);
@@ -53,20 +60,16 @@ bool setCmdVel(double dtheta, double dx)
     left_pwm = max_pwm*(left_pwm < 0 ? -1 : 1);
   }
 
-  json packet = {};
-  packet["type"] = "motor";
-  packet["mode"] = "PWM";
-  // TODO we may need to switch some of these signs
-  packet["PWM target"] = right_pwm;
-  packet["motor"] = "front_right_wheel";
-  ParseMotorPacket(packet);
-  packet["motor"] = "back_right_wheel";
-  ParseMotorPacket(packet);
-  packet["PWM target"] = left_pwm;
-  packet["motor"] = "front_left_wheel";
-  ParseMotorPacket(packet);
-  packet["motor"] = "back_left_wheel";
-  ParseMotorPacket(packet);
+  CANPacket p;
+  uint8_t motor_group = 0x04;
+  AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_FL, left_pwm);
+  sendCANPacket(p);
+  AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_FR, right_pwm);
+  sendCANPacket(p);
+  AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_BL, left_pwm);
+  sendCANPacket(p);
+  AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_BR, right_pwm);
+  sendCANPacket(p);
   return true;
 }
 
