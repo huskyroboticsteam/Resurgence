@@ -94,7 +94,7 @@ int recvCANPacket(CANPacket *packet)
   }
   else
   {
-    std::cout << "Got CAN packet" << std::endl;
+    //std::cout << "Got CAN packet" << std::endl;
     packet->id = can_frame_.can_id;
     packet->dlc = can_frame_.can_dlc;
     for(int i = 0; i < can_frame_.can_dlc; i++)

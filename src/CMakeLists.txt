@@ -64,6 +64,9 @@ add_library(simulator_world_interface SHARED
 add_library(stub_world_interface SHARED
   simulator/noop_world.cpp
   )
+add_library(real_world_interface SHARED
+  Networking/real_world_interface.cpp
+  )
 
 add_library(real_can_interface SHARED
   Networking/CANUtils.cpp
@@ -78,7 +81,7 @@ add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
-  stub_world_interface # only for now, until we figure out the real sensor interfaces
+  real_world_interface
   )
 
 add_executable(RoverNoCAN rover_main.cpp)
