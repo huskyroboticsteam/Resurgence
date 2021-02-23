@@ -13,26 +13,44 @@
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
 
+extern "C"
+{
+    #include "HindsightCAN/CANMotorUnit.h"
+}
+
 void InitializeRover()
 {
     InitializeCANSocket();
     InitializeBaseStationSocket();
+    CANPacket p;
+
+    // Set all wheel motors to mode PWM
+    uint8_t motor_group = 0x4;
+    uint8_t mode_PWM = 0x0;
+    uint16_t test_PWM = -5000;
+    for (uint8_t serial = 0x8; serial < 0xC; serial ++ ) {
+      AssembleModeSetPacket(&p, motor_group, serial, mode_PWM);
+      sendCANPacket(p);
+      //AssemblePWMDirSetPacket(&p, motor_group, serial, test_PWM);
+      //sendCANPacket(p);
+    }
+    setCmdVel(0.0, 0.25);
 }
 
 void closeSim(int signum)
 {
-	rclcpp::shutdown();
-	raise(SIGTERM);
+    rclcpp::shutdown();
+    raise(SIGTERM);
 }
 
 const double CONTROL_HZ = 10.0;
 
 int rover_loop(int argc, char **argv)
 {
-    world_interface_init();
-	rclcpp::init(0, nullptr);
-	// Ctrl+C doesn't stop the simulation without this line
-	signal(SIGINT, closeSim);
+    //world_interface_init();
+    rclcpp::init(0, nullptr);
+    // Ctrl+C doesn't stop the simulation without this line
+    signal(SIGINT, closeSim);
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover();
     CANPacket packet;
