@@ -16,9 +16,9 @@ void world_interface_init() {
   return;
 }
 
-const double WHEEL_BASE = 0.8; // eyeballed
-const double WHEEL_RADIUS = 0.2; // eyeballed
-const double PWM_FOR_1RAD_PER_SEC = 8000; // eyeballed
+const double WHEEL_BASE = 1.0; // eyeballed
+const double WHEEL_RADIUS = 0.15; // eyeballed
+const double PWM_FOR_1RAD_PER_SEC = 10000; // eyeballed
 /*
 dx = (right + left) / 2
 dtheta = (right - left) / (distance bw wheels)

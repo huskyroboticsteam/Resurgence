@@ -27,14 +27,10 @@ void InitializeRover()
     // Set all wheel motors to mode PWM
     uint8_t motor_group = 0x4;
     uint8_t mode_PWM = 0x0;
-    uint16_t test_PWM = -5000;
     for (uint8_t serial = 0x8; serial < 0xC; serial ++ ) {
       AssembleModeSetPacket(&p, motor_group, serial, mode_PWM);
       sendCANPacket(p);
-      //AssemblePWMDirSetPacket(&p, motor_group, serial, test_PWM);
-      //sendCANPacket(p);
     }
-    setCmdVel(0.0, 0.25);
 }
 
 void closeSim(int signum)
