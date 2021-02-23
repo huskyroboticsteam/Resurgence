@@ -43,7 +43,7 @@ const double CONTROL_HZ = 10.0;
 
 int rover_loop(int argc, char **argv)
 {
-    //world_interface_init();
+    world_interface_init();
     rclcpp::init(0, nullptr);
     // Ctrl+C doesn't stop the simulation without this line
     signal(SIGINT, closeSim);
