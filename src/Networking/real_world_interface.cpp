@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../simulator/world_interface.h"
 #include "../simulator/utils.h"
+#include "../Globals.h"
 #include "json.hpp"
 #include "motor_interface.h"
 #include "CANUtils.h"
@@ -22,6 +23,8 @@ const double PWM_FOR_1RAD_PER_SEC = 10000; // Eyeballed
 
 bool setCmdVel(double dtheta, double dx)
 {
+  if (Globals::E_STOP && (dtheta != 0 || dx != 0)) return false;
+
   /* This is the inverse of the formula:
    *    dx = (right_ground_vel + left_ground_vel) / 2
    *    dtheta = (right_ground_vel - left_ground_vel) / WHEEL_BASE

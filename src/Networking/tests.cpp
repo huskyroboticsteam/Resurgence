@@ -4,6 +4,7 @@
 #include "TestPackets.h"
 #include "NetworkingStubs.h"
 #include "IK.h"
+#include "../simulator/world_interface.h"
 extern "C"
 {
     #include "../HindsightCAN/Port.h"
@@ -195,7 +196,7 @@ TEST_CASE("Respects joint limits", "[BaseStation]")
     REQUIRE(m["msg"] == "IK solution outside joint limits for shoulder");
 }
 
-TEST_CASE("Deactivates wheel motors if e-stopped", "[BaseStation]")
+TEST_CASE("Deactivates wheel motors if e-stopped", "e-stop")
 {
     clearPackets();
     char const *estop_msg = "{\"type\":\"estop\",\"release\":false}";
@@ -220,4 +221,18 @@ TEST_CASE("Deactivates wheel motors if e-stopped", "[BaseStation]")
     m = json::parse(popBaseStationPacket());
     REQUIRE(m["msg"] == "Emergency stop is activated");
     REQUIRE(numCANPackets() == 0);
+}
+
+TEST_CASE("Does not allow setCmdVel with nonzero values if e-stopped", "e-stop")
+{
+    clearPackets();
+    char const *estop_msg = "{\"type\":\"estop\",\"release\":false}";
+    REQUIRE(ParseBaseStationPacket(estop_msg) == true);
+    clearPackets();
+    REQUIRE(setCmdVel(0.0, 0.1) == false);
+    REQUIRE(numCANPackets() == 0);
+    REQUIRE(setCmdVel(-0.1, 0.0) == false);
+    REQUIRE(numCANPackets() == 0);
+    REQUIRE(setCmdVel(0.0, 0.0) == true);
+    REQUIRE(numCANPackets() == 4);
 }

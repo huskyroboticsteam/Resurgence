@@ -112,7 +112,6 @@ add_executable(tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
   Networking/NetworkingStubs.cpp
-  Networking/real_world_interface.cpp
   # Autonomy tests
   mapping/ValidatorTest.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
@@ -125,6 +124,7 @@ target_link_libraries(tests
   ${rover_libs}
   lidar_slam
   stub_can_interface
+  real_world_interface
   )
 
 add_library(lidar_base
