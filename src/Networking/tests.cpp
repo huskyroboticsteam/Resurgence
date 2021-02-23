@@ -102,7 +102,14 @@ TEST_CASE("Can handle drive packets", "[BaseStation]")
 {
     char const *msg = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == -50);
+    REQUIRE(numCANPackets() == 4);
+    for (uint8_t i = 8; i < 12; i++) {
+      CANPacket p = popCANPacket();
+      // We expect the packets to be sent in ascending order, starting with
+      // the front-left wheel.
+      REQUIRE(GetDeviceSerialNumber(&p) == i);
+      REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PWM_DIR_SET));
+    }
 }
 
 TEST_CASE("Can handle malformed drive packets", "[BaseStation]")
@@ -194,15 +201,23 @@ TEST_CASE("Deactivates wheel motors if e-stopped", "[BaseStation]")
     char const *estop_msg = "{\"type\":\"estop\",\"release\":false}";
     char const *drive_msg = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
     json m;
+    CANPacket p;
     REQUIRE(ParseBaseStationPacket(drive_msg) == true);
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] != 0);
-    m = json::parse(popBaseStationPacket());
+    p = popCANPacket();
+    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PWM_DIR_SET));
+    REQUIRE(GetPWMFromPacket(&p) != 0);
+
+    clearPackets();
     REQUIRE(ParseBaseStationPacket(estop_msg) == true);
     m = json::parse(popBaseStationPacket());
     REQUIRE(m["status"] == "ok");
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == 0);
+    p = popCANPacket();
+    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PWM_DIR_SET));
+    REQUIRE(GetPWMFromPacket(&p) == 0);
+
+    clearPackets();
     REQUIRE(ParseBaseStationPacket(drive_msg) == false);
     m = json::parse(popBaseStationPacket());
     REQUIRE(m["msg"] == "Emergency stop is activated");
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == 0);
+    REQUIRE(numCANPackets() == 0);
 }
