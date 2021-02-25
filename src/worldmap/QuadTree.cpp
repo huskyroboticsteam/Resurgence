@@ -41,7 +41,7 @@ bool QuadTree::add(const point_t &point)
 	}
 
 	// we should never get here
-	assert(false);
+	return false;
 }
 
 bool QuadTree::remove(const point_t &point)
@@ -119,7 +119,7 @@ void QuadTree::subdivide()
 		double dx = (i & 1) == 0 ? -1 : 1;
 		double dy = (i & 0b10) == 0 ? -1 : 1;
 		point_t newCenter = center + d * point_t(dx,dy,0);
-		children[i] = std::make_shared<QuadTree>(center, width/2, nodeCapacity);
+		children[i] = std::make_shared<QuadTree>(newCenter, width/2, nodeCapacity);
 	}
 }
 

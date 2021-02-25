@@ -14,13 +14,12 @@ point_t randPoint(double size) {
 }
 }
 
-TEST_CASE("QuadTree") {
-	srand(time(nullptr));
+TEST_CASE("QuadTree - AddPoints", "[QuadTree]") {
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 	QuadTree tree(100);
 
-	REQUIRE(tree.add({0,0,1}));
-	REQUIRE(tree.add({0,1,1}));
-	REQUIRE(tree.add({0,3,1}));
-
-	REQUIRE(tree.getClosestWithin(point_t(1,1,1), 3) == point_t(0,1,1));
+	for (int i = 0; i < 50; i++) {
+		const point_t &point = randPoint(100);
+		REQUIRE(tree.add(point));
+	}
 }
