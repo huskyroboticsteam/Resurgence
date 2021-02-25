@@ -81,3 +81,40 @@ TEST_CASE("QuadTree - RemoveNonexistentPoints", "[QuadTree]")
 	REQUIRE_FALSE(tree.remove({99, -13, 1}));
 	REQUIRE(size == tree.getSize());
 }
+
+TEST_CASE("QuadTree - GetAllPoints", "[QuadTree]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+	QuadTree tree(100, 4);
+
+	points_t points;
+
+	for (int i = 0; i < 50; i++)
+	{
+		const point_t &point = randPoint(100);
+		points.push_back(point);
+		tree.add(point);
+	}
+
+	REQUIRE(points.size() == tree.getSize());
+
+	// assert that all points are in this list
+	points_t treePoints = tree.getAllPoints();
+	REQUIRE(points.size() == treePoints.size());
+	for (const point_t &point : points)
+	{
+		auto itr = std::find(treePoints.begin(), treePoints.end(), point);
+		REQUIRE(itr != treePoints.end());
+		REQUIRE(point == *itr);
+	}
+
+	// assert that modifying this list doesn't modify the tree
+	auto prevSize = treePoints.size();
+	point_t erased = *treePoints.begin();
+	treePoints.erase(treePoints.begin());
+	// not a catch2 assert since this is just a sanity check
+	assert(prevSize == treePoints.size() + 1);
+
+	REQUIRE(tree.getAllPoints().size() == prevSize);
+	REQUIRE(tree.getClosestWithin(erased, 1) == erased);
+}
