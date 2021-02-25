@@ -43,50 +43,6 @@ TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
     REQUIRE(Globals::status_data.dump() == "{\"front_right_wheel\":{\"current\":256}}");
 }
 
-TEST_CASE("Can change motor mode", "[BaseStation]")
-{
-    clearPackets();
-    char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"mode\": \"PID\"}";
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(popBaseStationPacket() == "{\"status\":\"ok\"}");
-    REQUIRE(Globals::motor_status["front_right_wheel"]["mode"] == "PID");
-    CANPacket p = popCANPacket();
-    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_MODE_SEL));
-    REQUIRE(p.dlc == 2);
-    REQUIRE(p.data[1] == MOTOR_UNIT_MODE_PID);
-    REQUIRE(GetDeviceGroupCode(&p) == DEVICE_GROUP_MOTOR_CONTROL);
-    REQUIRE(GetDeviceSerialNumber(&p) == 0x09); // front right wheel
-}
-
-TEST_CASE("Can set P coefficient", "[BaseStation]")
-{
-    clearPackets();
-    char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"P\": 256}";
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    CANPacket p = popCANPacket();
-    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PID_P_SET));
-    REQUIRE(p.dlc == 5);
-    REQUIRE(p.data[1] == 0);
-    REQUIRE(p.data[2] == 0);
-    REQUIRE(p.data[3] == 1); // 256 (MSB first)
-    REQUIRE(p.data[4] == 0);
-}
-
-TEST_CASE("Does not send CAN packets if nothing changes", "[BaseStation]")
-{
-    clearPackets();
-    REQUIRE(numCANPackets() == 0);
-    // This motor name needs to be different from the previous one, because the motor_status object is
-    // preserved across test cases.
-    char const *msg = "{\"type\": \"motor\", \"motor\": \"arm_base\", \"mode\": \"PID\"}";
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(numCANPackets() == 1);
-    popCANPacket();
-    REQUIRE(numCANPackets() == 0);
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(numCANPackets() == 0);
-}
-
 TEST_CASE("Can handle malformed packets", "[BaseStation]")
 {
     char const *msg = "{\"type\": \"moto";

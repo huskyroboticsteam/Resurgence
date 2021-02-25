@@ -18,19 +18,31 @@ extern "C"
     #include "HindsightCAN/CANMotorUnit.h"
 }
 
+void setArmMode(uint8_t mode)
+{
+    // Set all arm motors to given mode
+    CANPacket p;
+    for (uint8_t serial = 0x1; serial < 0x8; serial ++ ) {
+      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
+      sendCANPacket(p);
+    }
+}
+
 void InitializeRover()
 {
     InitializeCANSocket();
     InitializeBaseStationSocket();
-    CANPacket p;
 
     // Set all wheel motors to mode PWM
+    CANPacket p;
     uint8_t motor_group = 0x4;
     uint8_t mode_PWM = 0x0;
     for (uint8_t serial = 0x8; serial < 0xC; serial ++ ) {
-      AssembleModeSetPacket(&p, motor_group, serial, mode_PWM);
+      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode_PWM);
       sendCANPacket(p);
     }
+
+    setArmMode(mode_PWM); // Until we get encoders / PID control working
 }
 
 void closeSim(int signum)

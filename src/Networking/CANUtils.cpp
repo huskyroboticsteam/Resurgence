@@ -37,7 +37,9 @@ void InitializeCANSocket()
   strcpy(can_ifr.ifr_name, "can0");
   if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0)
   {
-    perror("Failed to get hardware CAN interface index");
+    perror("Failed to get hardware CAN interface index\n"
+           "If you are running this on the rover, you can enable CAN with\n\n"
+           "  ~/PY2020/enable_CAN.sh\n\n");
     strcpy(can_ifr.ifr_name, "vcan0");
     if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0)
     {
