@@ -1,5 +1,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
 
 #include "simulator/graphics.h"
 #include "simulator/utils.h"
@@ -16,7 +17,8 @@ public:
 			plan_sub(this->create_subscription<geometry_msgs::msg::Point>("plan_viz", 100, std::bind(&PlanViz::plan_callback, this, _1))),
 			curr_pose_sub(this->create_subscription<geometry_msgs::msg::Point>("current_pose", 100, std::bind(&PlanViz::curr_pose_callback, this, _1))),
 			next_pose_sub(this->create_subscription<geometry_msgs::msg::Point>("next_pose", 100, std::bind(&PlanViz::next_pose_callback, this, _1))),
-			lidar_sub(this->create_subscription<geometry_msgs::msg::Point>("lidar_scan", 100, std::bind(&PlanViz::lidar_callback, this, _1)))
+			lidar_sub(this->create_subscription<geometry_msgs::msg::Point>("lidar_scan", 100, std::bind(&PlanViz::lidar_callback, this, _1))),
+			gate_sub(this->create_subscription<geometry_msgs::msg::PoseArray>("gate_targets", 100, std::bind(&PlanViz::gate_callback, this, _1)))
 	{
 		viz_window.display();
 	}
@@ -35,6 +37,14 @@ private:
 	void lidar_callback(const geometry_msgs::msg::Point::SharedPtr message)
 	{
 		lidar_scan.push_back({message->x, message->y, message->z});
+	}
+
+	void gate_callback(const geometry_msgs::msg::PoseArray::SharedPtr message)
+	{
+		for (auto gate : message->poses)
+		{
+			viz_window.drawRobot(toTransform({gate.position.x, gate.position.y, gate.position.z}), sf::Color::Green);
+		}
 	}
 
 	void plan_callback(const geometry_msgs::msg::Point::SharedPtr message)
@@ -59,6 +69,7 @@ private:
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr curr_pose_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr next_pose_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr lidar_sub;
+	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr gate_sub;
 };
 
 int main(int argc, char **argv)

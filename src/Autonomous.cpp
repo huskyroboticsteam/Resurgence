@@ -42,7 +42,8 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
 		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
 		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
-		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100))
+		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100)),
+		gate_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("gate_targets", 100))
 {
 }
 
@@ -91,7 +92,7 @@ bool Autonomous::arrived(const pose_t &pose) const
 	}
 	if (target.right_post_id != -1)
 	{
-		return std::isinf(gate_targets.second(0));
+		return std::isinf(gate_targets.second(2));
 	}
 	else
 	{
@@ -207,9 +208,9 @@ void Autonomous::autonomyIter()
 	if (already_arrived || arrived(pose))
 	{
 		already_arrived = true;
-//		std::cout << "arrived at gate" << std::endl;
-//		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
-//					<< std::endl;
+		std::cout << "arrived at gate" << std::endl;
+		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
+					<< std::endl;
 		landmarkFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
@@ -219,6 +220,7 @@ void Autonomous::autonomyIter()
 
 
 		// If we are in a search pattern, set the drive target to the next search point
+		// TODO make sure this still works
 		if (state == NavState::SEARCH_PATTERN)
 		{
 			driveTarget = search_target;
@@ -274,53 +276,61 @@ void Autonomous::autonomyIter()
 				driveTarget.topRows(2) = filtered.topRows(2);
 			}
 			// we have already seen the first post but have not set gate targets yet or have
-			// potentially inaccurate landmark measurements
-			else if (std::isnan(gate_targets.first(0)) || landmarkFilter.getSize() < 5)
+			// potentially inaccurate gate landmark measurements
+			// TODO comment
+			else if ((std::isnan(gate_targets.first(2)) && landmarkFilter.getSize() == 5 && gate_filter.getSize() == 5) ||
+					 (!std::isnan(gate_targets.first(2)) && std::isnan(gate_targets.second(2)) && dist(pose, gate_targets.first, 0.0) < 2.0))
 			{
+				bool set_second_nan = std::isnan(gate_targets.first(2));
 				point_t post_1 = landmarkFilter.get();
 				point_t post_2 = filtered;
 				point_t center = (post_1 + post_2) / 2;
-				// TODO I think this is messed up fix this
-				double angle = std::atan2(post_1(1) - post_2(1), post_1(0) - post_2(0)) + PI / 2;// - PI / 4;
-				if (angle > PI)
+				// TODO third post in the middle for better alignment?
+				// TODO turn slowly at first target for better alignment
+				point_t offset{(post_1(1) - post_2(1)) / 2, (post_2(0) - post_1(0)) / 2, 0};
+				pose_t target_1 = center + 2 * offset;
+				pose_t target_2 = center - 2 * offset;
+
+				if (dist(pose, target_1, 0) < dist(pose, target_2, 0))
 				{
-					angle -= 2 * PI;
-				}
-				std::cout << "Angle: " << angle << std::endl;
-				pose_t offset{cos(angle), sin(angle), 0};
-				pose_t candidate_1 = center + 2 * offset;
-				pose_t candidate_2 = center - 2 * offset;
-				candidate_1(2) = angle;
-				candidate_2(2) = -angle;
-				if (dist(pose, candidate_1, 0) < dist(pose, candidate_2, 0))
-				{
-					gate_targets = std::make_pair(candidate_1, candidate_2);
+					gate_targets = std::make_pair(target_1, target_2);
 				}
 				else
 				{
-					gate_targets = std::make_pair(candidate_2, candidate_1);
+					gate_targets = std::make_pair(target_2, target_1);
 				}
+
+				double angle = std::atan2(gate_targets.second(1) - gate_targets.first(1), gate_targets.second(0) - gate_targets.first(0));
+				gate_targets.first(2) = angle;
+				// Mark second post as invalid if far away from landmarks
+				gate_targets.second(2) = set_second_nan ? NAN : angle;
+
 				driveTarget = gate_targets.first;
+
 				// Replan
 				plan_cost = INFINITE_COST;
 			}
 			// we have already seen the first post and have set gate targets
-			else
+			else if (!std::isnan(gate_targets.first(2)))
 			{
 				// Update gate targets
-				if (!std::isinf(gate_targets.first(0)) && dist(pose, gate_targets.first, 1.0) < 0.5 && dist(pose, gate_targets.first, 0.0) < 0.3)
+				if (!std::isinf(gate_targets.first(2)) && dist(pose, gate_targets.first, 1.5) < 0.5 && dist(pose, gate_targets.first, 0.0) < 0.3)
 				{
 					// Arrived at first gate target
 					std::cout << "Arrived at first target, distance " << dist(pose, gate_targets.first, 0.0) << std::endl;
 					gate_targets.first = (pose_t) {INFINITY, INFINITY, INFINITY};
+					// Replan
+					plan_cost = INFINITE_COST;
 				}
-				if (std::isinf(gate_targets.first(0)) && !std::isinf(gate_targets.second(0)) && dist(pose, gate_targets.second, 0.0) < 0.3)
+				if (std::isinf(gate_targets.first(2)) && !std::isinf(gate_targets.second(2)) && dist(pose, gate_targets.second, 0.0) < 0.3)
 				{
 					// Arrived at second gate target
 					std::cout << "Arrived at second target, distance " << dist(pose, gate_targets.second, 0.0) << std::endl;
 					gate_targets.second = (pose_t) {INFINITY, INFINITY, INFINITY};
+					// Reached goal, can return
+					return;
 				}
-				driveTarget = std::isinf(gate_targets.first(0)) ? gate_targets.second : gate_targets.first;
+				driveTarget = std::isinf(gate_targets.first(2)) ? gate_targets.second : gate_targets.first;
 			}
 		}
 
@@ -349,6 +359,29 @@ void Autonomous::autonomyIter()
 		{
 			publish(point, lidar_pub);
 		}
+
+		// Send gate targets to visualization
+		auto gate_message = geometry_msgs::msg::PoseArray();
+		gate_message.header.frame_id = "rover";
+		if (!std::isnan(gate_targets.first(2)) && !std::isinf(gate_targets.first(2)))
+		{
+			pose_t gate_1 = poseToDraw(gate_targets.first, pose);
+			auto gate = geometry_msgs::msg::Pose();
+			gate.position.x = gate_1(0);
+			gate.position.y = gate_1(1);
+			gate.position.z = gate_1(2);
+			gate_message.poses.push_back(gate);
+		}
+		if (!std::isnan(gate_targets.second(2)) && !std::isinf(gate_targets.second(2)))
+		{
+			pose_t gate_2 = poseToDraw(gate_targets.second, pose);
+			auto gate = geometry_msgs::msg::Pose();
+			gate.position.x = gate_2(0);
+			gate.position.y = gate_2(1);
+			gate.position.z = gate_2(2);
+			gate_message.poses.push_back(gate);
+		}
+		gate_pub->publish(gate_message);
 
 		// Send current pose to visualization
 		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
