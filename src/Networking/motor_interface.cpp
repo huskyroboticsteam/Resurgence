@@ -21,22 +21,22 @@ std::map<std::string, std::vector<std::string>> possible_keys = {
 
 // For PWM control, we want to use higher values when acting against gravity
 std::map<std::string, double> positive_arm_pwm_scales = {
-	{"arm_base",   3000},
-	{"shoulder",  20000},
-	{"elbow",     20000},
-	{"forearm",    3000},
-	{"diffleft",   4000},
-	{"diffright",  4000},
-	{"hand",      10000}
+	{"arm_base",    6000},
+	{"shoulder",   20000},
+	{"elbow",     -31000},
+	{"forearm",    -4000},
+	{"diffleft",    5000},
+	{"diffright",  -5000},
+	{"hand",       15000}
 };
 std::map<std::string, double> negative_arm_pwm_scales = {
-	{"arm_base",   3000},
-	{"shoulder",   8000},
-	{"elbow",      8000},
-	{"forearm",    3000},
-	{"diffleft",   4000},
-	{"diffright",  4000},
-	{"hand",      10000}
+	{"arm_base",    6000},
+	{"shoulder",   12000},
+	{"elbow",     -14000},
+	{"forearm",    -4000},
+	{"diffleft",    5000},
+	{"diffright",  -5000},
+	{"hand",       15000}
 };
 
 int getIndex(const std::vector<std::string> &arr, std::string &value)
