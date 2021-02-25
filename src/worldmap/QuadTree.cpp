@@ -23,6 +23,31 @@ size_t QuadTree::getSize() const
 	return size;
 }
 
+bool QuadTree::empty() const
+{
+	return size == 0;
+}
+
+points_t QuadTree::getAllPoints() const
+{
+	points_t allPoints;
+	allPoints.reserve(size);
+	getAllPoints(*this, allPoints);
+	return allPoints;
+}
+
+void QuadTree::getAllPoints(const QuadTree &tree, points_t &allPoints) const
+{
+	allPoints.insert(allPoints.end(), tree.points.begin(), tree.points.end());
+	if (tree.hasChildren())
+	{
+		for (const auto &ptr : tree.children)
+		{
+			getAllPoints(*ptr, allPoints);
+		}
+	}
+}
+
 bool QuadTree::add(const point_t &point)
 {
 	if (!inBounds(center, width, point))
@@ -30,18 +55,22 @@ bool QuadTree::add(const point_t &point)
 		return false;
 	}
 
-	if (points.size() < nodeCapacity && !hasChildren()) {
+	if (points.size() < nodeCapacity && !hasChildren())
+	{
 		points.push_back(point);
 		size++;
 		return true;
 	}
 
-	if (!hasChildren()) {
+	if (!hasChildren())
+	{
 		subdivide();
 	}
 
-	for (const std::shared_ptr<QuadTree> &childPtr : children) {
-		if (childPtr->add(point)) {
+	for (const std::shared_ptr<QuadTree> &childPtr : children)
+	{
+		if (childPtr->add(point))
+		{
 			size++;
 			return true;
 		}
@@ -59,15 +88,19 @@ bool QuadTree::remove(const point_t &point)
 	}
 
 	auto itr = std::find(points.begin(), points.end(), point);
-	if (itr != points.end()) {
+	if (itr != points.end())
+	{
 		points.erase(itr);
 		size--;
 		return true;
 	}
 
-	if (hasChildren()) {
-		for (const std::shared_ptr<QuadTree> &childPtr : children) {
-			if (childPtr->remove(point)) {
+	if (hasChildren())
+	{
+		for (const std::shared_ptr<QuadTree> &childPtr : children)
+		{
+			if (childPtr->remove(point))
+			{
 				size--;
 				return true;
 			}
@@ -77,18 +110,24 @@ bool QuadTree::remove(const point_t &point)
 	return false;
 }
 
-point_t QuadTree::getClosestWithin(const point_t &point, double areaSize)
+point_t QuadTree::getClosestWithin(const point_t &point, double areaSize) const
 {
+	// TODO: maybe make this iteratively increase search radius, to make it faster
 	points_t pointsInRange = getPointsWithin(point, areaSize);
-	if (pointsInRange.empty()) {
-		return {0,0,0};
-	} else {
+	if (pointsInRange.empty())
+	{
+		return {0, 0, 0};
+	}
+	else
+	{
 		point_t closest = pointsInRange[0];
 		double minDist = (closest - point).topRows<2>().norm();
-		for (int i = 1; i < pointsInRange.size(); i++) {
+		for (int i = 1; i < pointsInRange.size(); i++)
+		{
 			point_t p = pointsInRange[i];
 			double dist = (p - point).norm();
-			if (dist < minDist) {
+			if (dist < minDist)
+			{
 				minDist = dist;
 				closest = p;
 			}
@@ -97,7 +136,7 @@ point_t QuadTree::getClosestWithin(const point_t &point, double areaSize)
 	}
 }
 
-std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double areaSize)
+std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double areaSize) const
 {
 	points_t ret;
 	if (!inBounds(center, width, point))
@@ -105,14 +144,18 @@ std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double area
 		return ret;
 	}
 
-	for (const point_t &p : points) {
-		if (inBounds(point, areaSize, p)) {
+	for (const point_t &p : points)
+	{
+		if (inBounds(point, areaSize, p))
+		{
 			ret.push_back(p);
 		}
 	}
 
-	if (hasChildren()) {
-		for (const auto &child : children) {
+	if (hasChildren())
+	{
+		for (const auto &child : children)
+		{
 			points_t pointsInChild = child->getPointsWithin(point, areaSize);
 			ret.insert(ret.end(), pointsInChild.begin(), pointsInChild.end());
 		}
@@ -123,16 +166,17 @@ std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double area
 
 void QuadTree::subdivide()
 {
-	double d = width/4;
-	for (int i = 0; i < 4; i++) {
+	double d = width / 4;
+	for (int i = 0; i < 4; i++)
+	{
 		double dx = (i & 1) == 0 ? -1 : 1;
 		double dy = (i & 0b10) == 0 ? -1 : 1;
-		point_t newCenter = center + d * point_t(dx,dy,0);
-		children[i] = std::make_shared<QuadTree>(newCenter, width/2, nodeCapacity);
+		point_t newCenter = center + d * point_t(dx, dy, 0);
+		children[i] = std::make_shared<QuadTree>(newCenter, width / 2, nodeCapacity);
 	}
 }
 
-bool QuadTree::hasChildren()
+bool QuadTree::hasChildren() const
 {
 	return static_cast<bool>(children[0]); // if one is initialized, all are
 }
