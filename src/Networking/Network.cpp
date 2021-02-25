@@ -16,6 +16,7 @@
 
 int base_station_fd = -1;
 bool connected = false;
+bool failed_once = false;
 
 bool InitializeBaseStationSocket()
 {
@@ -23,7 +24,10 @@ bool InitializeBaseStationSocket()
 
   if ((base_station_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
-    perror("Base station socket creation failed");
+    if (!failed_once) {
+      perror("Base station socket creation failed");
+      failed_once = true;
+    }
     return false;
   }
 
@@ -36,11 +40,27 @@ bool InitializeBaseStationSocket()
 
   if (connect(base_station_fd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
   {
-    perror("Base station connect failed");
+    if (!failed_once) {
+      perror("Base station connect failed");
+      failed_once = true;
+    }
     return false;
   }
 
+  printf("Connected to base station.\n");
   return (connected = true);
+}
+
+int abort(const std::string &msg)
+{
+  perror(msg.c_str());
+  if (connected) {
+    close(base_station_fd);
+    base_station_fd = -1;
+    connected = false;
+    failed_once = false;
+  }
+  return 0;
 }
 
 int recvBaseStationPacket(char *buffer)
@@ -52,49 +72,53 @@ int recvBaseStationPacket(char *buffer)
   // If we split by requiring the base station to send a four-byte length
   // before sending each packet, we might need to dynamically allocate
   // memory. Either way we may need to handle blocking reads more carefully.
-  uint8_t len_buffer[4];
+  uint8_t len_buffer[5];
+  len_buffer[4] = '\0';
   int ret = recv(base_station_fd, &len_buffer, 4, MSG_DONTWAIT);
   if (ret < 0)
   {
     if (errno != EAGAIN && errno != EWOULDBLOCK) {
-      perror("Failed to read from base station");
+      return abort("Failed to read from base station");
     }
     return 0;
   } else if (ret == 0) {
-    perror("Base station disconnected");
-    exit(1);
+    return abort("Base station disconnected");
   } else if (ret != 4) {
     printf("Could not read exactly four bytes from base station (got %d)", ret);
-    exit(1);
+    return abort("Disconnecting");
   }
   uint8_t b0 = len_buffer[0];
   uint8_t b1 = len_buffer[1];
   uint8_t b2 = len_buffer[2];
   uint8_t b3 = len_buffer[3];
-  //printf("received bytes from base station: %x %x %x %x\n", b0, b1, b2, b3);
+  //printf("received bytes from base station: %x %x %x %x (%s)\n", b0, b1, b2, b3, len_buffer);
   int length = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
-  //printf("parsed this to packet length: %d\n", length);
+  //printf("parsed this to packet length: %d (MAXLINE is %d)\n", length, MAXLINE);
 
-  if (length > MAXLINE-1)
+  bool invalid = (length > (MAXLINE-1)) || (length < 0);
+  if (invalid)
   {
-    printf("Message length from base station is too large: %d", length);
-    exit(1);
+    printf("Message length from base station is invalid: %d\n", length);
+    return abort("Disconnecting");
   }
 
-  ret = recv(base_station_fd, buffer, length, MSG_DONTWAIT);
+  int len_to_recv = MAXLINE-1;
+  if (length < len_to_recv) len_to_recv = length;
+
+  ret = recv(base_station_fd, buffer, len_to_recv, MSG_DONTWAIT);
+  buffer[len_to_recv] = '\0';
 
   if (ret < 0)
   {
     if (errno != EAGAIN && errno != EWOULDBLOCK) {
-      perror("Failed to read from base station");
+      return abort("Failed to read from base station");
     }
     return 0;
   } else if (ret == 0) {
-    perror("Base station disconnected");
-    exit(1);
+    return abort("Base station disconnected");
   } else if (ret != length) {
     printf("Could not read %d bytes from the base station (got %d)", length, ret);
-    exit(1);
+    return abort("Disconnecting");
   }
   //printf("final two characters of message: %d %d '%s'", buffer[length-2], buffer[length-1], buffer + (length-2));
 

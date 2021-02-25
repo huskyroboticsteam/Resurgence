@@ -21,7 +21,6 @@ extern "C"
 void InitializeRover()
 {
     InitializeCANSocket();
-    InitializeBaseStationSocket();
     CANPacket p;
 
     // Set all wheel motors to mode PWM
@@ -59,11 +58,12 @@ int rover_loop(int argc, char **argv)
     for(;;)
     {
         gettimeofday(&tp_start, NULL);
-        if (recvCANPacket(&packet) != 0) {
+        while (recvCANPacket(&packet) != 0) {
             ParseCANPacket(packet);
         }
+        InitializeBaseStationSocket();
         bzero(buffer, sizeof(buffer));
-        if (recvBaseStationPacket(buffer) != 0) {
+        while (recvBaseStationPacket(buffer) != 0) {
             ParseBaseStationPacket(buffer);
         }
         autonomous.autonomyIter();
