@@ -43,7 +43,6 @@ list(APPEND RoverCommonTest
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
-  worldmap/LinearQuadTree.cpp
   )
 
 list(APPEND RoverCommon
