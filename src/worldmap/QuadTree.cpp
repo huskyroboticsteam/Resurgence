@@ -10,12 +10,17 @@ bool inBounds(const point_t &center, double size, const point_t &point)
 }
 
 QuadTree::QuadTree(point_t center, double width, int nodeCapacity)
-	: center(std::move(center)), width(width), points({}), nodeCapacity(nodeCapacity)
+	: center(std::move(center)), width(width), points({}), nodeCapacity(nodeCapacity), size(0)
 {
 }
 
 QuadTree::QuadTree(double width, int nodeCapacity) : QuadTree({0, 0, 1}, width, nodeCapacity)
 {
+}
+
+int QuadTree::getSize() const
+{
+	return size;
 }
 
 bool QuadTree::add(const point_t &point)
@@ -27,6 +32,7 @@ bool QuadTree::add(const point_t &point)
 
 	if (points.size() < nodeCapacity && !hasChildren()) {
 		points.push_back(point);
+		size++;
 		return true;
 	}
 
@@ -36,6 +42,7 @@ bool QuadTree::add(const point_t &point)
 
 	for (const std::shared_ptr<QuadTree> &childPtr : children) {
 		if (childPtr->add(point)) {
+			size++;
 			return true;
 		}
 	}
@@ -54,12 +61,14 @@ bool QuadTree::remove(const point_t &point)
 	auto itr = std::find(points.begin(), points.end(), point);
 	if (itr != points.end()) {
 		points.erase(itr);
+		size--;
 		return true;
 	}
 
 	if (hasChildren()) {
 		for (const std::shared_ptr<QuadTree> &childPtr : children) {
 			if (childPtr->remove(point)) {
+				size--;
 				return true;
 			}
 		}
@@ -68,14 +77,14 @@ bool QuadTree::remove(const point_t &point)
 	return false;
 }
 
-point_t QuadTree::getClosestWithin(const point_t &point, double size)
+point_t QuadTree::getClosestWithin(const point_t &point, double areaSize)
 {
-	points_t pointsInRange = getPointsWithin(point, size);
+	points_t pointsInRange = getPointsWithin(point, areaSize);
 	if (pointsInRange.empty()) {
 		return {0,0,0};
 	} else {
 		point_t closest = pointsInRange[0];
-		double minDist = (closest - point).norm();
+		double minDist = (closest - point).topRows<2>().norm();
 		for (int i = 1; i < pointsInRange.size(); i++) {
 			point_t p = pointsInRange[i];
 			double dist = (p - point).norm();
@@ -88,7 +97,7 @@ point_t QuadTree::getClosestWithin(const point_t &point, double size)
 	}
 }
 
-std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double size)
+std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double areaSize)
 {
 	points_t ret;
 	if (!inBounds(center, width, point))
@@ -97,14 +106,14 @@ std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double size
 	}
 
 	for (const point_t &p : points) {
-		if (inBounds(point, size, p)) {
+		if (inBounds(point, areaSize, p)) {
 			ret.push_back(p);
 		}
 	}
 
 	if (hasChildren()) {
 		for (const auto &child : children) {
-			points_t pointsInChild = child->getPointsWithin(point, size);
+			points_t pointsInChild = child->getPointsWithin(point, areaSize);
 			ret.insert(ret.end(), pointsInChild.begin(), pointsInChild.end());
 		}
 	}

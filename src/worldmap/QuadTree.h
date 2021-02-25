@@ -10,10 +10,11 @@ public:
 	explicit QuadTree(double width, int nodeCapacity=16);
 	QuadTree(point_t center, double width, int nodeCapacity=16);
 
+	int getSize() const;
 	bool add(const point_t &point);
 	bool remove(const point_t &point);
-	point_t getClosestWithin(const point_t &point, double size);
-	points_t getPointsWithin(const point_t &point, double size);
+	point_t getClosestWithin(const point_t &point, double areaSize);
+	points_t getPointsWithin(const point_t &point, double areaSize);
 
 private:
 	std::shared_ptr<QuadTree> children[4];
@@ -21,6 +22,7 @@ private:
 	double width;
 	points_t points;
 	int nodeCapacity;
+	int size;
 
 	void subdivide();
 	bool hasChildren();

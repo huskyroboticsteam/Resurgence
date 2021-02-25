@@ -20,6 +20,8 @@ TEST_CASE("QuadTree - AddPoints", "[QuadTree]") {
 
 	for (int i = 0; i < 50; i++) {
 		const point_t &point = randPoint(100);
+		REQUIRE(tree.getSize() == i);
 		REQUIRE(tree.add(point));
+		REQUIRE(tree.getSize() == i+1);
 	}
 }
