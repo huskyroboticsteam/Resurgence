@@ -58,10 +58,12 @@ TEST_CASE("QuadTree - RemoveNonexistentPoints", "[QuadTree]") {
 		tree.add(randPoint(5));
 	}
 
+	auto size = tree.getSize();
 	REQUIRE_FALSE(tree.remove({53,1,1}));
 	REQUIRE_FALSE(tree.remove({0,0,0}));
 	REQUIRE_FALSE(tree.remove({-32,63,1}));
 	REQUIRE_FALSE(tree.remove({-32,-84,1}));
 	REQUIRE_FALSE(tree.remove({99,-13,1}));
+	REQUIRE(size == tree.getSize());
 }
 

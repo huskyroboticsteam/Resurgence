@@ -18,7 +18,7 @@ QuadTree::QuadTree(double width, int nodeCapacity) : QuadTree({0, 0, 1}, width, 
 {
 }
 
-int QuadTree::getSize() const
+size_t QuadTree::getSize() const
 {
 	return size;
 }

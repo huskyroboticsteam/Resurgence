@@ -10,7 +10,7 @@ public:
 	explicit QuadTree(double width, int nodeCapacity=16);
 	QuadTree(point_t center, double width, int nodeCapacity=16);
 
-	int getSize() const;
+	size_t getSize() const;
 	bool add(const point_t &point);
 	bool remove(const point_t &point);
 	point_t getClosestWithin(const point_t &point, double areaSize);
@@ -22,7 +22,7 @@ private:
 	double width;
 	points_t points;
 	int nodeCapacity;
-	int size;
+	size_t size;
 
 	void subdivide();
 	bool hasChildren();
