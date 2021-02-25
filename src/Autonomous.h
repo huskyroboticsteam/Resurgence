@@ -55,6 +55,7 @@ private:
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr lidar_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr gate_pub;
+	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);

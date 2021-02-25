@@ -70,8 +70,8 @@ extern const std::vector<std::string> telem_types = {
 const std::string getDeviceTelemetryName(CANPacket &p) {
     uint8_t device_group = GetSenderDeviceGroupCode(&p);
     uint8_t device_serial = GetSenderDeviceSerialNumber(&p);
-    std::cout << "device_group " << (int) device_group << " device_serial " <<
-      (int) device_serial << std::endl;
+    //std::cout << "device_group " << (int) device_group << " device_serial " <<
+    //  (int) device_serial << std::endl;
     if (device_group < can_groups.size() &&
         device_serial < can_groups[device_group].size()) {
       return can_groups[device_group][device_serial];
@@ -85,8 +85,8 @@ void ParseCANPacket(CANPacket p)
     if (PacketIsOfID(&p, ID_TELEMETRY_REPORT)) {
         const std::string device_name = getDeviceTelemetryName(p);
         const std::string telem_type = telem_types[DecodeTelemetryType(&p)];
-        std::cout << "Got telemetry packet for device_name and telem_type " <<
-          device_name << " " << telem_type << std::endl;
+        //std::cout << "Got telemetry packet for device_name and telem_type " <<
+        //  device_name << " " << telem_type << std::endl;
         // TODO is this data sometimes unsigned?
         Globals::status_data[device_name][telem_type] = DecodeTelemetryDataSigned(&p);
     }

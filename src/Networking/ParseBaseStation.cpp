@@ -111,6 +111,7 @@ bool ParseDrivePacket(json &message) {
   {
     return sendError("Drive targets not within bounds +/- 1.0");
   }
-  // TODO do we need to scale or invert these?
-  return setCmdVel(lr, fb);
+  double MAX_X_VEL = 0.25; // m/s
+  double MAX_TH_VEL = 0.5; // rad/s
+  return setCmdVel(lr * MAX_TH_VEL, fb * MAX_X_VEL);
 }
