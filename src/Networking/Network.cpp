@@ -52,7 +52,8 @@ int recvBaseStationPacket(char *buffer)
   // If we split by requiring the base station to send a four-byte length
   // before sending each packet, we might need to dynamically allocate
   // memory. Either way we may need to handle blocking reads more carefully.
-  int ret = recv(base_station_fd, buffer, MAXLINE, MSG_DONTWAIT);
+  uint8_t len_buffer[4];
+  int ret = recv(base_station_fd, &len_buffer, 4, MSG_DONTWAIT);
   if (ret < 0)
   {
     if (errno != EAGAIN && errno != EWOULDBLOCK) {
@@ -62,7 +63,41 @@ int recvBaseStationPacket(char *buffer)
   } else if (ret == 0) {
     perror("Base station disconnected");
     exit(1);
+  } else if (ret != 4) {
+    printf("Could not read exactly four bytes from base station (got %d)", ret);
+    exit(1);
   }
+  uint8_t b0 = len_buffer[0];
+  uint8_t b1 = len_buffer[1];
+  uint8_t b2 = len_buffer[2];
+  uint8_t b3 = len_buffer[3];
+  //printf("received bytes from base station: %x %x %x %x\n", b0, b1, b2, b3);
+  int length = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+  //printf("parsed this to packet length: %d\n", length);
+
+  if (length > MAXLINE-1)
+  {
+    printf("Message length from base station is too large: %d", length);
+    exit(1);
+  }
+
+  ret = recv(base_station_fd, buffer, length, MSG_DONTWAIT);
+
+  if (ret < 0)
+  {
+    if (errno != EAGAIN && errno != EWOULDBLOCK) {
+      perror("Failed to read from base station");
+    }
+    return 0;
+  } else if (ret == 0) {
+    perror("Base station disconnected");
+    exit(1);
+  } else if (ret != length) {
+    printf("Could not read %d bytes from the base station (got %d)", length, ret);
+    exit(1);
+  }
+  //printf("final two characters of message: %d %d '%s'", buffer[length-2], buffer[length-1], buffer + (length-2));
+
   return 1;
 }
 
