@@ -16,10 +16,6 @@ int main() {
   std::string str;
   CANPacket p;
   uint8_t motor_group = 0x04;
-  if (TEST_PWM) {
-    AssembleModeSetPacket(&p, motor_group, (uint8_t) 0x0, (uint8_t) 0x0);
-    sendCANPacket(p);
-  }
   while(1) {
     if (TEST_MODE_SET) {
       std::cout << "Enter motor serial > ";
@@ -39,6 +35,8 @@ int main() {
       std::cout << "Enter PWM > ";
       std::getline(std::cin, str);
       int pwm = std::stoi(str);
+      AssembleModeSetPacket(&p, motor_group, (uint8_t) serial, (uint8_t) 0x0);
+      sendCANPacket(p);
       AssemblePWMDirSetPacket(&p, motor_group, (uint8_t) serial, (int16_t) pwm);
       sendCANPacket(p);
     }
