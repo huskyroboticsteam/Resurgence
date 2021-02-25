@@ -9,6 +9,11 @@ bool inBounds(const point_t &center, double size, const point_t &point)
 	return diff(0) <= halfSize && diff(1) <= halfSize;
 }
 
+bool boundsIntersect(const point_t &center1, double size1, const point_t &center2, double size2) {
+	point_t absDiff = (center1 - center2).array().abs();
+	return (absDiff.x() * 2 < (size1 + size2)) && (absDiff.y() * 2 < (size1 + size2));
+}
+
 QuadTree::QuadTree(point_t center, double width, int nodeCapacity)
 	: center(std::move(center)), width(width), points({}), nodeCapacity(nodeCapacity), size(0)
 {
@@ -76,7 +81,7 @@ bool QuadTree::add(const point_t &point)
 		}
 	}
 
-	// we should never get here
+	// this only happens if the given point is outside of the entire tree
 	return false;
 }
 
@@ -139,7 +144,7 @@ point_t QuadTree::getClosestWithin(const point_t &point, double areaSize) const
 std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double areaSize) const
 {
 	points_t ret;
-	if (!inBounds(center, width, point))
+	if (!boundsIntersect(center, width, point, areaSize))
 	{
 		return ret;
 	}

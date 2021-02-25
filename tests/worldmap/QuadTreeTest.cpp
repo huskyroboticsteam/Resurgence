@@ -118,3 +118,46 @@ TEST_CASE("QuadTree - GetAllPoints", "[QuadTree]")
 	REQUIRE(tree.getAllPoints().size() == prevSize);
 	REQUIRE(tree.getClosestWithin(erased, 1) == erased);
 }
+
+TEST_CASE("QuadTree - GetPointsWithin", "[QuadTree]") {
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+	QuadTree tree(100, 4);
+
+	// create two bunches: bottom-left and top-right
+	points_t left, right;
+
+	for (int i = 0; i < 50; i++) {
+		point_t p = randPoint(10) - point_t(20,20,0);
+		left.push_back(p);
+		tree.add(p);
+	}
+
+	for (int i = 0; i < 50; i++) {
+		point_t p = randPoint(10) + point_t(20,20,0);
+		right.push_back(p);
+		tree.add(p);
+	}
+
+	REQUIRE(tree.getSize() == (left.size() + right.size()));
+
+	points_t closestToLeft = tree.getPointsWithin(point_t(-20,-20,1), 25);
+	points_t closestToRight = tree.getPointsWithin(point_t(20,20,1), 25);
+
+	// verify that we retrieved all the points in the bottom-left bunch
+	REQUIRE(closestToLeft.size() == left.size());
+	for (const point_t &point : left)
+	{
+		auto itr = std::find(closestToLeft.begin(), closestToLeft.end(), point);
+		REQUIRE(itr != closestToLeft.end());
+		REQUIRE(point == *itr);
+	}
+
+	// verify that we retrieved all the points in the top-right bunch
+	REQUIRE(closestToRight.size() == right.size());
+	for (const point_t &point : right)
+	{
+		auto itr = std::find(closestToRight.begin(), closestToRight.end(), point);
+		REQUIRE(itr != closestToRight.end());
+		REQUIRE(point == *itr);
+	}
+}
