@@ -101,7 +101,8 @@ add_executable(tests
   ../tests/filters/EKFTest.cpp
   ../tests/filters/StateSpaceUtilsTest.cpp
   ../tests/worldmap/TrICPTest.cpp
-  ../tests/worldmap/GlobalMapTest.cpp)
+  ../tests/worldmap/GlobalMapTest.cpp
+  ../tests/worldmap/QuadTreeTest.cpp)
 
 add_executable(lidar_vis
     lidar/MainVis.cpp
