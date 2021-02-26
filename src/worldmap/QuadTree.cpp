@@ -12,7 +12,7 @@ bool inBounds(const point_t &center, double size, const point_t &point)
 
 bool boundsIntersect(const point_t &center1, double size1, const point_t &center2, double size2) {
 	point_t absDiff = (center1 - center2).array().abs();
-	return (absDiff.x() * 2 < (size1 + size2)) && (absDiff.y() * 2 < (size1 + size2));
+	return (absDiff.x() * 2 <= (size1 + size2)) && (absDiff.y() * 2 <= (size1 + size2));
 }
 
 QuadTree::QuadTree(point_t center, double width, int nodeCapacity)
