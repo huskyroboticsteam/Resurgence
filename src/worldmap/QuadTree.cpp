@@ -1,6 +1,7 @@
 #include "QuadTree.h"
 
 #include <algorithm>
+#include <stack>
 
 bool inBounds(const point_t &center, double size, const point_t &point)
 {
@@ -115,9 +116,62 @@ bool QuadTree::remove(const point_t &point)
 	return false;
 }
 
+int getChildIdx(const point_t &center, const point_t &point) {
+	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
+	bool isTop = point.y() >= center.y();
+	bool isRight = point.x() >= center.x();
+	return (isTop ? 0b10 : 0) | (isRight ? 1 : 0);
+}
+
+point_t QuadTree::getClosest(const point_t &point) const
+{
+	// if there are no children just search through this tree's points
+	if (!hasChildren()) {
+		point_t closest = {0,0,0};
+		double minDist = std::numeric_limits<double>::infinity();
+		for(const point_t &p : points) {
+			double dist = (p - point).norm();
+			if (dist < minDist) {
+				closest = p;
+				minDist = dist;
+			}
+		}
+		return closest;
+	}
+	std::shared_ptr<QuadTree> tree = children[getChildIdx(center, point)];
+	std::stack<std::shared_ptr<QuadTree>> stack;
+	stack.push(tree);
+
+	// traverse down the tree until we find a square w/o children containing the search point
+	while (tree->hasChildren()) {
+		auto child = tree->children[getChildIdx(tree->center, point)];
+		stack.push(child);
+		tree = child;
+	}
+
+	// traverse back up until we find a nonempty square (usually the first one)
+	while (!stack.empty() && tree->points.empty()) {
+		tree = stack.top();
+		stack.pop();
+	}
+
+	// if there are no points in this tree, return {0,0,0}
+	if (stack.empty()) {
+		assert(size == 0); // this should only happen if the tree is empty
+		return {0,0,0};
+	} else {
+		assert(!tree->points.empty()); // should be guaranteed
+		// choose an arbitrary point
+		point_t p = tree->points[0];
+		// areas must be square, so choose the largest dimension of the diff vector
+		double areaSize = (p - point).topRows<2>().array().abs().maxCoeff();
+		// get the closest of all points within this area
+		return getClosestWithin(point, areaSize);
+	}
+}
+
 point_t QuadTree::getClosestWithin(const point_t &point, double areaSize) const
 {
-	// TODO: maybe make this iteratively increase search radius, to make it faster
 	points_t pointsInRange = getPointsWithin(point, areaSize);
 	if (pointsInRange.empty())
 	{
@@ -174,6 +228,7 @@ void QuadTree::subdivide()
 	double d = width / 4;
 	for (int i = 0; i < 4; i++)
 	{
+		// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
 		double dx = (i & 1) == 0 ? -1 : 1;
 		double dy = (i & 0b10) == 0 ? -1 : 1;
 		point_t newCenter = center + d * point_t(dx, dy, 0);

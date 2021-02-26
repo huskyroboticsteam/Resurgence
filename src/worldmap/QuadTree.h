@@ -22,7 +22,7 @@ public:
 	 * @param nodeCapacity The number of points stored in each node.
 	 * Too high means slower lookup times, too low means higher memory overhead.
 	 */
-	explicit QuadTree(double width, int nodeCapacity = 16);
+	explicit QuadTree(double width, int nodeCapacity = 4);
 
 	/**
 	 * Creates a new quadtree with the given area size centered at the given point.
@@ -69,6 +69,8 @@ public:
 	 */
 	bool remove(const point_t &point);
 
+	point_t getClosest(const point_t &point) const;
+
 	/**
 	 * Get the point in this quadtree that is closest to the given point.
 	 * @param point The point for which to find the nearest neighbor.
@@ -88,6 +90,8 @@ public:
 	points_t getPointsWithin(const point_t &point, double areaSize) const;
 
 private:
+	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
+	// if one is initialized then all are initialized
 	std::shared_ptr<QuadTree> children[4];
 	point_t center;
 	double width;
