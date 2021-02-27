@@ -82,7 +82,7 @@ bool QuadTree::add(const point_t &point)
 		}
 	}
 
-	// this only happens if the given point is outside of the entire tree
+	// this should never happen
 	return false;
 }
 
