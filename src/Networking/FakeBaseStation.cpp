@@ -57,6 +57,14 @@ int main()
       {
         std::cout << "Enter message in JSON format (no newlines): ";
         std::getline(std::cin, str);
+        int msg_len = str.length();
+        int ret = write(connfd, &msg_len, 4);
+        if (ret < 0) {
+          perror("Socket write failed");
+        }
+        else if (ret != 4) {
+          perror("Wrote a weird number of bytes");
+        }
         if (write(connfd, str.c_str(), str.length()) < 0) {
           perror("Socket write failed");
         }
