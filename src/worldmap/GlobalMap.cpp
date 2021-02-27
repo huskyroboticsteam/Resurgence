@@ -1,5 +1,7 @@
 #include "GlobalMap.h"
 
+#include <Eigen/LU>
+
 /*
  * Since the map is transformed to fit the sample, and there might be a lot of points in the
  * global map, we don't transform the entire map with each sample. Instead, we only transform
