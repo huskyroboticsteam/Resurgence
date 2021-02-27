@@ -31,11 +31,9 @@ void setArmMode(uint8_t mode)
 void InitializeRover()
 {
     InitializeCANSocket();
-    InitializeBaseStationSocket();
 
     // Set all wheel motors to mode PWM
     CANPacket p;
-    uint8_t motor_group = 0x4;
     uint8_t mode_PWM = 0x0;
     for (uint8_t serial = 0x8; serial < 0xC; serial ++ ) {
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode_PWM);
@@ -71,11 +69,12 @@ int rover_loop(int argc, char **argv)
     for(;;)
     {
         gettimeofday(&tp_start, NULL);
-        if (recvCANPacket(&packet) != 0) {
+        while (recvCANPacket(&packet) != 0) {
             ParseCANPacket(packet);
         }
+        InitializeBaseStationSocket();
         bzero(buffer, sizeof(buffer));
-        if (recvBaseStationPacket(buffer) != 0) {
+        while (recvBaseStationPacket(buffer) != 0) {
             ParseBaseStationPacket(buffer);
         }
         autonomous.autonomyIter();
