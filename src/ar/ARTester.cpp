@@ -255,7 +255,10 @@ int main(int argc, char *argv[])
 			std::vector<cv::Point2d> cubePoints =
 				projectCube(MARKER_SET->getPhysicalSize(), tag.getRVec(), tag.getTVec());
 			std::cout << "rvec: " << tag.getRVec() << std::endl;
-			std::cout << "tvec: " << tag.getTVec() << std::endl;
+			cv::Vec3d tvec = tag.getTVec();
+			double dist = sqrt(pow(tvec[0], 2) + pow(tvec[1], 2) + pow(tvec[2], 2));
+			std::cout << "tvec: " << tvec << "(distance: "
+					  << dist << ")" << std::endl;
 			std::cout << "coordinates: " << tag.getCoordinates() << std::endl;
 
 			for (size_t i = 0; i < 4; i++)
