@@ -108,11 +108,11 @@ private:
 	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
 	// if one is initialized then all are initialized
 	std::shared_ptr<QuadTree> children[4];
-	point_t center; // center of bounding box, in word coords
-	double width; // size of square area
-	points_t points; // the points in this node, 0 <= points.size() <= nodeCapacity
+	point_t center;	  // center of bounding box, in word coords
+	double width;	  // size of square area
+	points_t points;  // the points in this node, 0 <= points.size() <= nodeCapacity
 	int nodeCapacity; // number of points stored in each node
-	size_t size; // number of nodes stored in this or its descendants
+	size_t size;	  // number of nodes stored in this or its descendants
 
 	// create children nodes (doesn't check for already existing)
 	void subdivide();

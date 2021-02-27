@@ -186,6 +186,7 @@ TEST_CASE("QuadTree - GetClosestPoint", "[QuadTree]")
 	for (const point_t &point : points)
 	{
 		point_t closestTree = tree.getClosest(point);
+		// manually compute the nearest neighbor to check against
 		point_t closest = {0, 0, 0};
 		double minDist = std::numeric_limits<double>::infinity();
 		for (const point_t &p : points)
@@ -201,15 +202,16 @@ TEST_CASE("QuadTree - GetClosestPoint", "[QuadTree]")
 	}
 }
 
-TEST_CASE("QuadTree - GetClosestDiffQuadrants", "[QuadTree]") {
-	QuadTree tree(100, 1); // store only one point per node
-	point_t p1 = {5,5,1}; // stored in root
+TEST_CASE("QuadTree - GetClosestDiffQuadrants", "[QuadTree]")
+{
+	QuadTree tree(100, 1);	// store only one point per node
+	point_t p1 = {5, 5, 1}; // stored in root
 	tree.add(p1);
-	point_t p2 = {1,1,1}; // stored in child
+	point_t p2 = {1, 1, 1}; // stored in child
 	tree.add(p2);
 	tree.remove(p1); // now the root is empty
 
-	REQUIRE(tree.getClosest({-1,-1,0}) == p2);
+	REQUIRE(tree.getClosest({-1, -1, 0}) == p2);
 }
 
 TEST_CASE("QuadTree - TestBoundary", "[QuadTree]")

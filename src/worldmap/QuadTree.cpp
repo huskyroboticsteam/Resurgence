@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stack>
 
+// checks if the given point is contained in the specified square axis-aligned bounding box
 bool inBounds(const point_t &center, double size, const point_t &point)
 {
 	point_t diff = (point - center).array().abs();
@@ -10,7 +11,10 @@ bool inBounds(const point_t &center, double size, const point_t &point)
 	return diff(0) <= halfSize && diff(1) <= halfSize;
 }
 
-bool boundsIntersect(const point_t &center1, double size1, const point_t &center2, double size2) {
+// checks if two square axis-aligned bounding boxes intersect
+bool boundsIntersect(const point_t &center1, double size1, const point_t &center2,
+					 double size2)
+{
 	point_t absDiff = (center1 - center2).array().abs();
 	return (absDiff.x() * 2 <= (size1 + size2)) && (absDiff.y() * 2 <= (size1 + size2));
 }
@@ -56,13 +60,18 @@ void QuadTree::getAllPoints(const QuadTree &tree, points_t &allPoints) const
 
 point_t QuadTree::getArbitraryPoint() const
 {
-	point_t zero = point_t(0,0,0);
-	if (!points.empty()) {
+	point_t zero = point_t(0, 0, 0);
+	if (!points.empty())
+	{
 		return points[0];
-	} else if (hasChildren()) {
-		for (const auto &child : children) {
+	}
+	else if (hasChildren())
+	{
+		for (const auto &child : children)
+		{
 			point_t p = child->getArbitraryPoint();
-			if (p != zero) {
+			if (p != zero)
+			{
 				return p;
 			}
 		}
@@ -78,6 +87,7 @@ bool QuadTree::add(const point_t &point)
 		return false;
 	}
 
+	// if we have room for this point in this node, add it
 	if (points.size() < nodeCapacity && !hasChildren())
 	{
 		points.push_back(point);
@@ -85,11 +95,13 @@ bool QuadTree::add(const point_t &point)
 		return true;
 	}
 
+	// create children if this node doesn't have any
 	if (!hasChildren())
 	{
 		subdivide();
 	}
 
+	// add this node to the child that contains it
 	for (const std::shared_ptr<QuadTree> &childPtr : children)
 	{
 		if (childPtr->add(point))
@@ -110,6 +122,7 @@ bool QuadTree::remove(const point_t &point)
 		return false;
 	}
 
+	// if the point is in this node, erase it and return
 	auto itr = std::find(points.begin(), points.end(), point);
 	if (itr != points.end())
 	{
@@ -118,6 +131,7 @@ bool QuadTree::remove(const point_t &point)
 		return true;
 	}
 
+	// search through children for this point
 	if (hasChildren())
 	{
 		for (const std::shared_ptr<QuadTree> &childPtr : children)
@@ -130,10 +144,13 @@ bool QuadTree::remove(const point_t &point)
 		}
 	}
 
+	// the point is not stored in this tree
 	return false;
 }
 
-int getChildIdx(const point_t &center, const point_t &point) {
+// gets the index of the child node of the node centered at `center` that contains `point`
+int getChildIdx(const point_t &center, const point_t &point)
+{
 	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
 	bool isTop = point.y() >= center.y();
 	bool isRight = point.x() >= center.x();
@@ -143,12 +160,15 @@ int getChildIdx(const point_t &center, const point_t &point) {
 point_t QuadTree::getClosest(const point_t &point) const
 {
 	// if there are no children just search through this tree's points
-	if (!hasChildren()) {
-		point_t closest = {0,0,0};
+	if (!hasChildren())
+	{
+		point_t closest = {0, 0, 0};
 		double minDist = std::numeric_limits<double>::infinity();
-		for(const point_t &p : points) {
+		for (const point_t &p : points)
+		{
 			double dist = (p - point).norm();
-			if (dist < minDist) {
+			if (dist < minDist)
+			{
 				closest = p;
 				minDist = dist;
 			}
@@ -156,27 +176,32 @@ point_t QuadTree::getClosest(const point_t &point) const
 		return closest;
 	}
 	const QuadTree *tree = this;
-	std::stack<const QuadTree*> stack;
+	std::stack<const QuadTree *> stack;
 	stack.push(tree);
 
 	// traverse down the tree until we find a square w/o children containing the search point
-	while (tree->hasChildren()) {
+	while (tree->hasChildren())
+	{
 		QuadTree *child = tree->children[getChildIdx(tree->center, point)].get();
 		stack.push(child);
 		tree = child;
 	}
 
 	// traverse back up until we find a nonempty square (usually the first one)
-	while (!stack.empty() && tree->empty()) {
+	while (!stack.empty() && tree->empty())
+	{
 		tree = stack.top();
 		stack.pop();
 	}
 
 	// if there are no points in this tree, return {0,0,0}
-	if (tree->empty()) {
+	if (tree->empty())
+	{
 		assert(size == 0); // this should only happen if the tree is empty
-		return {0,0,0};
-	} else {
+		return {0, 0, 0};
+	}
+	else
+	{
 		assert(!tree->empty()); // should be guaranteed
 		// choose an arbitrary point
 		point_t p = tree->getArbitraryPoint();
@@ -193,10 +218,12 @@ point_t QuadTree::getClosestWithin(const point_t &point, double areaSize) const
 	points_t pointsInRange = getPointsWithin(point, areaSize);
 	if (pointsInRange.empty())
 	{
+		// no points in range
 		return {0, 0, 0};
 	}
 	else
 	{
+		// compute the nearest neighbor in linear time (on a much smaller subset of points)
 		point_t closest = pointsInRange[0];
 		double minDist = (closest - point).topRows<2>().norm();
 		for (int i = 1; i < pointsInRange.size(); i++)
@@ -216,11 +243,13 @@ point_t QuadTree::getClosestWithin(const point_t &point, double areaSize) const
 std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double areaSize) const
 {
 	points_t ret;
+	// if the given bounding box doesn't intersect this node's area, return empty vector
 	if (!boundsIntersect(center, width, point, areaSize))
 	{
 		return ret;
 	}
 
+	// add any points from this node in the search area to the vector
 	for (const point_t &p : points)
 	{
 		if (inBounds(point, areaSize, p))
@@ -229,6 +258,7 @@ std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double area
 		}
 	}
 
+	// search through children, if they exist
 	if (hasChildren())
 	{
 		for (const auto &child : children)
@@ -256,5 +286,5 @@ void QuadTree::subdivide()
 
 bool QuadTree::hasChildren() const
 {
-	return static_cast<bool>(children[0]); // if one is initialized, all are
+	return static_cast<bool>(children[0]); // if one child is initialized, all are
 }
