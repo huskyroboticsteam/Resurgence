@@ -55,7 +55,8 @@ public:
 	 *
 	 * @param state The state to set the vector to.
 	 * @param stdDevs The standard deviation of the measurement of each element in the state
-	 * vector.
+	 * vector. This should not be the zero vector. If you want to represent high certainty, use
+	 * very small values instead.
 	 */
 	void reset(const Eigen::Matrix<double, stateDim, 1> &state,
 			   const Eigen::Matrix<double, stateDim, 1> &stdDevs)
@@ -67,8 +68,10 @@ public:
 	 * Sets the state estimate to the supplied vector and the estimate covariance matrix to the
 	 * supplied matrix.
 	 *
-	 * @param state
-	 * @param estCovMat
+	 * @param state The state to set the vector to.
+	 * @param estCovMat The matrix to set the estimate covariance matrix to. This should not be
+	 * the zero matrix. If you want to represent high certainty, use a diagonal matrix with
+	 * very small values.
 	 */
 	void reset(const Eigen::Matrix<double, stateDim, 1> &state,
 			   const Eigen::Matrix<double, stateDim, stateDim> &estCovMat)

@@ -7,7 +7,9 @@
 #include "StateSpaceUtil.h"
 
 /**
- * Represents a square noise covariance matrix.
+ * Represents a square noise covariance matrix. Returning the zero matrix can sometimes be
+ * dangerous depending on your model, as it may cause numerical instability or incorrect
+ * computations.
  *
  * @tparam stateDim The dimension of the state space for this system. This is the number of
  * elements in the state vector.
@@ -47,8 +49,8 @@ public:
 	 * when needed using the supplied function.
 	 *
 	 * @param func The function that supplies the noise covariance matrix,
-	 * given the state vector and one additional vector. For process noise, this is the input
-	 * vector. For output noise, this is the output vector.
+	 * given the state vector and one additional vector. For process noise, this is usually the
+	 * input vector. For output noise, this is usually the output vector.
 	 */
 	NoiseCovMat(const std::function<Eigen::Matrix<double, size, size>(const state_t &,
 																	  const param_t &)> &func)
@@ -61,7 +63,9 @@ public:
 	 * The matrix may be time-invariant, which case the values of x and param do not matter.
 	 *
 	 * @param x The current state vector.
-	 * @param param The parameter vector, as defined by the use of this matrix.
+	 * @param param The parameter vector, as defined by the use of this matrix. For process
+	 * noise, this is usually the input vector. For output noise this is usually the output
+	 * vector.
 	 * @return The noise covariance matrix.
 	 */
 	Eigen::Matrix<double, size, size> get(const state_t &x, const param_t &param)

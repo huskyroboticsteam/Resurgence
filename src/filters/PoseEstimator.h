@@ -3,6 +3,7 @@
 #include <Eigen/Core>
 
 #include "../simulator/utils.h"
+#include "../kinematics/DiffDriveKinematics.h"
 #include "ExtendedKalmanFilter.h"
 
 constexpr int numStates = 3;
@@ -91,6 +92,6 @@ public:
 
 private:
 	ExtendedKalmanFilter<numStates, 2, 3, 2, 3> ekf;
-	double wheelBase;
+	DiffDriveKinematics kinematics;
 	double dt;
 };

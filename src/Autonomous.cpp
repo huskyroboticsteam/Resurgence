@@ -10,24 +10,40 @@
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
-constexpr double DRIVE_SPEED = 8;
+constexpr double DRIVE_SPEED = 3;
 const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
+
+constexpr double FOLLOW_DIST = 2.0;
+constexpr double PLAN_COLLISION_STOP_DIST = 2.0;
+constexpr double INFINITE_COST = 1e10;
+constexpr int REPLAN_PERIOD = 20;
+
+constexpr const char * ROVER_FRAME = "rover";
 
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
-	: viz_window("Planning visualization"),
+	: Node("autonomous"),
 		target(_target),
+		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter(),
 		state(NavState::INIT),
-		clock_counter(0),
+		time_since_plan(0),
 		plan(0,2),
+		plan_cost(INFINITE_COST),
 		plan_base({0,0,0}),
-		plan_idx(0)
+		plan_idx(0),
+		search_theta_increment(PI / 4),
+		already_arrived(false),
+		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
+		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
+		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
+		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100)),
+		landmarks_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("landmarks", 100))
 {
 }
 
@@ -51,17 +67,32 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	return diff.norm();
 }
 
-void Autonomous::drawPose(pose_t &pose, pose_t &current_pose, sf::Color c)
+pose_t Autonomous::poseToDraw(pose_t &pose, pose_t &current_pose) const
 {
 	// Both poses are given in the same frame. (usually GPS frame)
 	// `current_pose` is the current location of the robot, `pose` is the pose we wish to draw
 	transform_t inv_curr = toTransform(current_pose).inverse();
-	viz_window.drawRobot(toTransform(pose) * inv_curr * VIZ_BASE_TF, c);
+	return toPose(toTransform(pose) * inv_curr * VIZ_BASE_TF, 0);
+}
+
+void Autonomous::publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const
+{
+	auto message = geometry_msgs::msg::Point();
+	message.x = pose(0);
+	message.y = pose(1);
+	message.z = pose(2);
+	publisher->publish(message);
 }
 
 bool Autonomous::arrived(const pose_t &pose) const
 {
-	return dist(pose, getTargetPose(), 1.0) < 0.5;
+	if (landmarkFilter.getSize() == 0)
+	{
+		return false;
+	}
+	pose_t target = getTargetPose();
+	target.topRows(2) = landmarkFilter.get().topRows(2);
+	return dist(pose, target, 1.0) < 0.5;
 }
 
 double Autonomous::angleToTarget(const pose_t &gpsPose) const
@@ -77,7 +108,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 	poses.push_back(pose);
 	if (poses.size() == numSamples)
 	{
-		pose_t sum;
+		pose_t sum = pose_t::Zero();
 		for (const pose_t &p : poses)
 		{
 			sum += p;
@@ -86,10 +117,7 @@ bool calibratePeriodic(std::vector<pose_t> &poses, const pose_t &pose, pose_t &o
 		out = sum;
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 double transformAngle(double currAngle, double targetAngle)
@@ -124,7 +152,8 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 	// we reach the target orientation. Otherwise, we want to turn the rover to
 	// aim it at the target location.
 	double targetAngle = target(2);
-	if (state == NavState::INIT) {
+	if (state == NavState::INIT || state == NavState::SEARCH_PATTERN)
+	{
 		double dx = target(0) - pose(0);
 		double dy = target(1) - pose(1);
 		targetAngle = atan2(dy, dx);
@@ -168,12 +197,14 @@ void Autonomous::autonomyIter()
 	// get the latest pose estimation
 	poseEstimator.correct(gps);
 	pose_t pose = poseEstimator.getPose();
+	transform_t invTransform = toTransform(pose).inverse();
 
-	if (arrived(pose))
+	if (already_arrived || arrived(pose))
 	{
+		already_arrived = true;
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
-				  << std::endl;
+					<< std::endl;
 		landmarkFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
@@ -195,31 +226,84 @@ void Autonomous::autonomyIter()
 			}
 			else
 			{
+				if (landmarkFilter.getSize() == 0)
+				{
+					// Replan if this is the first landmark we have seen
+					plan_cost = INFINITE_COST;
+				}
 				// transform and add the new data to the filter
-				transform_t invTransform = toTransform(pose).inverse();
 				point_t landmarkMapSpace = invTransform * leftPostLandmark;
 				// the filtering is done on the target in map space to reduce any phase lag
 				// caused by filtering
 				driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
 			}
+			if (state == NavState::SEARCH_PATTERN)
+			{
+				// Currently in a search pattern and landmark has been seen, can exit search
+				state = NavState::INIT;
+			}
+		}
+		// If the target has a second post we can see and we haven't seen the first post yet,
+		// use the second post as the drive target without adding it to the filter
+		else if (target.right_post_id != -1 && landmarks[target.right_post_id](2) != 0)
+		{
+			point_t rightPostLandmark = landmarks[target.right_post_id];
+			// transform and add the new data to the filter
+			point_t landmarkMapSpace = invTransform * rightPostLandmark;
+			// the filtering is done on the target in map space to reduce any phase lag
+			// caused by filtering
+			driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
+			// clear the filter so the second post is removed from it
+			landmarkFilter.reset();
+		}
+		// If we are in a search pattern, set the drive target to the next search point
+		else if (state == NavState::SEARCH_PATTERN)
+		{
+			driveTarget = search_target;
 		}
 
 		const points_t lidar_scan = readLidarScan();
-		bool should_replan = ((clock_counter++) % 20 == 0); // TODO make this configurable
-		if (should_replan) {
-			plan_base = pose;
-			plan_idx = 0;
+		if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
 			point_t point_t_goal;
 			point_t_goal.topRows(2) = driveTarget.topRows(2);
 			point_t_goal(2) = 1.0;
 			point_t_goal = toTransform(pose) * point_t_goal;
 			double goal_radius = 2.0;
-			plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+			plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+			double new_plan_cost = planCostFromIndex(new_plan, 0);
+			// we want a significant improvement to avoid thrash
+			if (new_plan_cost < plan_cost * 0.8) {
+				plan_idx = 0;
+				plan_base = pose;
+				plan_cost = new_plan_cost;
+				plan = new_plan;
+				time_since_plan = 0;
+			}
 		}
 
-		while (viz_window.pollWindowEvent() != -1) {}
-		viz_window.drawPoints(transformReadings(lidar_scan, VIZ_BASE_TF), sf::Color::Red, 3);
-		drawPose(pose, pose, sf::Color::Black);
+		// Send lidar points to visualization
+		const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
+		for (point_t point : lidar_scan_transformed)
+		{
+			publish(point, lidar_pub);
+		}
+		const points_t landmarks_transformed = transformReadings(landmarks, VIZ_BASE_TF);
+
+		auto message = geometry_msgs::msg::PoseArray();
+		message.header.frame_id = ROVER_FRAME; // technically this is in the window frame actually
+		// but we'll figure out our transform situation later
+		for (point_t l : landmarks_transformed) {
+			auto p = geometry_msgs::msg::Pose();
+			p.position.x = l(0);
+			p.position.y = l(1);
+			p.position.z = l(2);
+			message.poses.push_back(p);
+		}
+		landmarks_pub->publish(message);
+
+		// Send current pose to visualization
+		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
+		publish(curr_pose_transformed, curr_pose_pub);
 
 		int plan_size = plan.rows();
 		if (plan_size == 0 && dist(driveTarget, pose, 1.0) < 2.0) {
@@ -229,32 +313,94 @@ void Autonomous::autonomyIter()
 			// Roll out the plan until we find a target pose a certain distance in front
 			// of the robot. (This code also handles visualizing the plan.)
 			pose_t plan_pose = plan_base;
-			drawPose(plan_pose, pose, sf::Color::Red);
+
+			// Send starting plan_pose
+			const pose_t start_plan_pose_transformed = poseToDraw(plan_pose, pose);
+			publish(start_plan_pose_transformed, plan_pub);
+
 			bool found_target = false;
 			for (int i = 0; i < plan_size; i++) {
 				action_t action = plan.row(i);
 				plan_pose(2) += action(0);
 				plan_pose(0) += action(1) * cos(plan_pose(2));
 				plan_pose(1) += action(1) * sin(plan_pose(2));
-				if (i >= plan_idx && !found_target && dist(plan_pose, pose, 1.0) > 5.0) {
+				transform_t tf_plan_pose = toTransform(plan_pose) * invTransform;
+				if (collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
+					// We'll replan next timestep
+					// TODO strictly speaking, we don't need to replan if the collision happened
+					// on a part of the plan that we've already passed. But I'm not quite sure how
+					// to algorithmically decide which parts of the plan we've already passed.
+					plan_cost = INFINITE_COST;
+					// TODO we should have a more sophisticated way of deciding whether a collision
+					// is imminent.
+					if (dist(plan_pose, pose, 0.0) < PLAN_COLLISION_STOP_DIST) {
+						driveTarget = pose; // Don't move
+					}
+				}
+				if (i >= plan_idx && !found_target && dist(plan_pose, pose, 1.0) > FOLLOW_DIST) {
 					found_target = true;
 					plan_idx = i;
+					plan_cost = planCostFromIndex(plan, i);
 					driveTarget = plan_pose;
-					drawPose(plan_pose, pose, sf::Color::Blue);
+					// Send next target pose to visualization
+					const pose_t next_pose_transformed = poseToDraw(plan_pose, pose);
+					publish(next_pose_transformed, next_pose_pub);
 				} else {
-					drawPose(plan_pose, pose, sf::Color::Red);
+					// Send current plan_pose to visualization
+					const pose_t curr_plan_transformed = poseToDraw(plan_pose, pose);
+					publish(curr_plan_transformed, plan_pub);
 				}
 			}
 		}
-		viz_window.display();
+
+		// Send message to visualization that all data has been sent
+		publish({NAN, NAN, NAN}, plan_pub);
 
 		double d = dist(driveTarget, pose, 0);
+		if (state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)
+		{
+			// Current search point has been reached
+			// Replan to avoid waiting at current search point
+			plan_cost = INFINITE_COST;
+			// Set the search target to the next point in the search pattern
+			search_target -= target.approx_GPS;
+			double radius = hypot(search_target(0), search_target(1));
+			double scale = (radius + search_theta_increment) / radius;
+			// Rotate the target counterclockwise by the theta increment
+			search_target.topRows(2) =
+				(Eigen::Matrix2d() << cos(search_theta_increment), -sin(search_theta_increment),
+										sin(search_theta_increment), cos(search_theta_increment)).finished()
+				* search_target.topRows(2) * scale;
+			search_target += target.approx_GPS;
+			// Adjust the target angle
+			search_target(2) += search_theta_increment;
+			if (search_target(2) > PI)
+			{
+				search_target(2) -= 2 * PI;
+				// Decrease the theta increment every time a full rotation is made so the
+				// spiral shape is followed better
+				// This increases the denominator of the theta increment by 4
+				search_theta_increment = PI / ((int) (PI / search_theta_increment + 4));
+			}
+		}
+		if (state != NavState::SEARCH_PATTERN && dist(target.approx_GPS, pose, 0.0) < 0.2 &&
+			landmarkFilter.getSize() == 0 && !landmarkVisible)
+		{
+			// Close to GPS target but no landmark in sight, should use search pattern
+			// Replan so the search starts faster
+			plan_cost = INFINITE_COST;
+			state = NavState::SEARCH_PATTERN;
+		}
 		// There's an overlap where either state might apply, to prevent rapidly switching
 		// back and forth between these two states.
-		if (d < 0.2) {
+		// We also don't want to switch into one of these two states if we're currently in a
+		// search pattern.
+		if (d < 0.2 && state == NavState::INIT)
+		{
 			state = NavState::NEAR_TARGET_POSE;
 		}
-		if (d > 0.5) {
+		if (d > 0.5 && state == NavState::NEAR_TARGET_POSE)
+		{
 			state = NavState::INIT;
 		}
 		double thetaErr;

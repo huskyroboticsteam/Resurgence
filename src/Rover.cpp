@@ -1,6 +1,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <ctime>
+#include <csignal>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -12,22 +13,57 @@
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
 
+extern "C"
+{
+    #include "HindsightCAN/CANMotorUnit.h"
+}
+
+void setArmMode(uint8_t mode)
+{
+    // Set all arm motors to given mode
+    CANPacket p;
+    for (uint8_t serial = 0x1; serial < 0x8; serial ++ ) {
+      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
+      sendCANPacket(p);
+    }
+}
+
 void InitializeRover()
 {
     InitializeCANSocket();
     InitializeBaseStationSocket();
+
+    // Set all wheel motors to mode PWM
+    CANPacket p;
+    uint8_t motor_group = 0x4;
+    uint8_t mode_PWM = 0x0;
+    for (uint8_t serial = 0x8; serial < 0xC; serial ++ ) {
+      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode_PWM);
+      sendCANPacket(p);
+    }
+
+    setArmMode(mode_PWM); // Until we get encoders / PID control working
+}
+
+void closeSim(int signum)
+{
+    rclcpp::shutdown();
+    raise(SIGTERM);
 }
 
 const double CONTROL_HZ = 10.0;
 
-int main(int argc, char **argv)
+int rover_loop(int argc, char **argv)
 {
     world_interface_init();
+    rclcpp::init(0, nullptr);
+    // Ctrl+C doesn't stop the simulation without this line
+    signal(SIGINT, closeSim);
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover();
     CANPacket packet;
     // Target location for autonomous navigation
-    // Eventually this will be set by communcation from the base station
+    // Eventually this will be set by communication from the base station
     int urc_leg = 5;
     Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
     char buffer[MAXLINE];
