@@ -203,19 +203,31 @@ TEST_CASE("QuadTree - GetClosestPoint", "[QuadTree]")
 
 TEST_CASE("QuadTree - TestBoundary", "[QuadTree]")
 {
-	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 	QuadTree tree(100);
 
 	// test that adding things in the boundary work
-	REQUIRE(tree.add({50,50,1}));
-	REQUIRE_FALSE(tree.add({100,100,1}));
+	REQUIRE(tree.add({50, 50, 1}));
+	REQUIRE_FALSE(tree.add({100, 100, 1}));
 
-	REQUIRE(tree.add({-50,-50,1}));
-	REQUIRE_FALSE(tree.add({-100,-100,1}));
+	REQUIRE(tree.add({-50, -50, 1}));
+	REQUIRE_FALSE(tree.add({-100, -100, 1}));
 
-	REQUIRE(tree.getClosest({50,50,1}) == point_t(50,50,1));
-	REQUIRE(tree.getClosest({-50,-50,1}) == point_t(-50,-50,1));
+	REQUIRE(tree.getClosest({50, 50, 1}) == point_t(50, 50, 1));
+	REQUIRE(tree.getClosest({-50, -50, 1}) == point_t(-50, -50, 1));
 
-	REQUIRE(tree.getClosest({1,1,1}) == point_t(50,50,1));
-	REQUIRE(tree.getClosest({-1,-1,1}) == point_t(-50,-50,1));
+	REQUIRE(tree.getClosest({1, 1, 1}) == point_t(50, 50, 1));
+	REQUIRE(tree.getClosest({-1, -1, 1}) == point_t(-50, -50, 1));
+}
+
+TEST_CASE("QuadTree - EmptyTree", "[QuadTree]")
+{
+	// test behavior of empty graph
+	QuadTree tree(100);
+
+	REQUIRE(tree.empty());
+	REQUIRE(tree.getSize() == 0);
+	REQUIRE(tree.getClosest({0, 0, 1}) == point_t(0, 0, 0));
+	REQUIRE(tree.getClosestWithin({0, 0, 1}, 15) == point_t(0, 0, 0));
+	points_t points = tree.getPointsWithin(point_t(0, 0, 1), 15);
+	REQUIRE(points.empty());
 }

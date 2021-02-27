@@ -31,7 +31,7 @@ public:
 	 * @param nodeCapacity The number of points stored in each node.
 	 * Too high means slower lookup times, too low means higher memory overhead.
 	 */
-	QuadTree(point_t center, double width, int nodeCapacity = 16);
+	QuadTree(point_t center, double width, int nodeCapacity = 4);
 
 	/**
 	 * Gets the total number of points stored in this quadtree.
@@ -46,7 +46,7 @@ public:
 	bool empty() const;
 
 	/**
-	 * Gets a vector of all points in this quadtree. This is a linear operation, so
+	 * Gets a vector of all points in this quadtree. This is a linear-time operation, so
 	 * don't use too often if there are a large number of points.
 	 * Modifying this vector does not modify the tree.
 	 * @return A vector consisting of all points in this quadtree.
@@ -69,6 +69,13 @@ public:
 	 */
 	bool remove(const point_t &point);
 
+	/**
+	 * Gets the closest point to the given point in this quadtree.
+	 *
+	 * @param point The point for which to find the nearest neighbor.
+	 * @return The closest point to this point in the quadtree, or {0,0,0} if this quadtree is
+	 * empty.
+	 */
 	point_t getClosest(const point_t &point) const;
 
 	/**
@@ -93,13 +100,16 @@ private:
 	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
 	// if one is initialized then all are initialized
 	std::shared_ptr<QuadTree> children[4];
-	point_t center;
-	double width;
-	points_t points;
-	int nodeCapacity;
-	size_t size;
+	point_t center; // center of bounding box, in word coords
+	double width; // size of square area
+	points_t points; // the points in this node, 0 <= points.size() <= nodeCapacity
+	int nodeCapacity; // number of points stored in each node
+	size_t size; // number of nodes stored in this or its descendants
 
+	// create children nodes (doesn't check for already existing)
 	void subdivide();
+	// check if children exist
 	bool hasChildren() const;
+	// private method paired with QuadTree::getAllPoints()
 	void getAllPoints(const QuadTree &tree, points_t &allPoints) const;
 };
