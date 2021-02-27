@@ -19,7 +19,8 @@
 enum NavState {
 	INIT,
 	NEAR_TARGET_POSE,
-	SEARCH_PATTERN
+	SEARCH_PATTERN,
+	GATE_ALIGN
 };
 
 class Autonomous : rclcpp::Node

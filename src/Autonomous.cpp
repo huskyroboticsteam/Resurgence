@@ -57,7 +57,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &st
 	calibrated = true;
 }
 
-double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
+double dist(const pose_t &p1, const pose_t &p2, double theta_weight, double xy_weight = 1.0)
 {
 	pose_t diff = p1 - p2;
 	// angles are modular in nature, so wrap at 2pi radians
@@ -66,6 +66,8 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	if (thetaDiff > PI) {
 		thetaDiff -= 2 * PI;
 	}
+	diff(0) *= xy_weight;
+	diff(1) *= xy_weight;
 	diff(2) = thetaDiff * theta_weight;
 	return diff.norm();
 }
@@ -148,9 +150,9 @@ double Autonomous::getLinearVel(const pose_t &target, const pose_t &pose, double
 		// (given our relatively low control frequency of 10 Hz)
 		speed = DRIVE_SPEED / 3;
 	}
-	if (abs(thetaErr) > PI / 4 || state == NavState::NEAR_TARGET_POSE) {
+	if (abs(thetaErr) > PI / 4 || state == NavState::NEAR_TARGET_POSE || state == NavState::GATE_ALIGN) {
 		// don't drive forward if pointing away
-		// or if we're already very close to the target
+		// or if we're already very close to the target or aligning to a gate angle
 		speed = 0;
 	}
 	return speed;
@@ -287,8 +289,7 @@ void Autonomous::autonomyIter()
 				point_t post_1 = landmarkFilter.get();
 				point_t post_2 = filtered;
 				point_t center = (post_1 + post_2) / 2;
-				// TODO third post in the middle for better alignment?
-				// TODO turn slowly at first target for better alignment
+
 				point_t offset{(post_1(1) - post_2(1)) / 2, (post_2(0) - post_1(0)) / 2, 0};
 				pose_t target_1 = center + 2 * offset;
 				pose_t target_2 = center - 2 * offset;
@@ -316,20 +317,21 @@ void Autonomous::autonomyIter()
 			else if (!std::isnan(gate_targets.first(2)))
 			{
 				// Update gate targets
-				if (!std::isinf(gate_targets.first(2)) && dist(pose, gate_targets.first, 1.5) < 0.5 && dist(pose, gate_targets.first, 0.0) < 0.3)
+				if (!std::isinf(gate_targets.first(2)) && dist(pose, gate_targets.first, 0.0) < 0.2)
 				{
 					// Arrived at first gate target
 					std::cout << "Arrived at first target, distance " << dist(pose, gate_targets.first, 0.0) << std::endl;
 					gate_targets.first = (pose_t) {INFINITY, INFINITY, INFINITY};
-					// Replan
-					plan_cost = INFINITE_COST;
+					// Turn to desired angle
+					state = NavState::GATE_ALIGN;
 				}
-				if (std::isinf(gate_targets.first(2)) && !std::isinf(gate_targets.second(2)) && dist(pose, gate_targets.second, 0.0) < 0.3)
+				if (std::isinf(gate_targets.first(2)) && dist(pose, gate_targets.second, 0.0) < 0.3)
 				{
 					// Arrived at second gate target
 					std::cout << "Arrived at second target, distance " << dist(pose, gate_targets.second, 0.0) << std::endl;
 					gate_targets.second = (pose_t) {INFINITY, INFINITY, INFINITY};
 					// Reached goal, can return
+					already_arrived = true;
 					return;
 				}
 				driveTarget = std::isinf(gate_targets.first(2)) ? gate_targets.second : gate_targets.first;
@@ -488,6 +490,14 @@ void Autonomous::autonomyIter()
 			plan_cost = INFINITE_COST;
 			state = NavState::SEARCH_PATTERN;
 		}
+
+		// If aligned to desired gate angle, replan and continue to second target
+		if (state == NavState::GATE_ALIGN && dist(pose, gate_targets.second, 1.0, 0.0) < 0.05)
+		{
+			state = NavState::INIT;
+			plan_cost = INFINITE_COST;
+		}
+
 		// There's an overlap where either state might apply, to prevent rapidly switching
 		// back and forth between these two states.
 		// We also don't want to switch into one of these two states if we're currently in a
