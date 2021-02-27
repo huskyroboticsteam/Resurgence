@@ -170,3 +170,52 @@ TEST_CASE("QuadTree - GetPointsWithin", "[QuadTree]")
 		REQUIRE(point == *itr);
 	}
 }
+
+TEST_CASE("QuadTree - GetClosestPoint", "[QuadTree]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+	QuadTree tree(100);
+
+	for (int i = 0; i < 100; i++)
+	{
+		tree.add(randPoint(100));
+	}
+
+	points_t points = tree.getAllPoints();
+
+	for (const point_t &point : points)
+	{
+		point_t closestTree = tree.getClosest(point);
+		point_t closest = {0, 0, 0};
+		double minDist = std::numeric_limits<double>::infinity();
+		for (const point_t &p : points)
+		{
+			double dist = (p - point).norm();
+			if (dist < minDist)
+			{
+				minDist = dist;
+				closest = p;
+			}
+		}
+		REQUIRE(closest == closestTree);
+	}
+}
+
+TEST_CASE("QuadTree - TestBoundary", "[QuadTree]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+	QuadTree tree(100);
+
+	// test that adding things in the boundary work
+	REQUIRE(tree.add({50,50,1}));
+	REQUIRE_FALSE(tree.add({100,100,1}));
+
+	REQUIRE(tree.add({-50,-50,1}));
+	REQUIRE_FALSE(tree.add({-100,-100,1}));
+
+	REQUIRE(tree.getClosest({50,50,1}) == point_t(50,50,1));
+	REQUIRE(tree.getClosest({-50,-50,1}) == point_t(-50,-50,1));
+
+	REQUIRE(tree.getClosest({1,1,1}) == point_t(50,50,1));
+	REQUIRE(tree.getClosest({-1,-1,1}) == point_t(-50,-50,1));
+}
