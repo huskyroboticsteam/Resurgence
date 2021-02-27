@@ -201,6 +201,17 @@ TEST_CASE("QuadTree - GetClosestPoint", "[QuadTree]")
 	}
 }
 
+TEST_CASE("QuadTree - GetClosestDiffQuadrants", "[QuadTree]") {
+	QuadTree tree(100, 1); // store only one point per node
+	point_t p1 = {5,5,1}; // stored in root
+	tree.add(p1);
+	point_t p2 = {1,1,1}; // stored in child
+	tree.add(p2);
+	tree.remove(p1); // now the root is empty
+
+	REQUIRE(tree.getClosest({-1,-1,0}) == p2);
+}
+
 TEST_CASE("QuadTree - TestBoundary", "[QuadTree]")
 {
 	QuadTree tree(100);
