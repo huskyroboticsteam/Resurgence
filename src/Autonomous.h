@@ -5,9 +5,8 @@
 #include <vector>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
 
-#include "Pathfinding/ObstacleMap.h"
-#include "Pathfinding/Pather2.h"
 #include "Util.h"
 #include "WorldData.h"
 #include "filters/PoseEstimator.h"
@@ -53,6 +52,7 @@ private:
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr lidar_pub;
+	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
 
 	// determine direction for robot at any given iteration
 	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
@@ -64,6 +64,4 @@ private:
 	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
 	void publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
 
-	ObstacleMap obsMap;
-	Pather2 pather;
 };

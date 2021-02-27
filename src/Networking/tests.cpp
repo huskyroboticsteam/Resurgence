@@ -4,6 +4,7 @@
 #include "TestPackets.h"
 #include "NetworkingStubs.h"
 #include "IK.h"
+#include "../simulator/world_interface.h"
 extern "C"
 {
     #include "../HindsightCAN/Port.h"
@@ -42,50 +43,6 @@ TEST_CASE("ParseCAN can handle telemetry", "[CAN]")
     REQUIRE(Globals::status_data.dump() == "{\"front_right_wheel\":{\"current\":256}}");
 }
 
-TEST_CASE("Can change motor mode", "[BaseStation]")
-{
-    clearPackets();
-    char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"mode\": \"PID\"}";
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(popBaseStationPacket() == "{\"status\":\"ok\"}");
-    REQUIRE(Globals::motor_status["front_right_wheel"]["mode"] == "PID");
-    CANPacket p = popCANPacket();
-    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_MODE_SEL));
-    REQUIRE(p.dlc == 2);
-    REQUIRE(p.data[1] == MOTOR_UNIT_MODE_PID);
-    REQUIRE(GetDeviceGroupCode(&p) == DEVICE_GROUP_MOTOR_CONTROL);
-    REQUIRE(GetDeviceSerialNumber(&p) == 0x09); // front right wheel
-}
-
-TEST_CASE("Can set P coefficient", "[BaseStation]")
-{
-    clearPackets();
-    char const *msg = "{\"type\": \"motor\", \"motor\": \"front_right_wheel\", \"P\": 256}";
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    CANPacket p = popCANPacket();
-    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PID_P_SET));
-    REQUIRE(p.dlc == 5);
-    REQUIRE(p.data[1] == 0);
-    REQUIRE(p.data[2] == 0);
-    REQUIRE(p.data[3] == 1); // 256 (MSB first)
-    REQUIRE(p.data[4] == 0);
-}
-
-TEST_CASE("Does not send CAN packets if nothing changes", "[BaseStation]")
-{
-    clearPackets();
-    REQUIRE(numCANPackets() == 0);
-    // This motor name needs to be different from the previous one, because the motor_status object is
-    // preserved across test cases.
-    char const *msg = "{\"type\": \"motor\", \"motor\": \"arm_base\", \"mode\": \"PID\"}";
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(numCANPackets() == 1);
-    popCANPacket();
-    REQUIRE(numCANPackets() == 0);
-    REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(numCANPackets() == 0);
-}
-
 TEST_CASE("Can handle malformed packets", "[BaseStation]")
 {
     char const *msg = "{\"type\": \"moto";
@@ -102,7 +59,14 @@ TEST_CASE("Can handle drive packets", "[BaseStation]")
 {
     char const *msg = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == -50);
+    REQUIRE(numCANPackets() == 4);
+    for (uint8_t i = 8; i < 12; i++) {
+      CANPacket p = popCANPacket();
+      // We expect the packets to be sent in ascending order, starting with
+      // the front-left wheel.
+      REQUIRE(GetDeviceSerialNumber(&p) == i);
+      REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PWM_DIR_SET));
+    }
 }
 
 TEST_CASE("Can handle malformed drive packets", "[BaseStation]")
@@ -188,21 +152,43 @@ TEST_CASE("Respects joint limits", "[BaseStation]")
     REQUIRE(m["msg"] == "IK solution outside joint limits for shoulder");
 }
 
-TEST_CASE("Deactivates wheel motors if e-stopped", "[BaseStation]")
+TEST_CASE("Deactivates wheel motors if e-stopped", "e-stop")
 {
     clearPackets();
     char const *estop_msg = "{\"type\":\"estop\",\"release\":false}";
     char const *drive_msg = "{\"type\":\"drive\",\"forward_backward\":0.3,\"left_right\":-0.4}";
     json m;
+    CANPacket p;
     REQUIRE(ParseBaseStationPacket(drive_msg) == true);
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] != 0);
-    m = json::parse(popBaseStationPacket());
+    p = popCANPacket();
+    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PWM_DIR_SET));
+    REQUIRE(GetPWMFromPacket(&p) != 0);
+
+    clearPackets();
     REQUIRE(ParseBaseStationPacket(estop_msg) == true);
     m = json::parse(popBaseStationPacket());
     REQUIRE(m["status"] == "ok");
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == 0);
+    p = popCANPacket();
+    REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PWM_DIR_SET));
+    REQUIRE(GetPWMFromPacket(&p) == 0);
+
+    clearPackets();
     REQUIRE(ParseBaseStationPacket(drive_msg) == false);
     m = json::parse(popBaseStationPacket());
     REQUIRE(m["msg"] == "Emergency stop is activated");
-    REQUIRE(Globals::motor_status["front_right_wheel"]["PWM target"] == 0);
+    REQUIRE(numCANPackets() == 0);
+}
+
+TEST_CASE("Does not allow setCmdVel with nonzero values if e-stopped", "e-stop")
+{
+    clearPackets();
+    char const *estop_msg = "{\"type\":\"estop\",\"release\":false}";
+    REQUIRE(ParseBaseStationPacket(estop_msg) == true);
+    clearPackets();
+    REQUIRE(setCmdVel(0.0, 0.1) == false);
+    REQUIRE(numCANPackets() == 0);
+    REQUIRE(setCmdVel(-0.1, 0.0) == false);
+    REQUIRE(numCANPackets() == 0);
+    REQUIRE(setCmdVel(0.0, 0.0) == true);
+    REQUIRE(numCANPackets() == 4);
 }
