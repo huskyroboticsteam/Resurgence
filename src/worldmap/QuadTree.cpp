@@ -54,6 +54,23 @@ void QuadTree::getAllPoints(const QuadTree &tree, points_t &allPoints) const
 	}
 }
 
+point_t QuadTree::getArbitraryPoint() const
+{
+	point_t zero = point_t(0,0,0);
+	if (!points.empty()) {
+		return points[0];
+	} else if (hasChildren()) {
+		for (const auto &child : children) {
+			point_t p = child->getArbitraryPoint();
+			if (p != zero) {
+				return p;
+			}
+		}
+	}
+
+	return zero;
+}
+
 bool QuadTree::add(const point_t &point)
 {
 	if (!inBounds(center, width, point))
@@ -138,33 +155,34 @@ point_t QuadTree::getClosest(const point_t &point) const
 		}
 		return closest;
 	}
-	std::shared_ptr<QuadTree> tree = children[getChildIdx(center, point)];
-	std::stack<std::shared_ptr<QuadTree>> stack;
+	const QuadTree *tree = this;
+	std::stack<const QuadTree*> stack;
 	stack.push(tree);
 
 	// traverse down the tree until we find a square w/o children containing the search point
 	while (tree->hasChildren()) {
-		auto child = tree->children[getChildIdx(tree->center, point)];
+		QuadTree *child = tree->children[getChildIdx(tree->center, point)].get();
 		stack.push(child);
 		tree = child;
 	}
 
 	// traverse back up until we find a nonempty square (usually the first one)
-	while (!stack.empty() && tree->points.empty()) {
+	while (!stack.empty() && tree->empty()) {
 		tree = stack.top();
 		stack.pop();
 	}
 
 	// if there are no points in this tree, return {0,0,0}
-	if (stack.empty()) {
+	if (tree->empty()) {
 		assert(size == 0); // this should only happen if the tree is empty
 		return {0,0,0};
 	} else {
-		assert(!tree->points.empty()); // should be guaranteed
+		assert(!tree->empty()); // should be guaranteed
 		// choose an arbitrary point
-		point_t p = tree->points[0];
+		point_t p = tree->getArbitraryPoint();
 		// areas must be square, so choose the largest dimension of the diff vector
-		double areaSize = (p - point).topRows<2>().array().abs().maxCoeff();
+		// multiply by two because this is half side-length
+		double areaSize = 2 * (p - point).topRows<2>().array().abs().maxCoeff();
 		// get the closest of all points within this area
 		return getClosestWithin(point, areaSize);
 	}

@@ -96,6 +96,14 @@ public:
 	 */
 	points_t getPointsWithin(const point_t &point, double areaSize) const;
 
+	/**
+	 * Gets an arbitrary point stored in this QuadTree. It is undefined which specific
+	 * point this is.
+	 *
+	 * @return An arbitrary point in this tree, or {0,0,0} if this is empty.
+	 */
+	point_t getArbitraryPoint() const;
+
 private:
 	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
 	// if one is initialized then all are initialized
