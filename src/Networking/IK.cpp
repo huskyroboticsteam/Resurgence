@@ -74,7 +74,6 @@ bool ParseIKPacket(json &message) {
     // Don't send these packets until we're sure the IK problem is feasible
     json base_packet = {{"type", "motor"},
                         {"motor", "arm_base"},
-                        {"mode", "PID"},
                         {"PID target", radToInt(baseAngle, 0, 1)}}; // TODO offset, flip
     if (!ParseMotorPacket(base_packet))
     {
@@ -82,7 +81,6 @@ bool ParseIKPacket(json &message) {
     }
     json shoulder_packet = {{"type", "motor"},
                             {"motor", "shoulder"},
-                            {"mode", "PID"},
                             {"PID target", radToInt(shoulderAngle, 0, 1)}};
     if (!ParseMotorPacket(shoulder_packet))
     {
@@ -90,7 +88,6 @@ bool ParseIKPacket(json &message) {
     }
     json elbow_packet = {{"type", "motor"},
                          {"motor", "elbow"},
-                         {"mode", "PID"},
                          {"PID target", radToInt(elbowAngle, 0, 1)}};
     if (!ParseMotorPacket(elbow_packet))
     {
