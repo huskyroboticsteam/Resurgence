@@ -37,7 +37,7 @@ double calculateMSE(const points_t &p1, const points_t &p2)
 }
 } // namespace
 
-TEST_CASE("Global Map")
+TEST_CASE("Global Map", "[GlobalMap]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 
@@ -61,13 +61,19 @@ TEST_CASE("Global Map")
 	}
 
 	points_t mapPoints = map.getPoints();
+
+	// we need to sort because iteration order is not consistent
+	auto comp = [](const point_t &a, const point_t &b) {return a(0) < b(0);};
+	std::sort(allPoints.begin(), allPoints.end(), comp);
+	std::sort(mapPoints.begin(), mapPoints.end(), comp);
+
 	double mse = calculateMSE(allPoints, mapPoints);
 
 	std::cout << "Global Map MSE Full Overlap: " << mse << std::endl;
 	REQUIRE(mse == Approx(0).margin(0.5));
 }
 
-TEST_CASE("Global Map 0.5 Overlap")
+TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 	// we'll be getting points along the sin function
@@ -99,6 +105,12 @@ TEST_CASE("Global Map 0.5 Overlap")
 	}
 
 	points_t mapPoints = map.getPoints();
+
+	// we need to sort because iteration order is not consistent
+	auto comp = [](const point_t &a, const point_t &b) {return a(0) < b(0);};
+	std::sort(truths.begin(), truths.end(), comp);
+	std::sort(mapPoints.begin(), mapPoints.end(), comp);
+
 	double mse = calculateMSE(truths, mapPoints);
 
 	std::cout << "Global Map MSE Partial Overlap: " << mse << std::endl;
