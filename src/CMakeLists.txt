@@ -53,6 +53,7 @@ add_library(rover_common SHARED
   kinematics/DiffDriveKinematics.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
+  worldmap/QuadTree.cpp
   )
 
 add_library(real_base_station SHARED
@@ -120,7 +121,9 @@ add_executable(tests
   ../tests/filters/EKFTest.cpp
   ../tests/filters/StateSpaceUtilsTest.cpp
   ../tests/worldmap/TrICPTest.cpp
-  ../tests/worldmap/GlobalMapTest.cpp)
+  ../tests/worldmap/GlobalMapTest.cpp
+  ../tests/worldmap/QuadTreeTest.cpp)
+
 target_link_libraries(tests
   ${rover_libs}
   lidar_slam
