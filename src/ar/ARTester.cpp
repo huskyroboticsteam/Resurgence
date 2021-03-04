@@ -84,7 +84,8 @@ std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
 int main(int argc, char *argv[])
 {
 	cv::CommandLineParser parser(argc, argv, keys);
-	if(!parser.check()){
+	if (!parser.check())
+	{
 		parser.printErrors();
 	}
 	parser.about("Program to open a camera and look for AR tags.");
@@ -204,7 +205,8 @@ int main(int argc, char *argv[])
 		auto read_start = std::chrono::system_clock::now();
 #endif
 		// Grabs frame
-		if(!cap.hasNewFrame(fnum)){
+		if (!cap.hasNewFrame(fnum))
+		{
 			continue;
 		}
 		cap.read(frame);
@@ -257,8 +259,7 @@ int main(int argc, char *argv[])
 			std::cout << "rvec: " << tag.getRVec() << std::endl;
 			cv::Vec3d tvec = tag.getTVec();
 			double dist = sqrt(pow(tvec[0], 2) + pow(tvec[1], 2) + pow(tvec[2], 2));
-			std::cout << "tvec: " << tvec << "(distance: "
-					  << dist << ")" << std::endl;
+			std::cout << "tvec: " << tvec << "(distance: " << dist << ")" << std::endl;
 			std::cout << "coordinates: " << tag.getCoordinates() << std::endl;
 
 			for (size_t i = 0; i < 4; i++)
@@ -302,13 +303,14 @@ int main(int argc, char *argv[])
 		}
 
 #ifndef NDEBUG
-		if (TIMING){
+		if (TIMING)
+		{
 			// Calculates time used to complete one loop on average
 			std::clock_t c_end = std::clock();
 			auto wall_end = std::chrono::system_clock::now();
 			auto wall_t =
 				std::chrono::duration_cast<std::chrono::microseconds>(wall_end - wall_start)
-				.count() /
+					.count() /
 				1000.0;
 			long double cpu_t = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
 			total_time += cpu_t;
