@@ -18,8 +18,9 @@
  */
 
 GlobalMap::GlobalMap(int maxIter, double relErrChangeThresh)
-	: points(), adjustmentTransform(transform_t::Identity()),
+	: adjustmentTransform(transform_t::Identity()),
 	  adjustmentTransformInv(transform_t::Identity()),
+	  tree(10000),
 	  icp(maxIter, relErrChangeThresh,
 		  std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
@@ -27,7 +28,7 @@ GlobalMap::GlobalMap(int maxIter, double relErrChangeThresh)
 
 points_t GlobalMap::getPoints() const
 {
-	points_t corrected = points;
+	points_t corrected = tree.getAllPoints();
 	for (point_t &p : corrected)
 	{
 		p = adjustmentTransform * p;
@@ -51,7 +52,7 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 		}
 	}
 
-	if (!points.empty())
+	if (!tree.empty())
 	{
 		if (overlap > 0)
 		{
@@ -66,30 +67,21 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 		}
 	}
 
-	// append to global map
-	points.insert(points.end(), transformed.begin(), transformed.end());
+	// add to global map
+	for (const point_t &p : transformed) {
+		tree.add(p);
+	}
 }
 
 point_t GlobalMap::getClosest(const point_t &point) const
 {
 	// convert the lookup point to "naive" map space
 	point_t p = adjustmentTransformInv * point;
-	if (points.empty())
+	if (tree.empty())
 	{
 		return {0, 0, 0};
 	}
-	// TODO: optimize with geohashing
-	point_t closest = points[0];
-	double minDist = (p - closest).norm();
-	for (int i = 1; i < points.size(); i++)
-	{
-		double dist = (p - points[i]).norm();
-		if (dist < minDist)
-		{
-			minDist = dist;
-			closest = points[i];
-		}
-	}
+	point_t closest = tree.getClosest(p);
 	// convert back to "corrected" map space
 	return adjustmentTransform * closest;
 }

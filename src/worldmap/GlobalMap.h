@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../simulator/utils.h"
+#include "QuadTree.h"
 #include "TrICP.h"
 
 /**
@@ -49,7 +50,7 @@ public:
 	point_t getClosest(const point_t &point) const;
 
 private:
-	points_t points;
+	QuadTree tree;
 	transform_t adjustmentTransform;
 	transform_t adjustmentTransformInv;
 	TrICP icp;
