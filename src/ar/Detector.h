@@ -13,15 +13,6 @@
 namespace AR
 {
 
-// TODO: determine if we need this or restructure it
-struct DetectorOutput
-{
-	cv::Mat grayscale_mat;
-	cv::Mat edges_mat;
-	std::vector<cv::Mat> tag_views;
-	std::vector<std::vector<cv::Point2f>> rejected_corners;
-};
-
 class Detector
 {
 private:

@@ -321,7 +321,7 @@ MarkerSet makeCIRCSet()
 		cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 	MarkerSet set(ARUCO_BIT_SIZE, ARUCO_BORDER_SIZE, ARUCO_PHYS_SIZE, circ_dict_ptr);
 	set.addIDMapping(0, CIRCMarker1);
-	// TODO: add all mappings
+	// TODO: add all mappings when we figure out what the CIRC markers are
 	return set;
 }
 
