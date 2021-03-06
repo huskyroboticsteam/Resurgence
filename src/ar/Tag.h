@@ -2,7 +2,7 @@
 
 #include <opencv2/core.hpp>
 
-#include "Marker.h"
+#include "MarkerPattern.h"
 
 namespace AR
 {
