@@ -38,11 +38,20 @@ private:
 
 public:
 	/**
+	   Creates an empty marker, with a data region size, border size, and ID of 0, and an empty
+	   matrix for the data bits. This is a default constructor just for convenience and you
+	   should not try to use these empty markers. You can check if a marker is empty using the
+	   Marker::empty() method.
+	 */
+	Marker();
+	/**
 	   Creates a marker, with the given data region size, border size, data bits, and id.
 	 */
 	Marker(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int id);
+	bool empty() const;
 	uint8_t getDataRegionSize() const;
 	uint8_t getBorderSize() const;
 	const cv::Ptr<cv::Mat> getDataBits() const;
 	int getId() const;
+	bool operator==(const Marker& other) const;
 };

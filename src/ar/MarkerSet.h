@@ -41,6 +41,7 @@ private:
 	uint8_t data_region_size;
 	uint8_t border_size;
 	std::unordered_map<int, int> id_mappings;
+	std::unordered_map<int, int> reverse_mappings;
 	void init(uint8_t data_region_size, uint8_t border_size, float physical_size,
 			  cv::Ptr<cv::aruco::Dictionary> markerDict);
 
@@ -90,19 +91,22 @@ public:
 	   Adds an ID mapping; that is, a mapping from a marker's actual ID (as defined by the
 	   ARUco dictionary) to a user-defined ID that may have some actual meaning in context.
 	 */
-	bool addIDMapping(int id, int mapping);
+	void addIDMapping(int id, int mapping);
 	/**
 	   Gets an ID mapping. The ID mapping should actually be defined; this method will throw a
 	   std::out_of_range exception if the ID mapping does not exist. See isIDMapped().
 	 */
-	int getIDMapping(int id);
+	int getIDMapping(int id) const;
 	/**
 	   Gets an ID mapping, statically cast to the type given in the template type
 	   parameter. The type given should be a type that an integer can be statically cast to
 	   (e.g. enums). This method will throw a std::out_of_range exception if the ID mapping
 	   does not exist. See isIDMapped().
 	 */
-	template <class IDMapping_t> IDMapping_t getIDMapping(int id);
+	template <class IDMapping_t> IDMapping_t getIDMappingCast(int id) const
+	{
+		return static_cast<IDMapping_t>(this->getIDMapping(id));
+	}
 	/**
 	   Returns the underlying ARUco dictionary defining the marker patterns.
 	 */
@@ -141,7 +145,7 @@ public:
 	   parameter; if it does not exist, this method will return false and the output parameter
 	   will not be modified.
 	*/
-	bool getMarkerByMappedID(int id, Marker &out) const;
+	bool getMarkerByMappedID(int mapped_id, Marker &out) const;
 	/**
 	   Returns true if the given user-defined ID mapping exists and false if it does not.
 	 */

@@ -55,20 +55,13 @@ void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physic
 	this->markers = markerVec;
 }
 
-bool MarkerSet::addIDMapping(int id, int mapping)
+void MarkerSet::addIDMapping(int id, int mapping)
 {
-	if (this->id_mappings.find(id) != this->id_mappings.end())
-	{
-		this->id_mappings[id] = mapping;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	this->id_mappings[id] = mapping;
+	this->reverse_mappings[mapping] = id;
 }
 
-int MarkerSet::getIDMapping(int id)
+int MarkerSet::getIDMapping(int id) const
 {
 	return this->id_mappings.at(id);
 }
@@ -76,11 +69,6 @@ int MarkerSet::getIDMapping(int id)
 int &MarkerSet::operator[](int id)
 {
 	return this->id_mappings[id];
-}
-
-template <class IDMapping_t> IDMapping_t MarkerSet::getIDMapping(int id)
-{
-	return static_cast<IDMapping_t>(this->id_mappings.at(id));
 }
 
 ar_dict_ptr MarkerSet::getDict() const
@@ -123,14 +111,14 @@ bool MarkerSet::getMarkerByID(int id, Marker &out) const
 	return true;
 }
 
-bool MarkerSet::getMarkerByMappedID(int id, Marker &out) const
+bool MarkerSet::getMarkerByMappedID(int mapped_id, Marker &out) const
 {
-	if (!isIDMapped(id))
-	{
+	try{
+		out = markers[this->reverse_mappings.at(mapped_id)];
+		return true;
+	} catch(std::out_of_range){
 		return false;
 	}
-	out = markers[this->id_mappings.at(id)];
-	return true;
 }
 
 namespace Markers

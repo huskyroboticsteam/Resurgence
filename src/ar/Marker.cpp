@@ -18,6 +18,13 @@ Marker::Marker(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int 
 	assert(bits.cols == data_region_size);
 }
 
+Marker::Marker() {}
+
+bool Marker::empty() const
+{
+	return this->data_bits.empty();
+}
+
 uint8_t Marker::getDataRegionSize() const
 {
 	return this->data_region_size;
@@ -36,4 +43,14 @@ const mat_ptr Marker::getDataBits() const
 int Marker::getId() const
 {
 	return this->id;
+}
+
+bool Marker::operator==(const Marker& other) const
+{
+	return (this->data_region_size == other.data_region_size)
+		&& (this->border_size == other.border_size)
+		&& (this->id == other.id)
+		&& (std::equal(this->data_bits->begin<uint8_t>(),
+					   this->data_bits->end<uint8_t>(),
+					   other.data_bits->begin<uint8_t>()));
 }
