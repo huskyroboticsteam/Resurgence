@@ -3,7 +3,7 @@
 namespace AR
 {
 
-Tag::Tag(Marker marker, cv::Vec3d rvec, cv::Vec3d tvec)
+Tag::Tag(MarkerPattern marker, cv::Vec3d rvec, cv::Vec3d tvec)
 	: marker_(marker), rvec_(rvec), tvec_(tvec){}
 
 cv::Vec3d Tag::getRVec() const
@@ -21,7 +21,7 @@ cv::Vec3d Tag::getCoordinates() const
 	return tvec_;
 }
 
-Marker Tag::getMarker() const
+MarkerPattern Tag::getMarker() const
 {
 	return marker_;
 }

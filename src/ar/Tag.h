@@ -20,10 +20,10 @@ class Tag
 private:
 	cv::Vec3d rvec_;
 	cv::Vec3d tvec_;
-	Marker marker_;
+	MarkerPattern marker_;
 
 public:
-	Tag(Marker marker, cv::Vec3d rvec, cv::Vec3d tvec);
+	Tag(MarkerPattern marker, cv::Vec3d rvec, cv::Vec3d tvec);
 	Tag() = delete;
 	/**
 	   Gets the rotation vector of the tag. This vector defines a line through the origin
@@ -54,6 +54,6 @@ public:
 	/**
 	   Gets the Marker associated with the tag.
 	 */
-	Marker getMarker() const;
+	MarkerPattern getMarker() const;
 };
 } // namespace AR

@@ -6,10 +6,9 @@ add_executable(ar_tester
   CameraParams.cpp
   Detector.cpp
   MarkerSet.cpp
-  Marker.cpp
+  MarkerPattern.cpp
   Tag.cpp
-  ../ThreadedCapture.cpp
-  ../Util.cpp)
+  ../ThreadedCapture.cpp)
 
 add_executable(calibration
   calibration.cpp)

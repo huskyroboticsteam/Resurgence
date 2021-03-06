@@ -109,7 +109,7 @@ add_executable(tests
   Autonomous.cpp
   # AR Detection tests
   # ar/ARUnitTests.cpp
-  ar/Marker.cpp
+  ar/MarkerPattern.cpp
   ar/MarkerSet.cpp
   ar/MarkerSetTests.cpp
   # CAN tests

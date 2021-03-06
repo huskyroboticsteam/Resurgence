@@ -39,7 +39,7 @@ std::vector<Tag> Detector::detectTags(const cv::Mat &input)
 	std::vector<Tag> tags;
 	for(size_t i = 0; i < ids.size(); i++){
 		int id = ids[i];
-		Marker marker = this->marker_set_->getMarkers()[id];
+		MarkerPattern marker = this->marker_set_->getMarkers()[id];
 		Tag current(marker, rvecs[i], tvecs[i]);
 		tags.push_back(current);
 	}

@@ -82,7 +82,7 @@ TEST_CASE("Adding and retrieving ID mappings works", TAG)
 TEST_CASE("Markers can be retrieved from the MarkerSet")
 {
 	MarkerSet ms = makeSet();
-	std::vector<Marker> markers = ms.getMarkers();
+	std::vector<MarkerPattern> markers = ms.getMarkers();
 	// marker vector should have the same number of markers as are in the
 	// dictionary
 	CHECK(markers.size() == DICT_4X4_50->bytesList.rows);
@@ -104,8 +104,8 @@ TEST_CASE("Markers can be retrieved from the MarkerSet")
 	{
 		for (int i = 0; i < markers.size(); i++)
 		{
-			Marker from_vector = markers[i];
-			Marker from_set;
+			MarkerPattern from_vector = markers[i];
+			MarkerPattern from_set;
 			CHECK(ms.getMarkerByID(i, from_set));
 			CHECK(from_vector == from_set);
 		}
@@ -117,12 +117,12 @@ TEST_CASE("Markers can be retrieved from the MarkerSet")
 			ms.addIDMapping(nums[i], i);
 		}
 		for(int i = 0; i < (sizeof(nums) / sizeof(int)); i++){
-			Marker m;
+			MarkerPattern m;
 			CHECK(ms.getMarkerByMappedID(i, m));
 			CHECK(markers[nums[i]] == m);
 		}
 		// non-existent ID should return false
-		Marker m;
+		MarkerPattern m;
 		CHECK_FALSE(ms.getMarkerByMappedID(-1, m));
 	}
 }

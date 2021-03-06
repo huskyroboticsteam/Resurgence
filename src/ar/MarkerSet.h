@@ -7,7 +7,7 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core.hpp>
 
-#include "Marker.h"
+#include "MarkerPattern.h"
 
 namespace AR
 {
@@ -36,7 +36,7 @@ class MarkerSet
 {
 private:
 	cv::Ptr<cv::aruco::Dictionary> dict;
-	std::vector<Marker> markers;
+	std::vector<MarkerPattern> markers;
 	float physical_size;
 	uint8_t data_region_size;
 	uint8_t border_size;
@@ -131,21 +131,21 @@ public:
 	/**
 	   Returns a vector of the Markers in this marker set.
 	 */
-	std::vector<Marker> getMarkers() const;
+	std::vector<MarkerPattern> getMarkers() const;
 	/**
 	   Gets a Marker by its ID, as defined by the ARUco Dictionary. If the Marker exists, this
 	   method will return true and the Marker will be returned through the output parameter; if
 	   it does not exist, this method will return false and the output parameter will not be
 	   modified.
 	 */
-	bool getMarkerByID(int id, Marker &out) const;
+	bool getMarkerByID(int id, MarkerPattern &out) const;
 	/**
 	   Gets a Marker by its mapped ID (as defined with addIDMapping()). If the mapping exists,
 	   this method will return true and the Marker will be returned through the output
 	   parameter; if it does not exist, this method will return false and the output parameter
 	   will not be modified.
 	*/
-	bool getMarkerByMappedID(int mapped_id, Marker &out) const;
+	bool getMarkerByMappedID(int mapped_id, MarkerPattern &out) const;
 	/**
 	   Returns true if the given user-defined ID mapping exists and false if it does not.
 	 */

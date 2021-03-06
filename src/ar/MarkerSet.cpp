@@ -7,8 +7,6 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core.hpp>
 
-#include "Marker.h"
-
 using ar_dict = cv::aruco::Dictionary;
 using ar_dict_ptr = cv::Ptr<cv::aruco::Dictionary>;
 using mat_ptr = cv::Ptr<cv::Mat>;
@@ -42,14 +40,14 @@ void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physic
 	this->physical_size = physical_size;
 	this->dict = markerDict;
 
-	std::vector<Marker> markerVec;
+	std::vector<MarkerPattern> markerVec;
 	cv::Mat bytesList;
 	dict->bytesList.copyTo(bytesList);
 	for (size_t i = 0; i < bytesList.rows; i++)
 	{
 		cv::Mat row = bytesList.row(i);
 		cv::Mat markerBits = ar_dict::getBitsFromByteList(row, data_region_size);
-		Marker current(data_region_size, border_size, markerBits, i);
+		MarkerPattern current(data_region_size, border_size, markerBits, i);
 		markerVec.push_back(current);
 	}
 	this->markers = markerVec;
@@ -91,7 +89,7 @@ float MarkerSet::getPhysicalSize() const
 	return this->physical_size;
 }
 
-std::vector<Marker> MarkerSet::getMarkers() const
+std::vector<MarkerPattern> MarkerSet::getMarkers() const
 {
 	return this->markers;
 }
@@ -101,7 +99,7 @@ bool MarkerSet::isIDMapped(int id) const
 	return this->id_mappings.count(id) == 1;
 }
 
-bool MarkerSet::getMarkerByID(int id, Marker &out) const
+bool MarkerSet::getMarkerByID(int id, MarkerPattern &out) const
 {
 	if (id < 0 || id > markers.size())
 	{
@@ -111,12 +109,15 @@ bool MarkerSet::getMarkerByID(int id, Marker &out) const
 	return true;
 }
 
-bool MarkerSet::getMarkerByMappedID(int mapped_id, Marker &out) const
+bool MarkerSet::getMarkerByMappedID(int mapped_id, MarkerPattern &out) const
 {
-	try{
+	try
+	{
 		out = markers[this->reverse_mappings.at(mapped_id)];
 		return true;
-	} catch(std::out_of_range){
+	}
+	catch (std::out_of_range)
+	{
 		return false;
 	}
 }
@@ -214,59 +215,59 @@ uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
 	 0,0,1,0,1,
 	 1,1,1,1,0},
 	// ALVAR Marker 9
-	{1, 1, 0, 1, 1,
-  	 1, 1, 0, 1, 1,
-  	 1, 0, 1, 0, 1,
-  	 1, 1, 1, 0, 0,
-  	 1, 1, 1, 0, 0},
+	{1,1,0,1,1,
+  	 1,1,0,1,1,
+  	 1,0,1,0,1,
+  	 1,1,1,0,0,
+  	 1,1,1,0,0},
 	// ALVAR Marker 10
- 	{1, 1, 0, 1, 1,
-  	 1, 1, 0, 1, 1,
-  	 1, 0, 1, 0, 1,
-  	 0, 1, 1, 0, 0,
-  	 1, 0, 1, 1, 1},
+ 	{1,1,0,1,1,
+  	 1,1,0,1,1,
+  	 1,0,1,0,1,
+  	 0,1,1,0,0,
+  	 1,0,1,1,1},
 	// ALVAR Marker 11
- 	{1, 1, 0, 1, 1,
- 	 1, 1, 0, 1, 1,
- 	 1, 0, 1, 0, 1,
- 	 1, 0, 1, 0, 1,
- 	 1, 0, 1, 0, 1},
+ 	{1,1,0,1,1,
+ 	 1,1,0,1,1,
+ 	 1,0,1,0,1,
+ 	 1,0,1,0,1,
+ 	 1,0,1,0,1},
 	// ALVAR Marker 12
- 	{1, 1, 0, 1, 1,
- 	 1, 1, 0, 1, 1,
-  	 1, 0, 1, 0, 1,
- 	 1, 0, 1, 0, 0,
- 	 1, 1, 1, 1, 1},
+ 	{1,1,0,1,1,
+ 	 1,1,0,1,1,
+  	 1,0,1,0,1,
+ 	 1,0,1,0,0,
+ 	 1,1,1,1,1},
 	// ALVAR Marker 13
- 	{1, 1, 0, 1, 1,
- 	 1, 1, 0, 1, 1,
- 	 1, 0, 1, 0, 1,
- 	 0, 1, 1, 0, 1,
- 	 0, 1, 1, 0, 1},
+ 	{1,1,0,1,1,
+ 	 1,1,0,1,1,
+ 	 1,0,1,0,1,
+ 	 0,1,1,0,1,
+ 	 0,1,1,0,1},
 	// ALVAR Marker 14
- 	{1, 1, 0, 1, 1,
- 	 1, 1, 0, 1, 1,
- 	 1, 0, 1, 0, 1,
- 	 1, 1, 1, 0, 1,
- 	 0, 0, 1, 1, 0},
+ 	{1,1,0,1,1,
+ 	 1,1,0,1,1,
+ 	 1,0,1,0,1,
+ 	 1,1,1,0,1,
+ 	 0,0,1,1,0},
 	// ALVAR Marker 15
- 	{1, 1, 0, 1, 1,
- 	 1, 1, 0, 1, 1,
- 	 1, 0, 1, 0, 1,
- 	 0, 0, 1, 0, 0,
- 	 0, 0, 1, 0, 0},
+ 	{1,1,0,1,1,
+ 	 1,1,0,1,1,
+ 	 1,0,1,0,1,
+ 	 0,0,1,0,0,
+ 	 0,0,1,0,0},
 	// ALVAR Marker 16
- 	{0, 0, 0, 1, 1,
- 	 1, 1, 0, 0, 1,
- 	 1, 0, 1, 0, 1,
- 	 1, 1, 1, 1, 1,
- 	 1, 1, 1, 1, 1},
+ 	{0,0,0,1,1,
+ 	 1,1,0,0,1,
+ 	 1,0,1,0,1,
+ 	 1,1,1,1,1,
+ 	 1,1,1,1,1},
 	// ALVAR Marker 17
- 	{0, 0, 0, 1, 1,
- 	 1, 1, 0, 0, 1,
- 	 1, 0, 1, 0, 1,
- 	 0, 0, 1, 1, 0,
- 	 1, 1, 1, 0, 1}
+ 	{0,0,0,1,1,
+ 	 1,1,0,0,1,
+ 	 1,0,1,0,1,
+ 	 0,0,1,1,0,
+ 	 1,1,1,0,1}
 
 	// clang-format on
 };

@@ -13,7 +13,7 @@
 
    You should likely not have to construct any instances of this class yourself.
  */
-class Marker
+class MarkerPattern
 {
 private:
 	/**
@@ -43,15 +43,15 @@ public:
 	   should not try to use these empty markers. You can check if a marker is empty using the
 	   Marker::empty() method.
 	 */
-	Marker();
+	MarkerPattern();
 	/**
 	   Creates a marker, with the given data region size, border size, data bits, and id.
 	 */
-	Marker(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int id);
+	MarkerPattern(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, int id);
 	bool empty() const;
 	uint8_t getDataRegionSize() const;
 	uint8_t getBorderSize() const;
 	const cv::Ptr<cv::Mat> getDataBits() const;
 	int getId() const;
-	bool operator==(const Marker& other) const;
+	bool operator==(const MarkerPattern& other) const;
 };
