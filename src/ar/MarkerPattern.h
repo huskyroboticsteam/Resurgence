@@ -6,12 +6,16 @@
 
 /**
    A class to represent the pattern that may appear on a physical AR tag, NOT a physical
-   instance of a tag itself; those are represented by the Tag class. Markers are square
-   patterns of either black or white pixels, usually with a border on the outside and a data
-   region inside the border. Markers should be unique and referred to by an ID, which may or
-   may not be actually encoded in their data.
+   instance of a tag itself; each individual instance of the pattern as it appears in the world
+   is represented by an instance of the Tag class, and there may be multiple Tags corresponding
+   to the same MarkerPattern. MarkerPatterns are square patterns of either black or white
+   pixels, usually with a border on the outside and a data region inside the
+   border. MarkerPatterns should be unique and referred to uniquely by an ID, which is a
+   non-negative integer that should be considered arbitrary and not guaranteed to have any
+   actual meaning.
 
-   You should likely not have to construct any instances of this class yourself.
+   You should likely not have to construct any instances of this class yourself; this will be
+   done internally by the Detector class.
  */
 class MarkerPattern
 {
