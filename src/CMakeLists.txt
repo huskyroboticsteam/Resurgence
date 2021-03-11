@@ -7,6 +7,7 @@ project(Rover LANGUAGES CXX C)
 
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(Threads REQUIRED)
 
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
@@ -107,8 +108,13 @@ add_executable(tests
   Tests.cpp
   Autonomous.cpp
   # AR Detection tests
-  # ar/ARUnitTests.cpp
+  ar/Detector.cpp
+  ar/CameraParams.cpp
   ar/Tag.cpp
+  ar/DetectorTests.cpp
+  ar/MarkerPattern.cpp
+  ar/MarkerSet.cpp
+  ar/MarkerSetTests.cpp
   # CAN tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
