@@ -1,6 +1,6 @@
-[submodule "src/simulator"]
-	path = src/simulator
-	url = https://github.com/nhatch/slam
 [submodule "src/HindsightCAN"]
 	path = src/HindsightCAN
 	url = https://github.com/huskyroboticsteam/HindsightCAN.git
+[submodule "src/simulator"]
+	path = src/simulator
+	url = https://github.com/huskyroboticsteam/PlanarSimulator
