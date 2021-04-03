@@ -176,6 +176,37 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 	return KP_ANGLE * thetaErr;
 }
 
+std::pair<pose_t, pose_t> Autonomous::getGateGoals(const point_t &post_1, const point_t &post_2, const pose_t &pose) const
+{
+	point_t center = (post_1 + post_2) / 2;
+	point_t offset{(post_1(1) - post_2(1)) / 2, (post_2(0) - post_1(0)) / 2, 0};
+	pose_t goal_1 = center + 2 * offset;
+	pose_t goal_2 = center - 2 * offset;
+
+	std::pair<pose_t, pose_t> gate_goals;
+	if (dist(pose, goal_1, 0) < dist(pose, goal_2, 0))
+	{
+		gate_goals = std::make_pair(goal_1, goal_2);
+	}
+	else
+	{
+		gate_goals = std::make_pair(goal_2, goal_1);
+	}
+
+	// If we are at the first target, we can set the first goal to the current pose to get a more accurate angle
+	// that accounts for potential error from the actual goal position
+	if (std::isinf(gate_targets.first(2)))
+	{
+		gate_goals.first = pose;
+	}
+
+	double angle = std::atan2(gate_goals.second(1) - gate_goals.first(1), gate_goals.second(0) - gate_goals.first(0));
+	gate_goals.first(2) = angle;
+	gate_goals.second(2) = angle;
+
+	return gate_goals;
+}
+
 void Autonomous::autonomyIter()
 {
 	if (!Globals::AUTONOMOUS)
@@ -281,34 +312,19 @@ void Autonomous::autonomyIter()
 			}
 			// we have already seen the first post but have not set gate targets yet or have
 			// potentially inaccurate gate landmark measurements
-			// TODO comment
+			// TODO comment and refactor
 			else if ((std::isnan(gate_targets.first(2)) && landmarkFilter.getSize() == 5 && gate_filter.getSize() == 5) ||
 					 (!std::isnan(gate_targets.first(2)) && std::isnan(gate_targets.second(2)) && dist(pose, gate_targets.first, 0.0) < 2.0))
 			{
-				bool set_second_nan = std::isnan(gate_targets.first(2));
-				point_t post_1 = landmarkFilter.get();
-				point_t post_2 = filtered;
-				point_t center = (post_1 + post_2) / 2;
+				bool refining = !std::isnan(gate_targets.first(2));
 
-				point_t offset{(post_1(1) - post_2(1)) / 2, (post_2(0) - post_1(0)) / 2, 0};
-				pose_t target_1 = center + 2 * offset;
-				pose_t target_2 = center - 2 * offset;
-
-				if (dist(pose, target_1, 0) < dist(pose, target_2, 0))
-				{
-					gate_targets = std::make_pair(target_1, target_2);
-				}
-				else
-				{
-					gate_targets = std::make_pair(target_2, target_1);
-				}
-
-				double angle = std::atan2(gate_targets.second(1) - gate_targets.first(1), gate_targets.second(0) - gate_targets.first(0));
-				gate_targets.first(2) = angle;
-				// Mark second post as invalid if far away from landmarks
-				gate_targets.second(2) = set_second_nan ? NAN : angle;
-
+				gate_targets.first = getGateGoals(landmarkFilter.get(), gate_filter.get(), pose).first;
 				driveTarget = gate_targets.first;
+				// Mark first target as refined
+				if (refining)
+				{
+					gate_targets.second(2) = 0.0;
+				}
 
 				// Replan
 				plan_cost = INFINITE_COST;
@@ -319,9 +335,11 @@ void Autonomous::autonomyIter()
 				// Update gate targets
 				if (!std::isinf(gate_targets.first(2)) && dist(pose, gate_targets.first, 0.0) < 0.2)
 				{
-					// Arrived at first gate target
+					// Arrived at first gate target, mark as complete
 					std::cout << "Arrived at first target, distance " << dist(pose, gate_targets.first, 0.0) << std::endl;
-					gate_targets.first = (pose_t) {INFINITY, INFINITY, INFINITY};
+					gate_targets.first = pose_t(INFINITY, INFINITY, INFINITY);
+
+					gate_targets.second = getGateGoals(landmarkFilter.get(), gate_filter.get(), pose).second;
 					// Turn to desired angle
 					state = NavState::GATE_ALIGN;
 				}
@@ -329,8 +347,8 @@ void Autonomous::autonomyIter()
 				{
 					// Arrived at second gate target
 					std::cout << "Arrived at second target, distance " << dist(pose, gate_targets.second, 0.0) << std::endl;
-					gate_targets.second = (pose_t) {INFINITY, INFINITY, INFINITY};
-					// Reached goal, can return
+					gate_targets.second = pose_t(INFINITY, INFINITY, INFINITY);
+					// Reached goal, no further action needed
 					already_arrived = true;
 					return;
 				}
@@ -389,7 +407,7 @@ void Autonomous::autonomyIter()
 			gate.position.z = gate_1(2);
 			gate_message.poses.push_back(gate);
 		}
-		if (!std::isnan(gate_targets.second(2)) && !std::isinf(gate_targets.second(2)))
+		if (!std::isnan(gate_targets.second(0)) && !std::isinf(gate_targets.second(2)))
 		{
 			pose_t gate_2 = poseToDraw(gate_targets.second, pose);
 			auto gate = geometry_msgs::msg::Pose();
