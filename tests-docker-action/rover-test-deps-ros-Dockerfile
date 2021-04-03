@@ -9,7 +9,7 @@ RUN apt-get update
 RUN apt-get upgrade -y
 
 # Install system dependencies
-RUN apt-get install -y wget unzip curl gnupg2 lsb-release
+RUN apt-get install -y wget unzip curl gnupg2 lsb-release git cmake g++ make
 
 ################### SFML ###################
 
@@ -25,15 +25,19 @@ RUN apt-get install -y libeigen3-dev
 RUN apt-get install -y libopencv-dev libopencv-contrib-dev
 
 ################### CATCH2 ###################
-WORKDIR "/usr/local/share"
+WORKDIR "/tmp"
 
 # Download Catch2
 RUN git clone https://github.com/catchorg/catch2
 
 # Configure Catch2
-WORKDIR "/usr/local/share/catch2"
+WORKDIR "/tmp/catch2"
+# Check out the correct release tag
+RUN git checkout v2.13.4
+# Make build directory
 RUN mkdir build
-WORKDIR "/usr/local/share/catch2/build"
+WORKDIR "/tmp/catch2/build"
+# Run CMake config
 RUN cmake ..
 
 # Build Catch2
@@ -42,21 +46,29 @@ RUN make
 # Install Catch2
 RUN make install
 
+# Clean up sources to save storage space
+WORKDIR "/tmp"
+RUN rm -rf catch2
+
 WORKDIR "/"
 
 ################### LIDAR ###################
 
-WORKDIR "/usr/local/share"
+WORKDIR "/tmp/"
 
 # Download the URG Lidar library
 RUN git clone https://github.com/andrewbriand/urg_library-1.2.5.git
-WORKDIR "/usr/local/share/urg_library-1.2.5"
+WORKDIR "/tmp/urg_library-1.2.5"
 
 # Build URG library
 RUN make
 
 # Install URG library
 RUN make install
+
+# Clean up sources to save storage space
+WORKDIR "/tmp"
+RUN rm -rf urg_library-1.2.5
 
 WORKDIR "/"
 
