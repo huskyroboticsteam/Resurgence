@@ -159,6 +159,7 @@ int getChildIdx(const point_t &center, const point_t &point)
 
 point_t QuadTree::getClosest(const point_t &point) const
 {
+	// TODO: there's a bug somewhere in this method
 	// if there are no children just search through this tree's points
 	if (!hasChildren())
 	{
@@ -166,7 +167,7 @@ point_t QuadTree::getClosest(const point_t &point) const
 		double minDist = std::numeric_limits<double>::infinity();
 		for (const point_t &p : points)
 		{
-			double dist = (p - point).norm();
+			double dist = (p - point).topRows<2>().norm();
 			if (dist < minDist)
 			{
 				closest = p;
@@ -205,9 +206,9 @@ point_t QuadTree::getClosest(const point_t &point) const
 		assert(!tree->empty()); // should be guaranteed
 		// choose an arbitrary point
 		point_t p = tree->getArbitraryPoint();
-		// areas must be square, so choose the largest dimension of the diff vector
+		// Search area is square, so using the distance guarantees that the closest is found
 		// multiply by two because this is half side-length
-		double areaSize = 2 * (p - point).topRows<2>().array().abs().maxCoeff();
+		double areaSize = 2 * (p - point).topRows<2>().norm();
 		// get the closest of all points within this area
 		return getClosestWithin(point, areaSize);
 	}
