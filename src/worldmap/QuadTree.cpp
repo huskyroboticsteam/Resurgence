@@ -159,7 +159,6 @@ int getChildIdx(const point_t &center, const point_t &point)
 
 point_t QuadTree::getClosest(const point_t &point) const
 {
-	// TODO: there's a bug somewhere in this method
 	// if there are no children just search through this tree's points
 	if (!hasChildren())
 	{
