@@ -5,5 +5,5 @@ mkdir ./build
 cd build
 cmake ../src
 cd ..
-cmake --build ./build
+cmake --build ./build -j$(nproc)
 ./build/tests

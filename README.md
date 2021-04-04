@@ -18,14 +18,10 @@ access.
 
 ## Install OpenCV
 OpenCV is a computer vision library that's used for the AR tag detection code
-and as such is needed to compile the project.
-
-The setup process takes some time and will use a lot of CPU, but it's fairly
-straightforward and should only need to be done once.
-
-We need an extra module (ARUco) for OpenCV for the AR tag detection code which
-is not bundled with OpenCV, so you will have to install that module before
-building OpenCV. The below instructions will cover this.
+and as such is needed to compile the project. We will also need the OpenCV
+contrib modules for the AR tag detection code. Either OpenCV 3 or OpenCV 4
+should work, but we are developing and testing against OpenCV 4 so you should
+try to get that version for best results.
 
 ### On GNU/Linux (including Windows Subsystem for Linux)
 
@@ -34,45 +30,14 @@ GNU/Linux distribution natively or in a VM, you can often paste with
 `CTRL+SHIFT+v`. If you are using Windows Subsystem for Linux, these commands
 should be executed in your WSL terminal, and you can paste with right click.
 
-1. `sudo apt update && sudo apt -y dist-upgrade`
-2. `sudo apt install unzip git cmake g++ libgtk2.0-dev pkg-config libavcodec-dev
-   libavformat-dev libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev
-   libtiff-dev libdc1394-22-dev`
-   
-Now, to install the extra modules:
+OpenCV and its contrib modules are packaged for Ubuntu GNU/Linux. For other
+distributions, check to see if `libopencv` and `libopencv-contrib` are included
+in your distribution's package catalog. 
 
-3. `git clone https://github.com/opencv/opencv_contrib`
-4. `cd opencv_contrib`
-5. `git checkout 3.4.7`
+To install, simply run the following commands:
 
-We will do the next two steps because the contrib repository comes with many
-extra modules, and we only need the one for ARUco. Copying it into its own
-directory will allow us to only build and include that one module instead of
-having to build all of them.
-
-6. `mkdir selected_modules`
-7. `cp -r modules/aruco selected_modules/`
-
-Return to your original directory.
-
-8. `cd ..`
-
-Now, to install and build OpenCV, with the extra modules:
-
-9. `wget https://github.com/opencv/opencv/archive/3.4.7.zip`
-10. `unzip 3.4.7.zip`
-11. `cd opencv-3.4.7`
-12. `mkdir build`
-13. `cd build`
-14. `cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-    -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/selected_modules ..` 
-15. `make -j$(nproc)` (The command `nproc` here will return the number of CPU
-   cores on your computer, and will enable `make` to build in parallel, which
-   will make the build process go faster.) This step will take a long
-   time and use nearly 100% CPU for that entire time, so be warned. If you are a
-   VM user, this process can go faster if you allocate more processor cores to
-   your VM.
-16. `sudo make install`
+1. `sudo apt update && sudo apt -y upgrade`
+2. `sudo apt install libopencv-dev libopencv-contrib-dev`
 
 ### On Mac
 There is a Homebrew package available for OpenCV on Mac OS. Open the Terminal
@@ -80,7 +45,7 @@ and run these commands:
 1. `/usr/bin/ruby -e "$(curl -fsSL
    https://raw.githubusercontent.com/Homebrew/install/master/install)"` (If you
    already have Homebrew installed, you can skip this step.)
-2. `brew install opencv@3`
+2. `brew install opencv@4`
 
 ## Install Catch2 (for unit testing)
 These instructions assume you've followed the steps above to set up OpenCV,

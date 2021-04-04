@@ -7,6 +7,7 @@ project(Rover LANGUAGES CXX C)
 
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(Threads REQUIRED)
 
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
@@ -107,8 +108,13 @@ add_executable(tests
   Tests.cpp
   Autonomous.cpp
   # AR Detection tests
-  # ar/ARUnitTests.cpp
+  ar/Detector.cpp
+  ar/CameraParams.cpp
   ar/Tag.cpp
+  ar/DetectorTests.cpp
+  ar/MarkerPattern.cpp
+  ar/MarkerSet.cpp
+  ar/MarkerSetTests.cpp
   # CAN tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
@@ -165,6 +171,7 @@ list(APPEND sfml_libs
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+target_include_directories(lidar_base SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
