@@ -10,3 +10,4 @@ Makefile
 CMakeFiles
 *.cmake
 .DS_Store
+/docs/
