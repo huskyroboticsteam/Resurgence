@@ -28,7 +28,6 @@ double calculateMSE(const points_t &p1, const points_t &p2)
 	{
 		point_t truth = p1[i];
 		point_t p = p2[i];
-		//		std::cout << p(0) << ", " << p(1) << std::endl;
 		mse += pow((p - truth).norm(), 2);
 	}
 	mse /= p1.size();
@@ -36,6 +35,48 @@ double calculateMSE(const points_t &p1, const points_t &p2)
 	return mse;
 }
 } // namespace
+
+TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+
+	GlobalMap map;
+	points_t points;
+
+	constexpr int areaMin = -5;
+	constexpr int areaMax = 5;
+
+	for (int i = 0; i < 100; i++)
+	{
+		double x = rand(areaMin, areaMax);
+		double y = rand(areaMin, areaMax);
+		point_t p = {x, y, 1};
+		points.push_back(p);
+	}
+	map.addPoints(transform_t::Identity(), points, 0);
+
+	for (int i = 0; i < 500; i++) {
+		double x = rand(areaMin, areaMax);
+		double y = rand(areaMin, areaMax);
+		point_t point = {x, y, 1};
+
+		// manually compute the nearest neighbor to check against
+		point_t closest = {0, 0, 0};
+		double minDist = std::numeric_limits<double>::infinity();
+		for (const point_t &p : points)
+		{
+			double dist = (p - point).topRows<2>().norm();
+			if (dist < minDist)
+			{
+				minDist = dist;
+				closest = p;
+			}
+		}
+
+		point_t closestMap = map.getClosest(point);
+		REQUIRE(closest == closestMap);
+	}
+}
 
 TEST_CASE("Global Map", "[GlobalMap]")
 {
@@ -63,7 +104,7 @@ TEST_CASE("Global Map", "[GlobalMap]")
 	points_t mapPoints = map.getPoints();
 
 	// we need to sort because iteration order is not consistent
-	auto comp = [](const point_t &a, const point_t &b) {return a(0) < b(0);};
+	auto comp = [](const point_t &a, const point_t &b) { return a(0) < b(0); };
 	std::sort(allPoints.begin(), allPoints.end(), comp);
 	std::sort(mapPoints.begin(), mapPoints.end(), comp);
 
@@ -107,7 +148,7 @@ TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
 	points_t mapPoints = map.getPoints();
 
 	// we need to sort because iteration order is not consistent
-	auto comp = [](const point_t &a, const point_t &b) {return a(0) < b(0);};
+	auto comp = [](const point_t &a, const point_t &b) { return a(0) < b(0); };
 	std::sort(truths.begin(), truths.end(), comp);
 	std::sort(mapPoints.begin(), mapPoints.end(), comp);
 
