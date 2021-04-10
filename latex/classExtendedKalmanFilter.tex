@@ -1,0 +1,192 @@
+\hypertarget{classExtendedKalmanFilter}{}\doxysection{Extended\+Kalman\+Filter$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$ Class Template Reference}
+\label{classExtendedKalmanFilter}\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+
+
+{\ttfamily \#include $<$Extended\+Kalman\+Filter.\+h$>$}
+
+
+
+Inheritance diagram for Extended\+Kalman\+Filter$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classExtendedKalmanFilter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Extended\+Kalman\+Filter$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classExtendedKalmanFilter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classExtendedKalmanFilter_a48c38a782856b96f6da8ba64e67ddd1f}\label{classExtendedKalmanFilter_a48c38a782856b96f6da8ba64e67ddd1f}} 
+using {\bfseries state\+\_\+t} = Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$
+\item 
+\mbox{\Hypertarget{classExtendedKalmanFilter_a9b0f5e4b6eaee4fbc595600ae2c028e7}\label{classExtendedKalmanFilter_a9b0f5e4b6eaee4fbc595600ae2c028e7}} 
+using {\bfseries output\+\_\+t} = Eigen\+::\+Matrix$<$ double, output\+Dim, 1 $>$
+\item 
+\mbox{\Hypertarget{classExtendedKalmanFilter_a3642f61040843a41ad5397d082af7b23}\label{classExtendedKalmanFilter_a3642f61040843a41ad5397d082af7b23}} 
+using {\bfseries input\+\_\+t} = Eigen\+::\+Matrix$<$ double, input\+Dim, 1 $>$
+\item 
+\mbox{\Hypertarget{classExtendedKalmanFilter_aade9bd033d2b7e48d552fc52e5195793}\label{classExtendedKalmanFilter_aade9bd033d2b7e48d552fc52e5195793}} 
+using {\bfseries statefunc\+\_\+t} = std\+::function$<$ state\+\_\+t(const state\+\_\+t \&, const input\+\_\+t \&, const Eigen\+::\+Matrix$<$ double, process\+Noise\+Dim, 1 $>$ \&)$>$
+\item 
+\mbox{\Hypertarget{classExtendedKalmanFilter_a33c3b5b461e2c61c86efcff76fe18dd3}\label{classExtendedKalmanFilter_a33c3b5b461e2c61c86efcff76fe18dd3}} 
+using {\bfseries outputfunc\+\_\+t} = std\+::function$<$ output\+\_\+t(const state\+\_\+t \&, const Eigen\+::\+Matrix$<$ double, output\+Noise\+Dim, 1 $>$ \&)$>$
+\item 
+\mbox{\Hypertarget{classExtendedKalmanFilter_a84ec3d56f7c8b74c2bd760d613726bb3}\label{classExtendedKalmanFilter_a84ec3d56f7c8b74c2bd760d613726bb3}} 
+using {\bfseries processnoise\+\_\+t} = Eigen\+::\+Matrix$<$ double, process\+Noise\+Dim, 1 $>$
+\item 
+\mbox{\Hypertarget{classExtendedKalmanFilter_acae4492b1aefdeaa79f3e183585843cd}\label{classExtendedKalmanFilter_acae4492b1aefdeaa79f3e183585843cd}} 
+using {\bfseries outputnoise\+\_\+t} = Eigen\+::\+Matrix$<$ double, output\+Noise\+Dim, 1 $>$
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classExtendedKalmanFilter_a56e1344818304df9260566913075ddee}{Extended\+Kalman\+Filter}} (const statefunc\+\_\+t \&state\+Func, const outputfunc\+\_\+t \&output\+Func, const \mbox{\hyperlink{classNoiseCovMat}{Noise\+Cov\+Mat}}$<$ state\+Dim, process\+Noise\+Dim, input\+Dim $>$ \&process\+Noise, const \mbox{\hyperlink{classNoiseCovMat}{Noise\+Cov\+Mat}}$<$ state\+Dim, output\+Noise\+Dim, output\+Dim $>$ \&output\+Noise, double dt)
+\item 
+void \mbox{\hyperlink{classExtendedKalmanFilter_abc136509ffcb284fff0b7b3c860bf51b}{predict}} (const Eigen\+::\+Matrix$<$ double, input\+Dim, 1 $>$ \&input) override
+\item 
+void \mbox{\hyperlink{classExtendedKalmanFilter_a59682d61622062f600f4c92c1bacc1e9}{correct}} (const Eigen\+::\+Matrix$<$ double, output\+Dim, 1 $>$ \&measurement) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::function$<$ Eigen\+::\+Matrix$<$ double, state\+Dim, state\+Dim $>$const state\+\_\+t \&, const input\+\_\+t \&, const processnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter_a0f1a61c73d5eb0e507dec8c46566e1c6}{state\+Func\+JacobianX}}
+\item 
+std\+::function$<$ Eigen\+::\+Matrix$<$ double, state\+Dim, process\+Noise\+Dim $>$ const state\+\_\+t \&, const input\+\_\+t \&, const processnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter_ac685714f6a7fc6d383d3b49e07b78dbb}{state\+Func\+JacobianW}}
+\item 
+std\+::function$<$ Eigen\+::\+Matrix$<$ double, output\+Dim, state\+Dim $>$const state\+\_\+t \&, const outputnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter_a95c4ac6d6960b87f5d0b9e9acd55d6d4}{output\+Func\+JacobianX}}
+\item 
+std\+::function$<$ Eigen\+::\+Matrix$<$ double, output\+Dim, output\+Noise\+Dim $>$const state\+\_\+t \&, const outputnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter_ab2f97e78ba5a12e582c957a52be50f3f}{output\+Func\+JacobianV}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$\newline
+class Extended\+Kalman\+Filter$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$}
+
+Implements a discrete-\/time EKF. This implements the more general system form described here\+: \href{https://en.wikipedia.org/wiki/Extended_Kalman_filter\#Non-additive_noise_formulation_and_equations}{\texttt{ https\+://en.\+wikipedia.\+org/wiki/\+Extended\+\_\+\+Kalman\+\_\+filter\#\+Non-\/additive\+\_\+noise\+\_\+formulation\+\_\+and\+\_\+equations}}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em state\+Dim} & The dimension of the state space for this system. This is the number of elements in the state vector. \\
+\hline
+{\em input\+Dim} & The dimension of the input space for this system. This is the number of elements in the input vector. \\
+\hline
+{\em output\+Dim} & The dimension of the output space for this system. This is the number of elements in the output (measurement) vector. \\
+\hline
+{\em process\+Noise\+Dim} & The dimension of the process noise matrix. In systems with additive process noise, this is the same as state\+Dim. \\
+\hline
+{\em output\+Noise\+Dim} & The dimension of the output noise matrix. In systems with additive output noise, this is the same as output\+Dim. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classExtendedKalmanFilter_a56e1344818304df9260566913075ddee}\label{classExtendedKalmanFilter_a56e1344818304df9260566913075ddee}} 
+\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}!ExtendedKalmanFilter@{ExtendedKalmanFilter}}
+\index{ExtendedKalmanFilter@{ExtendedKalmanFilter}!ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+\doxysubsubsection{\texorpdfstring{ExtendedKalmanFilter()}{ExtendedKalmanFilter()}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$ \\
+\mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}}$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+::\mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}} (\begin{DoxyParamCaption}\item[{const statefunc\+\_\+t \&}]{state\+Func,  }\item[{const outputfunc\+\_\+t \&}]{output\+Func,  }\item[{const \mbox{\hyperlink{classNoiseCovMat}{Noise\+Cov\+Mat}}$<$ state\+Dim, process\+Noise\+Dim, input\+Dim $>$ \&}]{process\+Noise,  }\item[{const \mbox{\hyperlink{classNoiseCovMat}{Noise\+Cov\+Mat}}$<$ state\+Dim, output\+Noise\+Dim, output\+Dim $>$ \&}]{output\+Noise,  }\item[{double}]{dt }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Create a new discrete-\/time EKF.
+
+
+\begin{DoxyParams}{Parameters}
+{\em state\+Func} & Discrete-\/time state transition function. x\+\_\+t+1 = f(x\+\_\+t, u) \\
+\hline
+{\em output\+Func} & Output function of the system. Also known as h(x) \\
+\hline
+{\em process\+Noise} & The process noise covariance matrix for this system. \\
+\hline
+{\em output\+Noise} & The output noise covariance matrix for this system. \\
+\hline
+{\em dt} & The time in seconds between updates. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classExtendedKalmanFilter_a59682d61622062f600f4c92c1bacc1e9}\label{classExtendedKalmanFilter_a59682d61622062f600f4c92c1bacc1e9}} 
+\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}!correct@{correct}}
+\index{correct@{correct}!ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+\doxysubsubsection{\texorpdfstring{correct()}{correct()}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$ \\
+void \mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}}$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+::correct (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, output\+Dim, 1 $>$ \&}]{measurement }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Correct the state estimate with measurement data. The measurement should be in the same space as the state.
+
+
+\begin{DoxyParams}{Parameters}
+{\em measurement} & The measurement to use to correct the filter. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classKalmanFilterBase_ac02e8635b6b1b70455823ec36aa0ebd9}{Kalman\+Filter\+Base$<$ state\+Dim, input\+Dim, output\+Dim $>$}}.
+
+\mbox{\Hypertarget{classExtendedKalmanFilter_abc136509ffcb284fff0b7b3c860bf51b}\label{classExtendedKalmanFilter_abc136509ffcb284fff0b7b3c860bf51b}} 
+\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}!predict@{predict}}
+\index{predict@{predict}!ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+\doxysubsubsection{\texorpdfstring{predict()}{predict()}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$ \\
+void \mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}}$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+::predict (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, input\+Dim, 1 $>$ \&}]{input }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Use the model to predict the next system state, given the current inputs.
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & The current inputs to the system. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classKalmanFilterBase_a52c2fa846033b16b01b73b434a9e1e15}{Kalman\+Filter\+Base$<$ state\+Dim, input\+Dim, output\+Dim $>$}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classExtendedKalmanFilter_ab2f97e78ba5a12e582c957a52be50f3f}\label{classExtendedKalmanFilter_ab2f97e78ba5a12e582c957a52be50f3f}} 
+\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}!outputFuncJacobianV@{outputFuncJacobianV}}
+\index{outputFuncJacobianV@{outputFuncJacobianV}!ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+\doxysubsubsection{\texorpdfstring{outputFuncJacobianV}{outputFuncJacobianV}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$ \\
+std\+::function$<$Eigen\+::\+Matrix$<$double, output\+Dim, output\+Noise\+Dim$>$const state\+\_\+t \&, const outputnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}}$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+::output\+Func\+JacobianV}
+
+Set this to provide an analytic solution to dh/dv. If this is null, it will be numerically approximated. \mbox{\Hypertarget{classExtendedKalmanFilter_a95c4ac6d6960b87f5d0b9e9acd55d6d4}\label{classExtendedKalmanFilter_a95c4ac6d6960b87f5d0b9e9acd55d6d4}} 
+\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}!outputFuncJacobianX@{outputFuncJacobianX}}
+\index{outputFuncJacobianX@{outputFuncJacobianX}!ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+\doxysubsubsection{\texorpdfstring{outputFuncJacobianX}{outputFuncJacobianX}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$ \\
+std\+::function$<$Eigen\+::\+Matrix$<$double, output\+Dim, state\+Dim$>$const state\+\_\+t \&, const outputnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}}$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+::output\+Func\+JacobianX}
+
+Set this to provide an analytic solution to dh/dx. If this is null, it will be numerically approximated. \mbox{\Hypertarget{classExtendedKalmanFilter_ac685714f6a7fc6d383d3b49e07b78dbb}\label{classExtendedKalmanFilter_ac685714f6a7fc6d383d3b49e07b78dbb}} 
+\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}!stateFuncJacobianW@{stateFuncJacobianW}}
+\index{stateFuncJacobianW@{stateFuncJacobianW}!ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+\doxysubsubsection{\texorpdfstring{stateFuncJacobianW}{stateFuncJacobianW}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$ \\
+std\+::function$<$Eigen\+::\+Matrix$<$double, state\+Dim, process\+Noise\+Dim$>$ const state\+\_\+t \&, const input\+\_\+t \&, const processnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}}$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+::state\+Func\+JacobianW}
+
+Set this to provide an analytic solution to df/dw. If this is null, it will be numerically approximated. \mbox{\Hypertarget{classExtendedKalmanFilter_a0f1a61c73d5eb0e507dec8c46566e1c6}\label{classExtendedKalmanFilter_a0f1a61c73d5eb0e507dec8c46566e1c6}} 
+\index{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}!stateFuncJacobianX@{stateFuncJacobianX}}
+\index{stateFuncJacobianX@{stateFuncJacobianX}!ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$@{ExtendedKalmanFilter$<$ stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim $>$}}
+\doxysubsubsection{\texorpdfstring{stateFuncJacobianX}{stateFuncJacobianX}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim, int process\+Noise\+Dim, int output\+Noise\+Dim$>$ \\
+std\+::function$<$Eigen\+::\+Matrix$<$double, state\+Dim, state\+Dim$>$const state\+\_\+t \&, const input\+\_\+t \&, const processnoise\+\_\+t \&)$>$ \mbox{\hyperlink{classExtendedKalmanFilter}{Extended\+Kalman\+Filter}}$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$\+::state\+Func\+JacobianX}
+
+Set this to provide an analytic solution to df/dx. If this is null, it will be numerically approximated. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/filters/Extended\+Kalman\+Filter.\+h\end{DoxyCompactItemize}

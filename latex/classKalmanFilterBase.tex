@@ -1,0 +1,161 @@
+\hypertarget{classKalmanFilterBase}{}\doxysection{Kalman\+Filter\+Base$<$ state\+Dim, input\+Dim, output\+Dim $>$ Class Template Reference}
+\label{classKalmanFilterBase}\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+
+
+Inheritance diagram for Kalman\+Filter\+Base$<$ state\+Dim, input\+Dim, output\+Dim $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classKalmanFilterBase__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classKalmanFilterBase_ac02e8635b6b1b70455823ec36aa0ebd9}{correct}} (const Eigen\+::\+Matrix$<$ double, output\+Dim, 1 $>$ \&measurement)=0
+\item 
+virtual void \mbox{\hyperlink{classKalmanFilterBase_a52c2fa846033b16b01b73b434a9e1e15}{predict}} (const Eigen\+::\+Matrix$<$ double, input\+Dim, 1 $>$ \&input)=0
+\item 
+void \mbox{\hyperlink{classKalmanFilterBase_aaaa9d731dd009c8d7a164130a748f6cb}{reset}} ()
+\item 
+void \mbox{\hyperlink{classKalmanFilterBase_a49a10d0e1e0d8debdaa2445d3f19964e}{reset}} (const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&state)
+\item 
+void \mbox{\hyperlink{classKalmanFilterBase_a1349bf801f5091dea3d2c1a42cdfeec3}{reset}} (const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&state, const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&std\+Devs)
+\item 
+void \mbox{\hyperlink{classKalmanFilterBase_a46abab401585c2bbc4dac1e953ce9db0}{reset}} (const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&state, const Eigen\+::\+Matrix$<$ double, state\+Dim, state\+Dim $>$ \&est\+Cov\+Mat)
+\item 
+Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \mbox{\hyperlink{classKalmanFilterBase_a36eec69dcb14555789f1c32bb319c5ce}{get\+State}} () const
+\item 
+Eigen\+::\+Matrix$<$ double, state\+Dim, state\+Dim $>$ \mbox{\hyperlink{classKalmanFilterBase_af12351303ff47af593ded655cd28696f}{get\+Estimate\+Covariance\+Mat}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classKalmanFilterBase_a6d2b363084b7d49a8a25f6f1ec20bd2a}\label{classKalmanFilterBase_a6d2b363084b7d49a8a25f6f1ec20bd2a}} 
+Eigen\+::\+Matrix$<$ double, state\+Dim, state\+Dim $>$ {\bfseries P}
+\item 
+\mbox{\Hypertarget{classKalmanFilterBase_abfb179245ebfbe9d249368e3fe1eae41}\label{classKalmanFilterBase_abfb179245ebfbe9d249368e3fe1eae41}} 
+Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ {\bfseries x\+Hat}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classKalmanFilterBase_ac02e8635b6b1b70455823ec36aa0ebd9}\label{classKalmanFilterBase_ac02e8635b6b1b70455823ec36aa0ebd9}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!correct@{correct}}
+\index{correct@{correct}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{correct()}{correct()}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+virtual void \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::correct (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, output\+Dim, 1 $>$ \&}]{measurement }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Correct the state estimate with measurement data. The measurement should be in the same space as the state.
+
+
+\begin{DoxyParams}{Parameters}
+{\em measurement} & The measurement to use to correct the filter. \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \mbox{\hyperlink{classExtendedKalmanFilter_a59682d61622062f600f4c92c1bacc1e9}{Extended\+Kalman\+Filter$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$}}, and \mbox{\hyperlink{classExtendedKalmanFilter_a59682d61622062f600f4c92c1bacc1e9}{Extended\+Kalman\+Filter$<$ num\+States, 2, 3, 2, 3 $>$}}.
+
+\mbox{\Hypertarget{classKalmanFilterBase_af12351303ff47af593ded655cd28696f}\label{classKalmanFilterBase_af12351303ff47af593ded655cd28696f}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!getEstimateCovarianceMat@{getEstimateCovarianceMat}}
+\index{getEstimateCovarianceMat@{getEstimateCovarianceMat}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{getEstimateCovarianceMat()}{getEstimateCovarianceMat()}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+Eigen\+::\+Matrix$<$double, state\+Dim, state\+Dim$>$ \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::get\+Estimate\+Covariance\+Mat (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get the current estimate covariance matrix. This is an indication of the uncertainty of the pose estimate.
+
+\begin{DoxyReturn}{Returns}
+The estimate covariance matrix, AKA the P matrix. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classKalmanFilterBase_a36eec69dcb14555789f1c32bb319c5ce}\label{classKalmanFilterBase_a36eec69dcb14555789f1c32bb319c5ce}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!getState@{getState}}
+\index{getState@{getState}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{getState()}{getState()}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+Eigen\+::\+Matrix$<$double, state\+Dim, 1$>$ \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::get\+State (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Gets the current state estimate.
+
+\begin{DoxyReturn}{Returns}
+The state estimate. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classKalmanFilterBase_a52c2fa846033b16b01b73b434a9e1e15}\label{classKalmanFilterBase_a52c2fa846033b16b01b73b434a9e1e15}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!predict@{predict}}
+\index{predict@{predict}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{predict()}{predict()}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+virtual void \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::predict (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, input\+Dim, 1 $>$ \&}]{input }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Use the model to predict the next system state, given the current inputs.
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & The current inputs to the system. \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \mbox{\hyperlink{classKalmanFilter_aba72318d43541d76ef05c6d8d55cfbc5}{Kalman\+Filter$<$ state\+Dim, input\+Dim, output\+Dim $>$}}, \mbox{\hyperlink{classKalmanFilter_aba72318d43541d76ef05c6d8d55cfbc5}{Kalman\+Filter$<$ 3, 3, 3 $>$}}, \mbox{\hyperlink{classExtendedKalmanFilter_abc136509ffcb284fff0b7b3c860bf51b}{Extended\+Kalman\+Filter$<$ state\+Dim, input\+Dim, output\+Dim, process\+Noise\+Dim, output\+Noise\+Dim $>$}}, and \mbox{\hyperlink{classExtendedKalmanFilter_abc136509ffcb284fff0b7b3c860bf51b}{Extended\+Kalman\+Filter$<$ num\+States, 2, 3, 2, 3 $>$}}.
+
+\mbox{\Hypertarget{classKalmanFilterBase_aaaa9d731dd009c8d7a164130a748f6cb}\label{classKalmanFilterBase_aaaa9d731dd009c8d7a164130a748f6cb}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!reset@{reset}}
+\index{reset@{reset}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+void \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::reset (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the state estimate to the zero vector and resets the estimate covariance matrix to a diagonal matrix with large values. \mbox{\Hypertarget{classKalmanFilterBase_a49a10d0e1e0d8debdaa2445d3f19964e}\label{classKalmanFilterBase_a49a10d0e1e0d8debdaa2445d3f19964e}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!reset@{reset}}
+\index{reset@{reset}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+void \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::reset (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the state estimate to the supplied vector and resets the estimate covariance matrix to a diagonal matrix with large values.
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & The state to which the state estimate will be set. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classKalmanFilterBase_a1349bf801f5091dea3d2c1a42cdfeec3}\label{classKalmanFilterBase_a1349bf801f5091dea3d2c1a42cdfeec3}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!reset@{reset}}
+\index{reset@{reset}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+void \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::reset (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&}]{state,  }\item[{const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&}]{std\+Devs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the state estimate to the supplied vector with the given uncertainty.
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & The state to set the vector to. \\
+\hline
+{\em std\+Devs} & The standard deviation of the measurement of each element in the state vector. This should not be the zero vector. If you want to represent high certainty, use very small values instead. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classKalmanFilterBase_a46abab401585c2bbc4dac1e953ce9db0}\label{classKalmanFilterBase_a46abab401585c2bbc4dac1e953ce9db0}} 
+\index{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}!reset@{reset}}
+\index{reset@{reset}!KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$@{KalmanFilterBase$<$ stateDim, inputDim, outputDim $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template$<$int state\+Dim, int input\+Dim, int output\+Dim$>$ \\
+void \mbox{\hyperlink{classKalmanFilterBase}{Kalman\+Filter\+Base}}$<$ state\+Dim, input\+Dim, output\+Dim $>$\+::reset (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, state\+Dim, 1 $>$ \&}]{state,  }\item[{const Eigen\+::\+Matrix$<$ double, state\+Dim, state\+Dim $>$ \&}]{est\+Cov\+Mat }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Sets the state estimate to the supplied vector and the estimate covariance matrix to the supplied matrix.
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & The state to set the vector to. \\
+\hline
+{\em est\+Cov\+Mat} & The matrix to set the estimate covariance matrix to. This should not be the zero matrix. If you want to represent high certainty, use a diagonal matrix with very small values. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/filters/Kalman\+Filter\+Base.\+h\end{DoxyCompactItemize}

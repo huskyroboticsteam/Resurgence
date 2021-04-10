@@ -1,0 +1,54 @@
+\hypertarget{classEKFSlam}{}\doxysection{EKFSlam Class Reference}
+\label{classEKFSlam}\index{EKFSlam@{EKFSlam}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classEKFSlam_a11be4e2f2e17f6e7998942d110fa0556}{EKFSlam}} (float motion\+\_\+noise=0.\+6f)
+\item 
+virtual \mbox{\hyperlink{classEKFSlam_a7d537466579914d61b0a4fbec8f59f63}{$\sim$\+EKFSlam}} ()
+\item 
+\mbox{\Hypertarget{classEKFSlam_a690cb632a8be80dafbcfcc51e3224367}\label{classEKFSlam_a690cb632a8be80dafbcfcc51e3224367}} 
+void {\bfseries Prediction} (const \mbox{\hyperlink{structMagnetometerReading}{Magnetometer\+Reading}} \&mr, const \mbox{\hyperlink{structGPSReading}{GPSReading}} \&gps)
+\item 
+\mbox{\Hypertarget{classEKFSlam_a00bdad1621df67c83494dff1b32b6f05}\label{classEKFSlam_a00bdad1621df67c83494dff1b32b6f05}} 
+void {\bfseries update\+From\+Lidar} (std\+::vector$<$ std\+::vector$<$ \mbox{\hyperlink{structPointXY}{Point\+XY}} $>$$>$ \&lidar\+Clusters)
+\item 
+\mbox{\Hypertarget{classEKFSlam_a05bc8bff3ffbb25fbd20b7e4e4a6f885}\label{classEKFSlam_a05bc8bff3ffbb25fbd20b7e4e4a6f885}} 
+void {\bfseries step} ()
+\item 
+\mbox{\Hypertarget{classEKFSlam_a16665d964ed03fea8470d4b14dbe78c0}\label{classEKFSlam_a16665d964ed03fea8470d4b14dbe78c0}} 
+\mbox{\hyperlink{structPointXY}{Point\+XY}} {\bfseries get\+Position} ()
+\item 
+\mbox{\Hypertarget{classEKFSlam_a69dffb76eead3de94252e6f08541533e}\label{classEKFSlam_a69dffb76eead3de94252e6f08541533e}} 
+float {\bfseries get\+Heading} ()
+\item 
+\mbox{\Hypertarget{classEKFSlam_a4d57d90a0b059b4ae8e89f9a0f1d6f69}\label{classEKFSlam_a4d57d90a0b059b4ae8e89f9a0f1d6f69}} 
+float {\bfseries get\+Validation\+Value} (size\+\_\+t id, \mbox{\hyperlink{structPointXY}{Point\+XY}} obstacle)
+\item 
+\mbox{\Hypertarget{classEKFSlam_ad1ac013daeff06e4069f9ff843622666}\label{classEKFSlam_ad1ac013daeff06e4069f9ff843622666}} 
+std\+::vector$<$ \mbox{\hyperlink{structObstaclePoint}{Obstacle\+Point}} $>$ {\bfseries get\+Obstacles} ()
+\item 
+\mbox{\Hypertarget{classEKFSlam_aaccaf92471e1034ce975693ae8ee79fe}\label{classEKFSlam_aaccaf92471e1034ce975693ae8ee79fe}} 
+int {\bfseries get\+New\+Landmark\+ID} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classEKFSlam_a11be4e2f2e17f6e7998942d110fa0556}\label{classEKFSlam_a11be4e2f2e17f6e7998942d110fa0556}} 
+\index{EKFSlam@{EKFSlam}!EKFSlam@{EKFSlam}}
+\index{EKFSlam@{EKFSlam}!EKFSlam@{EKFSlam}}
+\doxysubsubsection{\texorpdfstring{EKFSlam()}{EKFSlam()}}
+{\footnotesize\ttfamily EKFSlam\+::\+EKFSlam (\begin{DoxyParamCaption}\item[{float}]{motion\+\_\+noise = {\ttfamily 0.6f} }\end{DoxyParamCaption})}
+
+Constructor. \mbox{\Hypertarget{classEKFSlam_a7d537466579914d61b0a4fbec8f59f63}\label{classEKFSlam_a7d537466579914d61b0a4fbec8f59f63}} 
+\index{EKFSlam@{EKFSlam}!````~EKFSlam@{$\sim$EKFSlam}}
+\index{````~EKFSlam@{$\sim$EKFSlam}!EKFSlam@{EKFSlam}}
+\doxysubsubsection{\texorpdfstring{$\sim$EKFSlam()}{~EKFSlam()}}
+{\footnotesize\ttfamily EKFSlam\+::$\sim$\+EKFSlam (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Destructor. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/mapping/\+EKFSlam/EKFSlam.\+h\item 
+src/mapping/\+EKFSlam/EKFSlam.\+cpp\end{DoxyCompactItemize}

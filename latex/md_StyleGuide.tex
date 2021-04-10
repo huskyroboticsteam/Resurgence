@@ -1,0 +1,45 @@
+
+\begin{DoxyItemize}
+\item Curly braces are always on the next line 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{int MyFunction()}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{    if(true)}
+\DoxyCodeLine{    \{}
+\DoxyCodeLine{        while(false)}
+\DoxyCodeLine{        \{}
+\DoxyCodeLine{        \}}
+\DoxyCodeLine{    \}}
+\DoxyCodeLine{    return 0;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+\item Function names are in {\ttfamily camel\+Case}
+\item Struct, Enum, Class, Enum Class, Union, etc. names are in {\ttfamily Pascal\+Case}
+\item Variable names are in {\ttfamily snake\+\_\+case}
+\item Always use C++\textquotesingle{}s includes\+: {\ttfamily $<$cstdint$>$, $<$cstdio$>$}, NOT {\ttfamily $<$stdint.\+h$>$, $<$stdio.\+h$>$}
+\item Order of includes is\+: Our includes, C++ Standard includes, kernel includes. Include an extra line between each group. Good\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#include "{}Globals.h"{}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#include <cstdint>}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#include <signal.h>}
+
+\end{DoxyCode}
+ Bad\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#include <iostream>}
+\DoxyCodeLine{\#include <signal.h>}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#include "{}Globals.h"{}}
+
+\end{DoxyCode}
+
+\item ALWAYS guard a header file with {\ttfamily \#pragma once}
+\item Avoid \#define, prefer constexpr
+\item Avoid raw pointers, prefer smart pointers (i.\+e shared\+\_\+ptr) or references ~\newline
+
+\end{DoxyItemize}\hypertarget{md_StyleGuide_autotoc_md26}{}\doxysubsection{Indentation}\label{md_StyleGuide_autotoc_md26}
+Use tabs to indent, and use additional spaces to align multi-\/line code (i.\+e. when lines are too long and have to be wrapped). 

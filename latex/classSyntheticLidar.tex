@@ -1,0 +1,56 @@
+\hypertarget{classSyntheticLidar}{}\doxysection{Synthetic\+Lidar Class Reference}
+\label{classSyntheticLidar}\index{SyntheticLidar@{SyntheticLidar}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structPolar2D}{Polar2D}} $>$ \mbox{\hyperlink{classSyntheticLidar_ac40a8a296cd552d83815872112f8a404}{next\+Polar\+Circle}} (double radius)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structPolar2D}{Polar2D}} $>$ \mbox{\hyperlink{classSyntheticLidar_ac27559a3cade724a70b87e1fa477abbe}{next\+Polar\+Square}} (double dimension)
+\item 
+\mbox{\Hypertarget{classSyntheticLidar_a65db4325de8a66dec747170514db9885}\label{classSyntheticLidar_a65db4325de8a66dec747170514db9885}} 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structPolar2D}{Polar2D}} $>$ $>$ {\bfseries get\+Last\+Frame} ()
+\item 
+\mbox{\Hypertarget{classSyntheticLidar_a6ad3c382e3fa4cfe0393574e5f20651f}\label{classSyntheticLidar_a6ad3c382e3fa4cfe0393574e5f20651f}} 
+double {\bfseries get\+Last\+Angle} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classSyntheticLidar_ac40a8a296cd552d83815872112f8a404}\label{classSyntheticLidar_ac40a8a296cd552d83815872112f8a404}} 
+\index{SyntheticLidar@{SyntheticLidar}!nextPolarCircle@{nextPolarCircle}}
+\index{nextPolarCircle@{nextPolarCircle}!SyntheticLidar@{SyntheticLidar}}
+\doxysubsubsection{\texorpdfstring{nextPolarCircle()}{nextPolarCircle()}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structPolar2D}{Polar2D}} $>$ Synthetic\+Lidar\+::next\+Polar\+Circle (\begin{DoxyParamCaption}\item[{double}]{radius }\end{DoxyParamCaption})}
+
+Steps the Lidar for the time having passed since it was last called (Given the average time for a complete rotation of the lidar) and returns the next polar coordinate at the given radius for a circle.
+
+
+\begin{DoxyParams}{Parameters}
+{\em radius} & The radius for which the next point should be generated. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A shared pointer to the next \mbox{\hyperlink{structPolar2D}{Polar2D}} coordinate. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classSyntheticLidar_ac27559a3cade724a70b87e1fa477abbe}\label{classSyntheticLidar_ac27559a3cade724a70b87e1fa477abbe}} 
+\index{SyntheticLidar@{SyntheticLidar}!nextPolarSquare@{nextPolarSquare}}
+\index{nextPolarSquare@{nextPolarSquare}!SyntheticLidar@{SyntheticLidar}}
+\doxysubsubsection{\texorpdfstring{nextPolarSquare()}{nextPolarSquare()}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structPolar2D}{Polar2D}} $>$ Synthetic\+Lidar\+::next\+Polar\+Square (\begin{DoxyParamCaption}\item[{double}]{dimension }\end{DoxyParamCaption})}
+
+Steps the Lidar for the time having passed since it was last called (Given the average time for a complete rotation of the lidar) and returns the next polar coordinate at the given dimension for a axis-\/aligned square.
+
+
+\begin{DoxyParams}{Parameters}
+{\em radius} & The dimension for which the next point should be generated. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A shared pointer to the next \mbox{\hyperlink{structPolar2D}{Polar2D}} coordinate. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/lidar/Synthetic\+Lidar.\+h\item 
+src/lidar/Synthetic\+Lidar.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,87 @@
+\hypertarget{namespacenlohmann}{}\doxysection{nlohmann Namespace Reference}
+\label{namespacenlohmann}\index{nlohmann@{nlohmann}}
+
+
+namespace for Niels Lohmann  
+
+
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespacenlohmann_1_1detail}{detail}}
+\begin{DoxyCompactList}\small\item\em detail namespace with internal helper functions \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structnlohmann_1_1adl__serializer}{adl\+\_\+serializer}}
+\begin{DoxyCompactList}\small\item\em default JSONSerializer template argument \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classnlohmann_1_1basic__json}{basic\+\_\+json}}
+\begin{DoxyCompactList}\small\item\em a class to store JSON values \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classnlohmann_1_1json__pointer}{json\+\_\+pointer}}
+\begin{DoxyCompactList}\small\item\em JSON Pointer. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structnlohmann_1_1json__sax}{json\+\_\+sax}}
+\begin{DoxyCompactList}\small\item\em SAX interface. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474}{json}} = \mbox{\hyperlink{classnlohmann_1_1basic__json}{basic\+\_\+json}}$<$$>$
+\begin{DoxyCompactList}\small\item\em default JSON class \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+NLOHMANN\+\_\+\+BASIC\+\_\+\+JSON\+\_\+\+TPL\+\_\+\+DECLARATION std\+::string \mbox{\hyperlink{namespacenlohmann_a6ce645a0b8717757e096a5b5773b7a16}{to\+\_\+string}} (const NLOHMANN\+\_\+\+BASIC\+\_\+\+JSON\+\_\+\+TPL \&j)
+\begin{DoxyCompactList}\small\item\em user-\/defined to\+\_\+string function for JSON values \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+namespace for Niels Lohmann 
+
+namespace to hold default {\ttfamily to\+\_\+json} function
+
+\begin{DoxySeeAlso}{See also}
+\href{https://github.com/nlohmann}{\texttt{ https\+://github.\+com/nlohmann}} 
+\end{DoxySeeAlso}
+\begin{DoxySince}{Since}
+version 1.\+0.\+0 
+\end{DoxySince}
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474}\label{namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474}} 
+\index{nlohmann@{nlohmann}!json@{json}}
+\index{json@{json}!nlohmann@{nlohmann}}
+\doxysubsubsection{\texorpdfstring{json}{json}}
+{\footnotesize\ttfamily using \mbox{\hyperlink{namespacenlohmann_a2bfd99e845a2e5cd90aeaf1b1431f474}{nlohmann\+::json}} = typedef \mbox{\hyperlink{classnlohmann_1_1basic__json}{basic\+\_\+json}}$<$$>$}
+
+
+
+default JSON class 
+
+This type is the default specialization of the \mbox{\hyperlink{classnlohmann_1_1basic__json}{basic\+\_\+json}} class which uses the standard template types.
+
+\begin{DoxySince}{Since}
+version 1.\+0.\+0 
+\end{DoxySince}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespacenlohmann_a6ce645a0b8717757e096a5b5773b7a16}\label{namespacenlohmann_a6ce645a0b8717757e096a5b5773b7a16}} 
+\index{nlohmann@{nlohmann}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!nlohmann@{nlohmann}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily NLOHMANN\+\_\+\+BASIC\+\_\+\+JSON\+\_\+\+TPL\+\_\+\+DECLARATION std\+::string nlohmann\+::to\+\_\+string (\begin{DoxyParamCaption}\item[{const NLOHMANN\+\_\+\+BASIC\+\_\+\+JSON\+\_\+\+TPL \&}]{j }\end{DoxyParamCaption})}
+
+
+
+user-\/defined to\+\_\+string function for JSON values 
+
+This function implements a user-\/defined to\+\_\+string for JSON objects.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em j} & a JSON object \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a std\+::string object 
+\end{DoxyReturn}

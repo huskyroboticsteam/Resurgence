@@ -1,0 +1,57 @@
+\hypertarget{classMarkerPattern}{}\doxysection{Marker\+Pattern Class Reference}
+\label{classMarkerPattern}\index{MarkerPattern@{MarkerPattern}}
+
+
+{\ttfamily \#include $<$Marker\+Pattern.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classMarkerPattern_afc0196c7495be04b5b928c90c1ee3d06}{Marker\+Pattern}} ()
+\item 
+\mbox{\hyperlink{classMarkerPattern_a5fa8ed4a1f233e05e08eb5a6f60d1fa6}{Marker\+Pattern}} (uint8\+\_\+t data\+\_\+region\+\_\+size, uint8\+\_\+t border\+\_\+size, cv\+::\+Mat bits, int id)
+\item 
+\mbox{\Hypertarget{classMarkerPattern_a3d40ab21239c0b4b063fa5b5225327b5}\label{classMarkerPattern_a3d40ab21239c0b4b063fa5b5225327b5}} 
+bool {\bfseries empty} () const
+\item 
+\mbox{\Hypertarget{classMarkerPattern_a9812906a2ba157a4d29ee829708588ef}\label{classMarkerPattern_a9812906a2ba157a4d29ee829708588ef}} 
+uint8\+\_\+t {\bfseries get\+Data\+Region\+Size} () const
+\item 
+\mbox{\Hypertarget{classMarkerPattern_a3e923c0993790cd228b6407dc2ada580}\label{classMarkerPattern_a3e923c0993790cd228b6407dc2ada580}} 
+uint8\+\_\+t {\bfseries get\+Border\+Size} () const
+\item 
+\mbox{\Hypertarget{classMarkerPattern_a94f3b3fda003d47e558e2d97063ac7bd}\label{classMarkerPattern_a94f3b3fda003d47e558e2d97063ac7bd}} 
+const cv\+::\+Ptr$<$ cv\+::\+Mat $>$ {\bfseries get\+Data\+Bits} () const
+\item 
+\mbox{\Hypertarget{classMarkerPattern_acead34703f5a07cc9c64440fc8d240d0}\label{classMarkerPattern_acead34703f5a07cc9c64440fc8d240d0}} 
+int {\bfseries get\+Id} () const
+\item 
+\mbox{\Hypertarget{classMarkerPattern_a5bad6f236a87f574d6485a467793f086}\label{classMarkerPattern_a5bad6f236a87f574d6485a467793f086}} 
+bool {\bfseries operator==} (const \mbox{\hyperlink{classMarkerPattern}{Marker\+Pattern}} \&other) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A class to represent the pattern that may appear on a physical AR tag, NOT a physical instance of a tag itself; each individual instance of the pattern as it appears in the world is represented by an instance of the Tag class, and there may be multiple Tags corresponding to the same \mbox{\hyperlink{classMarkerPattern}{Marker\+Pattern}}. Marker\+Patterns are square patterns of either black or white pixels, usually with a border on the outside and a data region inside the border. Marker\+Patterns should be unique and referred to uniquely by an ID, which is a non-\/negative integer that should be considered arbitrary and not guaranteed to have any actual meaning.
+
+You should likely not have to construct any instances of this class yourself; this will be done internally by the Detector class. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classMarkerPattern_afc0196c7495be04b5b928c90c1ee3d06}\label{classMarkerPattern_afc0196c7495be04b5b928c90c1ee3d06}} 
+\index{MarkerPattern@{MarkerPattern}!MarkerPattern@{MarkerPattern}}
+\index{MarkerPattern@{MarkerPattern}!MarkerPattern@{MarkerPattern}}
+\doxysubsubsection{\texorpdfstring{MarkerPattern()}{MarkerPattern()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Marker\+Pattern\+::\+Marker\+Pattern (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Creates an empty marker, with a data region size, border size, and ID of 0, and an empty matrix for the data bits. This is a default constructor just for convenience and you should not try to use these empty markers. You can check if a marker is empty using the Marker\+::empty() method. \mbox{\Hypertarget{classMarkerPattern_a5fa8ed4a1f233e05e08eb5a6f60d1fa6}\label{classMarkerPattern_a5fa8ed4a1f233e05e08eb5a6f60d1fa6}} 
+\index{MarkerPattern@{MarkerPattern}!MarkerPattern@{MarkerPattern}}
+\index{MarkerPattern@{MarkerPattern}!MarkerPattern@{MarkerPattern}}
+\doxysubsubsection{\texorpdfstring{MarkerPattern()}{MarkerPattern()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Marker\+Pattern\+::\+Marker\+Pattern (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{data\+\_\+region\+\_\+size,  }\item[{uint8\+\_\+t}]{border\+\_\+size,  }\item[{cv\+::\+Mat}]{bits,  }\item[{int}]{id }\end{DoxyParamCaption})}
+
+Creates a marker, with the given data region size, border size, data bits, and id. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/ar/Marker\+Pattern.\+h\item 
+src/ar/Marker\+Pattern.\+cpp\end{DoxyCompactItemize}

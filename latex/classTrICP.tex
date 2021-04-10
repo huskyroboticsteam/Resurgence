@@ -1,0 +1,70 @@
+\hypertarget{classTrICP}{}\doxysection{Tr\+ICP Class Reference}
+\label{classTrICP}\index{TrICP@{TrICP}}
+
+
+{\ttfamily \#include $<$Tr\+ICP.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classTrICP_a7bf9c0e9dbdecac18ee35af54db49e55}{Tr\+ICP}} (int max\+Iter, double rel\+Err\+Change\+Thresh, std\+::function$<$ point\+\_\+t(const point\+\_\+t \&)$>$ get\+Closest)
+\item 
+transform\+\_\+t \mbox{\hyperlink{classTrICP_aaf1217d5df064448bba3daee278a8fd1}{correct}} (const points\+\_\+t \&sample, double overlap)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Implements the Trimmed Iterative Closest Point algorithm for 2D point cloud registration.
+
+\begin{DoxySeeAlso}{See also}
+\href{https://www.researchgate.net/publication/3974183_The_Trimmed_Iterative_Closest_Point_algorithm}{\texttt{ Research paper}} 
+\end{DoxySeeAlso}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classTrICP_a7bf9c0e9dbdecac18ee35af54db49e55}\label{classTrICP_a7bf9c0e9dbdecac18ee35af54db49e55}} 
+\index{TrICP@{TrICP}!TrICP@{TrICP}}
+\index{TrICP@{TrICP}!TrICP@{TrICP}}
+\doxysubsubsection{\texorpdfstring{TrICP()}{TrICP()}}
+{\footnotesize\ttfamily Tr\+ICP\+::\+Tr\+ICP (\begin{DoxyParamCaption}\item[{int}]{max\+Iter,  }\item[{double}]{rel\+Err\+Change\+Thresh,  }\item[{std\+::function$<$ point\+\_\+t(const point\+\_\+t \&)$>$}]{get\+Closest }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+Creates a new \mbox{\hyperlink{classTrICP}{Tr\+ICP}} object.
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\+Iter} & Maximum number of iterations for point cloud registration. \\
+\hline
+{\em rel\+Err\+Change\+Thresh} & Minimum relative error change threshold for registration. Iteration will terminate early if the relative change in error drops below this amount. \\
+\hline
+{\em get\+Closest} & A function that finds the closest point to a given point in the collection of points that the new point cloud sample is being registered to. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classTrICP_aaf1217d5df064448bba3daee278a8fd1}\label{classTrICP_aaf1217d5df064448bba3daee278a8fd1}} 
+\index{TrICP@{TrICP}!correct@{correct}}
+\index{correct@{correct}!TrICP@{TrICP}}
+\doxysubsubsection{\texorpdfstring{correct()}{correct()}}
+{\footnotesize\ttfamily transform\+\_\+t Tr\+ICP\+::correct (\begin{DoxyParamCaption}\item[{const points\+\_\+t \&}]{sample,  }\item[{double}]{overlap }\end{DoxyParamCaption})}
+
+Finds a rigid transformation that maps the map to the given sample.
+
+NOTE\+: this doesn\textquotesingle{}t transform the sample to match the map, it transforms the map to match the sample.
+
+
+\begin{DoxyParams}{Parameters}
+{\em sample} & The sample to register. \\
+\hline
+{\em overlap} & The estimated overlap, in the range \mbox{[}0,1\mbox{]} between this sample and the global map. It\textquotesingle{}s better to underestimate than overestimate. However, if it\textquotesingle{}s too low then no meaningful features can be matched. Set to 0 to add points directly with no feature matching. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A rigid transformation that maps the map to the given sample, or the identity matrix if the sample is empty or overlap is 0. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/worldmap/Tr\+ICP.\+h\item 
+src/worldmap/Tr\+ICP.\+cpp\end{DoxyCompactItemize}

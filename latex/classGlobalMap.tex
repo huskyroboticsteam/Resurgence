@@ -1,0 +1,91 @@
+\hypertarget{classGlobalMap}{}\doxysection{Global\+Map Class Reference}
+\label{classGlobalMap}\index{GlobalMap@{GlobalMap}}
+
+
+{\ttfamily \#include $<$Global\+Map.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classGlobalMap_a5627a0a4d550c1fda773d50427524d77}{Global\+Map}} (int max\+Iter=25, double rel\+Err\+Change\+Thresh=0.\+005)
+\item 
+void \mbox{\hyperlink{classGlobalMap_a2ff7db053adb777b891b95f7daf8ceaf}{add\+Points}} (const transform\+\_\+t \&robot\+Trf, const points\+\_\+t \&points, double overlap)
+\item 
+points\+\_\+t \mbox{\hyperlink{classGlobalMap_ab6293cd388e58b87f8c4651cb8258c43}{get\+Points}} () const
+\item 
+point\+\_\+t \mbox{\hyperlink{classGlobalMap_a523f0757fae96a92d712c0ff22410da2}{get\+Closest}} (const point\+\_\+t \&point) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Represents a 2D global point cloud map. As the robot moves around, it will store information about its environment for mapping purposes. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classGlobalMap_a5627a0a4d550c1fda773d50427524d77}\label{classGlobalMap_a5627a0a4d550c1fda773d50427524d77}} 
+\index{GlobalMap@{GlobalMap}!GlobalMap@{GlobalMap}}
+\index{GlobalMap@{GlobalMap}!GlobalMap@{GlobalMap}}
+\doxysubsubsection{\texorpdfstring{GlobalMap()}{GlobalMap()}}
+{\footnotesize\ttfamily Global\+Map\+::\+Global\+Map (\begin{DoxyParamCaption}\item[{int}]{max\+Iter = {\ttfamily 25},  }\item[{double}]{rel\+Err\+Change\+Thresh = {\ttfamily 0.005} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+Creates a new \mbox{\hyperlink{classGlobalMap}{Global\+Map}} object, for use with building global lidar point clouds.
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\+Iter} & Maximum iterations allowed for fitting new samples to the map \\
+\hline
+{\em rel\+Err\+Change\+Thresh} & Minimum relative error change threshold for fitting new samples to the map. Iteration will terminate early if the relative change in error drops below this amount. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classGlobalMap_a2ff7db053adb777b891b95f7daf8ceaf}\label{classGlobalMap_a2ff7db053adb777b891b95f7daf8ceaf}} 
+\index{GlobalMap@{GlobalMap}!addPoints@{addPoints}}
+\index{addPoints@{addPoints}!GlobalMap@{GlobalMap}}
+\doxysubsubsection{\texorpdfstring{addPoints()}{addPoints()}}
+{\footnotesize\ttfamily void Global\+Map\+::add\+Points (\begin{DoxyParamCaption}\item[{const transform\+\_\+t \&}]{robot\+Trf,  }\item[{const points\+\_\+t \&}]{points,  }\item[{double}]{overlap }\end{DoxyParamCaption})}
+
+Register the given points into the global map.
+
+
+\begin{DoxyParams}{Parameters}
+{\em robot\+Trf} & The transform of the robot pose. \\
+\hline
+{\em points} & The lidar sample point cloud, in the reference frame of the given robot transform. \\
+\hline
+{\em overlap} & The estimated overlap, in the range \mbox{[}0,1\mbox{]} between this sample and the global map. It\textquotesingle{}s better to underestimate than overestimate. However, if it\textquotesingle{}s too low then no meaningful features can be matched. Set to 0 to add points directly with no feature matching. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classGlobalMap_a523f0757fae96a92d712c0ff22410da2}\label{classGlobalMap_a523f0757fae96a92d712c0ff22410da2}} 
+\index{GlobalMap@{GlobalMap}!getClosest@{getClosest}}
+\index{getClosest@{getClosest}!GlobalMap@{GlobalMap}}
+\doxysubsubsection{\texorpdfstring{getClosest()}{getClosest()}}
+{\footnotesize\ttfamily point\+\_\+t Global\+Map\+::get\+Closest (\begin{DoxyParamCaption}\item[{const point\+\_\+t \&}]{point }\end{DoxyParamCaption}) const}
+
+Get the point in the point cloud closest (as determined by L1 norm) to the given point.
+
+
+\begin{DoxyParams}{Parameters}
+{\em point} & The point for which the closest point will be found. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The closest point, or \mbox{[}0,0,0\mbox{]} if no points are in this map. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classGlobalMap_ab6293cd388e58b87f8c4651cb8258c43}\label{classGlobalMap_ab6293cd388e58b87f8c4651cb8258c43}} 
+\index{GlobalMap@{GlobalMap}!getPoints@{getPoints}}
+\index{getPoints@{getPoints}!GlobalMap@{GlobalMap}}
+\doxysubsubsection{\texorpdfstring{getPoints()}{getPoints()}}
+{\footnotesize\ttfamily points\+\_\+t Global\+Map\+::get\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Get the points in the global map. This vector is a copy, so modifying it will not harm this class.
+
+\begin{DoxyReturn}{Returns}
+A vector of points in the 2D point map. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/worldmap/Global\+Map.\+h\item 
+src/worldmap/Global\+Map.\+cpp\end{DoxyCompactItemize}

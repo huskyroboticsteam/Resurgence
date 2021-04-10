@@ -1,0 +1,60 @@
+\hypertarget{classTools}{}\doxysection{Tools Class Reference}
+\label{classTools}\index{Tools@{Tools}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classTools_afb07d80318b98bb63771efa0654f961e}{Tools}} ()
+\item 
+virtual \mbox{\hyperlink{classTools_a18472d06fc4c94a3af67d49d128a8510}{$\sim$\+Tools}} ()
+\item 
+Vector\+Xd \mbox{\hyperlink{classTools_a73d3cd5d6324eae9469d486564ba97bb}{Calculate\+RMSE}} (const vector$<$ Vector\+Xd $>$ \&estimations, const vector$<$ Vector\+Xd $>$ \&ground\+\_\+truth)
+\item 
+Matrix\+Xd \mbox{\hyperlink{classTools_ae7a9ee5134df6f53f673bce1f99e0311}{Calculate\+Jacobian}} (const Vector\+Xd \&x\+\_\+state)
+\item 
+float \mbox{\hyperlink{classTools_a577a2f11fb06c30303af94f939ecdf6a}{normalize\+\_\+angle}} (float phi)
+\item 
+\mbox{\Hypertarget{classTools_a1e2119cbea48220169f479a3b805d554}\label{classTools_a1e2119cbea48220169f479a3b805d554}} 
+void {\bfseries normalize\+\_\+bearing} (Vector\+Xd \&Z)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classTools_afb07d80318b98bb63771efa0654f961e}\label{classTools_afb07d80318b98bb63771efa0654f961e}} 
+\index{Tools@{Tools}!Tools@{Tools}}
+\index{Tools@{Tools}!Tools@{Tools}}
+\doxysubsubsection{\texorpdfstring{Tools()}{Tools()}}
+{\footnotesize\ttfamily Tools\+::\+Tools (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Constructor. \mbox{\Hypertarget{classTools_a18472d06fc4c94a3af67d49d128a8510}\label{classTools_a18472d06fc4c94a3af67d49d128a8510}} 
+\index{Tools@{Tools}!````~Tools@{$\sim$Tools}}
+\index{````~Tools@{$\sim$Tools}!Tools@{Tools}}
+\doxysubsubsection{\texorpdfstring{$\sim$Tools()}{~Tools()}}
+{\footnotesize\ttfamily Tools\+::$\sim$\+Tools (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Destructor. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classTools_ae7a9ee5134df6f53f673bce1f99e0311}\label{classTools_ae7a9ee5134df6f53f673bce1f99e0311}} 
+\index{Tools@{Tools}!CalculateJacobian@{CalculateJacobian}}
+\index{CalculateJacobian@{CalculateJacobian}!Tools@{Tools}}
+\doxysubsubsection{\texorpdfstring{CalculateJacobian()}{CalculateJacobian()}}
+{\footnotesize\ttfamily Matrix\+Xd Tools\+::\+Calculate\+Jacobian (\begin{DoxyParamCaption}\item[{const Vector\+Xd \&}]{x\+\_\+state }\end{DoxyParamCaption})}
+
+A helper method to calculate Jacobians. TODO\+: Calculate a Jacobian here.\mbox{\Hypertarget{classTools_a73d3cd5d6324eae9469d486564ba97bb}\label{classTools_a73d3cd5d6324eae9469d486564ba97bb}} 
+\index{Tools@{Tools}!CalculateRMSE@{CalculateRMSE}}
+\index{CalculateRMSE@{CalculateRMSE}!Tools@{Tools}}
+\doxysubsubsection{\texorpdfstring{CalculateRMSE()}{CalculateRMSE()}}
+{\footnotesize\ttfamily Vector\+Xd Tools\+::\+Calculate\+RMSE (\begin{DoxyParamCaption}\item[{const vector$<$ Vector\+Xd $>$ \&}]{estimations,  }\item[{const vector$<$ Vector\+Xd $>$ \&}]{ground\+\_\+truth }\end{DoxyParamCaption})}
+
+A helper method to calculate RMSE. TODO\+: Calculate the RMSE here.\mbox{\Hypertarget{classTools_a577a2f11fb06c30303af94f939ecdf6a}\label{classTools_a577a2f11fb06c30303af94f939ecdf6a}} 
+\index{Tools@{Tools}!normalize\_angle@{normalize\_angle}}
+\index{normalize\_angle@{normalize\_angle}!Tools@{Tools}}
+\doxysubsubsection{\texorpdfstring{normalize\_angle()}{normalize\_angle()}}
+{\footnotesize\ttfamily float Tools\+::normalize\+\_\+angle (\begin{DoxyParamCaption}\item[{float}]{phi }\end{DoxyParamCaption})}
+
+Noarmlize the angle 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/mapping/\+EKFSlam/tools.\+h\item 
+src/mapping/\+EKFSlam/tools.\+cpp\end{DoxyCompactItemize}
