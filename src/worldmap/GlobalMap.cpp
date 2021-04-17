@@ -69,6 +69,11 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 
 	// add to global map
 	for (const point_t &p : transformed) {
+		// TODO: add some pruning mechanism
+		points_t close = tree.getPointsWithin(p, 0.3);
+		for (const point_t &p1 : close) {
+			assert(tree.remove(p1));
+		}
 		tree.add(p);
 	}
 }
@@ -84,4 +89,27 @@ point_t GlobalMap::getClosest(const point_t &point) const
 	point_t closest = tree.getClosest(p);
 	// convert back to "corrected" map space
 	return adjustmentTransform * closest;
+}
+
+points_t GlobalMap::getPointsWithin(const point_t &point, double dist) const
+{
+	// convert the lookup point to "naive" map space
+	point_t p = adjustmentTransformInv * point;
+	points_t points;
+	if (!tree.empty())
+	{
+		points_t within = tree.getPointsWithin(p, dist * 2 * sqrt(2));
+		for (const point_t &p1 : within) {
+			points.push_back(adjustmentTransform * p1);
+		}
+	}
+	return points;
+}
+
+bool GlobalMap::hasPointWithin(const point_t &point, double dist) const
+{
+	if (tree.empty()) {
+		return false;
+	}
+	return (getClosest(point) - point).topRows<2>().norm() <= dist;
 }

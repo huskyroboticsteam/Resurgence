@@ -49,6 +49,10 @@ public:
 	 */
 	point_t getClosest(const point_t &point) const;
 
+	points_t getPointsWithin(const point_t &point, double dist) const;
+
+	bool hasPointWithin(const point_t &point, double dist) const;
+
 private:
 	QuadTree tree;
 	transform_t adjustmentTransform;
