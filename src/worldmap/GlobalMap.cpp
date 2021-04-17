@@ -69,11 +69,6 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 
 	// add to global map
 	for (const point_t &p : transformed) {
-		// TODO: add some pruning mechanism
-		points_t close = tree.getPointsWithin(p, 0.3);
-		for (const point_t &p1 : close) {
-			assert(tree.remove(p1));
-		}
 		tree.add(p);
 	}
 }
