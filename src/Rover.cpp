@@ -16,31 +16,52 @@
 extern "C"
 {
     #include "HindsightCAN/CANMotorUnit.h"
+    #include "HindsightCAN/CANSerialNumbers.h"
+}
+
+void initEncoders()
+{
+    CANPacket p;
+    for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
+        serial < DEVICE_SERIAL_MOTOR_CHASSIS_BR;
+        serial ++ ) {
+      AssembleEncoderInitializePacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial,
+          0, 0, 1); // 1 means to zero the encoder angle measurement
+      sendCANPacket(p);
+      AssembleEncoderPPJRSetPacket(   &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
+          1024); // I have no idea how many pulses actually make one rotation
+      sendCANPacket(p);
+    }
 }
 
 void setArmMode(uint8_t mode)
 {
     // Set all arm motors to given mode
     CANPacket p;
-    for (uint8_t serial = 0x1; serial < 0x8; serial ++ ) {
+    for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
+        serial < DEVICE_SERIAL_MOTOR_HAND;
+        serial ++ ) {
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
       sendCANPacket(p);
     }
 }
 
-void InitializeRover()
+void InitializeRover(uint8_t arm_mode)
 {
     InitializeCANSocket();
 
     // Set all wheel motors to mode PWM
     CANPacket p;
     uint8_t mode_PWM = 0x0;
-    for (uint8_t serial = 0x8; serial < 0xC; serial ++ ) {
-      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode_PWM);
+    for (uint8_t serial = DEVICE_SERIAL_MOTOR_CHASSIS_FL;
+        serial < DEVICE_SERIAL_MOTOR_CHASSIS_BR;
+        serial ++) {
+      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, MOTOR_UNIT_MODE_PWM);
       sendCANPacket(p);
     }
 
-    setArmMode(mode_PWM); // Until we get encoders / PID control working
+    initEncoders();
+    setArmMode(arm_mode);
 }
 
 void closeSim(int signum)
@@ -58,7 +79,7 @@ int rover_loop(int argc, char **argv)
     // Ctrl+C doesn't stop the simulation without this line
     signal(SIGINT, closeSim);
     Globals::opts = ParseCommandLineOptions(argc, argv);
-    InitializeRover();
+    InitializeRover(MOTOR_UNIT_MODE_PWM);
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communication from the base station
