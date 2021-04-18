@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <ctime>
 #include <csignal>
+#include <unistd.h>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
