@@ -7,14 +7,14 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core.hpp>
 
-#include "CameraParams.h"
+#include "../camera/CameraParams.h"
 #include "Tag.h"
 
 namespace AR
 {
 
 Detector::Detector(std::shared_ptr<MarkerSet> marker_set,
-				   CameraParams camera_params,
+				   cam::CameraParams camera_params,
 				   cv::Ptr<cv::aruco::DetectorParameters> detector_params)
 	: marker_set_(marker_set), camera_params_(camera_params), detector_params_(detector_params)
 {

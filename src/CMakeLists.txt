@@ -125,7 +125,7 @@ add_executable(tests
   Autonomous.cpp
   # AR Detection tests
   ar/Detector.cpp
-  ar/CameraParams.cpp
+  camera/CameraParams.cpp
   ar/Tag.cpp
   ar/DetectorTests.cpp
   ar/MarkerPattern.cpp

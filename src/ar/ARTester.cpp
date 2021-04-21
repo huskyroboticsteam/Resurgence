@@ -21,7 +21,7 @@ const std::string ORIG_WINDOW_NAME = "Image (Original)";
 constexpr bool EXTRA_WINDOWS = true;
 
 // Set to whichever camera params should be used
-AR::CameraParams PARAMS = AR::getCameraParams(AR::Params::ROBOT_TOP_WEBCAM_480);
+cam::CameraParams PARAMS = cam::getCameraParams(cam::Params::ROBOT_TOP_WEBCAM_480);
 
 // Set to whichever MarkerSet should be used (CIRC/URC)
 std::shared_ptr<AR::MarkerSet> MARKER_SET =
@@ -117,29 +117,29 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	AR::Params camera_to_use = AR::Params::ROBOT_TOP_WEBCAM_480;
+	cam::Params camera_to_use = cam::Params::ROBOT_TOP_WEBCAM_480;
 	switch (camera_param_num)
 	{
 	case 0:
-		camera_to_use = AR::Params::WINSTON_WEBCAM_480;
+		camera_to_use = cam::Params::WINSTON_WEBCAM_480;
 		break;
 	case 1:
-		camera_to_use = AR::Params::WEBCAM_1080;
+		camera_to_use = cam::Params::WEBCAM_1080;
 		break;
 	case 2:
-		camera_to_use = AR::Params::WEBCAM_720;
+		camera_to_use = cam::Params::WEBCAM_720;
 		break;
 	case 3:
-		camera_to_use = AR::Params::LAPTOP;
+		camera_to_use = cam::Params::LAPTOP;
 		break;
 	case 4:
-		camera_to_use = AR::Params::WEBCAM;
+		camera_to_use = cam::Params::WEBCAM;
 		break;
 	case 5:
-		camera_to_use = AR::Params::EVAN_NEW_WEBCAM_480;
+		camera_to_use = cam::Params::EVAN_NEW_WEBCAM_480;
 		break;
 	case 6:
-		camera_to_use = AR::Params::ROBOT_TOP_WEBCAM_480;
+		camera_to_use = cam::Params::ROBOT_TOP_WEBCAM_480;
 		break;
 	default:
 		std::cerr << "Unsupported camera params: " << std::to_string(camera_param_num)
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	PARAMS = AR::getCameraParams(camera_to_use);
+	PARAMS = cam::getCameraParams(camera_to_use);
 
 	camera_id = parser.get<int>("c");
 
