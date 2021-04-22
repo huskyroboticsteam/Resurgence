@@ -33,7 +33,7 @@ std::vector<Tag> Detector::detectTags(const cv::Mat &input)
 
 	std::vector<cv::Vec3d> rvecs, tvecs;
 	cv::aruco::estimatePoseSingleMarkers(corners, this->marker_set_->getPhysicalSize(),
-										 this->camera_params_.getCameraParams(),
+										 this->camera_params_.getCameraMatrix(),
 										 this->camera_params_.getDistCoeff(), rvecs, tvecs);
 
 	std::vector<Tag> tags;

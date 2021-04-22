@@ -52,7 +52,7 @@ std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec)
 	object_points.push_back(cv::Point3d((len / 2), (len / 2), len));
 	object_points.push_back(cv::Point3d((len / 2), -(len / 2), len));
 	object_points.push_back(cv::Point3d(-(len / 2), -(len / 2), len));
-	cv::projectPoints(object_points, rvec, tvec, PARAMS.getCameraParams(),
+	cv::projectPoints(object_points, rvec, tvec, PARAMS.getCameraMatrix(),
 					  PARAMS.getDistCoeff(), image_points);
 
 	return image_points;
@@ -76,7 +76,7 @@ std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
 			}
 		}
 	}
-	cv::undistortPoints(grid_points, projected_points, PARAMS.getCameraParams(),
+	cv::undistortPoints(grid_points, projected_points, PARAMS.getCameraMatrix(),
 						PARAMS.getDistCoeff());
 	return projected_points;
 }

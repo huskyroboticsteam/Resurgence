@@ -5,31 +5,113 @@
 namespace cam
 {
 
-CameraParams::CameraParams(cv::Mat camera_params, cv::Mat dist_coeff, cv::Size image_size)
-	: _camera_params(camera_params), _dist_coeff(dist_coeff), _image_size(image_size)
+////////////// CONSTRUCTORS //////////////
+
+CameraParams::CameraParams()
 {
 }
 
-// TODO: Implement rest of methods
+void CameraParams::init(cv::Mat camera_matrix, cv::Mat dist_coeff, cv::Size image_size)
+{
+	if (camera_matrix.size() != cv::Size(3, 3))
+	{
+		throw std::invalid_argument("Camera matrix must be 3x3");
+	}
+	int n_coeffs = dist_coeff.rows * dist_coeff.cols;
+	if (!(n_coeffs == 4 || n_coeffs == 5 || n_coeffs == 8 || n_coeffs == 12 || n_coeffs == 14))
+	{
+		throw std::invalid_argument(
+			"Number of distortion coefficients must be 4, 5, 8, 12, or 14");
+	}
+	dist_coeff.reshape(1, {n_coeffs, 1});
+	if (image_size.empty())
+	{
+		throw std::invalid_argument("Image size must not be empty");
+	}
+
+	this->_dist_coeff = dist_coeff;
+	this->_camera_matrix = camera_matrix;
+	this->_image_size = image_size;
+}
+
+CameraParams::CameraParams(cv::Mat camera_matrix, cv::Mat dist_coeff, cv::Size image_size)
+{
+	init(camera_matrix, dist_coeff, image_size);
+}
 
 CameraParams::CameraParams(const CameraParams &other)
 {
 	cv::Mat newCam, newDist;
-	other._camera_params.copyTo(newCam);
-	this->_image_size = other._image_size;
+	other._camera_matrix.copyTo(newCam);
 	other._dist_coeff.copyTo(newDist);
-	this->_camera_params = newCam;
+	this->_camera_matrix = newCam;
 	this->_dist_coeff = newDist;
+
+	this->_image_size = other._image_size;
 }
 
-cv::Mat CameraParams::getCameraParams() const
+bool CameraParams::empty() const
 {
-	return _camera_params;
+	return _camera_matrix.empty() || _dist_coeff.empty() || _image_size.empty();
+}
+
+////////////// ACCESSORS /////////////////
+
+cv::Mat CameraParams::getCameraMatrix() const
+{
+	return _camera_matrix;
 }
 
 cv::Mat CameraParams::getDistCoeff() const
 {
 	return _dist_coeff;
+}
+
+cv::Size CameraParams::getImageSize() const
+{
+	return _image_size;
+}
+
+////////////// SERIALIZATION //////////////
+
+void CameraParams::readFromFileNode(const cv::FileNode &file_node)
+{
+	cv::Mat cam, dist;
+	file_node["camera_matrix"] >> cam;
+	file_node["distortion_coefficients"] >> dist;
+	int w, h;
+	w = (int)file_node["image_width"];
+	h = (int)file_node["image_height"];
+	cv::Size size(w, h);
+	// call init to do validation
+	init(cam, dist, size);
+}
+
+void CameraParams::writeToFileStorage(cv::FileStorage &file_storage) const
+{
+	file_storage << "{"
+				 << "image_width" << _image_size.width << "image_height" << _image_size.height
+				 << "camera_matrix" << _camera_matrix << "distortion_coefficients"
+				 << _dist_coeff << "}";
+}
+
+static void read(const cv::FileNode &node, CameraParams &params,
+				 const CameraParams &default_value)
+{
+	if (node.empty())
+	{
+		params = default_value;
+	}
+	else
+	{
+		params.readFromFileNode(node);
+	}
+}
+
+
+static void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params)
+{
+	params.writeToFileStorage(fs);
 }
 
 // TODO: These all need to be moved into .yml files

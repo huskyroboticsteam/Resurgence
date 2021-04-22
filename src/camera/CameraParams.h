@@ -10,8 +10,6 @@ namespace cam
    @{
  */
 
-
-
 /**
    @brief Represents a set of intrinsic camera parameters.
 
@@ -22,23 +20,60 @@ namespace cam
    Each set of CameraParams contains a camera matrix which defines how points in
    3D space are linearly projected to the 2D image plane of the camera, and a
    set of distortion coefficients which can be used to correct for radial
-   distortion in the image.
+   distortion in the image. The projection is linear which means that projected
+   points are unique only up to scaling.
+
+   @warning Note that camera parameters are different for different resolutions
+   of the camera! It is often not enough to simply scale the image centers/focal
+   lengths for different resolutions because many cameras have different fields
+   of view (and therefore different projections/distortion) at different
+   resolutions. For this reason, a CameraParams object has an associated
+   cv::Size which contains the image size the parameters are valid for.
 */
 class CameraParams
 {
 private:
-	cv::Mat _camera_params;
+	cv::Mat _camera_matrix;
 	cv::Mat _dist_coeff;
 	cv::Size _image_size;
+	void init(cv::Mat camera_matrix, cv::Mat dist_coeff, cv::Size image_size);
 
 public:
-	CameraParams(cv::Mat camera_params, cv::Mat dist_coeff,
+	/**
+	   Constructs a default or empty set of camera parameters.
+
+	   @warning Empty sets of camera parameters are not suitable for actual use! Check to make
+	   sure they are non-empty with empty().
+	 */
+	CameraParams();
+	/**
+	   Constructs a set of camera parameters with the given camera matrix, distortion
+	   coefficients, and image size.
+
+	   @param camera_matrix A 3x3 matrix defining the projection of the camera.
+
+	   @param dist_coeff A set of distortion coefficients defining the lens distortion of the
+	   camera. Must be a 1xN or Nx1 matrix where N is the number of coefficients. N must be 4,
+	   5, 8, 12, or 14.
+
+	   @param image_size The size of the image the parameters are calibrated for. Defaults to
+	   640x480 as this is the default resolution of many webcams.
+	 */
+	CameraParams(cv::Mat camera_matrix, cv::Mat dist_coeff,
 				 cv::Size image_size = cv::Size(640, 480));
+	/**
+	   @brief Copy constructor.
+
+	   Constructs a set of camera parameters by copying another. Underlying data like the
+	   camera matrix and distortion coefficients are actually copied, so the copy may be
+	   modified without affecting the original.
+	 */
 	CameraParams(const CameraParams &other);
+	bool empty() const;
 	/**
 	   Gets the camera matrix associated with this set of camera parameters.
 	 */
-	cv::Mat getCameraParams() const;
+	cv::Mat getCameraMatrix() const;
 	/**
 	   Gets the distortion coefficients (as a column vector) associated with
 	   this set of camera parameters.
@@ -50,29 +85,48 @@ public:
 	cv::Size getImageSize() const;
 
 	/**
-	   Constructs a CameraParams object from the given file.
-	   @param filename The path to the file to read from.
+	   @brief Reads the data for this CameraParams object from the given cv::FileNode object.
+
+	   Used for serialization - you should not need to call this method directly but should
+	   instead use the >> operator on a cv::FileNode object.
 	 */
-	static CameraParams readFromFile(std::string filename);
+	void readFromFileNode(const cv::FileNode &file_node);
 	/**
-	   Constructs a CameraParams object using the given FileStorage object.
+	   @brief Writes the data for this CameraParams object to the given cv::FileStorage
+	   object.
+
+	   Used for serialization - you should not need to call this method directly but should
+	   instead use the << operator on a cv::FileStorage object.
 	 */
-	static CameraParams readFromFile(cv::FileStorage file_storage);
-	bool writeToFile(std::string filename);
+	void writeToFileStorage(cv::FileStorage &file_storage) const;
 };
 
 /**
-   The set of all the camera parameters that are defined so far. Note that these
-   are just constants to identify a set of camera parameters; you should call
-   getCameraParams() with one of these values as an argument to get an actual
-   CameraParams object that you can use.
+   @brief Reads a CameraParams object from the given cv::FileNode object.
 
-   Each member should have a comment describing which camera they are for, what
-   the image size is, and what the unit scale is. It is important to use the
-   correct image size and unt scale.
+   Used for serialization - you should not need to call this method directly but should
+   instead use the >> operator on a cv::FileNode object.
+*/
+static void read(const cv::FileNode &node, CameraParams &params,
+				 const CameraParams &default_value = CameraParams());
+/**
+   @brief Writes the given CameraParams object to the given cv::FileStorage object.
 
-   Note that some of these are old or were just for testing and are probably
-   subject to be removed at some point in the future.
+   Used for serialization - you should not need to call this method directly but should
+   instead use the << operator on a cv::FileStorage object.
+*/
+static void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params);
+
+/**
+   The set of all the camera parameters that are defined so far. Note that these are just
+   constants to identify a set of camera parameters; you should call getCameraParams() with one
+   of these values as an argument to get an actual CameraParams object that you can use.
+
+   Each member should have a comment describing which camera they are for and what the image
+   size is. It is important to use the correct image size.
+
+   Note that some of these are old or were just for testing and are probably subject to be
+   removed at some point in the future.
 
    TODO: This needs to be reworked as we flesh out the camera system.
  */

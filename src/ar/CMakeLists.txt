@@ -8,6 +8,7 @@ add_executable(ar_tester
   MarkerSet.cpp
   MarkerPattern.cpp
   Tag.cpp
+  # TODO: remove/change this once on the new camera system
   ../ThreadedCapture.cpp)
 
 add_executable(calibration
