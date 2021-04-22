@@ -36,7 +36,7 @@ private:
 	cv::Mat _camera_matrix;
 	cv::Mat _dist_coeff;
 	cv::Size _image_size;
-	void init(cv::Mat camera_matrix, cv::Mat dist_coeff, cv::Size image_size);
+	void init(const cv::Mat &camera_matrix, const cv::Mat &dist_coeff, cv::Size image_size);
 
 public:
 	/**
@@ -59,7 +59,7 @@ public:
 	   @param image_size The size of the image the parameters are calibrated for. Defaults to
 	   640x480 as this is the default resolution of many webcams.
 	 */
-	CameraParams(cv::Mat camera_matrix, cv::Mat dist_coeff,
+	CameraParams(const cv::Mat &camera_matrix, const cv::Mat &dist_coeff,
 				 cv::Size image_size = cv::Size(640, 480));
 	/**
 	   @brief Copy constructor.
@@ -107,15 +107,15 @@ public:
    Used for serialization - you should not need to call this method directly but should
    instead use the >> operator on a cv::FileNode object.
 */
-static void read(const cv::FileNode &node, CameraParams &params,
-				 const CameraParams &default_value = CameraParams());
+void read(const cv::FileNode &node, CameraParams &params,
+		  const CameraParams &default_value = CameraParams());
 /**
    @brief Writes the given CameraParams object to the given cv::FileStorage object.
 
    Used for serialization - you should not need to call this method directly but should
    instead use the << operator on a cv::FileStorage object.
 */
-static void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params);
+void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params);
 
 /**
    The set of all the camera parameters that are defined so far. Note that these are just

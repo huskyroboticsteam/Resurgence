@@ -135,6 +135,9 @@ add_executable(tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
   Networking/NetworkingStubs.cpp
+  # Camera tests
+  camera/CameraParamsTests.cpp
+  camera/CameraParams.cpp
   # Autonomy tests
   mapping/ValidatorTest.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp

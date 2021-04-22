@@ -11,7 +11,8 @@ CameraParams::CameraParams()
 {
 }
 
-void CameraParams::init(cv::Mat camera_matrix, cv::Mat dist_coeff, cv::Size image_size)
+void CameraParams::init(const cv::Mat &camera_matrix, const cv::Mat &dist_coeff,
+						cv::Size image_size)
 {
 	if (camera_matrix.size() != cv::Size(3, 3))
 	{
@@ -23,18 +24,18 @@ void CameraParams::init(cv::Mat camera_matrix, cv::Mat dist_coeff, cv::Size imag
 		throw std::invalid_argument(
 			"Number of distortion coefficients must be 4, 5, 8, 12, or 14");
 	}
-	dist_coeff.reshape(1, {n_coeffs, 1});
 	if (image_size.empty())
 	{
 		throw std::invalid_argument("Image size must not be empty");
 	}
 
-	this->_dist_coeff = dist_coeff;
-	this->_camera_matrix = camera_matrix;
+	dist_coeff.reshape(1, {n_coeffs, 1}).copyTo(this->_dist_coeff);
+	camera_matrix.copyTo(this->_camera_matrix);
 	this->_image_size = image_size;
 }
 
-CameraParams::CameraParams(cv::Mat camera_matrix, cv::Mat dist_coeff, cv::Size image_size)
+CameraParams::CameraParams(const cv::Mat &camera_matrix, const cv::Mat &dist_coeff,
+						   cv::Size image_size)
 {
 	init(camera_matrix, dist_coeff, image_size);
 }
@@ -95,8 +96,7 @@ void CameraParams::writeToFileStorage(cv::FileStorage &file_storage) const
 				 << _dist_coeff << "}";
 }
 
-static void read(const cv::FileNode &node, CameraParams &params,
-				 const CameraParams &default_value)
+void read(const cv::FileNode &node, CameraParams &params, const CameraParams &default_value)
 {
 	if (node.empty())
 	{
@@ -108,8 +108,7 @@ static void read(const cv::FileNode &node, CameraParams &params,
 	}
 }
 
-
-static void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params)
+void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params)
 {
 	params.writeToFileStorage(fs);
 }
