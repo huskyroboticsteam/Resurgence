@@ -65,7 +65,6 @@ private:
 
 	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
-	std::pair<pose_t, pose_t> getGateGoals(const point_t &post_1, const point_t &post_2, const pose_t &pose) const;
 	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
 	void publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
 
