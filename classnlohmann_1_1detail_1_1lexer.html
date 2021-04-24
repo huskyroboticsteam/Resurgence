@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PY2020: Hindsight: nlohmann::detail::lexer&lt; BasicJsonType &gt; Class Template Reference</title>
+<title>PY2020: Hindsight: nlohmann::detail::lexer&lt; BasicJsonType, InputAdapterType &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,10 +69,9 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classnlohmann_1_1detail_1_1lexer-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">nlohmann::detail::lexer&lt; BasicJsonType &gt; Class Template Reference</div>  </div>
+<div class="title">nlohmann::detail::lexer&lt; BasicJsonType, InputAdapterType &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -80,176 +79,139 @@ $(function() {
  <a href="classnlohmann_1_1detail_1_1lexer.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="json_8hpp_source.html">json.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for nlohmann::detail::lexer&lt; BasicJsonType, InputAdapterType &gt;:</div>
+<div class="dyncontent">
+<div class="center"><img src="classnlohmann_1_1detail_1_1lexer__inherit__graph.png" border="0" usemap="#anlohmann_1_1detail_1_1lexer_3_01BasicJsonType_00_01InputAdapterType_01_4_inherit__map" alt="Inheritance graph"/></div>
+<map name="anlohmann_1_1detail_1_1lexer_3_01BasicJsonType_00_01InputAdapterType_01_4_inherit__map" id="anlohmann_1_1detail_1_1lexer_3_01BasicJsonType_00_01InputAdapterType_01_4_inherit__map">
+<area shape="rect" title="lexical analysis" alt="" coords="5,95,208,151"/>
+<area shape="rect" href="classnlohmann_1_1detail_1_1lexer__base.html" title=" " alt="" coords="23,5,191,47"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for nlohmann::detail::lexer&lt; BasicJsonType, InputAdapterType &gt;:</div>
+<div class="dyncontent">
+<div class="center"><img src="classnlohmann_1_1detail_1_1lexer__coll__graph.png" border="0" usemap="#anlohmann_1_1detail_1_1lexer_3_01BasicJsonType_00_01InputAdapterType_01_4_coll__map" alt="Collaboration graph"/></div>
+<map name="anlohmann_1_1detail_1_1lexer_3_01BasicJsonType_00_01InputAdapterType_01_4_coll__map" id="anlohmann_1_1detail_1_1lexer_3_01BasicJsonType_00_01InputAdapterType_01_4_coll__map">
+<area shape="rect" title="lexical analysis" alt="" coords="5,95,208,151"/>
+<area shape="rect" href="classnlohmann_1_1detail_1_1lexer__base.html" title=" " alt="" coords="23,5,191,47"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a3f313cdbe187cababfc5e06f0b69b098"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098">token_type</a> { <br />
-&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a42dd1a73d072bb6bf3f494f22b15db8e">uninitialized</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a85cc1a37b0aaa52de40e72f0ed4e0c0d">literal_true</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098afab1694b1b3937a079f4625fe0b6108b">literal_false</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098ab7ae4c0e46d86f884677768160b26e9e">literal_null</a>
+<tr class="memitem:a986907dff5ceb4fa06aa8ff301822726"><td class="memItemLeft" align="right" valign="top"><a id="a986907dff5ceb4fa06aa8ff301822726"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>token_type</b> = typename <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html">lexer_base</a>&lt; BasicJsonType &gt;::<a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454">token_type</a></td></tr>
+<tr class="separator:a986907dff5ceb4fa06aa8ff301822726"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_types_classnlohmann_1_1detail_1_1lexer__base"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classnlohmann_1_1detail_1_1lexer__base')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html">nlohmann::detail::lexer_base&lt; BasicJsonType &gt;</a></td></tr>
+<tr class="memitem:aa3538cce439a2de6c7893e627b38c454 inherit pub_types_classnlohmann_1_1detail_1_1lexer__base"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454">token_type</a> { <br />
+&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a42dd1a73d072bb6bf3f494f22b15db8e">uninitialized</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a85cc1a37b0aaa52de40e72f0ed4e0c0d">literal_true</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454afab1694b1b3937a079f4625fe0b6108b">literal_false</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454ab7ae4c0e46d86f884677768160b26e9e">literal_null</a>
 , <br />
-&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a2b490e8bf366b4cbe3ebd99b26ce15ce">value_string</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098aaf1f040fcd2f674d2e5893d7a731078f">value_unsigned</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a5064b6655d88a50ae16665cf7751c0ee">value_integer</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a0d2671a6f81efb91e77f6ac3bdb11443">value_float</a>
+&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a2b490e8bf366b4cbe3ebd99b26ce15ce">value_string</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454aaf1f040fcd2f674d2e5893d7a731078f">value_unsigned</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a5064b6655d88a50ae16665cf7751c0ee">value_integer</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a0d2671a6f81efb91e77f6ac3bdb11443">value_float</a>
 , <br />
-&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a16c226b4425b68560fea322b46dabe01">begin_array</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a9a9ffd53b6869d4eca271b1ed5b57fe8">begin_object</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a2f3e68e7f111a1e5c7728742b3ca2b7f">end_array</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a7d5b4427866814de4d8f132721d59c87">end_object</a>
+&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a16c226b4425b68560fea322b46dabe01">begin_array</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a9a9ffd53b6869d4eca271b1ed5b57fe8">begin_object</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a2f3e68e7f111a1e5c7728742b3ca2b7f">end_array</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a7d5b4427866814de4d8f132721d59c87">end_object</a>
 , <br />
-&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098acc3c64f8ae08c00de1b33f19a4d2913a">name_separator</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a745373036100d7392ad62c617cab59af">value_separator</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098a456e19aeafa334241c7ff3f589547f9d">parse_error</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098aca11f56dd477c09e06583dbdcda0985f">end_of_input</a>
+&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454acc3c64f8ae08c00de1b33f19a4d2913a">name_separator</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a745373036100d7392ad62c617cab59af">value_separator</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a456e19aeafa334241c7ff3f589547f9d">parse_error</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454aca11f56dd477c09e06583dbdcda0985f">end_of_input</a>
 , <br />
-&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098ad2a8e6f6721cccec0b466301dd9495a5">literal_or_value</a>
+&#160;&#160;<a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454ad2a8e6f6721cccec0b466301dd9495a5">literal_or_value</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a3f313cdbe187cababfc5e06f0b69b098"><td class="mdescLeft">&#160;</td><td class="mdescRight">token types for the parser  <a href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098">More...</a><br /></td></tr>
-<tr class="separator:a3f313cdbe187cababfc5e06f0b69b098"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:aa3538cce439a2de6c7893e627b38c454"><td class="mdescLeft">&#160;</td><td class="mdescRight">token types for the parser  <a href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454">More...</a><br /></td></tr>
+<tr class="separator:aa3538cce439a2de6c7893e627b38c454 inherit pub_types_classnlohmann_1_1detail_1_1lexer__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab6818e0fc05f4a52c65aeb967dd79919"><td class="memItemLeft" align="right" valign="top"><a id="ab6818e0fc05f4a52c65aeb967dd79919"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>lexer</b> (<a class="el" href="namespacenlohmann_1_1detail.html#ae132f8cd5bb24c5e9b40ad0eafedf1c2">detail::input_adapter_t</a> &amp;&amp;adapter)</td></tr>
-<tr class="separator:ab6818e0fc05f4a52c65aeb967dd79919"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e8ce2a0d266d148b69dfbcc2e4ad71a"><td class="memItemLeft" align="right" valign="top"><a id="a2e8ce2a0d266d148b69dfbcc2e4ad71a"></a>
+<tr class="memitem:a5498021440ac08dc6079a3597ae1e459"><td class="memItemLeft" align="right" valign="top"><a id="a5498021440ac08dc6079a3597ae1e459"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>lexer</b> (InputAdapterType &amp;&amp;adapter, bool ignore_comments_=false)</td></tr>
+<tr class="separator:a5498021440ac08dc6079a3597ae1e459"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab75d61c4de687717648c7698850ddb9b"><td class="memItemLeft" align="right" valign="top"><a id="ab75d61c4de687717648c7698850ddb9b"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>lexer</b> (const <a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;)=delete</td></tr>
-<tr class="separator:a2e8ce2a0d266d148b69dfbcc2e4ad71a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9045348915010649fad1f15e80b6e34d"><td class="memItemLeft" align="right" valign="top"><a id="a9045348915010649fad1f15e80b6e34d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>lexer</b> (<a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;&amp;)=delete</td></tr>
-<tr class="separator:a9045348915010649fad1f15e80b6e34d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33e97dee7c5faf1b36aff5b74a6c8f55"><td class="memItemLeft" align="right" valign="top"><a id="a33e97dee7c5faf1b36aff5b74a6c8f55"></a>
+<tr class="separator:ab75d61c4de687717648c7698850ddb9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae95416c7ae8b36f0dd0ab349eaa754a2"><td class="memItemLeft" align="right" valign="top"><a id="ae95416c7ae8b36f0dd0ab349eaa754a2"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>lexer</b> (<a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:ae95416c7ae8b36f0dd0ab349eaa754a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7e7002d4bb66e9104d752791b8070f8"><td class="memItemLeft" align="right" valign="top"><a id="af7e7002d4bb66e9104d752791b8070f8"></a>
 <a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;)=delete</td></tr>
-<tr class="separator:a33e97dee7c5faf1b36aff5b74a6c8f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8ab91a774484fa220ba073421c8f452"><td class="memItemLeft" align="right" valign="top"><a id="af8ab91a774484fa220ba073421c8f452"></a>
-<a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;&amp;)=delete</td></tr>
-<tr class="separator:af8ab91a774484fa220ba073421c8f452"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa338d17c0a7e834c73104258a2c8ced"><td class="memItemLeft" align="right" valign="top"><a id="afa338d17c0a7e834c73104258a2c8ced"></a>
-constexpr number_integer_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#afa338d17c0a7e834c73104258a2c8ced">get_number_integer</a> () const noexcept</td></tr>
-<tr class="memdesc:afa338d17c0a7e834c73104258a2c8ced"><td class="mdescLeft">&#160;</td><td class="mdescRight">return integer value <br /></td></tr>
-<tr class="separator:afa338d17c0a7e834c73104258a2c8ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56640fb92293e0c17742ca3c814d74d6"><td class="memItemLeft" align="right" valign="top"><a id="a56640fb92293e0c17742ca3c814d74d6"></a>
-constexpr number_unsigned_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a56640fb92293e0c17742ca3c814d74d6">get_number_unsigned</a> () const noexcept</td></tr>
-<tr class="memdesc:a56640fb92293e0c17742ca3c814d74d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">return unsigned integer value <br /></td></tr>
-<tr class="separator:a56640fb92293e0c17742ca3c814d74d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac013af35a21e9387993b19da5b3e0ae2"><td class="memItemLeft" align="right" valign="top"><a id="ac013af35a21e9387993b19da5b3e0ae2"></a>
-constexpr number_float_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#ac013af35a21e9387993b19da5b3e0ae2">get_number_float</a> () const noexcept</td></tr>
-<tr class="memdesc:ac013af35a21e9387993b19da5b3e0ae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">return floating-point value <br /></td></tr>
-<tr class="separator:ac013af35a21e9387993b19da5b3e0ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54aa290ff2f60218a8f35f1ebf81666d"><td class="memItemLeft" align="right" valign="top"><a id="a54aa290ff2f60218a8f35f1ebf81666d"></a>
-string_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a54aa290ff2f60218a8f35f1ebf81666d">get_string</a> ()</td></tr>
-<tr class="memdesc:a54aa290ff2f60218a8f35f1ebf81666d"><td class="mdescLeft">&#160;</td><td class="mdescRight">return current string value (implicitly resets the token; useful only once) <br /></td></tr>
-<tr class="separator:a54aa290ff2f60218a8f35f1ebf81666d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf5143501435f9f79898c1ff238c2622"><td class="memItemLeft" align="right" valign="top"><a id="abf5143501435f9f79898c1ff238c2622"></a>
-constexpr <a class="el" href="structnlohmann_1_1detail_1_1position__t.html">position_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#abf5143501435f9f79898c1ff238c2622">get_position</a> () const noexcept</td></tr>
-<tr class="memdesc:abf5143501435f9f79898c1ff238c2622"><td class="mdescLeft">&#160;</td><td class="mdescRight">return position of last read token <br /></td></tr>
-<tr class="separator:abf5143501435f9f79898c1ff238c2622"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4aef7e72e539be04e139c34872421f2a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a4aef7e72e539be04e139c34872421f2a">get_token_string</a> () const</td></tr>
-<tr class="separator:a4aef7e72e539be04e139c34872421f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fe3f97ee5059d557097bbcc88f0fbe8"><td class="memItemLeft" align="right" valign="top"><a id="a8fe3f97ee5059d557097bbcc88f0fbe8"></a>
-constexpr JSON_HEDLEY_RETURNS_NON_NULL const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a8fe3f97ee5059d557097bbcc88f0fbe8">get_error_message</a> () const noexcept</td></tr>
-<tr class="memdesc:a8fe3f97ee5059d557097bbcc88f0fbe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">return syntax error message <br /></td></tr>
-<tr class="separator:a8fe3f97ee5059d557097bbcc88f0fbe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a709afd52def2e258dac0b8a67dc4ea26"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a709afd52def2e258dac0b8a67dc4ea26">skip_bom</a> ()</td></tr>
-<tr class="memdesc:a709afd52def2e258dac0b8a67dc4ea26"><td class="mdescLeft">&#160;</td><td class="mdescRight">skip the UTF-8 byte order mark  <a href="classnlohmann_1_1detail_1_1lexer.html#a709afd52def2e258dac0b8a67dc4ea26">More...</a><br /></td></tr>
-<tr class="separator:a709afd52def2e258dac0b8a67dc4ea26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac3041cd2b9291e64fee38db422863c9"><td class="memItemLeft" align="right" valign="top"><a id="aac3041cd2b9291e64fee38db422863c9"></a>
-<a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098">token_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>scan</b> ()</td></tr>
-<tr class="separator:aac3041cd2b9291e64fee38db422863c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:af7e7002d4bb66e9104d752791b8070f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1383bb59c5efd4f9370ca3ee4ad1a4ba"><td class="memItemLeft" align="right" valign="top"><a id="a1383bb59c5efd4f9370ca3ee4ad1a4ba"></a>
+<a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classnlohmann_1_1detail_1_1lexer.html">lexer</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:a1383bb59c5efd4f9370ca3ee4ad1a4ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9535d0c72adbe9fe149853ebad5faee8"><td class="memItemLeft" align="right" valign="top"><a id="a9535d0c72adbe9fe149853ebad5faee8"></a>
+constexpr number_integer_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a9535d0c72adbe9fe149853ebad5faee8">get_number_integer</a> () const noexcept</td></tr>
+<tr class="memdesc:a9535d0c72adbe9fe149853ebad5faee8"><td class="mdescLeft">&#160;</td><td class="mdescRight">return integer value <br /></td></tr>
+<tr class="separator:a9535d0c72adbe9fe149853ebad5faee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfc85ff04fcb1a5a8d8ea299a4c479e5"><td class="memItemLeft" align="right" valign="top"><a id="abfc85ff04fcb1a5a8d8ea299a4c479e5"></a>
+constexpr number_unsigned_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#abfc85ff04fcb1a5a8d8ea299a4c479e5">get_number_unsigned</a> () const noexcept</td></tr>
+<tr class="memdesc:abfc85ff04fcb1a5a8d8ea299a4c479e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">return unsigned integer value <br /></td></tr>
+<tr class="separator:abfc85ff04fcb1a5a8d8ea299a4c479e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb1a71f6a3e65ed32c452a318967b61e"><td class="memItemLeft" align="right" valign="top"><a id="adb1a71f6a3e65ed32c452a318967b61e"></a>
+constexpr number_float_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#adb1a71f6a3e65ed32c452a318967b61e">get_number_float</a> () const noexcept</td></tr>
+<tr class="memdesc:adb1a71f6a3e65ed32c452a318967b61e"><td class="mdescLeft">&#160;</td><td class="mdescRight">return floating-point value <br /></td></tr>
+<tr class="separator:adb1a71f6a3e65ed32c452a318967b61e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76875bb49a480763f6c48b8586f7e60e"><td class="memItemLeft" align="right" valign="top"><a id="a76875bb49a480763f6c48b8586f7e60e"></a>
+string_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a76875bb49a480763f6c48b8586f7e60e">get_string</a> ()</td></tr>
+<tr class="memdesc:a76875bb49a480763f6c48b8586f7e60e"><td class="mdescLeft">&#160;</td><td class="mdescRight">return current string value (implicitly resets the token; useful only once) <br /></td></tr>
+<tr class="separator:a76875bb49a480763f6c48b8586f7e60e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a948c80b8bd8a3095b544e4655e1ca37e"><td class="memItemLeft" align="right" valign="top"><a id="a948c80b8bd8a3095b544e4655e1ca37e"></a>
+constexpr <a class="el" href="structnlohmann_1_1detail_1_1position__t.html">position_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a948c80b8bd8a3095b544e4655e1ca37e">get_position</a> () const noexcept</td></tr>
+<tr class="memdesc:a948c80b8bd8a3095b544e4655e1ca37e"><td class="mdescLeft">&#160;</td><td class="mdescRight">return position of last read token <br /></td></tr>
+<tr class="separator:a948c80b8bd8a3095b544e4655e1ca37e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae000b7571480e528dee4b281f63d5b15"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#ae000b7571480e528dee4b281f63d5b15">get_token_string</a> () const</td></tr>
+<tr class="separator:ae000b7571480e528dee4b281f63d5b15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9848a0ed22f53ec29fcfd1fd04c0cd37"><td class="memItemLeft" align="right" valign="top"><a id="a9848a0ed22f53ec29fcfd1fd04c0cd37"></a>
+constexpr JSON_HEDLEY_RETURNS_NON_NULL const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a9848a0ed22f53ec29fcfd1fd04c0cd37">get_error_message</a> () const noexcept</td></tr>
+<tr class="memdesc:a9848a0ed22f53ec29fcfd1fd04c0cd37"><td class="mdescLeft">&#160;</td><td class="mdescRight">return syntax error message <br /></td></tr>
+<tr class="separator:a9848a0ed22f53ec29fcfd1fd04c0cd37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cd7d55de2cd398660bc243c7229caf9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a7cd7d55de2cd398660bc243c7229caf9">skip_bom</a> ()</td></tr>
+<tr class="memdesc:a7cd7d55de2cd398660bc243c7229caf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">skip the UTF-8 byte order mark  <a href="classnlohmann_1_1detail_1_1lexer.html#a7cd7d55de2cd398660bc243c7229caf9">More...</a><br /></td></tr>
+<tr class="separator:a7cd7d55de2cd398660bc243c7229caf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a449f3f3703dfbf8b757e12f002668604"><td class="memItemLeft" align="right" valign="top"><a id="a449f3f3703dfbf8b757e12f002668604"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>skip_whitespace</b> ()</td></tr>
+<tr class="separator:a449f3f3703dfbf8b757e12f002668604"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40320a8fef5f1f03b60c8b2f2f40af4d"><td class="memItemLeft" align="right" valign="top"><a id="a40320a8fef5f1f03b60c8b2f2f40af4d"></a>
+<a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454">token_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>scan</b> ()</td></tr>
+<tr class="separator:a40320a8fef5f1f03b60c8b2f2f40af4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:adb831e1f692a45c2281ed3d59ddf1e17"><td class="memItemLeft" align="right" valign="top"><a id="adb831e1f692a45c2281ed3d59ddf1e17"></a>
-JSON_HEDLEY_RETURNS_NON_NULL static JSON_HEDLEY_CONST const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer.html#adb831e1f692a45c2281ed3d59ddf1e17">token_type_name</a> (const <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098">token_type</a> t) noexcept</td></tr>
-<tr class="memdesc:adb831e1f692a45c2281ed3d59ddf1e17"><td class="mdescLeft">&#160;</td><td class="mdescRight">return name of values of type token_type (only used for errors) <br /></td></tr>
-<tr class="separator:adb831e1f692a45c2281ed3d59ddf1e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_methods_classnlohmann_1_1detail_1_1lexer__base"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnlohmann_1_1detail_1_1lexer__base')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html">nlohmann::detail::lexer_base&lt; BasicJsonType &gt;</a></td></tr>
+<tr class="memitem:ad214d59300605f9d3a4a32c8917aa608 inherit pub_static_methods_classnlohmann_1_1detail_1_1lexer__base"><td class="memItemLeft" align="right" valign="top"><a id="ad214d59300605f9d3a4a32c8917aa608"></a>
+JSON_HEDLEY_RETURNS_NON_NULL static JSON_HEDLEY_CONST const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#ad214d59300605f9d3a4a32c8917aa608">token_type_name</a> (const <a class="el" href="classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454">token_type</a> t) noexcept</td></tr>
+<tr class="memdesc:ad214d59300605f9d3a4a32c8917aa608 inherit pub_static_methods_classnlohmann_1_1detail_1_1lexer__base"><td class="mdescLeft">&#160;</td><td class="mdescRight">return name of values of type token_type (only used for errors) <br /></td></tr>
+<tr class="separator:ad214d59300605f9d3a4a32c8917aa608 inherit pub_static_methods_classnlohmann_1_1detail_1_1lexer__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename BasicJsonType&gt;<br />
-class nlohmann::detail::lexer&lt; BasicJsonType &gt;</h3>
+<div class="textblock"><h3>template&lt;typename BasicJsonType, typename InputAdapterType&gt;<br />
+class nlohmann::detail::lexer&lt; BasicJsonType, InputAdapterType &gt;</h3>
 
 <p>lexical analysis </p>
 <p>This class organizes the lexical analysis during JSON deserialization. </p>
-</div><h2 class="groupheader">Member Enumeration Documentation</h2>
-<a id="a3f313cdbe187cababfc5e06f0b69b098"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f313cdbe187cababfc5e06f0b69b098">&#9670;&nbsp;</a></span>token_type</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ae000b7571480e528dee4b281f63d5b15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae000b7571480e528dee4b281f63d5b15">&#9670;&nbsp;</a></span>get_token_string()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename BasicJsonType &gt; </div>
+template&lt;typename BasicJsonType , typename InputAdapterType &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a3f313cdbe187cababfc5e06f0b69b098">nlohmann::detail::lexer::token_type</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>token types for the parser </p>
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a42dd1a73d072bb6bf3f494f22b15db8e"></a>uninitialized&#160;</td><td class="fielddoc"><p>indicating the scanner is uninitialized </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a85cc1a37b0aaa52de40e72f0ed4e0c0d"></a>literal_true&#160;</td><td class="fielddoc"><p>the <code>true</code> literal </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098afab1694b1b3937a079f4625fe0b6108b"></a>literal_false&#160;</td><td class="fielddoc"><p>the <code>false</code> literal </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098ab7ae4c0e46d86f884677768160b26e9e"></a>literal_null&#160;</td><td class="fielddoc"><p>the <code>null</code> literal </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a2b490e8bf366b4cbe3ebd99b26ce15ce"></a>value_string&#160;</td><td class="fielddoc"><p>a string &ndash; use <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a54aa290ff2f60218a8f35f1ebf81666d" title="return current string value (implicitly resets the token; useful only once)">get_string()</a> for actual value </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098aaf1f040fcd2f674d2e5893d7a731078f"></a>value_unsigned&#160;</td><td class="fielddoc"><p>an unsigned integer &ndash; use <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a56640fb92293e0c17742ca3c814d74d6" title="return unsigned integer value">get_number_unsigned()</a> for actual value </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a5064b6655d88a50ae16665cf7751c0ee"></a>value_integer&#160;</td><td class="fielddoc"><p>a signed integer &ndash; use <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#afa338d17c0a7e834c73104258a2c8ced" title="return integer value">get_number_integer()</a> for actual value </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a0d2671a6f81efb91e77f6ac3bdb11443"></a>value_float&#160;</td><td class="fielddoc"><p>an floating point number &ndash; use <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#ac013af35a21e9387993b19da5b3e0ae2" title="return floating-point value">get_number_float()</a> for actual value </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a16c226b4425b68560fea322b46dabe01"></a>begin_array&#160;</td><td class="fielddoc"><p>the character for array begin <code>[</code> </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a9a9ffd53b6869d4eca271b1ed5b57fe8"></a>begin_object&#160;</td><td class="fielddoc"><p>the character for object begin <code>{</code> </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a2f3e68e7f111a1e5c7728742b3ca2b7f"></a>end_array&#160;</td><td class="fielddoc"><p>the character for array end <code>]</code> </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a7d5b4427866814de4d8f132721d59c87"></a>end_object&#160;</td><td class="fielddoc"><p>the character for object end <code>}</code> </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098acc3c64f8ae08c00de1b33f19a4d2913a"></a>name_separator&#160;</td><td class="fielddoc"><p>the name separator <code>:</code> </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a745373036100d7392ad62c617cab59af"></a>value_separator&#160;</td><td class="fielddoc"><p>the value separator <code>,</code> </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098a456e19aeafa334241c7ff3f589547f9d"></a>parse_error&#160;</td><td class="fielddoc"><p>indicating a parse error </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098aca11f56dd477c09e06583dbdcda0985f"></a>end_of_input&#160;</td><td class="fielddoc"><p>indicating the end of the input buffer </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a3f313cdbe187cababfc5e06f0b69b098ad2a8e6f6721cccec0b466301dd9495a5"></a>literal_or_value&#160;</td><td class="fielddoc"><p>a literal or the begin of a value (only for diagnostics) </p>
-</td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a4aef7e72e539be04e139c34872421f2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4aef7e72e539be04e139c34872421f2a">&#9670;&nbsp;</a></span>get_token_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BasicJsonType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string <a class="el" href="classnlohmann_1_1detail_1_1lexer.html">nlohmann::detail::lexer</a>&lt; BasicJsonType &gt;::get_token_string </td>
+          <td class="memname">std::string <a class="el" href="classnlohmann_1_1detail_1_1lexer.html">nlohmann::detail::lexer</a>&lt; BasicJsonType, InputAdapterType &gt;::get_token_string </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -265,19 +227,19 @@ template&lt;typename BasicJsonType &gt; </div>
 
 </div>
 </div>
-<a id="a709afd52def2e258dac0b8a67dc4ea26"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a709afd52def2e258dac0b8a67dc4ea26">&#9670;&nbsp;</a></span>skip_bom()</h2>
+<a id="a7cd7d55de2cd398660bc243c7229caf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cd7d55de2cd398660bc243c7229caf9">&#9670;&nbsp;</a></span>skip_bom()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename BasicJsonType &gt; </div>
+template&lt;typename BasicJsonType , typename InputAdapterType &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classnlohmann_1_1detail_1_1lexer.html">nlohmann::detail::lexer</a>&lt; BasicJsonType &gt;::skip_bom </td>
+          <td class="memname">bool <a class="el" href="classnlohmann_1_1detail_1_1lexer.html">nlohmann::detail::lexer</a>&lt; BasicJsonType, InputAdapterType &gt;::skip_bom </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>

@@ -94,6 +94,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>number_float_t</b> =
 <tr class="memitem:afd4d961ab2a6b01cbe6e840f7fb90cdc"><td class="memItemLeft" align="right" valign="top"><a id="afd4d961ab2a6b01cbe6e840f7fb90cdc"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>string_t</b> = typename BasicJsonType::string_t</td></tr>
 <tr class="separator:afd4d961ab2a6b01cbe6e840f7fb90cdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a188c267325965fdbe487ce68ab5496aa"><td class="memItemLeft" align="right" valign="top"><a id="a188c267325965fdbe487ce68ab5496aa"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>binary_t</b> = typename BasicJsonType::binary_t</td></tr>
+<tr class="separator:a188c267325965fdbe487ce68ab5496aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -129,6 +132,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>number_float</b> (num
 <tr class="memitem:a851d965082d20a726138f5d0330dc7d8"><td class="memItemLeft" align="right" valign="top"><a id="a851d965082d20a726138f5d0330dc7d8"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>string</b> (string_t &amp;val)</td></tr>
 <tr class="separator:a851d965082d20a726138f5d0330dc7d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc05c450d515f0f95c37401bf23c8db3"><td class="memItemLeft" align="right" valign="top"><a id="acc05c450d515f0f95c37401bf23c8db3"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>binary</b> (binary_t &amp;val)</td></tr>
+<tr class="separator:acc05c450d515f0f95c37401bf23c8db3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9929b4cc92d471c49bd0a92802629f90"><td class="memItemLeft" align="right" valign="top"><a id="a9929b4cc92d471c49bd0a92802629f90"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>start_object</b> (std::size_t len)</td></tr>
 <tr class="separator:a9929b4cc92d471c49bd0a92802629f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -144,9 +150,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>start_array</b> (std:
 <tr class="memitem:af7cb5e5fe06ea908b0ce4ed762919759"><td class="memItemLeft" align="right" valign="top"><a id="af7cb5e5fe06ea908b0ce4ed762919759"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>end_array</b> ()</td></tr>
 <tr class="separator:af7cb5e5fe06ea908b0ce4ed762919759"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d3bf1f361ebb817c694ba45b3814fa6"><td class="memItemLeft" align="right" valign="top"><a id="a7d3bf1f361ebb817c694ba45b3814fa6"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>parse_error</b> (std::size_t, const std::string &amp;, const <a class="el" href="classnlohmann_1_1detail_1_1exception.html">detail::exception</a> &amp;ex)</td></tr>
-<tr class="separator:a7d3bf1f361ebb817c694ba45b3814fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bc7d26e6a6f30185310de42cb2e820d"><td class="memTemplParams" colspan="2"><a id="a7bc7d26e6a6f30185310de42cb2e820d"></a>
+template&lt;class Exception &gt; </td></tr>
+<tr class="memitem:a7bc7d26e6a6f30185310de42cb2e820d"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>parse_error</b> (std::size_t, const std::string &amp;, const Exception &amp;ex)</td></tr>
+<tr class="separator:a7bc7d26e6a6f30185310de42cb2e820d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1b9f3681fadbbb2e0127f5c8a99c662"><td class="memItemLeft" align="right" valign="top"><a id="ad1b9f3681fadbbb2e0127f5c8a99c662"></a>
 constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_errored</b> () const</td></tr>
 <tr class="separator:ad1b9f3681fadbbb2e0127f5c8a99c662"><td class="memSeparator" colspan="2">&#160;</td></tr>

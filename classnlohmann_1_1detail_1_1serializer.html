@@ -208,11 +208,13 @@ template&lt;typename BasicJsonType &gt; </div>
 <li>strings and object keys are escaped using <code>escape_string()</code></li>
 <li>integer numbers are converted implicitly via <code>operator&lt;&lt;</code></li>
 <li>floating-point numbers are converted to a string using <code>"%g"</code> format</li>
+<li>binary values are serialized as objects containing the subtype and the byte array</li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">val</td><td>value to serialize </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pretty_print</td><td>whether the output shall be pretty-printed </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ensure_ascii</td><td>If <em>ensure_ascii</em> is true, all non-ASCII characters in the output are escaped with <code>\uXXXX</code> sequences, and the result consists of ASCII characters only. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">indent_step</td><td>the indent level </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">current_indent</td><td>the current indent level (only used internally) </td></tr>
   </table>

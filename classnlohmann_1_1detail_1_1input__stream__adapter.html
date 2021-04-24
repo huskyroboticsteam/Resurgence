@@ -67,6 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classnlohmann_1_1detail_1_1input__stream__adapter-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -75,25 +76,13 @@ $(function() {
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="json_8hpp_source.html">json.hpp</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for nlohmann::detail::input_stream_adapter:</div>
-<div class="dyncontent">
-<div class="center"><img src="classnlohmann_1_1detail_1_1input__stream__adapter__inherit__graph.png" border="0" usemap="#anlohmann_1_1detail_1_1input__stream__adapter_inherit__map" alt="Inheritance graph"/></div>
-<map name="anlohmann_1_1detail_1_1input__stream__adapter_inherit__map" id="anlohmann_1_1detail_1_1input__stream__adapter_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,95,155,136"/>
-<area shape="rect" href="structnlohmann_1_1detail_1_1input__adapter__protocol.html" title="abstract input adapter interface" alt="" coords="5,5,155,47"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
-<div class="dynheader">
-Collaboration diagram for nlohmann::detail::input_stream_adapter:</div>
-<div class="dyncontent">
-<div class="center"><img src="classnlohmann_1_1detail_1_1input__stream__adapter__coll__graph.png" border="0" usemap="#anlohmann_1_1detail_1_1input__stream__adapter_coll__map" alt="Collaboration graph"/></div>
-<map name="anlohmann_1_1detail_1_1input__stream__adapter_coll__map" id="anlohmann_1_1detail_1_1input__stream__adapter_coll__map">
-<area shape="rect" title=" " alt="" coords="5,95,155,136"/>
-<area shape="rect" href="structnlohmann_1_1detail_1_1input__adapter__protocol.html" title="abstract input adapter interface" alt="" coords="5,5,155,47"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a72f0713587f6bb3f3fbaae7d34c0ca39"><td class="memItemLeft" align="right" valign="top"><a id="a72f0713587f6bb3f3fbaae7d34c0ca39"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>char_type</b> = char</td></tr>
+<tr class="separator:a72f0713587f6bb3f3fbaae7d34c0ca39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af487152e4606d013eb4ec6a90eaf82ea"><td class="memItemLeft" align="right" valign="top"><a id="af487152e4606d013eb4ec6a90eaf82ea"></a>
@@ -105,16 +94,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aeac5048221929b8f7558d1698dd0fb3a"><td class="memItemLeft" align="right" valign="top"><a id="aeac5048221929b8f7558d1698dd0fb3a"></a>
 <a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;)=delete</td></tr>
 <tr class="separator:aeac5048221929b8f7558d1698dd0fb3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ae74b874f7db43640905cb7f2442b1d"><td class="memItemLeft" align="right" valign="top"><a id="a0ae74b874f7db43640905cb7f2442b1d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>input_stream_adapter</b> (<a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;&amp;)=delete</td></tr>
-<tr class="separator:a0ae74b874f7db43640905cb7f2442b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3577dff99cc91968557b52959b0363e4"><td class="memItemLeft" align="right" valign="top"><a id="a3577dff99cc91968557b52959b0363e4"></a>
-<a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;&amp;)=delete</td></tr>
-<tr class="separator:a3577dff99cc91968557b52959b0363e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0760af923583de6354725e901d1869d"><td class="memItemLeft" align="right" valign="top"><a id="ae0760af923583de6354725e901d1869d"></a>
-std::char_traits&lt; char &gt;::int_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html#ae0760af923583de6354725e901d1869d">get_character</a> () override</td></tr>
-<tr class="memdesc:ae0760af923583de6354725e901d1869d"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a character [0,255] or std::char_traits&lt;char&gt;::eof(). <br /></td></tr>
-<tr class="separator:ae0760af923583de6354725e901d1869d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a088eead93cd71f1e3613d1876e3c95da"><td class="memItemLeft" align="right" valign="top"><a id="a088eead93cd71f1e3613d1876e3c95da"></a>
+<a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;&amp;rhs)=delete</td></tr>
+<tr class="separator:a088eead93cd71f1e3613d1876e3c95da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0be44ef098e88e8453eb4c31c9b14421"><td class="memItemLeft" align="right" valign="top"><a id="a0be44ef098e88e8453eb4c31c9b14421"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>input_stream_adapter</b> (<a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html">input_stream_adapter</a> &amp;&amp;rhs) noexcept</td></tr>
+<tr class="separator:a0be44ef098e88e8453eb4c31c9b14421"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6c760c5df3a85b5800b4271c09e8671"><td class="memItemLeft" align="right" valign="top"><a id="ac6c760c5df3a85b5800b4271c09e8671"></a>
+std::char_traits&lt; char &gt;::int_type&#160;</td><td class="memItemRight" valign="bottom"><b>get_character</b> ()</td></tr>
+<tr class="separator:ac6c760c5df3a85b5800b4271c09e8671"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Input adapter for a (caching) istream. Ignores a UFT Byte Order Mark at beginning of input. Does not support changing the underlying std::streambuf in mid-input. Maintains underlying std::istream and std::streambuf to support subsequent use of standard std::istream operations to process any input characters following those used in parsing the JSON input. Clears the std::istream flags; any input errors (e.g., EOF) will be detected by the first subsequent call for input from the std::istream. </p>

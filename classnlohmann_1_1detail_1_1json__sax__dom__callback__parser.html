@@ -89,6 +89,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>number_float_t</b> =
 <tr class="memitem:a00e7d95d82d5d8a43421526a42a8eabc"><td class="memItemLeft" align="right" valign="top"><a id="a00e7d95d82d5d8a43421526a42a8eabc"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>string_t</b> = typename BasicJsonType::string_t</td></tr>
 <tr class="separator:a00e7d95d82d5d8a43421526a42a8eabc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5af8493f830eeb1a79c69fc39ed54ef8"><td class="memItemLeft" align="right" valign="top"><a id="a5af8493f830eeb1a79c69fc39ed54ef8"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>binary_t</b> = typename BasicJsonType::binary_t</td></tr>
+<tr class="separator:a5af8493f830eeb1a79c69fc39ed54ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f636086fa8e7cf26c35c8afd50903ce"><td class="memItemLeft" align="right" valign="top"><a id="a4f636086fa8e7cf26c35c8afd50903ce"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>parser_callback_t</b> = typename BasicJsonType::parser_callback_t</td></tr>
 <tr class="separator:a4f636086fa8e7cf26c35c8afd50903ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,6 +134,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>number_float</b> (num
 <tr class="memitem:ad94e912a67c7b96158937236805b8b47"><td class="memItemLeft" align="right" valign="top"><a id="ad94e912a67c7b96158937236805b8b47"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>string</b> (string_t &amp;val)</td></tr>
 <tr class="separator:ad94e912a67c7b96158937236805b8b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66f5515cddef5074c9499f21c26ac099"><td class="memItemLeft" align="right" valign="top"><a id="a66f5515cddef5074c9499f21c26ac099"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>binary</b> (binary_t &amp;val)</td></tr>
+<tr class="separator:a66f5515cddef5074c9499f21c26ac099"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a040e60243cc7c18a6078c6b83cdb4a81"><td class="memItemLeft" align="right" valign="top"><a id="a040e60243cc7c18a6078c6b83cdb4a81"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>start_object</b> (std::size_t len)</td></tr>
 <tr class="separator:a040e60243cc7c18a6078c6b83cdb4a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,9 +152,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>start_array</b> (std:
 <tr class="memitem:aa64e7a650952174037d32028de582c12"><td class="memItemLeft" align="right" valign="top"><a id="aa64e7a650952174037d32028de582c12"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>end_array</b> ()</td></tr>
 <tr class="separator:aa64e7a650952174037d32028de582c12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac6e64f0b59c9150cde974e182d5ecab"><td class="memItemLeft" align="right" valign="top"><a id="aac6e64f0b59c9150cde974e182d5ecab"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>parse_error</b> (std::size_t, const std::string &amp;, const <a class="el" href="classnlohmann_1_1detail_1_1exception.html">detail::exception</a> &amp;ex)</td></tr>
-<tr class="separator:aac6e64f0b59c9150cde974e182d5ecab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb54d6937ee5d5a40e1db94422998aec"><td class="memTemplParams" colspan="2"><a id="afb54d6937ee5d5a40e1db94422998aec"></a>
+template&lt;class Exception &gt; </td></tr>
+<tr class="memitem:afb54d6937ee5d5a40e1db94422998aec"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>parse_error</b> (std::size_t, const std::string &amp;, const Exception &amp;ex)</td></tr>
+<tr class="separator:afb54d6937ee5d5a40e1db94422998aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a167fd9bf385d3d08bcbbba8a927c0eff"><td class="memItemLeft" align="right" valign="top"><a id="a167fd9bf385d3d08bcbbba8a927c0eff"></a>
 constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_errored</b> () const</td></tr>
 <tr class="separator:a167fd9bf385d3d08bcbbba8a927c0eff"><td class="memSeparator" colspan="2">&#160;</td></tr>

@@ -104,13 +104,11 @@ template&lt;typename SAX , typename BasicJsonType &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">        is_detected_exact&lt;bool, null_function_t, SAX&gt;::value &amp;&amp;</div>
 <div class="line">        is_detected_exact&lt;bool, boolean_function_t, SAX&gt;::value &amp;&amp;</div>
-<div class="line">        is_detected_exact&lt;bool, number_integer_function_t, SAX,</div>
-<div class="line">        number_integer_t&gt;::value &amp;&amp;</div>
-<div class="line">        is_detected_exact&lt;bool, number_unsigned_function_t, SAX,</div>
-<div class="line">        number_unsigned_t&gt;::value &amp;&amp;</div>
-<div class="line">        is_detected_exact&lt;bool, number_float_function_t, SAX, number_float_t,</div>
-<div class="line">        string_t&gt;::value &amp;&amp;</div>
+<div class="line">        is_detected_exact&lt;bool, number_integer_function_t, SAX, number_integer_t&gt;::value &amp;&amp;</div>
+<div class="line">        is_detected_exact&lt;bool, number_unsigned_function_t, SAX, number_unsigned_t&gt;::value &amp;&amp;</div>
+<div class="line">        is_detected_exact&lt;bool, number_float_function_t, SAX, number_float_t, string_t&gt;::value &amp;&amp;</div>
 <div class="line">        is_detected_exact&lt;bool, string_function_t, SAX, string_t&gt;::value &amp;&amp;</div>
+<div class="line">        is_detected_exact&lt;bool, binary_function_t, SAX, binary_t&gt;::value &amp;&amp;</div>
 <div class="line">        is_detected_exact&lt;bool, start_object_function_t, SAX&gt;::value &amp;&amp;</div>
 <div class="line">        is_detected_exact&lt;bool, key_function_t, SAX, string_t&gt;::value &amp;&amp;</div>
 <div class="line">        is_detected_exact&lt;bool, end_object_function_t, SAX&gt;::value &amp;&amp;</div>

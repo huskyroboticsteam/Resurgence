@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['input_5fformat_5ft_963',['input_format_t',['../namespacenlohmann_1_1detail.html#aa554fc6a11519e4f347deb25a9f0db40',1,'nlohmann::detail']]]
+  ['error_5fhandler_5ft_1001',['error_handler_t',['../namespacenlohmann_1_1detail.html#a5a76b60b26dc8c47256a996d18d967df',1,'nlohmann::detail']]]
 ];
