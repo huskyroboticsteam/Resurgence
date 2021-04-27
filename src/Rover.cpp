@@ -24,7 +24,7 @@ void initEncoders()
 {
     CANPacket p;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
-        serial < DEVICE_SERIAL_MOTOR_CHASSIS_BR;
+        serial <= DEVICE_SERIAL_MOTOR_HAND;
         serial ++ ) {
       AssembleEncoderInitializePacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial,
           0, 0, 1); // 1 means to zero the encoder angle measurement
@@ -40,7 +40,7 @@ void setArmMode(uint8_t mode)
     // Set all arm motors to given mode
     CANPacket p;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
-        serial < DEVICE_SERIAL_MOTOR_HAND;
+        serial <= DEVICE_SERIAL_MOTOR_HAND;
         serial ++ ) {
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
       sendCANPacket(p);
@@ -55,7 +55,7 @@ void InitializeRover(uint8_t arm_mode)
     CANPacket p;
     uint8_t mode_PWM = 0x0;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_CHASSIS_FL;
-        serial < DEVICE_SERIAL_MOTOR_CHASSIS_BR;
+        serial <= DEVICE_SERIAL_MOTOR_CHASSIS_BR;
         serial ++) {
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, MOTOR_UNIT_MODE_PWM);
       sendCANPacket(p);
