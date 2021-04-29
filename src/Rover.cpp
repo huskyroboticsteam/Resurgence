@@ -18,20 +18,27 @@ extern "C"
 {
     #include "HindsightCAN/CANMotorUnit.h"
     #include "HindsightCAN/CANSerialNumbers.h"
+    #include "HindsightCAN/CANCommon.h"
 }
 
 void initEncoders()
 {
     CANPacket p;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
-        serial <= DEVICE_SERIAL_MOTOR_HAND;
+        serial < DEVICE_SERIAL_MOTOR_HAND; // The hand motor doesn't have an encoder
         serial ++ ) {
       AssembleEncoderInitializePacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial,
           0, 0, 1); // 1 means to zero the encoder angle measurement
       sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
       AssembleEncoderPPJRSetPacket(   &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
           1024); // I have no idea how many pulses actually make one rotation
       sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
+      AssembleTelemetryTimingPacket(  &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
+          PACKET_TELEMETRY_ANG_POSITION, 100); // 100 ms, for 10 hz
+      sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
     }
 }
 
@@ -44,6 +51,7 @@ void setArmMode(uint8_t mode)
         serial ++ ) {
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
       sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
     }
 }
 
@@ -59,9 +67,11 @@ void InitializeRover(uint8_t arm_mode)
         serial ++) {
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, MOTOR_UNIT_MODE_PWM);
       sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
     }
 
     initEncoders();
+    usleep(1 * 1000 * 1000);
     setArmMode(arm_mode);
 }
 
