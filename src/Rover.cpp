@@ -71,7 +71,9 @@ void InitializeRover(uint8_t arm_mode)
     }
 
     initEncoders();
-    usleep(1 * 1000 * 1000);
+    // Weird bug on AVR boards. Without this delay, the AVR boards won't move the motors when
+    // we use PWM control later. (This problem does not arise if we do not call initEncoders.)
+    usleep(1 * 1000 * 1000); 
     setArmMode(arm_mode);
 }
 
