@@ -32,7 +32,7 @@ void initEncoders()
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
       AssembleEncoderPPJRSetPacket(   &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
-          1024); // I have no idea how many pulses actually make one rotation
+          360 * 1000); // I have no idea how many pulses actually make one rotation
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
       AssembleTelemetryTimingPacket(  &p, DEVICE_GROUP_MOTOR_CONTROL, serial,

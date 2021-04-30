@@ -27,6 +27,7 @@ void cleanup(int signum) {
   CANPacket p;
   AssembleGroupBroadcastingEmergencyStopPacket(&p, motor_group_id, ESTOP_ERR_GENERAL);
   sendCANPacket(p);
+  usleep(1000); // Give the packet time to be sent
   exit(0);
 }
 
@@ -36,8 +37,8 @@ int main(int argc, char** argv)
     InitializeRover(MOTOR_UNIT_MODE_PID);
     struct timeval tp0, tp_start;
 
-    // todo add this to our makefile
-    // todo how do we find the PPJR for each motor?
+    // TODO: Before running this script, make sure the PPJR is set correctly for each motor
+    // in Rover.cpp.
 
     signal(SIGINT, cleanup);
 
