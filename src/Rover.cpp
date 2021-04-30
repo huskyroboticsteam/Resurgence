@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <ctime>
 #include <csignal>
+#include <unistd.h>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -16,31 +17,63 @@
 extern "C"
 {
     #include "HindsightCAN/CANMotorUnit.h"
+    #include "HindsightCAN/CANSerialNumbers.h"
+    #include "HindsightCAN/CANCommon.h"
+}
+
+void initEncoders()
+{
+    CANPacket p;
+    for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
+        serial < DEVICE_SERIAL_MOTOR_HAND; // The hand motor doesn't have an encoder
+        serial ++ ) {
+      AssembleEncoderInitializePacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial,
+          0, 0, 1); // 1 means to zero the encoder angle measurement
+      sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
+      AssembleEncoderPPJRSetPacket(   &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
+          360 * 1000); // I have no idea how many pulses actually make one rotation
+      sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
+      AssembleTelemetryTimingPacket(  &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
+          PACKET_TELEMETRY_ANG_POSITION, 100); // 100 ms, for 10 hz
+      sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
+    }
 }
 
 void setArmMode(uint8_t mode)
 {
     // Set all arm motors to given mode
     CANPacket p;
-    for (uint8_t serial = 0x1; serial < 0x8; serial ++ ) {
+    for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
+        serial <= DEVICE_SERIAL_MOTOR_HAND;
+        serial ++ ) {
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
       sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
     }
 }
 
-void InitializeRover()
+void InitializeRover(uint8_t arm_mode)
 {
     InitializeCANSocket();
 
     // Set all wheel motors to mode PWM
     CANPacket p;
-    uint8_t mode_PWM = 0x0;
-    for (uint8_t serial = 0x8; serial < 0xC; serial ++ ) {
-      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode_PWM);
+    for (uint8_t serial = DEVICE_SERIAL_MOTOR_CHASSIS_FL;
+        serial <= DEVICE_SERIAL_MOTOR_CHASSIS_BR;
+        serial ++) {
+      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, MOTOR_UNIT_MODE_PWM);
       sendCANPacket(p);
+      usleep(1000); // We're running out of CAN buffer space
     }
 
-    setArmMode(mode_PWM); // Until we get encoders / PID control working
+    initEncoders();
+    // Weird bug on AVR boards. Without this delay, the AVR boards won't move the motors when
+    // we use PWM control later. (This problem does not arise if we do not call initEncoders.)
+    usleep(1 * 1000 * 1000);
+    setArmMode(arm_mode);
 }
 
 void closeSim(int signum)
@@ -58,7 +91,7 @@ int rover_loop(int argc, char **argv)
     // Ctrl+C doesn't stop the simulation without this line
     signal(SIGINT, closeSim);
     Globals::opts = ParseCommandLineOptions(argc, argv);
-    InitializeRover();
+    InitializeRover(MOTOR_UNIT_MODE_PWM);
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communication from the base station
