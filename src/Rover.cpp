@@ -61,7 +61,6 @@ void InitializeRover(uint8_t arm_mode)
 
     // Set all wheel motors to mode PWM
     CANPacket p;
-    uint8_t mode_PWM = 0x0;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_CHASSIS_FL;
         serial <= DEVICE_SERIAL_MOTOR_CHASSIS_BR;
         serial ++) {
@@ -73,7 +72,7 @@ void InitializeRover(uint8_t arm_mode)
     initEncoders();
     // Weird bug on AVR boards. Without this delay, the AVR boards won't move the motors when
     // we use PWM control later. (This problem does not arise if we do not call initEncoders.)
-    usleep(1 * 1000 * 1000); 
+    usleep(1 * 1000 * 1000);
     setArmMode(arm_mode);
 }
 
