@@ -5,8 +5,8 @@
 #include <iostream>
 
 #include "Globals.h"
-#include "simulator/world_interface.h"
 #include "simulator/constants.h"
+#include "simulator/world_interface.h"
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
@@ -28,6 +28,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		target(_target),
 		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
+	  	map(),
 		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter(),
@@ -39,6 +40,10 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_idx(0),
 		search_theta_increment(PI / 4),
 		already_arrived(false),
+	  	mapUpdateCounter(0),
+	  	mapBlindPeriod(15),
+	  	mapDoesOverlap(false),
+	  	mapOverlapSampleThreshold(15),
 		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
 		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
 		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
@@ -263,13 +268,27 @@ void Autonomous::autonomyIter()
 		}
 
 		const points_t lidar_scan = readLidarScan();
+
+		if (mapUpdateCounter > mapBlindPeriod) {
+			map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
+			mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
+		}
+		points_t mapPoints = map.getPointsWithin({pose.x(), pose.y(), 1}, 10);
+
+		// TODO: there's still an issue with the planning lagging out and messing up everything
 		if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
 			point_t point_t_goal;
 			point_t_goal.topRows(2) = driveTarget.topRows(2);
 			point_t_goal(2) = 1.0;
 			point_t_goal = toTransform(pose) * point_t_goal;
 			double goal_radius = 2.0;
-			plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+			plan_t new_plan = getPlan([&](double x, double y, double radius)->bool {
+				point_t relPoint = {x, y, 1};
+				point_t p = invTransform * relPoint;
+				return map.hasPointWithin(p, radius);
+			}, point_t_goal, goal_radius);
+			// TODO: remove this line once it gets ironed out
+//			plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
 			double new_plan_cost = planCostFromIndex(new_plan, 0);
 			// we want a significant improvement to avoid thrash
 			if (new_plan_cost < plan_cost * 0.8) {

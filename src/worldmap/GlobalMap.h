@@ -55,7 +55,5 @@ public:
 
 private:
 	QuadTree tree;
-	transform_t adjustmentTransform;
-	transform_t adjustmentTransformInv;
 	TrICP icp;
 };

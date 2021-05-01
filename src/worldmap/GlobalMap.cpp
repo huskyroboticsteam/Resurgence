@@ -3,24 +3,12 @@
 #include <Eigen/LU>
 
 /*
- * Since the map is transformed to fit the sample, and there might be a lot of points in the
- * global map, we don't transform the entire map with each sample. Instead, we only transform
- * the map when it is requested by the client.
- *
- * We have a notion of "naive" map space and "corrected" map space. Both are in the map
- * reference frame, but "naive" map space is when every sample is transformed to fit the first,
- * while the "corrected" map space is when every sample is transformed to fit the last.
- * The "corrected" map space is so named because it most correctly matches the robot's
- * pose estimation.
- *
- * Points are stored in "naive" map space, and the adjustmentTransform transformation maps
- * from "naive" to "corrected" map space.
+ * The map is stored relative to the first sample. This isn't ideal, but
+ * transforming the map to fit the latest sample worked terribly.
  */
 
 GlobalMap::GlobalMap(int maxIter, double relErrChangeThresh)
-	: adjustmentTransform(transform_t::Identity()),
-	  adjustmentTransformInv(transform_t::Identity()),
-	  tree(10000),
+	: tree(10000),
 	  icp(maxIter, relErrChangeThresh,
 		  std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
@@ -28,12 +16,7 @@ GlobalMap::GlobalMap(int maxIter, double relErrChangeThresh)
 
 points_t GlobalMap::getPoints() const
 {
-	points_t corrected = tree.getAllPoints();
-	for (point_t &p : corrected)
-	{
-		p = adjustmentTransform * p;
-	}
-	return corrected;
+	return tree.getAllPoints();
 }
 
 void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, double overlap)
@@ -57,13 +40,13 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 		if (overlap > 0)
 		{
 			transform_t mapAdjustment = icp.correct(transformed, overlap);
-			// instead of adjusting the entire map right now, store the transformation
-			adjustmentTransform = mapAdjustment * adjustmentTransform;
-			adjustmentTransformInv = adjustmentTransform.inverse();
-		}
-		for (point_t &p : transformed)
-		{
-			p = adjustmentTransformInv * p;
+			// just transform the sample instead of the map (yes i know there are some
+			// unnecessary inversions going on but I'll fix that later)
+			transform_t adj = mapAdjustment.inverse();
+			for (point_t &p : transformed)
+			{
+				p = adj * p;
+			}
 		}
 	}
 
@@ -75,27 +58,22 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 
 point_t GlobalMap::getClosest(const point_t &point) const
 {
-	// convert the lookup point to "naive" map space
-	point_t p = adjustmentTransformInv * point;
 	if (tree.empty())
 	{
 		return {0, 0, 0};
 	}
-	point_t closest = tree.getClosest(p);
-	// convert back to "corrected" map space
-	return adjustmentTransform * closest;
+	point_t closest = tree.getClosest(point);
+	return closest;
 }
 
 points_t GlobalMap::getPointsWithin(const point_t &point, double dist) const
 {
-	// convert the lookup point to "naive" map space
-	point_t p = adjustmentTransformInv * point;
 	points_t points;
 	if (!tree.empty())
 	{
-		points_t within = tree.getPointsWithin(p, dist * 2 * sqrt(2));
+		points_t within = tree.getPointsWithin(point, dist * 2 * sqrt(2));
 		for (const point_t &p1 : within) {
-			points.push_back(adjustmentTransform * p1);
+			points.push_back(p1);
 		}
 	}
 	return points;

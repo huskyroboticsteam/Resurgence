@@ -9,6 +9,7 @@
 
 #include "Util.h"
 #include "WorldData.h"
+#include "worldmap/GlobalMap.h"
 #include "filters/PoseEstimator.h"
 #include "filters/RollingAvgFilter.h"
 #include "lidar/PointCloudProcessing.h"
@@ -37,6 +38,7 @@ private:
 	URCLeg target;
 	pose_t search_target;
 	PoseEstimator poseEstimator;
+	GlobalMap map;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
 	RollingAvgFilter<5,3> landmarkFilter;
@@ -48,6 +50,10 @@ private:
 	int plan_idx;
 	double search_theta_increment;
 	bool already_arrived;
+	int mapUpdateCounter; // number of times the map has been updated
+	int mapBlindPeriod; // the number of loops to wait before starting to build the map
+	bool mapDoesOverlap;
+	int mapOverlapSampleThreshold; // at least these many points required to overlap map
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;

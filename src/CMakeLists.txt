@@ -167,7 +167,6 @@ add_subdirectory(ar)
 list(APPEND sfml_libs
   sfml-graphics sfml-window sfml-system pthread)
 
-# My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 

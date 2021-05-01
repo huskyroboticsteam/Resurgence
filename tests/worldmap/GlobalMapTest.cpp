@@ -88,8 +88,8 @@ TEST_CASE("Global Map", "[GlobalMap]")
 	for (int i = 0; i < 5; i++)
 	{
 		points_t sample;
-		// last sample should be in axes reference frame, so we can check performance easily
-		transform_t trf = i < 4 ? randTransform(0, 0) : transform_t::Identity();
+		// first sample should be in axes reference frame, so we can check performance easily
+		transform_t trf = i > 0 ? randTransform(0, 0) : transform_t::Identity();
 		for (int j = 0; j < 150; j++)
 		{
 			double x1 = rand(-3, 3);
