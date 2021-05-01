@@ -37,6 +37,8 @@ public:
 private:
 	URCLeg target;
 	pose_t search_target;
+	// Gate targets are {NAN, NAN, NAN} if unset and {INF, INF, INF} if reached
+	// gate_targets.second(2) is NAN if targets have not been refined with more accurate landmark measurements
 	std::pair<pose_t, pose_t> gate_targets;
 	PoseEstimator poseEstimator;
 	bool calibrated = false;
