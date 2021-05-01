@@ -228,7 +228,6 @@ void Autonomous::autonomyIter()
 
 
 		// If we are in a search pattern, set the drive target to the next search point
-		// TODO make sure this still works
 		if (state == NavState::SEARCH_PATTERN)
 		{
 			driveTarget = search_target;
@@ -282,7 +281,6 @@ void Autonomous::autonomyIter()
 				driveTarget.topRows(2) = post_2.topRows(2);
 			}
 			// we have already seen the first post
-			// TODO comment
 			else
 			{
 				point_t post_1 = landmarkFilter.get();
@@ -291,7 +289,9 @@ void Autonomous::autonomyIter()
 				// Use the center as the drive target to avoid being close to one post but far from the other
 				driveTarget.topRows(2) = center.topRows(2);
 
+				// True if we are close enough to have sufficiently accurate landmark measurements
 				bool inRange = std::isnan(gate_targets.first(2)) && dist(pose, center, 0.0) < 8.0;
+				// True if we are within refining distance
 				bool shouldRefine = !std::isnan(gate_targets.first(2)) && std::isnan(gate_targets.second(2)) && dist(pose, gate_targets.first, 0.0) < 1.5;
 
 				// we have not set gate targets yet or have potentially inaccurate gate landmark measurements
@@ -301,6 +301,7 @@ void Autonomous::autonomyIter()
 					pose_t goal_1 = center + 2 * offset;
 					pose_t goal_2 = center - 2 * offset;
 
+					// Choose the closest goal to be the first target
 					if (dist(pose, goal_1, 0) < dist(pose, goal_2, 0))
 					{
 						gate_targets = std::make_pair(goal_1, goal_2);
@@ -310,7 +311,9 @@ void Autonomous::autonomyIter()
 						gate_targets = std::make_pair(goal_2, goal_1);
 					}
 
+					// Angle between targets
 					double angle = std::atan2(gate_targets.second(1) - gate_targets.first(1), gate_targets.second(0) - gate_targets.first(0));
+					// Angle between current post and first target
 					gate_targets.first(2) = std::atan2(gate_targets.first(1) - pose(1), gate_targets.first(0) - pose(0));
 					// Mark targets as unrefined if not refining
 					gate_targets.second(2) = shouldRefine ? angle : NAN;
@@ -330,7 +333,6 @@ void Autonomous::autonomyIter()
 						dist(pose, gate_targets.first, 0.0) < 0.2)
 					{
 						// Arrived at first gate target, mark as complete
-						std::cout << "Arrived at first target, distance " << dist(pose, gate_targets.first, 0.0) << std::endl;
 						gate_targets.first = pose_t(INFINITY, INFINITY, INFINITY);
 
 						// Update target angle of second target to account for inaccuracies
@@ -342,7 +344,6 @@ void Autonomous::autonomyIter()
 					if (std::isinf(gate_targets.first(2)) && dist(pose, gate_targets.second, 0.0) < 0.3)
 					{
 						// Arrived at second gate target
-						std::cout << "Arrived at second target, distance " << dist(pose, gate_targets.second, 0.0) << std::endl;
 						gate_targets.second = pose_t(INFINITY, INFINITY, INFINITY);
 
 						// No further action needed since goal has been reached
@@ -350,6 +351,10 @@ void Autonomous::autonomyIter()
 						return;
 					}
 					driveTarget = std::isinf(gate_targets.first(2)) ? gate_targets.second : gate_targets.first;
+					// Avoids weird planning behavior when close to the second target
+					if (dist(pose, gate_targets.second, 1.0) < 3.0) {
+						plan_cost = INFINITE_COST;
+					}
 				}
 			}
 		}
@@ -508,20 +513,11 @@ void Autonomous::autonomyIter()
 		}
 
 		// If aligned to desired gate angle, replan and continue to second target
-		if (state == NavState::GATE_ALIGN && std::abs(pose(2) - (std::isinf(gate_targets.first(2)) ? gate_targets.second : gate_targets.first)(2)) < 0.05)
-//		if (state == NavState::GATE_ALIGN && std::abs(pose(2) - gate_targets.second(2)) < 0.05)
+		if (state == NavState::GATE_ALIGN && std::abs(pose(2) - (std::isinf(gate_targets.first(2)) ? gate_targets.second : gate_targets.first)(2)) < 0.07)
 		{
 			state = NavState::INIT;
 			plan_cost = INFINITE_COST;
 		}
-
-//		if (state == NavState::GATE_ALIGN &&
-//			(!std::isinf(gate_targets.first(2)) && std::abs(pose(2) - gate_targets.first(2)) < 0.1 ||
-//			 std::isinf(gate_targets.first(2)) && std::abs(pose(2) - gate_targets.second(2)) < 0.05))
-//		{
-//			state = NavState::INIT;
-//			plan_cost = INFINITE_COST;
-//		}
 
 		// There's an overlap where either state might apply, to prevent rapidly switching
 		// back and forth between these two states.
