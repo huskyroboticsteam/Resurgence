@@ -79,12 +79,16 @@ add_library(stub_can_interface SHARED
 list(APPEND rover_libs
   rover_common hindsight_can simulator_base simulator_nav)
 
+list(APPEND sfml_libs
+  sfml-graphics sfml-window sfml-system pthread)
+
 add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
   real_world_interface
   )
+target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
 add_executable(RoverNoCAN rover_main.cpp)
 target_link_libraries(RoverNoCAN ${rover_libs}
@@ -92,6 +96,7 @@ target_link_libraries(RoverNoCAN ${rover_libs}
   stub_can_interface
   stub_world_interface
   )
+target_link_libraries(RoverNoCAN ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 
 add_executable(RoverSim rover_main.cpp)
 target_link_libraries(RoverSim ${rover_libs}
@@ -99,10 +104,20 @@ target_link_libraries(RoverSim ${rover_libs}
   stub_can_interface
   simulator_world_interface
   )
+target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+
+add_executable(TunePID TunePID.cpp)
+target_link_libraries(TunePID ${rover_libs}
+  real_base_station
+  real_can_interface
+  real_world_interface
+  )
+target_link_libraries(TunePID ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
 add_executable(PlanViz
   PlanViz.cpp)
 target_link_libraries(PlanViz simulator_base)
+target_link_libraries(PlanViz ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 
 add_executable(tests
   Tests.cpp
@@ -135,11 +150,18 @@ target_link_libraries(tests
   stub_can_interface
   real_world_interface
   )
+include(CTest)
+include(Catch)
+target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(tests Catch2::Catch2)
+target_link_libraries(tests ${OpenCV_LIBS})
+catch_discover_tests(tests)
 
 add_library(lidar_base
     lidar/LidarVis.cpp
     lidar/PointCloudProcessing.cpp
     lidar/URGLidar.cpp)
+target_include_directories(lidar_base SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 
 add_library(lidar_slam
         mapping/EKFSlam/EKFSlam.cpp
@@ -150,43 +172,27 @@ add_library(lidar_slam
 add_executable(lidar_vis
     lidar/MainVis.cpp)
 target_link_libraries(lidar_vis lidar_base)
+target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 
 add_executable(lidarOnlyTest
         mapping/EKFSlam/lidarOnlyTest.cpp
         )
 target_link_libraries(lidarOnlyTest lidar_base lidar_slam)
+target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 
 add_executable(simulator_navigation_demo
   simulator/navigation.cpp
   )
 target_link_libraries(simulator_navigation_demo
   simulator_base simulator_nav simulator_world_interface)
+target_link_libraries(simulator_navigation_demo ${sfml_libs})
 
 add_subdirectory(ar)
 
-list(APPEND sfml_libs
-  sfml-graphics sfml-window sfml-system pthread)
 
 # My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
-
-target_include_directories(lidar_base SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
-target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
-target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
-target_link_libraries(RoverNoCAN ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
-target_link_libraries(Rover ${sfml_libs})
-target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
-target_link_libraries(simulator_navigation_demo ${sfml_libs})
-target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
-target_link_libraries(PlanViz ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
-
-include(CTest)
-include(Catch)
-target_link_libraries(tests Catch2::Catch2)
-target_link_libraries(tests ${OpenCV_LIBS})
-catch_discover_tests(tests)
 
 add_executable(Server
   Networking/Server.cpp)
