@@ -1,6 +1,9 @@
 #!/bin/bash
 git submodule update --init --recursive
 source /opt/ros/foxy/setup.bash
+
+sudo apt install gpsd gpsd-clients libgps-dev
+
 mkdir ./build
 cd build
 cmake ../src
