@@ -13,7 +13,7 @@ The status LED for the GPS is very small, on the side of the sensor. It should t
 
 The GPS has a magnet on the bottom---be careful.
 
-You can check that we can receive data from the sensor as follows. Replace /dev/ttyUSB0 with whichever /dev is associated with the GPS. (You can figure this out by unplugging it / replugging it and comparing the output of `ls /dev`.
+You can check that we can receive data from the sensor as follows. Replace /dev/ttyUSB0 with whichever /dev is associated with the GPS. (You can figure this out by unplugging it / replugging it and comparing the output of `ls /dev`.)
 
 sudo stty -F /dev/ttyUSB0 ispeed 4800
 sudo cat /dev/ttyUSB0
@@ -46,7 +46,7 @@ I couldn't get `xgps` to work, but `cgps` seems to run fine. While waiting for a
 
 I was able to get a GPS fix (blinking red LED) after 4 or 5 minutes outside. At that point, cgps should show "Status: 3D FIX" and latitute/longitude/altitude information.
 
-# Machine readable data
+# Machine readable output
 
 sudo apt install libgps-dev
 
