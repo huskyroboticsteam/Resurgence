@@ -99,7 +99,7 @@ bool Autonomous::arrived(const pose_t &pose) const
 	}
 	else
 	{
-		pose_t target = getTargetPose();
+		pose_t target = getGPSTargetPose();
 		target.topRows(2) = leftPostFilter.get().topRows(2);
 		return dist(pose, target, 1.0) < 0.5;
 	}
@@ -224,7 +224,7 @@ void Autonomous::autonomyIter()
 	}
 	else
 	{
-		pose_t driveTarget = getTargetPose();
+		pose_t driveTarget = getGPSTargetPose();
 
 
 		// If we are in a search pattern, set the drive target to the next search point
@@ -550,7 +550,7 @@ double Autonomous::pathDirection(const points_t &lidar, const pose_t &gpsPose)
 	return dtheta;
 }
 
-pose_t Autonomous::getTargetPose() const
+pose_t Autonomous::getGPSTargetPose() const
 {
 	pose_t ret{target.approx_GPS(0), target.approx_GPS(1), 0.0};
 	return ret;
