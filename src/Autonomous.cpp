@@ -31,8 +31,8 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		calibrated(false),
 		calibrationPoses({}),
-		landmarkFilter(),
-		gate_filter(),
+		leftPostFilter(),
+		rightPostFilter(),
 		state(NavState::INIT),
 		time_since_plan(0),
 		plan(0,2),
@@ -89,7 +89,7 @@ void Autonomous::publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::
 
 bool Autonomous::arrived(const pose_t &pose) const
 {
-	if (landmarkFilter.getSize() == 0)
+	if (leftPostFilter.getSize() == 0)
 	{
 		return false;
 	}
@@ -100,7 +100,7 @@ bool Autonomous::arrived(const pose_t &pose) const
 	else
 	{
 		pose_t target = getTargetPose();
-		target.topRows(2) = landmarkFilter.get().topRows(2);
+		target.topRows(2) = leftPostFilter.get().topRows(2);
 		return dist(pose, target, 1.0) < 0.5;
 	}
 }
@@ -219,7 +219,7 @@ void Autonomous::autonomyIter()
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 					<< std::endl;
-		landmarkFilter.reset(); // clear the cached data points
+		leftPostFilter.reset(); // clear the cached data points
 		setCmdVel(0, 0);
 	}
 	else
@@ -236,18 +236,18 @@ void Autonomous::autonomyIter()
 		// if we have some existing data or new data, set the target using the landmark
 		// data
 		bool landmarkVisible = leftPostLandmark(2) != 0;
-		if (landmarkFilter.getSize() > 0 || landmarkVisible)
+		if (leftPostFilter.getSize() > 0 || landmarkVisible)
 		{
 			// TODO shift the target location and orientation to align
 			// with the gate and/or avoid crashing into the post.
 			if (!landmarkVisible)
 			{
 				// we have no new data, so use the data already in the filter
-				driveTarget.topRows(2) = landmarkFilter.get().topRows(2);
+				driveTarget.topRows(2) = leftPostFilter.get().topRows(2);
 			}
 			else
 			{
-				if (landmarkFilter.getSize() == 0)
+				if (leftPostFilter.getSize() == 0)
 				{
 					// Replan if this is the first landmark we have seen
 					plan_cost = INFINITE_COST;
@@ -256,7 +256,7 @@ void Autonomous::autonomyIter()
 				point_t landmarkMapSpace = invTransform * leftPostLandmark;
 				// the filtering is done on the target in map space to reduce any phase lag
 				// caused by filtering
-				driveTarget.topRows(2) = landmarkFilter.get(landmarkMapSpace).topRows(2);
+				driveTarget.topRows(2) = leftPostFilter.get(landmarkMapSpace).topRows(2);
 			}
 			if (state == NavState::SEARCH_PATTERN)
 			{
@@ -273,17 +273,17 @@ void Autonomous::autonomyIter()
 			point_t landmarkMapSpace = invTransform * rightPostLandmark;
 			// the filtering is done on the target in map space to reduce any phase lag
 			// caused by filtering
-			point_t post_2 = gate_filter.get(landmarkMapSpace);
+			point_t post_2 = rightPostFilter.get(landmarkMapSpace);
 
 			// we haven't seen the first post yet, use the second post as the drive target
-			if (landmarkFilter.getSize() == 0)
+			if (leftPostFilter.getSize() == 0)
 			{
 				driveTarget.topRows(2) = post_2.topRows(2);
 			}
 			// we have already seen the first post
 			else
 			{
-				point_t post_1 = landmarkFilter.get();
+				point_t post_1 = leftPostFilter.get();
 				point_t center = (post_1 + post_2) / 2;
 
 				// Use the center as the drive target to avoid being close to one post but far from the other
@@ -504,7 +504,7 @@ void Autonomous::autonomyIter()
 			}
 		}
 		if (state != NavState::SEARCH_PATTERN && dist(target.approx_GPS, pose, 0.0) < 0.2 &&
-			landmarkFilter.getSize() == 0 && !landmarkVisible)
+			leftPostFilter.getSize() == 0 && !landmarkVisible)
 		{
 			// Close to GPS target but no landmark in sight, should use search pattern
 			// Replan so the search starts faster
