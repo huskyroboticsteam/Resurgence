@@ -239,46 +239,64 @@ static void saveCameraParams( const std::string& filename,
 {
     cv::FileStorage fs( filename, cv::FileStorage::WRITE );
 
-    time_t tt;
+	fs.writeComment("Name and description for the camera.\nYou should replace these.");
+	fs << "name" << "TODO: Replace this" << "description" << "TODO: Replace this";
+	fs.writeComment("Additionally, you should choose one of the below\n"
+					"and replace it with the proper value.");
+	fs.writeComment("Camera ID: given ID N, will attempt to use /dev/videoN.");
+	fs << "camera_id" << 0;
+	fs.writeComment("Filename: will attempt to open the video device/stream\n"
+					"at the given path.");
+	fs << "filename" << "/path/to/camera/device";
+
+	time_t tt;
     time( &tt );
     struct tm *t2 = localtime( &tt );
     char buf[1024];
     strftime( buf, sizeof(buf)-1, "%c", t2 );
 
+	fs.writeComment("Information about the calibration process, such as the\n"
+					"reprojection error and board size.");
+	fs << "calib_info" << "{";
     fs << "calibration_time" << buf;
+	fs << "board_width" << boardSize.width;
+    fs << "board_height" << boardSize.height;
+    fs << "square_size" << squareSize;
+
+		fs << "avg_reprojection_error" << totalAvgErr;
+	if (!reprojErrs.empty())
+		fs << "per_view_reprojection_errors" << cv::Mat(reprojErrs);
 
     if( !rvecs.empty() || !reprojErrs.empty() )
         fs << "nframes" << (int)std::max(rvecs.size(), reprojErrs.size());
-    fs << "image_width" << imageSize.width;
-    fs << "image_height" << imageSize.height;
-    fs << "board_width" << boardSize.width;
-    fs << "board_height" << boardSize.height;
-    fs << "square_size" << squareSize;
 
     if( flags & cv::CALIB_FIX_ASPECT_RATIO )
         fs << "aspectRatio" << aspectRatio;
 
     if( flags != 0 )
-    {
-        sprintf( buf, "flags: %s%s%s%s",
-            flags & cv::CALIB_USE_INTRINSIC_GUESS ? "+use_intrinsic_guess" : "",
-            flags & cv::CALIB_FIX_ASPECT_RATIO ? "+fix_aspectRatio" : "",
-            flags & cv::CALIB_FIX_PRINCIPAL_POINT ? "+fix_principal_point" : "",
-            flags & cv::CALIB_ZERO_TANGENT_DIST ? "+zero_tangent_dist" : "" );
-        //cvWriteComment( *fs, buf, 0 );
-    }
+	{
+		sprintf(buf, "flags: %s%s%s%s",
+				flags & cv::CALIB_USE_INTRINSIC_GUESS ? "+use_intrinsic_guess" : "",
+				flags & cv::CALIB_FIX_ASPECT_RATIO ? "+fix_aspectRatio" : "",
+				flags & cv::CALIB_FIX_PRINCIPAL_POINT ? "+fix_principal_point" : "",
+				flags & cv::CALIB_ZERO_TANGENT_DIST ? "+zero_tangent_dist" : "");
+		// cvWriteComment( *fs, buf, 0 );
+	}
 
-    fs << "flags" << flags;
+	fs << "flags" << flags;
+	fs << "}";
 
-    fs << "camera_matrix" << cameraMatrix;
-    fs << "distortion_coefficients" << distCoeffs;
+	fs.writeComment("The actual intrinsic parameters of the camera.");
+	fs << "intrinsic_params" << "{";
+	fs << "camera_matrix" << cameraMatrix;
+	fs << "distortion_coefficients" << distCoeffs;
+    fs << "image_width" << imageSize.width;
+    fs << "image_height" << imageSize.height;
 
-    fs << "avg_reprojection_error" << totalAvgErr;
-    if( !reprojErrs.empty() )
-        fs << "per_view_reprojection_errors" << cv::Mat(reprojErrs);
+	fs << "}";
 
-    if( !rvecs.empty() && !tvecs.empty() )
-    {
+		if (!rvecs.empty() && !tvecs.empty())
+	{
         CV_Assert(rvecs[0].type() == tvecs[0].type());
         cv::Mat bigmat((int)rvecs.size(), 6, rvecs[0].type());
         for( int i = 0; i < (int)rvecs.size(); i++ )

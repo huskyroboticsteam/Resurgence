@@ -65,22 +65,39 @@ TEST_CASE("Serialization works", "[camera][camera_params]")
 	CameraParams params3((cv::Mat_<double>(3, 3) << 1280, 0, 640, 0, 720, 360, 0, 0, 1),
 						 cv::Mat::zeros(cv::Size(14, 1), CV_64FC1), cv::Size(1280, 720));
 	cv::FileStorage fs_write(filename, cv::FileStorage::WRITE);
-	fs_write << "params1" << params1;
-	fs_write << "params2" << params2;
-	fs_write << "params3" << params3;
-	fs_write.release();
-
-	cv::FileStorage fs_read(filename, cv::FileStorage::READ);
 	CameraParams read1, read2, read3;
-	fs_read["params1"] >> read1;
-	fs_read["params2"] >> read2;
-	fs_read["params3"] >> read3;
-	fs_read.release();
+	SECTION("Writing using streaming operator")
+	{
+		fs_write << "params1" << params1;
+		fs_write << "params2" << params2;
+		fs_write << "params3" << params3;
+		fs_write.release();
 
-	checkEqual(params1, read1);
-	checkEqual(params2, read2);
-	checkEqual(params3, read3);
-	remove(filename.c_str());
+		cv::FileStorage fs_read(filename, cv::FileStorage::READ);
+		fs_read["params1"] >> read1;
+		fs_read["params2"] >> read2;
+		fs_read["params3"] >> read3;
+		fs_read.release();
+
+		checkEqual(params1, read1);
+		checkEqual(params2, read2);
+		checkEqual(params3, read3);
+	}
+
+	SECTION("Writing data directly to root")
+	{
+		fs_write << "camera_matrix" << params1.getCameraMatrix()
+				 << "distortion_coefficients" << params1.getDistCoeff()
+				 << "image_width" << params1.getImageSize().width
+				 << "image_height" << params1.getImageSize().height;
+		fs_write.release();
+
+		cv::FileStorage fs_read(filename, cv::FileStorage::READ);
+		fs_read.root() >> read1;
+		fs_read.release();
+		checkEqual(params1, read1);
+	}
+	//   remove(filename.c_str());
 }
 
 } // namespace cam
