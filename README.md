@@ -83,6 +83,14 @@ sudo make install
 Follow instructions in `src/simulator/README.md`, or just execute the commands
 from `tests-docker-action/entrypoint.sh`.
 
+## Install GPS libraries
+
+On Ubuntu, just run:
+
+```bash
+sudo apt-get install gpsd gpsd-clients libgps-dev
+```
+
 ## Install ROS (planning visualization)
 
 ### On Ubuntu (Including Windows Subsystem for Linux)
