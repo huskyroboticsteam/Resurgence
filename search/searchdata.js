@@ -9,7 +9,7 @@ var indexSectionsWithContent =
   6: "ceiptv",
   7: "abdeiklnoprsuv",
   8: "os",
-  9: "ds"
+  9: "dos"
 };
 
 var indexSectionNames =

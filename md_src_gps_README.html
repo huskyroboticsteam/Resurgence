@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PY2020: Hindsight: Style Guide</title>
+<title>PY2020: Hindsight: Overview</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,43 +63,34 @@ $(function() {
 </div><!-- top -->
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">Style Guide </div>  </div>
+<div class="title">Overview </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><ul>
-<li>Curly braces are always on the next line <div class="fragment"><div class="line">int MyFunction()</div>
-<div class="line">{</div>
-<div class="line">    if(true)</div>
-<div class="line">    {</div>
-<div class="line">        while(false)</div>
-<div class="line">        {</div>
-<div class="line">        }</div>
-<div class="line">    }</div>
-<div class="line">    return 0;</div>
-<div class="line">}</div>
-</div><!-- fragment --></li>
-<li>Function names are in <code>camelCase</code></li>
-<li>Struct, Enum, Class, Enum Class, Union, etc. names are in <code>PascalCase</code></li>
-<li>Variable names are in <code>snake_case</code></li>
-<li>Always use C++'s includes: <code>&lt;cstdint&gt;, &lt;cstdio&gt;</code>, NOT <code>&lt;stdint.h&gt;, &lt;stdio.h&gt;</code></li>
-<li>Order of includes is: Our includes, C++ Standard includes, kernel includes. Include an extra line between each group. Good: <div class="fragment"><div class="line">#include &quot;Globals.h&quot;</div>
-<div class="line"> </div>
-<div class="line">#include &lt;cstdint&gt;</div>
-<div class="line"> </div>
-<div class="line">#include &lt;signal.h&gt;</div>
-</div><!-- fragment --> Bad: <div class="fragment"><div class="line">#include &lt;iostream&gt;</div>
-<div class="line">#include &lt;signal.h&gt;</div>
-<div class="line"> </div>
-<div class="line">#include &quot;Globals.h&quot;</div>
-</div><!-- fragment --></li>
-<li>ALWAYS guard a header file with <code>#pragma once</code></li>
-<li>Avoid #define, prefer constexpr</li>
-<li>Avoid raw pointers, prefer smart pointers (i.e shared_ptr) or references <br  />
-</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md34"></a>
-Indentation</h2>
-<p>Use tabs to indent, and use additional spaces to align multi-line code (i.e. when lines are too long and have to be wrapped). </p>
+<div class="textblock"><p>To get GPS data, you need to (install and) run the gpsd daemon. This runs in the background as a separate process, after which you can query for GPS data using a C++ interface.</p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+Information about BU-353S4 sensor</h1>
+<p>Manufacturer website is not very informative: <a href="https://www.globalsat.com.tw/en/product-199952/Cable-GPS-with-USB-interface-SiRF-Star-IV-BU-353S4.html">https://www.globalsat.com.tw/en/product-199952/Cable-GPS-with-USB-interface-SiRF-Star-IV-BU-353S4.html</a> <a href="https://www.globalsat.com.tw/ftp/download/GMouse_Win_UsersGuide-V1.0.pdf">https://www.globalsat.com.tw/ftp/download/GMouse_Win_UsersGuide-V1.0.pdf</a></p>
+<p>The status LED for the GPS is very small, on the side of the sensor. It should turn on (solid) when you plug it into a computer.</p>
+<p>The GPS has a magnet on the bottom&mdash;be careful.</p>
+<p>You can check that we can receive data from the sensor as follows. Replace /dev/ttyUSB0 with whichever /dev is associated with the GPS. (You can figure this out by unplugging it / replugging it and comparing the output of <code>ls /dev</code>.)</p>
+<p>sudo stty -F /dev/ttyUSB0 ispeed 4800 sudo cat /dev/ttyUSB0</p>
+<p>You should see lines looking like this:</p>
+<p>$GPRMC,011231.147,V,,,,,,,111220,,,N*4E $GPGGA,011232.147,,,,,0,00,,,M,0.0,M,,0000*57 $GPGSA,M,1,,,,,,,,,,,,,,,*12</p>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Installing and running gpsd</h1>
+<p>sudo apt install gpsd gpsd-clients</p>
+<p>If you have issues, this web page seems useful: <a href="https://gpsd.gitlab.io/gpsd/installation.html">https://gpsd.gitlab.io/gpsd/installation.html</a></p>
+<p>Start gpsd: gpsd -D 5 -N -n /dev/ttyUSB0</p>
+<p>Note: For some reason this sometimes fails with "can't bind IPv4 port gpsd, Address already in use". In this case, you might be able to fix this with: sudo service gpsd start sudo service gpsd stop</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Human readable output</h1>
+<p>I couldn't get <code>xgps</code> to work, but <code>cgps</code> seems to run fine. While waiting for a GPS fix, you should see JSON-style messages scrolling through the console.</p>
+<p>I was able to get a GPS fix (blinking red LED) after 4 or 5 minutes outside. At that point, cgps should show "Status: 3D FIX" and latitute/longitude/altitude information.</p>
+<h1><a class="anchor" id="autotoc_md4"></a>
+Machine readable output</h1>
+<p>sudo apt install libgps-dev</p>
+<p>Compile the test program gpsd_test.cpp using g++ gpsd_test.cpp -l gps</p>
+<p>Or just run <code>make gpsd_test</code> from the usual build directory. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
