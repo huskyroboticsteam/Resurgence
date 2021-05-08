@@ -187,6 +187,10 @@ target_link_libraries(simulator_navigation_demo
   simulator_base simulator_nav simulator_world_interface)
 target_link_libraries(simulator_navigation_demo ${sfml_libs})
 
+add_executable(gpsd_test
+  gps/gpsd_test.cpp)
+target_link_libraries(gpsd_test gps)
+
 add_subdirectory(ar)
 
 
