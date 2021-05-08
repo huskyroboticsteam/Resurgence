@@ -53,7 +53,7 @@ namespace cam
 class Camera
 {
 private:
-	cv::Mat _frame;
+	std::shared_ptr<cv::Mat> _frame;
 	std::shared_ptr<uint32_t> _frame_num;
 	std::shared_ptr<cv::VideoCapture> _capture;
 	std::string _name;
@@ -63,7 +63,7 @@ private:
 	std::shared_ptr<std::thread> _thread;
 	CameraParams _intrinsic_params;
 	cv::Mat _extrinsic_params;
-	bool _running;
+	std::shared_ptr<bool> _running;
 	void captureLoop();
 	void init(const cv::Mat &extrinsic_params);
 

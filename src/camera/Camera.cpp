@@ -10,8 +10,8 @@ Camera::Camera(string filename, string name, string description, CameraParams in
 			   Mat extrinsic_params)
 	: _name(name), _description(description), _intrinsic_params(intrinsic_params),
 	  _capture(std::make_shared<cv::VideoCapture>(filename)),
-	  _frame_num(std::make_shared<uint32_t>(0)), _frame_lock(std::make_shared<std::mutex>()),
-	  _cap_lock(std::make_shared<std::mutex>())
+	  _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
+	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>())
 {
 	init(extrinsic_params);
 }
@@ -20,8 +20,8 @@ Camera::Camera(int camera_id, string name, string description, CameraParams intr
 			   Mat extrinsic_params)
 	: _name(name), _description(description), _intrinsic_params(intrinsic_params),
 	  _capture(std::make_shared<cv::VideoCapture>(camera_id)),
-	  _frame_num(std::make_shared<uint32_t>(0)), _frame_lock(std::make_shared<std::mutex>()),
-	  _cap_lock(std::make_shared<std::mutex>())
+	  _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
+	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>())
 {
 	init(extrinsic_params);
 }
@@ -33,8 +33,13 @@ void Camera::init(const Mat &extrinsic_params)
 		throw std::invalid_argument("extrinsic_params must be 4x4 if given");
 	}
 	extrinsic_params.copyTo(this->_extrinsic_params);
-	_thread = std::make_shared<std::thread>(&Camera::captureLoop, this);
-	_running = true;
+	_running = std::make_shared<bool>(true);
+	_thread = std::shared_ptr<std::thread>(new std::thread(&Camera::captureLoop, this),
+										   [this](std::thread *p) {
+											   *(this->_running) = false;
+											   p->join();
+											   delete p;
+										   });
 }
 
 Camera::Camera(const Camera &other)
@@ -48,14 +53,24 @@ Camera::Camera(const Camera &other)
 
 void Camera::captureLoop()
 {
+	cv::Size image_size(640, 480);
+	if (!_intrinsic_params.empty())
+	{
+		image_size = _intrinsic_params.getImageSize();
+	}
+	_cap_lock->lock();
+	_capture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+	_capture->set(cv::CAP_PROP_FRAME_WIDTH, image_size.width);
+	_capture->set(cv::CAP_PROP_FRAME_HEIGHT, image_size.height);
+	_cap_lock->unlock();
 	cv::Mat frame;
-	while (_running)
+	while (*_running)
 	{
 		_cap_lock->lock();
 		_capture->read(frame);
 		_cap_lock->unlock();
 		_frame_lock->lock();
-		frame.copyTo(_frame);
+		frame.copyTo(*(this->_frame));
 		(*_frame_num)++;
 		_frame_lock->unlock();
 	}
@@ -86,8 +101,8 @@ bool Camera::next(cv::Mat &frame, uint32_t &frame_num) const
 		return false;
 	}
 	_frame_lock->lock();
-	_frame.copyTo(frame);
-	frame_num = *_frame_num;
+	frame = this->_frame->clone();
+	frame_num = *(this->_frame_num);
 	_frame_lock->unlock();
 	return true;
 }
