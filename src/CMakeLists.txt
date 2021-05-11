@@ -71,6 +71,7 @@ add_library(real_world_interface SHARED
   )
 
 add_library(real_can_interface SHARED
+  log.cpp
   Networking/CANUtils.cpp
   )
 add_library(stub_can_interface SHARED
