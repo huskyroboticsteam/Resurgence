@@ -42,10 +42,10 @@ add_library(rover_common SHARED
   Autonomous.cpp
   CommandLineOptions.cpp
   Globals.cpp
+  log.cpp
   Networking/ParseBaseStation.cpp
   Networking/IK.cpp
   Networking/ParseCAN.cpp
-  Networking/log.cpp
   Networking/motor_interface.cpp
   Util.cpp
   filters/PoseEstimator.cpp
