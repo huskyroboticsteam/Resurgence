@@ -34,7 +34,7 @@ void cleanup(int signum) {
 int main(int argc, char** argv)
 {
     world_interface_init();
-    InitializeRover(MOTOR_UNIT_MODE_PID);
+    InitializeRover(MOTOR_UNIT_MODE_PID, false);
     struct timeval tp0, tp_start;
 
     // TODO: Before running this script, make sure the PPJR is set correctly for each motor
@@ -46,9 +46,9 @@ int main(int argc, char** argv)
     std::cout << "Enter motor serial > ";
     std::getline(std::cin, str);
     int raw_serial = std::stoi(str);
-    uint8_t serial = (uint8_t) serial;
+    uint8_t serial = (uint8_t) raw_serial;
     std::string motor_name = motor_group[serial];
-    std::cout << "Enter coefficients for motor " << motor_name << ":\n";
+    printf("Enter coefficients for motor [%s] (serial %d):\n", motor_name.c_str(), serial);
     std::cout << "P > ";
     std::getline(std::cin, str);
     int p_coeff = std::stoi(str);
@@ -71,7 +71,13 @@ int main(int argc, char** argv)
     double period = 3.0;
     double amplitude = 15 * 1000.0; // in 1000th's of degrees
             // (doesn't make sense for hand motor, but that doesn't use PID)
-    int32_t angle_target = 0;
+
+    usleep(300 * 1000); // wait for encoder position data to arrive
+    while (recvCANPacket(&p) != 0) {
+        ParseCANPacket(p);
+    }
+    int32_t starting_angle = Globals::status_data[motor_name]["angular_position"];
+    int32_t angle_target = starting_angle;
     double acc_error = 0.0;
     int total_steps = 0;
 
@@ -90,7 +96,8 @@ int main(int argc, char** argv)
         total_steps += 1;
 
         timestep += 1.0/CONTROL_HZ;
-        angle_target = (int32_t) round(amplitude * sin(2*M_PI * timestep / period));
+        angle_target = (int32_t) round(amplitude * sin(2*M_PI * timestep / period))
+            + starting_angle;
 
         AssemblePIDTargetSetPacket(&p, motor_group_id, serial, angle_target);
         sendCANPacket(p);

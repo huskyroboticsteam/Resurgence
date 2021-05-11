@@ -6,6 +6,7 @@
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
+#include "log.h"
 #include "Networking/NetworkConstants.h"
 #include "Networking/Network.h"
 #include "Networking/CANUtils.h"
@@ -21,18 +22,27 @@ extern "C"
     #include "HindsightCAN/CANCommon.h"
 }
 
-void initEncoders()
+const std::vector<uint32_t> arm_PPJRs = {
+    360 * 1000, // base, unmeasured
+    360 * 1000, // shoulder, unmeasured
+    36 * 1000, // elbow, rough estimate
+    360 * 1000, // forearm, unmeasured
+    360 * 1000, // diff_left, unmeasured
+    360 * 1000 // diff_right, unmeasured
+};
+
+void initEncoders(bool zero_encoders)
 {
     CANPacket p;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
         serial < DEVICE_SERIAL_MOTOR_HAND; // The hand motor doesn't have an encoder
         serial ++ ) {
       AssembleEncoderInitializePacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial,
-          0, 0, 1); // 1 means to zero the encoder angle measurement
+          0, 0, zero_encoders);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
       AssembleEncoderPPJRSetPacket(   &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
-          360 * 1000); // I have no idea how many pulses actually make one rotation
+          arm_PPJRs[serial-1]);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
       AssembleTelemetryTimingPacket(  &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
@@ -55,7 +65,7 @@ void setArmMode(uint8_t mode)
     }
 }
 
-void InitializeRover(uint8_t arm_mode)
+void InitializeRover(uint8_t arm_mode, bool zero_encoders)
 {
     InitializeCANSocket();
 
@@ -69,7 +79,7 @@ void InitializeRover(uint8_t arm_mode)
       usleep(1000); // We're running out of CAN buffer space
     }
 
-    initEncoders();
+    initEncoders(zero_encoders);
     // Weird bug on AVR boards. Without this delay, the AVR boards won't move the motors when
     // we use PWM control later. (This problem does not arise if we do not call initEncoders.)
     usleep(1 * 1000 * 1000);
@@ -91,7 +101,7 @@ int rover_loop(int argc, char **argv)
     // Ctrl+C doesn't stop the simulation without this line
     signal(SIGINT, closeSim);
     Globals::opts = ParseCommandLineOptions(argc, argv);
-    InitializeRover(MOTOR_UNIT_MODE_PWM);
+    InitializeRover(MOTOR_UNIT_MODE_PWM, true);
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communication from the base station
