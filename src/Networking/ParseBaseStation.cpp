@@ -1,6 +1,6 @@
 
 #include "Network.h"
-#include "log.h"
+#include "../log.h"
 #include "IK.h"
 #include "motor_interface.h"
 #include "ParseBaseStation.h"
@@ -22,13 +22,13 @@ bool sendError(std::string const &msg)
   error_message["status"] = "error";
   error_message["msg"] = msg;
   sendBaseStationPacket(error_message.dump());
-  log(LOG_ERROR, error_message.dump());
+  log(LOG_ERROR, "%s", error_message.dump());
   return false;
 }
 
 bool ParseBaseStationPacket(char const* buffer)
 {
-  log(LOG_INFO, "Message from base station: " + (std::string) buffer);
+  log(LOG_DEBUG, "Message from base station: %s", buffer);
   json parsed_message;
   try
   {
@@ -47,7 +47,7 @@ bool ParseBaseStationPacket(char const* buffer)
   {
     return sendError("Could not find message type");
   }
-  log(LOG_DEBUG, "Message type: " + type);
+  log(LOG_DEBUG, "Message type: %s", type);
 
   bool success = false;
   if (type == "estop") {

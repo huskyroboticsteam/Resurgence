@@ -1,4 +1,5 @@
 #include "../Globals.h"
+#include "../log.h"
 #include "json.hpp"
 #include <iostream>
 
@@ -70,8 +71,7 @@ extern const std::vector<std::string> telem_types = {
 const std::string getDeviceTelemetryName(CANPacket &p) {
     uint8_t device_group = GetSenderDeviceGroupCode(&p);
     uint8_t device_serial = GetSenderDeviceSerialNumber(&p);
-    //std::cout << "device_group " << (int) device_group << " device_serial " <<
-    //  (int) device_serial << std::endl;
+    log(LOG_DEBUG, "device_group %d device_serial %d\n", device_group, device_serial);
     if (device_group < can_groups.size() &&
         device_serial < can_groups[device_group].size()) {
       return can_groups[device_group][device_serial];
@@ -85,9 +85,11 @@ void ParseCANPacket(CANPacket p)
     if (PacketIsOfID(&p, ID_TELEMETRY_REPORT)) {
         const std::string device_name = getDeviceTelemetryName(p);
         const std::string telem_type = telem_types[DecodeTelemetryType(&p)];
-        //std::cout << "Got telemetry packet for device_name and telem_type " <<
-        //  device_name << " " << telem_type << std::endl;
+        int32_t val = DecodeTelemetryDataSigned(&p);
+        log(LOG_DEBUG, "%s  \t %s \t %d\n", device_name.c_str(), telem_type.c_str(), val);
         // TODO is this data sometimes unsigned?
-        Globals::status_data[device_name][telem_type] = DecodeTelemetryDataSigned(&p);
+        Globals::status_data[device_name][telem_type] = val;
+    } else {
+        log(LOG_WARN, "Got packet of non-telemetry ID\n");
     }
 }
