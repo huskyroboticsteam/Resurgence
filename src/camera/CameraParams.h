@@ -134,6 +134,7 @@ void write(cv::FileStorage &fs, const std::string &name, const CameraParams &par
    removed at some point in the future.
 
    TODO: This needs to be reworked as we flesh out the camera system.
+   @deprecated Will be replaced when we move to the new camera system.
  */
 enum Params
 {
@@ -171,7 +172,10 @@ enum Params
 
 /**
    Returns a CameraParams object corresponding to the given Params constant.
+   @deprecated Will be replaced when we move to the new camera system.
  */
 CameraParams getCameraParams(Params params);
+
+/** @} */
 
 } // namespace cam

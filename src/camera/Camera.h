@@ -20,6 +20,10 @@
    optionally specified at runtime.
  */
 
+/**
+   @namespace cam
+   @brief Namespace for camera access system.
+ */
 namespace cam
 {
 
