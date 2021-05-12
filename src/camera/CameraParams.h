@@ -10,6 +10,11 @@ namespace cam
    @{
  */
 
+const std::string KEY_IMAGE_WIDTH = "image_width";
+const std::string KEY_IMAGE_HEIGHT = "image_height";
+const std::string KEY_CAMERA_MATRIX = "camera_matrix";
+const std::string KEY_DIST_COEFFS = "distortion_coefficients";
+
 /**
    @brief Represents a set of intrinsic camera parameters.
 

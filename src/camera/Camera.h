@@ -28,6 +28,14 @@ namespace cam
    @{
  */
 
+const std::string KEY_FILENAME = "filename";
+const std::string KEY_CAMERA_ID = "camera_id";
+const std::string KEY_INTRINSIC_PARAMS = "intrinsic_params";
+const std::string KEY_EXTRINSIC_PARAMS = "extrinsic_params";
+const std::string KEY_CALIB_INFO = "calib_info";
+const std::string KEY_NAME = "name";
+const std::string KEY_DESCRIPTION = "description";
+
 /**
 	@brief Represents a camera on the rover, from which a video feed can be
 	retrieved.

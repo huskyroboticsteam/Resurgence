@@ -78,11 +78,11 @@ cv::Size CameraParams::getImageSize() const
 void CameraParams::readFromFileNode(const cv::FileNode &file_node)
 {
 	cv::Mat cam, dist;
-	file_node["camera_matrix"] >> cam;
-	file_node["distortion_coefficients"] >> dist;
+	file_node[KEY_CAMERA_MATRIX] >> cam;
+	file_node[KEY_DIST_COEFFS] >> dist;
 	int w, h;
-	w = (int)file_node["image_width"];
-	h = (int)file_node["image_height"];
+	w = (int)file_node[KEY_IMAGE_WIDTH];
+	h = (int)file_node[KEY_IMAGE_HEIGHT];
 	cv::Size size(w, h);
 	// call init to do validation
 	init(cam, dist, size);
@@ -90,10 +90,12 @@ void CameraParams::readFromFileNode(const cv::FileNode &file_node)
 
 void CameraParams::writeToFileStorage(cv::FileStorage &file_storage) const
 {
-	file_storage << "{"
-				 << "image_width" << _image_size.width << "image_height" << _image_size.height
-				 << "camera_matrix" << _camera_matrix << "distortion_coefficients"
-				 << _dist_coeff << "}";
+	file_storage << "{";
+	file_storage << KEY_IMAGE_WIDTH << _image_size.width;
+	file_storage << KEY_IMAGE_HEIGHT << _image_size.height;
+	file_storage << KEY_CAMERA_MATRIX << _camera_matrix;
+	file_storage << KEY_DIST_COEFFS << _dist_coeff;
+	file_storage << "}";
 }
 
 void read(const cv::FileNode &node, CameraParams &params, const CameraParams &default_value)
