@@ -1,6 +1,6 @@
 
 #include <string>
-#include "log.h"
+#include "../log.h"
 #include "CANUtils.h"
 #include "ParseCAN.h"
 extern "C"
@@ -68,7 +68,7 @@ bool ParseMotorPacket(json &message)
     return sendError("Unrecognized motor " + motor);
   }
 
-  log(LOG_DEBUG, "Parsing motor packet for motor " + motor);
+  log(LOG_DEBUG, "Parsing motor packet for motor %s", motor);
 
   for (int key_idx = 0; key_idx < possible_keys["motor"].size(); key_idx++)
   {

@@ -1,4 +1,5 @@
 #include "../Globals.h"
+#include "../log.h"
 #include "Network.h"
 #include "ParseCAN.h"
 #include "NetworkConstants.h"
@@ -47,7 +48,7 @@ bool InitializeBaseStationSocket()
     return false;
   }
 
-  printf("Connected to base station.\n");
+  log(LOG_INFO, "Connected to base station.\n");
   return (connected = true);
 }
 
@@ -84,21 +85,21 @@ int recvBaseStationPacket(char *buffer)
   } else if (ret == 0) {
     return abort("Base station disconnected");
   } else if (ret != 4) {
-    printf("Could not read exactly four bytes from base station (got %d)", ret);
+    log(LOG_ERROR, "Could not read exactly four bytes from base station (got %d)", ret);
     return abort("Disconnecting");
   }
   uint8_t b0 = len_buffer[0];
   uint8_t b1 = len_buffer[1];
   uint8_t b2 = len_buffer[2];
   uint8_t b3 = len_buffer[3];
-  //printf("received bytes from base station: %x %x %x %x (%s)\n", b0, b1, b2, b3, len_buffer);
+  log(LOG_TRACE, "received bytes from base station: %x %x %x %x (%s)\n", b0, b1, b2, b3, len_buffer);
   int length = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
-  //printf("parsed this to packet length: %d (MAXLINE is %d)\n", length, MAXLINE);
+  log(LOG_TRACE, "parsed this to packet length: %d (MAXLINE is %d)\n", length, MAXLINE);
 
   bool invalid = (length > (MAXLINE-1)) || (length < 0);
   if (invalid)
   {
-    printf("Message length from base station is invalid: %d\n", length);
+    log(LOG_ERROR, "Message length from base station is invalid: %d\n", length);
     return abort("Disconnecting");
   }
 
@@ -117,10 +118,11 @@ int recvBaseStationPacket(char *buffer)
   } else if (ret == 0) {
     return abort("Base station disconnected");
   } else if (ret != length) {
-    printf("Could not read %d bytes from the base station (got %d)", length, ret);
+    log(LOG_ERROR, "Could not read %d bytes from the base station (got %d)", length, ret);
     return abort("Disconnecting");
   }
-  //printf("final two characters of message: %d %d '%s'", buffer[length-2], buffer[length-1], buffer + (length-2));
+  log(LOG_TRACE, "final two characters of message: %d %d '%s'",
+		  buffer[length-2], buffer[length-1], buffer + (length-2));
 
   return 1;
 }
