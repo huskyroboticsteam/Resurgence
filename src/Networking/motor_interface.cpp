@@ -68,7 +68,7 @@ bool ParseMotorPacket(json &message)
     return sendError("Unrecognized motor " + motor);
   }
 
-  log(LOG_DEBUG, "Parsing motor packet for motor %s", motor);
+  log(LOG_DEBUG, "Parsing motor packet for motor %s\n", motor.c_str());
 
   for (int key_idx = 0; key_idx < possible_keys["motor"].size(); key_idx++)
   {
