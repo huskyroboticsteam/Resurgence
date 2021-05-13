@@ -90,6 +90,6 @@ void ParseCANPacket(CANPacket p)
         // TODO is this data sometimes unsigned?
         Globals::status_data[device_name][telem_type] = val;
     } else {
-        log(LOG_WARN, "Got packet of non-telemetry ID\n");
+        log(LOG_WARN, "Got packet of non-telemetry ID %d\n", GetPacketID(&p));
     }
 }

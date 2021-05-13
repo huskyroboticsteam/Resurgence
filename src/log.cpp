@@ -3,7 +3,7 @@
 #include <iostream>
 #include "log.h"
 
-int LOG_LEVEL = LOG_INFO;
+int LOG_LEVEL = LOG_TRACE;
 
 void log(int level, const char *fmt, ...)
 {

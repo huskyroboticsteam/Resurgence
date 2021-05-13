@@ -168,6 +168,19 @@ TEST_CASE("Deactivates wheel motors if e-stopped", "e-stop")
     REQUIRE(ParseBaseStationPacket(estop_msg) == true);
     m = json::parse(popBaseStationPacket());
     REQUIRE(m["status"] == "ok");
+    // Should send broadcast e-stop
+    p = popCANPacket();
+    REQUIRE(PacketIsOfID(&p, ID_ESTOP));
+    REQUIRE(GetDeviceGroupCode(&p) == DEVICE_GROUP_MOTOR_CONTROL);
+    REQUIRE(GetDeviceSerialNumber(&p) == 0x0); // broadcast
+    // Should also send individual motor e-stops
+    for (uint8_t serial = 1; serial < 12; serial++) {
+      p = popCANPacket();
+      REQUIRE(PacketIsOfID(&p, ID_ESTOP));
+      REQUIRE(GetDeviceGroupCode(&p) == DEVICE_GROUP_MOTOR_CONTROL);
+      REQUIRE(GetDeviceSerialNumber(&p) == serial);
+    }
+    // Should also set wheel motor PWM to zero (mostly for use in simulation)
     p = popCANPacket();
     REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PWM_DIR_SET));
     REQUIRE(GetPWMFromPacket(&p) == 0);
