@@ -24,8 +24,10 @@ extern "C"
 
 const std::vector<uint32_t> arm_PPJRs = {
     360 * 1000, // base, unmeasured
-    360 * 1000, // shoulder, unmeasured
+
+    180 * 1000, // shoulder, rough estimate
     36 * 1000, // elbow, rough estimate
+
     360 * 1000, // forearm, unmeasured
     360 * 1000, // diff_left, unmeasured
     360 * 1000 // diff_right, unmeasured
