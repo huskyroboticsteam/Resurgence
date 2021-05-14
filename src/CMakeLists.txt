@@ -33,8 +33,8 @@ add_library(simulator_base SHARED
   simulator/graphics.cpp)
 
 add_library(simulator_nav SHARED
-  simulator/plan.cpp
-  simulator/search.cpp
+        planning/plan.cpp
+        planning/search.cpp
   )
 
 add_library(rover_common SHARED
@@ -185,7 +185,7 @@ target_link_libraries(lidarOnlyTest lidar_base lidar_slam)
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 
 add_executable(simulator_navigation_demo
-  simulator/navigation.cpp
+        planning/navigation.cpp
   )
 target_link_libraries(simulator_navigation_demo
   simulator_base simulator_nav simulator_world_interface)
