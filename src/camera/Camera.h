@@ -155,5 +155,29 @@ public:
 	std::string getDescription() const;
 	std::string getName() const;
 };
+
+/**
+   Exception for errors in the camera configuration.
+ */
+class invalid_camera_config : public std::exception {
+public:
+	/**
+	   Constructs an invalid_camera_config exception with the default message "Invalid camera
+	   configuration".
+	 */
+	invalid_camera_config();
+	/**
+	   Constructs an invalid_camera_config exception with the given message appended to
+	   "Invalid camera configuration:".
+	   @param msg The message to use for the exception.
+	 */
+	invalid_camera_config(const std::string& msg);
+	/**
+	   Returns the exception message as a C string.
+	 */
+	const char * what() const noexcept;
+private:
+	std::string _msg;
+};
 /** @} */
 } // namespace cam

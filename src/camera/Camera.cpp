@@ -51,6 +51,19 @@ Camera::Camera(const Camera &other)
 {
 }
 
+invalid_camera_config::invalid_camera_config() : _msg("Invalid camera configuration")
+{
+}
+
+invalid_camera_config::invalid_camera_config(const string &msg)
+	: _msg("Invalid camera configuration:" + msg)
+{
+}
+
+const char *invalid_camera_config::what() const noexcept
+{
+	return _msg.c_str();
+}
 void Camera::captureLoop()
 {
 	cv::Size image_size(640, 480);
