@@ -142,60 +142,6 @@ void read(const cv::FileNode &node, CameraParams &params,
 */
 void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params);
 
-/**
-   The set of all the camera parameters that are defined so far. Note that these are just
-   constants to identify a set of camera parameters; you should call getCameraParams() with one
-   of these values as an argument to get an actual CameraParams object that you can use.
-
-   Each member should have a comment describing which camera they are for and what the image
-   size is. It is important to use the correct image size.
-
-   Note that some of these are old or were just for testing and are probably subject to be
-   removed at some point in the future.
-
-   TODO: This needs to be reworked as we flesh out the camera system.
-   @deprecated Will be replaced when we move to the new camera system.
- */
-enum Params
-{
-
-	/**
-	   Params for Winston's webcam, 640x480, scale in meters
-	 */
-	WINSTON_WEBCAM_480,
-	/**
-	   Params for Evan's webcam, 1920x1080, scale in meters
-	 */
-	WEBCAM_1080,
-	/**
-	   Params for Evan's webcam, 1280x720, scale in meters
-	 */
-	WEBCAM_720,
-	/**
-	   Params for Evan's integrated laptop camera, 640x480, scale in millimeters
-	 */
-	LAPTOP,
-	/**
-	   Params for Evan's webcam, 640x480, scale in millimeters
-	 */
-	WEBCAM,
-	/**
-	   Params for Evan's new webcam, 640x480, scale in meters
-	 */
-	EVAN_NEW_WEBCAM_480,
-	/**
-	   Params for the webcam on top of the robot, 640x480, scale in meters
-	 */
-	ROBOT_TOP_WEBCAM_480
-
-};
-
-/**
-   Returns a CameraParams object corresponding to the given Params constant.
-   @deprecated Will be replaced when we move to the new camera system.
- */
-CameraParams getCameraParams(Params params);
-
 /** @} */
 
 } // namespace cam
