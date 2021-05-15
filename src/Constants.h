@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <string>
 
 // NOTE(sasha): Everything in here should be marked constexpr.
 namespace Constants
@@ -19,4 +20,6 @@ constexpr double SHOULDER_MIN = 0.0;
 constexpr double SHOULDER_MAX = M_PI * 5. / 6.; // Can't quite lie flat
 constexpr double ELBOW_MIN = 0.0;
 constexpr double ELBOW_MAX = M_PI;
+
+const std::string AR_CAMERA_CONFIG_PATH = "camera-config/MastCameraCalibration.yml";
 } // namespace Constants
