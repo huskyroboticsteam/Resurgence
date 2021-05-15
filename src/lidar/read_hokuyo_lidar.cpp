@@ -2,6 +2,7 @@
 #include "PointCloudProcessing.h"
 #include "PointGenerator.h"
 #include "URGLidar.h"
+#include "../simulator/world_interface.h"
 #include "../simulator/utils.h"
 
 bool lidar_initialized = false;
