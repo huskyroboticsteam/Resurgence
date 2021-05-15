@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "Globals.h"
+#include "log.h"
 #include "simulator/world_interface.h"
 #include "simulator/constants.h"
 
@@ -166,10 +167,6 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 
 void Autonomous::autonomyIter()
 {
-	if (!Globals::AUTONOMOUS)
-	{
-		return;
-	}
 
 	transform_t gps = readGPS(); // <--- has some heading information
 
@@ -192,6 +189,11 @@ void Autonomous::autonomyIter()
 
 	// get landmark data and filter out invalid data points
 	points_t landmarks = readLandmarks();
+	if (target.left_post_id < 0 || target.left_post_id > landmarks.size())
+	{
+		log(LOG_ERROR, "Invalid left_post_id %d\n", target.left_post_id);
+		return;
+	}
 	point_t leftPostLandmark = landmarks[target.left_post_id];
 
 	// get the latest pose estimation
@@ -206,7 +208,10 @@ void Autonomous::autonomyIter()
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 					<< std::endl;
 		landmarkFilter.reset(); // clear the cached data points
-		setCmdVel(0, 0);
+		if (Globals::AUTONOMOUS)
+		{
+			setCmdVel(0, 0);
+		}
 	}
 	else
 	{
@@ -407,7 +412,7 @@ void Autonomous::autonomyIter()
 		double thetaVel = getThetaVel(driveTarget, pose, thetaErr);
 		double driveSpeed = getLinearVel(driveTarget, pose, thetaErr);
 
-		if (!Globals::E_STOP)
+		if (!Globals::E_STOP && Globals::AUTONOMOUS)
 		{
 			setCmdVel(thetaVel, driveSpeed);
 			poseEstimator.predict(thetaVel, driveSpeed);
