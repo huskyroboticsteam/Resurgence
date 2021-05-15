@@ -271,6 +271,31 @@ std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double area
 	return ret;
 }
 
+bool QuadTree::hasPointWithin(const point_t &point, double dist) const {
+	// if the given bounding box doesn't intersect this node's area, return false
+	if (empty() || !boundsIntersect(center, width, point, dist * 2))
+	{
+		return false;
+	}
+
+	// check any points from this node
+	for (const point_t &p : points)
+	{
+		if ((p - point).topRows<2>().norm() <= dist) return true;
+	}
+
+	// search through children, if they exist
+	if (hasChildren())
+	{
+		for (const auto &child : children)
+		{
+			if (child->hasPointWithin(point, dist)) return true;
+		}
+	}
+
+	return false;
+}
+
 void QuadTree::subdivide()
 {
 	double d = width / 4;

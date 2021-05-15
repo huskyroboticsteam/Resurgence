@@ -84,12 +84,5 @@ points_t GlobalMap::getPointsWithin(const point_t &point, double dist) const
 
 bool GlobalMap::hasPointWithin(const point_t &point, double dist) const
 {
-	if (tree.empty()) {
-		return false;
-	}
-	points_t within = tree.getPointsWithin(point, dist * 2);
-	for (const point_t &p : within) {
-		if ((p - point).topRows<2>().norm() <= dist) return true;
-	}
-	return false;
+	return tree.hasPointWithin(point, dist);
 }

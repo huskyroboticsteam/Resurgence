@@ -87,6 +87,8 @@ public:
 	 */
 	point_t getClosestWithin(const point_t &point, double areaSize) const;
 
+	bool hasPointWithin(const point_t &point, double areaSize) const;
+
 	/**
 	 * Gets all points in the quadtree that lie in the axis-aligned square bounding box
 	 * centered at the given point with the given size.
