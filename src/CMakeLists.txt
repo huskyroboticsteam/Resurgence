@@ -68,6 +68,7 @@ add_library(stub_world_interface SHARED
   )
 add_library(real_world_interface SHARED
   Networking/real_world_interface.cpp
+  lidar/read_hokuyo_lidar.cpp
   )
 
 add_library(real_can_interface SHARED
@@ -88,6 +89,8 @@ target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
   real_world_interface
+  lidar_base
+  liburg_c.a
   )
 target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 

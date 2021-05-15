@@ -24,6 +24,11 @@ PointXY polarToCartesian(Polar2D p)
 	return PointXY({p.r * cosf(p.theta), p.r * sinf(p.theta)});
 }
 
+point_t polarToCartesian2(Polar2D p)
+{
+	return {p.r * cosf(p.theta), p.r * sinf(p.theta), 1.0};
+}
+
 // p is a point relative to the robot
 // heading should be in radians, 0 is north, pi/2 is east, pi is south, 3*pi/2 is west
 void localToGlobal(PointXY &p, float x_loc, float y_loc, float heading)

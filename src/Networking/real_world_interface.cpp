@@ -61,10 +61,6 @@ bool setCmdVel(double dtheta, double dx)
 
 // Everything below this line still needs to be implemented
 
-points_t readLidarScan() {
-  return {};
-}
-
 points_t readLandmarks() {
   return {};
 }
