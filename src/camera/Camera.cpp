@@ -6,6 +6,41 @@ using std::string;
 
 namespace cam
 {
+Camera::Camera()
+	: _capture(std::make_shared<cv::VideoCapture>()), _frame(std::make_shared<cv::Mat>()),
+	  _frame_num(std::make_shared<uint32_t>(0)), _frame_lock(std::make_shared<std::mutex>()),
+	  _cap_lock(std::make_shared<std::mutex>())
+{
+}
+
+bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_params)
+{
+	if (_running)
+	{
+		return false;
+	}
+	_cap_lock->lock();
+	bool result = this->_capture->open(camera_id);
+	_cap_lock->unlock();
+	this->_intrinsic_params = intrinsic_params;
+	init(extrinsic_params);
+	return result;
+}
+
+bool Camera::open(string filename, CameraParams intrinsic_params, Mat extrinsic_params)
+{
+	if (_running)
+	{
+		return false;
+	}
+	_cap_lock->lock();
+	bool result = this->_capture->open(filename);
+	_cap_lock->unlock();
+	this->_intrinsic_params = intrinsic_params;
+	init(extrinsic_params);
+	return result;
+}
+
 Camera::Camera(string filename, string name, string description, CameraParams intrinsic_params,
 			   Mat extrinsic_params)
 	: _name(name), _description(description), _intrinsic_params(intrinsic_params),
@@ -89,7 +124,7 @@ Camera openFromConfigFile(std::string filename)
 		throw invalid_camera_config(KEY_NAME + " must be present");
 	}
 	string name = (string)fs[KEY_NAME];
-	
+
 	// read description
 	string description;
 	if (!fs[KEY_DESCRIPTION].empty())

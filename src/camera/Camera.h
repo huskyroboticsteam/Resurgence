@@ -80,6 +80,11 @@ private:
 	void init(const cv::Mat &extrinsic_params);
 
 public:
+	Camera();
+	bool open(std::string filename, CameraParams intrinsic_params = CameraParams(),
+			  cv::Mat extrinsic_params = cv::Mat());
+	bool open(int camera_id, CameraParams intrinsic_params = CameraParams(),
+			  cv::Mat extrinsic_params = cv::Mat());
 	/**
 	   Constructs a Camera that will open the given file for input and have the
 	   given name and description.
@@ -159,7 +164,8 @@ public:
 /**
    Exception for errors in the camera configuration.
  */
-class invalid_camera_config : public std::exception {
+class invalid_camera_config : public std::exception
+{
 public:
 	/**
 	   Constructs an invalid_camera_config exception with the default message "Invalid camera
@@ -171,11 +177,12 @@ public:
 	   "Invalid camera configuration:".
 	   @param msg The message to use for the exception.
 	 */
-	invalid_camera_config(const std::string& msg);
+	invalid_camera_config(const std::string &msg);
 	/**
 	   Returns the exception message as a C string.
 	 */
-	const char * what() const noexcept;
+	const char *what() const noexcept;
+
 private:
 	std::string _msg;
 };
