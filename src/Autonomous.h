@@ -15,7 +15,7 @@
 #include "lidar/PointCloudProcessing.h"
 #include "simulator/graphics.h"
 #include "simulator/utils.h"
-#include "simulator/plan.h"
+#include "planning/plan.h"
 
 enum NavState {
 	INIT,
