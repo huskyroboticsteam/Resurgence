@@ -1,4 +1,4 @@
-# Camera Configuration
+# Camera Configuration {#cameraconfig}
 <!--   File is intended to be processed by Doxygen and may contain   -->
 <!--   Doxygen-specific syntax that is not valid Markdown.           -->
 

@@ -236,4 +236,14 @@ std::string Camera::getDescription() const
 	return _description;
 }
 
+void Camera::setName(std::string new_name)
+{
+	this->_name = new_name;
+}
+
+void Camera::setDescription(std::string new_description)
+{
+	this->_description = new_description;
+}
+
 } // namespace cam

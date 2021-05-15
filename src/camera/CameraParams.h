@@ -10,10 +10,30 @@ namespace cam
    @{
  */
 
+/**
+	@name Configuration File Keys
+
+	The following are constants for the keys used in the camera configuration files. See @ref
+	cameraconfig for more details.
+ */
+/**@{*/
+/**
+   Config file key for image width.
+ */
 const std::string KEY_IMAGE_WIDTH = "image_width";
+/**
+   Config file key for image height.
+ */
 const std::string KEY_IMAGE_HEIGHT = "image_height";
+/**
+   Config file key for the camera matrix.
+ */
 const std::string KEY_CAMERA_MATRIX = "camera_matrix";
+/**
+   Config file key for the distortion coefficients.
+ */
 const std::string KEY_DIST_COEFFS = "distortion_coefficients";
+/**@}*/
 
 /**
    @brief Represents a set of intrinsic camera parameters.
