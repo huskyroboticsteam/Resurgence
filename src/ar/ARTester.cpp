@@ -50,6 +50,13 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 
+	if (!parser.has("c"))
+	{
+		std::cerr << "Error: camera configuration file is required." << std::endl;
+		parser.printMessage();
+		return EXIT_FAILURE;
+	}
+
 	std::string marker_set = parser.get<std::string>("m");
 	std::transform(marker_set.begin(), marker_set.end(), marker_set.begin(), ::tolower);
 
@@ -69,9 +76,17 @@ int main(int argc, char *argv[])
 	}
 
 	cv::FileStorage cam_config(parser.get<std::string>("c"), cv::FileStorage::READ);
+	if (!cam_config.isOpened())
+	{
+		std::cerr << "Error: given camera configuration file " << parser.get<std::string>("c")
+				  << " does not exist!" << std::endl;
+		cam_config.release();
+		return EXIT_FAILURE;
+	}
 	if (cam_config[cam::KEY_INTRINSIC_PARAMS].empty())
 	{
-		std::cerr << "Intrinsic parameters are required for AR tag detection!" << std::endl;
+		std::cerr << "Error: Intrinsic parameters are required for AR tag detection!"
+				  << std::endl;
 		cam_config.release();
 		return EXIT_FAILURE;
 	}
@@ -92,7 +107,7 @@ int main(int argc, char *argv[])
 	{
 		try
 		{
-			cap = cam::Camera::openFromConfigFile(parser.get<std::string>("c"));
+			open_success = cap.openFromConfigFile(parser.get<std::string>("c"));
 		}
 		catch (cam::invalid_camera_config c)
 		{

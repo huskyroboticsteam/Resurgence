@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include <iostream>
+
 using cv::Mat;
 using cv::Size;
 using std::string;
@@ -9,18 +11,20 @@ namespace cam
 Camera::Camera()
 	: _capture(std::make_shared<cv::VideoCapture>()), _frame(std::make_shared<cv::Mat>()),
 	  _frame_num(std::make_shared<uint32_t>(0)), _frame_lock(std::make_shared<std::mutex>()),
-	  _cap_lock(std::make_shared<std::mutex>())
+	  _cap_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false))
 {
 }
 
 bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_params)
 {
-	if (_running)
+	if (*_running)
 	{
 		return false;
 	}
 	_cap_lock->lock();
+	std::cout << "Opening camera " << camera_id << "... ";
 	bool result = this->_capture->open(camera_id);
+	std::cout << (result ? "success" : "failed") << std::endl;
 	_cap_lock->unlock();
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
@@ -29,7 +33,7 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 
 bool Camera::open(string filename, CameraParams intrinsic_params, Mat extrinsic_params)
 {
-	if (_running)
+	if (*_running)
 	{
 		return false;
 	}
@@ -46,7 +50,8 @@ Camera::Camera(string filename, string name, string description, CameraParams in
 	: _name(name), _description(description), _intrinsic_params(intrinsic_params),
 	  _capture(std::make_shared<cv::VideoCapture>(filename)),
 	  _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>())
+	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>()),
+	  _running(std::make_shared<bool>(false))
 {
 	init(extrinsic_params);
 }
@@ -56,7 +61,8 @@ Camera::Camera(int camera_id, string name, string description, CameraParams intr
 	: _name(name), _description(description), _intrinsic_params(intrinsic_params),
 	  _capture(std::make_shared<cv::VideoCapture>(camera_id)),
 	  _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>())
+	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>()),
+	  _running(std::make_shared<bool>(false))
 {
 	init(extrinsic_params);
 }
@@ -68,13 +74,17 @@ void Camera::init(const Mat &extrinsic_params)
 		throw std::invalid_argument("extrinsic_params must be 4x4 if given");
 	}
 	extrinsic_params.copyTo(this->_extrinsic_params);
-	_running = std::make_shared<bool>(true);
-	_thread = std::shared_ptr<std::thread>(new std::thread(&Camera::captureLoop, this),
-										   [this](std::thread *p) {
-											   *(this->_running) = false;
-											   p->join();
-											   delete p;
-										   });
+	*(this->_running) = true;
+	this->_thread = std::shared_ptr<std::thread>(
+		new std::thread(&Camera::captureLoop, this), [this](std::thread *p) {
+			if (*(this->_running))
+			{
+				std::cout << "shutting down camera thread" << std::endl;
+				*(this->_running) = false;
+				p->join();
+			}
+			delete p;
+		});
 }
 
 Camera::Camera(const Camera &other)
@@ -91,7 +101,7 @@ invalid_camera_config::invalid_camera_config() : _msg("Invalid camera configurat
 }
 
 invalid_camera_config::invalid_camera_config(const string &msg)
-	: _msg("Invalid camera configuration:" + msg)
+	: _msg("Invalid camera configuration: " + msg)
 {
 }
 
@@ -100,48 +110,45 @@ const char *invalid_camera_config::what() const noexcept
 	return _msg.c_str();
 }
 
-Camera Camera::openFromConfigFile(std::string filename)
+bool Camera::openFromConfigFile(std::string filename)
 {
 	cv::FileStorage fs(filename, cv::FileStorage::READ);
 
 	// read intrinsic parameters
-	CameraParams intrinsics;
 	if (!fs[KEY_INTRINSIC_PARAMS].empty())
 	{
-		fs[KEY_INTRINSIC_PARAMS] >> intrinsics;
+		fs[KEY_INTRINSIC_PARAMS] >> _intrinsic_params;
 	}
 
 	// read extrinsic parameters
-	cv::Mat extrinsics;
 	if (!fs[KEY_EXTRINSIC_PARAMS].empty())
 	{
-		fs[KEY_EXTRINSIC_PARAMS] >> extrinsics;
+		fs[KEY_EXTRINSIC_PARAMS] >> _extrinsic_params;
 	}
 
 	// read name
-	if (!fs[KEY_NAME].empty())
+	if (fs[KEY_NAME].empty())
 	{
 		throw invalid_camera_config(KEY_NAME + " must be present");
 	}
-	string name = (string)fs[KEY_NAME];
+	_name = (string)fs[KEY_NAME];
 
 	// read description
-	string description;
 	if (!fs[KEY_DESCRIPTION].empty())
 	{
-		description = (string)fs[KEY_DESCRIPTION];
+		_description = (string)fs[KEY_DESCRIPTION];
 	}
 
 	// read filename or camera ID, and open camera.
 	if (!fs[KEY_FILENAME].empty())
 	{
 		string cam_file = (string)fs[KEY_FILENAME];
-		return Camera(cam_file, name, description, intrinsics, extrinsics);
+		return this->open(cam_file);
 	}
 	else if (!fs[KEY_CAMERA_ID].empty())
 	{
 		int cam_id = (int)fs[KEY_CAMERA_ID];
-		return Camera(cam_id, name, description, intrinsics, extrinsics);
+		return this->open(cam_id);
 	}
 	else
 	{
