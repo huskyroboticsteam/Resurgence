@@ -274,7 +274,6 @@ void Autonomous::autonomyIter()
 			mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
 		}
 
-		// TODO: there's still an issue with the planning lagging out and messing up everything
 		if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
 			point_t point_t_goal;
 			point_t_goal.topRows(2) = driveTarget.topRows(2);
@@ -282,12 +281,11 @@ void Autonomous::autonomyIter()
 			point_t_goal = toTransform(pose) * point_t_goal;
 			double goal_radius = 2.0;
 			plan_t new_plan = getPlan([&](double x, double y, double radius)->bool {
+				// transform the point to check into map space
 				point_t relPoint = {x, y, 1};
 				point_t p = invTransform * relPoint;
 				return map.hasPointWithin(p, radius);
 			}, point_t_goal, goal_radius);
-			// TODO: remove this line once it gets ironed out
-//			plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
 			double new_plan_cost = planCostFromIndex(new_plan, 0);
 			// we want a significant improvement to avoid thrash
 			if (new_plan_cost < plan_cost * 0.8) {
