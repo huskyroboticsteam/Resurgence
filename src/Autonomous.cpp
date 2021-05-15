@@ -40,7 +40,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_idx(0),
 		search_theta_increment(PI / 4),
 		already_arrived(false),
-	  	mapUpdateCounter(0),
+	  	mapLoopCounter(0),
 	  	mapBlindPeriod(15),
 	  	mapDoesOverlap(false),
 	  	mapOverlapSampleThreshold(15),
@@ -269,11 +269,10 @@ void Autonomous::autonomyIter()
 
 		const points_t lidar_scan = readLidarScan();
 
-		if (mapUpdateCounter > mapBlindPeriod) {
+		if (mapLoopCounter++ > mapBlindPeriod) {
 			map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
 			mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
 		}
-		points_t mapPoints = map.getPointsWithin({pose.x(), pose.y(), 1}, 10);
 
 		// TODO: there's still an issue with the planning lagging out and messing up everything
 		if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {

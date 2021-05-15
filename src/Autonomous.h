@@ -50,7 +50,7 @@ private:
 	int plan_idx;
 	double search_theta_increment;
 	bool already_arrived;
-	int mapUpdateCounter; // number of times the map has been updated
+	int mapLoopCounter; // number of times the map has been updated
 	int mapBlindPeriod; // the number of loops to wait before starting to build the map
 	bool mapDoesOverlap;
 	int mapOverlapSampleThreshold; // at least these many points required to overlap map
