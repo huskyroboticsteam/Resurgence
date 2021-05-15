@@ -100,7 +100,7 @@ const char *invalid_camera_config::what() const noexcept
 	return _msg.c_str();
 }
 
-Camera openFromConfigFile(std::string filename)
+Camera Camera::openFromConfigFile(std::string filename)
 {
 	cv::FileStorage fs(filename, cv::FileStorage::READ);
 

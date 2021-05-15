@@ -185,6 +185,19 @@ public:
 	   objects sharing access are destroyed, the camera will be closed.
 	 */
 	Camera(const Camera &other);
+
+	/**
+	   @brief Opens and returns a camera using the given configuration file.
+
+	   @param filename The path to the configuration file to open and
+	   read. Configuration file should be formatted as described in @ref
+	   cameraconfig.
+
+	   @throws invalid_camera_config If the configuration is invalid for any
+	   reason.
+	*/
+	static Camera openFromConfigFile(std::string filename);
+
 	/**
 	   @brief Returns true if the camera is open.
 	 */
@@ -277,8 +290,6 @@ public:
 private:
 	std::string _msg;
 };
-
-Camera openFromConfigFile(std::string filename);
 
 /** @} */
 } // namespace cam
