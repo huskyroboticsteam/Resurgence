@@ -179,5 +179,8 @@ public:
 private:
 	std::string _msg;
 };
+
+Camera openFromConfigFile(std::string filename);
+
 /** @} */
 } // namespace cam

@@ -64,6 +64,57 @@ const char *invalid_camera_config::what() const noexcept
 {
 	return _msg.c_str();
 }
+
+Camera openFromConfigFile(std::string filename)
+{
+	cv::FileStorage fs(filename, cv::FileStorage::READ);
+
+	// read intrinsic parameters
+	CameraParams intrinsics;
+	if (!fs[KEY_INTRINSIC_PARAMS].empty())
+	{
+		fs[KEY_INTRINSIC_PARAMS] >> intrinsics;
+	}
+
+	// read extrinsic parameters
+	cv::Mat extrinsics;
+	if (!fs[KEY_EXTRINSIC_PARAMS].empty())
+	{
+		fs[KEY_EXTRINSIC_PARAMS] >> extrinsics;
+	}
+
+	// read name
+	if (!fs[KEY_NAME].empty())
+	{
+		throw invalid_camera_config(KEY_NAME + " must be present");
+	}
+	string name = (string)fs[KEY_NAME];
+	
+	// read description
+	string description;
+	if (!fs[KEY_DESCRIPTION].empty())
+	{
+		description = (string)fs[KEY_DESCRIPTION];
+	}
+
+	// read filename or camera ID, and open camera.
+	if (!fs[KEY_FILENAME].empty())
+	{
+		string cam_file = (string)fs[KEY_FILENAME];
+		return Camera(cam_file, name, description, intrinsics, extrinsics);
+	}
+	else if (!fs[KEY_CAMERA_ID].empty())
+	{
+		int cam_id = (int)fs[KEY_CAMERA_ID];
+		return Camera(cam_id, name, description, intrinsics, extrinsics);
+	}
+	else
+	{
+		throw invalid_camera_config("One of " + KEY_FILENAME + " or " + KEY_CAMERA_ID +
+									" must be present");
+	}
+}
+
 void Camera::captureLoop()
 {
 	cv::Size image_size(640, 480);
