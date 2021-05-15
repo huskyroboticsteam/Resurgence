@@ -1,6 +1,8 @@
 #include "../../src/worldmap/GlobalMap.h"
 
 #include <iostream>
+#include <cmath>
+#include <cfloat>
 
 #include <catch2/catch.hpp>
 
@@ -40,7 +42,7 @@ TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 
-	GlobalMap map;
+	GlobalMap map(1000);
 	points_t points;
 
 	constexpr int areaMin = -5;
@@ -75,6 +77,13 @@ TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
 
 		point_t closestMap = map.getClosest(point);
 		REQUIRE(closest == closestMap);
+		REQUIRE(map.hasPointWithin(point, minDist));
+
+		REQUIRE(map.hasPointWithin(point, std::nextafter(minDist, DBL_MAX)));
+		REQUIRE_FALSE(map.hasPointWithin(point, std::nextafter(minDist, 0)));
+
+		REQUIRE(map.hasPointWithin(point, minDist * 2));
+		REQUIRE_FALSE(map.hasPointWithin(point, minDist / 2.0));
 	}
 }
 
@@ -82,7 +91,7 @@ TEST_CASE("Global Map", "[GlobalMap]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 
-	GlobalMap map;
+	GlobalMap map(1000);
 	points_t allPoints;
 	// create 5 groups of points for aligning with each other, all in same area
 	for (int i = 0; i < 5; i++)
@@ -120,7 +129,7 @@ TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
 	// we'll be getting points along the sin function
 	std::function<double(double)> func = [](double x) { return sin(x); };
 
-	GlobalMap map;
+	GlobalMap map(1000);
 	points_t truths;
 	// create 5 groups of points for aligning, each partially overlapping with the last
 	for (int i = -2; i <= 2; i++)

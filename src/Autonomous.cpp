@@ -28,7 +28,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		target(_target),
 		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
-	  	map(),
+	  	map(10000),
 		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter(),

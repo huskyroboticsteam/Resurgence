@@ -35,7 +35,7 @@ TEST_CASE("Trimmed ICP")
 		sample.push_back(p);
 	}
 
-	GlobalMap globalMap;
+	GlobalMap globalMap(1000);
 	globalMap.addPoints(transform_t::Identity(), map, 1);
 
 	TrICP icp(25, 0.005, std::bind(&GlobalMap::getClosest, &globalMap, std::placeholders::_1));

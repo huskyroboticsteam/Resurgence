@@ -16,12 +16,14 @@ public:
 	/**
 	 * Creates a new GlobalMap object, for use with building global lidar point clouds.
 	 *
+	 * @param areaSize The side length of the square represented by this global map. The units
+	 * 			don't matter, as long as they're consistent with the data.
 	 * @param maxIter Maximum iterations allowed for fitting new samples to the map
 	 * @param relErrChangeThresh Minimum relative error change threshold for fitting new
 	 * samples to the map. Iteration will terminate early if the relative change in error
 	 * drops below this amount.
 	 */
-	explicit GlobalMap(int maxIter = 25, double relErrChangeThresh = 0.005);
+	explicit GlobalMap(double areaSize, int maxIter = 25, double relErrChangeThresh = 0.005);
 	/**
 	 * Register the given points into the global map.
 	 *
@@ -42,7 +44,7 @@ public:
 	 */
 	points_t getPoints() const;
 	/**
-	 * Get the point in the point cloud closest (as determined by L1 norm) to the given point.
+	 * Get the point in the point cloud closest to the given point.
 	 *
 	 * @param point The point for which the closest point will be found.
 	 * @return The closest point, or [0,0,0] if no points are in this map.

@@ -7,8 +7,8 @@
  * transforming the map to fit the latest sample worked terribly.
  */
 
-GlobalMap::GlobalMap(int maxIter, double relErrChangeThresh)
-	: tree(10000),
+GlobalMap::GlobalMap(double areaSize, int maxIter, double relErrChangeThresh)
+	: tree(areaSize),
 	  icp(maxIter, relErrChangeThresh,
 		  std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
@@ -42,6 +42,7 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 			transform_t mapAdjustment = icp.correct(transformed, overlap);
 			// just transform the sample instead of the map (yes i know there are some
 			// unnecessary inversions going on but I'll fix that later)
+			// TODO: fix the double inversions
 			transform_t adj = mapAdjustment.inverse();
 			for (point_t &p : transformed)
 			{
@@ -52,7 +53,7 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 
 	// add to global map
 	for (const point_t &p : transformed) {
-		tree.add(p);
+		assert(tree.add(p));
 	}
 }
 
@@ -71,9 +72,11 @@ points_t GlobalMap::getPointsWithin(const point_t &point, double dist) const
 	points_t points;
 	if (!tree.empty())
 	{
-		points_t within = tree.getPointsWithin(point, dist * 2 * sqrt(2));
+		points_t within = tree.getPointsWithin(point, dist * 2);
 		for (const point_t &p1 : within) {
-			points.push_back(p1);
+			if ((p1 - point).topRows<2>().norm() <= dist) {
+				points.push_back(p1);
+			}
 		}
 	}
 	return points;
@@ -84,5 +87,9 @@ bool GlobalMap::hasPointWithin(const point_t &point, double dist) const
 	if (tree.empty()) {
 		return false;
 	}
-	return (getClosest(point) - point).topRows<2>().norm() <= dist;
+	points_t within = tree.getPointsWithin(point, dist * 2);
+	for (const point_t &p : within) {
+		if ((p - point).topRows<2>().norm() <= dist) return true;
+	}
+	return false;
 }
