@@ -1,5 +1,6 @@
 #include "../../src/worldmap/TrICP.h"
 
+#include <Eigen/LU>
 #include <iostream>
 
 #include <catch2/catch.hpp>
@@ -43,7 +44,7 @@ TEST_CASE("Trimmed ICP")
 	transform_t trfApprox = icp.correct(sample, 0.3);
 	transform_t trfInv = trf.inverse();
 
-	double mse =(trfInv - trfApprox).array().square().mean();
+	double mse = (trfInv - trfApprox).array().square().mean();
 	std::cout << "TrICP MSE: " << mse << std::endl;
 	CHECK(mse == Approx(0).margin(0.01));
 }
