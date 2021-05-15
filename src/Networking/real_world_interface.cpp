@@ -70,10 +70,6 @@ points_t readLandmarks() {
   return lms;
 }
 
-transform_t readGPS() {
-  return toTransform({0,0,0});
-}
-
 transform_t readOdom() {
   return toTransform({0,0,0});
 }
