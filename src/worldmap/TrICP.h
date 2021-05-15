@@ -37,9 +37,16 @@ public:
 	transform_t correct(const points_t &sample, double overlap);
 
 private:
+	// maximum number of iterations to use
 	int maxIter;
+	// if the relative error change drops below this threshold, stop iterating
 	double relErrChangeThresh;
+	// find the closest point in the reference to the given point
 	std::function<point_t(const point_t &)> getClosest;
+
+	// performs a single iteration of point cloud registration, returning the computed transform
 	transform_t iterate(points_t &sample, int N, double &mse) const;
+
+	// returns true iff any of the stopping conditions are met
 	bool isDone(int numIter, double S, double oldMSE) const;
 };

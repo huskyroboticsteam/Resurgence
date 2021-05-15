@@ -87,6 +87,16 @@ public:
 	 */
 	point_t getClosestWithin(const point_t &point, double areaSize) const;
 
+	/**
+	 * Checks if the given point has at least one point within the given distance from it.
+	 * Although it's functionally equivalent to checking the size of the vector returned by
+	 * getPointsWithin(), it is much cheaper to call this method.
+	 *
+	 * @param point The point to check if it has a nearby point.
+	 * @param dist The distance within which to search.
+	 * @return True iff there exists a point in the tree, which may be the given point, within
+	 * the given distance from the given point. False otherwise.
+	 */
 	bool hasPointWithin(const point_t &point, double areaSize) const;
 
 	/**

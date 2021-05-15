@@ -24,6 +24,7 @@ public:
 	 * drops below this amount.
 	 */
 	explicit GlobalMap(double areaSize, int maxIter = 25, double relErrChangeThresh = 0.005);
+
 	/**
 	 * Register the given points into the global map.
 	 *
@@ -36,6 +37,7 @@ public:
 	 * with no feature matching.
 	 */
 	void addPoints(const transform_t &robotTrf, const points_t &points, double overlap);
+
 	/**
 	 * Get the points in the global map. This vector is a copy, so modifying it will not
 	 * harm this class.
@@ -43,6 +45,7 @@ public:
 	 * @return A vector of points in the 2D point map.
 	 */
 	points_t getPoints() const;
+
 	/**
 	 * Get the point in the point cloud closest to the given point.
 	 *
@@ -51,8 +54,25 @@ public:
 	 */
 	point_t getClosest(const point_t &point) const;
 
+	/**
+	 * Gets all points in the map within the given distance (inclusive) from the given point.
+	 *
+	 * @param point The point to find the nearby points for.
+	 * @param dist The distance within which to search.
+	 * @return A vector of points that are within the given distance from the given point.
+	 */
 	points_t getPointsWithin(const point_t &point, double dist) const;
 
+	/**
+	 * Checks if the given point has at least one point within the given distance from it.
+	 * Although it's functionally equivalent to checking the size of the vector returned by
+	 * getPointsWithin(), it is much cheaper to call this method.
+	 *
+	 * @param point The point to check if it has a nearby point.
+	 * @param dist The distance within which to search.
+	 * @return True iff there exists a point in the map, which may be the given point, within
+	 * the given distance from the given point. False otherwise.
+	 */
 	bool hasPointWithin(const point_t &point, double dist) const;
 
 private:
