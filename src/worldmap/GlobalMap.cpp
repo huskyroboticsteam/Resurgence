@@ -39,11 +39,8 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 	{
 		if (overlap > 0)
 		{
-			transform_t mapAdjustment = icp.correct(transformed, overlap);
-			// just transform the sample instead of the map (yes i know there are some
-			// unnecessary inversions going on but I'll fix that later)
-			// TODO: fix the double inversions
-			transform_t adj = mapAdjustment.inverse();
+			// find the transformation from the sample to the map
+			transform_t adj = icp.correct(transformed, overlap);
 			for (point_t &p : transformed)
 			{
 				p = adj * p;
