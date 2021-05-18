@@ -43,7 +43,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
 		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
 		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
-		lidar_pub(this->create_publisher<geometry_msgs::msg::Point>("lidar_scan", 100)),
+		lidar_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("lidar_scan", 100)),
 		landmarks_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("landmarks", 100))
 {
 }
@@ -76,12 +76,29 @@ pose_t Autonomous::poseToDraw(pose_t &pose, pose_t &current_pose) const
 	return toPose(toTransform(pose) * inv_curr * VIZ_BASE_TF, 0);
 }
 
-void Autonomous::publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const
+void Autonomous::publish(Eigen::Vector3d pose,
+		rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const
 {
 	auto message = geometry_msgs::msg::Point();
 	message.x = pose(0);
 	message.y = pose(1);
 	message.z = pose(2);
+	publisher->publish(message);
+}
+
+void Autonomous::publish_array(const points_t &points,
+		rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr &publisher) const
+{
+	auto message = geometry_msgs::msg::PoseArray();
+	message.header.frame_id = ROVER_FRAME; // technically this is in the window frame actually
+	// but we'll figure out our transform situation later
+	for (point_t l : points) {
+		auto p = geometry_msgs::msg::Pose();
+		p.position.x = l(0);
+		p.position.y = l(1);
+		p.position.z = l(2);
+		message.poses.push_back(p);
+	}
 	publisher->publish(message);
 }
 
@@ -288,23 +305,11 @@ void Autonomous::autonomyIter()
 
 		// Send lidar points to visualization
 		const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
-		for (point_t point : lidar_scan_transformed)
-		{
-			publish(point, lidar_pub);
-		}
-		const points_t landmarks_transformed = transformReadings(landmarks, VIZ_BASE_TF);
+		log(LOG_DEBUG, "Publishing %d lidar points\n", lidar_scan_transformed.size());
+		publish_array(lidar_scan_transformed, lidar_pub);
 
-		auto message = geometry_msgs::msg::PoseArray();
-		message.header.frame_id = ROVER_FRAME; // technically this is in the window frame actually
-		// but we'll figure out our transform situation later
-		for (point_t l : landmarks_transformed) {
-			auto p = geometry_msgs::msg::Pose();
-			p.position.x = l(0);
-			p.position.y = l(1);
-			p.position.z = l(2);
-			message.poses.push_back(p);
-		}
-		landmarks_pub->publish(message);
+		const points_t landmarks_transformed = transformReadings(landmarks, VIZ_BASE_TF);
+		publish_array(landmarks_transformed, landmarks_pub);
 
 		// Send current pose to visualization
 		const pose_t curr_pose_transformed = poseToDraw(pose, pose);
