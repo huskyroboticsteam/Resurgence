@@ -9,6 +9,8 @@
 namespace lidar
 {
 
+const double LIDAR_METERS_PER_TICK = 0.001; // 1 mm resolution
+
 bool approxEqual(PointXY p, PointXY q)
 {
 	return fabs(p.x - q.x) < 1e-4 && fabs(p.y - q.y) < 1e-4;
@@ -26,7 +28,10 @@ PointXY polarToCartesian(Polar2D p)
 
 point_t polarToCartesian2(Polar2D p)
 {
-	return {p.r * cosf(p.theta), p.r * sinf(p.theta), 1.0};
+	double x = p.r * cos(p.theta);
+	double y = p.r * sin(p.theta);
+	point_t ret({x*LIDAR_METERS_PER_TICK, y*LIDAR_METERS_PER_TICK, 1.0});
+	return ret;
 }
 
 // p is a point relative to the robot

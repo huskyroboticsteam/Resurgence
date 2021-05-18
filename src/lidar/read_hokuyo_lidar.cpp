@@ -29,9 +29,9 @@ points_t readLidarScan() {
 
   std::vector<Polar2D> polarPts = urg_lidar.getLastFrame();
   std::vector<point_t> pts(polarPts.size());
-  for (Polar2D p : polarPts)
+  for (int i = 0; i < polarPts.size(); i++)
   {
-    pts.push_back(lidar::polarToCartesian2(p));
+    pts[i] = lidar::polarToCartesian2(polarPts[i]);
   }
 
   return pts;
