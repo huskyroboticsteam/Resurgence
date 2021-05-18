@@ -10,5 +10,5 @@ namespace Globals {
   nlohmann::json status_data;
   nlohmann::json motor_status;
   bool E_STOP = false;
-  bool AUTONOMOUS = true;
+  bool AUTONOMOUS = false;
 }

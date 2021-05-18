@@ -51,7 +51,7 @@ private:
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;
-	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr lidar_pub;
+	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr lidar_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
 
 	// determine direction for robot at any given iteration
@@ -62,6 +62,9 @@ private:
 	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
 	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
-	void publish(Eigen::Vector3d pose, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
+	void publish(Eigen::Vector3d pose,
+			rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
+	void publish_array(const points_t &points,
+			rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr &publisher) const;
 
 };
