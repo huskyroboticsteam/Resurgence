@@ -28,8 +28,8 @@ PointXY polarToCartesian(Polar2D p)
 
 point_t polarToCartesian2(Polar2D p)
 {
-	double x = p.r * cos(p.theta);
-	double y = p.r * sin(p.theta);
+	double x = p.r * cos(p.theta - M_PI/2);
+	double y = p.r * sin(p.theta - M_PI/2);
 	point_t ret({x*LIDAR_METERS_PER_TICK, y*LIDAR_METERS_PER_TICK, 1.0});
 	return ret;
 }

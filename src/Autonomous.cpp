@@ -285,21 +285,23 @@ void Autonomous::autonomyIter()
 		}
 
 		const points_t lidar_scan = readLidarScan();
-		if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
-			point_t point_t_goal;
-			point_t_goal.topRows(2) = driveTarget.topRows(2);
-			point_t_goal(2) = 1.0;
-			point_t_goal = toTransform(pose) * point_t_goal;
-			double goal_radius = 2.0;
-			plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
-			double new_plan_cost = planCostFromIndex(new_plan, 0);
-			// we want a significant improvement to avoid thrash
-			if (new_plan_cost < plan_cost * 0.8) {
-				plan_idx = 0;
-				plan_base = pose;
-				plan_cost = new_plan_cost;
-				plan = new_plan;
-				time_since_plan = 0;
+		if (Globals::AUTONOMOUS) {
+			if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
+				point_t point_t_goal;
+				point_t_goal.topRows(2) = driveTarget.topRows(2);
+				point_t_goal(2) = 1.0;
+				point_t_goal = toTransform(pose) * point_t_goal;
+				double goal_radius = 2.0;
+				plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+				double new_plan_cost = planCostFromIndex(new_plan, 0);
+				// we want a significant improvement to avoid thrash
+				if (new_plan_cost < plan_cost * 0.8) {
+					plan_idx = 0;
+					plan_base = pose;
+					plan_cost = new_plan_cost;
+					plan = new_plan;
+					time_since_plan = 0;
+				}
 			}
 		}
 
