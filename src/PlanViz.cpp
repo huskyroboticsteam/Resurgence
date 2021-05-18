@@ -47,7 +47,7 @@ private:
 	{
 		points_t lidar {};
 		for (auto l : message->poses) {
-			lidar.push_back({l.position.x, l.position.y, l.position.x});
+			lidar.push_back({l.position.x, l.position.y, l.position.z});
 		}
 		viz_window.drawPoints(lidar, sf::Color::Red, 3);
 	}
@@ -56,7 +56,7 @@ private:
 	{
 		points_t landmarks {};
 		for (auto l : message->poses) {
-			landmarks.push_back({l.position.x, l.position.y, l.position.x});
+			landmarks.push_back({l.position.x, l.position.y, l.position.z});
 		}
 		viz_window.drawPoints(landmarks, sf::Color::Blue, 5);
 	}
