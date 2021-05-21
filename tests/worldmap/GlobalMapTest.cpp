@@ -38,6 +38,24 @@ double calculateMSE(const points_t &p1, const points_t &p2)
 }
 } // namespace
 
+TEST_CASE("Global Map - ScanStride", "[GlobalMap]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+
+	for (int i = 1; i <= 3; i++) {
+		GlobalMap map(1000, i);
+		points_t points;
+		for (int j = 0; j < i * 1000; j++) {
+			point_t point = {rand(-100, 100), rand(-100, 100), 1};
+			points.push_back(point);
+		}
+		map.addPoints(transform_t::Identity(), points, 0);
+
+		REQUIRE(map.size() == 1000);
+		REQUIRE(map.getPoints().size() == 1000);
+	}
+}
+
 TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)

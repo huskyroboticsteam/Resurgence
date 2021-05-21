@@ -7,8 +7,9 @@
  * transforming the map to fit the latest sample worked terribly.
  */
 
-GlobalMap::GlobalMap(double areaSize, int maxIter, double relErrChangeThresh)
+GlobalMap::GlobalMap(double areaSize, int scanStride, int maxIter, double relErrChangeThresh)
 	: tree(areaSize),
+	  scanStride(scanStride),
 	  icp(maxIter, relErrChangeThresh,
 		  std::bind(&GlobalMap::getClosest, this, std::placeholders::_1))
 {
@@ -19,6 +20,11 @@ points_t GlobalMap::getPoints() const
 	return tree.getAllPoints();
 }
 
+size_t GlobalMap::size() const
+{
+	return tree.getSize();
+}
+
 void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, double overlap)
 {
 	if (toAdd.empty())
@@ -27,8 +33,9 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 	}
 	transform_t trfInv = robotTrf.inverse();
 	points_t transformed;
-	for (const point_t &point : toAdd)
+	for (int i = 0; i < toAdd.size(); i += scanStride)
 	{
+		const point_t &point = toAdd[i];
 		if (point(2) != 0)
 		{
 			transformed.push_back(trfInv * point);

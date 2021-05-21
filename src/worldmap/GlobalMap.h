@@ -18,12 +18,15 @@ public:
 	 *
 	 * @param areaSize The side length of the square represented by this global map. The units
 	 * 			don't matter, as long as they're consistent with the data.
+	 * @param scanStride Indicates the amount of points per scan to ignore. The number of points
+	 * kept from each scan is 1/scanStride, rounded down.
 	 * @param maxIter Maximum iterations allowed for fitting new samples to the map
 	 * @param relErrChangeThresh Minimum relative error change threshold for fitting new
 	 * samples to the map. Iteration will terminate early if the relative change in error
 	 * drops below this amount.
 	 */
-	explicit GlobalMap(double areaSize, int maxIter = 25, double relErrChangeThresh = 0.005);
+	explicit GlobalMap(double areaSize, int scanStride = 1, int maxIter = 25,
+					   double relErrChangeThresh = 0.005);
 
 	/**
 	 * Register the given points into the global map.
@@ -45,6 +48,13 @@ public:
 	 * @return A vector of points in the 2D point map.
 	 */
 	points_t getPoints() const;
+
+	/**
+	 * Gets the number of points stored in this map.
+	 *
+	 * @return The size of this map.
+	 */
+	size_t size() const;
 
 	/**
 	 * Get the point in the point cloud closest to the given point.
@@ -78,4 +88,5 @@ public:
 private:
 	QuadTree tree;
 	TrICP icp;
+	int scanStride;
 };
