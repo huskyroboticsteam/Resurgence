@@ -72,10 +72,31 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="keyword">namespace </span>util</div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;{</div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="keywordtype">bool</span> almostEqual(<span class="keywordtype">double</span> a, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> threshold = 1e-6);</div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;}</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;chrono&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>util</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keywordtype">bool</span> almostEqual(<span class="keywordtype">double</span> a, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> threshold = 1e-6);</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="classutil_1_1ScopedTimer.html">   14</a></span>&#160;<span class="keyword">class </span><a class="code" href="classutil_1_1ScopedTimer.html">ScopedTimer</a></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;{</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">ScopedTimer</a>(std::string name);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">ScopedTimer</a>();</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    ~<a class="code" href="classutil_1_1ScopedTimer.html">ScopedTimer</a>();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    std::chrono::microseconds <a class="code" href="classutil_1_1ScopedTimer.html#a8b5106706ff6007114bf545852b2b5cc">elapsedTime</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    std::chrono::time_point&lt;std::chrono::high_resolution_clock&gt; startTime;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    std::string name;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;} <span class="comment">// namespace util</span></div>
+<div class="ttc" id="aclassutil_1_1ScopedTimer_html"><div class="ttname"><a href="classutil_1_1ScopedTimer.html">util::ScopedTimer</a></div><div class="ttdef"><b>Definition:</b> Util.h:15</div></div>
+<div class="ttc" id="aclassutil_1_1ScopedTimer_html_a74471e10bbfdba342fe8e94131915349"><div class="ttname"><a href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">util::ScopedTimer::ScopedTimer</a></div><div class="ttdeci">ScopedTimer()</div><div class="ttdef"><b>Definition:</b> Util.cpp:17</div></div>
+<div class="ttc" id="aclassutil_1_1ScopedTimer_html_a8b5106706ff6007114bf545852b2b5cc"><div class="ttname"><a href="classutil_1_1ScopedTimer.html#a8b5106706ff6007114bf545852b2b5cc">util::ScopedTimer::elapsedTime</a></div><div class="ttdeci">std::chrono::microseconds elapsedTime() const</div><div class="ttdef"><b>Definition:</b> Util.cpp:31</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
