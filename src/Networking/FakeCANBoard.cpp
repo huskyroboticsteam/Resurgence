@@ -26,6 +26,7 @@ int main() {
   uint8_t motor_group = 0x04;
   int test_type = prompt("What are you testing? (0 for MODE SET, 1 for PWM, 2 for PID)");
   int serial = prompt("Enter motor serial");
+  bool mode_has_been_set = false;
 
   while(1) {
     if (test_type == TEST_MODE_SET) {
@@ -46,18 +47,22 @@ int main() {
       // Don't send all five packets at once. On some motor boards, the CAN buffer
       // only fits four packets.
 
-      AssembleModeSetPacket(&p, motor_group, (uint8_t) serial, (uint8_t) 0x1);
-      sendCANPacket(p);
+      if (!mode_has_been_set) {
+          // AVR board firmware resets the angle target every time it receives a
+          // mode set packet, so we only want to send this once.
+          AssembleModeSetPacket(&p, motor_group, (uint8_t) serial, (uint8_t) 0x1);
+          sendCANPacket(p);
+          mode_has_been_set = true;
+      }
 
       int p_coeff = prompt("P");
+      int i_coeff = prompt("I");
+      int d_coeff = prompt("D");
+
       AssemblePSetPacket(&p, motor_group, (uint8_t) serial, p_coeff);
       sendCANPacket(p);
-
-      int i_coeff = prompt("I");
       AssembleISetPacket(&p, motor_group, (uint8_t) serial, i_coeff);
       sendCANPacket(p);
-
-      int d_coeff = prompt("D");
       AssembleDSetPacket(&p, motor_group, (uint8_t) serial, d_coeff);
       sendCANPacket(p);
 

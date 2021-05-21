@@ -10,6 +10,7 @@
 #include "simulator/world_interface.h"
 #include "Networking/CANUtils.h"
 #include "Networking/ParseCAN.h"
+#include "log.h"
 
 extern "C"
 {
@@ -33,6 +34,7 @@ void cleanup(int signum) {
 
 int main(int argc, char** argv)
 {
+    LOG_LEVEL = LOG_INFO;
     world_interface_init();
     InitializeRover(MOTOR_UNIT_MODE_PID, false);
     struct timeval tp0, tp_start;
@@ -68,8 +70,8 @@ int main(int argc, char** argv)
     sendCANPacket(p);
 
     double timestep = 0.0;
-    double period = 3.0;
-    double amplitude = 15 * 1000.0; // in 1000th's of degrees
+    double period = 2.0;
+    double amplitude = 10 * 1000.0; // in 1000th's of degrees
             // (doesn't make sense for hand motor, but that doesn't use PID)
 
     usleep(300 * 1000); // wait for encoder position data to arrive
@@ -81,7 +83,7 @@ int main(int argc, char** argv)
     double acc_error = 0.0;
     int total_steps = 0;
 
-    while (total_steps < 30)
+    while (total_steps < 60)
     {
         gettimeofday(&tp_start, NULL);
 
@@ -111,5 +113,6 @@ int main(int argc, char** argv)
             std::cout << "Can't keep up with control frequency! Desired " << desiredUsecs/1000 << " elapsed " << elapsedUsecs/1000 << std::endl;
         }
     }
+    std::cout << "RMSE: " << sqrt(acc_error / total_steps) << std::endl;
     return 0;
 }

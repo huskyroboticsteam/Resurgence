@@ -33,6 +33,18 @@ const std::vector<uint32_t> arm_PPJRs = {
     360 * 1000 // diff_right, unmeasured
 };
 
+// So far only the shoulder has been tuned (and only roughly, at that)
+// base, shoulder, elbow, forearm, diff_left, diff_right
+const std::vector<int32_t> arm_Ps = {
+   0,    100,      0,     0,       0,         0
+};
+const std::vector<int32_t> arm_Is = {
+   0,      0,      0,     0,       0,         0
+};
+const std::vector<int32_t> arm_Ds = {
+   0,   1000,      0,     0,       0,         0
+};
+
 void initEncoders(bool zero_encoders)
 {
     CANPacket p;
@@ -64,6 +76,18 @@ void setArmMode(uint8_t mode)
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
+      if (mode == MOTOR_UNIT_MODE_PID) {
+          int p_coeff = arm_Ps[serial-1];
+          int i_coeff = arm_Is[serial-1];
+          int d_coeff = arm_Ds[serial-1];
+          AssemblePSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, p_coeff);
+          sendCANPacket(p);
+          AssembleISetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, i_coeff);
+          sendCANPacket(p);
+          AssembleDSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, d_coeff);
+          sendCANPacket(p);
+          usleep(1000); // We're running out of CAN buffer space
+      }
     }
 }
 
