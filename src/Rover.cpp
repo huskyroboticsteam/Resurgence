@@ -33,16 +33,20 @@ const std::vector<uint32_t> arm_PPJRs = {
     360 * 1000 // diff_right, unmeasured
 };
 
-// So far only the shoulder has been tuned (and only roughly, at that)
+// So far only the shoulder and elbow have been tuned (and only roughly)
+//
 // base, shoulder, elbow, forearm, diff_left, diff_right
 const std::vector<int32_t> arm_Ps = {
-   0,    100,      0,     0,       0,         0
+   0,    100,    500,     0,       0,         0
 };
 const std::vector<int32_t> arm_Is = {
-   0,      0,      0,     0,       0,         0
+   0,      0,    300,     0,       0,         0
 };
 const std::vector<int32_t> arm_Ds = {
-   0,   1000,      0,     0,       0,         0
+   0,   1000,  10000,     0,       0,         0
+};
+const std::vector<uint8_t> arm_encoder_signs = {
+   0,      0,      1,     0,       0,         0
 };
 
 void initEncoders(bool zero_encoders)
@@ -51,8 +55,9 @@ void initEncoders(bool zero_encoders)
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
         serial < DEVICE_SERIAL_MOTOR_HAND; // The hand motor doesn't have an encoder
         serial ++ ) {
+      uint8_t encoder_sign = arm_encoder_signs[serial-1];
       AssembleEncoderInitializePacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial,
-          0, 0, zero_encoders);
+          0, encoder_sign, zero_encoders);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
       AssembleEncoderPPJRSetPacket(   &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
