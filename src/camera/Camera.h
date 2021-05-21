@@ -106,7 +106,7 @@ private:
 	std::string _name;
 	std::string _description;
 	std::shared_ptr<std::mutex> _frame_lock;
-	std::shared_ptr<std::mutex> _cap_lock;
+	std::shared_ptr<std::mutex> _capture_lock;
 	std::shared_ptr<std::thread> _thread;
 	CameraParams _intrinsic_params;
 	cv::Mat _extrinsic_params;

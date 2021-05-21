@@ -11,7 +11,7 @@ namespace cam
 Camera::Camera()
 	: _capture(std::make_shared<cv::VideoCapture>()), _frame(std::make_shared<cv::Mat>()),
 	  _frame_num(std::make_shared<uint32_t>(0)), _frame_lock(std::make_shared<std::mutex>()),
-	  _cap_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false))
+	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false))
 {
 }
 
@@ -21,11 +21,11 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 	{
 		return false;
 	}
-	_cap_lock->lock();
+	_capture_lock->lock();
 	std::cout << "Opening camera " << camera_id << "... ";
 	bool result = this->_capture->open(camera_id);
 	std::cout << (result ? "success" : "failed") << std::endl;
-	_cap_lock->unlock();
+	_capture_lock->unlock();
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
 	return result;
@@ -37,9 +37,9 @@ bool Camera::open(string filename, CameraParams intrinsic_params, Mat extrinsic_
 	{
 		return false;
 	}
-	_cap_lock->lock();
+	_capture_lock->lock();
 	bool result = this->_capture->open(filename);
-	_cap_lock->unlock();
+	_capture_lock->unlock();
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
 	return result;
@@ -50,7 +50,7 @@ Camera::Camera(string filename, string name, string description, CameraParams in
 	: _name(name), _description(description), _intrinsic_params(intrinsic_params),
 	  _capture(std::make_shared<cv::VideoCapture>(filename)),
 	  _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>()),
+	  _frame_lock(std::make_shared<std::mutex>()), _capture_lock(std::make_shared<std::mutex>()),
 	  _running(std::make_shared<bool>(false))
 {
 	init(extrinsic_params);
@@ -61,7 +61,7 @@ Camera::Camera(int camera_id, string name, string description, CameraParams intr
 	: _name(name), _description(description), _intrinsic_params(intrinsic_params),
 	  _capture(std::make_shared<cv::VideoCapture>(camera_id)),
 	  _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_lock(std::make_shared<std::mutex>()), _cap_lock(std::make_shared<std::mutex>()),
+	  _frame_lock(std::make_shared<std::mutex>()), _capture_lock(std::make_shared<std::mutex>()),
 	  _running(std::make_shared<bool>(false))
 {
 	init(extrinsic_params);
@@ -91,7 +91,7 @@ Camera::Camera(const Camera &other)
 	: _running(other._running), _name(other._name), _description(other._description),
 	  _frame(other._frame), _frame_num(other._frame_num), _capture(other._capture),
 	  _extrinsic_params(other._extrinsic_params), _frame_lock(other._frame_lock),
-	  _cap_lock(other._cap_lock), _thread(other._thread),
+	  _capture_lock(other._capture_lock), _thread(other._thread),
 	  _intrinsic_params(other._intrinsic_params)
 {
 }
@@ -164,17 +164,17 @@ void Camera::captureLoop()
 	{
 		image_size = _intrinsic_params.getImageSize();
 	}
-	_cap_lock->lock();
+	_capture_lock->lock();
 	_capture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
 	_capture->set(cv::CAP_PROP_FRAME_WIDTH, image_size.width);
 	_capture->set(cv::CAP_PROP_FRAME_HEIGHT, image_size.height);
-	_cap_lock->unlock();
+	_capture_lock->unlock();
 	cv::Mat frame;
 	while (*_running)
 	{
-		_cap_lock->lock();
+		_capture_lock->lock();
 		_capture->read(frame);
-		_cap_lock->unlock();
+		_capture_lock->unlock();
 		_frame_lock->lock();
 		frame.copyTo(*(this->_frame));
 		(*_frame_num)++;
@@ -185,9 +185,9 @@ void Camera::captureLoop()
 bool Camera::isOpen() const
 {
 	bool open;
-	_cap_lock->lock();
+	_capture_lock->lock();
 	open = _capture->isOpened();
-	_cap_lock->unlock();
+	_capture_lock->unlock();
 	return open;
 }
 
