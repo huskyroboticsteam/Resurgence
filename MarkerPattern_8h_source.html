@@ -72,30 +72,36 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;opencv2/core.hpp&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classMarkerPattern.html">   20</a></span>&#160;<span class="keyword">class </span><a class="code" href="classMarkerPattern.html">MarkerPattern</a></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    uint8_t data_region_size;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    uint8_t border_size;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">int</span> id;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    cv::Ptr&lt;cv::Mat&gt; data_bits;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classMarkerPattern.html#afc0196c7495be04b5b928c90c1ee3d06">MarkerPattern</a>();</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="classMarkerPattern.html#afc0196c7495be04b5b928c90c1ee3d06">MarkerPattern</a>(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, <span class="keywordtype">int</span> <span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">bool</span> empty() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    uint8_t getDataRegionSize() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    uint8_t getBorderSize() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">const</span> cv::Ptr&lt;cv::Mat&gt; getDataBits() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">int</span> getId() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="classMarkerPattern.html">MarkerPattern</a>&amp; other) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;};</div>
-<div class="ttc" id="aclassMarkerPattern_html"><div class="ttname"><a href="classMarkerPattern.html">MarkerPattern</a></div><div class="ttdef"><b>Definition:</b> MarkerPattern.h:21</div></div>
-<div class="ttc" id="aclassMarkerPattern_html_afc0196c7495be04b5b928c90c1ee3d06"><div class="ttname"><a href="classMarkerPattern.html#afc0196c7495be04b5b928c90c1ee3d06">MarkerPattern::MarkerPattern</a></div><div class="ttdeci">MarkerPattern()</div><div class="ttdef"><b>Definition:</b> MarkerPattern.cpp:23</div></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;opencv2/core.hpp&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>AR</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classAR_1_1MarkerPattern.html">   29</a></span>&#160;<span class="keyword">class </span><a class="code" href="classAR_1_1MarkerPattern.html">MarkerPattern</a></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    uint8_t data_region_size;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    uint8_t border_size;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">int</span> id;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    cv::Ptr&lt;cv::Mat&gt; data_bits;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="classAR_1_1MarkerPattern.html#aff809f5b8e8c885380b480df80f7903a">MarkerPattern</a>();</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="classAR_1_1MarkerPattern.html#aff809f5b8e8c885380b480df80f7903a">MarkerPattern</a>(uint8_t data_region_size, uint8_t border_size, cv::Mat bits, <span class="keywordtype">int</span> <span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">bool</span> empty() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    uint8_t getDataRegionSize() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    uint8_t getBorderSize() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">const</span> cv::Ptr&lt;cv::Mat&gt; getDataBits() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordtype">int</span> getId() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="classAR_1_1MarkerPattern.html">MarkerPattern</a> &amp;other) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;};</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;} <span class="comment">// namespace ar</span></div>
+<div class="ttc" id="aclassAR_1_1MarkerPattern_html"><div class="ttname"><a href="classAR_1_1MarkerPattern.html">AR::MarkerPattern</a></div><div class="ttdef"><b>Definition:</b> MarkerPattern.h:30</div></div>
+<div class="ttc" id="aclassAR_1_1MarkerPattern_html_aff809f5b8e8c885380b480df80f7903a"><div class="ttname"><a href="classAR_1_1MarkerPattern.html#aff809f5b8e8c885380b480df80f7903a">AR::MarkerPattern::MarkerPattern</a></div><div class="ttdeci">MarkerPattern()</div><div class="ttdef"><b>Definition:</b> MarkerPattern.cpp:26</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

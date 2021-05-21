@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PY2020: Hindsight: src/ar/CameraParams.h Source File</title>
+<title>PY2020: Hindsight: src/camera/CameraParams.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_89f12bade8d9fea319d71e72377b803c.html">ar</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_34519bff5ae72130fe71a8620cbf1fc0.html">camera</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -74,41 +74,54 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;opencv2/core.hpp&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="keyword">namespace </span>AR</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacecam.html">cam</a></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;{</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classAR_1_1CameraParams.html">   20</a></span>&#160;<span class="keyword">class </span><a class="code" href="classAR_1_1CameraParams.html">CameraParams</a></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    cv::Mat _camera_params;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    cv::Mat _dist_coeff;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="classAR_1_1CameraParams.html">CameraParams</a>(cv::Mat camera_params, cv::Mat dist_coeff);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="classAR_1_1CameraParams.html">CameraParams</a>(<span class="keyword">const</span> <a class="code" href="classAR_1_1CameraParams.html">CameraParams</a>&amp; other);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    cv::Mat <a class="code" href="classAR_1_1CameraParams.html#ab0f5fb35730497dacca9103c5e3ac0b3">getCameraParams</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    cv::Mat <a class="code" href="classAR_1_1CameraParams.html#abd4d37fa497c0e6b3eec18e0462de98c">getDistCoeff</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;};</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">enum</span> Params</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    WINSTON_WEBCAM_480,</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    WEBCAM_1080,</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    WEBCAM_720,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    LAPTOP,</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    WEBCAM,</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    EVAN_NEW_WEBCAM_480,</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    ROBOT_TOP_WEBCAM_480</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;};</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;CameraParams getCameraParams(Params params);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;} <span class="comment">// namespace AR</span></div>
-<div class="ttc" id="aclassAR_1_1CameraParams_html"><div class="ttname"><a href="classAR_1_1CameraParams.html">AR::CameraParams</a></div><div class="ttdef"><b>Definition:</b> CameraParams.h:21</div></div>
-<div class="ttc" id="aclassAR_1_1CameraParams_html_ab0f5fb35730497dacca9103c5e3ac0b3"><div class="ttname"><a href="classAR_1_1CameraParams.html#ab0f5fb35730497dacca9103c5e3ac0b3">AR::CameraParams::getCameraParams</a></div><div class="ttdeci">cv::Mat getCameraParams() const</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:20</div></div>
-<div class="ttc" id="aclassAR_1_1CameraParams_html_abd4d37fa497c0e6b3eec18e0462de98c"><div class="ttname"><a href="classAR_1_1CameraParams.html#abd4d37fa497c0e6b3eec18e0462de98c">AR::CameraParams::getDistCoeff</a></div><div class="ttdeci">cv::Mat getDistCoeff() const</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:25</div></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="group__camera.html#gab7bc23b140e20ddc826d0c7aec467e79">   23</a></span>&#160;<span class="keyword">const</span> std::string <a class="code" href="group__camera.html#gab7bc23b140e20ddc826d0c7aec467e79">KEY_IMAGE_WIDTH</a> = <span class="stringliteral">&quot;image_width&quot;</span>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="group__camera.html#gaf2fa19088a3b13e980600b2c72f35fbc">   27</a></span>&#160;<span class="keyword">const</span> std::string <a class="code" href="group__camera.html#gaf2fa19088a3b13e980600b2c72f35fbc">KEY_IMAGE_HEIGHT</a> = <span class="stringliteral">&quot;image_height&quot;</span>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="group__camera.html#ga6bfd418b25f981a13507e0e9849e5cfa">   31</a></span>&#160;<span class="keyword">const</span> std::string <a class="code" href="group__camera.html#ga6bfd418b25f981a13507e0e9849e5cfa">KEY_CAMERA_MATRIX</a> = <span class="stringliteral">&quot;camera_matrix&quot;</span>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="group__camera.html#gad44108228c27e97bc0541ec85e1a88ec">   35</a></span>&#160;<span class="keyword">const</span> std::string <a class="code" href="group__camera.html#gad44108228c27e97bc0541ec85e1a88ec">KEY_DIST_COEFFS</a> = <span class="stringliteral">&quot;distortion_coefficients&quot;</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="classcam_1_1CameraParams.html">   58</a></span>&#160;<span class="keyword">class </span><a class="code" href="classcam_1_1CameraParams.html">CameraParams</a></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;{</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    cv::Mat _camera_matrix;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    cv::Mat _dist_coeff;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    cv::Size _image_size;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">void</span> init(<span class="keyword">const</span> cv::Mat &amp;camera_matrix, <span class="keyword">const</span> cv::Mat &amp;dist_coeff, cv::Size image_size);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="classcam_1_1CameraParams.html#a98ffb2af6ad2b44af39cf0b56bef342b">CameraParams</a>();</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classcam_1_1CameraParams.html#a98ffb2af6ad2b44af39cf0b56bef342b">CameraParams</a>(<span class="keyword">const</span> cv::Mat &amp;camera_matrix, <span class="keyword">const</span> cv::Mat &amp;dist_coeff,</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                 cv::Size image_size = cv::Size(640, 480));</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="classcam_1_1CameraParams.html#a98ffb2af6ad2b44af39cf0b56bef342b">CameraParams</a>(<span class="keyword">const</span> <a class="code" href="classcam_1_1CameraParams.html">CameraParams</a> &amp;other);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">bool</span> empty() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    cv::Mat <a class="code" href="classcam_1_1CameraParams.html#a8326e701816b8175d460bc83794a222b">getCameraMatrix</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    cv::Mat <a class="code" href="classcam_1_1CameraParams.html#a5ded65441cf5df57d3e69ceebadd13b5">getDistCoeff</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    cv::Size <a class="code" href="classcam_1_1CameraParams.html#a3610c3796220505394f18f65540bc88c">getImageSize</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classcam_1_1CameraParams.html#a532633c3553a48c668c3f06729a7af70">readFromFileNode</a>(<span class="keyword">const</span> cv::FileNode &amp;file_node);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classcam_1_1CameraParams.html#a2b2311039851a446ad081f6532bc6c15">writeToFileStorage</a>(cv::FileStorage &amp;file_storage) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;};</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__camera.html#ga385fcc3b2e88c3692d7be7fb713a809a">read</a>(<span class="keyword">const</span> cv::FileNode &amp;node, <a class="code" href="classcam_1_1CameraParams.html">CameraParams</a> &amp;params,</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;          <span class="keyword">const</span> <a class="code" href="classcam_1_1CameraParams.html">CameraParams</a> &amp;default_value = <a class="code" href="classcam_1_1CameraParams.html">CameraParams</a>());</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__camera.html#ga806482a95ece6e635dc2adea22008df5">write</a>(cv::FileStorage &amp;fs, <span class="keyword">const</span> std::string &amp;name, <span class="keyword">const</span> <a class="code" href="classcam_1_1CameraParams.html">CameraParams</a> &amp;params);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;} <span class="comment">// namespace cam</span></div>
+<div class="ttc" id="aclasscam_1_1CameraParams_html"><div class="ttname"><a href="classcam_1_1CameraParams.html">cam::CameraParams</a></div><div class="ttdoc">Represents a set of intrinsic camera parameters.</div><div class="ttdef"><b>Definition:</b> CameraParams.h:59</div></div>
+<div class="ttc" id="aclasscam_1_1CameraParams_html_a2b2311039851a446ad081f6532bc6c15"><div class="ttname"><a href="classcam_1_1CameraParams.html#a2b2311039851a446ad081f6532bc6c15">cam::CameraParams::writeToFileStorage</a></div><div class="ttdeci">void writeToFileStorage(cv::FileStorage &amp;file_storage) const</div><div class="ttdoc">Writes the data for this CameraParams object to the given cv::FileStorage object.</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:91</div></div>
+<div class="ttc" id="aclasscam_1_1CameraParams_html_a3610c3796220505394f18f65540bc88c"><div class="ttname"><a href="classcam_1_1CameraParams.html#a3610c3796220505394f18f65540bc88c">cam::CameraParams::getImageSize</a></div><div class="ttdeci">cv::Size getImageSize() const</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:71</div></div>
+<div class="ttc" id="aclasscam_1_1CameraParams_html_a532633c3553a48c668c3f06729a7af70"><div class="ttname"><a href="classcam_1_1CameraParams.html#a532633c3553a48c668c3f06729a7af70">cam::CameraParams::readFromFileNode</a></div><div class="ttdeci">void readFromFileNode(const cv::FileNode &amp;file_node)</div><div class="ttdoc">Reads the data for this CameraParams object from the given cv::FileNode object.</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:78</div></div>
+<div class="ttc" id="aclasscam_1_1CameraParams_html_a5ded65441cf5df57d3e69ceebadd13b5"><div class="ttname"><a href="classcam_1_1CameraParams.html#a5ded65441cf5df57d3e69ceebadd13b5">cam::CameraParams::getDistCoeff</a></div><div class="ttdeci">cv::Mat getDistCoeff() const</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:66</div></div>
+<div class="ttc" id="aclasscam_1_1CameraParams_html_a8326e701816b8175d460bc83794a222b"><div class="ttname"><a href="classcam_1_1CameraParams.html#a8326e701816b8175d460bc83794a222b">cam::CameraParams::getCameraMatrix</a></div><div class="ttdeci">cv::Mat getCameraMatrix() const</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:61</div></div>
+<div class="ttc" id="aclasscam_1_1CameraParams_html_a98ffb2af6ad2b44af39cf0b56bef342b"><div class="ttname"><a href="classcam_1_1CameraParams.html#a98ffb2af6ad2b44af39cf0b56bef342b">cam::CameraParams::CameraParams</a></div><div class="ttdeci">CameraParams()</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:10</div></div>
+<div class="ttc" id="agroup__camera_html_ga385fcc3b2e88c3692d7be7fb713a809a"><div class="ttname"><a href="group__camera.html#ga385fcc3b2e88c3692d7be7fb713a809a">cam::read</a></div><div class="ttdeci">void read(const cv::FileNode &amp;node, CameraParams &amp;params, const CameraParams &amp;default_value)</div><div class="ttdoc">Reads a CameraParams object from the given cv::FileNode object.</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:101</div></div>
+<div class="ttc" id="agroup__camera_html_ga6bfd418b25f981a13507e0e9849e5cfa"><div class="ttname"><a href="group__camera.html#ga6bfd418b25f981a13507e0e9849e5cfa">cam::KEY_CAMERA_MATRIX</a></div><div class="ttdeci">const std::string KEY_CAMERA_MATRIX</div><div class="ttdef"><b>Definition:</b> CameraParams.h:31</div></div>
+<div class="ttc" id="agroup__camera_html_ga806482a95ece6e635dc2adea22008df5"><div class="ttname"><a href="group__camera.html#ga806482a95ece6e635dc2adea22008df5">cam::write</a></div><div class="ttdeci">void write(cv::FileStorage &amp;fs, const std::string &amp;name, const CameraParams &amp;params)</div><div class="ttdoc">Writes the given CameraParams object to the given cv::FileStorage object.</div><div class="ttdef"><b>Definition:</b> CameraParams.cpp:113</div></div>
+<div class="ttc" id="agroup__camera_html_gab7bc23b140e20ddc826d0c7aec467e79"><div class="ttname"><a href="group__camera.html#gab7bc23b140e20ddc826d0c7aec467e79">cam::KEY_IMAGE_WIDTH</a></div><div class="ttdeci">const std::string KEY_IMAGE_WIDTH</div><div class="ttdef"><b>Definition:</b> CameraParams.h:23</div></div>
+<div class="ttc" id="agroup__camera_html_gad44108228c27e97bc0541ec85e1a88ec"><div class="ttname"><a href="group__camera.html#gad44108228c27e97bc0541ec85e1a88ec">cam::KEY_DIST_COEFFS</a></div><div class="ttdeci">const std::string KEY_DIST_COEFFS</div><div class="ttdef"><b>Definition:</b> CameraParams.h:35</div></div>
+<div class="ttc" id="agroup__camera_html_gaf2fa19088a3b13e980600b2c72f35fbc"><div class="ttname"><a href="group__camera.html#gaf2fa19088a3b13e980600b2c72f35fbc">cam::KEY_IMAGE_HEIGHT</a></div><div class="ttdeci">const std::string KEY_IMAGE_HEIGHT</div><div class="ttdef"><b>Definition:</b> CameraParams.h:27</div></div>
+<div class="ttc" id="anamespacecam_html"><div class="ttname"><a href="namespacecam.html">cam</a></div><div class="ttdoc">Namespace for camera access system.</div><div class="ttdef"><b>Definition:</b> Camera.cpp:10</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

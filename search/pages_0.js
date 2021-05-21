@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['deprecated_20list_1061',['Deprecated List',['../deprecated.html',1,'']]]
+  ['camera_20configuration_1123',['Camera Configuration',['../cameraconfig.html',1,'']]]
 ];
