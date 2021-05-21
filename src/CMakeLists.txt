@@ -67,6 +67,7 @@ add_library(stub_world_interface SHARED
   )
 add_library(real_world_interface SHARED
   Networking/real_world_interface.cpp
+  lidar/read_hokuyo_lidar.cpp
   )
 
 add_library(real_can_interface SHARED
@@ -82,11 +83,16 @@ list(APPEND rover_libs
 list(APPEND sfml_libs
   sfml-graphics sfml-window sfml-system pthread)
 
+list(APPEND real_world_libs
+  real_world_interface
+  lidar_base
+  liburg_c.a)
+
 add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
-  real_world_interface
+  ${real_world_libs}
   )
 target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
@@ -110,7 +116,7 @@ add_executable(TunePID TunePID.cpp)
 target_link_libraries(TunePID ${rover_libs}
   real_base_station
   real_can_interface
-  real_world_interface
+  ${real_world_libs}
   )
 target_link_libraries(TunePID ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
@@ -151,7 +157,7 @@ target_link_libraries(tests
   ${rover_libs}
   lidar_slam
   stub_can_interface
-  real_world_interface
+  ${real_world_libs}
   )
 include(CTest)
 include(Catch)
