@@ -61,12 +61,13 @@ bool setCmdVel(double dtheta, double dx)
 
 // Everything below this line still needs to be implemented
 
-points_t readLidarScan() {
-  return {};
-}
-
 points_t readLandmarks() {
-  return {};
+  points_t lms({});
+  for (int i = 0; i < 11; i++) {
+    point_t lm({0.0,0.0,0.0});
+    lms.push_back(lm);
+  }
+  return lms;
 }
 
 transform_t readGPS() {
@@ -78,5 +79,5 @@ transform_t readOdom() {
 }
 
 URCLeg getLeg(int index) {
-  return URCLeg { -1, -1, {0.,0.,0.}};
+  return URCLeg { 0, -1, {0.,0.,0.}};
 }
