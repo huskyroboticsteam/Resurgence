@@ -11,6 +11,10 @@
 
 namespace AR
 {
+/**
+   @addtogroup ar
+   @{
+ */
 
 /**
    Represents a "set" of markers used for a competition, containing the markers that should be
@@ -200,5 +204,5 @@ const std::shared_ptr<MarkerSet> URC_MARKERS();
 const std::shared_ptr<MarkerSet> CIRC_MARKERS();
 
 } // namespace Markers
-
+/** @} */
 } // namespace AR

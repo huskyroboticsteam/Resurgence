@@ -10,76 +10,29 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "../ThreadedCapture.h"
+#include "../camera/Camera.h"
+#include "../camera/CameraParams.h"
 #include "Detector.h"
 
-// change to true to turn on timing code
-#define TIMING false
+const std::string WINDOW_NAME = "Image";
 
-const std::string ORIG_WINDOW_NAME = "Image (Original)";
+const std::string keys =
+	"{h help             |        | Show this help message.}"
+	"{cam_config c       | <none> | The path to a camera configuration file "
+	"defining the camera you would like to use.}"
+	"{cam_override co    | -1     | If present, should be the ID of a camera to open "
+	"rather than the one defined in the configuration file.}"
+	"{marker_set m       | urc    | The set of markers to look for. Currently "
+	"only \"urc\" and \"circ\" are supported.}"
+	"{frame_by_frame f   |        | If present, program will go frame-by-frame "
+	"instead of capturing continuously.}";
 
-constexpr bool EXTRA_WINDOWS = true;
+cam::Camera cap;
+cam::CameraParams PARAMS;
+std::shared_ptr<AR::MarkerSet> MARKER_SET;
 
-// Set to whichever camera params should be used
-AR::CameraParams PARAMS = AR::getCameraParams(AR::Params::ROBOT_TOP_WEBCAM_480);
-
-// Set to whichever MarkerSet should be used (CIRC/URC)
-std::shared_ptr<AR::MarkerSet> MARKER_SET =
-	AR::Markers::CIRC_MARKERS(); // AR::Markers::URC_MARKERS();
-
-const std::string keys = "{h help || Show this help message.}"
-						 "{params p       | 0 | The set of camera parameters to use. This "
-						 "value should be a non-negative zero-indexed integer corresponding "
-						 "to the member of AR::Params you want to use.}"
-						 "{marker_set m   | urc | The set of markers to look for. Currently "
-						 "only \"urc\" and \"circ\" are supported.}"
-						 "{cam c | 0 | The camera ID to use.}"
-						 "{frame_by_frame f || If present, program will go frame-by-frame "
-						 "instead of capturing continuously.}";
-
-int camera_id = 0;
-
-std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec)
-{
-	std::vector<cv::Point3d> object_points;
-	std::vector<cv::Point2d> image_points;
-
-	object_points.push_back(cv::Point3d(-(len / 2), (len / 2), 0));
-	object_points.push_back(cv::Point3d((len / 2), (len / 2), 0));
-	object_points.push_back(cv::Point3d((len / 2), -(len / 2), 0));
-	object_points.push_back(cv::Point3d(-(len / 2), -(len / 2), 0));
-	object_points.push_back(cv::Point3d(-(len / 2), (len / 2), len));
-	object_points.push_back(cv::Point3d((len / 2), (len / 2), len));
-	object_points.push_back(cv::Point3d((len / 2), -(len / 2), len));
-	object_points.push_back(cv::Point3d(-(len / 2), -(len / 2), len));
-	cv::projectPoints(object_points, rvec, tvec, PARAMS.getCameraParams(),
-					  PARAMS.getDistCoeff(), image_points);
-
-	return image_points;
-}
-
-std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
-{
-	cv::Point2f center(imageSize.width / 2, imageSize.height / 2);
-	std::vector<cv::Point2f> grid_points;
-	std::vector<cv::Point2f> projected_points;
-	for (int x = 0; x < imageSize.width / 2; x += spacing)
-	{
-		for (int y = 0; y < imageSize.height / 2; y += spacing)
-		{
-			grid_points.push_back(cv::Point2f(x, y) + center);
-			if (x != 0 || y != 0)
-			{
-				grid_points.push_back(cv::Point2f(-x, -y) + center);
-				grid_points.push_back(cv::Point2f(-x, y) + center);
-				grid_points.push_back(cv::Point2f(x, -y) + center);
-			}
-		}
-	}
-	cv::undistortPoints(grid_points, projected_points, PARAMS.getCameraParams(),
-						PARAMS.getDistCoeff());
-	return projected_points;
-}
+std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec);
+std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing);
 
 int main(int argc, char *argv[])
 {
@@ -97,8 +50,13 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 
-	// get camera params and marker set arguments
-	int camera_param_num = parser.get<int>("p");
+	if (!parser.has("c"))
+	{
+		std::cerr << "Error: camera configuration file is required." << std::endl;
+		parser.printMessage();
+		return EXIT_FAILURE;
+	}
+
 	std::string marker_set = parser.get<std::string>("m");
 	std::transform(marker_set.begin(), marker_set.end(), marker_set.begin(), ::tolower);
 
@@ -117,72 +75,57 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	AR::Params camera_to_use = AR::Params::ROBOT_TOP_WEBCAM_480;
-	switch (camera_param_num)
+	cv::FileStorage cam_config(parser.get<std::string>("c"), cv::FileStorage::READ);
+	if (!cam_config.isOpened())
 	{
-	case 0:
-		camera_to_use = AR::Params::WINSTON_WEBCAM_480;
-		break;
-	case 1:
-		camera_to_use = AR::Params::WEBCAM_1080;
-		break;
-	case 2:
-		camera_to_use = AR::Params::WEBCAM_720;
-		break;
-	case 3:
-		camera_to_use = AR::Params::LAPTOP;
-		break;
-	case 4:
-		camera_to_use = AR::Params::WEBCAM;
-		break;
-	case 5:
-		camera_to_use = AR::Params::EVAN_NEW_WEBCAM_480;
-		break;
-	case 6:
-		camera_to_use = AR::Params::ROBOT_TOP_WEBCAM_480;
-		break;
-	default:
-		std::cerr << "Unsupported camera params: " << std::to_string(camera_param_num)
+		std::cerr << "Error: given camera configuration file " << parser.get<std::string>("c")
+				  << " does not exist!" << std::endl;
+		cam_config.release();
+		return EXIT_FAILURE;
+	}
+	if (cam_config[cam::KEY_INTRINSIC_PARAMS].empty())
+	{
+		std::cerr << "Error: Intrinsic parameters are required for AR tag detection!"
 				  << std::endl;
-		parser.printMessage();
+		cam_config.release();
+		return EXIT_FAILURE;
+	}
+	cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
+	cam_config.release();
+
+	cv::Mat frame;
+	uint32_t fnum = 0;
+
+	std::cout << "Opening camera..." << std::endl;
+	int cam_override_id = parser.get<int>("co");
+	bool open_success = false;
+	if (cam_override_id > -1)
+	{
+		open_success = cap.open(cam_override_id, PARAMS);
+	}
+	else
+	{
+		try
+		{
+			open_success = cap.openFromConfigFile(parser.get<std::string>("c"));
+		}
+		catch (cam::invalid_camera_config c)
+		{
+			std::cerr << c.what() << std::endl;
+		}
+	}
+
+	if (!open_success)
+	{
+		std::cerr << "ERROR! Unable to open camera" << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	PARAMS = AR::getCameraParams(camera_to_use);
-
-	camera_id = parser.get<int>("c");
-
-	cv::Mat frame;
-	size_t fnum = 0;
-	AR::ThreadedCapture cap;
-
-	int api_id = cv::CAP_ANY;
-
-	std::cout << "Opening camera..." << std::endl;
-	if (!cap.open(camera_id, api_id))
-	{
-		std::cerr << "ERROR! Unable to open camera" << std::endl;
-		return 1;
-	}
-
-	//	cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
-	//   cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-	//   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
-	cv::Size imageSize(static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH)),
-					   static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT)));
-	std::cout << "Image size: " << imageSize << std::endl;
-
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
-	cv::namedWindow(ORIG_WINDOW_NAME);
+	cv::namedWindow(WINDOW_NAME);
 
 	AR::Detector detector(MARKER_SET, PARAMS);
-
-#ifndef NDEBUG
-	double loop_num = 0.0;
-	long double total_time = 0.0;
-	long double total_wall = 0.0;
-#endif
 
 	int count = 0;
 	bool frame_by_frame = parser.has("f");
@@ -191,63 +134,25 @@ int main(int argc, char *argv[])
 	int grid_spacing = 20;
 
 	bool loop = true;
+	cv::Size imageSize = PARAMS.getImageSize();
 
 	while (loop)
 	{
-
-#ifndef NDEBUG
-		std::clock_t c_start = std::clock(); // Stores current cpu time
-		auto wall_start = std::chrono::system_clock::now();
-		loop_num++;
-#endif
-
-#ifndef NDEBUG
-		auto read_start = std::chrono::system_clock::now();
-#endif
 		// Grabs frame
-		if (!cap.hasNewFrame(fnum))
+		if (!cap.hasNext(fnum))
 		{
 			continue;
 		}
-		cap.read(frame);
-#ifndef NDEBUG
-		auto read_end = std::chrono::system_clock::now();
-#endif
+		cap.next(frame, fnum);
 		if (frame.empty())
 		{
 			std::cerr << "ERROR! Blank frame grabbed" << std::endl;
 			continue;
 		}
-#ifndef NDEBUG
-		if (TIMING)
-		{
-			long double read_time =
-				std::chrono::duration_cast<std::chrono::milliseconds>(read_end - read_start)
-					.count();
-			std::cout << "Read took " << read_time << "ms" << std::endl;
-		}
-#endif
-
-		// Mats to hold grayscale and edge detection results
-		cv::Mat gray;
-		cv::Mat edges;
-
-		std::vector<std::vector<cv::Point2f>> quad_corners;
 
 		// Passes frame to the detector class.
 		// Tags will be located and returned.
 		std::vector<AR::Tag> tags = detector.detectTags(frame);
-
-		// Draws a green line around all quadrilateral shapes found in the image (debugging
-		// purposes)
-		cv::Scalar green_line = cv::Scalar(0, 255, 0);
-		for (std::vector<cv::Point2f> quad : quad_corners)
-		{
-			cv::line(frame, quad[0], quad[1], green_line, 2);
-			cv::line(frame, quad[1], quad[2], green_line, 2);
-			cv::line(frame, quad[2], quad[3], green_line, 2);
-			cv::line(frame, quad[3], quad[0], green_line, 2);
-		}
 
 		// Draws an outline around the tag and a cross in the center
 		// Projects a cube onto the tag to debug TVec and RVec
@@ -282,7 +187,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		cv::imshow(ORIG_WINDOW_NAME, frame);
+		cv::imshow(WINDOW_NAME, frame);
 
 		int delay = (frame_by_frame && count % 10 == 0) ? 0 : 1;
 		switch (cv::waitKey(delay))
@@ -301,26 +206,49 @@ int main(int argc, char *argv[])
 		default:
 			break;
 		}
-
-#ifndef NDEBUG
-		if (TIMING)
-		{
-			// Calculates time used to complete one loop on average
-			std::clock_t c_end = std::clock();
-			auto wall_end = std::chrono::system_clock::now();
-			auto wall_t =
-				std::chrono::duration_cast<std::chrono::microseconds>(wall_end - wall_start)
-					.count() /
-				1000.0;
-			long double cpu_t = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
-			total_time += cpu_t;
-			total_wall += wall_t;
-			std::cout << "CPU Time: " << cpu_t << "ms, avg: " << total_time / loop_num
-					  << "ms; Wall Time: " << wall_t << "ms, avg: " << total_wall / loop_num
-					  << "ms" << std::endl;
-		}
-#endif
 	}
 
 	return 0;
+}
+
+std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec)
+{
+	std::vector<cv::Point3d> object_points;
+	std::vector<cv::Point2d> image_points;
+
+	object_points.push_back(cv::Point3d(-(len / 2), (len / 2), 0));
+	object_points.push_back(cv::Point3d((len / 2), (len / 2), 0));
+	object_points.push_back(cv::Point3d((len / 2), -(len / 2), 0));
+	object_points.push_back(cv::Point3d(-(len / 2), -(len / 2), 0));
+	object_points.push_back(cv::Point3d(-(len / 2), (len / 2), len));
+	object_points.push_back(cv::Point3d((len / 2), (len / 2), len));
+	object_points.push_back(cv::Point3d((len / 2), -(len / 2), len));
+	object_points.push_back(cv::Point3d(-(len / 2), -(len / 2), len));
+	cv::projectPoints(object_points, rvec, tvec, PARAMS.getCameraMatrix(),
+					  PARAMS.getDistCoeff(), image_points);
+
+	return image_points;
+}
+
+std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
+{
+	cv::Point2f center(imageSize.width / 2, imageSize.height / 2);
+	std::vector<cv::Point2f> grid_points;
+	std::vector<cv::Point2f> projected_points;
+	for (int x = 0; x < imageSize.width / 2; x += spacing)
+	{
+		for (int y = 0; y < imageSize.height / 2; y += spacing)
+		{
+			grid_points.push_back(cv::Point2f(x, y) + center);
+			if (x != 0 || y != 0)
+			{
+				grid_points.push_back(cv::Point2f(-x, -y) + center);
+				grid_points.push_back(cv::Point2f(-x, y) + center);
+				grid_points.push_back(cv::Point2f(x, -y) + center);
+			}
+		}
+	}
+	cv::undistortPoints(grid_points, projected_points, PARAMS.getCameraMatrix(),
+						PARAMS.getDistCoeff());
+	return projected_points;
 }

@@ -8,6 +8,9 @@
 
 using mat_ptr = cv::Ptr<cv::Mat>;
 
+namespace AR
+{
+
 ///////// Marker class implementation ///////////////
 MarkerPattern::MarkerPattern(uint8_t data_region_size, uint8_t border_size, cv::Mat bits,
 							 int id)
@@ -56,3 +59,4 @@ bool MarkerPattern::operator==(const MarkerPattern &other) const
 		   (std::equal(this->data_bits->begin<uint8_t>(), this->data_bits->end<uint8_t>(),
 					   other.data_bits->begin<uint8_t>()));
 }
+} // namespace ar

@@ -8,6 +8,11 @@ namespace AR
 {
 
 /**
+   @addtogroup ar
+   @{
+ */
+
+/**
    @brief Class representing an AR tag detected in an image.
 
    This class is simply used as a way to represent the result of a detection, and can
@@ -56,4 +61,7 @@ public:
 	 */
 	MarkerPattern getMarker() const;
 };
+
+/** @} */
+
 } // namespace AR

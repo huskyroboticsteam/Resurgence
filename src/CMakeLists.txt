@@ -130,7 +130,7 @@ add_executable(tests
   Autonomous.cpp
   # AR Detection tests
   ar/Detector.cpp
-  ar/CameraParams.cpp
+  camera/CameraParams.cpp
   ar/Tag.cpp
   ar/DetectorTests.cpp
   ar/MarkerPattern.cpp
@@ -140,6 +140,9 @@ add_executable(tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
   Networking/NetworkingStubs.cpp
+  # Camera tests
+  camera/CameraParamsTests.cpp
+  camera/CameraParams.cpp
   # Autonomy tests
   mapping/ValidatorTest.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
@@ -191,7 +194,7 @@ add_executable(gpsd_test
 target_link_libraries(gpsd_test gps)
 
 add_subdirectory(ar)
-
+add_subdirectory(camera)
 
 # My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
 find_package(Eigen3 REQUIRED)
