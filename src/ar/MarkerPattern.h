@@ -1,8 +1,17 @@
 #pragma once
 
-#include <memory>
-#include <opencv2/core.hpp>
 #include <cstdint>
+#include <memory>
+
+#include <opencv2/core.hpp>
+
+namespace AR
+{
+
+/**
+   @addtogroup ar
+   @{
+ */
 
 /**
    A class to represent the pattern that may appear on a physical AR tag, NOT a physical
@@ -57,5 +66,9 @@ public:
 	uint8_t getBorderSize() const;
 	const cv::Ptr<cv::Mat> getDataBits() const;
 	int getId() const;
-	bool operator==(const MarkerPattern& other) const;
+	bool operator==(const MarkerPattern &other) const;
 };
+
+/** @} */
+
+} // namespace ar

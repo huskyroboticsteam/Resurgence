@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../math/PointXY.h"
+#include "../simulator/utils.h"
 
 class Polar2D;
 
@@ -20,6 +21,7 @@ typedef struct BoundingBox
 bool approxEqual(PointXY p, PointXY q);
 float distance(float x0, float y0, float x1, float y1);
 PointXY polarToCartesian(Polar2D p);
+point_t polarToCartesian2(Polar2D p);
 void localToGlobal(PointXY &p, float x_loc, float y_loc, float heading);
 std::vector<std::vector<PointXY>> clusterPoints(std::vector<PointXY> &pts,
 												float sep_threshold);

@@ -7,14 +7,14 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core.hpp>
 
-#include "CameraParams.h"
+#include "../camera/CameraParams.h"
 #include "Tag.h"
 
 namespace AR
 {
 
 Detector::Detector(std::shared_ptr<MarkerSet> marker_set,
-				   CameraParams camera_params,
+				   cam::CameraParams camera_params,
 				   cv::Ptr<cv::aruco::DetectorParameters> detector_params)
 	: marker_set_(marker_set), camera_params_(camera_params), detector_params_(detector_params)
 {
@@ -33,7 +33,7 @@ std::vector<Tag> Detector::detectTags(const cv::Mat &input)
 
 	std::vector<cv::Vec3d> rvecs, tvecs;
 	cv::aruco::estimatePoseSingleMarkers(corners, this->marker_set_->getPhysicalSize(),
-										 this->camera_params_.getCameraParams(),
+										 this->camera_params_.getCameraMatrix(),
 										 this->camera_params_.getDistCoeff(), rvecs, tvecs);
 
 	std::vector<Tag> tags;

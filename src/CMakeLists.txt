@@ -34,7 +34,6 @@ add_library(simulator_base SHARED
 
 add_library(simulator_nav SHARED
         planning/plan.cpp
-        planning/search.cpp
   )
 
 add_library(rover_common SHARED
@@ -68,6 +67,7 @@ add_library(stub_world_interface SHARED
   )
 add_library(real_world_interface SHARED
   Networking/real_world_interface.cpp
+  lidar/read_hokuyo_lidar.cpp
   )
 
 add_library(real_can_interface SHARED
@@ -83,11 +83,16 @@ list(APPEND rover_libs
 list(APPEND sfml_libs
   sfml-graphics sfml-window sfml-system pthread)
 
+list(APPEND real_world_libs
+  real_world_interface
+  lidar_base
+  liburg_c.a)
+
 add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
-  real_world_interface
+  ${real_world_libs}
   )
 target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
@@ -111,7 +116,7 @@ add_executable(TunePID TunePID.cpp)
 target_link_libraries(TunePID ${rover_libs}
   real_base_station
   real_can_interface
-  real_world_interface
+  ${real_world_libs}
   )
 target_link_libraries(TunePID ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
@@ -125,7 +130,7 @@ add_executable(tests
   Autonomous.cpp
   # AR Detection tests
   ar/Detector.cpp
-  ar/CameraParams.cpp
+  camera/CameraParams.cpp
   ar/Tag.cpp
   ar/DetectorTests.cpp
   ar/MarkerPattern.cpp
@@ -135,6 +140,9 @@ add_executable(tests
   Networking/tests.cpp
   Networking/TestPackets.cpp
   Networking/NetworkingStubs.cpp
+  # Camera tests
+  camera/CameraParamsTests.cpp
+  camera/CameraParams.cpp
   # Autonomy tests
   mapping/ValidatorTest.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
@@ -149,7 +157,7 @@ target_link_libraries(tests
   ${rover_libs}
   lidar_slam
   stub_can_interface
-  real_world_interface
+  ${real_world_libs}
   )
 include(CTest)
 include(Catch)
@@ -181,19 +189,12 @@ add_executable(lidarOnlyTest
 target_link_libraries(lidarOnlyTest lidar_base lidar_slam)
 target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 
-add_executable(simulator_navigation_demo
-        planning/navigation.cpp
-  )
-target_link_libraries(simulator_navigation_demo
-  simulator_base simulator_nav simulator_world_interface)
-target_link_libraries(simulator_navigation_demo ${sfml_libs})
-
 add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
 add_subdirectory(ar)
-
+add_subdirectory(camera)
 
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
