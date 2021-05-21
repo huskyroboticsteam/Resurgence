@@ -1,0 +1,3 @@
+# Example udev rule for a webcam. We should make sure that the videoN
+# ids are unique, and match those in the .yml files.
+SUBSYSTEM=="usb", ATTR{idVendor}=="0c45", ATTR{idProduct}=="6366", SYMLINK+="video20", GROUP="video"
