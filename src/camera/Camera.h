@@ -217,9 +217,9 @@ public:
 	/**
 	   @brief Retrieves the next frame.
 
-	   @param[out] frame An output parameter for the frame. Whatever is passed
-	   in will be overwritten so you do not need to worry about the passed-in
-	   Mat having the correct size or format.
+	   @param[out] frame An output parameter for the frame. All data will be
+	   overwritten so you do not need to worry about the passed-in Mat having
+	   the correct size or format.
 
 	   @param[out] frame_num An output parameter for the frame number.
 
