@@ -15,9 +15,8 @@
    @brief This module provides an interface for defining and accessing the
    different cameras attached to the rover.
 
-   Cameras should be defined in a YAML file with a format that will be
-   documented soon, and the location of this file should be able to be
-   optionally specified at runtime.
+   Cameras can be defined in YAML files (see @ref cameraconfig) and opened using
+   these files at runtime (see Camera::openFromConfigFile()).
  */
 
 /**
@@ -92,8 +91,10 @@ const std::string KEY_DESCRIPTION = "description";
 	the code that refer to the same underlying camera and share access to it.
 
 	@warning Note that intrinsic and extrinsic parameters are optional for a
-	Camera object; such Cameras may not be suitable for some computer vision
-	operations. Use Camera::hasIntrinsicParams() and
+	Camera object; Camera objects that are missing either intrinsic parameters,
+	extrinsic parameters, or both may not be suitable for some computer vision
+	operations. For example, AR tag detection requires intrinsic parameters and
+	cannot be performed without them. Use Camera::hasIntrinsicParams() and
 	Camera::hasExtrinsicParams() to check for the presence of each.
  */
 class Camera
