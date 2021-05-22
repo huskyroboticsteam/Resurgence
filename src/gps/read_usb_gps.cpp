@@ -68,13 +68,15 @@ void gps_loop() {
       log(LOG_ERROR, "GPS read error.\n");
       continue;
     } else {
-      log(LOG_DEBUG, "Received fresh GPS data.\n");
       if (newdata->status == STATUS_NO_FIX) {
         log(LOG_WARN, "No GPS fix.\n");
         continue;
       } else {
         double lat = newdata->fix.latitude;
         double lon = newdata->fix.longitude;
+        point_t p = gpsToMeters__private(lon, lat);
+        log(LOG_DEBUG, "Received fresh GPS data: %.2f %.2f (lat %.6f, lon %.6f).\n",
+            p(0), p(1), lat, lon);
         gps_mutex.lock();
         if (first_fix_lat == 0.0) {
           // This is our first fix
@@ -84,7 +86,7 @@ void gps_loop() {
 
         fresh_data = true;
         // TODO no heading information
-        most_recent_tf = toTransform(gpsToMeters__private(lon, lat));
+        most_recent_tf = toTransform(p);
         gps_mutex.unlock();
       }
     }
