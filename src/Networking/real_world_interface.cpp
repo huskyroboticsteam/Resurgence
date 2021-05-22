@@ -32,16 +32,17 @@ void world_interface_init() {
 	try {
 		ar_cam.openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
 		if(!ar_cam.hasIntrinsicParams()){
-			log(LOG_ERROR, "Camera must have intrinsic parameters for AR tag detection\n");
+			log(LOG_ERROR, "Camera does not have intrinsic parameters! AR tag detection "
+						   "cannot be performed.\n");
 		} else {
 			ar_detector =
 				AR::Detector(AR::Markers::URC_MARKERS(), ar_cam.getIntrinsicParams());
 		}
 		if(!ar_cam.hasExtrinsicParams()){
-			log(LOG_WARN, "Camera does not have extrinsic parameters!");
-			log(LOG_WARN, "Coordinates returned for AR tags will be relative to camera");
+			log(LOG_WARN, "Camera does not have extrinsic parameters! Coordinates returned "
+						  "for AR tags will be relative to camera\n");
 		}
-	} catch (std::exception e) {
+	} catch (std::exception& e) {
 		log(LOG_ERROR, "Error opening camera for AR tag detection:\n%s\n", e.what());
 	}
 }
