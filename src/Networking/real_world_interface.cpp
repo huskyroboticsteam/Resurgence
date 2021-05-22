@@ -101,13 +101,14 @@ points_t readLandmarks() {
 		if(ar_cam.hasNext(last_frame_no)){
 			ar_cam.next(frame, last_frame_no);
 			std::vector<AR::Tag> tags = ar_detector.detectTags(frame);
+			log(LOG_DEBUG, "readLandmarks(): %d tags spotted\n", tags.size());
 
 			// build up map with first tag of each ID spotted.
 		    points_t output(NUM_LANDMARKS);
 			std::map<int, cv::Vec3d> first_tag;
 			for(AR::Tag tag : tags){
 				int id = tag.getMarker().getId();
-				if(first_tag.find(id) != first_tag.end()){
+				if(first_tag.find(id) == first_tag.end()){
 					first_tag[id] = tag.getCoordinates();
 				}
 			}
@@ -123,10 +124,13 @@ points_t readLandmarks() {
 					// rotation/translation)
 					if (ar_cam.hasExtrinsicParams()) {
 						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
-						cv::Vec4d transformed =
-							ar_cam.getExtrinsicParams().dot(coords_homogeneous);
-						output[i] = {transformed[0], transformed[1], 1.0};
+						cv::Mat transformed =
+							ar_cam.getExtrinsicParams() * cv::Mat(coords_homogeneous);
+						output[i] = {transformed.at<double>(0, 0),
+									 transformed.at<double>(1, 0),
+									 1.0};
 					} else {
+						// just account for coordinate axis change.
 						output[i] = {coords[2], -coords[0], 1.0};
 					}
 				} else {
