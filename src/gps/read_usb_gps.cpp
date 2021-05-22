@@ -1,5 +1,7 @@
 
 #include <libgpsmm.h>
+#include <thread>
+#include <mutex>
 
 #include "../log.h"
 #include "../simulator/world_interface.h"
@@ -12,52 +14,92 @@ constexpr double METERS_PER_DEG_EW = 75124.2106730417; // Seattle, WA, USA
 // constexpr double METERS_PER_DEG_EW = 69498.37410392637 // Drumheller, Alberta, CA
 
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
-bool gps_ready = false;
+std::thread gps_thread;
+std::mutex gps_mutex;
 double first_fix_lat = 0.0;
 double first_fix_lon = 0.0;
+bool fresh_data = false;
+transform_t most_recent_tf;
 
-point_t gpsToMeters(double lon, double lat) {
+bool gpsHasFix() {
+  gps_mutex.lock();
+  bool r = first_fix_lat != 0.0;
+  gps_mutex.unlock();
+  return r;
+}
+
+bool gpsHasFreshData() {
+  gps_mutex.lock();
+  bool r = fresh_data;
+  gps_mutex.unlock();
+  return r;
+}
+
+point_t gpsToMeters__private(double lon, double lat) {
   double x = (lon - first_fix_lon) * METERS_PER_DEG_EW;
   double y = (lat - first_fix_lat) * METERS_PER_DEG_NS;
   return {x,y,0};
 }
 
+point_t gpsToMeters(double lon, double lat) {
+  gps_mutex.lock();
+  point_t r = gpsToMeters__private(lon, lat);
+  gps_mutex.unlock();
+  return r;
+}
+
 transform_t readGPS() {
-  if (!gps_ready) {
-    if (gps_rec.stream(WATCH_ENABLE|WATCH_JSON) == NULL) {
-        log(LOG_ERROR, "No GPSD running.\n");
-        return toTransform({0,0,0});
-    } else {
-      gps_ready = true;
-    }
-  }
+  gps_mutex.lock();
+  transform_t tf = most_recent_tf;
+  gps_mutex.unlock();
+  return tf;
+}
 
-  if (!gps_rec.waiting(1000)) {
-    log(LOG_ERROR, "No GPS hardware detected.\n");
-    return toTransform({0,0,0});
-  }
-
+void gps_loop() {
   struct gps_data_t* newdata;
 
-  if ((newdata = gps_rec.read()) == NULL) {
-    log(LOG_ERROR, "GPS read error.\n");
-    return toTransform({0,0,0});
-  } else {
-    if (newdata->status == STATUS_NO_FIX) {
-      log(LOG_WARN, "No GPS fix.\n");
-      return toTransform({0,0,0});
-    } else {
-      double lat = newdata->fix.latitude;
-      double lon = newdata->fix.longitude;
-      if (first_fix_lat == 0.0) {
-        // This is our first fix
-        first_fix_lat = lat;
-        first_fix_lon = lon;
-      }
+  while (true) {
+    if (!gps_rec.waiting(5000000)) {
+      log(LOG_ERROR, "Lost connection to GPS hardware!\n");
+      continue;
+    }
 
-      // TODO no heading information
-      return toTransform(gpsToMeters(lon, lat));
+    if ((newdata = gps_rec.read()) == NULL) {
+      log(LOG_ERROR, "GPS read error.\n");
+      continue;
+    } else {
+      log(LOG_DEBUG, "Received fresh GPS data.\n");
+      if (newdata->status == STATUS_NO_FIX) {
+        log(LOG_WARN, "No GPS fix.\n");
+        continue;
+      } else {
+        double lat = newdata->fix.latitude;
+        double lon = newdata->fix.longitude;
+        gps_mutex.lock();
+        if (first_fix_lat == 0.0) {
+          // This is our first fix
+          first_fix_lat = lat;
+          first_fix_lon = lon;
+        }
+
+        fresh_data = true;
+        // TODO no heading information
+        most_recent_tf = toTransform(gpsToMeters__private(lon, lat));
+        gps_mutex.unlock();
+      }
     }
   }
 }
 
+bool startGPSThread() {
+  if (gps_rec.stream(WATCH_ENABLE|WATCH_JSON) == NULL) {
+    log(LOG_ERROR, "No GPSD running.\n");
+    return false;
+  }
+  if (!gps_rec.waiting(5000000)) {
+    log(LOG_ERROR, "No GPS hardware detected.\n");
+    return false;
+  }
+  gps_thread = std::thread(gps_loop);
+  return true;
+}
