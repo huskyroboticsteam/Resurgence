@@ -2,11 +2,6 @@
 
 #include <Eigen/LU>
 
-/*
- * The map is stored relative to the first sample. This isn't ideal, but
- * transforming the map to fit the latest sample worked terribly.
- */
-
 GlobalMap::GlobalMap(double areaSize, int scanStride, int maxIter, double relErrChangeThresh)
 	: tree(areaSize),
 	  scanStride(scanStride),

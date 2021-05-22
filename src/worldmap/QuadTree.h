@@ -116,6 +116,8 @@ public:
 	 */
 	point_t getArbitraryPoint() const;
 
+	// TODO: add method to remove random points, to help keep the tree size down
+
 private:
 	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
 	// if one is initialized then all are initialized
