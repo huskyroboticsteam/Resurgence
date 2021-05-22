@@ -6,25 +6,30 @@
 #include <opencv2/core.hpp>
 #include <opencv2/aruco.hpp>
 
-#include "CameraParams.h"
+#include "../camera/CameraParams.h"
 #include "MarkerSet.h"
 #include "Tag.h"
 
 namespace AR
 {
 
+/**
+   @addtogroup ar
+   @{
+ */
 class Detector
 {
 private:
 	std::shared_ptr<MarkerSet> marker_set_;
-	CameraParams camera_params_;
+	cam::CameraParams camera_params_;
 	cv::Ptr<cv::aruco::DetectorParameters> detector_params_;
 
 public:
-	Detector(std::shared_ptr<MarkerSet> marker_set, CameraParams camera_params,
+	Detector(std::shared_ptr<MarkerSet> marker_set, cam::CameraParams camera_params,
 			 cv::Ptr<cv::aruco::DetectorParameters> detector_params =
 				 cv::aruco::DetectorParameters::create());
 	std::vector<Tag> detectTags(const cv::Mat &input);
 };
+/** @} */
 
 } // namespace AR

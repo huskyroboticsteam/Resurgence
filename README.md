@@ -78,10 +78,26 @@ make
 sudo make install
 ```
 
+By default on Ubuntu, the USB lidar device will only be accessible to the
+root user (e.g. via sudo). To make it accessible to everyone:
+
+```
+sudo cp src/lidar/50-usb-hokuyo-lidar.rules /etc/udev/rules.d
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
 ## Install SFML and Eigen (navigation simulator)
 
 Follow instructions in `src/simulator/README.md`, or just execute the commands
 from `tests-docker-action/entrypoint.sh`.
+
+## Install GPS libraries
+
+On Ubuntu, just run:
+
+```bash
+sudo apt-get install gpsd gpsd-clients libgps-dev
+```
 
 ## Install ROS (planning visualization)
 

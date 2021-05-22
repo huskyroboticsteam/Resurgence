@@ -12,7 +12,6 @@ class PlanViz : public rclcpp::Node
 public:
 	PlanViz()
 		: Node("plan_visualization"),
-			lidar_scan({}),
 			viz_window("Planning visualization"),
 			plan_sub(
 					this->create_subscription<geometry_msgs::msg::Point>(
@@ -24,7 +23,7 @@ public:
 					this->create_subscription<geometry_msgs::msg::Point>(
 						"next_pose", 100, std::bind(&PlanViz::next_pose_callback, this, _1))),
 			lidar_sub(
-					this->create_subscription<geometry_msgs::msg::Point>(
+					this->create_subscription<geometry_msgs::msg::PoseArray>(
 						"lidar_scan", 100, std::bind(&PlanViz::lidar_callback, this, _1))),
 			gate_sub(
 					this->create_subscription<geometry_msgs::msg::PoseArray>(
@@ -47,9 +46,13 @@ private:
 		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Blue);
 	}
 
-	void lidar_callback(const geometry_msgs::msg::Point::SharedPtr message)
+	void lidar_callback(const geometry_msgs::msg::PoseArray::SharedPtr message)
 	{
-		lidar_scan.push_back({message->x, message->y, message->z});
+		points_t lidar {};
+		for (auto l : message->poses) {
+			lidar.push_back({l.position.x, l.position.y, l.position.z});
+		}
+		viz_window.drawPoints(lidar, sf::Color::Red, 3);
 	}
 
 	void gate_callback(const geometry_msgs::msg::PoseArray::SharedPtr message)
@@ -66,7 +69,7 @@ private:
 	{
 		points_t landmarks {};
 		for (auto l : message->poses) {
-			landmarks.push_back({l.position.x, l.position.y, l.position.x});
+			landmarks.push_back({l.position.x, l.position.y, l.position.z});
 		}
 		viz_window.drawPoints(landmarks, sf::Color::Blue, 5);
 	}
@@ -77,8 +80,6 @@ private:
 		{
 			// All data has been received, we can draw the visualization
 			while (viz_window.pollWindowEvent() != -1) {}
-			viz_window.drawPoints(lidar_scan, sf::Color::Red, 3);
-			lidar_scan.clear();
 			viz_window.display();
 		}
 		else
@@ -87,13 +88,12 @@ private:
 		}
 	}
 
-	points_t lidar_scan;
 	MyWindow viz_window;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr plan_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr curr_pose_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr next_pose_sub;
-	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr lidar_sub;
 	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr gate_sub;
+	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr lidar_sub;
 	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_sub;
 };
 

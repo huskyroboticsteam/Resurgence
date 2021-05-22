@@ -1,6 +1,6 @@
 
 #include "Network.h"
-#include "log.h"
+#include "../log.h"
 #include "IK.h"
 #include "motor_interface.h"
 #include "ParseBaseStation.h"
@@ -8,6 +8,15 @@
 #include <tgmath.h>
 #include "../simulator/world_interface.h"
 #include "../Globals.h"
+#include "CANUtils.h"
+
+extern "C"
+{
+    #include "../HindsightCAN/CANMotorUnit.h"
+    #include "../HindsightCAN/CANSerialNumbers.h"
+    #include "../HindsightCAN/CANCommon.h"
+    #include "../HindsightCAN/CANPacket.h"
+}
 
 #include <iostream>
 
@@ -22,13 +31,13 @@ bool sendError(std::string const &msg)
   error_message["status"] = "error";
   error_message["msg"] = msg;
   sendBaseStationPacket(error_message.dump());
-  log(LOG_ERROR, error_message.dump());
+  log(LOG_ERROR, "%s\n", error_message.dump().c_str());
   return false;
 }
 
 bool ParseBaseStationPacket(char const* buffer)
 {
-  log(LOG_INFO, "Message from base station: " + (std::string) buffer);
+  log(LOG_DEBUG, "Message from base station: %s\n", buffer);
   json parsed_message;
   try
   {
@@ -47,7 +56,7 @@ bool ParseBaseStationPacket(char const* buffer)
   {
     return sendError("Could not find message type");
   }
-  log(LOG_DEBUG, "Message type: " + type);
+  log(LOG_DEBUG, "Message type: %s\n", type.c_str());
 
   bool success = false;
   if (type == "estop") {
@@ -75,7 +84,17 @@ bool ParseBaseStationPacket(char const* buffer)
 }
 
 bool ParseEmergencyStop(json &message) {
-  // TODO actually send e-stop packet (packet id 0x30 broadcast)
+  CANPacket p;
+  AssembleGroupBroadcastingEmergencyStopPacket(&p,
+          DEVICE_GROUP_MOTOR_CONTROL, ESTOP_ERR_GENERAL);
+  sendCANPacket(p);
+  // For some reason, the above broadcast doesn't seem to be received by the boards.
+  // To address this, we also send individual e-stop packets.
+  for (uint8_t serial = 1; serial < 12; serial++) {
+      AssembleEmergencyStopPacket(&p,
+          DEVICE_GROUP_MOTOR_CONTROL, serial, ESTOP_ERR_GENERAL);
+      sendCANPacket(p);
+  }
   bool success = setCmdVel(0,0);
   Globals::E_STOP = true;
   bool release;

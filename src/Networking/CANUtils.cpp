@@ -14,6 +14,8 @@ extern "C"
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
+#include "../log.h"
+
 struct sockaddr_can can_addr;
 struct can_frame can_frame_;
 struct ifreq can_ifr;
@@ -48,11 +50,11 @@ void InitializeCANSocket()
             "  sudo ip link add type vcan\n"
             "  sudo ip link set dev vcan0 up\n\n");
     }
-    std::cout << "Found virtual CAN interface index." << std::endl;
+    log(LOG_INFO, "Found virtual CAN interface index.\n");
   }
 
   can_addr.can_family = AF_CAN;
-  std::cout << "Index: " << can_ifr.ifr_ifindex << std::endl;
+  log(LOG_DEBUG, "Index: %d\n", can_ifr.ifr_ifindex);
   can_addr.can_ifindex = can_ifr.ifr_ifindex;
 
   if (bind(can_fd, (struct sockaddr *)&can_addr, sizeof(can_addr)) < 0)
@@ -78,7 +80,7 @@ void sendCANPacket(const CANPacket &packet)
   }
   else
   {
-    std::cout << "CAN packet sent.\n";
+    log(LOG_TRACE, "CAN packet sent.\n");
   }
 }
 
@@ -96,7 +98,7 @@ int recvCANPacket(CANPacket *packet)
   }
   else
   {
-    //std::cout << "Got CAN packet" << std::endl;
+    log(LOG_TRACE, "Got CAN packet\n");
     packet->id = can_frame_.can_id;
     packet->dlc = can_frame_.can_dlc;
     for(int i = 0; i < can_frame_.can_dlc; i++)
