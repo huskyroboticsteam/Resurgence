@@ -2,11 +2,11 @@
 #include "plan.h"
 
 #include <Eigen/Core>
-#include <chrono>
 #include <iostream>
 #include <queue>
 #include <set>
 
+#include "../Util.h"
 #include "../simulator/constants.h"
 #include "../simulator/graphics.h"
 #include "../simulator/world_interface.h"
@@ -109,9 +109,7 @@ bool is_valid(const Node *n, const collides_predicate_t &collides)
 }
 
 plan_t getPlan(const collides_predicate_t &collides, const point_t &goal, double goal_radius) {
-	// TODO: remove timing code
-	std::chrono::milliseconds startTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::system_clock::now().time_since_epoch());
+	util::ScopedTimer timer;
 	std::cout << "Planning... " << std::flush;
 	action_t action = action_t::Zero();
 	std::vector<Node*> allocated_nodes;
@@ -169,7 +167,7 @@ plan_t getPlan(const collides_predicate_t &collides, const point_t &goal, double
 		std::chrono::system_clock::now().time_since_epoch());
 
 	std::cout << "finished in " << counter << " iterations (";
-	std::cout << allocated_nodes.size() << " visited nodes), Time: " << (endTime - startTime).count() << "ms\n";
+	std::cout << allocated_nodes.size() << " visited nodes), Time: " << (timer.elapsedTime().count() / 1000) << "ms\n";
 	for (Node *p : allocated_nodes)
 	{
 		free(p);

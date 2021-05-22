@@ -29,7 +29,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		target(_target),
 		search_target({target.approx_GPS(0) - PI, target.approx_GPS(1), -PI / 2}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
-	  	map(10000),
+	  	map(10000), // TODO: the stride should be set higher when using the real lidar
 		calibrated(false),
 		calibrationPoses({}),
 		landmarkFilter(),
@@ -353,7 +353,7 @@ void Autonomous::autonomyIter()
 				plan_pose(0) += action(1) * cos(plan_pose(2));
 				plan_pose(1) += action(1) * sin(plan_pose(2));
 				transform_t tf_plan_pose = toTransform(plan_pose) * invTransform;
-				if (map.hasPointWithin(toPose(tf_plan_pose, 0), 1.3)) { // stay 1.3 meters away
+				if (collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
 					// We'll replan next timestep
 					// TODO strictly speaking, we don't need to replan if the collision happened
 					// on a part of the plan that we've already passed. But I'm not quite sure how
