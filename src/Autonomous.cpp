@@ -198,7 +198,6 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 
 void Autonomous::autonomyIter()
 {
-
 	transform_t gps = readGPS(); // <--- has some heading information
 
 	// If we haven't calibrated position, do so now
@@ -239,6 +238,7 @@ void Autonomous::autonomyIter()
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 					<< std::endl;
 		leftPostFilter.reset(); // clear the cached data points
+		rightPostFilter.reset();
 		if (Globals::AUTONOMOUS)
 		{
 			setCmdVel(0, 0);
@@ -247,7 +247,6 @@ void Autonomous::autonomyIter()
 	else
 	{
 		pose_t driveTarget = getGPSTargetPose();
-
 
 		// If we are in a search pattern, set the drive target to the next search point
 		if (state == NavState::SEARCH_PATTERN)
