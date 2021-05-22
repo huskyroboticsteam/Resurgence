@@ -7,9 +7,9 @@
 
 // UW lat/long is 47.653116, -122.305619
 // source: http://www.csgnetwork.com/degreelenllavcalc.html
-const double METERS_PER_DEG_NS = 111183.53599983045;
-const double METERS_PER_DEG_EW = 75124.2106730417; // Seattle, WA, USA
-// const double METERS_PER_DEG_EW = 69498.37410392637 // Drumheller, Alberta, CA
+constexpr double METERS_PER_DEG_NS = 111183.53599983045;
+constexpr double METERS_PER_DEG_EW = 75124.2106730417; // Seattle, WA, USA
+// constexpr double METERS_PER_DEG_EW = 69498.37410392637 // Drumheller, Alberta, CA
 
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 bool gps_ready = false;
