@@ -103,11 +103,11 @@ points_t readLandmarks() {
 
 			// build up map with first tag of each ID spotted.
 		    points_t output(NUM_LANDMARKS);
-			std::map<int, AR::Tag> first_tag;
+			std::map<int, cv::Vec3d> first_tag;
 			for(AR::Tag tag : tags){
 				int id = tag.getMarker().getId();
 				if(first_tag.find(id) != first_tag.end()){
-					first_tag[id] = tag;
+					first_tag[id] = tag.getCoordinates();
 				}
 			}
 
@@ -116,7 +116,7 @@ points_t readLandmarks() {
 			// transforms). If not, add a zero point.
 			for(int i = 0; i < NUM_LANDMARKS; i++){
 				if(first_tag.find(i) != first_tag.end()){
-					cv::Vec3d coords = first_tag[i].getCoordinates();
+					cv::Vec3d coords = first_tag[i];
 					// if we have extrinsic parameters, multiply coordinates by them to do
 					// appropriate transformation. If not, just change the coordinate axes (no
 					// rotation/translation)
