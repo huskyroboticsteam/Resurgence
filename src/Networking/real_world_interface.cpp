@@ -9,6 +9,7 @@
 #include "CANUtils.h"
 #include "motor_interface.h"
 #include <set>
+#include <opencv2/calib3d.hpp>
 
 #include "json.hpp"
 
@@ -20,16 +21,25 @@ using nlohmann::json;
 
 cam::Camera ar_cam;
 AR::Detector ar_detector(AR::Markers::URC_MARKERS(), cam::CameraParams());
+points_t zero_landmarks;
+const point_t ZERO_POINT = {0.0, 0.0, 0.0};
+constexpr size_t NUM_LANDMARKS = 11;
 
 void world_interface_init() {
+	for(int i = 0; i < NUM_LANDMARKS; i++){
+		zero_landmarks.push_back({0.0, 0.0, 0.0});
+	}
 	try {
 		ar_cam.openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
 		if(!ar_cam.hasIntrinsicParams()){
 			log(LOG_ERROR, "Camera must have intrinsic parameters for AR tag detection\n");
-			ar_cam = cam::Camera();
 		} else {
 			ar_detector =
 				AR::Detector(AR::Markers::URC_MARKERS(), ar_cam.getIntrinsicParams());
+		}
+		if(!ar_cam.hasExtrinsicParams()){
+			log(LOG_WARN, "Camera does not have extrinsic parameters!");
+			log(LOG_WARN, "Coordinates returned for AR tags will be relative to camera");
 		}
 	} catch (std::exception e) {
 		log(LOG_ERROR, "Error opening camera for AR tag detection:\n%s\n", e.what());
@@ -79,16 +89,20 @@ bool setCmdVel(double dtheta, double dx) {
 }
 
 // Everything below this line still needs to be implemented
-points_t last_landmarks;
+points_t last_landmarks = zero_landmarks;
 uint32_t last_frame_no = 0;
-constexpr size_t NUM_LANDMARKS = 11;
+cv::Mat frame;
 points_t readLandmarks() {
+	// camera might not be open if opening camera failed in init_world_interface.
+	// if it is not, return a list of 11 zero points.
 	if (ar_cam.isOpen()) {
+		// if we have a next frame, retrieve it and perform AR tag detection.
 		if(ar_cam.hasNext(last_frame_no)){
-			cv::Mat frame;
 			ar_cam.next(frame, last_frame_no);
 			std::vector<AR::Tag> tags = ar_detector.detectTags(frame);
-		    point_t output[NUM_LANDMARKS];
+
+			// build up map with first tag of each ID spotted.
+		    points_t output(NUM_LANDMARKS);
 			std::map<int, AR::Tag> first_tag;
 			for(AR::Tag tag : tags){
 				int id = tag.getMarker().getId();
@@ -96,16 +110,37 @@ points_t readLandmarks() {
 					first_tag[id] = tag;
 				}
 			}
+
+			// for every possible landmark ID, go through and if the map contains a value for
+			// that ID, add it to the output array (doing appropriate coordinate space
+			// transforms). If not, add a zero point.
 			for(int i = 0; i < NUM_LANDMARKS; i++){
 				if(first_tag.find(i) != first_tag.end()){
 					cv::Vec3d coords = first_tag[i].getCoordinates();
-					output[i] = {coords[2], -coords[0], 1.0};
+					// if we have extrinsic parameters, multiply coordinates by them to do
+					// appropriate transformation. If not, just change the coordinate axes (no
+					// rotation/translation)
+					if (ar_cam.hasExtrinsicParams()) {
+						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
+						cv::Vec4d transformed =
+							ar_cam.getExtrinsicParams().dot(coords_homogeneous);
+						output[i] = {transformed[0], transformed[1], 1.0};
+					} else {
+						output[i] = {coords[2], -coords[0], 1.0};
+					}
+				} else {
+					output[i] = ZERO_POINT;
 				}
 			}
+
+			// return output array.
+			last_landmarks = output;
+			return output;
+		} else {
+			return last_landmarks;
 		}
-		return last_landmarks;
 	} else {
-		return {};
+		return zero_landmarks;
 	}
 }
 
