@@ -3,6 +3,7 @@
 #include <ctime>
 #include <csignal>
 #include <unistd.h>
+#include <array>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -22,7 +23,7 @@ extern "C"
     #include "HindsightCAN/CANCommon.h"
 }
 
-const std::vector<uint32_t> arm_PPJRs = {
+constexpr std::array<uint32_t,6> arm_PPJRs = {
     360 * 1000, // base, unmeasured
 
     180 * 1000, // shoulder, rough estimate
@@ -33,14 +34,31 @@ const std::vector<uint32_t> arm_PPJRs = {
     360 * 1000 // diff_right, unmeasured
 };
 
+// So far only the shoulder and elbow have been tuned (and only roughly)
+//
+// base, shoulder, elbow, forearm, diff_left, diff_right
+constexpr std::array<int32_t,6> arm_Ps = {
+   0,    100,    500,     0,       0,         0
+};
+constexpr std::array<int32_t,6> arm_Is = {
+   0,      0,    300,     0,       0,         0
+};
+constexpr std::array<int32_t,6> arm_Ds = {
+   0,   1000,  10000,     0,       0,         0
+};
+constexpr std::array<uint8_t,6> arm_encoder_signs = {
+   0,      0,      1,     0,       0,         0
+};
+
 void initEncoders(bool zero_encoders)
 {
     CANPacket p;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
         serial < DEVICE_SERIAL_MOTOR_HAND; // The hand motor doesn't have an encoder
         serial ++ ) {
+      uint8_t encoder_sign = arm_encoder_signs[serial-1];
       AssembleEncoderInitializePacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial,
-          0, 0, zero_encoders);
+          0, encoder_sign, zero_encoders);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
       AssembleEncoderPPJRSetPacket(   &p, DEVICE_GROUP_MOTOR_CONTROL, serial,
@@ -64,6 +82,18 @@ void setArmMode(uint8_t mode)
       AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
+      if (mode == MOTOR_UNIT_MODE_PID) {
+          int p_coeff = arm_Ps[serial-1];
+          int i_coeff = arm_Is[serial-1];
+          int d_coeff = arm_Ds[serial-1];
+          AssemblePSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, p_coeff);
+          sendCANPacket(p);
+          AssembleISetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, i_coeff);
+          sendCANPacket(p);
+          AssembleDSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, d_coeff);
+          sendCANPacket(p);
+          usleep(1000); // We're running out of CAN buffer space
+      }
     }
 }
 
