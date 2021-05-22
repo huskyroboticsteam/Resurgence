@@ -3,6 +3,7 @@
 #include <ctime>
 #include <csignal>
 #include <unistd.h>
+#include <array>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -22,7 +23,7 @@ extern "C"
     #include "HindsightCAN/CANCommon.h"
 }
 
-const std::vector<uint32_t> arm_PPJRs = {
+constexpr std::array<uint32_t,6> arm_PPJRs = {
     360 * 1000, // base, unmeasured
 
     180 * 1000, // shoulder, rough estimate
@@ -36,16 +37,16 @@ const std::vector<uint32_t> arm_PPJRs = {
 // So far only the shoulder and elbow have been tuned (and only roughly)
 //
 // base, shoulder, elbow, forearm, diff_left, diff_right
-const std::vector<int32_t> arm_Ps = {
+constexpr std::array<int32_t,6> arm_Ps = {
    0,    100,    500,     0,       0,         0
 };
-const std::vector<int32_t> arm_Is = {
+constexpr std::array<int32_t,6> arm_Is = {
    0,      0,    300,     0,       0,         0
 };
-const std::vector<int32_t> arm_Ds = {
+constexpr std::array<int32_t,6> arm_Ds = {
    0,   1000,  10000,     0,       0,         0
 };
-const std::vector<uint8_t> arm_encoder_signs = {
+constexpr std::array<uint8_t,6> arm_encoder_signs = {
    0,      0,      1,     0,       0,         0
 };
 
