@@ -74,6 +74,7 @@ add_library(real_world_interface SHARED
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
   ar/Tag.cpp
+  gps/read_usb_gps.cpp
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${OpenCV_LIBS})
@@ -93,6 +94,7 @@ list(APPEND sfml_libs
 
 list(APPEND real_world_libs
   real_world_interface
+  gps
   lidar_base
   liburg_c.a)
 

@@ -40,15 +40,14 @@ void InitializeCANSocket()
   if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0)
   {
     perror("Failed to get hardware CAN interface index\n"
-           "If you are running this on the rover, you can enable CAN with\n\n"
-           "  ~/PY2020/enable_CAN.sh\n\n");
+           "You can enable CAN with\n\n"
+           "  ~/PY2020/enable_CAN_and_GPS.sh\n\n");
     strcpy(can_ifr.ifr_name, "vcan0");
     if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0)
     {
       error("Failed to get virtual CAN interface index\n"
-            "You can make a virtual CAN interface with\n\n"
-            "  sudo ip link add type vcan\n"
-            "  sudo ip link set dev vcan0 up\n\n");
+            "You can enable CAN with\n\n"
+            "  ~/PY2020/enable_CAN_and_GPS.sh\n\n");
     }
     log(LOG_INFO, "Found virtual CAN interface index.\n");
   }

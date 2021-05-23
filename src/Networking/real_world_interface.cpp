@@ -6,6 +6,9 @@
 #include "../log.h"
 #include "../simulator/utils.h"
 #include "../simulator/world_interface.h"
+#include "../gps/read_usb_gps.h"
+#include "json.hpp"
+#include "motor_interface.h"
 #include "CANUtils.h"
 #include "motor_interface.h"
 #include <set>
@@ -45,6 +48,7 @@ void world_interface_init() {
 	} catch (std::exception& e) {
 		log(LOG_ERROR, "Error opening camera for AR tag detection:\n%s\n", e.what());
 	}
+	bool gps_success = startGPSThread();
 }
 
 constexpr double WHEEL_BASE = 1.0;			   // Distance between left and right wheels. Eyeballed
@@ -146,10 +150,6 @@ points_t readLandmarks() {
 	} else {
 		return zero_landmarks;
 	}
-}
-
-transform_t readGPS() {
-	return toTransform({0, 0, 0});
 }
 
 transform_t readOdom() {
