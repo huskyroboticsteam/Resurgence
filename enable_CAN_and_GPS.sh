@@ -17,4 +17,8 @@ fi
 
 sudo service gpsd start
 sudo service gpsd stop
-sudo gpsd -n /dev/ttyUSB0
+if [[ -e /dev/ttyUSB0 ]]; then
+  sudo gpsd -n /dev/ttyUSB0
+else
+  echo "No device connected at /dev/ttyUSB0; gpsd not started!"
+fi

@@ -68,7 +68,7 @@ void gps_loop() {
       log(LOG_ERROR, "GPS read error.\n");
       continue;
     } else {
-      if (newdata->status == STATUS_NO_FIX) {
+      if (std::isnan(newdata->fix.latitude)) {
         log(LOG_WARN, "No GPS fix.\n");
         continue;
       } else {

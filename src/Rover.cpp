@@ -133,7 +133,7 @@ int rover_loop(int argc, char **argv)
           shoulder_pos = Globals::status_data["shoulder"]["angular_position"];
         if (!Globals::status_data["elbow"].empty())
           elbow_pos = Globals::status_data["elbow"]["angular_position"];
-        log(LOG_INFO, "Time\t %d arm_base\t %d\t shoulder\t %d\t elbow\t %d \n",
+        log(LOG_DEBUG, "Time\t %d arm_base\t %d\t shoulder\t %d\t elbow\t %d \n",
                 totalElapsedUsecs / 1000,
                 arm_base_pos, shoulder_pos, elbow_pos);
 
