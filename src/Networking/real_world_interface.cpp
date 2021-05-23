@@ -98,39 +98,38 @@ points_t readLandmarks() {
 	// if it is not, return a list of 11 zero points.
 	if (ar_cam.isOpen()) {
 		// if we have a next frame, retrieve it and perform AR tag detection.
-		if(ar_cam.hasNext(last_frame_no)){
+		if (ar_cam.hasNext(last_frame_no)) {
 			ar_cam.next(frame, last_frame_no);
 			std::vector<AR::Tag> tags = ar_detector.detectTags(frame);
 			log(LOG_DEBUG, "readLandmarks(): %d tags spotted\n", tags.size());
 
 			// build up map with first tag of each ID spotted.
-		    points_t output(NUM_LANDMARKS);
-			std::map<int, cv::Vec3d> first_tag;
-			for(AR::Tag tag : tags){
+			points_t output(NUM_LANDMARKS);
+			std::map<int, cv::Vec3d> ids_to_camera_coords;
+			for (AR::Tag tag : tags) {
 				int id = tag.getMarker().getId();
-				if(first_tag.find(id) == first_tag.end()){
-					first_tag[id] = tag.getCoordinates();
+				if (ids_to_camera_coords.find(id) == ids_to_camera_coords.end()) {
+					ids_to_camera_coords[id] = tag.getCoordinates();
 				}
 			}
 
 			// for every possible landmark ID, go through and if the map contains a value for
 			// that ID, add it to the output array (doing appropriate coordinate space
 			// transforms). If not, add a zero point.
-			for(int i = 0; i < NUM_LANDMARKS; i++){
-				if(first_tag.find(i) != first_tag.end()){
-					cv::Vec3d coords = first_tag[i];
+			for (int i = 0; i < NUM_LANDMARKS; i++) {
+				if (ids_to_camera_coords.find(i) != ids_to_camera_coords.end()) {
+					cv::Vec3d coords = ids_to_camera_coords[i];
 					// if we have extrinsic parameters, multiply coordinates by them to do
-					// appropriate transformation. If not, just change the coordinate axes (no
-					// rotation/translation)
+					// appropriate transformation.
 					if (ar_cam.hasExtrinsicParams()) {
 						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
 						cv::Mat transformed =
 							ar_cam.getExtrinsicParams() * cv::Mat(coords_homogeneous);
 						output[i] = {transformed.at<double>(0, 0),
-									 transformed.at<double>(1, 0),
-									 1.0};
+									 transformed.at<double>(1, 0), 1.0};
 					} else {
-						// just account for coordinate axis change.
+						// just account for coordinate axis change; rover frame has +x front,
+						// +y left, +z up while camera has +x right, +y down, +z front.
 						output[i] = {coords[2], -coords[0], 1.0};
 					}
 				} else {
