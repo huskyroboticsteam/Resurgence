@@ -24,6 +24,18 @@ constexpr const char * ROVER_FRAME = "rover";
 
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
+/**
+   @brief Prints a list of landmarks using the logging mechanism.
+
+   The message is formatted as "Landmarks: [i: {x, y, z}, ...]" where i is the index of the
+   landmark in the list.
+
+   @param landmarks The list of landmarks to print.
+   @param log_level The optional log level to use; defaults to LOG_DEBUG so the message isn't
+   seen if on a higher logging level.
+ */
+static void printLandmarks(points_t& landmarks, int log_level = LOG_DEBUG);
+
 Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 	: Node("autonomous"),
 		target(_target),
@@ -184,7 +196,6 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 
 void Autonomous::autonomyIter()
 {
-
 	transform_t gps = readGPS(); // <--- has some heading information
 
 	// If we haven't calibrated position, do so now
@@ -206,6 +217,7 @@ void Autonomous::autonomyIter()
 
 	// get landmark data and filter out invalid data points
 	points_t landmarks = readLandmarks();
+	printLandmarks(landmarks);
 	if (target.left_post_id < 0 || target.left_post_id > landmarks.size())
 	{
 		log(LOG_ERROR, "Invalid left_post_id %d\n", target.left_post_id);
@@ -438,4 +450,22 @@ pose_t Autonomous::getTargetPose() const
 {
 	pose_t ret{target.approx_GPS(0), target.approx_GPS(1), 0.0};
 	return ret;
+}
+
+static void printLandmarks(points_t& landmarks, int log_level){
+	std::ostringstream stream;
+	stream << "Landmarks: [";
+	for(int i = 0; i < landmarks.size(); i++){
+		stream << i << ": {"
+			   << landmarks[i][0] << ", "
+			   << landmarks[i][1] << ", "
+			   << landmarks[i][2]
+			   << "}";
+		if (i < landmarks.size() - 1)
+		{
+			stream << ", ";
+		}
+	}
+	stream << "}" << std::endl;
+	log(log_level, stream.str().c_str());
 }

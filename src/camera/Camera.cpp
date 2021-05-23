@@ -113,17 +113,22 @@ const char *invalid_camera_config::what() const noexcept
 bool Camera::openFromConfigFile(std::string filename)
 {
 	cv::FileStorage fs(filename, cv::FileStorage::READ);
+	if(!fs.isOpened()){
+		throw std::invalid_argument("Configuration file " + filename + " does not exist");
+	}
 
 	// read intrinsic parameters
+	CameraParams intrinsics;
 	if (!fs[KEY_INTRINSIC_PARAMS].empty())
 	{
-		fs[KEY_INTRINSIC_PARAMS] >> _intrinsic_params;
+		fs[KEY_INTRINSIC_PARAMS] >> intrinsics;
 	}
 
 	// read extrinsic parameters
+	cv::Mat extrinsics;
 	if (!fs[KEY_EXTRINSIC_PARAMS].empty())
 	{
-		fs[KEY_EXTRINSIC_PARAMS] >> _extrinsic_params;
+		fs[KEY_EXTRINSIC_PARAMS] >> extrinsics;
 	}
 
 	// read name
@@ -143,12 +148,12 @@ bool Camera::openFromConfigFile(std::string filename)
 	if (!fs[KEY_FILENAME].empty())
 	{
 		string cam_file = (string)fs[KEY_FILENAME];
-		return this->open(cam_file);
+		return this->open(cam_file, intrinsics, extrinsics);
 	}
 	else if (!fs[KEY_CAMERA_ID].empty())
 	{
 		int cam_id = (int)fs[KEY_CAMERA_ID];
-		return this->open(cam_id);
+		return this->open(cam_id, intrinsics, extrinsics);
 	}
 	else
 	{
@@ -215,12 +220,12 @@ bool Camera::next(cv::Mat &frame, uint32_t &frame_num) const
 
 bool Camera::hasIntrinsicParams() const
 {
-	return !_intrinsic_params.empty();
+	return !(_intrinsic_params.empty());
 }
 
 bool Camera::hasExtrinsicParams() const
 {
-	return !_extrinsic_params.empty();
+	return !(_extrinsic_params.empty());
 }
 
 CameraParams Camera::getIntrinsicParams() const

@@ -68,8 +68,16 @@ add_library(stub_world_interface SHARED
 add_library(real_world_interface SHARED
   Networking/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
+  camera/Camera.cpp
+  camera/CameraParams.cpp
+  ar/Detector.cpp
+  ar/MarkerSet.cpp
+  ar/MarkerPattern.cpp
+  ar/Tag.cpp
   gps/read_usb_gps.cpp
   )
+target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(real_world_interface ${OpenCV_LIBS})
 
 add_library(real_can_interface SHARED
   log.cpp
@@ -131,12 +139,7 @@ add_executable(tests
   Tests.cpp
   Autonomous.cpp
   # AR Detection tests
-  ar/Detector.cpp
-  camera/CameraParams.cpp
-  ar/Tag.cpp
   ar/DetectorTests.cpp
-  ar/MarkerPattern.cpp
-  ar/MarkerSet.cpp
   ar/MarkerSetTests.cpp
   # CAN tests
   Networking/tests.cpp
@@ -144,7 +147,6 @@ add_executable(tests
   Networking/NetworkingStubs.cpp
   # Camera tests
   camera/CameraParamsTests.cpp
-  camera/CameraParams.cpp
   # Autonomy tests
   mapping/ValidatorTest.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
