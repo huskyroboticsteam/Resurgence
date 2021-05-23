@@ -18,19 +18,33 @@ following top-level keys:
     unique but it isn't strictly necessary at this time.
   * `description`: _Optional._ A longer description of the camera, including
     details like its location on the rover.
-  * *One* of the following:
-	* `filename`: The file path or URI to a video device or stream that should
+  * *One* of the following. **If both are present, `filename` will take precedence.**
+   	  * `filename`: The file path or URI to a video device or stream that should
       be opened.
-    * `camera_id`: The ID of a video device that will be opened. Given ID N, the
+	  * `camera_id`: The ID of a video device that will be opened. Given ID N, the
       device at `/dev/videoN` will be opened.
-    
-	**If both are present, `filename` will take precedence.**
- * `intrinsic_params`: _Optional._ Value should be a nested key-value mapping,
+  * `intrinsic_params`: _Optional._ Value should be a nested key-value mapping,
    defining a set of intrinsic camera parameters as defined in the section
    [Intrinsic Parameters](@ref intrinsic) below.
- * `extrinsic_params`: _Optional._ Should be a 4x4 matrix defining a rigid
-   transform from the camera frame to the rover frame.
- * `calib_info`: _Optional._ Information from the calibration process, generated
+  * `extrinsic_params`: _Optional._ Should be a 4x4 matrix defining a
+    transformation from 3-dimensional coordinates in the camera's
+    frame of reference to the rover's frame of reference. This matrix
+    should ideally have a 3x3 [rotation
+    matrix](https://en.wikipedia.org/wiki/Rotation_matrix#In_three_dimensions)
+    in the first three rows and columns, and the first three rows in
+    the fourth column should be a translation vector.  The fourth row
+    should be `0, 0, 0, 1` so that [homogeneous
+    coordinates](https://en.wikipedia.org/wiki/Homogeneous_coordinates)
+    (4-dimensional coordinates where the 4th coordinate is `1`) can be
+    used.
+
+	Note that in the rover's frame of reference, the positive
+    x-axis is towards the front, the positive y-axis is towards the
+    left, and the positive z-axis is towards the top; in the camera's
+    frame of reference, the positive x-axis is to the right (parallel
+    to the image plane), the positive y-axis is down, and the positive
+    z-axis is in the direction the camera is pointing.
+  * `calib_info`: _Optional._ Information from the calibration process, generated
    by the calibration program. See [Calibration Info](@ref calibinfo) below.
    
 ### Intrinsic Parameters {#intrinsic}
