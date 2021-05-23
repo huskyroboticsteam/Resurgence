@@ -2,6 +2,7 @@
 #include "../simulator/world_interface.h"
 #include "../simulator/utils.h"
 #include "../Globals.h"
+#include "../gps/read_usb_gps.h"
 #include "json.hpp"
 #include "motor_interface.h"
 #include "CANUtils.h"
@@ -14,6 +15,7 @@ extern "C"
 using nlohmann::json;
 
 void world_interface_init() {
+  bool gps_success = startGPSThread();
   return;
 }
 
@@ -68,10 +70,6 @@ points_t readLandmarks() {
     lms.push_back(lm);
   }
   return lms;
-}
-
-transform_t readGPS() {
-  return toTransform({0,0,0});
 }
 
 transform_t readOdom() {

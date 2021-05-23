@@ -68,6 +68,7 @@ add_library(stub_world_interface SHARED
 add_library(real_world_interface SHARED
   Networking/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
+  gps/read_usb_gps.cpp
   )
 
 add_library(real_can_interface SHARED
@@ -85,6 +86,7 @@ list(APPEND sfml_libs
 
 list(APPEND real_world_libs
   real_world_interface
+  gps
   lidar_base
   liburg_c.a)
 
