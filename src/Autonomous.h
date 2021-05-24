@@ -16,11 +16,18 @@
 #include "simulator/utils.h"
 #include "planning/plan.h"
 
-enum NavState {
-	INIT,
+enum ControlState {
 	NEAR_TARGET_POSE,
+	FAR_FROM_TARGET_POSE
+};
+
+enum NavState {
+	GPS,
+	POST_VISIBLE,
 	SEARCH_PATTERN,
-	GATE_ALIGN
+	GATE_ALIGN,
+	GATE_TRAVERSE,
+	DONE
 };
 
 class Autonomous : rclcpp::Node
@@ -45,14 +52,14 @@ private:
 	std::vector<pose_t> calibrationPoses{};
 	RollingAvgFilter<5,3> leftPostFilter;
 	RollingAvgFilter<5,3> rightPostFilter;
-	NavState state;
+	NavState nav_state;
+	ControlState control_state;
 	int time_since_plan;
 	plan_t plan;
 	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
 	double search_theta_increment;
-	bool already_arrived;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;

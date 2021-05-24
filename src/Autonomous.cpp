@@ -46,14 +46,14 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		calibrationPoses({}),
 		leftPostFilter(),
 		rightPostFilter(),
-		state(NavState::INIT),
+		nav_state(NavState::GPS),
+		control_state(ControlState::FAR_FROM_TARGET_POSE),
 		time_since_plan(0),
 		plan(0,2),
 		plan_cost(INFINITE_COST),
 		plan_base({0,0,0}),
 		plan_idx(0),
 		search_theta_increment(PI / 4),
-		already_arrived(false),
 		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
 		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
 		next_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("next_pose", 100)),
@@ -178,7 +178,7 @@ double Autonomous::getLinearVel(const pose_t &target, const pose_t &pose, double
 		// (given our relatively low control frequency of 10 Hz)
 		speed = DRIVE_SPEED / 3;
 	}
-	if (abs(thetaErr) > PI / 4 || state == NavState::NEAR_TARGET_POSE || state == NavState::GATE_ALIGN) {
+	if (abs(thetaErr) > PI / 4 || control_state == ControlState::NEAR_TARGET_POSE || nav_state == NavState::GATE_ALIGN) {
 		// don't drive forward if pointing away
 		// or if we're already very close to the target or aligning to a gate angle
 		speed = 0;
@@ -192,11 +192,11 @@ double Autonomous::getThetaVel(const pose_t &target, const pose_t &pose, double 
 	// we reach the target orientation. Otherwise, we want to turn the rover to
 	// aim it at the target location.
 	double targetAngle = target(2);
-	if (state == NavState::GATE_ALIGN)
+	if (nav_state == NavState::GATE_ALIGN)
 	{
 		targetAngle = gate_targets.second(2);
 	}
-	if (state == NavState::INIT || state == NavState::SEARCH_PATTERN)
+	if (control_state == ControlState::FAR_FROM_TARGET_POSE)
 	{
 		double dx = target(0) - pose(0);
 		double dy = target(1) - pose(1);
@@ -244,9 +244,9 @@ void Autonomous::autonomyIter()
 	pose_t pose = poseEstimator.getPose();
 	transform_t invTransform = toTransform(pose).inverse();
 
-	if (already_arrived || arrived(pose))
+	if (nav_state == NavState::DONE || arrived(pose))
 	{
-		already_arrived = true;
+		nav_state = NavState::DONE;
 		std::cout << "arrived at gate" << std::endl;
 		std::cout << "x: " << pose(0) << " y: " << pose(1) << " theta: " << pose(2)
 					<< std::endl;
@@ -262,7 +262,7 @@ void Autonomous::autonomyIter()
 		pose_t driveTarget = getGPSTargetPose();
 
 		// If we are in a search pattern, set the drive target to the next search point
-		if (state == NavState::SEARCH_PATTERN)
+		if (nav_state == NavState::SEARCH_PATTERN)
 		{
 			driveTarget = search_target;
 		}
@@ -292,16 +292,22 @@ void Autonomous::autonomyIter()
 				// caused by filtering
 				driveTarget.topRows(2) = leftPostFilter.get(landmarkMapSpace).topRows(2);
 			}
-			if (state == NavState::SEARCH_PATTERN)
+			if (nav_state == NavState::GPS || nav_state == NavState::SEARCH_PATTERN)
 			{
-				// Currently in a search pattern and landmark has been seen, can exit search
-				state = NavState::INIT;
+				// Update nav state
+				nav_state = NavState::POST_VISIBLE;
 			}
 		}
 
 		// The target has a second post we can see
 		if (target.right_post_id != -1 && landmarks[target.right_post_id](2) != 0)
 		{
+			if (nav_state == NavState::GPS || nav_state == NavState::SEARCH_PATTERN)
+			{
+				// Update nav state
+				nav_state = NavState::POST_VISIBLE;
+			}
+
 			// Get old landmark measurement for stability stop condition
 			point_t post_2_old = rightPostFilter.getSize() > 0 ? rightPostFilter.get() : point_t(0, 0, 0);
 
@@ -336,7 +342,7 @@ void Autonomous::autonomyIter()
 						gate_targets.second(2) = std::atan2(gate_targets.second(1) - pose(1), gate_targets.second(0) - pose(0));
 
 						// Turn to desired angle
-						state = NavState::GATE_ALIGN;
+						nav_state = NavState::GATE_ALIGN;
 					}
 					if (std::isinf(gate_targets.first(2)) && second_post_dist < 0.3)
 					{
@@ -344,7 +350,7 @@ void Autonomous::autonomyIter()
 						gate_targets.second = pose_t(INFINITY, INFINITY, INFINITY);
 
 						// No further action needed since goal has been reached
-						already_arrived = true;
+						nav_state = NavState::DONE;
 						return;
 					}
 				}
@@ -505,7 +511,7 @@ void Autonomous::autonomyIter()
 		publish({NAN, NAN, NAN}, plan_pub);
 
 		double d = dist(driveTarget, pose, 0);
-		if (state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)
+		if (nav_state == NavState::SEARCH_PATTERN && dist(search_target, pose, 0.0) < 0.5)
 		{
 			// Current search point has been reached
 			// Replan to avoid waiting at current search point
@@ -531,19 +537,19 @@ void Autonomous::autonomyIter()
 				search_theta_increment = PI / ((int) (PI / search_theta_increment + 4));
 			}
 		}
-		if (state != NavState::SEARCH_PATTERN && dist(target.approx_GPS, pose, 0.0) < 0.2 &&
-			leftPostFilter.getSize() == 0 && !landmarkVisible)
+
+		if (nav_state == NavState::GPS && dist(target.approx_GPS, pose, 0.0) < 0.2)
 		{
 			// Close to GPS target but no landmark in sight, should use search pattern
 			// Replan so the search starts faster
 			plan_cost = INFINITE_COST;
-			state = NavState::SEARCH_PATTERN;
+			nav_state = NavState::SEARCH_PATTERN;
 		}
 
 		// If aligned to desired gate angle, replan and continue to second target
-		if (state == NavState::GATE_ALIGN && std::abs(pose(2) - (std::isinf(gate_targets.first(2)) ? gate_targets.second : gate_targets.first)(2)) < 0.07)
+		if (nav_state == NavState::GATE_ALIGN && std::abs(pose(2) - gate_targets.second(2)) < 0.07)
 		{
-			state = NavState::INIT;
+			nav_state = NavState::GATE_TRAVERSE;
 			plan_cost = INFINITE_COST;
 		}
 
@@ -551,13 +557,13 @@ void Autonomous::autonomyIter()
 		// back and forth between these two states.
 		// We also don't want to switch into one of these two states if we're currently in a
 		// search pattern.
-		if (d < 0.2 && state == NavState::INIT)
+		if (d < 0.2 && control_state == ControlState::FAR_FROM_TARGET_POSE)
 		{
-			state = NavState::NEAR_TARGET_POSE;
+			control_state = ControlState::NEAR_TARGET_POSE;
 		}
-		if (d > 0.5 && state == NavState::NEAR_TARGET_POSE)
+		if (d > 0.5 && control_state == ControlState::NEAR_TARGET_POSE)
 		{
-			state = NavState::INIT;
+			control_state = ControlState::FAR_FROM_TARGET_POSE;
 		}
 		double thetaErr;
 		double thetaVel = getThetaVel(driveTarget, pose, thetaErr);
