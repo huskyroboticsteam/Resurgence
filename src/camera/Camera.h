@@ -196,6 +196,8 @@ public:
 
 	   @throws invalid_camera_config If the configuration is invalid for any
 	   reason.
+
+	   @throws std::invalid_argument If the configuration file does not exist.
 	*/
 	bool openFromConfigFile(std::string filename);
 
@@ -286,7 +288,7 @@ public:
 	/**
 	   Returns the exception message as a C string.
 	 */
-	const char *what() const noexcept;
+	virtual const char *what() const noexcept;
 
 private:
 	std::string _msg;
