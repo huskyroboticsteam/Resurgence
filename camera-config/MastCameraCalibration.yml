@@ -27,4 +27,11 @@ intrinsic_params:
       dt: d
       data: [ -4.5670452858419575e-01, 2.1512832208218641e-01,
           -1.1179480533495888e-03, -5.7450430930239835e-04, 0. ]
-# TODO: add extrinsic parameters
+extrinsic_params: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: d
+  data: [ 0., 0., 1., -.50,
+         -1., 0., 0., -.25,
+          0., 0., 0., 1.,
+          0., 0., 0., 0.]
