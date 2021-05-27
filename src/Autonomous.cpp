@@ -12,7 +12,7 @@
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 3;
-const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
+const Eigen::Vector3d gpsStdDev = {2, 2, 2*PI};
 constexpr int numSamples = 1;
 
 constexpr double FOLLOW_DIST = 2.0;
@@ -367,7 +367,7 @@ void Autonomous::autonomyIter()
 	if (!calibrated)
 	{
 		pose_t out;
-		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
+		if (gps.norm() != 0.0 && calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
 		{
 			// the standard error of the calculated mean is the std dev of the mean
 			poseEstimator.reset(out, gpsStdDev / sqrt((double)numSamples));
@@ -381,8 +381,12 @@ void Autonomous::autonomyIter()
 	}
 
 	// get the latest pose estimation
-	poseEstimator.correct(gps);
+	if (gps.norm() != 0.0)
+	{
+		poseEstimator.correct(gps);
+	}
 	pose_t pose = poseEstimator.getPose();
+	log(LOG_INFO, "Pose %f %f %f with heading %f\n", pose(0), pose(1), pose(2), gps(2));
 	transform_t invTransform = toTransform(pose).inverse();
 
 	if (nav_state == NavState::DONE)
@@ -393,7 +397,7 @@ void Autonomous::autonomyIter()
 		{
 			setCmdVel(0, 0);
 		}
-    return;
+		return;
 	}
 
   updateLandmarkInformation(invTransform);
