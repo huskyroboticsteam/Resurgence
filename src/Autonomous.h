@@ -16,51 +16,77 @@
 #include "simulator/utils.h"
 #include "planning/plan.h"
 
-enum NavState {
-	INIT,
+enum ControlState {
 	NEAR_TARGET_POSE,
-	SEARCH_PATTERN
+	FAR_FROM_TARGET_POSE
 };
+
+enum NavState {
+	GPS,
+	POST_VISIBLE,
+	SEARCH_PATTERN,
+	SEARCH_PATTERN_SECOND_POST,
+	GATE_ALIGN,
+	GATE_TRAVERSE,
+	DONE
+};
+
+constexpr std::array<const char *, 7> NAV_STATE_NAMES ({
+	"GPS",
+	"POST_VISIBLE",
+	"SEARCH_PATTERN",
+	"SEARCH_PATTERN_SECOND_POST",
+	"GATE_ALIGN",
+	"GATE_TRAVERSE",
+	"DONE"
+});
 
 class Autonomous : rclcpp::Node
 {
 public:
-	explicit Autonomous(const URCLeg &target, double controlHz);
-	Autonomous(const URCLeg &target, double controlHz, const pose_t &startPose);
+	explicit Autonomous(const URCLeg &urc_target, double controlHz);
+	Autonomous(const URCLeg &urc_target, double controlHz, const pose_t &startPose);
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	// Gets the target's coordinate
-	pose_t getTargetPose() const;
+	pose_t getGPSTargetPose() const;
 	void autonomyIter();
 
 private:
-	URCLeg target;
+	URCLeg urc_target;
 	pose_t search_target;
+	// Gate targets are {NAN, NAN, NAN} if unset and {INF, INF, INF} if reached
+	// gate_targets.second(2) is NAN if targets have not been refined with more accurate landmark measurements
+	std::pair<pose_t, pose_t> gate_targets;
 	PoseEstimator poseEstimator;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
-	RollingAvgFilter<5,3> landmarkFilter;
-	NavState state;
+	RollingAvgFilter<5,3> leftPostFilter;
+	RollingAvgFilter<5,3> rightPostFilter;
+	NavState nav_state;
+	ControlState control_state;
 	int time_since_plan;
 	plan_t plan;
 	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
 	double search_theta_increment;
-	bool already_arrived;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
-	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr next_pose_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_target_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr lidar_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
 
-	// determine direction for robot at any given iteration
-	double pathDirection(const points_t &lidar, const pose_t &gpsPose);
-	double angleToTarget(const pose_t &gpsPose) const;
-	bool arrived(const pose_t &pose) const;
+  void setNavState(NavState s);
+  void update_nav_state(const pose_t &pose, const pose_t &plan_target);
+  pose_t choose_plan_target(const pose_t &pose);
+  void updateLandmarkInformation(const transform_t &invTransform);
+  void computeGateTargets(const pose_t &pose);
+  void updateSearchTarget();
 
-	double getLinearVel(const pose_t &target, const pose_t &pose, double thetaErr) const;
-	double getThetaVel(const pose_t &target, const pose_t &pose, double &thetaErr) const;
+	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
+	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;
 	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
 	void publish(Eigen::Vector3d pose,
 			rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;

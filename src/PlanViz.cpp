@@ -19,9 +19,12 @@ public:
 			curr_pose_sub(
 					this->create_subscription<geometry_msgs::msg::Point>(
 						"current_pose", 100, std::bind(&PlanViz::curr_pose_callback, this, _1))),
-			next_pose_sub(
+			drive_target_sub(
 					this->create_subscription<geometry_msgs::msg::Point>(
-						"next_pose", 100, std::bind(&PlanViz::next_pose_callback, this, _1))),
+						"drive_target", 100, std::bind(&PlanViz::drive_target_callback, this, _1))),
+			plan_target_sub(
+					this->create_subscription<geometry_msgs::msg::Point>(
+						"plan_target", 100, std::bind(&PlanViz::plan_target_callback, this, _1))),
 			lidar_sub(
 					this->create_subscription<geometry_msgs::msg::PoseArray>(
 						"lidar_scan", 100, std::bind(&PlanViz::lidar_callback, this, _1))),
@@ -38,9 +41,14 @@ private:
 		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Black);
 	}
 
-	void next_pose_callback(const geometry_msgs::msg::Point::SharedPtr message)
+	void drive_target_callback(const geometry_msgs::msg::Point::SharedPtr message)
 	{
 		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Blue);
+	}
+
+	void plan_target_callback(const geometry_msgs::msg::Point::SharedPtr message)
+	{
+		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Green);
 	}
 
 	void lidar_callback(const geometry_msgs::msg::PoseArray::SharedPtr message)
@@ -78,7 +86,8 @@ private:
 	MyWindow viz_window;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr plan_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr curr_pose_sub;
-	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr next_pose_sub;
+	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr drive_target_sub;
+	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr plan_target_sub;
 	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr lidar_sub;
 	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_sub;
 };
