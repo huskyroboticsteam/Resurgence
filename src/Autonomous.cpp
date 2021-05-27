@@ -400,10 +400,14 @@ void Autonomous::autonomyIter()
   update_nav_state(pose, plan_target);
 
   points_t lidar_scan = readLidarScan();
+  // Our lidar sensor cannot see behind the rover. Until our mapping is improved
+  // to remember obstacles behind the rover, we just assume that the way behind us
+  // is blocked.
   double trail_dist = 3.0;
   for (double y = -1.8 * trail_dist; y < 1.8 * trail_dist; y += 0.5) {
     lidar_scan.push_back({-trail_dist, y, 1.0});
   }
+
   if (Globals::AUTONOMOUS) {
     if (plan_cost >= INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
       // TODO planning should happen in a separate thread
