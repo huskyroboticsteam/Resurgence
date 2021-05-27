@@ -92,6 +92,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a988ccf65dfb6f11ffe89293563b71d22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76856040fbc9281124ff0fb8ffdc899d"><td class="memItemLeft" align="right" valign="top">point_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a76856040fbc9281124ff0fb8ffdc899d">getClosestWithin</a> (const point_t &amp;point, double areaSize) const</td></tr>
 <tr class="separator:a76856040fbc9281124ff0fb8ffdc899d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ebf87fe172bf82b196bb434e49ae44e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a7ebf87fe172bf82b196bb434e49ae44e">hasPointWithin</a> (const point_t &amp;point, double areaSize) const</td></tr>
+<tr class="separator:a7ebf87fe172bf82b196bb434e49ae44e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1a4070a3b4ea1e95e1f98aa38f7d80e"><td class="memItemLeft" align="right" valign="top">points_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#aa1a4070a3b4ea1e95e1f98aa38f7d80e">getPointsWithin</a> (const point_t &amp;point, double areaSize) const</td></tr>
 <tr class="separator:aa1a4070a3b4ea1e95e1f98aa38f7d80e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa45c33925d7f38f7dea5332865b0bb79"><td class="memItemLeft" align="right" valign="top">point_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">getArbitraryPoint</a> () const</td></tr>
@@ -381,6 +383,43 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Gets the total number of points stored in this quadtree. </p><dl class="section return"><dt>Returns</dt><dd>The number of points in this quadtree. </dd></dl>
+
+</div>
+</div>
+<a id="a7ebf87fe172bf82b196bb434e49ae44e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ebf87fe172bf82b196bb434e49ae44e">&#9670;&nbsp;</a></span>hasPointWithin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool QuadTree::hasPointWithin </td>
+          <td>(</td>
+          <td class="paramtype">const point_t &amp;&#160;</td>
+          <td class="paramname"><em>point</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>areaSize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Checks if the given point has at least one point within the given distance from it. Although it's functionally equivalent to checking the size of the vector returned by <a class="el" href="classQuadTree.html#aa1a4070a3b4ea1e95e1f98aa38f7d80e">getPointsWithin()</a>, it is much cheaper to call this method.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">point</td><td>The point to check if it has a nearby point. </td></tr>
+    <tr><td class="paramname">dist</td><td>The distance within which to search. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True iff there exists a point in the tree, which may be the given point, within the given distance from the given point. False otherwise. </dd></dl>
 
 </div>
 </div>

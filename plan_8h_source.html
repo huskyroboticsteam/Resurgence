@@ -82,10 +82,12 @@ $(function() {
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">using</span> plan_t = Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">using</span> action_t = Eigen::Vector2d;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;plan_t getPlan(<span class="keyword">const</span> points_t &amp;lidar_scan, <span class="keyword">const</span> point_t &amp;goal, <span class="keywordtype">double</span> goal_radius);</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keywordtype">double</span> planCostFromIndex(plan_t &amp;plan, <span class="keywordtype">int</span> idx);</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;plan_t getPlan(<span class="keyword">const</span> std::function&lt;<span class="keywordtype">bool</span>(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y, <span class="keywordtype">double</span> radius)&gt; &amp;collides, <span class="keyword">const</span> point_t &amp;goal, <span class="keywordtype">double</span> goal_radius);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;plan_t getPlan(<span class="keyword">const</span> points_t &amp;lidar_scan, <span class="keyword">const</span> point_t &amp;goal, <span class="keywordtype">double</span> goal_radius);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keywordtype">double</span> planCostFromIndex(plan_t &amp;plan, <span class="keywordtype">int</span> idx);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

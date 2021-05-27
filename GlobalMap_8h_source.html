@@ -75,27 +75,41 @@ $(function() {
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;../simulator/utils.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;TrICP.h&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="classGlobalMap.html">   12</a></span>&#160;<span class="keyword">class </span><a class="code" href="classGlobalMap.html">GlobalMap</a></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="classGlobalMap.html#a5627a0a4d550c1fda773d50427524d77">GlobalMap</a>(<span class="keywordtype">int</span> maxIter = 25, <span class="keywordtype">double</span> relErrChangeThresh = 0.005);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classGlobalMap.html#a2ff7db053adb777b891b95f7daf8ceaf">addPoints</a>(<span class="keyword">const</span> transform_t &amp;robotTrf, <span class="keyword">const</span> points_t &amp;points, <span class="keywordtype">double</span> overlap);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    points_t <a class="code" href="classGlobalMap.html#ab6293cd388e58b87f8c4651cb8258c43">getPoints</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    point_t <a class="code" href="classGlobalMap.html#a523f0757fae96a92d712c0ff22410da2">getClosest</a>(<span class="keyword">const</span> point_t &amp;point) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    points_t points;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    transform_t adjustmentTransform;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    transform_t adjustmentTransformInv;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classTrICP.html">TrICP</a> icp;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;};</div>
-<div class="ttc" id="aclassGlobalMap_html"><div class="ttname"><a href="classGlobalMap.html">GlobalMap</a></div><div class="ttdef"><b>Definition:</b> GlobalMap.h:13</div></div>
-<div class="ttc" id="aclassGlobalMap_html_a2ff7db053adb777b891b95f7daf8ceaf"><div class="ttname"><a href="classGlobalMap.html#a2ff7db053adb777b891b95f7daf8ceaf">GlobalMap::addPoints</a></div><div class="ttdeci">void addPoints(const transform_t &amp;robotTrf, const points_t &amp;points, double overlap)</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:38</div></div>
-<div class="ttc" id="aclassGlobalMap_html_a523f0757fae96a92d712c0ff22410da2"><div class="ttname"><a href="classGlobalMap.html#a523f0757fae96a92d712c0ff22410da2">GlobalMap::getClosest</a></div><div class="ttdeci">point_t getClosest(const point_t &amp;point) const</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:73</div></div>
-<div class="ttc" id="aclassGlobalMap_html_a5627a0a4d550c1fda773d50427524d77"><div class="ttname"><a href="classGlobalMap.html#a5627a0a4d550c1fda773d50427524d77">GlobalMap::GlobalMap</a></div><div class="ttdeci">GlobalMap(int maxIter=25, double relErrChangeThresh=0.005)</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:20</div></div>
-<div class="ttc" id="aclassGlobalMap_html_ab6293cd388e58b87f8c4651cb8258c43"><div class="ttname"><a href="classGlobalMap.html#ab6293cd388e58b87f8c4651cb8258c43">GlobalMap::getPoints</a></div><div class="ttdeci">points_t getPoints() const</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:28</div></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;QuadTree.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;TrICP.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classGlobalMap.html">   13</a></span>&#160;<span class="keyword">class </span><a class="code" href="classGlobalMap.html">GlobalMap</a></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;{</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="classGlobalMap.html#a77e3288317a748f83775d7280e8f7410">GlobalMap</a>(<span class="keywordtype">double</span> areaSize, <span class="keywordtype">int</span> scanStride = 1, <span class="keywordtype">int</span> maxIter = 25,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                       <span class="keywordtype">double</span> relErrChangeThresh = 0.005);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classGlobalMap.html#a2ff7db053adb777b891b95f7daf8ceaf">addPoints</a>(<span class="keyword">const</span> transform_t &amp;robotTrf, <span class="keyword">const</span> points_t &amp;points, <span class="keywordtype">double</span> overlap);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    points_t <a class="code" href="classGlobalMap.html#ab6293cd388e58b87f8c4651cb8258c43">getPoints</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classGlobalMap.html#ad2be24e4a236d63446bc5f1742953d3d">size</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    point_t <a class="code" href="classGlobalMap.html#a523f0757fae96a92d712c0ff22410da2">getClosest</a>(<span class="keyword">const</span> point_t &amp;point) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    points_t <a class="code" href="classGlobalMap.html#a75a26ad9d4825d253d993dea5d390bb2">getPointsWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> dist) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classGlobalMap.html#aff9dabc9e280ecfd9e9c51ec56defe38">hasPointWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> dist) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="classQuadTree.html">QuadTree</a> tree;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="classTrICP.html">TrICP</a> icp;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">int</span> scanStride;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;};</div>
+<div class="ttc" id="aclassGlobalMap_html"><div class="ttname"><a href="classGlobalMap.html">GlobalMap</a></div><div class="ttdef"><b>Definition:</b> GlobalMap.h:14</div></div>
+<div class="ttc" id="aclassGlobalMap_html_a2ff7db053adb777b891b95f7daf8ceaf"><div class="ttname"><a href="classGlobalMap.html#a2ff7db053adb777b891b95f7daf8ceaf">GlobalMap::addPoints</a></div><div class="ttdeci">void addPoints(const transform_t &amp;robotTrf, const points_t &amp;points, double overlap)</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:23</div></div>
+<div class="ttc" id="aclassGlobalMap_html_a523f0757fae96a92d712c0ff22410da2"><div class="ttname"><a href="classGlobalMap.html#a523f0757fae96a92d712c0ff22410da2">GlobalMap::getClosest</a></div><div class="ttdeci">point_t getClosest(const point_t &amp;point) const</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:59</div></div>
+<div class="ttc" id="aclassGlobalMap_html_a75a26ad9d4825d253d993dea5d390bb2"><div class="ttname"><a href="classGlobalMap.html#a75a26ad9d4825d253d993dea5d390bb2">GlobalMap::getPointsWithin</a></div><div class="ttdeci">points_t getPointsWithin(const point_t &amp;point, double dist) const</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:69</div></div>
+<div class="ttc" id="aclassGlobalMap_html_a77e3288317a748f83775d7280e8f7410"><div class="ttname"><a href="classGlobalMap.html#a77e3288317a748f83775d7280e8f7410">GlobalMap::GlobalMap</a></div><div class="ttdeci">GlobalMap(double areaSize, int scanStride=1, int maxIter=25, double relErrChangeThresh=0.005)</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:5</div></div>
+<div class="ttc" id="aclassGlobalMap_html_ab6293cd388e58b87f8c4651cb8258c43"><div class="ttname"><a href="classGlobalMap.html#ab6293cd388e58b87f8c4651cb8258c43">GlobalMap::getPoints</a></div><div class="ttdeci">points_t getPoints() const</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:13</div></div>
+<div class="ttc" id="aclassGlobalMap_html_ad2be24e4a236d63446bc5f1742953d3d"><div class="ttname"><a href="classGlobalMap.html#ad2be24e4a236d63446bc5f1742953d3d">GlobalMap::size</a></div><div class="ttdeci">size_t size() const</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:18</div></div>
+<div class="ttc" id="aclassGlobalMap_html_aff9dabc9e280ecfd9e9c51ec56defe38"><div class="ttname"><a href="classGlobalMap.html#aff9dabc9e280ecfd9e9c51ec56defe38">GlobalMap::hasPointWithin</a></div><div class="ttdeci">bool hasPointWithin(const point_t &amp;point, double dist) const</div><div class="ttdef"><b>Definition:</b> GlobalMap.cpp:84</div></div>
+<div class="ttc" id="aclassQuadTree_html"><div class="ttname"><a href="classQuadTree.html">QuadTree</a></div><div class="ttdef"><b>Definition:</b> QuadTree.h:17</div></div>
 <div class="ttc" id="aclassTrICP_html"><div class="ttname"><a href="classTrICP.html">TrICP</a></div><div class="ttdef"><b>Definition:</b> TrICP.h:13</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

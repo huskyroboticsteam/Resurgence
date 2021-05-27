@@ -12,5 +12,6 @@ var searchData=
   ['hash_3c_20nlohmann_3a_3ajson_20_3e_191',['hash&lt; nlohmann::json &gt;',['../structstd_1_1hash_3_01nlohmann_1_1json_01_4.html',1,'std']]],
   ['hash_3c_20xyq_20_3e_192',['hash&lt; XYQ &gt;',['../structstd_1_1hash_3_01XYQ_01_4.html',1,'std']]],
   ['hasintrinsicparams_193',['hasIntrinsicParams',['../classcam_1_1Camera.html#a5eaa58b230cd0245ec51178feb9efc30',1,'cam::Camera']]],
-  ['hasnext_194',['hasNext',['../classcam_1_1Camera.html#aec30888642d4f81aa1f26728782ad4d9',1,'cam::Camera']]]
+  ['hasnext_194',['hasNext',['../classcam_1_1Camera.html#aec30888642d4f81aa1f26728782ad4d9',1,'cam::Camera']]],
+  ['haspointwithin_195',['hasPointWithin',['../classGlobalMap.html#aff9dabc9e280ecfd9e9c51ec56defe38',1,'GlobalMap::hasPointWithin()'],['../classQuadTree.html#a7ebf87fe172bf82b196bb434e49ae44e',1,'QuadTree::hasPointWithin()']]]
 ];

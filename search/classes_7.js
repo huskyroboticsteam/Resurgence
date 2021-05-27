@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['globalmap_578',['GlobalMap',['../classGlobalMap.html',1,'']]],
-  ['gpsreading_579',['GPSReading',['../structGPSReading.html',1,'']]]
+  ['globalmap_579',['GlobalMap',['../classGlobalMap.html',1,'']]],
+  ['gpsreading_580',['GPSReading',['../structGPSReading.html',1,'']]]
 ];

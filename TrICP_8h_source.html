@@ -79,15 +79,22 @@ $(function() {
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="classTrICP.html#a7bf9c0e9dbdecac18ee35af54db49e55">TrICP</a>(<span class="keywordtype">int</span> maxIter, <span class="keywordtype">double</span> relErrChangeThresh,</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;                   std::function&lt;point_t(<span class="keyword">const</span> point_t &amp;)&gt; getClosest);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    transform_t <a class="code" href="classTrICP.html#aaf1217d5df064448bba3daee278a8fd1">correct</a>(<span class="keyword">const</span> points_t &amp;sample, <span class="keywordtype">double</span> overlap);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">int</span> maxIter;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">double</span> relErrChangeThresh;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    transform_t <a class="code" href="classTrICP.html#aaf1217d5df064448bba3daee278a8fd1">correct</a>(<span class="keyword">const</span> points_t &amp;sample, <span class="keywordtype">double</span> overlap);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">// maximum number of iterations to use</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">int</span> maxIter;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="comment">// if the relative error change drops below this threshold, stop iterating</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">double</span> relErrChangeThresh;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">// find the closest point in the reference to the given point</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    std::function&lt;point_t(<span class="keyword">const</span> point_t &amp;)&gt; getClosest;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    transform_t iterate(points_t &amp;sample, <span class="keywordtype">int</span> N, <span class="keywordtype">double</span> &amp;mse) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">bool</span> isDone(<span class="keywordtype">int</span> numIter, <span class="keywordtype">double</span> S, <span class="keywordtype">double</span> oldMSE) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="comment">// performs a single iteration of point cloud registration, returning the computed transform</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    transform_t iterate(points_t &amp;sample, <span class="keywordtype">int</span> N, <span class="keywordtype">double</span> &amp;mse) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">// returns true iff any of the stopping conditions are met</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">bool</span> isDone(<span class="keywordtype">int</span> numIter, <span class="keywordtype">double</span> S, <span class="keywordtype">double</span> oldMSE) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;};</div>
 <div class="ttc" id="aclassTrICP_html"><div class="ttname"><a href="classTrICP.html">TrICP</a></div><div class="ttdef"><b>Definition:</b> TrICP.h:13</div></div>
 <div class="ttc" id="aclassTrICP_html_a7bf9c0e9dbdecac18ee35af54db49e55"><div class="ttname"><a href="classTrICP.html#a7bf9c0e9dbdecac18ee35af54db49e55">TrICP::TrICP</a></div><div class="ttdeci">TrICP(int maxIter, double relErrChangeThresh, std::function&lt; point_t(const point_t &amp;)&gt; getClosest)</div><div class="ttdef"><b>Definition:</b> TrICP.cpp:105</div></div>
 <div class="ttc" id="aclassTrICP_html_aaf1217d5df064448bba3daee278a8fd1"><div class="ttname"><a href="classTrICP.html#aaf1217d5df064448bba3daee278a8fd1">TrICP::correct</a></div><div class="ttdeci">transform_t correct(const points_t &amp;sample, double overlap)</div><div class="ttdef"><b>Definition:</b> TrICP.cpp:112</div></div>

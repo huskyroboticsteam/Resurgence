@@ -97,27 +97,31 @@ $(function() {
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    point_t <a class="code" href="classQuadTree.html#a76856040fbc9281124ff0fb8ffdc899d">getClosestWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> areaSize) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    points_t <a class="code" href="classQuadTree.html#aa1a4070a3b4ea1e95e1f98aa38f7d80e">getPointsWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> areaSize) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    point_t <a class="code" href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">getArbitraryPoint</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="comment">// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="comment">// if one is initialized then all are initialized</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    std::shared_ptr&lt;QuadTree&gt; children[4];</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    point_t center;   <span class="comment">// center of bounding box, in word coords</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordtype">double</span> width;     <span class="comment">// size of square area</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    points_t points;  <span class="comment">// the points in this node, 0 &lt;= points.size() &lt;= nodeCapacity</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordtype">int</span> nodeCapacity; <span class="comment">// number of points stored in each node</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">size_t</span> size;      <span class="comment">// number of nodes stored in this or its descendants</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">// create children nodes (doesn&#39;t check for already existing)</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> subdivide();</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">// check if children exist</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordtype">bool</span> hasChildren() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">// private method paired with QuadTree::getAllPoints()</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">getAllPoints</a>(<span class="keyword">const</span> <a class="code" href="classQuadTree.html">QuadTree</a> &amp;tree, points_t &amp;allPoints) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;};</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classQuadTree.html#a7ebf87fe172bf82b196bb434e49ae44e">hasPointWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> areaSize) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    points_t <a class="code" href="classQuadTree.html#aa1a4070a3b4ea1e95e1f98aa38f7d80e">getPointsWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> areaSize) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    point_t <a class="code" href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">getArbitraryPoint</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">// TODO: add method to remove random points, to help keep the tree size down</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="comment">// if one is initialized then all are initialized</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    std::shared_ptr&lt;QuadTree&gt; children[4];</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    point_t center;   <span class="comment">// center of bounding box, in word coords</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordtype">double</span> width;     <span class="comment">// size of square area</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    points_t points;  <span class="comment">// the points in this node, 0 &lt;= points.size() &lt;= nodeCapacity</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">int</span> nodeCapacity; <span class="comment">// number of points stored in each node</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">size_t</span> size;      <span class="comment">// number of nodes stored in this or its descendants</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">// create children nodes (doesn&#39;t check for already existing)</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordtype">void</span> subdivide();</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">// check if children exist</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordtype">bool</span> hasChildren() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="comment">// private method paired with QuadTree::getAllPoints()</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">getAllPoints</a>(<span class="keyword">const</span> <a class="code" href="classQuadTree.html">QuadTree</a> &amp;tree, points_t &amp;allPoints) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;};</div>
 <div class="ttc" id="aclassQuadTree_html"><div class="ttname"><a href="classQuadTree.html">QuadTree</a></div><div class="ttdef"><b>Definition:</b> QuadTree.h:17</div></div>
 <div class="ttc" id="aclassQuadTree_html_a1528c5a86d608cf01358acfa289db273"><div class="ttname"><a href="classQuadTree.html#a1528c5a86d608cf01358acfa289db273">QuadTree::getSize</a></div><div class="ttdeci">size_t getSize() const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:31</div></div>
 <div class="ttc" id="aclassQuadTree_html_a1e3fb6735f6868d2756cd061250262b8"><div class="ttname"><a href="classQuadTree.html#a1e3fb6735f6868d2756cd061250262b8">QuadTree::remove</a></div><div class="ttdeci">bool remove(const point_t &amp;point)</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:118</div></div>
@@ -125,6 +129,7 @@ $(function() {
 <div class="ttc" id="aclassQuadTree_html_a3c4e91970522b6049a802d193fe79c20"><div class="ttname"><a href="classQuadTree.html#a3c4e91970522b6049a802d193fe79c20">QuadTree::add</a></div><div class="ttdeci">bool add(const point_t &amp;point)</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:83</div></div>
 <div class="ttc" id="aclassQuadTree_html_a5a383998dae77988cc36b0575c344356"><div class="ttname"><a href="classQuadTree.html#a5a383998dae77988cc36b0575c344356">QuadTree::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:36</div></div>
 <div class="ttc" id="aclassQuadTree_html_a76856040fbc9281124ff0fb8ffdc899d"><div class="ttname"><a href="classQuadTree.html#a76856040fbc9281124ff0fb8ffdc899d">QuadTree::getClosestWithin</a></div><div class="ttdeci">point_t getClosestWithin(const point_t &amp;point, double areaSize) const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:216</div></div>
+<div class="ttc" id="aclassQuadTree_html_a7ebf87fe172bf82b196bb434e49ae44e"><div class="ttname"><a href="classQuadTree.html#a7ebf87fe172bf82b196bb434e49ae44e">QuadTree::hasPointWithin</a></div><div class="ttdeci">bool hasPointWithin(const point_t &amp;point, double areaSize) const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:274</div></div>
 <div class="ttc" id="aclassQuadTree_html_a988ccf65dfb6f11ffe89293563b71d22"><div class="ttname"><a href="classQuadTree.html#a988ccf65dfb6f11ffe89293563b71d22">QuadTree::getClosest</a></div><div class="ttdeci">point_t getClosest(const point_t &amp;point) const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:160</div></div>
 <div class="ttc" id="aclassQuadTree_html_aa1a4070a3b4ea1e95e1f98aa38f7d80e"><div class="ttname"><a href="classQuadTree.html#aa1a4070a3b4ea1e95e1f98aa38f7d80e">QuadTree::getPointsWithin</a></div><div class="ttdeci">points_t getPointsWithin(const point_t &amp;point, double areaSize) const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:243</div></div>
 <div class="ttc" id="aclassQuadTree_html_aa45c33925d7f38f7dea5332865b0bb79"><div class="ttname"><a href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">QuadTree::getArbitraryPoint</a></div><div class="ttdeci">point_t getArbitraryPoint() const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:61</div></div>
