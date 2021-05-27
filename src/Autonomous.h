@@ -31,6 +31,16 @@ enum NavState {
 	DONE
 };
 
+constexpr std::array<const char *, 7> NAV_STATE_NAMES ({
+	"GPS",
+	"POST_VISIBLE",
+	"SEARCH_PATTERN",
+	"SEARCH_PATTERN_SECOND_POST",
+	"GATE_ALIGN",
+	"GATE_TRAVERSE",
+	"DONE"
+});
+
 class Autonomous : rclcpp::Node
 {
 public:

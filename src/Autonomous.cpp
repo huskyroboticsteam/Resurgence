@@ -16,7 +16,7 @@ const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
 
 constexpr double FOLLOW_DIST = 2.0;
-constexpr double PLAN_COLLISION_STOP_DIST = 2.0;
+constexpr double PLAN_COLLISION_STOP_DIST = 4.0;
 constexpr double INFINITE_COST = 1e10;
 constexpr int REPLAN_PERIOD = 20;
 
@@ -89,7 +89,7 @@ void Autonomous::setNavState(NavState s)
   nav_state = s;
   if (old_state != s)
   {
-    log(LOG_INFO, "Changing navigation state to %d\n", s);
+    log(LOG_INFO, "Changing navigation state to %s\n", NAV_STATE_NAMES[nav_state]);
     plan_cost = INFINITE_COST;
   }
 }
@@ -198,7 +198,8 @@ double getRelativeAngle(double currAngle, double targetAngle)
 
 double Autonomous::getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const {
 	double speed = DRIVE_SPEED;
-	if (dist(drive_target, pose, 0) < 1.0) {
+	if (dist(drive_target, pose, 0) < 1.0 ||
+			nav_state == NavState::GATE_TRAVERSE) {
 		// We should drive slower near the goal so that we don't overshoot the target
 		// (given our relatively low control frequency of 10 Hz)
 		speed = DRIVE_SPEED / 3;
@@ -398,9 +399,13 @@ void Autonomous::autonomyIter()
   pose_t plan_target = choose_plan_target(pose);
   update_nav_state(pose, plan_target);
 
-  const points_t lidar_scan = readLidarScan();
+  points_t lidar_scan = readLidarScan();
+  double trail_dist = 3.0;
+  for (double y = -1.8 * trail_dist; y < 1.8 * trail_dist; y += 0.5) {
+    lidar_scan.push_back({-trail_dist, y, 1.0});
+  }
   if (Globals::AUTONOMOUS) {
-    if (plan_cost == INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
+    if (plan_cost >= INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
       // TODO planning should happen in a separate thread
       // because it takes a long time
       point_t point_t_goal;
@@ -411,6 +416,7 @@ void Autonomous::autonomyIter()
       plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
       double new_plan_cost = planCostFromIndex(new_plan, 0);
       // we want a significant improvement to avoid thrash
+      log(LOG_DEBUG, "old cost %f, new cost %f\n", plan_cost, new_plan_cost);
       if (new_plan_cost < plan_cost * 0.8) {
         plan_idx = 0;
         plan_base = pose;
@@ -447,28 +453,30 @@ void Autonomous::autonomyIter()
     publish(start_plan_pose_transformed, plan_pub);
 
     bool found_target = false;
+    double accumulated_cost = 0;
     for (int i = 0; i < plan_size; i++) {
       action_t action = plan.row(i);
       plan_pose(2) += action(0);
       plan_pose(0) += action(1) * cos(plan_pose(2));
       plan_pose(1) += action(1) * sin(plan_pose(2));
       transform_t tf_plan_pose = toTransform(plan_pose) * invTransform;
-      if (collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
+      if (i >= plan_idx && collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
         // We'll replan next timestep
         // TODO strictly speaking, we don't need to replan if the collision happened
         // on a part of the plan that we've already passed. But I'm not quite sure how
         // to algorithmically decide which parts of the plan we've already passed.
-        plan_cost = INFINITE_COST;
+        accumulated_cost += INFINITE_COST;
         // TODO we should have a more sophisticated way of deciding whether a collision
         // is imminent.
         if (dist(plan_pose, pose, 0.0) < PLAN_COLLISION_STOP_DIST) {
+          log(LOG_WARN, "Collision imminent! Stopping the rover!\n");
           driveTarget = pose; // Don't move
         }
       }
       if (i >= plan_idx && !found_target && dist(plan_pose, pose, 1.0) > FOLLOW_DIST) {
         found_target = true;
         plan_idx = i;
-        plan_cost = planCostFromIndex(plan, i);
+        accumulated_cost += planCostFromIndex(plan, i);
         driveTarget = plan_pose;
       } else {
         // Send current plan_pose to visualization
@@ -476,6 +484,10 @@ void Autonomous::autonomyIter()
         publish(curr_plan_transformed, plan_pub);
       }
     }
+    // This deals with drift
+    // TODO maybe we should just replan if the distance drifts too far
+    accumulated_cost += dist(plan_pose, plan_target, 1.0);
+    plan_cost = accumulated_cost;
   }
 
   // Send drive target to visualization
