@@ -16,6 +16,7 @@ const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
 constexpr int numSamples = 1;
 
 constexpr double FOLLOW_DIST = 2.0;
+constexpr double PLANNING_GOAL_REGION_RADIUS = 1.0;
 constexpr double PLAN_COLLISION_STOP_DIST = 4.0;
 constexpr double INFINITE_COST = 1e10;
 constexpr int REPLAN_PERIOD = 20;
@@ -416,8 +417,7 @@ void Autonomous::autonomyIter()
       point_t_goal.topRows(2) = plan_target.topRows(2);
       point_t_goal(2) = 1.0;
       point_t_goal = toTransform(pose) * point_t_goal;
-      double goal_radius = 2.0;
-      plan_t new_plan = getPlan(lidar_scan, point_t_goal, goal_radius);
+      plan_t new_plan = getPlan(lidar_scan, point_t_goal, PLANNING_GOAL_REGION_RADIUS);
       double new_plan_cost = planCostFromIndex(new_plan, 0);
       // we want a significant improvement to avoid thrash
       log(LOG_DEBUG, "old cost %f, new cost %f\n", plan_cost, new_plan_cost);
@@ -443,10 +443,11 @@ void Autonomous::autonomyIter()
   publish(plan_target_transformed, plan_target_pub);
 
   int plan_size = plan.rows();
-  pose_t driveTarget = plan_target;
-  if (plan_size == 0 && dist(plan_target, pose, 1.0) < 2.0) {
+  pose_t driveTarget = pose;
+  if (nav_state == NavState::GATE_TRAVERSE || dist(plan_target, pose, 0.0) < 2.0) {
     // We're probably within planning resolution of the goal,
     // so using the goal as the drive target makes sense.
+    driveTarget = plan_target;
   } else {
     // Roll out the plan until we find a target pose a certain distance in front
     // of the robot. (This code also handles visualizing the plan.)
@@ -488,9 +489,14 @@ void Autonomous::autonomyIter()
         publish(curr_plan_transformed, plan_pub);
       }
     }
+    if (!found_target) {
+      plan_idx = plan_size - 1;
+      driveTarget = plan_pose;
+    }
+
     // This deals with drift
     // TODO maybe we should just replan if the distance drifts too far
-    accumulated_cost += dist(plan_pose, plan_target, 1.0);
+    accumulated_cost += 2*dist(plan_pose, plan_target, 1.0);
     plan_cost = accumulated_cost;
   }
 
