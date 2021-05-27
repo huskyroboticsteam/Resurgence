@@ -1,5 +1,6 @@
 #include "../../src/worldmap/TrICP.h"
 
+#include <Eigen/LU>
 #include <iostream>
 
 #include <catch2/catch.hpp>
@@ -35,14 +36,15 @@ TEST_CASE("Trimmed ICP")
 		sample.push_back(p);
 	}
 
-	GlobalMap globalMap;
+	GlobalMap globalMap(1000);
 	globalMap.addPoints(transform_t::Identity(), map, 1);
 
 	TrICP icp(25, 0.005, std::bind(&GlobalMap::getClosest, &globalMap, std::placeholders::_1));
-	// approximate the transform used to create the sample
+	// approximate the inverse of the transform used to create the sample
 	transform_t trfApprox = icp.correct(sample, 0.3);
+	transform_t trfInv = trf.inverse();
 
-	double mse =(trf-trfApprox).array().square().mean();
+	double mse = (trfInv - trfApprox).array().square().mean();
 	std::cout << "TrICP MSE: " << mse << std::endl;
 	CHECK(mse == Approx(0).margin(0.01));
 }

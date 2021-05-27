@@ -1,6 +1,8 @@
 #include "../../src/worldmap/GlobalMap.h"
 
 #include <iostream>
+#include <cmath>
+#include <cfloat>
 
 #include <catch2/catch.hpp>
 
@@ -28,7 +30,6 @@ double calculateMSE(const points_t &p1, const points_t &p2)
 	{
 		point_t truth = p1[i];
 		point_t p = p2[i];
-		//		std::cout << p(0) << ", " << p(1) << std::endl;
 		mse += pow((p - truth).norm(), 2);
 	}
 	mse /= p1.size();
@@ -37,18 +38,85 @@ double calculateMSE(const points_t &p1, const points_t &p2)
 }
 } // namespace
 
-TEST_CASE("Global Map")
+TEST_CASE("Global Map - ScanStride", "[GlobalMap]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 
-	GlobalMap map;
+	for (int i = 1; i <= 3; i++) {
+		GlobalMap map(1000, i);
+		points_t points;
+		for (int j = 0; j < i * 1000; j++) {
+			point_t point = {rand(-100, 100), rand(-100, 100), 1};
+			points.push_back(point);
+		}
+		map.addPoints(transform_t::Identity(), points, 0);
+
+		REQUIRE(map.size() == 1000);
+		REQUIRE(map.getPoints().size() == 1000);
+	}
+}
+
+TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+
+	GlobalMap map(1000);
+	points_t points;
+
+	constexpr int areaMin = -5;
+	constexpr int areaMax = 5;
+
+	for (int i = 0; i < 100; i++)
+	{
+		double x = rand(areaMin, areaMax);
+		double y = rand(areaMin, areaMax);
+		point_t p = {x, y, 1};
+		points.push_back(p);
+	}
+	map.addPoints(transform_t::Identity(), points, 0);
+
+	for (int i = 0; i < 500; i++) {
+		double x = rand(areaMin, areaMax);
+		double y = rand(areaMin, areaMax);
+		point_t point = {x, y, 1};
+
+		// manually compute the nearest neighbor to check against
+		point_t closest = {0, 0, 0};
+		double minDist = std::numeric_limits<double>::infinity();
+		for (const point_t &p : points)
+		{
+			double dist = (p - point).topRows<2>().norm();
+			if (dist < minDist)
+			{
+				minDist = dist;
+				closest = p;
+			}
+		}
+
+		point_t closestMap = map.getClosest(point);
+		REQUIRE(closest == closestMap);
+		REQUIRE(map.hasPointWithin(point, minDist));
+
+		REQUIRE(map.hasPointWithin(point, std::nextafter(minDist, DBL_MAX)));
+		REQUIRE_FALSE(map.hasPointWithin(point, std::nextafter(minDist, 0)));
+
+		REQUIRE(map.hasPointWithin(point, minDist * 2));
+		REQUIRE_FALSE(map.hasPointWithin(point, minDist / 2.0));
+	}
+}
+
+TEST_CASE("Global Map", "[GlobalMap]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+
+	GlobalMap map(1000);
 	points_t allPoints;
 	// create 5 groups of points for aligning with each other, all in same area
 	for (int i = 0; i < 5; i++)
 	{
 		points_t sample;
-		// last sample should be in axes reference frame, so we can check performance easily
-		transform_t trf = i < 4 ? randTransform(0, 0) : transform_t::Identity();
+		// first sample should be in axes reference frame, so we can check performance easily
+		transform_t trf = i > 0 ? randTransform(0, 0) : transform_t::Identity();
 		for (int j = 0; j < 150; j++)
 		{
 			double x1 = rand(-3, 3);
@@ -61,19 +129,25 @@ TEST_CASE("Global Map")
 	}
 
 	points_t mapPoints = map.getPoints();
+
+	// we need to sort because iteration order is not consistent
+	auto comp = [](const point_t &a, const point_t &b) { return a(0) < b(0); };
+	std::sort(allPoints.begin(), allPoints.end(), comp);
+	std::sort(mapPoints.begin(), mapPoints.end(), comp);
+
 	double mse = calculateMSE(allPoints, mapPoints);
 
 	std::cout << "Global Map MSE Full Overlap: " << mse << std::endl;
 	REQUIRE(mse == Approx(0).margin(0.5));
 }
 
-TEST_CASE("Global Map 0.5 Overlap")
+TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 	// we'll be getting points along the sin function
 	std::function<double(double)> func = [](double x) { return sin(x); };
 
-	GlobalMap map;
+	GlobalMap map(1000);
 	points_t truths;
 	// create 5 groups of points for aligning, each partially overlapping with the last
 	for (int i = -2; i <= 2; i++)
@@ -99,6 +173,12 @@ TEST_CASE("Global Map 0.5 Overlap")
 	}
 
 	points_t mapPoints = map.getPoints();
+
+	// we need to sort because iteration order is not consistent
+	auto comp = [](const point_t &a, const point_t &b) { return a(0) < b(0); };
+	std::sort(truths.begin(), truths.end(), comp);
+	std::sort(mapPoints.begin(), mapPoints.end(), comp);
+
 	double mse = calculateMSE(truths, mapPoints);
 
 	std::cout << "Global Map MSE Partial Overlap: " << mse << std::endl;
