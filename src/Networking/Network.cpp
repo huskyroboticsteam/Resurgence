@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#include<iostream>
+#include <iostream>
 
 int base_station_fd = -1;
 bool connected = false;
