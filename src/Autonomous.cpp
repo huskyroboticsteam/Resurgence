@@ -364,6 +364,10 @@ void Autonomous::updateSearchTarget()
   }
 }
 
+plan_t computePlan(std::function<bool(double, double, double)> collide_func, const point_t& goal){
+	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
+}
+
 void Autonomous::autonomyIter()
 {
 	transform_t gps = readGPS(); // <--- has some heading information
@@ -412,30 +416,40 @@ void Autonomous::autonomyIter()
       map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
       mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
     }
-    if (plan_cost >= INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
-      // TODO planning should happen in a separate thread
-      // because it takes a long time
-      point_t point_t_goal;
-      point_t_goal.topRows(2) = plan_target.topRows(2);
-      point_t_goal(2) = 1.0;
-      point_t_goal = toTransform(pose) * point_t_goal;
-      //plan_t new_plan = getPlan(lidar_scan, point_t_goal, PLANNING_GOAL_REGION_RADIUS);
-      plan_t new_plan = getPlan([&](double x, double y, double radius)->bool {
-        // transform the point to check into map space
-        point_t relPoint = {x, y, 1};
-        point_t p = invTransform * relPoint;
-        return map.hasPointWithin(p, radius);
-      }, point_t_goal, PLANNING_GOAL_REGION_RADIUS);
-      double new_plan_cost = planCostFromIndex(new_plan, 0);
-      // we want a significant improvement to avoid thrash
-      log(LOG_DEBUG, "old cost %f, new cost %f\n", plan_cost, new_plan_cost);
-      if (new_plan_cost < plan_cost * 0.8) {
-        plan_idx = 0;
-        plan_base = pose;
-        plan_cost = new_plan_cost;
-        plan = new_plan;
-        time_since_plan = 0;
-      }
+    if ((plan_cost >= INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0)) {
+		// if we don't have a plan pending, we should start computing one.
+		if (!pending_plan.valid()) {
+			point_t point_t_goal;
+			point_t_goal.topRows(2) = plan_target.topRows(2);
+			point_t_goal(2) = 1.0;
+			point_t_goal = toTransform(pose) * point_t_goal;
+			auto collide_func = [&](double x, double y, double radius) -> bool {
+				// transform the point to check into map space
+				point_t relPoint = {x, y, 1};
+				point_t p = invTransform * relPoint;
+				return map.hasPointWithin(p, radius);
+			};
+			pending_plan =
+				std::async(std::launch::async, &computePlan, collide_func, point_t_goal);
+		}
+		// if there is a plan pending, wait maximum 1ms for it to be ready.
+		// TODO possibly change this time if we want it to be shorter.
+		else if(pending_plan.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready){
+			// plan is ready; retrieve it and check if the cost is satisfactory.
+			// upon calling get(), pending_plan.valid() will return false, so if we reject this
+			// plan another will be computed.
+			plan_t new_plan = pending_plan.get();
+			double new_plan_cost = planCostFromIndex(new_plan, 0);
+			// we want a significant improvement to avoid thrash
+			log(LOG_DEBUG, "old cost %f, new cost %f\n", plan_cost, new_plan_cost);
+			if (new_plan_cost < plan_cost * 0.8) {
+				plan_idx = 0;
+				plan_base = pose;
+				plan_cost = new_plan_cost;
+				plan = new_plan;
+				time_since_plan = 0;
+			}
+		}
     }
   }
 
