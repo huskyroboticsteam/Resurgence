@@ -24,9 +24,9 @@ extern "C"
 }
 
 constexpr std::array<uint32_t,6> arm_PPJRs = {
-    360 * 1000, // base, unmeasured
+    17 * 1000, // base, rough estimate
 
-    180 * 1000, // shoulder, rough estimate
+    1200 * 1000, // shoulder, estimate, TODO there's some bug with setting PPJR for this board
     36 * 1000, // elbow, rough estimate
 
     360 * 1000, // forearm, unmeasured
