@@ -4,6 +4,8 @@
 #include <csignal>
 #include <unistd.h>
 #include <array>
+#include <queue>
+#include <fstream>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -15,6 +17,7 @@
 #include "Networking/ParseBaseStation.h"
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
+//#include "gps/read_usb_gps.h"
 
 extern "C"
 {
@@ -139,8 +142,28 @@ int rover_loop(int argc, char **argv)
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communication from the base station
-    int urc_leg = 5;
-    Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
+    std::queue<URCLeg> urc_legs;
+	std::ifstream gps_legs("gps_legs.yaml");
+	if (gps_legs)
+	{
+//		for (int i = 0; !gps_legs.eof(); i++)
+//		{
+//			double lon, lat;
+//			gps_legs >> lon >> lat;
+//			point_t leg_map_space = gpsToMeters(lon, lat);
+//			URCLeg leg = {i, i, leg_map_space}; // TODO FIX POST IDS
+//		}
+		std::cout << "Using file" << std::endl;
+	}
+	else
+	{
+		// File does not exist, use simulation legs as defaults
+		for (int i = 0; i < 7; i++)
+		{
+			urc_legs.push(getLeg(i));
+		}
+	}
+    Autonomous autonomous(urc_legs, CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp_loop_end, tp_loop_start, tp_rover_start;
     int num_can_packets = 0;
