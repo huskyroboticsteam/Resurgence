@@ -129,7 +129,7 @@ transform_t TrICP::correct(const points_t &sample, double overlap)
 		trf = t * trf;
 	} while (!isDone(i, mse, oldMSE));
 
-	return trf.inverse();
+	return trf;
 }
 
 bool TrICP::isDone(int numIter, double mse, double oldMSE) const

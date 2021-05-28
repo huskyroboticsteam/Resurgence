@@ -6,8 +6,8 @@
 
 #include "Globals.h"
 #include "log.h"
-#include "simulator/world_interface.h"
 #include "simulator/constants.h"
+#include "simulator/world_interface.h"
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
@@ -43,6 +43,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		search_target({_target.approx_GPS(0) - PI, _target.approx_GPS(1), -PI / 2}),
 		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
 		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
+		map(10000), // TODO: the stride should be set higher when using the real lidar
 		calibrated(false),
 		calibrationPoses({}),
 		leftPostFilter(),
@@ -55,6 +56,10 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		plan_base({0,0,0}),
 		plan_idx(0),
 		search_theta_increment(PI / 4),
+		mapLoopCounter(0),
+		mapBlindPeriod(15),
+		mapDoesOverlap(false),
+		mapOverlapSampleThreshold(15),
 		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
 		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
 		drive_target_pub(this->create_publisher<geometry_msgs::msg::Point>("drive_target", 100)),
@@ -401,15 +406,12 @@ void Autonomous::autonomyIter()
   update_nav_state(pose, plan_target);
 
   points_t lidar_scan = readLidarScan();
-  // Our lidar sensor cannot see behind the rover. Until our mapping is improved
-  // to remember obstacles behind the rover, we just assume that the way behind us
-  // is blocked.
-  double trail_dist = 3.0;
-  for (double y = -1.8 * trail_dist; y < 1.8 * trail_dist; y += 0.5) {
-    lidar_scan.push_back({-trail_dist, y, 1.0});
-  }
 
   if (Globals::AUTONOMOUS) {
+    if (mapLoopCounter++ > mapBlindPeriod) {
+      map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
+      mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
+    }
     if (plan_cost >= INFINITE_COST || ++time_since_plan % REPLAN_PERIOD == 0) {
       // TODO planning should happen in a separate thread
       // because it takes a long time
@@ -417,7 +419,13 @@ void Autonomous::autonomyIter()
       point_t_goal.topRows(2) = plan_target.topRows(2);
       point_t_goal(2) = 1.0;
       point_t_goal = toTransform(pose) * point_t_goal;
-      plan_t new_plan = getPlan(lidar_scan, point_t_goal, PLANNING_GOAL_REGION_RADIUS);
+      //plan_t new_plan = getPlan(lidar_scan, point_t_goal, PLANNING_GOAL_REGION_RADIUS);
+      plan_t new_plan = getPlan([&](double x, double y, double radius)->bool {
+        // transform the point to check into map space
+        point_t relPoint = {x, y, 1};
+        point_t p = invTransform * relPoint;
+        return map.hasPointWithin(p, radius);
+      }, point_t_goal, PLANNING_GOAL_REGION_RADIUS);
       double new_plan_cost = planCostFromIndex(new_plan, 0);
       // we want a significant improvement to avoid thrash
       log(LOG_DEBUG, "old cost %f, new cost %f\n", plan_cost, new_plan_cost);
@@ -465,11 +473,9 @@ void Autonomous::autonomyIter()
       plan_pose(0) += action(1) * cos(plan_pose(2));
       plan_pose(1) += action(1) * sin(plan_pose(2));
       transform_t tf_plan_pose = toTransform(plan_pose) * invTransform;
-      if (i >= plan_idx && collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
+      if (i >= plan_idx && map.hasPointWithin(plan_pose, 1.3)) { // stay 1.3 meters away
+      //if (i >= plan_idx && collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
         // We'll replan next timestep
-        // TODO strictly speaking, we don't need to replan if the collision happened
-        // on a part of the plan that we've already passed. But I'm not quite sure how
-        // to algorithmically decide which parts of the plan we've already passed.
         accumulated_cost += INFINITE_COST;
         // TODO we should have a more sophisticated way of deciding whether a collision
         // is imminent.

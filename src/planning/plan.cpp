@@ -6,6 +6,7 @@
 #include <queue>
 #include <set>
 
+#include "../Util.h"
 #include "../simulator/constants.h"
 #include "../simulator/graphics.h"
 #include "../simulator/world_interface.h"
@@ -96,80 +97,94 @@ public:
 
 using pqueue_t = std::priority_queue<Node*, std::vector<Node*>, NodeCompare>;
 using set_t = std::set<Node*, NodeEqualityCompare>;
+using collides_predicate_t = std::function<bool(double x, double y , double radius)>;
 
-bool is_valid(const Node *n, const points_t &lidar_hits)
+bool is_valid(const Node *n, const collides_predicate_t &collides)
 {
   // To get away from obstacles, turning is always allowed.
   if (n->action(1) == 0.0) return true;
-  pose_t p(n->x * PLAN_RESOLUTION, n->y * PLAN_RESOLUTION, n->theta * M_PI/4);
-  transform_t tf = toTransform(p);
-  return !collides(tf, lidar_hits, SAFE_RADIUS);
+  double x = n->x * PLAN_RESOLUTION;
+  double y = n->y * PLAN_RESOLUTION;
+  return !collides(x, y, SAFE_RADIUS);
+}
+
+plan_t getPlan(const collides_predicate_t &collides, const point_t &goal, double goal_radius) {
+	util::ScopedTimer timer;
+	std::cout << "Planning... " << std::flush;
+	action_t action = action_t::Zero();
+	std::vector<Node*> allocated_nodes;
+	Node *start = new Node(nullptr, action, goal);
+	allocated_nodes.push_back(start);
+	pqueue_t fringe; // If you haven't guessed, we'll be using A*
+	set_t visited_set;
+	fringe.push(start);
+	visited_set.insert(start);
+	Node *n = start;
+	plan_t valid_actions(3,2);
+	valid_actions << 0., 0., M_PI/4, 0., -M_PI/4, 0.;
+	int counter = 0;
+	bool success = false;
+	while (fringe.size() > 0)
+	{
+		if (counter++ > MAX_ITERS)
+		{
+			break;
+		}
+		n = fringe.top();
+		fringe.pop();
+		if (n->heuristic_to_goal < goal_radius)
+		{
+			success = true;
+			break;
+		}
+		else
+		{
+			double forward_dist = (n->theta % 2 == 1) ? PLAN_RESOLUTION*1.414 : PLAN_RESOLUTION;
+			valid_actions(0,1) = forward_dist;
+			for (int i = 0; i < valid_actions.rows(); i++)
+			{
+				action = valid_actions.row(i);
+				Node *next = new Node(n, action, goal);
+				allocated_nodes.push_back(next);
+				if (is_valid(next, collides) && visited_set.count(next) == 0)
+				{
+					visited_set.insert(next);
+					fringe.push(next);
+				}
+			}
+		}
+	}
+	if (success == false) n = start;
+
+	plan_t plan(n->acc_steps,2);
+	for (int i = n->acc_steps-1; i >= 0; i--)
+	{
+		plan.row(i) = n->action;
+		n = n->parent;
+	}
+
+	std::chrono::milliseconds endTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::system_clock::now().time_since_epoch());
+
+	std::cout << "finished in " << counter << " iterations (";
+	std::cout << allocated_nodes.size() << " visited nodes), Time: " << (timer.elapsedTime().count() / 1000) << "ms\n";
+	for (Node *p : allocated_nodes)
+	{
+		free(p);
+	}
+
+	return plan;
 }
 
 // Goal given in robot frame
 plan_t getPlan(const points_t &lidar_hits, const point_t &goal, double goal_radius)
 {
-  std::cout << "Planning... " << std::flush;
-  action_t action = action_t::Zero();
-  std::vector<Node*> allocated_nodes;
-  Node *start = new Node(nullptr, action, goal);
-  allocated_nodes.push_back(start);
-  pqueue_t fringe; // If you haven't guessed, we'll be using A*
-  set_t visited_set;
-  fringe.push(start);
-  visited_set.insert(start);
-  Node *n = start;
-  plan_t valid_actions(3,2);
-  valid_actions << 0., 0., M_PI/4, 0., -M_PI/4, 0.;
-  int counter = 0;
-  bool success = false;
-  while (fringe.size() > 0)
-  {
-    if (counter++ > MAX_ITERS)
-    {
-      break;
-    }
-    n = fringe.top();
-    fringe.pop();
-    if (n->heuristic_to_goal < goal_radius)
-    {
-      success = true;
-      break;
-    }
-    else
-    {
-      double forward_dist = (n->theta % 2 == 1) ? PLAN_RESOLUTION*1.414 : PLAN_RESOLUTION;
-      valid_actions(0,1) = forward_dist;
-      for (int i = 0; i < valid_actions.rows(); i++)
-      {
-        action = valid_actions.row(i);
-        Node *next = new Node(n, action, goal);
-        allocated_nodes.push_back(next);
-        if (is_valid(next, lidar_hits) && visited_set.count(next) == 0)
-        {
-          visited_set.insert(next);
-          fringe.push(next);
-        }
-      }
-    }
-  }
-  if (success == false) n = start;
-
-  plan_t plan(n->acc_steps,2);
-  for (int i = n->acc_steps-1; i >= 0; i--)
-  {
-    plan.row(i) = n->action;
-    n = n->parent;
-  }
-
-  std::cout << "finished in " << counter << " iterations (";
-  std::cout << allocated_nodes.size() << " visited nodes)\n";
-  for (Node *p : allocated_nodes)
-  {
-    free(p);
-  }
-
-  return plan;
+  collides_predicate_t collidesPredicate = [&](double x, double y, double radius) {
+		pose_t p = {x, y, 0};
+		transform_t trf = toTransform(p);
+		return collides(trf, lidar_hits, SAFE_RADIUS);
+	};
+  return getPlan(collidesPredicate, goal, goal_radius);
 }
 
 double planCostFromIndex(plan_t &plan, int idx) {
