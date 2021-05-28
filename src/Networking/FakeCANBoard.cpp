@@ -25,7 +25,10 @@ int main() {
   CANPacket p;
   uint8_t motor_group = 0x04;
   int test_type = prompt("What are you testing? (0 for MODE SET, 1 for PWM, 2 for PID)");
-  int serial = prompt("Enter motor serial");
+  int serial;
+  if (test_type != TEST_MODE_SET) {
+      serial = prompt("Enter motor serial");
+  }
   bool mode_has_been_set = false;
 
   while(1) {

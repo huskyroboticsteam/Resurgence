@@ -78,7 +78,7 @@ add_library(real_world_interface SHARED
   gps/read_usb_gps.cpp
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(real_world_interface ${OpenCV_LIBS})
+target_link_libraries(real_world_interface ${vision_libs})
 
 add_library(real_can_interface SHARED
   log.cpp
@@ -99,13 +99,17 @@ list(APPEND real_world_libs
   lidar_base
   liburg_c.a)
 
+list(APPEND vision_libs
+  ${OpenCV_LIBS}
+  opencv_aruco)
+
 add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
   ${real_world_libs}
   )
-target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
+target_link_libraries(Rover ${vision_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
 add_executable(RoverNoCAN rover_main.cpp)
 target_link_libraries(RoverNoCAN ${rover_libs}
