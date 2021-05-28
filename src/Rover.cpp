@@ -134,6 +134,33 @@ void closeSim(int signum)
     raise(SIGTERM);
 }
 
+void parseGPSLegs(std::string filepath) {
+	std::ifstream gps_legs(filepath);
+	if (gps_legs)
+	{
+//		while (!gps_legs.eof())
+//		{
+//			// Assumes the file at filepath is properly formatted
+//			// with each leg on a separate line and of the form
+//			// left_post_id right_post_id lon lat
+//			int left_post_id, right_post_id;
+//			double lon, lat;
+//			gps_legs >> left_post_id >> right_post_id >> lon >> lat;
+//			point_t leg_map_space = gpsToMeters(lon, lat);
+//			URCLeg leg = {left_post_id, right_post_id, leg_map_space};
+//		}
+		std::cout << "Using file" << std::endl;
+	}
+	else
+	{
+		// File does not exist, use simulation legs as defaults
+		for (int i = 0; i < 7; i++)
+		{
+			urc_legs.push(getLeg(i));
+		}
+	}
+}
+
 const double CONTROL_HZ = 10.0;
 
 int rover_loop(int argc, char **argv)
@@ -149,27 +176,7 @@ int rover_loop(int argc, char **argv)
     CANPacket packet;
     // Target location for autonomous navigation
     // Eventually this will be set by communication from the base station
-    std::queue<URCLeg> urc_legs;
-	std::ifstream gps_legs("gps_legs.yaml");
-	if (gps_legs)
-	{
-//		for (int i = 0; !gps_legs.eof(); i++)
-//		{
-//			double lon, lat;
-//			gps_legs >> lon >> lat;
-//			point_t leg_map_space = gpsToMeters(lon, lat);
-//			URCLeg leg = {i, i, leg_map_space}; // TODO FIX POST IDS
-//		}
-		std::cout << "Using file" << std::endl;
-	}
-	else
-	{
-		// File does not exist, use simulation legs as defaults
-		for (int i = 0; i < 7; i++)
-		{
-			urc_legs.push(getLeg(i));
-		}
-	}
+    std::queue<URCLeg> urc_legs = parseGPSLegs("gps_legs.txt");
     Autonomous autonomous(urc_legs, CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp_rover_start;
