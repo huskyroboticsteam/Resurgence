@@ -12,13 +12,13 @@ struct Polar2D;
 typedef struct Polar2D
 {
     double r, theta;
-    int asCartesianX()
+    double asCartesianX()
     {
-        (long)(r * cos(theta));
+        return r * cos(theta);
     }
-    int asCartesianY()
+    double asCartesianY()
     {
-        (long)(r * sin(theta));
+        return r * sin(theta);
     }
 } Polar2D;
 
@@ -27,10 +27,10 @@ class URGLidar
 private:
     urg_t urg;
     int error = 0;
-    const char connect_device[13] = "/dev/ttyACM0";
-    const long connect_baudrate = 115200;
-    std::vector<Polar2D> lastFrame;                                   //The last completed frame.
-    std::chrono::time_point<std::chrono::steady_clock> lastFrameTime; //The system time at which the last frame was completed.
+	// The last completed frame.
+	std::vector<Polar2D> lastFrame;
+	// The system time at which the last frame was completed.
+	std::chrono::time_point<std::chrono::steady_clock> lastFrameTime;
 
 public:
     /**

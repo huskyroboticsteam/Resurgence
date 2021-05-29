@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+constexpr char CONNECT_DEVICE[] = "/dev/ttyACM0";
+constexpr long CONNECT_BAUDRATE = 115200;
+
 URGLidar::URGLidar() : lastFrameTime(std::chrono::steady_clock::now())
 {
 }
@@ -9,7 +12,7 @@ URGLidar::URGLidar() : lastFrameTime(std::chrono::steady_clock::now())
 bool URGLidar::open()
 {
 	int ret;
-	ret = urg_open(&urg, URG_SERIAL, connect_device, connect_baudrate);
+	ret = urg_open(&urg, URG_SERIAL, CONNECT_DEVICE, CONNECT_BAUDRATE);
 	if (ret != 0)
 	{
 		error = ret;
@@ -60,11 +63,12 @@ bool URGLidar::createFrame()
 	std::vector<Polar2D> frame;
 	for (int i = 0; i < length_data_size; ++i)
 	{
-		Polar2D pd{length_data[i], urg_index2rad(&urg, i) + M_PI / 2};
+		Polar2D pd{static_cast<double>(length_data[i]), urg_index2rad(&urg, i) + M_PI / 2};
 		frame.push_back(pd);
 	}
 	lastFrame = frame;
 	error = 0;
+	free(length_data);
 	return true;
 }
 
