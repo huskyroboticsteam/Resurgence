@@ -108,6 +108,7 @@ void Autonomous::setNavState(NavState s)
 		if (urc_targets.size() > 0)
 		{
 			setNavState(NavState::GPS);
+			search_target = {urc_targets.front().approx_GPS(0) - PI, urc_targets.front().approx_GPS(1), -PI / 2};
 			setCmdVel(0, 0);
 			Globals::AUTONOMOUS = false;
 		}
@@ -261,7 +262,7 @@ pose_t Autonomous::choose_plan_target(const pose_t &pose)
   {
     return getGPSTargetPose();
   }
-  else if (nav_state == NavState::SEARCH_PATTERN)
+  else if (nav_state == NavState::SEARCH_PATTERN || nav_state == NavState::SEARCH_PATTERN_SECOND_POST)
   {
     return search_target;
   }
