@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 #include <future>
-#include <thread>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>

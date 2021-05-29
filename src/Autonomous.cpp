@@ -54,6 +54,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		control_state(ControlState::FAR_FROM_TARGET_POSE),
 		time_since_plan(0),
 		plan(0,2),
+        pending_plan(),
 		plan_cost(INFINITE_COST),
 		plan_base({0,0,0}),
 		plan_idx(0),
