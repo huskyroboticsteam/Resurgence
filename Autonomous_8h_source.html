@@ -75,104 +75,106 @@ $(function() {
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;cmath&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;rclcpp/rclcpp.hpp&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;geometry_msgs/msg/point.hpp&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;geometry_msgs/msg/pose_array.hpp&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;Util.h&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;WorldData.h&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;worldmap/GlobalMap.h&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;filters/PoseEstimator.h&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;filters/RollingAvgFilter.h&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;lidar/PointCloudProcessing.h&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;simulator/graphics.h&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;simulator/utils.h&quot;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;planning/plan.h&quot;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">enum</span> ControlState {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    NEAR_TARGET_POSE,</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    FAR_FROM_TARGET_POSE</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;};</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">enum</span> NavState {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    GPS,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    POST_VISIBLE,</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    SEARCH_PATTERN,</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    SEARCH_PATTERN_SECOND_POST,</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    GATE_ALIGN,</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    GATE_TRAVERSE,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    DONE</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;};</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;constexpr std::array&lt;const char *, 7&gt; NAV_STATE_NAMES ({</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="stringliteral">&quot;GPS&quot;</span>,</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="stringliteral">&quot;POST_VISIBLE&quot;</span>,</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="stringliteral">&quot;SEARCH_PATTERN&quot;</span>,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="stringliteral">&quot;SEARCH_PATTERN_SECOND_POST&quot;</span>,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="stringliteral">&quot;GATE_ALIGN&quot;</span>,</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="stringliteral">&quot;GATE_TRAVERSE&quot;</span>,</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="stringliteral">&quot;DONE&quot;</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;});</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classAutonomous.html">   45</a></span>&#160;<span class="keyword">class </span><a class="code" href="classAutonomous.html">Autonomous</a> : rclcpp::Node</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;{</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="classAutonomous.html">Autonomous</a>(<span class="keyword">const</span> URCLeg &amp;urc_target, <span class="keywordtype">double</span> controlHz);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classAutonomous.html">Autonomous</a>(<span class="keyword">const</span> URCLeg &amp;urc_target, <span class="keywordtype">double</span> controlHz, <span class="keyword">const</span> pose_t &amp;startPose);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">// Returns a pair of floats, in heading, speed</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// Accepts current heading of the robot as parameter</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">// Gets the target&#39;s coordinate</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    pose_t getGPSTargetPose() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordtype">void</span> autonomyIter();</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    URCLeg urc_target;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    pose_t search_target;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">// Gate targets are {NAN, NAN, NAN} if unset and {INF, INF, INF} if reached</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">// gate_targets.second(2) is NAN if targets have not been refined with more accurate landmark measurements</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    std::pair&lt;pose_t, pose_t&gt; gate_targets;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="classPoseEstimator.html">PoseEstimator</a> poseEstimator;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="classGlobalMap.html">GlobalMap</a> map;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">bool</span> calibrated = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    std::vector&lt;pose_t&gt; calibrationPoses{};</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="classRollingAvgFilter.html">RollingAvgFilter&lt;5,3&gt;</a> leftPostFilter;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="classRollingAvgFilter.html">RollingAvgFilter&lt;5,3&gt;</a> rightPostFilter;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    NavState nav_state;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    ControlState control_state;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordtype">int</span> time_since_plan;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    plan_t plan;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">double</span> plan_cost;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    pose_t plan_base;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">int</span> plan_idx;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordtype">double</span> search_theta_increment;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordtype">int</span> mapLoopCounter; <span class="comment">// number of times the map has been updated</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">int</span> mapBlindPeriod; <span class="comment">// the number of loops to wait before starting to build the map</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">bool</span> mapDoesOverlap;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">int</span> mapOverlapSampleThreshold; <span class="comment">// at least these many points required to overlap map</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr plan_pub;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr curr_pose_pub;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr drive_target_pub;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr plan_target_pub;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::PoseArray&gt;::SharedPtr lidar_pub;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::PoseArray&gt;::SharedPtr landmarks_pub;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keywordtype">void</span> setNavState(NavState s);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordtype">void</span> update_nav_state(<span class="keyword">const</span> pose_t &amp;pose, <span class="keyword">const</span> pose_t &amp;plan_target);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  pose_t choose_plan_target(<span class="keyword">const</span> pose_t &amp;pose);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keywordtype">void</span> updateLandmarkInformation(<span class="keyword">const</span> transform_t &amp;invTransform);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordtype">void</span> computeGateTargets(<span class="keyword">const</span> pose_t &amp;pose);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordtype">void</span> updateSearchTarget();</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordtype">double</span> getLinearVel(<span class="keyword">const</span> pose_t &amp;drive_target, <span class="keyword">const</span> pose_t &amp;pose, <span class="keywordtype">double</span> thetaErr) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">double</span> getThetaVel(<span class="keyword">const</span> pose_t &amp;drive_target, <span class="keyword">const</span> pose_t &amp;pose, <span class="keywordtype">double</span> &amp;thetaErr) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    pose_t poseToDraw(pose_t &amp;pose, pose_t &amp;current_pose) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">void</span> publish(Eigen::Vector3d pose,</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr &amp;publisher) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">void</span> publish_array(<span class="keyword">const</span> points_t &amp;points,</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            rclcpp::Publisher&lt;geometry_msgs::msg::PoseArray&gt;::SharedPtr &amp;publisher) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;};</div>
-<div class="ttc" id="aclassAutonomous_html"><div class="ttname"><a href="classAutonomous.html">Autonomous</a></div><div class="ttdef"><b>Definition:</b> Autonomous.h:46</div></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;future&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;rclcpp/rclcpp.hpp&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;geometry_msgs/msg/point.hpp&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;geometry_msgs/msg/pose_array.hpp&gt;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;Util.h&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;WorldData.h&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;worldmap/GlobalMap.h&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;filters/PoseEstimator.h&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;filters/RollingAvgFilter.h&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;lidar/PointCloudProcessing.h&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;simulator/graphics.h&quot;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;simulator/utils.h&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;planning/plan.h&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">enum</span> ControlState {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    NEAR_TARGET_POSE,</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    FAR_FROM_TARGET_POSE</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;};</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">enum</span> NavState {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    GPS,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    POST_VISIBLE,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    SEARCH_PATTERN,</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    SEARCH_PATTERN_SECOND_POST,</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    GATE_ALIGN,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    GATE_TRAVERSE,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    DONE</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;};</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;constexpr std::array&lt;const char *, 7&gt; NAV_STATE_NAMES ({</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="stringliteral">&quot;GPS&quot;</span>,</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="stringliteral">&quot;POST_VISIBLE&quot;</span>,</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="stringliteral">&quot;SEARCH_PATTERN&quot;</span>,</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="stringliteral">&quot;SEARCH_PATTERN_SECOND_POST&quot;</span>,</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="stringliteral">&quot;GATE_ALIGN&quot;</span>,</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="stringliteral">&quot;GATE_TRAVERSE&quot;</span>,</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="stringliteral">&quot;DONE&quot;</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;});</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classAutonomous.html">   46</a></span>&#160;<span class="keyword">class </span><a class="code" href="classAutonomous.html">Autonomous</a> : rclcpp::Node</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="classAutonomous.html">Autonomous</a>(<span class="keyword">const</span> URCLeg &amp;urc_target, <span class="keywordtype">double</span> controlHz);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classAutonomous.html">Autonomous</a>(<span class="keyword">const</span> URCLeg &amp;urc_target, <span class="keywordtype">double</span> controlHz, <span class="keyword">const</span> pose_t &amp;startPose);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// Returns a pair of floats, in heading, speed</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">// Accepts current heading of the robot as parameter</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="comment">// Gets the target&#39;s coordinate</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    pose_t getGPSTargetPose() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">void</span> autonomyIter();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    URCLeg urc_target;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    pose_t search_target;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">// Gate targets are {NAN, NAN, NAN} if unset and {INF, INF, INF} if reached</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="comment">// gate_targets.second(2) is NAN if targets have not been refined with more accurate landmark measurements</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    std::pair&lt;pose_t, pose_t&gt; gate_targets;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="classPoseEstimator.html">PoseEstimator</a> poseEstimator;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="classGlobalMap.html">GlobalMap</a> map;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">bool</span> calibrated = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    std::vector&lt;pose_t&gt; calibrationPoses{};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="classRollingAvgFilter.html">RollingAvgFilter&lt;5,3&gt;</a> leftPostFilter;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="classRollingAvgFilter.html">RollingAvgFilter&lt;5,3&gt;</a> rightPostFilter;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    NavState nav_state;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    ControlState control_state;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">int</span> time_since_plan;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    plan_t plan;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    std::future&lt;plan_t&gt; pending_plan;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">double</span> plan_cost;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    pose_t plan_base;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordtype">int</span> plan_idx;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">double</span> search_theta_increment;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">int</span> mapLoopCounter; <span class="comment">// number of times the map has been updated</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">int</span> mapBlindPeriod; <span class="comment">// the number of loops to wait before starting to build the map</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordtype">bool</span> mapDoesOverlap;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">int</span> mapOverlapSampleThreshold; <span class="comment">// at least these many points required to overlap map</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr plan_pub;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr curr_pose_pub;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr drive_target_pub;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr plan_target_pub;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::PoseArray&gt;::SharedPtr lidar_pub;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::PoseArray&gt;::SharedPtr landmarks_pub;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keywordtype">void</span> setNavState(NavState s);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keywordtype">void</span> update_nav_state(<span class="keyword">const</span> pose_t &amp;pose, <span class="keyword">const</span> pose_t &amp;plan_target);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  pose_t choose_plan_target(<span class="keyword">const</span> pose_t &amp;pose);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordtype">void</span> updateLandmarkInformation(<span class="keyword">const</span> transform_t &amp;invTransform);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="keywordtype">void</span> computeGateTargets(<span class="keyword">const</span> pose_t &amp;pose);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keywordtype">void</span> updateSearchTarget();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">double</span> getLinearVel(<span class="keyword">const</span> pose_t &amp;drive_target, <span class="keyword">const</span> pose_t &amp;pose, <span class="keywordtype">double</span> thetaErr) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">double</span> getThetaVel(<span class="keyword">const</span> pose_t &amp;drive_target, <span class="keyword">const</span> pose_t &amp;pose, <span class="keywordtype">double</span> &amp;thetaErr) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    pose_t poseToDraw(pose_t &amp;pose, pose_t &amp;current_pose) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">void</span> publish(Eigen::Vector3d pose,</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr &amp;publisher) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordtype">void</span> publish_array(<span class="keyword">const</span> points_t &amp;points,</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            rclcpp::Publisher&lt;geometry_msgs::msg::PoseArray&gt;::SharedPtr &amp;publisher) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;};</div>
+<div class="ttc" id="aclassAutonomous_html"><div class="ttname"><a href="classAutonomous.html">Autonomous</a></div><div class="ttdef"><b>Definition:</b> Autonomous.h:47</div></div>
 <div class="ttc" id="aclassGlobalMap_html"><div class="ttname"><a href="classGlobalMap.html">GlobalMap</a></div><div class="ttdef"><b>Definition:</b> GlobalMap.h:14</div></div>
 <div class="ttc" id="aclassPoseEstimator_html"><div class="ttname"><a href="classPoseEstimator.html">PoseEstimator</a></div><div class="ttdef"><b>Definition:</b> PoseEstimator.h:17</div></div>
 <div class="ttc" id="aclassRollingAvgFilter_html"><div class="ttname"><a href="classRollingAvgFilter.html">RollingAvgFilter&lt; 5, 3 &gt;</a></div></div>
