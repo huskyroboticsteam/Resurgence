@@ -3,6 +3,7 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include <future>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>
@@ -69,6 +70,7 @@ private:
 	ControlState control_state;
 	int time_since_plan;
 	plan_t plan;
+	std::future<plan_t> pending_plan;
 	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
