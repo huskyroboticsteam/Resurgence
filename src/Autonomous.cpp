@@ -104,10 +104,9 @@ void Autonomous::setNavState(NavState s)
 		rightPostFilter.reset();
 		if (urc_targets.size() > 0)
 		{
-			std::cout << urc_targets.front().approx_GPS(0) << " " << urc_targets.front().approx_GPS(1) << " " << urc_targets.front().approx_GPS(2) << std::endl;
-//			plan_cost = INFINITE_COST;
 			setNavState(NavState::GPS);
-			// TODO SET GLOBALS:AUTONOMOUS TO FALSE SO THAT BASE STATION MUST SEND START MESSAGE TO START THE ROVER
+			setCmdVel(0, 0);
+			Globals::AUTONOMOUS = false;
 		}
 	}
   }

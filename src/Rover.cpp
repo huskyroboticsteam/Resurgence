@@ -134,7 +134,8 @@ void closeSim(int signum)
     raise(SIGTERM);
 }
 
-void parseGPSLegs(std::string filepath) {
+std::queue<URCLeg> parseGPSLegs(std::string filepath) {
+	std::queue<URCLeg> urc_legs;
 	std::ifstream gps_legs(filepath);
 	if (gps_legs)
 	{
@@ -159,6 +160,7 @@ void parseGPSLegs(std::string filepath) {
 			urc_legs.push(getLeg(i));
 		}
 	}
+	return urc_legs;
 }
 
 const double CONTROL_HZ = 10.0;
@@ -166,7 +168,6 @@ const double CONTROL_HZ = 10.0;
 int rover_loop(int argc, char **argv)
 {
     LOG_LEVEL = LOG_INFO;
-    Globals::AUTONOMOUS = true;
     world_interface_init();
     rclcpp::init(0, nullptr);
     // Ctrl+C doesn't stop the simulation without this line
@@ -184,6 +185,22 @@ int rover_loop(int argc, char **argv)
     gettimeofday(&tp_rover_start, NULL);
     for(int iter = 0; /*no termination condition*/; iter++)
     {
+		// For simulator only, comment this out when running on real rover
+		// Wait for user to press enter, then start the next leg
+        if (!Globals::AUTONOMOUS) {
+			std::cout << "Press enter to start next leg" << std::endl;
+			// If it takes longer than 10ms to find a newline, it was probably just inputted and we can proceed
+			long elapsedTime = 0;
+			while (elapsedTime < 10 * 1000)
+			{
+				long startTime = getElapsedUsecs(tp_rover_start);
+				// Wait until a newline is found in cin
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				elapsedTime = getElapsedUsecs(tp_rover_start) - startTime;
+			}
+			Globals::AUTONOMOUS = true;
+        }
+
         long loopStartElapsedUsecs = getElapsedUsecs(tp_rover_start);
         num_can_packets = 0;
         while (recvCANPacket(&packet) != 0) {
