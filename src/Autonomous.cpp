@@ -432,9 +432,8 @@ void Autonomous::autonomyIter()
 			pending_plan =
 				std::async(std::launch::async, &computePlan, collide_func, point_t_goal);
 		}
-		// if there is a plan pending, wait maximum 1ms for it to be ready.
-		// TODO possibly change this time if we want it to be shorter.
-		else if(pending_plan.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready){
+		// if there is a plan pending, check if it is ready.
+		else if(pending_plan.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready){
 			// plan is ready; retrieve it and check if the cost is satisfactory.
 			// upon calling get(), pending_plan.valid() will return false, so if we reject this
 			// plan another will be computed.
