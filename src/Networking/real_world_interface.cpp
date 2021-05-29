@@ -13,6 +13,7 @@
 #include "motor_interface.h"
 #include <set>
 #include <opencv2/calib3d.hpp>
+#include "../Util.h"
 
 #include "json.hpp"
 
@@ -98,6 +99,9 @@ points_t last_landmarks = zero_landmarks;
 uint32_t last_frame_no = 0;
 cv::Mat frame;
 points_t readLandmarks() {
+	// uncomment for timing of readLandmarks
+	// util::ScopedTimer("readLandmarks");
+
 	// camera might not be open if opening camera failed in init_world_interface.
 	// if it is not, return a list of 11 zero points.
 	if (ar_cam.isOpen()) {
