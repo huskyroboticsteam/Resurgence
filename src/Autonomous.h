@@ -54,6 +54,8 @@ public:
 	// Gets the target's coordinate
 	pose_t getGPSTargetPose() const;
 	void autonomyIter();
+	void startNextLeg();
+	bool currentLegDone();
 
 private:
 	std::queue<URCLeg> urc_targets;

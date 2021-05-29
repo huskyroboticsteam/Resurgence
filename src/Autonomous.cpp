@@ -92,6 +92,29 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	return diff.norm();
 }
 
+bool Autonomous::currentLegDone()
+{
+	return nav_state == NavState::DONE;
+}
+
+void Autonomous::startNextLeg()
+{
+	if (!currentLegDone())
+	{
+		log(LOG_INFO, "Cannot start next leg: current leg not done\n");
+	}
+	else if (urc_targets.size() <= 0)
+	{
+		log(LOG_INFO, "Cannot start next leg: no more legs to start\n");
+	}
+	else
+	{
+		log(LOG_INFO, "Starting next leg\n");
+		search_target = {urc_targets.front().approx_GPS(0) - PI, urc_targets.front().approx_GPS(1), -PI / 2};
+		setNavState(NavState::GPS);
+	}
+}
+
 void Autonomous::setNavState(NavState s)
 {
   NavState old_state = nav_state;
@@ -100,18 +123,17 @@ void Autonomous::setNavState(NavState s)
   {
     log(LOG_INFO, "Changing navigation state to %s\n", NAV_STATE_NAMES[nav_state]);
     plan_cost = INFINITE_COST;
-	if (s == NavState::DONE)
+	if (currentLegDone())
 	{
+		// Remove previous leg
 		urc_targets.pop();
-		leftPostFilter.reset(); // clear the cached data points
+
+		// clear the cached data points
+		leftPostFilter.reset();
 		rightPostFilter.reset();
-		if (urc_targets.size() > 0)
-		{
-			setNavState(NavState::GPS);
-			search_target = {urc_targets.front().approx_GPS(0) - PI, urc_targets.front().approx_GPS(1), -PI / 2};
-			setCmdVel(0, 0);
-			Globals::AUTONOMOUS = false;
-		}
+
+		// Stop the rover
+		setCmdVel(0, 0);
 	}
   }
 }
@@ -410,15 +432,13 @@ void Autonomous::autonomyIter()
 	pose_t pose = poseEstimator.getPose();
 	transform_t invTransform = toTransform(pose).inverse();
 
-	if (nav_state == NavState::DONE)
+	if (currentLegDone())
 	{
-		leftPostFilter.reset(); // clear the cached data points
-		rightPostFilter.reset();
 		if (Globals::AUTONOMOUS)
 		{
 			setCmdVel(0, 0);
 		}
-    return;
+		return;
 	}
 
   updateLandmarkInformation(invTransform);
@@ -558,7 +578,7 @@ void Autonomous::autonomyIter()
   double thetaVel = getThetaVel(driveTarget, pose, thetaErr);
   double driveSpeed = getLinearVel(driveTarget, pose, thetaErr);
 
-  if (!Globals::E_STOP && Globals::AUTONOMOUS)
+  if (!Globals::E_STOP && Globals::AUTONOMOUS && !currentLegDone())
   {
     setCmdVel(thetaVel, driveSpeed);
     poseEstimator.predict(thetaVel, driveSpeed);

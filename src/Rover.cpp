@@ -168,6 +168,7 @@ const double CONTROL_HZ = 10.0;
 int rover_loop(int argc, char **argv)
 {
     LOG_LEVEL = LOG_INFO;
+	Globals::AUTONOMOUS = true;
     world_interface_init();
     rclcpp::init(0, nullptr);
     // Ctrl+C doesn't stop the simulation without this line
@@ -187,7 +188,9 @@ int rover_loop(int argc, char **argv)
     {
 		// For simulator only, comment this out when running on real rover
 		// Wait for user to press enter, then start the next leg
-        if (!Globals::AUTONOMOUS) {
+		// TODO the real rover might want to get this command from the base station
+		// TODO test with only one or two legs so we can finish every leg and see behavior afterwards
+        if (autonomous.currentLegDone()) {
 			std::cout << "Press enter to start next leg" << std::endl;
 			// If it takes longer than 10ms to find a newline, it was probably just inputted and we can proceed
 			long elapsedTime = 0;
@@ -198,7 +201,7 @@ int rover_loop(int argc, char **argv)
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 				elapsedTime = getElapsedUsecs(tp_rover_start) - startTime;
 			}
-			Globals::AUTONOMOUS = true;
+			autonomous.startNextLeg();
         }
 
         long loopStartElapsedUsecs = getElapsedUsecs(tp_rover_start);
