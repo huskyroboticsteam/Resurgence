@@ -14,6 +14,16 @@
                     </locator> 
                     <locator> 
                         <udpv4>
+                          <address>192.168.133.1</address> 
+                        </udpv4>
+                    </locator> 
+                    <locator> 
+                        <udpv4>
+                          <address>192.168.133.12</address> 
+                        </udpv4>
+                    </locator> 
+                    <locator> 
+                        <udpv4>
                           <address>40.40.40.40</address> 
                         </udpv4>
                     </locator> 
