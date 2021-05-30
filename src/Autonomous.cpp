@@ -97,13 +97,18 @@ bool Autonomous::currentLegDone()
 	return nav_state == NavState::DONE;
 }
 
+bool Autonomous::hasNextLeg()
+{
+	return urc_targets.size() > 0;
+}
+
 void Autonomous::startNextLeg()
 {
 	if (!currentLegDone())
 	{
 		log(LOG_INFO, "Cannot start next leg: current leg not done\n");
 	}
-	else if (urc_targets.size() <= 0)
+	else if (!hasNextLeg())
 	{
 		log(LOG_INFO, "Cannot start next leg: no more legs to start\n");
 	}

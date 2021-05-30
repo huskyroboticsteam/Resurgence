@@ -55,6 +55,7 @@ public:
 	pose_t getGPSTargetPose() const;
 	void autonomyIter();
 	void startNextLeg();
+	bool hasNextLeg();
 	bool currentLegDone();
 
 private:

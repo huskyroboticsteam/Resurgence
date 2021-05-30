@@ -186,18 +186,18 @@ int rover_loop(int argc, char **argv)
     gettimeofday(&tp_rover_start, NULL);
     for(int iter = 0; /*no termination condition*/; iter++)
     {
-		// For simulator only, comment this out when running on real rover
-		// Wait for user to press enter, then start the next leg
-		// TODO the real rover might want to get this command from the base station
-		// TODO test with only one or two legs so we can finish every leg and see behavior afterwards
-        if (autonomous.currentLegDone()) {
+		// Wait for confirmation to start the next leg
+        if (Globals::AUTONOMOUS && autonomous.currentLegDone() && autonomous.hasNextLeg()) {
+			// For simulator only, change or comment this out when running on real rover
+			// Wait for user to press enter, then start the next leg
+			// TODO the real rover might want to get this command from the base station
 			std::cout << "Press enter to start next leg" << std::endl;
 			// If it takes longer than 10ms to find a newline, it was probably just inputted and we can proceed
 			long elapsedTime = 0;
 			while (elapsedTime < 10 * 1000)
 			{
 				long startTime = getElapsedUsecs(tp_rover_start);
-				// Wait until a newline is found in cin
+				// Blocks until a newline is found in cin
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 				elapsedTime = getElapsedUsecs(tp_rover_start) - startTime;
 			}
