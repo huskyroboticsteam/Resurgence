@@ -54,6 +54,7 @@ add_library(rover_common SHARED
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
   commands/nogps/DriveToGate.cpp
+  commands/nogps/DriveThroughGate.cpp
   )
 
 add_library(real_base_station SHARED
