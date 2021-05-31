@@ -26,8 +26,8 @@ const std::array<std::string, 4> operation_modes = {
 const std::map<std::string, double> positive_arm_pwm_scales = {
 	{"arm_base",    6000},
 	{"shoulder",   20000},
-	{"elbow",     -31000},
-	{"forearm",    -4000},
+	{"elbow",     -32768},
+	{"forearm",    -6000},
 	{"diffleft",    5000},
 	{"diffright",  -5000},
 	{"hand",       15000}
@@ -35,8 +35,8 @@ const std::map<std::string, double> positive_arm_pwm_scales = {
 const std::map<std::string, double> negative_arm_pwm_scales = {
 	{"arm_base",    6000},
 	{"shoulder",   12000},
-	{"elbow",     -14000},
-	{"forearm",    -4000},
+	{"elbow",     -18000},
+	{"forearm",    -6000},
 	{"diffleft",    5000},
 	{"diffright",  -5000},
 	{"hand",       15000}
