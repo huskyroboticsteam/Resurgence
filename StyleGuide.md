@@ -35,5 +35,6 @@ int MyFunction() {
 - Avoid raw pointers, prefer smart pointers (i.e shared_ptr) or references
 
 ### Indentation
-Use tabs to indent, and use additional spaces to align multi-line code
-(i.e. when lines are too long and have to be wrapped).
+- Use tabs to indent, and use additional spaces to align multi-line
+code (i.e. when lines are too long and have to be wrapped).
+- Indent `case` labels inside of a `switch` statement.
