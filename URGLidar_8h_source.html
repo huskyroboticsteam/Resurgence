@@ -84,13 +84,13 @@ $(function() {
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="structPolar2D.html">Polar2D</a></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keywordtype">double</span> r, theta;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keywordtype">int</span> asCartesianX()</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keywordtype">double</span> asCartesianX()</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        (long)(r * cos(theta));</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <span class="keywordflow">return</span> r * cos(theta);</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    }</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordtype">int</span> asCartesianY()</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordtype">double</span> asCartesianY()</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        (long)(r * sin(theta));</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keywordflow">return</span> r * sin(theta);</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    }</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;} <a class="code" href="structPolar2D.html">Polar2D</a>;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
@@ -99,10 +99,10 @@ $(function() {
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    urg_t urg;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">int</span> error = 0;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> connect_device[13] = <span class="stringliteral">&quot;/dev/ttyACM0&quot;</span>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">long</span> connect_baudrate = 115200;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    std::vector&lt;Polar2D&gt; lastFrame;                                   <span class="comment">//The last completed frame.</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    std::chrono::time_point&lt;std::chrono::steady_clock&gt; lastFrameTime; <span class="comment">//The system time at which the last frame was completed.</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="comment">// The last completed frame.</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    std::vector&lt;Polar2D&gt; lastFrame;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">// The system time at which the last frame was completed.</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    std::chrono::time_point&lt;std::chrono::steady_clock&gt; lastFrameTime;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classURGLidar.html#ae3b563224d09256101eb74db09551746">URGLidar</a>();</div>
@@ -114,13 +114,13 @@ $(function() {
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classURGLidar.html#a47bf0c9554111781b1c7ebd57b20de13">close</a>();</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;};</div>
 <div class="ttc" id="aclassURGLidar_html"><div class="ttname"><a href="classURGLidar.html">URGLidar</a></div><div class="ttdef"><b>Definition:</b> URGLidar.h:26</div></div>
-<div class="ttc" id="aclassURGLidar_html_a088d57d3b90e8713a09b273597d18af6"><div class="ttname"><a href="classURGLidar.html#a088d57d3b90e8713a09b273597d18af6">URGLidar::createFrame</a></div><div class="ttdeci">bool createFrame()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:42</div></div>
-<div class="ttc" id="aclassURGLidar_html_a34d6407255d6e557ee64bbb3b17107c4"><div class="ttname"><a href="classURGLidar.html#a34d6407255d6e557ee64bbb3b17107c4">URGLidar::getLastFrame</a></div><div class="ttdeci">std::vector&lt; Polar2D &gt; getLastFrame()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:32</div></div>
-<div class="ttc" id="aclassURGLidar_html_a47bf0c9554111781b1c7ebd57b20de13"><div class="ttname"><a href="classURGLidar.html#a47bf0c9554111781b1c7ebd57b20de13">URGLidar::close</a></div><div class="ttdeci">bool close()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:76</div></div>
-<div class="ttc" id="aclassURGLidar_html_a63dfabe4d07430c8b6ab90326aad5d99"><div class="ttname"><a href="classURGLidar.html#a63dfabe4d07430c8b6ab90326aad5d99">URGLidar::getLastFrameTime</a></div><div class="ttdeci">std::chrono::time_point&lt; std::chrono::steady_clock &gt; getLastFrameTime()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:37</div></div>
-<div class="ttc" id="aclassURGLidar_html_abdff0da5100fbe657033dd0baf6da851"><div class="ttname"><a href="classURGLidar.html#abdff0da5100fbe657033dd0baf6da851">URGLidar::open</a></div><div class="ttdeci">bool open()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:9</div></div>
-<div class="ttc" id="aclassURGLidar_html_ad36748a52fcf5acc4178521d7d0af751"><div class="ttname"><a href="classURGLidar.html#ad36748a52fcf5acc4178521d7d0af751">URGLidar::getError</a></div><div class="ttdeci">int getError()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:71</div></div>
-<div class="ttc" id="aclassURGLidar_html_ae3b563224d09256101eb74db09551746"><div class="ttname"><a href="classURGLidar.html#ae3b563224d09256101eb74db09551746">URGLidar::URGLidar</a></div><div class="ttdeci">URGLidar()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:5</div></div>
+<div class="ttc" id="aclassURGLidar_html_a088d57d3b90e8713a09b273597d18af6"><div class="ttname"><a href="classURGLidar.html#a088d57d3b90e8713a09b273597d18af6">URGLidar::createFrame</a></div><div class="ttdeci">bool createFrame()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:45</div></div>
+<div class="ttc" id="aclassURGLidar_html_a34d6407255d6e557ee64bbb3b17107c4"><div class="ttname"><a href="classURGLidar.html#a34d6407255d6e557ee64bbb3b17107c4">URGLidar::getLastFrame</a></div><div class="ttdeci">std::vector&lt; Polar2D &gt; getLastFrame()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:35</div></div>
+<div class="ttc" id="aclassURGLidar_html_a47bf0c9554111781b1c7ebd57b20de13"><div class="ttname"><a href="classURGLidar.html#a47bf0c9554111781b1c7ebd57b20de13">URGLidar::close</a></div><div class="ttdeci">bool close()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:80</div></div>
+<div class="ttc" id="aclassURGLidar_html_a63dfabe4d07430c8b6ab90326aad5d99"><div class="ttname"><a href="classURGLidar.html#a63dfabe4d07430c8b6ab90326aad5d99">URGLidar::getLastFrameTime</a></div><div class="ttdeci">std::chrono::time_point&lt; std::chrono::steady_clock &gt; getLastFrameTime()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:40</div></div>
+<div class="ttc" id="aclassURGLidar_html_abdff0da5100fbe657033dd0baf6da851"><div class="ttname"><a href="classURGLidar.html#abdff0da5100fbe657033dd0baf6da851">URGLidar::open</a></div><div class="ttdeci">bool open()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:12</div></div>
+<div class="ttc" id="aclassURGLidar_html_ad36748a52fcf5acc4178521d7d0af751"><div class="ttname"><a href="classURGLidar.html#ad36748a52fcf5acc4178521d7d0af751">URGLidar::getError</a></div><div class="ttdeci">int getError()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:75</div></div>
+<div class="ttc" id="aclassURGLidar_html_ae3b563224d09256101eb74db09551746"><div class="ttname"><a href="classURGLidar.html#ae3b563224d09256101eb74db09551746">URGLidar::URGLidar</a></div><div class="ttdeci">URGLidar()</div><div class="ttdef"><b>Definition:</b> URGLidar.cpp:8</div></div>
 <div class="ttc" id="astructPolar2D_html"><div class="ttname"><a href="structPolar2D.html">Polar2D</a></div><div class="ttdef"><b>Definition:</b> SyntheticLidar.h:11</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
