@@ -51,6 +51,7 @@ point_t gpsToMeters(double lon, double lat) {
 transform_t readGPS() {
   gps_mutex.lock();
   transform_t tf = most_recent_tf;
+  fresh_data = false;
   gps_mutex.unlock();
   return tf;
 }
