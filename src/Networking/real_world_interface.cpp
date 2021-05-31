@@ -11,6 +11,7 @@
 #include "motor_interface.h"
 #include "CANUtils.h"
 #include "motor_interface.h"
+#include "../lidar/read_hokuyo_lidar.h"
 #include <set>
 #include <opencv2/calib3d.hpp>
 #include "../Util.h"
@@ -50,6 +51,7 @@ void world_interface_init() {
 		log(LOG_ERROR, "Error opening camera for AR tag detection:\n%s\n", e.what());
 	}
 	bool gps_success = startGPSThread();
+	bool lidar_success = lidar::initializeLidar();
 }
 
 constexpr double WHEEL_BASE = 1.0;			   // Distance between left and right wheels. Eyeballed
@@ -153,6 +155,17 @@ points_t readLandmarks() {
 		}
 	} else {
 		return zero_landmarks;
+	}
+}
+
+points_t readLidarScan(){
+	if (lidar::isLidarDataFresh())
+	{
+		return lidar::readLidar();
+	}
+	else
+	{
+		return {};
 	}
 }
 
