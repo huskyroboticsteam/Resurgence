@@ -40,7 +40,7 @@ bool InitializeBaseStationSocket()
           }
       }
       server_ip = ssh_client;
-      log(LOG_INFO, "Setting server IP to %s\n", server_ip);
+      log(LOG_INFO, "Attempting to connect to server IP %s...\n", server_ip);
   }
 
   if ((base_station_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
