@@ -2,9 +2,8 @@
 ---
 name: "mast"
 description: "Camera located on the mast of the rover."
-# TODO: change this. Highly recommended to use udev rules to make sure this
-# camera has the same ID/file path every time.
-camera_id: 0
+# Make sure that this camera_id matches the one defined in the udev rules.
+camera_id: 20
 calib_info:
    calibration_time: "Sat 01 May 2021 01:54:16 PM PDT"
    board_width: 11
