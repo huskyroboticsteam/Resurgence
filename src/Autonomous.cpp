@@ -17,9 +17,12 @@ constexpr int numSamples = 1;
 
 constexpr double FOLLOW_DIST = 2.0;
 constexpr double PLANNING_GOAL_REGION_RADIUS = 1.0;
+constexpr double PLAN_COLLISION_DIST = 1.3;
 constexpr double PLAN_COLLISION_STOP_DIST = 4.0;
 constexpr double INFINITE_COST = 1e10;
 constexpr int REPLAN_PERIOD = 20;
+
+constexpr bool USE_MAP = false;
 
 constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 
@@ -414,46 +417,46 @@ void Autonomous::autonomyIter()
 
   points_t lidar_scan = readLidarScan();
 
-  if (Globals::AUTONOMOUS) {
-	  if (mapLoopCounter++ > mapBlindPeriod) {
-		  map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
-		  mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
-	  }
-    
-	  // if we don't have a plan pending, we should start computing one.
-	  if (!pending_plan.valid()) {
-		  point_t point_t_goal;
-		  point_t_goal.topRows(2) = plan_target.topRows(2);
-		  point_t_goal(2) = 1.0;
-		  point_t_goal = toTransform(pose) * point_t_goal;
-		  //plan_t new_plan = getPlan(lidar_scan, point_t_goal, PLANNING_GOAL_REGION_RADIUS); 
-		  auto collide_func = [&](double x, double y, double radius) -> bool {
-			  // transform the point to check into map space
-			  point_t relPoint = {x, y, 1};
-			  point_t p = invTransform * relPoint;
-			  return map.hasPointWithin(p, radius);
-		  };
-		  pending_plan =
-			  std::async(std::launch::async, &computePlan, collide_func, point_t_goal);
-	  }
-	  // if there is a plan pending, check if it is ready.
-	  else if(pending_plan.wait_for(ZERO_DURATION) == std::future_status::ready){
-		  // plan is ready; retrieve it and check if the cost is satisfactory.
-		  // upon calling get(), pending_plan.valid() will return false, so if we reject this
-		  // plan another will be computed.
-		  plan_t new_plan = pending_plan.get();
-		  double new_plan_cost = planCostFromIndex(new_plan, 0);
-		  // we want a significant improvement to avoid thrash
-		  log(LOG_DEBUG, "old cost %f, new cost %f\n", plan_cost, new_plan_cost);
-		  if (new_plan_cost < plan_cost * 0.8) {
-			  plan_idx = 0;
-			  plan_base = pose;
-			  plan_cost = new_plan_cost;
-			  plan = new_plan;
-			  time_since_plan = 0;
-		  }
-	  }
-    
+  if (USE_MAP) {
+      if (mapLoopCounter++ > mapBlindPeriod) {
+          map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
+          mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
+      }
+  }
+
+  // if we don't have a plan pending, we should start computing one.
+  if (!pending_plan.valid()) {
+      point_t point_t_goal;
+      point_t_goal.topRows(2) = plan_target.topRows(2);
+      point_t_goal(2) = 1.0;
+      point_t_goal = toTransform(pose) * point_t_goal;
+      auto collide_func = [&](double x, double y, double radius) -> bool {
+          // transform the point to check into map space
+          point_t relPoint = {x, y, 1};
+          point_t p = invTransform * relPoint;
+          transform_t coll_tf = toTransform(relPoint);
+          if (USE_MAP) return map.hasPointWithin(p, radius);
+          else return collides(coll_tf, lidar_scan, radius);
+      };
+      pending_plan =
+          std::async(std::launch::async, &computePlan, collide_func, point_t_goal);
+  }
+  // if there is a plan pending, check if it is ready.
+  else if(pending_plan.wait_for(ZERO_DURATION) == std::future_status::ready){
+      // plan is ready; retrieve it and check if the cost is satisfactory.
+      // upon calling get(), pending_plan.valid() will return false, so if we reject this
+      // plan another will be computed.
+      plan_t new_plan = pending_plan.get();
+      double new_plan_cost = planCostFromIndex(new_plan, 0);
+      // we want a significant improvement to avoid thrash
+      log(LOG_DEBUG, "old cost %f, new cost %f\n", plan_cost, new_plan_cost);
+      if (new_plan_cost < plan_cost * 0.8) {
+          plan_idx = 0;
+          plan_base = pose;
+          plan_cost = new_plan_cost;
+          plan = new_plan;
+          time_since_plan = 0;
+      }
   }
 
   // Send lidar points to visualization
@@ -490,8 +493,14 @@ void Autonomous::autonomyIter()
       plan_pose(0) += action(1) * cos(plan_pose(2));
       plan_pose(1) += action(1) * sin(plan_pose(2));
       transform_t tf_plan_pose = toTransform(plan_pose) * invTransform;
-      if (i >= plan_idx && map.hasPointWithin(plan_pose, 1.3)) { // stay 1.3 meters away
-      //if (i >= plan_idx && collides(tf_plan_pose, lidar_scan, 1.3)) { // stay 1.3 meters away
+      // We don't care about collisions on already-executed parts of the plan
+      bool plan_pose_collides = (i >= plan_idx);
+      if (USE_MAP) {
+          plan_pose_collides |= map.hasPointWithin(plan_pose, PLAN_COLLISION_DIST);
+      } else {
+          plan_pose_collides |= collides(tf_plan_pose, lidar_scan, PLAN_COLLISION_DIST);
+      }
+      if (plan_pose_collides) {
         // We'll replan next timestep
         accumulated_cost += INFINITE_COST;
         // TODO we should have a more sophisticated way of deciding whether a collision
