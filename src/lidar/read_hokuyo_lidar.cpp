@@ -12,7 +12,7 @@
 // This website may be helpful
 // https://sourceforge.net/p/urgnetwork/wiki/top_en/
 
-constexpr double LIDAR_MIN_RANGE = 0.015;
+constexpr double LIDAR_MIN_RANGE = 0.15;
 
 std::atomic<bool> lidar_initialized(false);
 std::atomic<bool> lidar_fresh(false);
