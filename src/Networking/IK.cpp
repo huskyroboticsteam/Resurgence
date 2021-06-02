@@ -17,19 +17,27 @@ const std::array<double, 3> offsets = {0.0,      Constants::SHOULDER_MAX, Consta
 
 int32_t radToInt(double d, int motor_serial)
 {
+  if (motor_serial < 1 || motor_serial > 3)
+  {
+    log(LOG_ERROR, "Invalid motor serial %d for radToInt\n", motor_serial);
+    return 0;
+  }
   double offset = offsets[motor_serial-1];
   int sign_flip = sign_flips[motor_serial-1];
   int32_t i = sign_flip * (d - offset) / RAD_PER_INT;
-  log(LOG_TRACE, "radToInt %f %d %f %d %d\n", d, motor_serial, offset, sign_flip, i);
   return i;
 }
 
 double intToRad(int32_t i, int motor_serial)
 {
+  if (motor_serial < 1 || motor_serial > 3)
+  {
+    log(LOG_ERROR, "Invalid motor serial %d for intToRad\n", motor_serial);
+    return 0;
+  }
   double offset = offsets[motor_serial-1];
   int sign_flip = sign_flips[motor_serial-1];
   double d = sign_flip * i * RAD_PER_INT + offset;
-  log(LOG_TRACE, "intToRad %d %d %f %d %f\n", i, motor_serial, offset, sign_flip, d);
   return d;
 }
 

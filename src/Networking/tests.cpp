@@ -201,15 +201,15 @@ void assert_IK_equals(double base, double shoulder, double elbow)
     CANPacket p;
     p = popPIDPkt();
     int base_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(base_val, 0) == Approx(base).margin(0.01));
+    REQUIRE(intToRad(base_val, 1) == Approx(base).margin(0.01));
 
     p = popPIDPkt();
     int shoulder_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(shoulder_val, 1) == Approx(shoulder).margin(0.01));
+    REQUIRE(intToRad(shoulder_val, 2) == Approx(shoulder).margin(0.01));
 
     p = popPIDPkt();
     int elbow_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(elbow_val, 2) == Approx(elbow).margin(0.01));
+    REQUIRE(intToRad(elbow_val, 3) == Approx(elbow).margin(0.01));
 }
 
 void set_radian_arm_angles(double arm_base, double shoulder, double elbow)
@@ -242,7 +242,7 @@ TEST_CASE("Forward kinematics in stowed position", "[BaseStation]")
     Globals::status_data["arm_base"]["angular_position"] = 0;
     Globals::status_data["shoulder"]["angular_position"] = 0;
     Globals::status_data["elbow"]["angular_position"] = 0;
-    assert_FK_equals(0.,0.,0.);
+    assert_FK_equals(0.119867, 0., 0.0152843);
 }
 
 TEST_CASE("Forward kinematics at full extension", "[BaseStation]")
@@ -262,7 +262,7 @@ TEST_CASE("Forward kinematics at full extension", "[BaseStation]")
 TEST_CASE("Forward kinematics near the ground", "[BaseStation]")
 {
     set_radian_arm_angles(0.9, 1.1, 2.3);
-    assert_FK_equals(0., 0., 0.);
+    assert_FK_equals(0.326845, 0.411873, -0.117700);
 }
 
 TEST_CASE("Can handle IK packets", "[BaseStation]")
@@ -330,8 +330,8 @@ TEST_CASE("Forward kinematics is the inverse of inverse kinematics", "[BaseStati
     setupEncoders();
     char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[0.6, -0.3, -0.1]}";
     REQUIRE(ParseBaseStationPacket(msg) == true);
-    assert_IK_equals     (0.927291, 0.534880, 1.342617);
-    set_radian_arm_angles(0.927291, 0.534880, 1.342617);
+    assert_IK_equals     (-0.463647, 1.005327, 2.053642);
+    set_radian_arm_angles(-0.463647, 1.005327, 2.053642);
     assert_FK_equals(0.6, -0.3, -0.1);
 }
 
