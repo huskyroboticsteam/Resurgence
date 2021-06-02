@@ -201,30 +201,40 @@ void assert_IK_equals(double base, double shoulder, double elbow)
     CANPacket p;
     p = popPIDPkt();
     int base_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(base_val, 0) == Approx(base));
+    REQUIRE(intToRad(base_val, 0) == Approx(base).margin(0.01));
 
     p = popPIDPkt();
     int shoulder_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(shoulder_val, 1) == Approx(shoulder));
+    REQUIRE(intToRad(shoulder_val, 1) == Approx(shoulder).margin(0.01));
 
     p = popPIDPkt();
     int elbow_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(elbow_val, 2) == Approx(elbow));
+    REQUIRE(intToRad(elbow_val, 2) == Approx(elbow).margin(0.01));
 }
 
 void set_radian_arm_angles(double arm_base, double shoulder, double elbow)
 {
-    Globals::status_data["arm_base"]["angular_position"] = radToInt(arm_base, 0);
-    Globals::status_data["shoulder"]["angular_position"] = radToInt(shoulder, 1);
-    Globals::status_data["elbow"]["angular_position"]    = radToInt(elbow, 2);
+    Globals::status_data["arm_base"]["angular_position"] = radToInt(arm_base, 1);
+    Globals::status_data["shoulder"]["angular_position"] = radToInt(shoulder, 2);
+    Globals::status_data["elbow"]["angular_position"]    = radToInt(elbow, 3);
 }
 
 void assert_FK_equals(double x, double y, double z)
 {
     std::array<double, 3> xyz = forward_kinematics();
-    REQUIRE(x == Approx(xyz[0]));
-    REQUIRE(y == Approx(xyz[1]));
-    REQUIRE(z == Approx(xyz[2]));
+    REQUIRE(x == Approx(xyz[0]).margin(0.01));
+    REQUIRE(y == Approx(xyz[1]).margin(0.01));
+    REQUIRE(z == Approx(xyz[2]).margin(0.01));
+}
+
+TEST_CASE("radToInt and intToRad", "[BaseStation]")
+{
+  for (int i = -360 * 1000; i < 360 * 1000; i += 56565) {
+    for (int serial = 1; serial < 4; serial++) {
+      //printf("%d (serial %d) %f %d\n", i, serial, intToRad(i, serial), radToInt(intToRad(i, serial), serial));
+      REQUIRE(abs(radToInt(intToRad(i, serial), serial) - i) < 5);
+    }
+  }
 }
 
 TEST_CASE("Forward kinematics in stowed position", "[BaseStation]")

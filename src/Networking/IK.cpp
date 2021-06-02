@@ -4,6 +4,7 @@
 #include "motor_interface.h"
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../log.h"
 #include <iostream>
 
 // Angular positions from the motor boards are given in millidegrees
@@ -16,17 +17,19 @@ const std::array<double, 3> offsets = {0.0,      Constants::SHOULDER_MAX, Consta
 
 int32_t radToInt(double d, int motor_serial)
 {
-  double offset = offsets[motor_serial];
-  int sign_flip = sign_flips[motor_serial];
+  double offset = offsets[motor_serial-1];
+  int sign_flip = sign_flips[motor_serial-1];
   int32_t i = sign_flip * (d - offset) / RAD_PER_INT;
+  log(LOG_TRACE, "radToInt %f %d %f %d %d\n", d, motor_serial, offset, sign_flip, i);
   return i;
 }
 
 double intToRad(int32_t i, int motor_serial)
 {
-  double offset = offsets[motor_serial];
-  int sign_flip = sign_flips[motor_serial];
+  double offset = offsets[motor_serial-1];
+  int sign_flip = sign_flips[motor_serial-1];
   double d = sign_flip * i * RAD_PER_INT + offset;
+  log(LOG_TRACE, "intToRad %d %d %f %d %f\n", i, motor_serial, offset, sign_flip, d);
   return d;
 }
 
@@ -39,6 +42,7 @@ std::array<double, 3> forward_kinematics() {
   double arm_base = intToRad(arm_base_pos, 1);
   double shoulder = intToRad(shoulder_pos, 2);
   double elbow = intToRad(elbow_pos, 3);
+  log(LOG_DEBUG, "Running forward kinematics for %f %f %f\n", arm_base, shoulder, elbow);
   double r1 = Constants::SHOULDER_LENGTH * cos(shoulder);
   double r2 = Constants::ELBOW_LENGTH * cos(shoulder-elbow);
   double z1 = Constants::SHOULDER_LENGTH * sin(shoulder);
