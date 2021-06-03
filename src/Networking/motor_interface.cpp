@@ -26,8 +26,8 @@ const std::array<std::string, 4> operation_modes = {
 const std::map<std::string, double> positive_arm_pwm_scales = {
 	{"arm_base",    6000},
 	{"shoulder",   20000},
-	{"elbow",     -31000},
-	{"forearm",    -4000},
+	{"elbow",     -32768},
+	{"forearm",    -6000},
 	{"diffleft",    5000},
 	{"diffright",  -5000},
 	{"hand",       15000}
@@ -35,20 +35,20 @@ const std::map<std::string, double> positive_arm_pwm_scales = {
 const std::map<std::string, double> negative_arm_pwm_scales = {
 	{"arm_base",    6000},
 	{"shoulder",   12000},
-	{"elbow",     -14000},
-	{"forearm",    -4000},
+	{"elbow",     -18000},
+	{"forearm",    -6000},
 	{"diffleft",    5000},
 	{"diffright",  -5000},
 	{"hand",       15000}
 };
 const std::map<std::string, double> incremental_pid_scales = {
-	{"arm_base",  M_PI/8}, // TODO: Check signs
-	{"shoulder",  M_PI/8},
-	{"elbow",     M_PI/8},
-	{"forearm",        0}, // We haven't implemented PID on these motors yet
-	{"diffleft",       0},
-	{"diffright",      0},
-	{"hand",           0}
+	{"arm_base",   M_PI/8}, // TODO: Check signs
+	{"shoulder",   M_PI/8},
+	{"elbow",     -M_PI/8},
+	{"forearm",         0}, // We haven't implemented PID on these motors yet
+	{"diffleft",        0},
+	{"diffright",       0},
+	{"hand",            0}
 };
 constexpr double incremental_ik_scale = 0.1; // m/s
 
