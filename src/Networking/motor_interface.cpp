@@ -57,6 +57,11 @@ const std::array<std::string, 3> ik_motors = {"arm_base", "shoulder", "elbow"};
 
 constexpr int INCREMENTAL_TIMEOUT_MS = 300;
 
+bool motorSupportsPID(int motor_serial)
+{
+  return motor_serial >= DEVICE_SERIAL_MOTOR_BASE && motor_serial <= DEVICE_SERIAL_MOTOR_ELBOW;
+}
+
 int getIndex(const std::vector<std::string> &arr, const std::string &value)
 {
   for (int i = 0; i < arr.size(); i++) {
@@ -69,7 +74,7 @@ int getIndex(const std::vector<std::string> &arr, const std::string &value)
 
 bool isValidOperationMode(int motor_serial, int ik_axis, const std::string &op_mode)
 {
-  if (op_mode != "PWM target" && (motor_serial > 3 || motor_serial < 1) && ik_axis < 0)
+  if (op_mode != "PWM target" && !motorSupportsPID(motor_serial) && ik_axis < 0)
   {
     return false;
   }
