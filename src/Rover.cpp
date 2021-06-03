@@ -9,6 +9,7 @@
 #include "Globals.h"
 #include "log.h"
 #include "Rover.h"
+#include "Util.h"
 #include "Networking/NetworkConstants.h"
 #include "Networking/Network.h"
 #include "Networking/CANUtils.h"
@@ -51,13 +52,6 @@ constexpr std::array<int32_t,6> arm_Ds = {
 constexpr std::array<uint8_t,6> arm_encoder_signs = {
    0,      0,      1,     0,       0,         0
 };
-
-long getElapsedUsecs(const struct timeval &tp_start) {
-  struct timeval tp0;
-  gettimeofday(&tp0, NULL);
-  long elapsed = (tp0.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp0.tv_usec - tp_start.tv_usec);
-  return elapsed;
-}
 
 void initEncoders(bool zero_encoders)
 {
