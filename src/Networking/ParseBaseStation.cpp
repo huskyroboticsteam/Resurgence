@@ -77,7 +77,7 @@ bool ParseBaseStationPacket(char const* buffer)
 
   if (success)
   {
-    json response = {{"status", "ok"}};
+    json response = {{"status", "ok"}, {"data", Globals::status_data}};
     sendBaseStationPacket(response.dump());
   }
   return success;

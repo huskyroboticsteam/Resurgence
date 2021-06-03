@@ -8,11 +8,13 @@
 #include "CommandLineOptions.h"
 #include "Globals.h"
 #include "log.h"
+#include "Rover.h"
 #include "Networking/NetworkConstants.h"
 #include "Networking/Network.h"
 #include "Networking/CANUtils.h"
 #include "Networking/ParseCAN.h"
 #include "Networking/ParseBaseStation.h"
+#include "Networking/motor_interface.h"
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
 
@@ -82,26 +84,35 @@ void initEncoders(bool zero_encoders)
 void setArmMode(uint8_t mode)
 {
     // Set all arm motors to given mode
-    CANPacket p;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
         serial <= DEVICE_SERIAL_MOTOR_HAND;
         serial ++ ) {
-      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
+      setMotorMode(serial, mode);
+    }
+}
+
+void setMotorMode(uint8_t serial, uint8_t mode) {
+  if ((serial > DEVICE_SERIAL_MOTOR_ELBOW || serial < 1)
+      && mode == MOTOR_UNIT_MODE_PID) {
+    log(LOG_ERROR, "Cannot use PID mode for motor serial %d\n", serial);
+    return;
+  }
+  CANPacket p;
+  AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
+  sendCANPacket(p);
+  usleep(1000); // We're running out of CAN buffer space
+  if (mode == MOTOR_UNIT_MODE_PID) {
+      int p_coeff = arm_Ps[serial-1];
+      int i_coeff = arm_Is[serial-1];
+      int d_coeff = arm_Ds[serial-1];
+      AssemblePSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, p_coeff);
+      sendCANPacket(p);
+      AssembleISetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, i_coeff);
+      sendCANPacket(p);
+      AssembleDSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, d_coeff);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
-      if (mode == MOTOR_UNIT_MODE_PID) {
-          int p_coeff = arm_Ps[serial-1];
-          int i_coeff = arm_Is[serial-1];
-          int d_coeff = arm_Ds[serial-1];
-          AssemblePSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, p_coeff);
-          sendCANPacket(p);
-          AssembleISetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, i_coeff);
-          sendCANPacket(p);
-          AssembleDSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, d_coeff);
-          sendCANPacket(p);
-          usleep(1000); // We're running out of CAN buffer space
-      }
-    }
+  }
 }
 
 void InitializeRover(uint8_t arm_mode, bool zero_encoders)
@@ -131,12 +142,10 @@ void closeSim(int signum)
     raise(SIGTERM);
 }
 
-const double CONTROL_HZ = 10.0;
-
 int rover_loop(int argc, char **argv)
 {
     LOG_LEVEL = LOG_INFO;
-    Globals::AUTONOMOUS = true;
+    Globals::AUTONOMOUS = false;
     world_interface_init();
     rclcpp::init(0, nullptr);
     // Ctrl+C doesn't stop the simulation without this line
@@ -165,11 +174,11 @@ int rover_loop(int argc, char **argv)
         int arm_base_pos = -1;
         int shoulder_pos = -1;
         int elbow_pos = -1;
-        if (!Globals::status_data["arm_base"].empty())
+        if (!Globals::status_data["arm_base"]["angular_position"].is_null())
           arm_base_pos = Globals::status_data["arm_base"]["angular_position"];
-        if (!Globals::status_data["shoulder"].empty())
+        if (!Globals::status_data["shoulder"]["angular_position"].is_null())
           shoulder_pos = Globals::status_data["shoulder"]["angular_position"];
-        if (!Globals::status_data["elbow"].empty())
+        if (!Globals::status_data["elbow"]["angular_position"].is_null())
           elbow_pos = Globals::status_data["elbow"]["angular_position"];
         log(LOG_INFO, "Time\t %d arm_base\t %d\t shoulder\t %d\t elbow\t %d \n",
                 loopStartElapsedUsecs / 1000,
@@ -183,6 +192,9 @@ int rover_loop(int argc, char **argv)
         while (recvBaseStationPacket(buffer) != 0) {
             ParseBaseStationPacket(buffer);
         }
+
+        incrementArm();
+
         autonomous.autonomyIter();
 
         long elapsedUsecs = getElapsedUsecs(tp_rover_start) - loopStartElapsedUsecs;

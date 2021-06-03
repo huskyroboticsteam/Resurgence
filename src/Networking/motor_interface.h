@@ -5,3 +5,4 @@
 using nlohmann::json;
 
 bool ParseMotorPacket(json &message);
+void incrementArm();
