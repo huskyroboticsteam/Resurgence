@@ -12,8 +12,8 @@ double RAD_PER_INT = (2*M_PI) / (360*1000.0);
 
 // See IK.h for explanation of sign / offset conventions
 //                                     arm_base, shoulder,                elbow
-const std::array<int, 3> sign_flips = {1,        1,                       1};
-const std::array<double, 3> offsets = {0.0,      Constants::SHOULDER_MAX, Constants::ELBOW_MAX};
+constexpr std::array<int, 3> sign_flips = {1,        1,                       1};
+constexpr std::array<double, 3> offsets = {0.0,      Constants::SHOULDER_MAX, Constants::ELBOW_MAX};
 
 int32_t radToInt(double d, int motor_serial)
 {
@@ -63,8 +63,8 @@ std::array<double, 3> forward_kinematics() {
 }
 
 bool ParseIKPacket(json &message) {
-  const double ELBOW_LENGTH = Constants::ELBOW_LENGTH;
-  const double SHOULDER_LENGTH = Constants::SHOULDER_LENGTH;
+  constexpr double ELBOW_LENGTH = Constants::ELBOW_LENGTH;
+  constexpr double SHOULDER_LENGTH = Constants::SHOULDER_LENGTH;
   if (message["wrist_base_target"] != nullptr)
   {
     json target = message["wrist_base_target"];
