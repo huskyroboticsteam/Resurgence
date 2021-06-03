@@ -13,8 +13,8 @@
 #include "commands/nogps/DriveThroughGate.h"
 
 constexpr float PI = M_PI;
-constexpr double KP_ANGLE = 2;
-constexpr double DRIVE_SPEED = 3;
+constexpr double KP_ANGLE = 2.0;
+constexpr double DRIVE_SPEED = 0.5;
 const Eigen::Vector3d gpsStdDev = {2, 2, 2*PI};
 constexpr int numSamples = 1;
 
@@ -384,13 +384,13 @@ void Autonomous::autonomyIter()
 {
 #ifdef GATE_TRAVERSAL
 #if GATE_TRAVERSAL == 1
-	static DriveToGate dtg(1, KP_ANGLE, 2, 3);
+	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
 	dtg.update(posts[urc_target.left_post_id]);
 	command_t cmd = dtg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
 #elif GATE_TRAVERSAL == 2
-	static DriveThroughGate dthg(readOdom(), KP_ANGLE, 2, 3);
+	static DriveThroughGate dthg(readOdom(), KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
 	point_t leftPost = posts[urc_target.left_post_id];
 	point_t rightPost = posts[urc_target.right_post_id];
