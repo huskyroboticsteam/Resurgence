@@ -34,8 +34,8 @@ void world_interface_init() {
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
 
-	gettimeofday(last_odom_reading_, NULL);
-	last_odom_pose_ = toTransform({0., 0., 0.});
+	gettimeofday(&last_odom_reading_, NULL);
+	last_odom_tf_ = toTransform({0., 0., 0.});
 	odom_dtheta_ = 0.0;
 	odom_dx_ = 0.0;
 }
@@ -53,13 +53,13 @@ transform_t getOdomAt(const struct timeval &time) {
 		rel_x = turn_radius * sin(rel_th);
 		rel_y = turn_radius * (1 - cos(rel_th));
 	}
-	transform_t rel_tf = toTransform(rel_x, rel_y, rel_th);
+	transform_t rel_tf = toTransform({rel_x, rel_y, rel_th});
 	return rel_tf * last_odom_tf_;
 }
 
 void setCmdVelToIntegrate(double dtheta, double dx) {
 	struct timeval now;
-	gettimeofday(now, NULL);
+	gettimeofday(&now, NULL);
 	transform_t new_tf = getOdomAt(now);
 	last_odom_reading_ = now;
 	last_odom_tf_ = new_tf;
@@ -132,7 +132,7 @@ points_t readLidarScan(){
 
 transform_t readOdom() {
 	struct timeval now;
-	gettimeofday(now, NULL);
+	gettimeofday(&now, NULL);
 	return getOdomAt(now);
 }
 
