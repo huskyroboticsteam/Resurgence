@@ -17,7 +17,7 @@ const std::array<double, 3> offsets = {0.0,      Constants::SHOULDER_MAX, Consta
 
 int32_t radToInt(double d, int motor_serial)
 {
-  if (motor_serial < 1 || motor_serial > 3)
+  if (!motorSupportsPID(motor_serial))
   {
     log(LOG_ERROR, "Invalid motor serial %d for radToInt\n", motor_serial);
     return 0;
@@ -30,7 +30,7 @@ int32_t radToInt(double d, int motor_serial)
 
 double intToRad(int32_t i, int motor_serial)
 {
-  if (motor_serial < 1 || motor_serial > 3)
+  if (!motorSupportsPID(motor_serial))
   {
     log(LOG_ERROR, "Invalid motor serial %d for intToRad\n", motor_serial);
     return 0;
@@ -119,7 +119,7 @@ bool ParseIKPacket(json &message) {
     // Don't send these packets until we're sure the IK problem is feasible
     json base_packet = {{"type", "motor"},
                         {"motor", "arm_base"},
-                        {"PID target", radToInt(baseAngle, 1)}}; // TODO offset, flip
+                        {"PID target", radToInt(baseAngle, 1)}};
     if (!ParseMotorPacket(base_packet))
     {
       return false;
