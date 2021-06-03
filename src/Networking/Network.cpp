@@ -27,7 +27,7 @@ bool InitializeBaseStationSocket()
   char *ssh_client = std::getenv("SSH_CLIENT");
   const char *server_ip;
   if (ssh_client == nullptr) {
-      log(LOG_WARN, "SSH_CLIENT environment variable is not set: defaulting server IP to 127.0.0.1");
+      log(LOG_WARN, "SSH_CLIENT environment variable is not set: defaulting server IP to 127.0.0.1\n");
       server_ip = "127.0.0.1";
   } else {
       int i = 0;
