@@ -200,6 +200,8 @@ int rover_loop(int argc, char **argv)
         long elapsedUsecs = getElapsedUsecs(tp_rover_start) - loopStartElapsedUsecs;
         long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
         if (desiredUsecs - elapsedUsecs > 0) {
+            // We drift by approximately 1ms per second unless we
+            // reduce our sleep time slightly
             usleep(desiredUsecs - elapsedUsecs - 90);
         } else {
             log(LOG_WARN, "Can't keep up with control frequency! Desired %d elapsed %d\n",
