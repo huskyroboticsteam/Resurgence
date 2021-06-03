@@ -201,15 +201,68 @@ void assert_IK_equals(double base, double shoulder, double elbow)
     CANPacket p;
     p = popPIDPkt();
     int base_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(base_val, 0, 1) == Approx(base));
+    REQUIRE(intToRad(base_val, 1) == Approx(base).margin(0.01));
 
     p = popPIDPkt();
     int shoulder_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(shoulder_val, 0, 1) == Approx(shoulder));
+    REQUIRE(intToRad(shoulder_val, 2) == Approx(shoulder).margin(0.01));
 
     p = popPIDPkt();
     int elbow_val = DecodeBytesToIntMSBFirst(p.data, 1, 5);
-    REQUIRE(intToRad(elbow_val, 0, 1) == Approx(elbow));
+    REQUIRE(intToRad(elbow_val, 3) == Approx(elbow).margin(0.01));
+}
+
+void set_radian_arm_angles(double arm_base, double shoulder, double elbow)
+{
+    Globals::status_data["arm_base"]["angular_position"] = radToInt(arm_base, 1);
+    Globals::status_data["shoulder"]["angular_position"] = radToInt(shoulder, 2);
+    Globals::status_data["elbow"]["angular_position"]    = radToInt(elbow, 3);
+}
+
+void assert_FK_equals(double x, double y, double z)
+{
+    std::array<double, 3> xyz = forward_kinematics();
+    REQUIRE(x == Approx(xyz[0]).margin(0.01));
+    REQUIRE(y == Approx(xyz[1]).margin(0.01));
+    REQUIRE(z == Approx(xyz[2]).margin(0.01));
+}
+
+TEST_CASE("radToInt and intToRad", "[BaseStation]")
+{
+  for (int i = -360 * 1000; i < 360 * 1000; i += 56565) {
+    for (int serial = 1; serial < 4; serial++) {
+      //printf("%d (serial %d) %f %d\n", i, serial, intToRad(i, serial), radToInt(intToRad(i, serial), serial));
+      REQUIRE(abs(radToInt(intToRad(i, serial), serial) - i) < 5);
+    }
+  }
+}
+
+TEST_CASE("Forward kinematics in stowed position", "[BaseStation]")
+{
+    Globals::status_data["arm_base"]["angular_position"] = 0;
+    Globals::status_data["shoulder"]["angular_position"] = 0;
+    Globals::status_data["elbow"]["angular_position"] = 0;
+    assert_FK_equals(0.119867, 0., 0.0152843);
+}
+
+TEST_CASE("Forward kinematics at full extension", "[BaseStation]")
+{
+    double full_extension = Constants::SHOULDER_LENGTH + Constants::ELBOW_LENGTH;
+
+    set_radian_arm_angles(0., 0., 0.);
+    assert_FK_equals(full_extension, 0., 0.);
+
+    set_radian_arm_angles(M_PI/2, 0., 0.);
+    assert_FK_equals(0., full_extension, 0.);
+
+    set_radian_arm_angles(0., M_PI/2, 0.);
+    assert_FK_equals(0., 0., full_extension);
+}
+
+TEST_CASE("Forward kinematics near the ground", "[BaseStation]")
+{
+    set_radian_arm_angles(0.9, 1.1, 2.3);
+    assert_FK_equals(0.326845, 0.411873, -0.117700);
 }
 
 TEST_CASE("Can handle IK packets", "[BaseStation]")
@@ -269,6 +322,17 @@ TEST_CASE("Respects joint limits", "[BaseStation]")
     REQUIRE(ParseBaseStationPacket(msg) == false);
     json m = json::parse(popBaseStationPacket());
     REQUIRE(m["msg"] == "IK solution outside joint limits for shoulder");
+}
+
+TEST_CASE("Forward kinematics is the inverse of inverse kinematics", "[BaseStation]")
+{
+    clearTestGlobals();
+    setupEncoders();
+    char const *msg = "{\"type\":\"ik\",\"wrist_base_target\":[0.6, -0.3, -0.1]}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    assert_IK_equals     (-0.463647, 1.005327, 2.053642);
+    set_radian_arm_angles(-0.463647, 1.005327, 2.053642);
+    assert_FK_equals(0.6, -0.3, -0.1);
 }
 
 TEST_CASE("Deactivates wheel motors if e-stopped", "e-stop")
