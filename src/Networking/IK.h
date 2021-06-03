@@ -12,7 +12,9 @@ bool ParseIKPacket(json &message);
 // are approximately (0,pi,pi).
 // Arm base positive direction is counterclockwise (viewed from above the rover).
 // Shoulder, elbow positive direction is towards the stowed limit switch.
-int32_t radToInt(double d, double offset, int32_t sign_flip);
+int32_t radToInt(double d, int motor_serial);
 
 // Inverse of the above
-double intToRad(int32_t i, double offset, int32_t sign_flip);
+double intToRad(int32_t i, int motor_serial);
+
+std::array<double, 3> forward_kinematics();

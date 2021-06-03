@@ -76,10 +76,11 @@ add_library(real_world_interface SHARED
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
   ar/Tag.cpp
+  ar/read_landmarks.cpp
   gps/read_usb_gps.cpp
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(real_world_interface ${OpenCV_LIBS})
+target_link_libraries(real_world_interface ${vision_libs})
 
 add_library(real_can_interface SHARED
   log.cpp
@@ -100,13 +101,17 @@ list(APPEND real_world_libs
   lidar_base
   liburg_c.a)
 
+list(APPEND vision_libs
+  ${OpenCV_LIBS}
+  opencv_aruco)
+
 add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
   real_base_station
   real_can_interface
   ${real_world_libs}
   )
-target_link_libraries(Rover ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
+target_link_libraries(Rover ${vision_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
 add_executable(RoverNoCAN rover_main.cpp)
 target_link_libraries(RoverNoCAN ${rover_libs}
@@ -202,7 +207,6 @@ target_link_libraries(gpsd_test gps)
 add_subdirectory(ar)
 add_subdirectory(camera)
 
-# My IDE kept yelling at me until I added these lines. I'm still able to build on the VM so I think it doesn't break anything
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 

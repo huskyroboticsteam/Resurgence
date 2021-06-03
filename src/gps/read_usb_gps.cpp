@@ -55,7 +55,7 @@ transform_t readGPS() {
     tf = most_recent_tf;
     fresh_data = false;
   } else {
-    tf = toTransform({0,0,0});
+    tf = transform_t::Zero();
   }
   gps_mutex.unlock();
   return tf;

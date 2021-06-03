@@ -3,12 +3,14 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include <future>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>
 
 #include "Util.h"
 #include "WorldData.h"
+#include "worldmap/GlobalMap.h"
 #include "filters/PoseEstimator.h"
 #include "filters/RollingAvgFilter.h"
 #include "lidar/PointCloudProcessing.h"
@@ -59,6 +61,7 @@ private:
 	// gate_targets.second(2) is NAN if targets have not been refined with more accurate landmark measurements
 	std::pair<pose_t, pose_t> gate_targets;
 	PoseEstimator poseEstimator;
+	GlobalMap map;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};
 	RollingAvgFilter<5,3> leftPostFilter;
@@ -67,10 +70,15 @@ private:
 	ControlState control_state;
 	int time_since_plan;
 	plan_t plan;
+	std::future<plan_t> pending_plan;
 	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
 	double search_theta_increment;
+	int mapLoopCounter; // number of times the map has been updated
+	int mapBlindPeriod; // the number of loops to wait before starting to build the map
+	bool mapDoesOverlap;
+	int mapOverlapSampleThreshold; // at least these many points required to overlap map
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;

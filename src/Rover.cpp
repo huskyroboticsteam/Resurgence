@@ -8,11 +8,13 @@
 #include "CommandLineOptions.h"
 #include "Globals.h"
 #include "log.h"
+#include "Rover.h"
 #include "Networking/NetworkConstants.h"
 #include "Networking/Network.h"
 #include "Networking/CANUtils.h"
 #include "Networking/ParseCAN.h"
 #include "Networking/ParseBaseStation.h"
+#include "Networking/motor_interface.h"
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
 
@@ -24,9 +26,9 @@ extern "C"
 }
 
 constexpr std::array<uint32_t,6> arm_PPJRs = {
-    360 * 1000, // base, unmeasured
+    17 * 1000, // base, estimate
 
-    180 * 1000, // shoulder, rough estimate
+    20 * 1000, // shoulder, estimate
     36 * 1000, // elbow, rough estimate
 
     360 * 1000, // forearm, unmeasured
@@ -49,6 +51,13 @@ constexpr std::array<int32_t,6> arm_Ds = {
 constexpr std::array<uint8_t,6> arm_encoder_signs = {
    0,      0,      1,     0,       0,         0
 };
+
+long getElapsedUsecs(const struct timeval &tp_start) {
+  struct timeval tp0;
+  gettimeofday(&tp0, NULL);
+  long elapsed = (tp0.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp0.tv_usec - tp_start.tv_usec);
+  return elapsed;
+}
 
 void initEncoders(bool zero_encoders)
 {
@@ -75,26 +84,35 @@ void initEncoders(bool zero_encoders)
 void setArmMode(uint8_t mode)
 {
     // Set all arm motors to given mode
-    CANPacket p;
     for (uint8_t serial = DEVICE_SERIAL_MOTOR_BASE;
         serial <= DEVICE_SERIAL_MOTOR_HAND;
         serial ++ ) {
-      AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
+      setMotorMode(serial, mode);
+    }
+}
+
+void setMotorMode(uint8_t serial, uint8_t mode) {
+  if ((serial > DEVICE_SERIAL_MOTOR_ELBOW || serial < 1)
+      && mode == MOTOR_UNIT_MODE_PID) {
+    log(LOG_ERROR, "Cannot use PID mode for motor serial %d\n", serial);
+    return;
+  }
+  CANPacket p;
+  AssembleModeSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, mode);
+  sendCANPacket(p);
+  usleep(1000); // We're running out of CAN buffer space
+  if (mode == MOTOR_UNIT_MODE_PID) {
+      int p_coeff = arm_Ps[serial-1];
+      int i_coeff = arm_Is[serial-1];
+      int d_coeff = arm_Ds[serial-1];
+      AssemblePSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, p_coeff);
+      sendCANPacket(p);
+      AssembleISetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, i_coeff);
+      sendCANPacket(p);
+      AssembleDSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, d_coeff);
       sendCANPacket(p);
       usleep(1000); // We're running out of CAN buffer space
-      if (mode == MOTOR_UNIT_MODE_PID) {
-          int p_coeff = arm_Ps[serial-1];
-          int i_coeff = arm_Is[serial-1];
-          int d_coeff = arm_Ds[serial-1];
-          AssemblePSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, p_coeff);
-          sendCANPacket(p);
-          AssembleISetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, i_coeff);
-          sendCANPacket(p);
-          AssembleDSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, d_coeff);
-          sendCANPacket(p);
-          usleep(1000); // We're running out of CAN buffer space
-      }
-    }
+  }
 }
 
 void InitializeRover(uint8_t arm_mode, bool zero_encoders)
@@ -124,12 +142,10 @@ void closeSim(int signum)
     raise(SIGTERM);
 }
 
-const double CONTROL_HZ = 10.0;
-
 int rover_loop(int argc, char **argv)
 {
     LOG_LEVEL = LOG_INFO;
-    Globals::AUTONOMOUS = true;
+    Globals::AUTONOMOUS = false;
     world_interface_init();
     rclcpp::init(0, nullptr);
     // Ctrl+C doesn't stop the simulation without this line
@@ -142,33 +158,32 @@ int rover_loop(int argc, char **argv)
     int urc_leg = 5;
     Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
     char buffer[MAXLINE];
-    struct timeval tp_loop_end, tp_loop_start, tp_rover_start;
+    struct timeval tp_rover_start;
     int num_can_packets = 0;
     gettimeofday(&tp_rover_start, NULL);
     for(int iter = 0; /*no termination condition*/; iter++)
     {
-        gettimeofday(&tp_loop_start, NULL);
-        long totalElapsedUsecs = (tp_loop_start.tv_sec - tp_rover_start.tv_sec) * 1000 * 1000 + (tp_loop_start.tv_usec - tp_rover_start.tv_usec);
+        long loopStartElapsedUsecs = getElapsedUsecs(tp_rover_start);
         num_can_packets = 0;
         while (recvCANPacket(&packet) != 0) {
             num_can_packets += 1;
             ParseCANPacket(packet);
         }
+        log(LOG_DEBUG, "Got %d CAN packets\n", num_can_packets);
 
         int arm_base_pos = -1;
         int shoulder_pos = -1;
         int elbow_pos = -1;
-        if (!Globals::status_data["arm_base"].empty())
+        if (!Globals::status_data["arm_base"]["angular_position"].is_null())
           arm_base_pos = Globals::status_data["arm_base"]["angular_position"];
-        if (!Globals::status_data["shoulder"].empty())
+        if (!Globals::status_data["shoulder"]["angular_position"].is_null())
           shoulder_pos = Globals::status_data["shoulder"]["angular_position"];
-        if (!Globals::status_data["elbow"].empty())
+        if (!Globals::status_data["elbow"]["angular_position"].is_null())
           elbow_pos = Globals::status_data["elbow"]["angular_position"];
-        log(LOG_DEBUG, "Time\t %d arm_base\t %d\t shoulder\t %d\t elbow\t %d \n",
-                totalElapsedUsecs / 1000,
+        log(LOG_INFO, "Time\t %d arm_base\t %d\t shoulder\t %d\t elbow\t %d \r",
+                loopStartElapsedUsecs / 1000,
                 arm_base_pos, shoulder_pos, elbow_pos);
 
-        log(LOG_DEBUG, "Got %d CAN packets\n", num_can_packets);
         if (iter % (int) CONTROL_HZ == 0) {
           // For computation reasons, only try to do this once per second
           InitializeBaseStationSocket();
@@ -177,13 +192,17 @@ int rover_loop(int argc, char **argv)
         while (recvBaseStationPacket(buffer) != 0) {
             ParseBaseStationPacket(buffer);
         }
+
+        incrementArm();
+
         autonomous.autonomyIter();
 
-        gettimeofday(&tp_loop_end, NULL);
-        long elapsedUsecs = (tp_loop_end.tv_sec - tp_loop_start.tv_sec) * 1000 * 1000 + (tp_loop_end.tv_usec - tp_loop_start.tv_usec);
+        long elapsedUsecs = getElapsedUsecs(tp_rover_start) - loopStartElapsedUsecs;
         long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
         if (desiredUsecs - elapsedUsecs > 0) {
-            usleep(desiredUsecs - elapsedUsecs);
+            // We drift by approximately 1ms per second unless we
+            // reduce our sleep time slightly
+            usleep(desiredUsecs - elapsedUsecs - 90);
         } else {
             log(LOG_WARN, "Can't keep up with control frequency! Desired %d elapsed %d\n",
                 desiredUsecs/1000, elapsedUsecs/1000);

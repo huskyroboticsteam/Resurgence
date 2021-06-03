@@ -8,12 +8,13 @@
 
 #include <net/if.h>
 #include <cstring>
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#include<iostream>
+#include <iostream>
 
 int base_station_fd = -1;
 bool connected = false;
@@ -22,6 +23,25 @@ bool failed_once = false;
 bool InitializeBaseStationSocket()
 {
   if (connected) return connected;
+
+  char *ssh_client = std::getenv("SSH_CLIENT");
+  const char *server_ip;
+  if (ssh_client == nullptr) {
+      log(LOG_WARN, "SSH_CLIENT environment variable is not set: defaulting server IP to 127.0.0.1");
+      server_ip = "127.0.0.1";
+  } else {
+      int i = 0;
+      log(LOG_DEBUG, "Got ssh client %s\n", ssh_client);
+      char c;
+      while ((c = ssh_client[i++]) != '\0') {
+          if (c == ' ') {
+              ssh_client[i-1] = '\0';
+              break;
+          }
+      }
+      server_ip = ssh_client;
+      log(LOG_INFO, "Attempting to connect to server IP %s...\n", server_ip);
+  }
 
   if ((base_station_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
@@ -37,7 +57,7 @@ bool InitializeBaseStationSocket()
 
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(PORT);
-  servaddr.sin_addr.s_addr = inet_addr(SERVER_IP);
+  servaddr.sin_addr.s_addr = inet_addr(server_ip);
 
   if (connect(base_station_fd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
   {

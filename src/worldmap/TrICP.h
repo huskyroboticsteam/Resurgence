@@ -24,25 +24,29 @@ public:
 	explicit TrICP(int maxIter, double relErrChangeThresh,
 				   std::function<point_t(const point_t &)> getClosest);
 	/**
-	 * Finds a rigid transformation that maps the map to the given sample.
-	 *
-	 * NOTE: this doesn't transform the sample to match the map, it transforms the map
-	 * to match the sample.
+	 * Finds a rigid transformation that transforms the given sample to match the map.
 	 *
 	 * @param sample The sample to register.
 	 * @param overlap The estimated overlap, in the range [0,1] between this sample and the
 	 * global map. It's better to underestimate than overestimate. However, if it's too low
 	 * then no meaningful features can be matched. Set to 0 to add points directly
 	 * with no feature matching.
-	 * @return A rigid transformation that maps the map to the given sample, or the identity
-	 * matrix if the sample is empty or overlap is 0.
+	 * @return A rigid transformation that transforms the given sample to match the map,
+	 * or the identity matrix if the sample is empty or overlap is 0.
 	 */
 	transform_t correct(const points_t &sample, double overlap);
 
 private:
+	// maximum number of iterations to use
 	int maxIter;
+	// if the relative error change drops below this threshold, stop iterating
 	double relErrChangeThresh;
+	// find the closest point in the reference to the given point
 	std::function<point_t(const point_t &)> getClosest;
+
+	// performs a single iteration of point cloud registration, returning the computed transform
 	transform_t iterate(points_t &sample, int N, double &mse) const;
+
+	// returns true iff any of the stopping conditions are met
 	bool isDone(int numIter, double S, double oldMSE) const;
 };

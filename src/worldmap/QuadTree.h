@@ -88,6 +88,18 @@ public:
 	point_t getClosestWithin(const point_t &point, double areaSize) const;
 
 	/**
+	 * Checks if the given point has at least one point within the given distance from it.
+	 * Although it's functionally equivalent to checking the size of the vector returned by
+	 * getPointsWithin(), it is much cheaper to call this method.
+	 *
+	 * @param point The point to check if it has a nearby point.
+	 * @param dist The distance within which to search.
+	 * @return True iff there exists a point in the tree, which may be the given point, within
+	 * the given distance from the given point. False otherwise.
+	 */
+	bool hasPointWithin(const point_t &point, double areaSize) const;
+
+	/**
 	 * Gets all points in the quadtree that lie in the axis-aligned square bounding box
 	 * centered at the given point with the given size.
 	 * @param point The center of the bounding box.
@@ -103,6 +115,8 @@ public:
 	 * @return An arbitrary point in this tree, or {0,0,0} if this is empty.
 	 */
 	point_t getArbitraryPoint() const;
+
+	// TODO: add method to remove random points, to help keep the tree size down
 
 private:
 	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west

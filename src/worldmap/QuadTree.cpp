@@ -166,7 +166,7 @@ point_t QuadTree::getClosest(const point_t &point) const
 		double minDist = std::numeric_limits<double>::infinity();
 		for (const point_t &p : points)
 		{
-			double dist = (p - point).norm();
+			double dist = (p - point).topRows<2>().norm();
 			if (dist < minDist)
 			{
 				closest = p;
@@ -205,9 +205,9 @@ point_t QuadTree::getClosest(const point_t &point) const
 		assert(!tree->empty()); // should be guaranteed
 		// choose an arbitrary point
 		point_t p = tree->getArbitraryPoint();
-		// areas must be square, so choose the largest dimension of the diff vector
+		// Search area is square, so using the distance guarantees that the closest is found
 		// multiply by two because this is half side-length
-		double areaSize = 2 * (p - point).topRows<2>().array().abs().maxCoeff();
+		double areaSize = 2 * (p - point).topRows<2>().norm();
 		// get the closest of all points within this area
 		return getClosestWithin(point, areaSize);
 	}
@@ -269,6 +269,31 @@ std::vector<point_t> QuadTree::getPointsWithin(const point_t &point, double area
 	}
 
 	return ret;
+}
+
+bool QuadTree::hasPointWithin(const point_t &point, double dist) const {
+	// if the given bounding box doesn't intersect this node's area, return false
+	if (empty() || !boundsIntersect(center, width, point, dist * 2))
+	{
+		return false;
+	}
+
+	// check any points from this node
+	for (const point_t &p : points)
+	{
+		if ((p - point).topRows<2>().norm() <= dist) return true;
+	}
+
+	// search through children, if they exist
+	if (hasChildren())
+	{
+		for (const auto &child : children)
+		{
+			if (child->hasPointWithin(point, dist)) return true;
+		}
+	}
+
+	return false;
 }
 
 void QuadTree::subdivide()

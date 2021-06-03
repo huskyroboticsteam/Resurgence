@@ -1,3 +1,11 @@
 # Example udev rule for a webcam. We should make sure that the videoN
 # ids are unique, and match those in the .yml files.
-SUBSYSTEM=="usb", ATTR{idVendor}=="0c45", ATTR{idProduct}=="6366", SYMLINK+="video20", GROUP="video"
+#
+# To help write these rules, try running:
+#   udevadm info -a --name /dev/video0
+
+# Mast camera
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9601", SYMLINK+="video20"
+
+# Forearm camera
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9230", SYMLINK+="video30"

@@ -171,6 +171,39 @@ TEST_CASE("QuadTree - GetPointsWithin", "[QuadTree]")
 	}
 }
 
+TEST_CASE("QuadTree - GetClosestPointRandom", "[QuadTree]")
+{
+	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
+	QuadTree tree(100);
+
+	for (int i = 0; i < 100; i++)
+	{
+		point_t p = randPoint(5);
+		tree.add(p);
+	}
+
+	points_t points = tree.getAllPoints();
+
+	for (int i = 0; i < 200; i++)
+	{
+		point_t point = randPoint(100);
+		point_t closestTree = tree.getClosest(point);
+		// manually compute the nearest neighbor to check against
+		point_t closest = {0, 0, 0};
+		double minDist = std::numeric_limits<double>::infinity();
+		for (const point_t &p : points)
+		{
+			double dist = (p - point).norm();
+			if (dist < minDist)
+			{
+				minDist = dist;
+				closest = p;
+			}
+		}
+		REQUIRE(closest == closestTree);
+	}
+}
+
 TEST_CASE("QuadTree - GetClosestPoint", "[QuadTree]")
 {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
