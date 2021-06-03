@@ -67,9 +67,14 @@ void setCmdVelToIntegrate(double dtheta, double dx) {
 	odom_dx_ = dx;
 }
 
-constexpr double WHEEL_BASE = 1.0;				 // Distance between left and right wheels. Eyeballed
+// Distance between left and right wheels.
+constexpr double WHEEL_BASE = 0.66;
+// Effective distance between wheels. Tweaked so that actual rover angular rate
+// roughly matches the commanded angular rate.
+constexpr double EFF_WHEEL_BASE = 1.40;
+
 constexpr double WHEEL_RADIUS = 0.15;			 // Eyeballed
-constexpr double PWM_FOR_1RAD_PER_SEC = 10000; // Eyeballed
+constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
 
 bool setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0))
@@ -77,14 +82,16 @@ bool setCmdVel(double dtheta, double dx) {
 
 	/* This is the inverse of the formula:
 	 *		dx = (right_ground_vel + left_ground_vel) / 2
-	 *		dtheta = (right_ground_vel - left_ground_vel) / WHEEL_BASE
+	 *		dtheta = (right_ground_vel - left_ground_vel) / EFF_WHEEL_BASE
 	 */
-	double right_ground_vel = dx + WHEEL_BASE / 2 * dtheta;
-	double left_ground_vel = dx - WHEEL_BASE / 2 * dtheta;
+	double right_ground_vel = dx + EFF_WHEEL_BASE / 2 * dtheta;
+	double left_ground_vel = dx - EFF_WHEEL_BASE / 2 * dtheta;
 	double right_angular_vel = right_ground_vel / WHEEL_RADIUS;
 	double left_angular_vel = left_ground_vel / WHEEL_RADIUS;
 	int16_t right_pwm = (int16_t)(right_angular_vel * PWM_FOR_1RAD_PER_SEC);
 	int16_t left_pwm = (int16_t)(left_angular_vel * PWM_FOR_1RAD_PER_SEC);
+	log(LOG_TRACE, "dtheta %f dx %f right ground %f right angular %f right pwm %d\n",
+			dtheta, dx, right_ground_vel, right_angular_vel, right_pwm);
 	// This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
 	int16_t max_pwm = 15000;
 	double scale_down_factor = 1.0;
