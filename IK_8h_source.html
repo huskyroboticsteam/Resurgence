@@ -84,10 +84,12 @@ $(function() {
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// are approximately (0,pi,pi).</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// Arm base positive direction is counterclockwise (viewed from above the rover).</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// Shoulder, elbow positive direction is towards the stowed limit switch.</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;int32_t radToInt(<span class="keywordtype">double</span> d, <span class="keywordtype">double</span> offset, int32_t sign_flip);</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;int32_t radToInt(<span class="keywordtype">double</span> d, <span class="keywordtype">int</span> motor_serial);</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// Inverse of the above</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">double</span> intToRad(int32_t i, <span class="keywordtype">double</span> offset, int32_t sign_flip);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">double</span> intToRad(int32_t i, <span class="keywordtype">int</span> motor_serial);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;std::array&lt;double, 3&gt; forward_kinematics();</div>
 <div class="ttc" id="anamespacenlohmann_html_a2bfd99e845a2e5cd90aeaf1b1431f474"><div class="ttname"><a href="namespacenlohmann.html#a2bfd99e845a2e5cd90aeaf1b1431f474">nlohmann::json</a></div><div class="ttdeci">basic_json&lt;&gt; json</div><div class="ttdoc">default JSON class</div><div class="ttdef"><b>Definition:</b> json.hpp:2933</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
