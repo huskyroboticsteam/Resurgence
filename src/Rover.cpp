@@ -6,6 +6,7 @@
 #include <array>
 #include <queue>
 #include <fstream>
+#include <sstream>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -17,7 +18,7 @@
 #include "Networking/ParseBaseStation.h"
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
-//#include "gps/read_usb_gps.h"
+#include "gps/read_usb_gps.h"
 
 extern "C"
 {
@@ -137,29 +138,35 @@ void closeSim(int signum)
 std::queue<URCLeg> parseGPSLegs(std::string filepath) {
 	std::queue<URCLeg> urc_legs;
 	std::ifstream gps_legs(filepath);
-	if (gps_legs)
+
+	int left_post_id, right_post_id;
+	double lat, lon;
+	std::string line;
+
+	// A properly formatted file has each leg on a separate line, with each line of the form
+	// left_post_id right_post_id lat lon
+	// Improperly formatted lines (empty lines, comments) are ignored, and text
+	// after the above data on properly formatted lines is ignored
+	while (getline(gps_legs, line))
 	{
-//		while (!gps_legs.eof())
-//		{
-//			// Assumes the file at filepath is properly formatted
-//			// with each leg on a separate line and of the form
-//			// left_post_id right_post_id lon lat
-//			int left_post_id, right_post_id;
-//			double lon, lat;
-//			gps_legs >> left_post_id >> right_post_id >> lon >> lat;
-//			point_t leg_map_space = gpsToMeters(lon, lat);
-//			URCLeg leg = {left_post_id, right_post_id, leg_map_space};
-//		}
-		std::cout << "Using file" << std::endl;
+		std::istringstream line_stream(line);
+		if (line_stream >> left_post_id >> right_post_id >> lat >> lon)
+		{
+			point_t leg_map_space = gpsToMeters(lon, lat);
+			URCLeg leg = {left_post_id, right_post_id, leg_map_space};
+			urc_legs.push(leg);
+		}
 	}
-	else
+
+	if (urc_legs.size() == 0)
 	{
-		// File does not exist, use simulation legs as defaults
+		// File does not exist or has no valid legs, use simulation legs as defaults
 		for (int i = 0; i < 7; i++)
 		{
 			urc_legs.push(getLeg(i));
 		}
 	}
+
 	return urc_legs;
 }
 
@@ -168,7 +175,7 @@ const double CONTROL_HZ = 10.0;
 int rover_loop(int argc, char **argv)
 {
     LOG_LEVEL = LOG_INFO;
-	Globals::AUTONOMOUS = true;
+    Globals::AUTONOMOUS = true;
     world_interface_init();
     rclcpp::init(0, nullptr);
     // Ctrl+C doesn't stop the simulation without this line
@@ -176,9 +183,9 @@ int rover_loop(int argc, char **argv)
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover(MOTOR_UNIT_MODE_PWM, true);
     CANPacket packet;
-    // Target location for autonomous navigation
-    // Eventually this will be set by communication from the base station
-    std::queue<URCLeg> urc_legs = parseGPSLegs("gps_legs.txt");
+	// Target locations for autonomous navigation
+	// Eventually this will be set by communication from the base station
+	std::queue<URCLeg> urc_legs = parseGPSLegs("../src/gps_legs.txt");
     Autonomous autonomous(urc_legs, CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp_rover_start;

@@ -53,7 +53,7 @@ add_library(rover_common SHARED
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
-  #gps/read_usb_gps.cpp
+  gps/read_usb_gps.cpp
   )
 
 add_library(real_base_station SHARED
