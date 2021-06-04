@@ -95,6 +95,9 @@ bool setMotorOperationMode(const std::string &motor, const std::string &op_mode)
     log(LOG_INFO, "Changing operation mode for %s (%s -> %s)\n",
         motor.c_str(), prev_mode.c_str(), op_mode.c_str());
     Globals::status_data[motor]["operation_mode"] = op_mode;
+    // Clear state for other operating modes
+    Globals::status_data[motor].erase("millideg_per_control_loop");
+    Globals::status_data[motor].erase("target_angle");
     if (op_mode == "PWM target") {
       setMotorMode(motor_serial, MOTOR_UNIT_MODE_PWM);
     } else if (prev_mode == "PWM target") {
@@ -189,7 +192,6 @@ bool ParseMotorPacket(json &message)
     }
     else if (key == "incremental PID speed")
     {
-      int current_angle = Globals::status_data[motor]["angular_position"];
       int current_millideg = 0;
       json curr_md = Globals::status_data[motor]["millideg_per_control_loop"];
       if (!curr_md.is_null()) current_millideg = curr_md;
@@ -198,9 +200,14 @@ bool ParseMotorPacket(json &message)
       if (current_millideg != millideg_per_control_loop) {
         log(LOG_DEBUG, "Current mdeg is %d vs asked %d\n", current_millideg, millideg_per_control_loop);
         Globals::status_data[motor]["millideg_per_control_loop"] = millideg_per_control_loop;
-        Globals::status_data[motor]["target_angle"] = current_angle;
+        if (Globals::status_data[motor]["target_angle"].is_null())
+        {
+          int current_angle = Globals::status_data[motor]["angular_position"];
+          Globals::status_data[motor]["target_angle"] = current_angle;
+        }
+        int target_angle = Globals::status_data[motor]["target_angle"];
         log(LOG_DEBUG, "Setting incremental PID for %s to %d starting from %d\n",
-            motor.c_str(), millideg_per_control_loop, current_angle);
+            motor.c_str(), millideg_per_control_loop, target_angle);
       }
     }
     else if (key == "incremental IK speed")
@@ -215,6 +222,7 @@ bool ParseMotorPacket(json &message)
 }
 
 // We assume this method will be called once per control loop.
+// THIS IS NOT THREAD SAFE!
 void incrementArmPID()
 {
   for (const std::string &motor : motor_group)
