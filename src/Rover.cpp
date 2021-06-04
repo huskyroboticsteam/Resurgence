@@ -20,7 +20,6 @@
 #include "Networking/motor_interface.h"
 #include "Autonomous.h"
 #include "simulator/world_interface.h"
-#include "gps/read_usb_gps.h"
 
 extern "C"
 {
