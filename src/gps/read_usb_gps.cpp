@@ -49,9 +49,14 @@ point_t gpsToMeters(double lon, double lat) {
 }
 
 transform_t readGPS() {
+  transform_t tf;
   gps_mutex.lock();
-  transform_t tf = most_recent_tf;
-  fresh_data = false;
+  if (fresh_data) {
+    tf = most_recent_tf;
+    fresh_data = false;
+  } else {
+    tf = transform_t::Zero();
+  }
   gps_mutex.unlock();
   return tf;
 }
