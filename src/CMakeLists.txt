@@ -55,6 +55,7 @@ add_library(rover_common SHARED
   worldmap/QuadTree.cpp
   gps/read_usb_gps.cpp
   )
+target_link_libraries(rover_common gps)
 
 add_library(real_base_station SHARED
   Networking/Network.cpp
