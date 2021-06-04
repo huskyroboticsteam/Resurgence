@@ -181,8 +181,6 @@ std::queue<URCLeg> parseGPSLegs(std::string filepath) {
 	return urc_legs;
 }
 
-const double CONTROL_HZ = 10.0;
-
 int rover_loop(int argc, char **argv)
 {
     LOG_LEVEL = LOG_INFO;
