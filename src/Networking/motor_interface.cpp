@@ -94,10 +94,6 @@ bool setMotorOperationMode(const std::string &motor, const std::string &op_mode)
   if (prev_mode != op_mode) {
     log(LOG_INFO, "Changing operation mode for %s (%s -> %s)\n",
         motor.c_str(), prev_mode.c_str(), op_mode.c_str());
-    Globals::status_data[motor]["operation_mode"] = op_mode;
-    // Clear state for other operating modes
-    Globals::status_data[motor].erase("millideg_per_control_loop");
-    Globals::status_data[motor].erase("target_angle");
     if (op_mode == "PWM target") {
       setMotorMode(motor_serial, MOTOR_UNIT_MODE_PWM);
     } else if (prev_mode == "PWM target") {
@@ -105,6 +101,10 @@ bool setMotorOperationMode(const std::string &motor, const std::string &op_mode)
       if (missing_encoder) return false;
       setMotorMode(motor_serial, MOTOR_UNIT_MODE_PID);
     }
+    Globals::status_data[motor]["operation_mode"] = op_mode;
+    // Clear state for other operating modes
+    Globals::status_data[motor].erase("millideg_per_control_loop");
+    Globals::status_data[motor].erase("target_angle");
   }
   return true;
 }
@@ -120,10 +120,12 @@ bool setOperationMode(const std::string &motor, int ik_axis, const std::string &
       success &= setMotorOperationMode(physical_motor, op_mode);
     }
   }
-  struct timeval now;
-  gettimeofday(&now, NULL);
-  long now_ms = now.tv_sec * 1000 + now.tv_usec / 1000;
-  Globals::status_data[motor]["most_recent_command"] = now_ms;
+  if (success) {
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    long now_ms = now.tv_sec * 1000 + now.tv_usec / 1000;
+    Globals::status_data[motor]["most_recent_command"] = now_ms;
+  }
   return success;
 }
 

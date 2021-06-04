@@ -382,6 +382,7 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 
 void Autonomous::autonomyIter()
 {
+  if (Globals::AUTONOMOUS) {
 #ifdef GATE_TRAVERSAL
 #if GATE_TRAVERSAL == 1
 	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
@@ -400,6 +401,9 @@ void Autonomous::autonomyIter()
 #endif
 	return;
 #endif
+  } else {
+    return;
+  }
 
 	transform_t gps = readGPS(); // <--- has some heading information
 
