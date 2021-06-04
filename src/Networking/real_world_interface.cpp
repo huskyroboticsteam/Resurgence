@@ -76,7 +76,7 @@ constexpr double EFF_WHEEL_BASE = 1.40;
 constexpr double WHEEL_RADIUS = 0.15;			 // Eyeballed
 constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
 // This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
-constexpr double MAX_PWM = 15000;
+constexpr double MAX_PWM = 20000;
 
 bool setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0))
