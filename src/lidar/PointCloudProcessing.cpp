@@ -23,7 +23,8 @@ float distance(float x0, float y0, float x1, float y1)
 
 PointXY polarToCartesian(Polar2D p)
 {
-	return PointXY({p.r * cosf(p.theta), p.r * sinf(p.theta)});
+	return PointXY(
+		{static_cast<float>(p.r * cos(p.theta)), static_cast<float>(p.r * sin(p.theta))});
 }
 
 point_t polarToCartesian2(Polar2D p)

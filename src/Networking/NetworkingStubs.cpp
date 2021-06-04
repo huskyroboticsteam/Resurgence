@@ -1,5 +1,6 @@
 
 #include "NetworkingStubs.h"
+#include "../Globals.h"
 #include <queue>
 
 std::queue<CANPacket> can_packets {};
@@ -16,7 +17,7 @@ int numBaseStationPackets()
 }
 
 
-void clearPackets()
+void clearTestGlobals()
 {
   while (!can_packets.empty())
   {
@@ -26,6 +27,7 @@ void clearPackets()
   {
     base_station_packets.pop();
   }
+  Globals::status_data = nlohmann::json();
 }
 
 void sendCANPacket(const CANPacket &packet)

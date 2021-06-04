@@ -75,6 +75,7 @@ add_library(real_world_interface SHARED
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
   ar/Tag.cpp
+  ar/read_landmarks.cpp
   gps/read_usb_gps.cpp
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
