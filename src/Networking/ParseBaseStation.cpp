@@ -84,7 +84,9 @@ bool ParseBaseStationPacket(char const* buffer)
 
   if (success)
   {
-    json response = {{"status", "ok"}, {"data", Globals::status_data}};
+    //For some reason sending these packets sometimes hangs. Maybe the string is too long?
+    //json response = {{"status", "ok"}, {"data", Globals::status_data}};
+    json response = {{"status", "ok"}};
     sendBaseStationPacket(response.dump());
   }
   return success;
