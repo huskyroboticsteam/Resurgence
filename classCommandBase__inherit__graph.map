@@ -1,0 +1,5 @@
+<map id="CommandBase" name="CommandBase">
+<area shape="rect" id="node1" title=" " alt="" coords="80,5,191,32"/>
+<area shape="rect" id="node2" href="$classDriveThroughGate.html" title=" " alt="" coords="5,80,132,107"/>
+<area shape="rect" id="node3" href="$classDriveToGate.html" title=" " alt="" coords="156,80,251,107"/>
+</map>
