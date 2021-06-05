@@ -93,7 +93,7 @@ private:
   void updateLandmarkInformation(const transform_t &invTransform);
   void computeGateTargets(const pose_t &pose);
   void updateSearchTarget();
-	void startNextLeg();
+	void endCurrentLeg();
 
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;
