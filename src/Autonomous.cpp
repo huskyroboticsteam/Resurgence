@@ -11,11 +11,12 @@
 
 #include "commands/nogps/DriveToGate.h"
 #include "commands/nogps/DriveThroughGate.h"
+#include "commands/DriveToGateNoCompass.h"
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2;
 constexpr double DRIVE_SPEED = 3;
-const Eigen::Vector3d gpsStdDev = {2, 2, 2*PI};
+const Eigen::Vector3d gpsStdDev = {2, 2, 3};
 constexpr int numSamples = 1;
 
 constexpr double FOLLOW_DIST = 2.0;
@@ -50,7 +51,7 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 		urc_target(_target),
 		search_target({_target.approx_GPS(0) - PI, _target.approx_GPS(1), -PI / 2}),
 		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
-		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
+		poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		map(10000), // TODO: the stride should be set higher when using the real lidar
 		calibrated(false),
 		calibrationPoses({}),
@@ -377,8 +378,9 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
-// 1 = drive to gate, 2 = drive through gate, comment out to run regular code
-#define GATE_TRAVERSAL 1
+// 1 = drive to gate, 2 = drive through gate, 3 = crappy full thing, comment out to run regular code
+// by "crappy full thing" I mean it should navigate to the goal and perform the correct action
+#define GATE_TRAVERSAL 3
 
 void Autonomous::autonomyIter()
 {
@@ -397,6 +399,63 @@ void Autonomous::autonomyIter()
 	dthg.update(readOdom(), leftPost, rightPost);
 	command_t cmd = dthg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
+#elif GATE_TRAVERSAL == 3
+	{
+		transform_t gps = readGPS();
+		if (!calibrated && gps.norm() != 0)
+		{
+			// large uncertainty for starting heading
+			poseEstimator.reset(toPose(gps, 0),
+								{gpsStdDev.x(), gpsStdDev.y(), M_PI});
+			calibrated = true;
+		}
+		else if (calibrated)
+		{
+			transform_t odom = readOdom();
+			static DriveToGateNoCompass dtgnc(15, KP_ANGLE, 3, odom, urc_target.approx_GPS);
+			if (gps.norm() != 0)
+			{
+				static transform_t lastGps = gps;
+				pose_t gpsPose = toPose(gps, 0);
+				pose_t lastGpsPose = toPose(lastGps, 0);
+				gpsPose(2) =
+					atan2(gpsPose.y() - lastGpsPose.y(), gpsPose.x() - lastGpsPose.x());
+				lastGps = gps;
+				gps = toTransform(gpsPose);
+				poseEstimator.correct(gps);
+//				log(LOG_INFO, "GPS: (%.3f, %.3f, %.3f)\n", gpsPose(0), gpsPose(1), gpsPose(2));
+			}
+
+			pose_t pose = poseEstimator.getPose();
+
+			points_t landmarks = readLandmarks();
+			command_t cmd;
+
+			if (!dtgnc.isDone())
+			{
+				dtgnc.update(odom, gps, pose, landmarks[urc_target.left_post_id], landmarks[urc_target.right_post_id]);
+				cmd = dtgnc.getOutput();
+			}
+			else if (urc_target.right_post_id != -1) // this is a gate
+			{
+				static DriveThroughGate dthg(odom, KP_ANGLE, 2, 3);
+				point_t leftPost = landmarks[urc_target.left_post_id];
+				point_t rightPost = landmarks[urc_target.right_post_id];
+				dthg.update(odom, leftPost, rightPost);
+				cmd = dthg.getOutput();
+			}
+			else // this is a single post, but no gate
+			{
+				static DriveToGate dtg(1, KP_ANGLE, 2, 3);
+				points_t posts = readLandmarks();
+				dtg.update(posts[urc_target.left_post_id]);
+				cmd = dtg.getOutput();
+			}
+
+			poseEstimator.predict(cmd.thetaVel, cmd.xVel);
+			setCmdVel(cmd.thetaVel, cmd.xVel);
+		}
+	}
 #endif
 	return;
 #endif
