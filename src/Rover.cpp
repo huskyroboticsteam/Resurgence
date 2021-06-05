@@ -4,6 +4,9 @@
 #include <csignal>
 #include <unistd.h>
 #include <array>
+#include <queue>
+#include <fstream>
+#include <sstream>
 
 #include "CommandLineOptions.h"
 #include "Globals.h"
@@ -137,6 +140,42 @@ void closeSim(int signum)
     raise(SIGTERM);
 }
 
+std::queue<URCLeg> parseGPSLegs(std::string filepath) {
+	std::queue<URCLeg> urc_legs;
+	std::ifstream gps_legs(filepath);
+
+	int left_post_id, right_post_id;
+	double lat, lon;
+	std::string line;
+
+	// A properly formatted file has each leg on a separate line, with each line of the form
+	// left_post_id right_post_id lat lon
+	// Improperly formatted lines (empty lines, comments) are ignored, and text
+	// after the above data on properly formatted lines is ignored
+	// An example can be found at example_gps_legs.txt
+	while (getline(gps_legs, line))
+	{
+		std::istringstream line_stream(line);
+		if (line_stream >> left_post_id >> right_post_id >> lat >> lon)
+		{
+			point_t leg_map_space = gpsToMeters(lon, lat);
+			URCLeg leg = {left_post_id, right_post_id, leg_map_space};
+			urc_legs.push(leg);
+		}
+	}
+
+	if (urc_legs.size() == 0)
+	{
+		// File does not exist or has no valid legs, use simulation legs as defaults
+		for (int i = 0; i < 7; i++)
+		{
+			urc_legs.push(getLeg(i));
+		}
+	}
+
+	return urc_legs;
+}
+
 int rover_loop(int argc, char **argv)
 {
     LOG_LEVEL = LOG_INFO;
@@ -148,10 +187,10 @@ int rover_loop(int argc, char **argv)
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover(MOTOR_UNIT_MODE_PWM, true);
     CANPacket packet;
-    // Target location for autonomous navigation
-    // Eventually this will be set by communication from the base station
-    int urc_leg = 5;
-    Autonomous autonomous(getLeg(urc_leg), CONTROL_HZ);
+	// Target locations for autonomous navigation
+	// Eventually this will be set by communication from the base station
+	std::queue<URCLeg> urc_legs = parseGPSLegs("../src/gps_legs.txt");
+    Autonomous autonomous(urc_legs, CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp_rover_start;
     int num_can_packets = 0;
