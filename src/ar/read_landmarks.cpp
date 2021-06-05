@@ -76,14 +76,24 @@ void detectLandmarksLoop(){
 			}
 
 			landmark_lock.lock();
-			current_landmarks = output;
+			for (int i = 0; i < NUM_LANDMARKS; i++) {
+				if (output[i](2) != 0.0) current_landmarks[i] = output[i];
+			}
 			fresh_data = true;
 			landmark_lock.unlock();
 		}
 	}
 }
 
+void zeroCurrent() {
+	current_landmarks.clear();
+	for (int i = 0; i < NUM_LANDMARKS; i++) {
+		current_landmarks.push_back(ZERO_POINT);
+	}
+}
+
 bool initializeLandmarkDetection(){
+	zeroCurrent();
 	try {
 		ar_cam.openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
 		if(!ar_cam.hasIntrinsicParams()){
@@ -117,6 +127,7 @@ points_t readLandmarks(){
 			landmark_lock.lock();
 			output = current_landmarks;
 			fresh_data = false;
+			zeroCurrent();
 			landmark_lock.unlock();
 			return output;
 		}
