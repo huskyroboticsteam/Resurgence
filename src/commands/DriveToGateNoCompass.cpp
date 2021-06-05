@@ -23,7 +23,7 @@ command_t DriveToGateNoCompass::getOutput()
 
 	if (state == DriveForward)
 	{
-		return {0, 3};
+		return {0, vel};
 	}
 	else if (state == TurnToTarget)
 	{
