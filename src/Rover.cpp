@@ -12,6 +12,7 @@
 #include "Globals.h"
 #include "log.h"
 #include "Rover.h"
+#include "Util.h"
 #include "Networking/NetworkConstants.h"
 #include "Networking/Network.h"
 #include "Networking/CANUtils.h"
@@ -39,28 +40,22 @@ constexpr std::array<uint32_t,6> arm_PPJRs = {
     360 * 1000 // diff_right, unmeasured
 };
 
-// So far only the shoulder and elbow have been tuned (and only roughly)
+
+// So far only the base, shoulder, elbow have been tuned
 //
 // base, shoulder, elbow, forearm, diff_left, diff_right
 constexpr std::array<int32_t,6> arm_Ps = {
-   0,    100,    500,     0,       0,         0
+   1000,     100,    500,     0,       0,         0
 };
 constexpr std::array<int32_t,6> arm_Is = {
-   0,      0,    300,     0,       0,         0
+     50,       0,     50,     0,       0,         0
 };
 constexpr std::array<int32_t,6> arm_Ds = {
-   0,   1000,  10000,     0,       0,         0
+  10000,    1000,  10000,     0,       0,         0
 };
 constexpr std::array<uint8_t,6> arm_encoder_signs = {
    0,      0,      1,     0,       0,         0
 };
-
-long getElapsedUsecs(const struct timeval &tp_start) {
-  struct timeval tp0;
-  gettimeofday(&tp0, NULL);
-  long elapsed = (tp0.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp0.tv_usec - tp_start.tv_usec);
-  return elapsed;
-}
 
 void initEncoders(bool zero_encoders)
 {

@@ -9,10 +9,13 @@
 #include "simulator/constants.h"
 #include "simulator/world_interface.h"
 
+#include "commands/nogps/DriveToGate.h"
+#include "commands/nogps/DriveThroughGate.h"
+
 constexpr float PI = M_PI;
-constexpr double KP_ANGLE = 2;
-constexpr double DRIVE_SPEED = 3;
-const Eigen::Vector3d gpsStdDev = {2, 2, PI / 24};
+constexpr double KP_ANGLE = 2.0;
+constexpr double DRIVE_SPEED = 0.5;
+const Eigen::Vector3d gpsStdDev = {2, 2, 2*PI};
 constexpr int numSamples = 1;
 
 constexpr double FOLLOW_DIST = 2.0;
@@ -414,15 +417,37 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
+// 1 = drive to gate, 2 = drive through gate, comment out to run regular code
+#define GATE_TRAVERSAL 1
+
 void Autonomous::autonomyIter()
 {
+#ifdef GATE_TRAVERSAL
+#if GATE_TRAVERSAL == 1
+	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
+	points_t posts = readLandmarks();
+	dtg.update(posts[urc_target.left_post_id]);
+	command_t cmd = dtg.getOutput();
+	setCmdVel(cmd.thetaVel, cmd.xVel);
+#elif GATE_TRAVERSAL == 2
+	static DriveThroughGate dthg(readOdom(), KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
+	points_t posts = readLandmarks();
+	point_t leftPost = posts[urc_target.left_post_id];
+	point_t rightPost = posts[urc_target.right_post_id];
+	dthg.update(readOdom(), leftPost, rightPost);
+	command_t cmd = dthg.getOutput();
+	setCmdVel(cmd.thetaVel, cmd.xVel);
+#endif
+	return;
+#endif
+
 	transform_t gps = readGPS(); // <--- has some heading information
 
 	// If we haven't calibrated position, do so now
 	if (!calibrated)
 	{
 		pose_t out;
-		if (calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
+		if (gps.norm() != 0.0 && calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
 		{
 			// the standard error of the calculated mean is the std dev of the mean
 			poseEstimator.reset(out, gpsStdDev / sqrt((double)numSamples));
@@ -436,8 +461,19 @@ void Autonomous::autonomyIter()
 	}
 
 	// get the latest pose estimation
-	poseEstimator.correct(gps);
+	if (gps.norm() != 0.0)
+	{
+		static transform_t lastGps = gps;
+		pose_t gpsPose = toPose(gps, 0);
+		pose_t lastGpsPose = toPose(lastGps, 0);
+		gpsPose(2) = atan2(gpsPose.y() - lastGpsPose.y(), gpsPose.x() - lastGpsPose.x());
+		lastGps = gps;
+		gps = toTransform(gpsPose);
+		poseEstimator.correct(gps);
+		log(LOG_INFO, "GPS: (%.3f, %.3f, %.3f)\n", gpsPose(0), gpsPose(1), gpsPose(2));
+	}
 	pose_t pose = poseEstimator.getPose();
+	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
 	transform_t invTransform = toTransform(pose).inverse();
 
 	if (currentLegDone())

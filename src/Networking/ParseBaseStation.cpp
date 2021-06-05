@@ -74,6 +74,13 @@ bool ParseBaseStationPacket(char const* buffer)
   else if (type == "motor") {
     success = ParseMotorPacket(parsed_message);
   }
+  else if (type == "autonomous") {
+    Globals::AUTONOMOUS = !Globals::AUTONOMOUS;
+    log(LOG_INFO, "Set autonomous to %d\n", Globals::AUTONOMOUS);
+    success = true;
+  } else if (type != "estop") {
+    return sendError("Unrecognized message type '" +  type + "'");
+  }
 
   if (success)
   {
@@ -130,7 +137,7 @@ bool ParseDrivePacket(json &message) {
   {
     return sendError("Drive targets not within bounds +/- 1.0");
   }
-  double MAX_X_VEL = 0.25; // m/s
-  double MAX_TH_VEL = 0.5; // rad/s
+  double MAX_X_VEL = 1.0; // m/s
+  double MAX_TH_VEL = 1.0; // rad/s
   return setCmdVel(lr * MAX_TH_VEL, fb * MAX_X_VEL);
 }
