@@ -98,31 +98,28 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	return diff.norm();
 }
 
-bool Autonomous::currentLegDone()
-{
-	return nav_state == NavState::DONE;
-}
-
-bool Autonomous::hasNextLeg()
-{
-	return urc_targets.size() > 0;
-}
-
 void Autonomous::startNextLeg()
 {
-	if (!currentLegDone())
+	if (nav_state != NavState::DONE)
 	{
-		log(LOG_INFO, "Cannot start next leg: current leg not done\n");
+		log(LOG_WARN, "Cannot start next leg: current leg not done\n");
 	}
-	else if (!hasNextLeg())
+	else if (urc_targets.size() <= 1)
 	{
-		log(LOG_INFO, "Cannot start next leg: no more legs to start\n");
+		log(LOG_WARN, "Cannot start next leg: no more legs to start\n");
 	}
 	else
 	{
-		log(LOG_INFO, "Starting next leg\n");
+		// Remove previous leg
+		urc_targets.pop();
+
+		// clear the cached data points
+		leftPostFilter.reset();
+		rightPostFilter.reset();
+
 		search_target = {urc_targets.front().approx_GPS(0) - PI, urc_targets.front().approx_GPS(1), -PI / 2};
 		setNavState(NavState::GPS);
+		log(LOG_INFO, "Enter autonomous mode to start next leg\n");
 	}
 }
 
@@ -134,18 +131,6 @@ void Autonomous::setNavState(NavState s)
   {
     log(LOG_INFO, "Changing navigation state to %s\n", NAV_STATE_NAMES[nav_state]);
     plan_cost = INFINITE_COST;
-	if (currentLegDone())
-	{
-		// Remove previous leg
-		urc_targets.pop();
-
-		// clear the cached data points
-		leftPostFilter.reset();
-		rightPostFilter.reset();
-
-		// Stop the rover
-		setCmdVel(0, 0);
-	}
   }
 }
 
@@ -418,7 +403,7 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 }
 
 // 1 = drive to gate, 2 = drive through gate, comment out to run regular code
-#define GATE_TRAVERSAL 1
+//#define GATE_TRAVERSAL 1
 
 void Autonomous::autonomyIter()
 {
@@ -426,14 +411,14 @@ void Autonomous::autonomyIter()
 #if GATE_TRAVERSAL == 1
 	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
-	dtg.update(posts[urc_target.left_post_id]);
+	dtg.update(posts[urc_targets.front().left_post_id]);
 	command_t cmd = dtg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
 #elif GATE_TRAVERSAL == 2
 	static DriveThroughGate dthg(readOdom(), KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
-	point_t leftPost = posts[urc_target.left_post_id];
-	point_t rightPost = posts[urc_target.right_post_id];
+	point_t leftPost = posts[urc_targets.front().left_post_id];
+	point_t rightPost = posts[urc_targets.front().right_post_id];
 	dthg.update(readOdom(), leftPost, rightPost);
 	command_t cmd = dthg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
@@ -476,11 +461,17 @@ void Autonomous::autonomyIter()
 	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
 	transform_t invTransform = toTransform(pose).inverse();
 
-	if (currentLegDone())
+	if (nav_state == NavState::DONE)
 	{
 		if (Globals::AUTONOMOUS)
 		{
 			setCmdVel(0, 0);
+			Globals::AUTONOMOUS = false;
+			log(LOG_INFO, "Leg complete, exiting autonomous mode\n");
+			if (urc_targets.size() > 1)
+			{
+				startNextLeg();
+			}
 		}
 		return;
 	}
@@ -628,7 +619,7 @@ void Autonomous::autonomyIter()
   double thetaVel = getThetaVel(driveTarget, pose, thetaErr);
   double driveSpeed = getLinearVel(driveTarget, pose, thetaErr);
 
-  if (!Globals::E_STOP && Globals::AUTONOMOUS && !currentLegDone())
+  if (!Globals::E_STOP && Globals::AUTONOMOUS)
   {
     setCmdVel(thetaVel, driveSpeed);
     poseEstimator.predict(thetaVel, driveSpeed);

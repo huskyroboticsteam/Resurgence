@@ -54,9 +54,6 @@ public:
 	// Gets the target's coordinate
 	pose_t getGPSTargetPose() const;
 	void autonomyIter();
-	void startNextLeg();
-	bool hasNextLeg();
-	bool currentLegDone();
 
 private:
 	std::queue<URCLeg> urc_targets;
@@ -96,6 +93,7 @@ private:
   void updateLandmarkInformation(const transform_t &invTransform);
   void computeGateTargets(const pose_t &pose);
   void updateSearchTarget();
+	void startNextLeg();
 
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;

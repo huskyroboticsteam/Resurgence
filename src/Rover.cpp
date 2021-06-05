@@ -152,6 +152,7 @@ std::queue<URCLeg> parseGPSLegs(std::string filepath) {
 	// left_post_id right_post_id lat lon
 	// Improperly formatted lines (empty lines, comments) are ignored, and text
 	// after the above data on properly formatted lines is ignored
+	// An example can be found at example_gps_legs.txt
 	while (getline(gps_legs, line))
 	{
 		std::istringstream line_stream(line);
@@ -196,24 +197,6 @@ int rover_loop(int argc, char **argv)
     gettimeofday(&tp_rover_start, NULL);
     for(int iter = 0; /*no termination condition*/; iter++)
     {
-		// Wait for confirmation to start the next leg
-        if (Globals::AUTONOMOUS && autonomous.currentLegDone() && autonomous.hasNextLeg()) {
-			// For simulator only, change or comment this out when running on real rover
-			// Wait for user to press enter, then start the next leg
-			// TODO the real rover might want to get this command from the base station
-			std::cout << "Press enter to start next leg" << std::endl;
-			// If it takes longer than 10ms to find a newline, it was probably just inputted and we can proceed
-			long elapsedTime = 0;
-			while (elapsedTime < 10 * 1000)
-			{
-				long startTime = getElapsedUsecs(tp_rover_start);
-				// Blocks until a newline is found in cin
-				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-				elapsedTime = getElapsedUsecs(tp_rover_start) - startTime;
-			}
-			autonomous.startNextLeg();
-        }
-
         long loopStartElapsedUsecs = getElapsedUsecs(tp_rover_start);
         num_can_packets = 0;
         while (recvCANPacket(&packet) != 0) {
