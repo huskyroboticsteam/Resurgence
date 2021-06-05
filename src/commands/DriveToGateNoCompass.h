@@ -7,12 +7,12 @@
 class DriveToGateNoCompass : CommandBase
 {
 public:
-	DriveToGateNoCompass(double driveDist, double angleKP, double vel);
+	DriveToGateNoCompass(double driveDist, double angleKP, double vel, double initial_heading);
 	void reset(transform_t &odom, point_t &target);
 	void update(const transform_t &odom, const transform_t &gps, const pose_t &currPose, const point_t &leftPost, const point_t &rightPost);
 	bool isDone() override;
 	bool isAlmostDone();
-	void setDone();
+	void setDone(const transform_t &odom);
 	command_t getOutput() override;
 
 private:
@@ -26,11 +26,16 @@ private:
 	};
 
 	void transitionStates();
-	// only valid when state == State::TurnToTarget
+	void checkpoint();
+	double distFromCheckpoint();
+	double headingChangeSinceCheckpoint();
+	double getCurrentHeading();
+	double getTargetHeading();
 	double calculateHeadingErr();
 
 	State state;
-	transform_t referenceTransform;
+	transform_t checkpointOdom;
+	double checkpointHeading;
 	transform_t currOdom;
 	pose_t currPose;
 	points_t calibrationPoints;

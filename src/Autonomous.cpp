@@ -15,7 +15,7 @@
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2.0;
-constexpr double DRIVE_SPEED = 0.5;
+constexpr double DRIVE_SPEED = 3.0;
 const Eigen::Vector3d gpsStdDev = {2, 2, 3};
 constexpr int numSamples = 1;
 
@@ -438,7 +438,8 @@ void Autonomous::autonomyIter()
 	else if (calibrated)
 	{
 		transform_t odom = readOdom();
-		static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED);
+		double initial_heading = 0.0;
+		static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, initial_heading);
 		if (dtgnc.isDone())
 		{
 			dtgnc.reset(odom, urc_targets.front().approx_GPS);
@@ -483,7 +484,7 @@ void Autonomous::autonomyIter()
 			dthg.update(odom, leftPost, rightPost);
 			cmd = dthg.getOutput();
 			if (dthg.isDone()) {
-				dtgnc.setDone();
+				dtgnc.setDone(odom);
 				endCurrentLeg();
 				return;
 			}
@@ -494,7 +495,7 @@ void Autonomous::autonomyIter()
 			dtg.update(leftPost);
 			cmd = dtg.getOutput();
 			if (dtg.isDone()) {
-				dtgnc.setDone();
+				dtgnc.setDone(odom);
 				endCurrentLeg();
 				return;
 			}
