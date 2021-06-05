@@ -101,6 +101,10 @@ command_t DriveThroughGate::getOutput()
 	else if (state == OneVisibleTurn)
 	{
 		double thetaVel = thetaKP * headingErr(trf, driveTarget);
+		double maxthvel = 1.0;
+		if (abs(thetaVel) > maxthvel) {
+			thetaVel = (thetaVel > 0) ? maxthvel : -maxthvel;
+		}
 		return {.thetaVel = thetaVel, .xVel = 0};
 	}
 	else if (state == BothVisible)
@@ -120,6 +124,10 @@ command_t DriveThroughGate::getOutput()
 			driveTarget = calculateAlignTargetPose(trf, leftPost, rightPost);
 		}
 		double thetaVel = thetaKP * headingErr(trf, driveTarget);
+		double maxthvel = 1.0;
+		if (abs(thetaVel) > maxthvel) {
+			thetaVel = (thetaVel > 0) ? maxthvel : -maxthvel;
+		}
 		return {.thetaVel = thetaVel, .xVel = 0};
 	}
 	else if (state == DriveThrough)
@@ -265,6 +273,10 @@ command_t DriveThroughGate::getCommandToTarget(const transform_t &trf, const poi
 		vel = 0;
 	}
 	double thetaVel = thetaKP * angleErr;
+		double maxthvel = 1.0;
+		if (abs(thetaVel) > maxthvel) {
+			thetaVel = (thetaVel > 0) ? maxthvel : -maxthvel;
+		}
 
 	return {.thetaVel = thetaVel, .xVel = vel};
 }

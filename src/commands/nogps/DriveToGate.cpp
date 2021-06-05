@@ -9,13 +9,18 @@ command_t DriveToGate::getOutput()
 {
 	if (post(2) != 1)
 	{
-		return {0, slowVel};
+		return {0, 0};
 	}
 	else if (!isDone())
 	{
 		double angle = atan2(post.y(), post.x());
 		double vel = (post.topRows<2>().norm() <= 2 * radius) ? slowVel : fastVel;
-		return {angle * thetaKP, vel};
+		double targthvel = angle * thetaKP;
+		double maxthvel = 1.0;
+		if (abs(targthvel) > maxthvel) {
+			targthvel = (targthvel > 0) ? maxthvel : -maxthvel;
+		}
+		return {targthvel, vel};
 	}
 	else
 	{
