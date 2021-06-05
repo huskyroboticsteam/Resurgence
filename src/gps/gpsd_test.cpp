@@ -16,7 +16,7 @@
 /* This simple program shows the basic functionality of the C++ wrapper class */
 #include <iostream>
 
-#include "libgpsmm.h"
+#include <libgpsmm.h>
 
 using namespace std;
 
@@ -30,17 +30,17 @@ static void libgps_dump_state(struct gps_data_t *collect)
 {
     /* no need to dump the entire state, this is a sanity check */
 #ifndef USE_QT
-    /* will fail on a 32-bit macine */
+    /* will fail on a 32-bit machine */
     (void)fprintf(stdout, "flags: (0x%04x) %s\n",
 		  (unsigned int)collect->set, gps_maskdump(collect->set));
 #endif
     if (collect->set & ONLINE_SET)
-	(void)fprintf(stdout, "ONLINE: %lf\n", collect->online);
+	(void)fprintf(stdout, "ONLINE: %ld.%09ld\n", collect->online.tv_sec, collect->online.tv_nsec);
     if (collect->set & TIME_SET)
-	(void)fprintf(stdout, "TIME: %lf\n", collect->fix.time);
+	(void)fprintf(stdout, "TIME: %ld.%09ld\n", collect->fix.time.tv_sec, collect->fix.time.tv_nsec);
     if (collect->set & LATLON_SET)
 	(void)fprintf(stdout, "LATLON: lat/lon: %lf %lf\n",
-		      collect->fix.latitude, collect->fix.longitude);
+	      collect->fix.latitude, collect->fix.longitude);
     if (collect->set & ALTITUDE_SET)
 	(void)fprintf(stdout, "ALTITUDE: altitude: %lf  U: climb: %lf\n",
 		      collect->fix.altitude, collect->fix.climb);
@@ -80,7 +80,7 @@ static void libgps_dump_state(struct gps_data_t *collect)
 	(void)fprintf(stdout, "SKY: satellites in view: %d\n",
 		      collect->satellites_visible);
 	for (i = 0; i < collect->satellites_visible; i++) {
-	    (void)fprintf(stdout, "    %2.2d: %2.2d %3.3d %3.0f %c\n",
+	    (void)fprintf(stdout, "    %2.2d: %2.2f %3.3f %3.0f %c\n",
 			  collect->skyview[i].PRN, collect->skyview[i].elevation,
 			  collect->skyview[i].azimuth, collect->skyview[i].ss,
 			  collect->skyview[i].used ? 'Y' : 'N');
