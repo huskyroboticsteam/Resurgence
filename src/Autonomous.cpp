@@ -460,16 +460,19 @@ void Autonomous::autonomyIter()
 		double fast = DRIVE_SPEED;
 		double slow = DRIVE_SPEED / 2;
 
+		bool is_gate = (urc_targets.front().right_post_id != -1);
+		point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
+		point_t rightPost = {0,0,0};
+		if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
+
 		if (!dtgnc.isDone())
 		{
-			dtgnc.update(odom, gps, pose, landmarks[urc_targets.front().left_post_id], landmarks[urc_targets.front().right_post_id]);
+			dtgnc.update(odom, gps, pose, leftPost, rightPost);
 			cmd = dtgnc.getOutput();
 		}
 		else if (urc_targets.front().right_post_id != -1) // this is a gate
 		{
 			static DriveThroughGate dthg(odom, KP_ANGLE, slow, fast);
-			point_t leftPost = landmarks[urc_targets.front().left_post_id];
-			point_t rightPost = landmarks[urc_targets.front().right_post_id];
 			dthg.update(odom, leftPost, rightPost);
 			cmd = dthg.getOutput();
 			if (dthg.isDone()) endCurrentLeg();
@@ -477,8 +480,7 @@ void Autonomous::autonomyIter()
 		else // this is a single post, but no gate
 		{
 			static DriveToGate dtg(1, KP_ANGLE, slow, fast);
-			points_t posts = readLandmarks();
-			dtg.update(posts[urc_targets.front().left_post_id]);
+			dtg.update(leftPost);
 			cmd = dtg.getOutput();
 			if (dtg.isDone()) endCurrentLeg();
 		}
