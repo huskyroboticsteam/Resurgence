@@ -156,6 +156,12 @@ TEST_CASE("Incremental PID", "[BaseStation]")
     incrementArm();
     REQUIRE(numCANPackets() == 0);
     REQUIRE(Globals::status_data["arm_base"]["millideg_per_control_loop"] == 0);
+
+    // Should clear incremental PID state if we switch back to PWM
+    msg = "{\"type\": \"motor\", \"motor\": \"arm_base\", \"PWM target\":-0.5}";
+    REQUIRE(ParseBaseStationPacket(msg) == true);
+    REQUIRE(Globals::status_data["arm_base"]["millideg_per_control_loop"].is_null());
+    REQUIRE(Globals::status_data["arm_base"]["target_angle"].is_null());
 }
 
 TEST_CASE("Does not allow incremental PID for non-PID motors", "[BaseStation]")
