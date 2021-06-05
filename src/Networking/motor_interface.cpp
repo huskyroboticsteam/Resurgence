@@ -43,7 +43,7 @@ const std::map<std::string, double> negative_arm_pwm_scales = {
 };
 const std::map<std::string, double> incremental_pid_scales = {
 	{"arm_base",   M_PI/8}, // TODO: Check signs
-	{"shoulder",   M_PI/8},
+	{"shoulder",  -M_PI/8},
 	{"elbow",     -M_PI/8},
 	{"forearm",         0}, // We haven't implemented PID on these motors yet
 	{"diffleft",        0},
@@ -194,8 +194,9 @@ bool ParseMotorPacket(json &message)
       json curr_md = Globals::status_data[motor]["millideg_per_control_loop"];
       if (!curr_md.is_null()) current_millideg = curr_md;
       double speed = message[key];
-      int millideg_per_control_loop = (incremental_pid_scales.at(motor) * 1000) * speed / CONTROL_HZ;
+      int millideg_per_control_loop = (incremental_pid_scales.at(motor) / (2*M_PI) * 360 * 1000) * speed / CONTROL_HZ;
       if (current_millideg != millideg_per_control_loop) {
+        log(LOG_DEBUG, "Current mdeg is %d vs asked %d\n", current_millideg, millideg_per_control_loop);
         Globals::status_data[motor]["millideg_per_control_loop"] = millideg_per_control_loop;
         Globals::status_data[motor]["target_angle"] = current_angle;
         log(LOG_DEBUG, "Setting incremental PID for %s to %d starting from %d\n",
@@ -236,6 +237,7 @@ void incrementArmPID()
       int target = Globals::status_data[motor]["target_angle"];
       int new_target = target + mdpl;
       Globals::status_data[motor]["target_angle"] = new_target;
+      log(LOG_DEBUG, "Setting target to %d\n", new_target);
       sendPIDPacket(motor, new_target);
     }
   }

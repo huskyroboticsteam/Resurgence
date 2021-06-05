@@ -125,7 +125,7 @@ TEST_CASE("Incremental PID", "[BaseStation]")
 
     REQUIRE(Globals::status_data["arm_base"]["operation_mode"] == "incremental PID speed");
     REQUIRE(Globals::status_data["arm_base"]["target_angle"] == start_angle);
-    int expected_increment = M_PI * 1000 / 8 / 10;
+    int expected_increment = 360 * 1000 * ((M_PI/8)/(2*M_PI)) / 10;
     REQUIRE(Globals::status_data["arm_base"]["millideg_per_control_loop"] ==
         expected_increment);
     REQUIRE(Globals::status_data["arm_base"]["most_recent_command"] > 0);

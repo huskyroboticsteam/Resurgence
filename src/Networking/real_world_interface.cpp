@@ -75,6 +75,8 @@ constexpr double EFF_WHEEL_BASE = 1.40;
 
 constexpr double WHEEL_RADIUS = 0.15;			 // Eyeballed
 constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
+// This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
+constexpr double MAX_PWM = 20000;
 
 bool setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0))
@@ -92,16 +94,14 @@ bool setCmdVel(double dtheta, double dx) {
 	int16_t left_pwm = (int16_t)(left_angular_vel * PWM_FOR_1RAD_PER_SEC);
 	log(LOG_TRACE, "dtheta %f dx %f right ground %f right angular %f right pwm %d\n",
 			dtheta, dx, right_ground_vel, right_angular_vel, right_pwm);
-	// This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
-	int16_t max_pwm = 15000;
 	double scale_down_factor = 1.0;
-	if (abs(right_pwm) > max_pwm) {
+	if (abs(right_pwm) > MAX_PWM) {
 		std::cout << "WARNING: requested too-large right PWM " << right_pwm << std::endl;
-		scale_down_factor = abs(right_pwm) / max_pwm;
+		scale_down_factor = abs(right_pwm) / MAX_PWM;
 	}
-	if (abs(left_pwm) > max_pwm) {
+	if (abs(left_pwm) > MAX_PWM) {
 		std::cout << "WARNING: requested too-large left PWM " << left_pwm << std::endl;
-		double scale_down_factor_left = abs(left_pwm) / max_pwm;
+		double scale_down_factor_left = abs(left_pwm) / MAX_PWM;
 		if (scale_down_factor_left > scale_down_factor) scale_down_factor = scale_down_factor_left;
 	}
 	right_pwm = (int16_t) (right_pwm / scale_down_factor);

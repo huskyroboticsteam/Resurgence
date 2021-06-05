@@ -14,8 +14,8 @@
 #include "commands/DriveToGateNoCompass.h"
 
 constexpr float PI = M_PI;
-constexpr double KP_ANGLE = 2;
-constexpr double DRIVE_SPEED = 3;
+constexpr double KP_ANGLE = 2.0;
+constexpr double DRIVE_SPEED = 0.5;
 const Eigen::Vector3d gpsStdDev = {2, 2, 3};
 constexpr int numSamples = 1;
 
@@ -386,13 +386,13 @@ void Autonomous::autonomyIter()
 {
 #ifdef GATE_TRAVERSAL
 #if GATE_TRAVERSAL == 1
-	static DriveToGate dtg(1, KP_ANGLE, 2, 3);
+	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
 	dtg.update(posts[urc_target.left_post_id]);
 	command_t cmd = dtg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
 #elif GATE_TRAVERSAL == 2
-	static DriveThroughGate dthg(readOdom(), KP_ANGLE, 2, 3);
+	static DriveThroughGate dthg(readOdom(), KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
 	point_t leftPost = posts[urc_target.left_post_id];
 	point_t rightPost = posts[urc_target.right_post_id];
@@ -412,7 +412,7 @@ void Autonomous::autonomyIter()
 		else if (calibrated)
 		{
 			transform_t odom = readOdom();
-			static DriveToGateNoCompass dtgnc(15, KP_ANGLE, 3, odom, urc_target.approx_GPS);
+			static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, odom, urc_target.approx_GPS);
 			if (gps.norm() != 0)
 			{
 				static transform_t lastGps = gps;
@@ -431,6 +431,9 @@ void Autonomous::autonomyIter()
 			points_t landmarks = readLandmarks();
 			command_t cmd;
 
+			double fast = DRIVE_SPEED;
+			double slow = DRIVE_SPEED / 2;
+
 			if (!dtgnc.isDone())
 			{
 				dtgnc.update(odom, gps, pose, landmarks[urc_target.left_post_id], landmarks[urc_target.right_post_id]);
@@ -438,7 +441,7 @@ void Autonomous::autonomyIter()
 			}
 			else if (urc_target.right_post_id != -1) // this is a gate
 			{
-				static DriveThroughGate dthg(odom, KP_ANGLE, 2, 3);
+				static DriveThroughGate dthg(odom, KP_ANGLE, slow, fast);
 				point_t leftPost = landmarks[urc_target.left_post_id];
 				point_t rightPost = landmarks[urc_target.right_post_id];
 				dthg.update(odom, leftPost, rightPost);
@@ -446,7 +449,7 @@ void Autonomous::autonomyIter()
 			}
 			else // this is a single post, but no gate
 			{
-				static DriveToGate dtg(1, KP_ANGLE, 2, 3);
+				static DriveToGate dtg(1, KP_ANGLE, slow, fast);
 				points_t posts = readLandmarks();
 				dtg.update(posts[urc_target.left_post_id]);
 				cmd = dtg.getOutput();
