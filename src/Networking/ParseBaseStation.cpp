@@ -20,8 +20,8 @@ extern "C"
 
 #include <iostream>
 
-const double DEFAULT_X_VEL = 0.5; // m/s
-const double DEFAULT_TH_VEL = 1.0; // rad/s
+const double DEFAULT_X_VEL = 0.3; // m/s
+const double DEFAULT_TH_VEL = 0.5; // rad/s
 
 using nlohmann::json;
 
