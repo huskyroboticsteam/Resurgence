@@ -5,5 +5,4 @@
 
 bool gpsHasFix();
 bool gpsHasFreshData();
-point_t gpsToMeters(double lon, double lat);
 bool startGPSThread();
