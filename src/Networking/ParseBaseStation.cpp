@@ -79,8 +79,8 @@ bool ParseBaseStationPacket(char const* buffer)
   }
   else if (type == "autonomous") {
     Globals::AUTONOMOUS = !Globals::AUTONOMOUS;
+    success = setCmdVel(0,0);
     log(LOG_INFO, "Set autonomous to %d\n", Globals::AUTONOMOUS);
-    success = true;
   } else if (type != "estop") {
     return sendError("Unrecognized message type '" +  type + "'");
   }

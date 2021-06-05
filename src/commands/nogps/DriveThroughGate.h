@@ -6,7 +6,9 @@
 class DriveThroughGate : CommandBase
 {
 public:
-	DriveThroughGate(transform_t odom, double thetaKP, double slowVel, double fastVel);
+	DriveThroughGate(double thetaKP, double slowVel, double fastVel);
+
+	void reset(transform_t &odom);
 
 	void update(const transform_t &odom, const point_t &left, const point_t &right);
 

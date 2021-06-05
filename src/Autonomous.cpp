@@ -11,11 +11,12 @@
 
 #include "commands/nogps/DriveToGate.h"
 #include "commands/nogps/DriveThroughGate.h"
+#include "commands/DriveToGateNoCompass.h"
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2.0;
-constexpr double DRIVE_SPEED = 0.5;
-const Eigen::Vector3d gpsStdDev = {2, 2, 2*PI};
+constexpr double DRIVE_SPEED = 3.0;
+const Eigen::Vector3d gpsStdDev = {2, 2, 3};
 constexpr int numSamples = 1;
 
 constexpr double FOLLOW_DIST = 2.0;
@@ -50,7 +51,7 @@ Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz)
 		urc_targets(_targets),
 		search_target({_targets.front().approx_GPS(0) - PI, _targets.front().approx_GPS(1), -PI / 2}),
 		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
-		poseEstimator({1.5, 1.5}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
+		poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		map(10000), // TODO: the stride should be set higher when using the real lidar
 		calibrated(false),
 		calibrationPoses({}),
@@ -98,25 +99,22 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	return diff.norm();
 }
 
-void Autonomous::startNextLeg()
+void Autonomous::endCurrentLeg()
 {
-	if (nav_state != NavState::DONE)
-	{
-		log(LOG_WARN, "Cannot start next leg: current leg not done\n");
-	}
-	else if (urc_targets.size() <= 1)
-	{
-		log(LOG_WARN, "Cannot start next leg: no more legs to start\n");
-	}
-	else
-	{
-		// Remove previous leg
-		urc_targets.pop();
+  log(LOG_INFO, "Leg complete, exiting autonomous mode\n");
+  setCmdVel(0, 0);
+  Globals::AUTONOMOUS = false;
+  urc_targets.pop();
+  // clear the cached data points
+  leftPostFilter.reset();
+  rightPostFilter.reset();
 
-		// clear the cached data points
-		leftPostFilter.reset();
-		rightPostFilter.reset();
-
+	if (urc_targets.size() == 0)
+	{
+		log(LOG_INFO, "All legs complete\n");
+	}
+  else
+  {
 		search_target = {urc_targets.front().approx_GPS(0) - PI, urc_targets.front().approx_GPS(1), -PI / 2};
 		setNavState(NavState::GPS);
 		log(LOG_INFO, "Enter autonomous mode to start next leg\n");
@@ -402,13 +400,19 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
-// 1 = drive to gate, 2 = drive through gate, comment out to run regular code
-//#define GATE_TRAVERSAL 1
+// 1 = drive to gate, 2 = drive through gate, 3 = crappy full thing, comment out to run regular code
+// by "crappy full thing" I mean it should navigate to the goal and perform the correct action
+#define GATE_TRAVERSAL 3
 
 void Autonomous::autonomyIter()
 {
-  if (Globals::AUTONOMOUS) {
+	transform_t gps = readGPS();
+
 #ifdef GATE_TRAVERSAL
+	if (!Globals::AUTONOMOUS)
+	{
+		return;
+	}
 #if GATE_TRAVERSAL == 1
 	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
@@ -423,14 +427,88 @@ void Autonomous::autonomyIter()
 	dthg.update(readOdom(), leftPost, rightPost);
 	command_t cmd = dthg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
-#endif
-	return;
-#endif
-  } else {
-    return;
-  }
+#elif GATE_TRAVERSAL == 3
+	if (!calibrated && gps.norm() != 0)
+	{
+		// large uncertainty for starting heading
+		poseEstimator.reset(toPose(gps, 0),
+							{gpsStdDev.x(), gpsStdDev.y(), M_PI});
+		calibrated = true;
+	}
+	else if (calibrated)
+	{
+		transform_t odom = readOdom();
+		double initial_heading = 0.0;
+		static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, initial_heading);
+		if (dtgnc.isDone())
+		{
+			dtgnc.reset(odom, urc_targets.front().approx_GPS);
+		}
+		if (gps.norm() != 0)
+		{
+			static transform_t lastGps = gps;
+			pose_t gpsPose = toPose(gps, 0);
+			pose_t lastGpsPose = toPose(lastGps, 0);
+			gpsPose(2) =
+				atan2(gpsPose.y() - lastGpsPose.y(), gpsPose.x() - lastGpsPose.x());
+			lastGps = gps;
+			gps = toTransform(gpsPose);
+			poseEstimator.correct(gps);
+//				log(LOG_INFO, "GPS: (%.3f, %.3f, %.3f)\n", gpsPose(0), gpsPose(1), gpsPose(2));
+		}
 
-	transform_t gps = readGPS(); // <--- has some heading information
+		pose_t pose = poseEstimator.getPose();
+
+		points_t landmarks = readLandmarks();
+		command_t cmd;
+
+		double fast = DRIVE_SPEED;
+		double slow = DRIVE_SPEED / 2;
+
+		bool is_gate = (urc_targets.front().right_post_id != -1);
+		point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
+		point_t rightPost = {0,0,0};
+		if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
+
+		if (!dtgnc.isAlmostDone())
+		{
+			dtgnc.update(odom, gps, pose, leftPost, rightPost);
+			cmd = dtgnc.getOutput();
+		}
+		else if (urc_targets.front().right_post_id != -1) // this is a gate
+		{
+			static DriveThroughGate dthg(KP_ANGLE, slow, fast);
+			if (dthg.isDone()) {
+				dthg.reset(odom);
+			}
+			dthg.update(odom, leftPost, rightPost);
+			cmd = dthg.getOutput();
+			if (dthg.isDone()) {
+				dtgnc.setDone(odom);
+				endCurrentLeg();
+				return;
+			}
+		}
+		else // this is a single post, but no gate
+		{
+			static DriveToGate dtg(1, KP_ANGLE, slow, fast);
+			dtg.update(leftPost);
+			cmd = dtg.getOutput();
+			if (dtg.isDone()) {
+				dtgnc.setDone(odom);
+				endCurrentLeg();
+				return;
+			}
+		}
+
+		poseEstimator.predict(cmd.thetaVel, cmd.xVel);
+		setCmdVel(cmd.thetaVel, cmd.xVel);
+	}
+#endif
+#endif
+
+	return; // Temporary for virtual URC
+
 
 	// If we haven't calibrated position, do so now
 	if (!calibrated)
@@ -465,18 +543,9 @@ void Autonomous::autonomyIter()
 	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
 	transform_t invTransform = toTransform(pose).inverse();
 
-	if (nav_state == NavState::DONE)
+	if (nav_state == NavState::DONE && Globals::AUTONOMOUS)
 	{
-		if (Globals::AUTONOMOUS)
-		{
-			setCmdVel(0, 0);
-			Globals::AUTONOMOUS = false;
-			log(LOG_INFO, "Leg complete, exiting autonomous mode\n");
-			if (urc_targets.size() > 1)
-			{
-				startNextLeg();
-			}
-		}
+    endCurrentLeg();
 		return;
 	}
 
