@@ -408,6 +408,15 @@ void Autonomous::autonomyIter()
 {
 	transform_t gps = readGPS();
 
+	points_t landmarks = readLandmarks();
+	point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
+	point_t rightPost = {0,0,0};
+	bool is_gate = (urc_targets.front().right_post_id != -1);
+	if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
+	if (leftPost(2) != 0) log(LOG_INFO, "Cam sees left post: %f %f %f\n", leftPost(0), leftPost(1), leftPost(2));
+	if (rightPost(2) != 0) log(LOG_INFO, "Cam sees right post: %f %f %f\n", rightPost(0), rightPost(1), rightPost(2));
+	if (leftPost(2) == 0 && rightPost(2) == 0) log(LOG_INFO, "Cam sees nothing\n");
+
 #ifdef GATE_TRAVERSAL
 	if (!Globals::AUTONOMOUS)
 	{
@@ -459,15 +468,6 @@ void Autonomous::autonomyIter()
 
 		pose_t pose = poseEstimator.getPose();
 
-		points_t landmarks = readLandmarks();
-		point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
-		point_t rightPost = {0,0,0};
-		bool is_gate = (urc_targets.front().right_post_id != -1);
-		if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
-		if (leftPost(2) != 0) log(LOG_INFO, "Cam sees left post: %f %f %f\n", leftPost(0), leftPost(1), leftPost(2));
-		if (rightPost(2) != 0) log(LOG_INFO, "Cam sees right post: %f %f %f\n", rightPost(0), rightPost(1), rightPost(2));
-		if (leftPost(2) == 0 && rightPost(2) == 0) log(LOG_INFO, "Cam sees nothing\n");
-
 		command_t cmd;
 
 		double fast = DRIVE_SPEED;
@@ -505,6 +505,7 @@ void Autonomous::autonomyIter()
 			}
 		}
 
+		log(LOG_INFO, "Requesting vel %f %f\n", cmd.thetaVel, cmd.xVel);
 		poseEstimator.predict(cmd.thetaVel, cmd.xVel);
 		setCmdVel(cmd.thetaVel, cmd.xVel);
 	}
