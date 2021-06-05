@@ -20,6 +20,9 @@ extern "C"
 
 #include <iostream>
 
+const double DEFAULT_X_VEL = 0.5; // m/s
+const double DEFAULT_TH_VEL = 1.0; // rad/s
+
 using nlohmann::json;
 
 bool ParseDrivePacket(json &message);
@@ -139,7 +142,5 @@ bool ParseDrivePacket(json &message) {
   {
     return sendError("Drive targets not within bounds +/- 1.0");
   }
-  double MAX_X_VEL = 0.5; // m/s
-  double MAX_TH_VEL = 1.0; // rad/s
-  return setCmdVel(lr * MAX_TH_VEL, fb * MAX_X_VEL);
+  return setCmdVel(lr * DEFAULT_TH_VEL, fb * DEFAULT_X_VEL);
 }
