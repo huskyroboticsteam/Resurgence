@@ -15,7 +15,7 @@
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2.0;
-constexpr double DRIVE_SPEED = 3.0;
+constexpr double DRIVE_SPEED = 0.5;
 const Eigen::Vector3d gpsStdDev = {2, 2, 3};
 constexpr int numSamples = 1;
 
@@ -460,22 +460,26 @@ void Autonomous::autonomyIter()
 		pose_t pose = poseEstimator.getPose();
 
 		points_t landmarks = readLandmarks();
+		point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
+		point_t rightPost = {0,0,0};
+		bool is_gate = (urc_targets.front().right_post_id != -1);
+		if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
+		if (leftPost(2) != 0) log(LOG_INFO, "Cam sees left post: %f %f %f\n", leftPost(0), leftPost(1), leftPost(2));
+		if (rightPost(2) != 0) log(LOG_INFO, "Cam sees right post: %f %f %f\n", rightPost(0), rightPost(1), rightPost(2));
+		if (leftPost(2) == 0 && rightPost(2) == 0) log(LOG_INFO, "Cam sees nothing\n");
+
 		command_t cmd;
 
 		double fast = DRIVE_SPEED;
 		double slow = DRIVE_SPEED / 2;
 
-		bool is_gate = (urc_targets.front().right_post_id != -1);
-		point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
-		point_t rightPost = {0,0,0};
-		if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
 
 		if (!dtgnc.isAlmostDone())
 		{
 			dtgnc.update(odom, gps, pose, leftPost, rightPost);
 			cmd = dtgnc.getOutput();
 		}
-		else if (urc_targets.front().right_post_id != -1) // this is a gate
+		else if (is_gate)
 		{
 			static DriveThroughGate dthg(KP_ANGLE, slow, fast);
 			if (dthg.isDone()) {
@@ -541,6 +545,7 @@ void Autonomous::autonomyIter()
 	}
 	pose_t pose = poseEstimator.getPose();
 	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
+
 	transform_t invTransform = toTransform(pose).inverse();
 
 	if (nav_state == NavState::DONE && Globals::AUTONOMOUS)
