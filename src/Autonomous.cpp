@@ -406,6 +406,8 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 
 void Autonomous::autonomyIter()
 {
+	transform_t gps = readGPS();
+
 #ifdef GATE_TRAVERSAL
 	if (!Globals::AUTONOMOUS)
 	{
@@ -426,73 +428,69 @@ void Autonomous::autonomyIter()
 	command_t cmd = dthg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
 #elif GATE_TRAVERSAL == 3
+	if (!calibrated && gps.norm() != 0)
 	{
-		transform_t gps = readGPS();
-		if (!calibrated && gps.norm() != 0)
+		// large uncertainty for starting heading
+		poseEstimator.reset(toPose(gps, 0),
+							{gpsStdDev.x(), gpsStdDev.y(), M_PI});
+		calibrated = true;
+	}
+	else if (calibrated)
+	{
+		transform_t odom = readOdom();
+		static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, odom, urc_targets.front().approx_GPS);
+		if (gps.norm() != 0)
 		{
-			// large uncertainty for starting heading
-			poseEstimator.reset(toPose(gps, 0),
-								{gpsStdDev.x(), gpsStdDev.y(), M_PI});
-			calibrated = true;
-		}
-		else if (calibrated)
-		{
-			transform_t odom = readOdom();
-			static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, odom, urc_targets.front().approx_GPS);
-			if (gps.norm() != 0)
-			{
-				static transform_t lastGps = gps;
-				pose_t gpsPose = toPose(gps, 0);
-				pose_t lastGpsPose = toPose(lastGps, 0);
-				gpsPose(2) =
-					atan2(gpsPose.y() - lastGpsPose.y(), gpsPose.x() - lastGpsPose.x());
-				lastGps = gps;
-				gps = toTransform(gpsPose);
-				poseEstimator.correct(gps);
+			static transform_t lastGps = gps;
+			pose_t gpsPose = toPose(gps, 0);
+			pose_t lastGpsPose = toPose(lastGps, 0);
+			gpsPose(2) =
+				atan2(gpsPose.y() - lastGpsPose.y(), gpsPose.x() - lastGpsPose.x());
+			lastGps = gps;
+			gps = toTransform(gpsPose);
+			poseEstimator.correct(gps);
 //				log(LOG_INFO, "GPS: (%.3f, %.3f, %.3f)\n", gpsPose(0), gpsPose(1), gpsPose(2));
-			}
-
-			pose_t pose = poseEstimator.getPose();
-
-			points_t landmarks = readLandmarks();
-			command_t cmd;
-
-			double fast = DRIVE_SPEED;
-			double slow = DRIVE_SPEED / 2;
-
-			if (!dtgnc.isDone())
-			{
-				dtgnc.update(odom, gps, pose, landmarks[urc_targets.front().left_post_id], landmarks[urc_targets.front().right_post_id]);
-				cmd = dtgnc.getOutput();
-			}
-			else if (urc_targets.front().right_post_id != -1) // this is a gate
-			{
-				static DriveThroughGate dthg(odom, KP_ANGLE, slow, fast);
-				point_t leftPost = landmarks[urc_targets.front().left_post_id];
-				point_t rightPost = landmarks[urc_targets.front().right_post_id];
-				dthg.update(odom, leftPost, rightPost);
-				cmd = dthg.getOutput();
-        if (dthg.isDone()) endCurrentLeg();
-			}
-			else // this is a single post, but no gate
-			{
-				static DriveToGate dtg(1, KP_ANGLE, slow, fast);
-				points_t posts = readLandmarks();
-				dtg.update(posts[urc_targets.front().left_post_id]);
-				cmd = dtg.getOutput();
-        if (dtg.isDone()) endCurrentLeg();
-			}
-
-			poseEstimator.predict(cmd.thetaVel, cmd.xVel);
-			setCmdVel(cmd.thetaVel, cmd.xVel);
 		}
+
+		pose_t pose = poseEstimator.getPose();
+
+		points_t landmarks = readLandmarks();
+		command_t cmd;
+
+		double fast = DRIVE_SPEED;
+		double slow = DRIVE_SPEED / 2;
+
+		if (!dtgnc.isDone())
+		{
+			dtgnc.update(odom, gps, pose, landmarks[urc_targets.front().left_post_id], landmarks[urc_targets.front().right_post_id]);
+			cmd = dtgnc.getOutput();
+		}
+		else if (urc_targets.front().right_post_id != -1) // this is a gate
+		{
+			static DriveThroughGate dthg(odom, KP_ANGLE, slow, fast);
+			point_t leftPost = landmarks[urc_targets.front().left_post_id];
+			point_t rightPost = landmarks[urc_targets.front().right_post_id];
+			dthg.update(odom, leftPost, rightPost);
+			cmd = dthg.getOutput();
+			if (dthg.isDone()) endCurrentLeg();
+		}
+		else // this is a single post, but no gate
+		{
+			static DriveToGate dtg(1, KP_ANGLE, slow, fast);
+			points_t posts = readLandmarks();
+			dtg.update(posts[urc_targets.front().left_post_id]);
+			cmd = dtg.getOutput();
+			if (dtg.isDone()) endCurrentLeg();
+		}
+
+		poseEstimator.predict(cmd.thetaVel, cmd.xVel);
+		setCmdVel(cmd.thetaVel, cmd.xVel);
 	}
 #endif
 #endif
 
 	return; // Temporary for virtual URC
 
-	transform_t gps = readGPS(); // <--- has some heading information
 
 	// If we haven't calibrated position, do so now
 	if (!calibrated)
