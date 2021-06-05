@@ -24,21 +24,21 @@ const std::array<std::string, 4> operation_modes = {
 
 // For PWM control, we want to use higher values when acting against gravity
 const std::map<std::string, double> positive_arm_pwm_scales = {
-	{"arm_base",    6000},
+	{"arm_base",   12000},
 	{"shoulder",  -20000},
 	{"elbow",     -32768},
 	{"forearm",    -6000},
 	{"diffleft",    5000},
-	{"diffright",  -5000},
+	{"diffright", -10000},
 	{"hand",       15000}
 };
 const std::map<std::string, double> negative_arm_pwm_scales = {
-	{"arm_base",    6000},
+	{"arm_base",   12000},
 	{"shoulder",  -14000},
 	{"elbow",     -18000},
 	{"forearm",    -6000},
 	{"diffleft",    5000},
-	{"diffright",  -5000},
+	{"diffright", -10000},
 	{"hand",       15000}
 };
 const std::map<std::string, double> incremental_pid_scales = {
