@@ -7,9 +7,12 @@
 class DriveToGateNoCompass : CommandBase
 {
 public:
-	DriveToGateNoCompass(double driveDist, double angleKP, double vel, transform_t odom, point_t target);
+	DriveToGateNoCompass(double driveDist, double angleKP, double vel);
+	void reset(transform_t &odom, point_t &target);
 	void update(const transform_t &odom, const transform_t &gps, const pose_t &currPose, const point_t &leftPost, const point_t &rightPost);
 	bool isDone() override;
+	bool isAlmostDone();
+	void setDone();
 	command_t getOutput() override;
 
 private:
@@ -18,6 +21,7 @@ private:
 		Start,
 		DriveForward,
 		TurnToTarget,
+		AlmostDone,
 		Done
 	};
 

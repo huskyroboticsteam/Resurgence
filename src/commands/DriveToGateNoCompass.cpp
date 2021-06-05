@@ -5,16 +5,23 @@
 #include "Eigen/Dense"
 #include "Eigen/LU"
 
-DriveToGateNoCompass::DriveToGateNoCompass(double driveDist, double angleKP, double vel,
-										   transform_t odom, point_t target)
-	: calibrateDriveDist(driveDist), currOdom(std::move(odom)), state(State::Start),
-	  referenceTransform(transform_t::Zero()), calibrationPoints(),
-	  targetPoint(std::move(target)), angleKP(angleKP), vel(vel)
+DriveToGateNoCompass::DriveToGateNoCompass(double driveDist, double angleKP, double vel)
+	: calibrateDriveDist(driveDist), currOdom(toTransform({0,0,0})), state(State::Done),
+		referenceTransform(transform_t::Zero()), calibrationPoints(),
+		targetPoint({0,0,0}), angleKP(angleKP), vel(vel)
 {
+}
+void DriveToGateNoCompass::reset(transform_t &odom, point_t &target)
+{
+	state = State::Start;
+	referenceTransform = transform_t::Zero();
+	calibrationPoints.clear();
+	currOdom = odom;
+	targetPoint = target;
 }
 command_t DriveToGateNoCompass::getOutput()
 {
-	if (state == State::Done)
+	if (state == State::Done || state == State::AlmostDone)
 	{
 		return {0, 0};
 	}
@@ -38,9 +45,17 @@ bool DriveToGateNoCompass::isDone()
 {
 	return state == State::Done;
 }
+bool DriveToGateNoCompass::isAlmostDone()
+{
+	return state == State::AlmostDone;
+}
+void DriveToGateNoCompass::setDone()
+{
+	state = State::Done;
+}
 void DriveToGateNoCompass::update(const transform_t &odom, const transform_t &gps,
-								  const pose_t &pose, const point_t &leftPost,
-								  const point_t &rightPost)
+									const pose_t &pose, const point_t &leftPost,
+									const point_t &rightPost)
 {
 	currOdom = odom;
 	currPose = pose;
@@ -52,7 +67,7 @@ void DriveToGateNoCompass::update(const transform_t &odom, const transform_t &gp
 	}
 	if (leftPost(2) != 0 || rightPost(2) != 0)
 	{
-		state = Done;
+		state = AlmostDone;
 	}
 }
 
@@ -122,6 +137,9 @@ void DriveToGateNoCompass::transitionStates()
 			double angle = calculateHeading(calibrationPoints);
 			// the third element isn't 1, but it's fine since we only want displacement
 			point_t toTarget = targetPoint - currPose;
+			log(LOG_INFO, "Target point %f %f current pose %f %f %f\n",
+					targetPoint(0), targetPoint(1),
+					currPose(0), currPose(1), currPose(2));
 			double targetAngle = atan2(toTarget.y(), toTarget.x());
 			double angleDiff = -targetAngle + angle;
 			double cosTheta = cos(angleDiff);

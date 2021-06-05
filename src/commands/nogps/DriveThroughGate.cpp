@@ -8,11 +8,17 @@
 
 constexpr double ALIGN_DIST = 2;
 
-DriveThroughGate::DriveThroughGate(transform_t odom, double thetaKP, double slowVel,
-								   double fastVel)
-	: startOdom(std::move(odom)), thetaKP(thetaKP), slowVel(slowVel), fastVel(fastVel),
-	  state(State::Start), driveTarget(pose_t::Zero())
+DriveThroughGate::DriveThroughGate(double thetaKP, double slowVel, double fastVel)
+	: startOdom(toTransform({0,0,0})), thetaKP(thetaKP), slowVel(slowVel), fastVel(fastVel),
+		state(State::Done), driveTarget(pose_t::Zero())
 {
+}
+
+void DriveThroughGate::reset(transform_t &odom)
+{
+	startOdom = odom;
+	state = State::Start;
+	driveTarget = pose_t::Zero();
 }
 
 bool DriveThroughGate::isDone()
@@ -129,7 +135,7 @@ command_t DriveThroughGate::getOutput()
 }
 
 void DriveThroughGate::update(const transform_t &odom, const point_t &left,
-							  const point_t &right)
+								const point_t &right)
 {
 	currOdom = odom;
 	leftPost = left;
@@ -215,7 +221,7 @@ void DriveThroughGate::transitionStates()
 				double sinTheta = sin(angle);
 				double dist = 2 * ALIGN_DIST;
 				driveTarget = {driveTarget.x() + dist * cosTheta,
-							   driveTarget.y() + dist * sinTheta, angle};
+											 driveTarget.y() + dist * sinTheta, angle};
 				state = DriveThrough;
 				log(LOG_INFO, "Align->DriveThrough\n");
 			}

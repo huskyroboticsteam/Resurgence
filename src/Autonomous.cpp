@@ -438,7 +438,11 @@ void Autonomous::autonomyIter()
 	else if (calibrated)
 	{
 		transform_t odom = readOdom();
-		static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, odom, urc_targets.front().approx_GPS);
+		static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED);
+		if (dtgnc.isDone())
+		{
+			dtgnc.reset(odom, urc_targets.front().approx_GPS);
+		}
 		if (gps.norm() != 0)
 		{
 			static transform_t lastGps = gps;
@@ -465,24 +469,35 @@ void Autonomous::autonomyIter()
 		point_t rightPost = {0,0,0};
 		if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
 
-		if (!dtgnc.isDone())
+		if (!dtgnc.isAlmostDone())
 		{
 			dtgnc.update(odom, gps, pose, leftPost, rightPost);
 			cmd = dtgnc.getOutput();
 		}
 		else if (urc_targets.front().right_post_id != -1) // this is a gate
 		{
-			static DriveThroughGate dthg(odom, KP_ANGLE, slow, fast);
+			static DriveThroughGate dthg(KP_ANGLE, slow, fast);
+			if (dthg.isDone()) {
+				dthg.reset(odom);
+			}
 			dthg.update(odom, leftPost, rightPost);
 			cmd = dthg.getOutput();
-			if (dthg.isDone()) endCurrentLeg();
+			if (dthg.isDone()) {
+				dtgnc.setDone();
+				endCurrentLeg();
+				return;
+			}
 		}
 		else // this is a single post, but no gate
 		{
 			static DriveToGate dtg(1, KP_ANGLE, slow, fast);
 			dtg.update(leftPost);
 			cmd = dtg.getOutput();
-			if (dtg.isDone()) endCurrentLeg();
+			if (dtg.isDone()) {
+				dtgnc.setDone();
+				endCurrentLeg();
+				return;
+			}
 		}
 
 		poseEstimator.predict(cmd.thetaVel, cmd.xVel);
