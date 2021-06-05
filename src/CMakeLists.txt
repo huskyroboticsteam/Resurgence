@@ -136,7 +136,7 @@ target_link_libraries(TunePID ${rover_libs}
   real_can_interface
   ${real_world_libs}
   )
-target_link_libraries(TunePID ${OpenCV_LIBS} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
+target_link_libraries(TunePID ${vision_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
 
 add_executable(PlanViz
   PlanViz.cpp)

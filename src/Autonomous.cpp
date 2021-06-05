@@ -46,10 +46,10 @@ const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,Nav
  */
 static void printLandmarks(points_t& landmarks, int log_level = LOG_DEBUG);
 
-Autonomous::Autonomous(const URCLeg &_target, double controlHz)
+Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz)
 	: Node("autonomous"),
-		urc_target(_target),
-		search_target({_target.approx_GPS(0) - PI, _target.approx_GPS(1), -PI / 2}),
+		urc_targets(_targets),
+		search_target({_targets.front().approx_GPS(0) - PI, _targets.front().approx_GPS(1), -PI / 2}),
 		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
 		poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 		map(10000), // TODO: the stride should be set higher when using the real lidar
@@ -79,8 +79,8 @@ Autonomous::Autonomous(const URCLeg &_target, double controlHz)
 {
 }
 
-Autonomous::Autonomous(const URCLeg &_target, double controlHz, const pose_t &startPose)
-	: Autonomous(_target, controlHz)
+Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz, const pose_t &startPose)
+	: Autonomous(_targets, controlHz)
 {
 	poseEstimator.reset(startPose);
 	calibrated = true;
@@ -97,6 +97,28 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 	}
 	diff(2) = thetaDiff * theta_weight;
 	return diff.norm();
+}
+
+void Autonomous::endCurrentLeg()
+{
+  log(LOG_INFO, "Leg complete, exiting autonomous mode\n");
+  setCmdVel(0, 0);
+  Globals::AUTONOMOUS = false;
+  urc_targets.pop();
+  // clear the cached data points
+  leftPostFilter.reset();
+  rightPostFilter.reset();
+
+	if (urc_targets.size() == 0)
+	{
+		log(LOG_INFO, "All legs complete\n");
+	}
+  else
+  {
+		search_target = {urc_targets.front().approx_GPS(0) - PI, urc_targets.front().approx_GPS(1), -PI / 2};
+		setNavState(NavState::GPS);
+		log(LOG_INFO, "Enter autonomous mode to start next leg\n");
+	}
 }
 
 void Autonomous::setNavState(NavState s)
@@ -164,7 +186,7 @@ void Autonomous::update_nav_state(const pose_t &pose, const pose_t &plan_target)
       log(LOG_WARN, "Reached GPS target without seeing post!\n");
       setNavState(NavState::SEARCH_PATTERN);
     } else if (nav_state == NavState::POST_VISIBLE) {
-      if (urc_target.right_post_id == -1) {
+      if (urc_targets.front().right_post_id == -1) {
         log(LOG_INFO, "Arrived at post\n");
         setNavState(NavState::DONE);
       } else {
@@ -256,7 +278,7 @@ pose_t Autonomous::choose_plan_target(const pose_t &pose)
   {
     return getGPSTargetPose();
   }
-  else if (nav_state == NavState::SEARCH_PATTERN)
+  else if (nav_state == NavState::SEARCH_PATTERN || nav_state == NavState::SEARCH_PATTERN_SECOND_POST)
   {
     return search_target;
   }
@@ -290,16 +312,16 @@ void Autonomous::updateLandmarkInformation(const transform_t &invTransform)
 	// get landmark data and filter out invalid data points
 	points_t landmarks = readLandmarks();
 	printLandmarks(landmarks);
-	if (urc_target.left_post_id < 0 || urc_target.left_post_id > landmarks.size())
+	if (urc_targets.front().left_post_id < 0 || urc_targets.front().left_post_id > landmarks.size())
 	{
-		log(LOG_ERROR, "Invalid left_post_id %d\n", urc_target.left_post_id);
+		log(LOG_ERROR, "Invalid left_post_id %d\n", urc_targets.front().left_post_id);
 		return;
 	}
-	point_t leftPostLandmark = landmarks[urc_target.left_post_id];
+	point_t leftPostLandmark = landmarks[urc_targets.front().left_post_id];
 	point_t rightPostLandmark({0,0,0});
-  if (urc_target.right_post_id != -1)
+  if (urc_targets.front().right_post_id != -1)
   {
-    rightPostLandmark = landmarks[urc_target.right_post_id];
+    rightPostLandmark = landmarks[urc_targets.front().right_post_id];
   }
 
   if (leftPostLandmark(2) != 0)
@@ -353,7 +375,7 @@ void Autonomous::updateSearchTarget()
   // Replan to avoid waiting at current search point
   plan_cost = INFINITE_COST;
   // Set the search target to the next point in the search pattern
-  search_target -= urc_target.approx_GPS;
+  search_target -= urc_targets.front().approx_GPS;
   double radius = hypot(search_target(0), search_target(1));
   double scale = (radius + search_theta_increment) / radius;
   // Rotate the target counterclockwise by the theta increment
@@ -361,7 +383,7 @@ void Autonomous::updateSearchTarget()
     (Eigen::Matrix2d() << cos(search_theta_increment), -sin(search_theta_increment),
                 sin(search_theta_increment), cos(search_theta_increment)).finished()
     * search_target.topRows(2) * scale;
-  search_target += urc_target.approx_GPS;
+  search_target += urc_targets.front().approx_GPS;
   // Adjust the target angle
   search_target(2) += search_theta_increment;
   if (search_target(2) > PI)
@@ -392,14 +414,14 @@ void Autonomous::autonomyIter()
 #if GATE_TRAVERSAL == 1
 	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
-	dtg.update(posts[urc_target.left_post_id]);
+	dtg.update(posts[urc_targets.front().left_post_id]);
 	command_t cmd = dtg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
 #elif GATE_TRAVERSAL == 2
 	static DriveThroughGate dthg(readOdom(), KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
-	point_t leftPost = posts[urc_target.left_post_id];
-	point_t rightPost = posts[urc_target.right_post_id];
+	point_t leftPost = posts[urc_targets.front().left_post_id];
+	point_t rightPost = posts[urc_targets.front().right_post_id];
 	dthg.update(readOdom(), leftPost, rightPost);
 	command_t cmd = dthg.getOutput();
 	setCmdVel(cmd.thetaVel, cmd.xVel);
@@ -416,7 +438,7 @@ void Autonomous::autonomyIter()
 		else if (calibrated)
 		{
 			transform_t odom = readOdom();
-			static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, odom, urc_target.approx_GPS);
+			static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, odom, urc_targets.front().approx_GPS);
 			if (gps.norm() != 0)
 			{
 				static transform_t lastGps = gps;
@@ -440,23 +462,25 @@ void Autonomous::autonomyIter()
 
 			if (!dtgnc.isDone())
 			{
-				dtgnc.update(odom, gps, pose, landmarks[urc_target.left_post_id], landmarks[urc_target.right_post_id]);
+				dtgnc.update(odom, gps, pose, landmarks[urc_targets.front().left_post_id], landmarks[urc_targets.front().right_post_id]);
 				cmd = dtgnc.getOutput();
 			}
-			else if (urc_target.right_post_id != -1) // this is a gate
+			else if (urc_targets.front().right_post_id != -1) // this is a gate
 			{
 				static DriveThroughGate dthg(odom, KP_ANGLE, slow, fast);
-				point_t leftPost = landmarks[urc_target.left_post_id];
-				point_t rightPost = landmarks[urc_target.right_post_id];
+				point_t leftPost = landmarks[urc_targets.front().left_post_id];
+				point_t rightPost = landmarks[urc_targets.front().right_post_id];
 				dthg.update(odom, leftPost, rightPost);
 				cmd = dthg.getOutput();
+        if (dthg.isDone()) endCurrentLeg();
 			}
 			else // this is a single post, but no gate
 			{
 				static DriveToGate dtg(1, KP_ANGLE, slow, fast);
 				points_t posts = readLandmarks();
-				dtg.update(posts[urc_target.left_post_id]);
+				dtg.update(posts[urc_targets.front().left_post_id]);
 				cmd = dtg.getOutput();
+        if (dtg.isDone()) endCurrentLeg();
 			}
 
 			poseEstimator.predict(cmd.thetaVel, cmd.xVel);
@@ -464,8 +488,9 @@ void Autonomous::autonomyIter()
 		}
 	}
 #endif
-	return;
 #endif
+
+	return; // Temporary for virtual URC
 
 	transform_t gps = readGPS(); // <--- has some heading information
 
@@ -502,14 +527,9 @@ void Autonomous::autonomyIter()
 	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
 	transform_t invTransform = toTransform(pose).inverse();
 
-	if (nav_state == NavState::DONE)
+	if (nav_state == NavState::DONE && Globals::AUTONOMOUS)
 	{
-		leftPostFilter.reset(); // clear the cached data points
-		rightPostFilter.reset();
-		if (Globals::AUTONOMOUS)
-		{
-			setCmdVel(0, 0);
-		}
+    endCurrentLeg();
 		return;
 	}
 
@@ -665,7 +685,7 @@ void Autonomous::autonomyIter()
 
 pose_t Autonomous::getGPSTargetPose() const
 {
-	pose_t ret{urc_target.approx_GPS(0), urc_target.approx_GPS(1), 0.0};
+	pose_t ret{urc_targets.front().approx_GPS(0), urc_targets.front().approx_GPS(1), 0.0};
 	return ret;
 }
 
