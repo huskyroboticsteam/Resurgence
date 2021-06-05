@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['detail_761',['detail',['../namespacenlohmann_1_1detail.html',1,'nlohmann']]],
-  ['dtoa_5fimpl_762',['dtoa_impl',['../namespacenlohmann_1_1detail_1_1dtoa__impl.html',1,'nlohmann::detail']]],
-  ['nlohmann_763',['nlohmann',['../namespacenlohmann.html',1,'']]]
+  ['detail_763',['detail',['../namespacenlohmann_1_1detail.html',1,'nlohmann']]],
+  ['dtoa_5fimpl_764',['dtoa_impl',['../namespacenlohmann_1_1detail_1_1dtoa__impl.html',1,'nlohmann::detail']]],
+  ['nlohmann_765',['nlohmann',['../namespacenlohmann.html',1,'']]]
 ];
