@@ -385,6 +385,10 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 void Autonomous::autonomyIter()
 {
 #ifdef GATE_TRAVERSAL
+	if (!Globals::AUTONOMOUS)
+	{
+		return;
+	}
 #if GATE_TRAVERSAL == 1
 	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
 	points_t posts = readLandmarks();
