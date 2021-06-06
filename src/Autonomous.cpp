@@ -15,7 +15,7 @@
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2.0;
-constexpr double DRIVE_SPEED = 0.5;
+constexpr double DRIVE_SPEED = 0.8;
 const Eigen::Vector3d gpsStdDev = {2, 2, 3};
 constexpr int numSamples = 1;
 
