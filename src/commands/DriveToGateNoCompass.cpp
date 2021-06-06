@@ -37,7 +37,7 @@ command_t DriveToGateNoCompass::getOutput()
 	{
 		calibrationPoints.clear();
 		double err = calculateHeadingErr();
-		double maxthvel = 1.0;
+		double maxthvel = 0.5;
 		double targthvel = err * angleKP;
 		if (abs(targthvel) > maxthvel) {
 			targthvel = (targthvel > 0) ? maxthvel : -maxthvel;
