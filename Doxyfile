@@ -2240,7 +2240,8 @@ SKIP_FUNCTION_MACROS   = YES
 
 TAGFILES               = "doxygen-tags/opencv.tag=https://docs.opencv.org/4.2.0" \
 		         "doxygen-tags/libstdc++.tag=https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api" \
-			 "doxygen-tags/Eigen.doxytags=https://eigen.tuxfamily.org/dox"
+			 "doxygen-tags/Eigen.doxytags=https://eigen.tuxfamily.org/dox" \
+			 "doxygen-tags/nlohmann_json.tag=https://nlohmann.github.io/json/doxygen"
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to
