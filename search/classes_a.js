@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['json_5fpointer_660',['json_pointer',['../classnlohmann_1_1json__pointer.html',1,'nlohmann']]],
-  ['json_5fref_661',['json_ref',['../classnlohmann_1_1detail_1_1json__ref.html',1,'nlohmann::detail']]],
-  ['json_5freverse_5fiterator_662',['json_reverse_iterator',['../classnlohmann_1_1detail_1_1json__reverse__iterator.html',1,'nlohmann::detail']]],
-  ['json_5fsax_663',['json_sax',['../structnlohmann_1_1json__sax.html',1,'nlohmann']]],
-  ['json_5fsax_5facceptor_664',['json_sax_acceptor',['../classnlohmann_1_1detail_1_1json__sax__acceptor.html',1,'nlohmann::detail']]],
-  ['json_5fsax_5fdom_5fcallback_5fparser_665',['json_sax_dom_callback_parser',['../classnlohmann_1_1detail_1_1json__sax__dom__callback__parser.html',1,'nlohmann::detail']]],
-  ['json_5fsax_5fdom_5fparser_666',['json_sax_dom_parser',['../classnlohmann_1_1detail_1_1json__sax__dom__parser.html',1,'nlohmann::detail']]]
+  ['jacobirotation_18868',['JacobiRotation',['https://eigen.tuxfamily.org/dox/classEigen_1_1JacobiRotation.html',1,'Eigen']]],
+  ['jacobisvd_18869',['JacobiSVD',['https://eigen.tuxfamily.org/dox/classEigen_1_1JacobiSVD.html',1,'Eigen']]],
+  ['join_18870',['join',['https://docs.opencv.org/4.2.0/d0/de2/structcv_1_1datasets_1_1join.html',1,'cv::datasets']]],
+  ['join_5ferror_18871',['join_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a11135.html',1,'__gnu_pbds']]],
+  ['json_5fpointer_18872',['json_pointer',['https://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer.html',1,'nlohmann']]],
+  ['json_5fsax_18873',['json_sax',['https://nlohmann.github.io/json/doxygen/structnlohmann_1_1json__sax.html',1,'nlohmann']]]
 ];

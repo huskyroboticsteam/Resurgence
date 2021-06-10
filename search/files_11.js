@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['ncv_2ehpp_21857',['NCV.hpp',['https://docs.opencv.org/4.2.0/d9/d96/NCV_8hpp.html',1,'']]],
+  ['ncvbroxopticalflow_2ehpp_21858',['NCVBroxOpticalFlow.hpp',['https://docs.opencv.org/4.2.0/d2/d84/NCVBroxOpticalFlow_8hpp.html',1,'']]],
+  ['ncvhaarobjectdetection_2ehpp_21859',['NCVHaarObjectDetection.hpp',['https://docs.opencv.org/4.2.0/d0/d3c/NCVHaarObjectDetection_8hpp.html',1,'']]],
+  ['ncvpyramid_2ehpp_21860',['NCVPyramid.hpp',['https://docs.opencv.org/4.2.0/db/dfa/NCVPyramid_8hpp.html',1,'']]],
+  ['neon_5futils_2ehpp_21861',['neon_utils.hpp',['https://docs.opencv.org/4.2.0/db/d38/neon__utils_8hpp.html',1,'']]],
+  ['nested_5fexception_2eh_21862',['nested_exception.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00428.html',1,'']]],
+  ['net_2eh_21863',['net.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01004.html',1,'']]],
+  ['new_21864',['new',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00032.html',1,'']]],
+  ['new_5fallocator_2eh_21865',['new_allocator.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01061.html',1,'']]],
+  ['nn_5findex_2eh_21866',['nn_index.h',['https://docs.opencv.org/4.2.0/d6/d9a/nn__index_8h.html',1,'']]],
+  ['node_5fhandle_2eh_21867',['node_handle.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00431.html',1,'']]],
+  ['non_5flinear_5fsvms_2emarkdown_21868',['non_linear_svms.markdown',['https://docs.opencv.org/4.2.0/da/d42/non__linear__svms_8markdown.html',1,'']]],
+  ['nonfree_2ehpp_21869',['nonfree.hpp',['https://docs.opencv.org/4.2.0/dc/dcb/nonfree_8hpp.html',1,'']]],
+  ['npp_5fstaging_2ehpp_21870',['NPP_staging.hpp',['https://docs.opencv.org/4.2.0/d5/d2c/NPP__staging_8hpp.html',1,'']]],
+  ['null_5fnode_5fmetadata_2ehpp_21871',['null_node_metadata.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01238.html',1,'']]],
+  ['numeric_21872',['numeric',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00113.html',1,'']]],
+  ['numeric_2ehpp_21873',['numeric.hpp',['https://docs.opencv.org/4.2.0/de/dd5/numeric_8hpp.html',1,'']]],
+  ['numeric_5ftraits_2eh_21874',['numeric_traits.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01064.html',1,'']]],
+  ['numericfwd_2eh_21875',['numericfwd.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00929.html',1,'']]]
+];

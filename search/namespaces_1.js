@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['detail_763',['detail',['../namespacenlohmann_1_1detail.html',1,'nlohmann']]],
-  ['dtoa_5fimpl_764',['dtoa_impl',['../namespacenlohmann_1_1detail_1_1dtoa__impl.html',1,'nlohmann::detail']]],
-  ['nlohmann_765',['nlohmann',['../namespacenlohmann.html',1,'']]]
+  ['abi_20861',['abi',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01558.html',1,'']]]
 ];

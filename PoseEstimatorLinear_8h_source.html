@@ -83,7 +83,7 @@ $(function() {
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="classPoseEstimatorLinear.html">PoseEstimatorLinear</a>(<span class="keyword">const</span> Eigen::Vector3d &amp;stateStdDevs,</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                  <span class="keyword">const</span> Eigen::Vector3d &amp;measurementStdDevs, <span class="keywordtype">double</span> dt);</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">void</span> correct(<span class="keyword">const</span> transform_t &amp;measurement);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">void</span> correct(<span class="keyword">const</span> transform_t &amp;<a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">measurement</a>);</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span> predict(<span class="keywordtype">double</span> thetaVel, <span class="keywordtype">double</span> xVel);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
@@ -97,7 +97,7 @@ $(function() {
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        reset(Eigen::Vector3d::Zero());</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classPoseEstimatorLinear.html#a2d59a739f660f7a5af2722da320c6544">   70</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classPoseEstimatorLinear.html#a2d59a739f660f7a5af2722da320c6544">reset</a>(<span class="keyword">const</span> pose_t &amp;pose);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordtype">void</span> reset(<span class="keyword">const</span> pose_t &amp;pose);</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">void</span> reset(<span class="keyword">const</span> pose_t &amp;pose, <span class="keyword">const</span> pose_t &amp;stdDevs);</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
@@ -110,9 +110,9 @@ $(function() {
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <a class="code" href="classKalmanFilter.html">KalmanFilter&lt;3,3,3&gt;</a> kf;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">double</span> dt;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;};</div>
+<div class="ttc" id="aclassEigen_1_1Matrix_html"><div class="ttname"><a href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a></div></div>
 <div class="ttc" id="aclassKalmanFilter_html"><div class="ttname"><a href="classKalmanFilter.html">KalmanFilter&lt; 3, 3, 3 &gt;</a></div></div>
 <div class="ttc" id="aclassPoseEstimatorLinear_html"><div class="ttname"><a href="classPoseEstimatorLinear.html">PoseEstimatorLinear</a></div><div class="ttdef"><b>Definition:</b> PoseEstimatorLinear.h:15</div></div>
-<div class="ttc" id="aclassPoseEstimatorLinear_html_a2d59a739f660f7a5af2722da320c6544"><div class="ttname"><a href="classPoseEstimatorLinear.html#a2d59a739f660f7a5af2722da320c6544">PoseEstimatorLinear::reset</a></div><div class="ttdeci">void reset(const pose_t &amp;pose)</div></div>
 <div class="ttc" id="aclassPoseEstimatorLinear_html_a33646061bbe356ef1d715e7d5e985996"><div class="ttname"><a href="classPoseEstimatorLinear.html#a33646061bbe356ef1d715e7d5e985996">PoseEstimatorLinear::getEstimateCovarianceMat</a></div><div class="ttdeci">Eigen::Matrix3d getEstimateCovarianceMat() const</div><div class="ttdef"><b>Definition:</b> PoseEstimatorLinear.h:51</div></div>
 <div class="ttc" id="aclassPoseEstimatorLinear_html_ad8ba810fc1072a421eb3a9ee8edf77b3"><div class="ttname"><a href="classPoseEstimatorLinear.html#ad8ba810fc1072a421eb3a9ee8edf77b3">PoseEstimatorLinear::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdef"><b>Definition:</b> PoseEstimatorLinear.h:59</div></div>
 <div class="ttc" id="aclassPoseEstimatorLinear_html_af4f5396d8925dddfbd0715531b1e1f56"><div class="ttname"><a href="classPoseEstimatorLinear.html#af4f5396d8925dddfbd0715531b1e1f56">PoseEstimatorLinear::getPose</a></div><div class="ttdeci">pose_t getPose() const</div><div class="ttdef"><b>Definition:</b> PoseEstimatorLinear.h:79</div></div>

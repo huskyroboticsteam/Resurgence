@@ -72,11 +72,11 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00107.html">memory</a>&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a>&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;opencv2/core.hpp&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;opencv2/aruco.hpp&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://docs.opencv.org/4.2.0/d0/d9c/core_2include_2opencv2_2core_8hpp.html">opencv2/core.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://docs.opencv.org/4.2.0/d9/d53/aruco_8hpp.html">opencv2/aruco.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;../camera/CameraParams.h&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;MarkerSet.h&quot;</span></div>
@@ -88,19 +88,27 @@ $(function() {
 <div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classAR_1_1Detector.html">   20</a></span>&#160;<span class="keyword">class </span><a class="code" href="classAR_1_1Detector.html">Detector</a></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    std::shared_ptr&lt;MarkerSet&gt; marker_set_;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr&lt;MarkerSet&gt;</a> marker_set_;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classcam_1_1CameraParams.html">cam::CameraParams</a> camera_params_;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    cv::Ptr&lt;cv::aruco::DetectorParameters&gt; detector_params_;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">cv::Ptr&lt;cv::aruco::DetectorParameters&gt;</a> detector_params_;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="classAR_1_1Detector.html">Detector</a>(std::shared_ptr&lt;MarkerSet&gt; marker_set, <a class="code" href="classcam_1_1CameraParams.html">cam::CameraParams</a> camera_params,</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;             cv::Ptr&lt;cv::aruco::DetectorParameters&gt; detector_params =</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                 cv::aruco::DetectorParameters::create());</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    std::vector&lt;Tag&gt; detectTags(<span class="keyword">const</span> cv::Mat &amp;input);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="classAR_1_1Detector.html">Detector</a>(<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr&lt;MarkerSet&gt;</a> marker_set, <a class="code" href="classcam_1_1CameraParams.html">cam::CameraParams</a> camera_params,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;             <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">cv::Ptr&lt;cv::aruco::DetectorParameters&gt;</a> detector_params =</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                 <a class="codeRef" href="https://docs.opencv.org/4.2.0/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.html#aca7a04c0d23b3e1c575e11af697d506c">cv::aruco::DetectorParameters::create</a>());</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt;Tag&gt;</a> detectTags(<span class="keyword">const</span> <a class="codeRef" href="https://docs.opencv.org/4.2.0/d3/d63/classcv_1_1Mat.html">cv::Mat</a> &amp;input);</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;};</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;} <span class="comment">// namespace AR</span></div>
+<div class="ttc" id="aa00107_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00107.html">memory</a></div></div>
+<div class="ttc" id="aa00182_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a></div></div>
+<div class="ttc" id="aa06899_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a></div></div>
+<div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector</a></div></div>
+<div class="ttc" id="aaruco_8hpp_html"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d9/d53/aruco_8hpp.html">aruco.hpp</a></div></div>
 <div class="ttc" id="aclassAR_1_1Detector_html"><div class="ttname"><a href="classAR_1_1Detector.html">AR::Detector</a></div><div class="ttdef"><b>Definition:</b> Detector.h:21</div></div>
 <div class="ttc" id="aclasscam_1_1CameraParams_html"><div class="ttname"><a href="classcam_1_1CameraParams.html">cam::CameraParams</a></div><div class="ttdoc">Represents a set of intrinsic camera parameters.</div><div class="ttdef"><b>Definition:</b> CameraParams.h:59</div></div>
+<div class="ttc" id="aclasscv_1_1Mat_html"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d3/d63/classcv_1_1Mat.html">cv::Mat</a></div></div>
+<div class="ttc" id="acore_2include_2opencv2_2core_8hpp_html"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d0/d9c/core_2include_2opencv2_2core_8hpp.html">core.hpp</a></div></div>
+<div class="ttc" id="astructcv_1_1aruco_1_1DetectorParameters_html_aca7a04c0d23b3e1c575e11af697d506c"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.html#aca7a04c0d23b3e1c575e11af697d506c">cv::aruco::DetectorParameters::create</a></div><div class="ttdeci">static Ptr&lt; DetectorParameters &gt; create()</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

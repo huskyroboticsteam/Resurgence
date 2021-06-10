@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['f_2dtransform_20theory_34381',['F-transform theory',['https://docs.opencv.org/4.2.0/db/daf/tutorial_fuzzy_theory.html',1,'']]],
+  ['face_20analytics_20pipeline_20with_20g_2dapi_34382',['Face analytics pipeline with G-API',['https://docs.opencv.org/4.2.0/d8/d24/tutorial_gapi_interactive_face_detection.html',1,'']]],
+  ['face_20detection_20in_20video_20capture_34383',['Face Detection in Video Capture',['https://docs.opencv.org/4.2.0/df/d6c/tutorial_js_face_detection_camera.html',1,'']]],
+  ['face_20detection_20using_20haar_20cascades_34384',['Face Detection using Haar Cascades',['https://docs.opencv.org/4.2.0/d2/d99/tutorial_js_face_detection.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d7/d8b/tutorial_py_face_detection.html',1,'(Global Namespace)']]],
+  ['face_20landmark_20detection_20in_20a_20video_34385',['Face landmark detection in a video',['https://docs.opencv.org/4.2.0/d8/d3c/tutorial_face_landmark_detection_in_video.html',1,'']]],
+  ['face_20landmark_20detection_20in_20an_20image_34386',['Face landmark detection in an image',['https://docs.opencv.org/4.2.0/d2/d42/tutorial_face_landmark_detection_in_an_image.html',1,'']]],
+  ['face_20module_20changelog_34387',['Face module changelog',['https://docs.opencv.org/4.2.0/d9/d47/face_changelog.html',1,'']]],
+  ['face_20recognition_20with_20opencv_34388',['Face Recognition with OpenCV',['https://docs.opencv.org/4.2.0/da/d60/tutorial_face_main.html',1,'']]],
+  ['face_20swapping_20using_20face_20landmark_20detection_34389',['Face swapping using face landmark detection',['https://docs.opencv.org/4.2.0/d1/d52/tutorial_face_swapping_face_landmark_detection.html',1,'']]],
+  ['face_5flandmark_5ftrainer_34390',['face_landmark_trainer',['https://docs.opencv.org/4.2.0/d6/d49/md__build_master-contrib_docs-lin64_opencv_contrib_modules_face_tutorials_face_landmark_face_landmark_trainer.html',1,'']]],
+  ['fast_20algorithm_20for_20corner_20detection_34391',['FAST Algorithm for Corner Detection',['https://docs.opencv.org/4.2.0/df/d0c/tutorial_py_fast.html',1,'']]],
+  ['feature_20description_34392',['Feature Description',['https://docs.opencv.org/4.2.0/d5/dde/tutorial_feature_description.html',1,'']]],
+  ['feature_20detection_34393',['Feature Detection',['https://docs.opencv.org/4.2.0/d7/d66/tutorial_feature_detection.html',1,'']]],
+  ['feature_20detection_20and_20description_34394',['Feature Detection and Description',['https://docs.opencv.org/4.2.0/db/d27/tutorial_py_table_of_contents_feature2d.html',1,'']]],
+  ['feature_20matching_34395',['Feature Matching',['https://docs.opencv.org/4.2.0/dc/dc3/tutorial_py_matcher.html',1,'']]],
+  ['feature_20matching_20_2b_20homography_20to_20find_20objects_34396',['Feature Matching + Homography to find Objects',['https://docs.opencv.org/4.2.0/d1/de0/tutorial_py_feature_homography.html',1,'']]],
+  ['feature_20matching_20with_20flann_34397',['Feature Matching with FLANN',['https://docs.opencv.org/4.2.0/d5/d6f/tutorial_feature_flann_matcher.html',1,'']]],
+  ['features2d_20_2b_20homography_20to_20find_20a_20known_20object_34398',['Features2D + Homography to find a known object',['https://docs.opencv.org/4.2.0/d7/dff/tutorial_feature_homography.html',1,'']]],
+  ['file_20input_20and_20output_20using_20xml_20and_20yaml_20files_34399',['File Input and Output using XML and YAML files',['https://docs.opencv.org/4.2.0/dd/d74/tutorial_file_input_output_with_xml_yml.html',1,'']]],
+  ['filtering_20using_20f_2dtransform_34400',['Filtering using F-transform',['https://docs.opencv.org/4.2.0/d3/d1d/tutorial_fuzzy_filtering.html',1,'']]],
+  ['finding_20contours_20in_20your_20image_34401',['Finding contours in your image',['https://docs.opencv.org/4.2.0/df/d0d/tutorial_find_contours.html',1,'']]],
+  ['foreground_20extraction_20using_20grabcut_20algorithm_34402',['Foreground Extraction using GrabCut Algorithm',['https://docs.opencv.org/4.2.0/dd/dfc/tutorial_js_grabcut.html',1,'']]],
+  ['fourier_20transform_34403',['Fourier Transform',['https://docs.opencv.org/4.2.0/dd/d02/tutorial_js_fourier_transform.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/de/dbc/tutorial_py_fourier_transform.html',1,'(Global Namespace)']]],
+  ['frequently_20asked_20questions_34404',['Frequently Asked Questions',['https://docs.opencv.org/4.2.0/d3/d2d/faq.html',1,'']]],
+  ['fuzzy_20image_20processing_20tutorials_34405',['Fuzzy image processing tutorials',['https://docs.opencv.org/4.2.0/d7/d36/tutorial_fuzzy.html',1,'']]]
+];

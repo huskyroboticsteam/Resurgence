@@ -79,15 +79,17 @@ $(function() {
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;../simulator/utils.h&quot;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// Sequence of controls. Each control is a (x distance, theta distance) pair.</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">using</span> plan_t = Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;;</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">using</span> <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">plan_t</a> = <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;</a>;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">using</span> action_t = Eigen::Vector2d;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;plan_t getPlan(<span class="keyword">const</span> std::function&lt;<span class="keywordtype">bool</span>(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y, <span class="keywordtype">double</span> radius)&gt; &amp;collides, <span class="keyword">const</span> point_t &amp;goal, <span class="keywordtype">double</span> goal_radius);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">plan_t</a> getPlan(<span class="keyword">const</span> std::function&lt;<span class="keywordtype">bool</span>(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y, <span class="keywordtype">double</span> radius)&gt; &amp;collides, <span class="keyword">const</span> point_t &amp;goal, <span class="keywordtype">double</span> goal_radius);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;plan_t getPlan(<span class="keyword">const</span> points_t &amp;lidar_scan, <span class="keyword">const</span> point_t &amp;goal, <span class="keywordtype">double</span> goal_radius);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keywordtype">double</span> planCostFromIndex(plan_t &amp;plan, <span class="keywordtype">int</span> idx);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">plan_t</a> getPlan(<span class="keyword">const</span> <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> &amp;lidar_scan, <span class="keyword">const</span> point_t &amp;goal, <span class="keywordtype">double</span> goal_radius);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keywordtype">double</span> planCostFromIndex(<a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">plan_t</a> &amp;plan, <span class="keywordtype">int</span> idx);</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt; point_t &gt;</a></div></div>
+<div class="ttc" id="aclassEigen_1_1Matrix_html"><div class="ttname"><a href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

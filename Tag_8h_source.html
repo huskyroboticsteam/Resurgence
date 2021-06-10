@@ -72,7 +72,7 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;opencv2/core.hpp&gt;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://docs.opencv.org/4.2.0/d0/d9c/core_2include_2opencv2_2core_8hpp.html">opencv2/core.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;MarkerPattern.h&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
@@ -82,16 +82,16 @@ $(function() {
 <div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classAR_1_1Tag.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="classAR_1_1Tag.html">Tag</a></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    cv::Vec3d rvec_;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    cv::Vec3d tvec_;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="codeRef" href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">cv::Vec3d</a> rvec_;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="codeRef" href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">cv::Vec3d</a> tvec_;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="classAR_1_1MarkerPattern.html">MarkerPattern</a> marker_;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classAR_1_1Tag.html">Tag</a>(<a class="code" href="classAR_1_1MarkerPattern.html">MarkerPattern</a> marker, cv::Vec3d rvec, cv::Vec3d tvec);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classAR_1_1Tag.html">Tag</a>(<a class="code" href="classAR_1_1MarkerPattern.html">MarkerPattern</a> marker, <a class="codeRef" href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">cv::Vec3d</a> rvec, <a class="codeRef" href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">cv::Vec3d</a> tvec);</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="classAR_1_1Tag.html">Tag</a>() = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    cv::Vec3d <a class="code" href="classAR_1_1Tag.html#a5c106533bf2eef5fffe633112ccec6fe">getRVec</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    cv::Vec3d <a class="code" href="classAR_1_1Tag.html#adf13474e6584539c096be20ee7fc61be">getTVec</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    cv::Vec3d <a class="code" href="classAR_1_1Tag.html#a166811d0a22ccb5759a039687ba30ae9">getCoordinates</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="codeRef" href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">cv::Vec3d</a> <a class="code" href="classAR_1_1Tag.html#a5c106533bf2eef5fffe633112ccec6fe">getRVec</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="codeRef" href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">cv::Vec3d</a> <a class="code" href="classAR_1_1Tag.html#adf13474e6584539c096be20ee7fc61be">getTVec</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="codeRef" href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">cv::Vec3d</a> <a class="code" href="classAR_1_1Tag.html#a166811d0a22ccb5759a039687ba30ae9">getCoordinates</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="classAR_1_1MarkerPattern.html">MarkerPattern</a> <a class="code" href="classAR_1_1Tag.html#ac841bf92ef87dcac6196435afc7c2f59">getMarker</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;};</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
@@ -102,6 +102,8 @@ $(function() {
 <div class="ttc" id="aclassAR_1_1Tag_html_a5c106533bf2eef5fffe633112ccec6fe"><div class="ttname"><a href="classAR_1_1Tag.html#a5c106533bf2eef5fffe633112ccec6fe">AR::Tag::getRVec</a></div><div class="ttdeci">cv::Vec3d getRVec() const</div><div class="ttdef"><b>Definition:</b> Tag.cpp:9</div></div>
 <div class="ttc" id="aclassAR_1_1Tag_html_ac841bf92ef87dcac6196435afc7c2f59"><div class="ttname"><a href="classAR_1_1Tag.html#ac841bf92ef87dcac6196435afc7c2f59">AR::Tag::getMarker</a></div><div class="ttdeci">MarkerPattern getMarker() const</div><div class="ttdef"><b>Definition:</b> Tag.cpp:24</div></div>
 <div class="ttc" id="aclassAR_1_1Tag_html_adf13474e6584539c096be20ee7fc61be"><div class="ttname"><a href="classAR_1_1Tag.html#adf13474e6584539c096be20ee7fc61be">AR::Tag::getTVec</a></div><div class="ttdeci">cv::Vec3d getTVec() const</div><div class="ttdef"><b>Definition:</b> Tag.cpp:14</div></div>
+<div class="ttc" id="aclasscv_1_1Vec_html"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d6/dcf/classcv_1_1Vec.html">Vec&lt; double, 3 &gt;</a></div></div>
+<div class="ttc" id="acore_2include_2opencv2_2core_8hpp_html"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d0/d9c/core_2include_2opencv2_2core_8hpp.html">core.hpp</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

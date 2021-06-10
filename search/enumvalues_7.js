@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['name_5fseparator_1108',['name_separator',['../classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454acc3c64f8ae08c00de1b33f19a4d2913a',1,'nlohmann::detail::lexer_base']]],
-  ['null_1109',['null',['../namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985a37a6259cc0c1dae299a7866489dff0bd',1,'nlohmann::detail']]],
-  ['number_5ffloat_1110',['number_float',['../namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985ad9966ecb59667235a57b4b999a649eef',1,'nlohmann::detail']]],
-  ['number_5finteger_1111',['number_integer',['../namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985a5763da164f8659d94a56e29df64b4bcc',1,'nlohmann::detail']]],
-  ['number_5funsigned_1112',['number_unsigned',['../namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985adce7cc8ec29055c4158828921f2f265e',1,'nlohmann::detail']]]
+  ['mask_33820',['mask',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01521.html#ga0a1765c6b0d8d734be3d54d85be9f145af2ce11ebf110993621bedd8e747d7b1b',1,'mask()(Global Namespace)'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01521.html#ga0a1765c6b0d8d734be3d54d85be9f145af2ce11ebf110993621bedd8e747d7b1b',1,'mask()(Global Namespace)']]],
+  ['mat_33821',['MAT',['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aaf0c2c0ca864067cc6e21a7ea2c1b1fdd',1,'MAT()(Global Namespace)'],['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aaf0c2c0ca864067cc6e21a7ea2c1b1fdd',1,'cv::MAT()'],['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aaf0c2c0ca864067cc6e21a7ea2c1b1fdd',1,'MAT()(Global Namespace)']]],
+  ['mat_5fvector_33822',['MAT_VECTOR',['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aac4f6db46662589f21d34d4abafdf8fb7',1,'MAT_VECTOR()(Global Namespace)'],['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aac4f6db46662589f21d34d4abafdf8fb7',1,'cv::MAT_VECTOR()'],['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aac4f6db46662589f21d34d4abafdf8fb7',1,'MAT_VECTOR()(Global Namespace)']]]
 ];

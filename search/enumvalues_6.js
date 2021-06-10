@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['literal_5ffalse_1104',['literal_false',['../classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454afab1694b1b3937a079f4625fe0b6108b',1,'nlohmann::detail::lexer_base']]],
-  ['literal_5fnull_1105',['literal_null',['../classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454ab7ae4c0e46d86f884677768160b26e9e',1,'nlohmann::detail::lexer_base']]],
-  ['literal_5for_5fvalue_1106',['literal_or_value',['../classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454ad2a8e6f6721cccec0b466301dd9495a5',1,'nlohmann::detail::lexer_base']]],
-  ['literal_5ftrue_1107',['literal_true',['../classnlohmann_1_1detail_1_1lexer__base.html#aa3538cce439a2de6c7893e627b38c454a85cc1a37b0aaa52de40e72f0ed4e0c0d',1,'nlohmann::detail::lexer_base']]]
+  ['image_33818',['IMAGE',['https://docs.opencv.org/4.2.0/d1/dae/namespacecv_1_1gapi_1_1ie.html#af63f38e596d0a0c4a2196532cfba3c1ba23a12f67f614b5518c7f1c2465bf95e3',1,'cv::gapi::ie']]],
+  ['int_33819',['INT',['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aa53f93baa3057821107c750323892fa92',1,'INT()(Global Namespace)'],['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aa53f93baa3057821107c750323892fa92',1,'cv::INT()'],['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aa53f93baa3057821107c750323892fa92',1,'INT()(Global Namespace)']]]
 ];

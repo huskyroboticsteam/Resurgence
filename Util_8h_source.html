@@ -72,36 +72,42 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;chrono&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a>&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00152.html">string</a>&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;time.h&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;sys/time.h&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>util</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keywordtype">bool</span> almostEqual(<span class="keywordtype">double</span> a, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> threshold = 1e-6);</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keywordtype">bool</span> almostEqual(<span class="keywordtype">double</span> a, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> <a class="codeRef" href="https://docs.opencv.org/4.2.0/d7/d1b/group__imgproc__misc.html#gae8a4a146d1ca78c626a53577199e9c57">threshold</a> = 1e-6);</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classutil_1_1ScopedTimer.html">   16</a></span>&#160;<span class="keyword">class </span><a class="code" href="classutil_1_1ScopedTimer.html">ScopedTimer</a></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;{</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">ScopedTimer</a>(std::string name);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">ScopedTimer</a>(<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> name);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">ScopedTimer</a>();</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    ~<a class="code" href="classutil_1_1ScopedTimer.html">ScopedTimer</a>();</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    std::chrono::microseconds <a class="code" href="classutil_1_1ScopedTimer.html#a8b5106706ff6007114bf545852b2b5cc">elapsedTime</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::microseconds</a> <a class="code" href="classutil_1_1ScopedTimer.html#a8b5106706ff6007114bf545852b2b5cc">elapsedTime</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    std::chrono::time_point&lt;std::chrono::high_resolution_clock&gt; startTime;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    std::string name;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">std::chrono::time_point&lt;std::chrono::high_resolution_clock&gt;</a> startTime;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> name;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;};</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;} <span class="comment">// namespace util</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keywordtype">long</span> getElapsedUsecs(<span class="keyword">const</span> <span class="keyword">struct</span> timeval &amp;tp_start, <span class="keyword">const</span> <span class="keyword">struct</span> timeval &amp;tp_end);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keywordtype">long</span> getElapsedUsecs(<span class="keyword">const</span> <span class="keyword">struct</span> timeval &amp;tp_start);</div>
+<div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
+<div class="ttc" id="aa00152_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00152.html">string</a></div></div>
+<div class="ttc" id="aa01516_html_gaa5dbcd13c2fb305025ac6784482d05a5"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a></div><div class="ttdeci">_GLIBCXX_END_NAMESPACE_CXX11 typedef basic_string&lt; char &gt; string</div></div>
+<div class="ttc" id="aa01839_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::duration</a></div></div>
+<div class="ttc" id="aa01843_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">std::chrono::time_point&lt; std::chrono::high_resolution_clock &gt;</a></div></div>
 <div class="ttc" id="aclassutil_1_1ScopedTimer_html"><div class="ttname"><a href="classutil_1_1ScopedTimer.html">util::ScopedTimer</a></div><div class="ttdef"><b>Definition:</b> Util.h:17</div></div>
 <div class="ttc" id="aclassutil_1_1ScopedTimer_html_a74471e10bbfdba342fe8e94131915349"><div class="ttname"><a href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">util::ScopedTimer::ScopedTimer</a></div><div class="ttdeci">ScopedTimer()</div><div class="ttdef"><b>Definition:</b> Util.cpp:19</div></div>
 <div class="ttc" id="aclassutil_1_1ScopedTimer_html_a8b5106706ff6007114bf545852b2b5cc"><div class="ttname"><a href="classutil_1_1ScopedTimer.html#a8b5106706ff6007114bf545852b2b5cc">util::ScopedTimer::elapsedTime</a></div><div class="ttdeci">std::chrono::microseconds elapsedTime() const</div><div class="ttdef"><b>Definition:</b> Util.cpp:33</div></div>
+<div class="ttc" id="agroup__imgproc__misc_html_gae8a4a146d1ca78c626a53577199e9c57"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d7/d1b/group__imgproc__misc.html#gae8a4a146d1ca78c626a53577199e9c57">threshold</a></div><div class="ttdeci">double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

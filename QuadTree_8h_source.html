@@ -72,7 +72,7 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00107.html">memory</a>&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;../simulator/utils.h&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
@@ -87,7 +87,7 @@ $(function() {
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classQuadTree.html#a5a383998dae77988cc36b0575c344356">empty</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    points_t <a class="code" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">getAllPoints</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> <a class="code" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">getAllPoints</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classQuadTree.html#a3c4e91970522b6049a802d193fe79c20">add</a>(<span class="keyword">const</span> point_t &amp;point);</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
@@ -99,7 +99,7 @@ $(function() {
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classQuadTree.html#a7ebf87fe172bf82b196bb434e49ae44e">hasPointWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> areaSize) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    points_t <a class="code" href="classQuadTree.html#aa1a4070a3b4ea1e95e1f98aa38f7d80e">getPointsWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> areaSize) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> <a class="code" href="classQuadTree.html#aa1a4070a3b4ea1e95e1f98aa38f7d80e">getPointsWithin</a>(<span class="keyword">const</span> point_t &amp;point, <span class="keywordtype">double</span> areaSize) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    point_t <a class="code" href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">getArbitraryPoint</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
@@ -108,10 +108,10 @@ $(function() {
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west</span></div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="comment">// if one is initialized then all are initialized</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    std::shared_ptr&lt;QuadTree&gt; children[4];</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr&lt;QuadTree&gt;</a> children[4];</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    point_t center;   <span class="comment">// center of bounding box, in word coords</span></div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordtype">double</span> width;     <span class="comment">// size of square area</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    points_t points;  <span class="comment">// the points in this node, 0 &lt;= points.size() &lt;= nodeCapacity</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> points;  <span class="comment">// the points in this node, 0 &lt;= points.size() &lt;= nodeCapacity</span></div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">int</span> nodeCapacity; <span class="comment">// number of points stored in each node</span></div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">size_t</span> size;      <span class="comment">// number of nodes stored in this or its descendants</span></div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
@@ -120,8 +120,11 @@ $(function() {
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">// check if children exist</span></div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordtype">bool</span> hasChildren() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="comment">// private method paired with QuadTree::getAllPoints()</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">getAllPoints</a>(<span class="keyword">const</span> <a class="code" href="classQuadTree.html">QuadTree</a> &amp;tree, points_t &amp;allPoints) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">getAllPoints</a>(<span class="keyword">const</span> <a class="code" href="classQuadTree.html">QuadTree</a> &amp;tree, <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> &amp;allPoints) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;};</div>
+<div class="ttc" id="aa00107_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00107.html">memory</a></div></div>
+<div class="ttc" id="aa06899_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr&lt; QuadTree &gt;</a></div></div>
+<div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt; point_t &gt;</a></div></div>
 <div class="ttc" id="aclassQuadTree_html"><div class="ttname"><a href="classQuadTree.html">QuadTree</a></div><div class="ttdef"><b>Definition:</b> QuadTree.h:17</div></div>
 <div class="ttc" id="aclassQuadTree_html_a1528c5a86d608cf01358acfa289db273"><div class="ttname"><a href="classQuadTree.html#a1528c5a86d608cf01358acfa289db273">QuadTree::getSize</a></div><div class="ttdeci">size_t getSize() const</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:31</div></div>
 <div class="ttc" id="aclassQuadTree_html_a1e3fb6735f6868d2756cd061250262b8"><div class="ttname"><a href="classQuadTree.html#a1e3fb6735f6868d2756cd061250262b8">QuadTree::remove</a></div><div class="ttdeci">bool remove(const point_t &amp;point)</div><div class="ttdef"><b>Definition:</b> QuadTree.cpp:118</div></div>

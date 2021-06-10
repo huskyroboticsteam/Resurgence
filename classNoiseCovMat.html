@@ -76,21 +76,21 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:aa60ef441c04fa8f5de87a7845d805c50"><td class="memItemLeft" align="right" valign="top"><a id="aa60ef441c04fa8f5de87a7845d805c50"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>state_t</b> = Eigen::Matrix&lt; double, stateDim, 1 &gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>state_t</b> = <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, stateDim, 1 &gt;</td></tr>
 <tr class="separator:aa60ef441c04fa8f5de87a7845d805c50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af24641e097bc8794f11eb53d2d4d2b4b"><td class="memItemLeft" align="right" valign="top"><a id="af24641e097bc8794f11eb53d2d4d2b4b"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>param_t</b> = Eigen::Matrix&lt; double, paramSize, 1 &gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>param_t</b> = <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, paramSize, 1 &gt;</td></tr>
 <tr class="separator:af24641e097bc8794f11eb53d2d4d2b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a93076204936f1b52f4d38c1422bf0cf5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#a93076204936f1b52f4d38c1422bf0cf5">NoiseCovMat</a> (const Eigen::Matrix&lt; double, size, 1 &gt; &amp;stdDevs)</td></tr>
+<tr class="memitem:a93076204936f1b52f4d38c1422bf0cf5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#a93076204936f1b52f4d38c1422bf0cf5">NoiseCovMat</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, 1 &gt; &amp;stdDevs)</td></tr>
 <tr class="separator:a93076204936f1b52f4d38c1422bf0cf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a360e14a449402002490d9876c4156a9d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#a360e14a449402002490d9876c4156a9d">NoiseCovMat</a> (const Eigen::Matrix&lt; double, size, size &gt; &amp;mat)</td></tr>
+<tr class="memitem:a360e14a449402002490d9876c4156a9d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#a360e14a449402002490d9876c4156a9d">NoiseCovMat</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a> &gt; &amp;mat)</td></tr>
 <tr class="separator:a360e14a449402002490d9876c4156a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3e8e75425c5c21219ccb61e3b50567e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#ad3e8e75425c5c21219ccb61e3b50567e">NoiseCovMat</a> (const std::function&lt; Eigen::Matrix&lt; double, size, size &gt;(const state_t &amp;, const param_t &amp;)&gt; &amp;func)</td></tr>
+<tr class="memitem:ad3e8e75425c5c21219ccb61e3b50567e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#ad3e8e75425c5c21219ccb61e3b50567e">NoiseCovMat</a> (const std::function&lt; <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a> &gt;(const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">state_t</a> &amp;, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">param_t</a> &amp;)&gt; &amp;func)</td></tr>
 <tr class="separator:ad3e8e75425c5c21219ccb61e3b50567e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87651502bd2f0ecffae4acd7ebaaa0f0"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, size, size &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#a87651502bd2f0ecffae4acd7ebaaa0f0">get</a> (const state_t &amp;x, const param_t &amp;param)</td></tr>
+<tr class="memitem:a87651502bd2f0ecffae4acd7ebaaa0f0"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNoiseCovMat.html#a87651502bd2f0ecffae4acd7ebaaa0f0">get</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">state_t</a> &amp;x, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">param_t</a> &amp;param)</td></tr>
 <tr class="separator:a87651502bd2f0ecffae4acd7ebaaa0f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -119,9 +119,9 @@ template&lt;int stateDim, int size, int paramSize&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, size, paramSize &gt;::<a class="el" href="classNoiseCovMat.html">NoiseCovMat</a> </td>
+          <td class="memname"><a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, paramSize &gt;::<a class="el" href="classNoiseCovMat.html">NoiseCovMat</a> </td>
           <td>(</td>
-          <td class="paramtype">const Eigen::Matrix&lt; double, size, 1 &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, 1 &gt; &amp;&#160;</td>
           <td class="paramname"><em>stdDevs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -154,9 +154,9 @@ template&lt;int stateDim, int size, int paramSize&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, size, paramSize &gt;::<a class="el" href="classNoiseCovMat.html">NoiseCovMat</a> </td>
+          <td class="memname"><a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, paramSize &gt;::<a class="el" href="classNoiseCovMat.html">NoiseCovMat</a> </td>
           <td>(</td>
-          <td class="paramtype">const Eigen::Matrix&lt; double, size, size &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>mat</em></td><td>)</td>
           <td></td>
         </tr>
@@ -189,9 +189,9 @@ template&lt;int stateDim, int size, int paramSize&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, size, paramSize &gt;::<a class="el" href="classNoiseCovMat.html">NoiseCovMat</a> </td>
+          <td class="memname"><a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, paramSize &gt;::<a class="el" href="classNoiseCovMat.html">NoiseCovMat</a> </td>
           <td>(</td>
-          <td class="paramtype">const std::function&lt; Eigen::Matrix&lt; double, size, size &gt;(const state_t &amp;, const param_t &amp;)&gt; &amp;&#160;</td>
+          <td class="paramtype">const std::function&lt; <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt; double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a> &gt;(const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">state_t</a> &amp;, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">param_t</a> &amp;)&gt; &amp;&#160;</td>
           <td class="paramname"><em>func</em></td><td>)</td>
           <td></td>
         </tr>
@@ -225,15 +225,15 @@ template&lt;int stateDim, int size, int paramSize&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Eigen::Matrix&lt;double, size, size&gt; <a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, size, paramSize &gt;::get </td>
+          <td class="memname"><a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a>&lt;double, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>&gt; <a class="el" href="classNoiseCovMat.html">NoiseCovMat</a>&lt; stateDim, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01487.html#ga5b1a5398fdc4ecf20576f3cae02ea8fc">size</a>, paramSize &gt;::get </td>
           <td>(</td>
-          <td class="paramtype">const state_t &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">state_t</a> &amp;&#160;</td>
           <td class="paramname"><em>x</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const param_t &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">param_t</a> &amp;&#160;</td>
           <td class="paramname"><em>param</em>&#160;</td>
         </tr>
         <tr>

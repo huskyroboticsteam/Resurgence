@@ -82,7 +82,7 @@ $(function() {
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keywordtype">void</span> reset(transform_t &amp;odom);</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keywordtype">void</span> update(<span class="keyword">const</span> transform_t &amp;odom, <span class="keyword">const</span> point_t &amp;left, <span class="keyword">const</span> point_t &amp;right);</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keywordtype">void</span> update(<span class="keyword">const</span> transform_t &amp;odom, <span class="keyword">const</span> point_t &amp;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a96d1c2cab30f14f4e34ccb460f1ad1c9">left</a>, <span class="keyword">const</span> point_t &amp;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a1a23b13efe06ee9b3cd9324af25ab538">right</a>);</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keywordtype">bool</span> isDone() <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <a class="code" href="structcommand__t.html">command_t</a> getOutput() <span class="keyword">override</span>;</div>
@@ -115,6 +115,8 @@ $(function() {
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="structcommand__t.html">command_t</a> getCommandToTarget(<span class="keyword">const</span> transform_t &amp;trf, <span class="keyword">const</span> point_t &amp;target);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="ttc" id="aa01548_html_a1a23b13efe06ee9b3cd9324af25ab538"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a1a23b13efe06ee9b3cd9324af25ab538">right</a></div><div class="ttdeci">ios_base &amp; right(ios_base &amp;__base)</div></div>
+<div class="ttc" id="aa01548_html_a96d1c2cab30f14f4e34ccb460f1ad1c9"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a96d1c2cab30f14f4e34ccb460f1ad1c9">left</a></div><div class="ttdeci">ios_base &amp; left(ios_base &amp;__base)</div></div>
 <div class="ttc" id="aclassCommandBase_html"><div class="ttname"><a href="classCommandBase.html">CommandBase</a></div><div class="ttdef"><b>Definition:</b> CommandBase.h:10</div></div>
 <div class="ttc" id="aclassDriveThroughGate_html"><div class="ttname"><a href="classDriveThroughGate.html">DriveThroughGate</a></div><div class="ttdef"><b>Definition:</b> DriveThroughGate.h:7</div></div>
 <div class="ttc" id="astructcommand__t_html"><div class="ttname"><a href="structcommand__t.html">command_t</a></div><div class="ttdef"><b>Definition:</b> CommandBase.h:4</div></div>

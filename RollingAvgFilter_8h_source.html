@@ -77,14 +77,14 @@ $(function() {
 <div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="classRollingAvgFilter.html">    8</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> numPo<span class="keywordtype">int</span>s, <span class="keywordtype">int</span> numDims&gt; <span class="keyword">class </span><a class="code" href="classRollingAvgFilter.html">RollingAvgFilter</a></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classRollingAvgFilter.html#aff262254991bebd7b02a58fa1a6673e2">   17</a></span>&#160;    Eigen::Matrix&lt;double, numDims, 1&gt; <a class="code" href="classRollingAvgFilter.html#aff262254991bebd7b02a58fa1a6673e2">get</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classRollingAvgFilter.html#aff262254991bebd7b02a58fa1a6673e2">   17</a></span>&#160;    <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt;double, numDims, 1&gt;</a> <a class="code" href="classRollingAvgFilter.html#aff262254991bebd7b02a58fa1a6673e2">get</a>()<span class="keyword"> const</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        Eigen::Matrix&lt;double, numDims, 1&gt; ret = Eigen::Matrix&lt;double, numDims, 1&gt;::Zero();</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt;double, numDims, 1&gt;</a> ret = <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1DenseBase.html#a422ddeef58bedc7bddb1d4357688d761">Eigen::Matrix&lt;double, numDims, 1&gt;::Zero</a>();</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keywordflow">if</span> (size == 0)</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        {</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;            <span class="keywordflow">return</span> ret;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        }</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">int</span> numData = std::min(numPoints, size);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">int</span> numData = <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01491.html#gad48656de2f272a953455e1fff2532125">std::min</a>(numPoints, size);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; numData; i++)</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        {</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            ret += data.col(i);</div>
@@ -92,7 +92,7 @@ $(function() {
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keywordflow">return</span> ret / numData;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    }</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classRollingAvgFilter.html#ac1aed527b05ab97faf5f3e9827af861d">   38</a></span>&#160;    Eigen::Matrix&lt;double, numDims, 1&gt; <a class="code" href="classRollingAvgFilter.html#ac1aed527b05ab97faf5f3e9827af861d">get</a>(<span class="keyword">const</span> Eigen::Matrix&lt;double, numDims, 1&gt; &amp;val)</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classRollingAvgFilter.html#ac1aed527b05ab97faf5f3e9827af861d">   38</a></span>&#160;    <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt;double, numDims, 1&gt;</a> <a class="code" href="classRollingAvgFilter.html#ac1aed527b05ab97faf5f3e9827af861d">get</a>(<span class="keyword">const</span> <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt;double, numDims, 1&gt;</a> &amp;val)</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    {</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        data.col(index) = val;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        index = (index + 1) % numPoints;</div>
@@ -120,16 +120,19 @@ $(function() {
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordflow">return</span> numPoints;</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    }</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="classRollingAvgFilter.html#aaf7bdbf7f66a2cec926c0ac3213bc78a">   85</a></span>&#160;    Eigen::Matrix&lt;double, numDims, numPoints&gt; <a class="code" href="classRollingAvgFilter.html#aaf7bdbf7f66a2cec926c0ac3213bc78a">getData</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="classRollingAvgFilter.html#aaf7bdbf7f66a2cec926c0ac3213bc78a">   85</a></span>&#160;    <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt;double, numDims, numPoints&gt;</a> <a class="code" href="classRollingAvgFilter.html#aaf7bdbf7f66a2cec926c0ac3213bc78a">getData</a>()<span class="keyword"> const</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">    </span>{</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">return</span> data;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    }</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    Eigen::Matrix&lt;double, numDims, numPoints&gt; data; <span class="comment">// ring buffer, starts with garbage data</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt;double, numDims, numPoints&gt;</a> data; <span class="comment">// ring buffer, starts with garbage data</span></div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordtype">int</span> size = 0;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">int</span> index = 0;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;};</div>
+<div class="ttc" id="aa01491_html_gad48656de2f272a953455e1fff2532125"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01491.html#gad48656de2f272a953455e1fff2532125">std::min</a></div><div class="ttdeci">_GLIBCXX14_CONSTEXPR const _Tp &amp; min(const _Tp &amp;__a, const _Tp &amp;__b)</div></div>
+<div class="ttc" id="aclassEigen_1_1DenseBase_html_a422ddeef58bedc7bddb1d4357688d761"><div class="ttname"><a href="https://eigen.tuxfamily.org/dox/classEigen_1_1DenseBase.html#a422ddeef58bedc7bddb1d4357688d761">Eigen::DenseBase::Zero</a></div><div class="ttdeci">static const ConstantReturnType Zero()</div></div>
+<div class="ttc" id="aclassEigen_1_1Matrix_html"><div class="ttname"><a href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix</a></div></div>
 <div class="ttc" id="aclassRollingAvgFilter_html"><div class="ttname"><a href="classRollingAvgFilter.html">RollingAvgFilter</a></div><div class="ttdef"><b>Definition:</b> RollingAvgFilter.h:9</div></div>
 <div class="ttc" id="aclassRollingAvgFilter_html_a46d2d10e96cb688020da129de069ea89"><div class="ttname"><a href="classRollingAvgFilter.html#a46d2d10e96cb688020da129de069ea89">RollingAvgFilter::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdef"><b>Definition:</b> RollingAvgFilter.h:53</div></div>
 <div class="ttc" id="aclassRollingAvgFilter_html_a752613fea1fc86684ab5b940cb2506f5"><div class="ttname"><a href="classRollingAvgFilter.html#a752613fea1fc86684ab5b940cb2506f5">RollingAvgFilter::getSize</a></div><div class="ttdeci">int getSize() const</div><div class="ttdef"><b>Definition:</b> RollingAvgFilter.h:64</div></div>
