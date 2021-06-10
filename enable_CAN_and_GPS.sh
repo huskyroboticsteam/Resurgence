@@ -8,9 +8,9 @@ sudo modprobe can
 sudo modprobe can_raw
 sudo modprobe mttcan
 
-sudo ip link set can0 type can bitrate "$CAN_BITRATE" dbitrate "$CAN_DBITRATE" \
+sudo ip link set can0 type can bitrate "${CAN_BITRATE}" dbitrate "${CAN_DBITRATE}" \
      berr-reporting on fd on
-sudo ip link set can1 type can bitrate "$CAN_BITRATE" dbitrate "$CAN_DBITRATE" \
+sudo ip link set can1 type can bitrate "${CAN_BITRATE}" dbitrate "${CAN_DBITRATE}" \
      berr-reporting on fd on
 sudo ip link set up can0
 sudo ip link set up can1
@@ -23,8 +23,8 @@ fi
 
 sudo service gpsd start
 sudo service gpsd stop
-if [[ -e "$GPS_PATH" ]]; then
-  sudo gpsd -n "$GPS_PATH"
+if [[ -e "${GPS_PATH}" ]]; then
+  sudo gpsd -n "${GPS_PATH}"
 else
-  echo "No device connected at $GPS_PATH; gpsd not started!"
+  echo "No device connected at ${GPS_PATH}; gpsd not started!"
 fi
