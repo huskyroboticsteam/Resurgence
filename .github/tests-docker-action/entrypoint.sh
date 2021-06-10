@@ -1,5 +1,4 @@
 #!/bin/bash
-git submodule update --init --recursive
 source /opt/ros/foxy/setup.bash
 
 apt-get update
