@@ -106,10 +106,10 @@ double setCmdVel(double dtheta, double dx) {
 	}
 	right_pwm = (int16_t) (right_pwm / scale_down_factor);
 	left_pwm = (int16_t) (left_pwm / scale_down_factor);
-  if (scale_down_factor < 1.0) {
-    log(LOG_WARN, "Scaling down cmd_vel by %f to %f %f\n",
-        scale_down_factor, dtheta / scale_down_factor, dx / scale_down_factor);
-  }
+	if (scale_down_factor < 1.0) {
+		log(LOG_WARN, "Scaling down cmd_vel by %f to %f %f\n",
+				scale_down_factor, dtheta / scale_down_factor, dx / scale_down_factor);
+	}
 
 	setCmdVelToIntegrate(dtheta / scale_down_factor, dx / scale_down_factor);
 
