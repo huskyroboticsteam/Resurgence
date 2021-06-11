@@ -191,9 +191,9 @@ int rover_loop(int argc, char **argv)
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover(MOTOR_UNIT_MODE_PWM, true);
     CANPacket packet;
-	// Target locations for autonomous navigation
-	// Eventually this will be set by communication from the base station
-	std::queue<URCLeg> urc_legs = parseGPSLegs("vurc_formatted.txt");
+    // Target locations for autonomous navigation
+    // Eventually this will be set by communication from the base station
+    std::queue<URCLeg> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
     Autonomous autonomous(urc_legs, CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp_rover_start;

@@ -32,5 +32,5 @@ bool DriveToGate::isDone()
 
 void DriveToGate::update(const point_t &p)
 {
-    if (p(2) != 0) this->post = p;
+		if (p(2) != 0) this->post = p;
 }
