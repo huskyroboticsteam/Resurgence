@@ -156,7 +156,6 @@ add_executable(tests
   # Camera tests
   camera/CameraParamsTests.cpp
   # Autonomy tests
-  mapping/ValidatorTest.cpp
   ../tests/kinematics/DiffDriveKinematicsTest.cpp
   ../tests/filters/RollingAvgFilterTest.cpp
   ../tests/filters/EKFTest.cpp
@@ -167,7 +166,6 @@ add_executable(tests
 
 target_link_libraries(tests
   ${rover_libs}
-  lidar_slam
   stub_can_interface
   ${real_world_libs}
   )
@@ -184,22 +182,10 @@ add_library(lidar_base
     lidar/URGLidar.cpp)
 target_include_directories(lidar_base SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 
-add_library(lidar_slam
-        mapping/EKFSlam/EKFSlam.cpp
-        mapping/ObjectValidator.cpp
-        mapping/EKFSlam/tools.cpp
-        )
-
 add_executable(lidar_vis
     lidar/MainVis.cpp)
 target_link_libraries(lidar_vis lidar_base)
 target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
-
-add_executable(lidarOnlyTest
-        mapping/EKFSlam/lidarOnlyTest.cpp
-        )
-target_link_libraries(lidarOnlyTest lidar_base lidar_slam)
-target_link_libraries(lidarOnlyTest liburg_c.a ${OpenCV_LIBS})
 
 add_executable(gpsd_test
   gps/gpsd_test.cpp)
