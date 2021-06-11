@@ -90,7 +90,7 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 {
 	pose_t diff = p1 - p2;
 	// angles are modular in nature, so wrap at 2pi radians
-	double thetaDiff = std::fmod(abs(diff(2)), 2 * PI);
+	double thetaDiff = std::fmod(fabs(diff(2)), 2 * PI);
 	// change domain from [0, 2pi) to (-pi, pi]
 	if (thetaDiff > PI) {
 		thetaDiff -= 2 * PI;
@@ -227,7 +227,7 @@ double getRelativeAngle(double currAngle, double targetAngle)
 {
 	double range = 2 * PI;
 	double dist = std::fmod(targetAngle - currAngle, range);
-	double absDist = abs(dist);
+	double absDist = fabs(dist);
 
 	int sign = dist > 0 ? 1 : (dist < 0 ? -1 : 0);
 
@@ -242,7 +242,7 @@ double Autonomous::getLinearVel(const pose_t &drive_target, const pose_t &pose, 
 		// (given our relatively low control frequency of 10 Hz)
 		speed = DRIVE_SPEED / 3;
 	}
-	if (abs(thetaErr) > PI / 4 || control_state == ControlState::NEAR_TARGET_POSE) {
+	if (fabs(thetaErr) > PI / 4 || control_state == ControlState::NEAR_TARGET_POSE) {
 		// don't drive forward if pointing away
 		// or if we're already very close to the target
 		speed = 0;
@@ -506,8 +506,8 @@ void Autonomous::autonomyIter()
 		}
 
 		log(LOG_INFO, "Requesting vel %f %f\n", cmd.thetaVel, cmd.xVel);
-		poseEstimator.predict(cmd.thetaVel, cmd.xVel);
-		setCmdVel(cmd.thetaVel, cmd.xVel);
+		double scale_factor = setCmdVel(cmd.thetaVel, cmd.xVel);
+		poseEstimator.predict(scale_factor * cmd.thetaVel, scale_factor * cmd.xVel);
 	}
 #endif
 #endif
@@ -700,8 +700,8 @@ void Autonomous::autonomyIter()
 
   if (!Globals::E_STOP && Globals::AUTONOMOUS)
   {
-    setCmdVel(thetaVel, driveSpeed);
-    poseEstimator.predict(thetaVel, driveSpeed);
+    double scale_factor = setCmdVel(thetaVel, driveSpeed);
+    poseEstimator.predict(scale_factor * thetaVel, scale_factor * driveSpeed);
   }
 }
 

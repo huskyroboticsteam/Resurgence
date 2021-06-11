@@ -45,7 +45,7 @@ transform_t getOdomAt(const struct timeval &time) {
 	double delta_theta = odom_dtheta_ * elapsed;
 	double rel_x, rel_y, rel_th;
 	rel_th = odom_dtheta_ * elapsed;
-	if (abs(odom_dtheta_) < 0.000001) {
+	if (fabs(odom_dtheta_) < 0.000001) {
 		rel_x = odom_dx_ * elapsed;
 		rel_y = 0.0;
 	} else {

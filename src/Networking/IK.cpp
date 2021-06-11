@@ -101,7 +101,7 @@ bool ParseIKPacket(json &message) {
     double cosElbowAngle = (crossSection*crossSection
       - ELBOW_LENGTH*ELBOW_LENGTH - SHOULDER_LENGTH*SHOULDER_LENGTH)
       /(-2*SHOULDER_LENGTH*ELBOW_LENGTH);
-    if (abs(cosElbowAngle) >= 1.0)
+    if (fabs(cosElbowAngle) >= 1.0)
     {
       return sendError("Infeasible IK target");
     }

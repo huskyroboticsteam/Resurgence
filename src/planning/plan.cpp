@@ -43,7 +43,7 @@ struct Node
     {
       acc_steps = p->acc_steps + 1;
       bool moving_forward = action(1) > 0.0;
-      double step_cost = moving_forward ? action(1) : RADIAN_COST * abs(action(0));
+      double step_cost = moving_forward ? action(1) : RADIAN_COST * fabs(action(0));
       acc_cost = p->acc_cost + step_cost;
       if (moving_forward)
       {
@@ -191,7 +191,7 @@ double planCostFromIndex(plan_t &plan, int idx) {
   double cost = 0;
   for (int i = idx; i < plan.rows(); i++) {
     action_t action = plan.row(i);
-    cost += abs(action(1)) + RADIAN_COST * abs(action(0));
+    cost += fabs(action(1)) + RADIAN_COST * fabs(action(0));
   }
   return cost;
 }

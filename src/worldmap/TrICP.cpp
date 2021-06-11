@@ -138,7 +138,7 @@ bool TrICP::isDone(int numIter, double mse, double oldMSE) const
 	{
 		return true;
 	}
-	double relErrChange = abs(mse - oldMSE) / mse;
+	double relErrChange = fabs(mse - oldMSE) / mse;
 	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
 }
 

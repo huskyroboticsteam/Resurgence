@@ -29,7 +29,7 @@ pose_t DiffDriveKinematics::getLocalPoseUpdate(const wheelvel_t &wheelVel, doubl
 
 	double dx, dy;
 	// if dTheta is close to 0 use the taylor approximations
-	if (abs(dTheta) <= 1e-5)
+	if (fabs(dTheta) <= 1e-5)
 	{
 		dx = forward * (1.0 - dTheta * dTheta / 6.0);
 		dy = forward * 0.5 * dTheta;

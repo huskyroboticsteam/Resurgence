@@ -37,11 +37,7 @@ command_t DriveToGateNoCompass::getOutput()
 	{
 		calibrationPoints.clear();
 		double err = calculateHeadingErr();
-		double maxthvel = 0.5;
 		double targthvel = err * angleKP;
-		if (abs(targthvel) > maxthvel) {
-			targthvel = (targthvel > 0) ? maxthvel : -maxthvel;
-		}
 		return {.thetaVel = targthvel, .xVel = 0};
 	}
 
@@ -213,7 +209,7 @@ void DriveToGateNoCompass::transitionStates()
 	{
 		double err = calculateHeadingErr();
 		log(LOG_INFO, "Heading Err: %.2f\n", err);
-		if (abs(err) <= M_PI / 16)
+		if (fabs(err) <= M_PI / 16)
 		{
 			state = DriveForward;
 			checkpoint();

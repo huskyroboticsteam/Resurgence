@@ -17,11 +17,6 @@ command_t DriveToGate::getOutput()
 		double angle = atan2(post.y(), post.x());
 		double vel = (post.topRows<2>().norm() <= 2 * radius) ? slowVel : fastVel;
 		double targthvel = angle * thetaKP;
-		double maxthvel = 0.5;
-        std::cout << "Requesting vel " << vel << std::endl;
-		if (abs(targthvel) > maxthvel) {
-			targthvel = (targthvel > 0) ? maxthvel : -maxthvel;
-		}
 		return {targthvel, vel};
 	}
 	else
