@@ -43,3 +43,7 @@ private:
 
 long getElapsedUsecs(const struct timeval &tp_start, const struct timeval &tp_end);
 long getElapsedUsecs(const struct timeval &tp_start);
+
+constexpr double MAX_THETA_VEL = 0.5;
+
+double clipThetaVel(double requestedThetaVel);
