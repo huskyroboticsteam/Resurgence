@@ -7,7 +7,7 @@
 #include "Globals.h"
 #include "log.h"
 #include "simulator/constants.h"
-#include "simulator/world_interface.h"
+#include "world_interface/world_interface.h"
 
 #include "commands/nogps/DriveToGate.h"
 #include "commands/nogps/DriveThroughGate.h"

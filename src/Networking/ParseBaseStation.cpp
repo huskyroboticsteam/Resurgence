@@ -6,7 +6,7 @@
 #include "ParseBaseStation.h"
 #include <cmath>
 #include <tgmath.h>
-#include "../simulator/world_interface.h"
+#include "../world_interface/world_interface.h"
 #include "../Globals.h"
 #include "CANUtils.h"
 

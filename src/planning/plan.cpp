@@ -10,7 +10,6 @@
 #include "../Util.h"
 #include "../simulator/constants.h"
 #include "../simulator/graphics.h"
-#include "../simulator/world_interface.h"
 
 using namespace NavSim;
 

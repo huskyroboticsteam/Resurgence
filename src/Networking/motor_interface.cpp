@@ -13,7 +13,7 @@ extern "C"
 }
 #include "../Globals.h"
 
-#include "../simulator/world_interface.h"
+#include "../world_interface/world_interface.h"
 #include "../simulator/utils.h"
 #include "ParseBaseStation.h"
 #include "motor_interface.h"

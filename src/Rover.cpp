@@ -20,7 +20,7 @@
 #include "Networking/ParseBaseStation.h"
 #include "Networking/motor_interface.h"
 #include "Autonomous.h"
-#include "simulator/world_interface.h"
+#include "world_interface/world_interface.h"
 
 extern "C"
 {
