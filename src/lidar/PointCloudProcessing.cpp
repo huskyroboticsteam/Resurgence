@@ -86,8 +86,8 @@ std::vector<std::vector<PointXY>> clusterOrderedPoints(std::vector<PointXY> &poi
 {
 	std::vector<std::vector<PointXY>> clusters;
 	std::vector<PointXY> lastCluster;
-	PointXY lastPoint;
 	for (int i = 1; i < points.size(); i++)
+	PointXY lastPoint = points[0];
 	{
 		float diff = distance(points[i].x, points[i].y, points[i - 1].x, points[i - 1].y);
 		if (diff < sep_threshold)

@@ -32,7 +32,7 @@ std::thread landmark_thread;
 
 void detectLandmarksLoop(){
 	cv::Mat frame;
-	uint32_t last_frame_no;
+	uint32_t last_frame_no = 0;
 	while(true){
 		if (ar_cam.hasNext(last_frame_no)) {
 			ar_cam.next(frame, last_frame_no);
