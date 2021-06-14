@@ -6,11 +6,12 @@
 #include "Eigen/Dense"
 #include "Eigen/LU"
 
-DriveToGateNoCompass::DriveToGateNoCompass(double driveDist, double angleKP, double vel, double initial_heading)
-	: calibrateDriveDist(driveDist), currOdom(toTransform({0,0,0})), state(State::Done),
-		calibrationPoints(),
-		targetPoint({0,0,0}), angleKP(angleKP), vel(vel), currPose({0,0,0}),
-		checkpointHeading(initial_heading)
+DriveToGateNoCompass::DriveToGateNoCompass(double driveDist, double angleKP, double vel,
+										   double initial_heading)
+	: state(State::Done), checkpointHeading(initial_heading), currOdom(toTransform({0, 0, 0})),
+	  currPose({0, 0, 0}), calibrationPoints(), calibrateDriveDist(driveDist),
+	  targetPoint({0, 0, 0}), angleKP(angleKP), vel(vel)
+
 {
 }
 void DriveToGateNoCompass::reset(transform_t &odom, point_t &target)
