@@ -22,4 +22,5 @@ CommandLineOptions ParseCommandLineOptions(int argc, char **argv)
     {
         ParseCommandLineOption(result, argv[i]);
     }
+	return result;
 }
