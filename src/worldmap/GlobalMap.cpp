@@ -28,7 +28,7 @@ void GlobalMap::addPoints(const transform_t &robotTrf, const points_t &toAdd, do
 	}
 	transform_t trfInv = robotTrf.inverse();
 	points_t transformed;
-	for (int i = 0; i < toAdd.size(); i += scanStride)
+	for (size_t i = 0; i < toAdd.size(); i += scanStride)
 	{
 		const point_t &point = toAdd[i];
 		if (point(2) != 0)

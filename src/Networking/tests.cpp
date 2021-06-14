@@ -142,16 +142,18 @@ TEST_CASE("Incremental PID", "[BaseStation]")
     p = popCANPacket();
     REQUIRE(GetDeviceSerialNumber(&p) == 1);
     REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PID_POS_TGT_SET));
-    REQUIRE(GetPIDTargetFromPacket(&p) == start_angle + expected_increment);
+	REQUIRE(GetPIDTargetFromPacket(&p) ==
+			static_cast<unsigned>(start_angle + expected_increment));
 
-    incrementArm();
+	incrementArm();
     REQUIRE(numCANPackets() == 1);
     p = popCANPacket();
     REQUIRE(GetDeviceSerialNumber(&p) == 1);
     REQUIRE(PacketIsOfID(&p, ID_MOTOR_UNIT_PID_POS_TGT_SET));
-    REQUIRE(GetPIDTargetFromPacket(&p) == start_angle + 2 * expected_increment);
+	REQUIRE(GetPIDTargetFromPacket(&p) ==
+			static_cast<unsigned>(start_angle + 2 * expected_increment));
 
-    // Artificially trigger the timeout
+	// Artificially trigger the timeout
     Globals::status_data["arm_base"]["most_recent_command"] = 0;
     incrementArm();
     REQUIRE(numCANPackets() == 0);

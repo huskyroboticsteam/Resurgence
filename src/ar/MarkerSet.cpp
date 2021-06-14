@@ -43,7 +43,7 @@ void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physic
 	std::vector<MarkerPattern> markerVec;
 	cv::Mat bytesList;
 	dict->bytesList.copyTo(bytesList);
-	for (size_t i = 0; i < bytesList.rows; i++)
+	for (int i = 0; i < bytesList.rows; i++)
 	{
 		cv::Mat row = bytesList.row(i);
 		cv::Mat markerBits = ar_dict::getBitsFromByteList(row, data_region_size);
@@ -101,7 +101,7 @@ bool MarkerSet::isIDMapped(int id) const
 
 bool MarkerSet::getMarkerByID(int id, MarkerPattern &out) const
 {
-	if (id < 0 || id > markers.size())
+	if (id < 0 || static_cast<unsigned>(id) > markers.size())
 	{
 		return false;
 	}

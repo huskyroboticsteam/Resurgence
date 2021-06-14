@@ -53,7 +53,7 @@ std::vector<std::vector<PointXY>> clusterPoints(std::vector<PointXY> &pts, float
 	{
 		int nearest_cluster = -1;
 		float min_dist = std::numeric_limits<float>::infinity();
-		for (int i = 0; i < clusters.size(); i++)
+		for (size_t i = 0; i < clusters.size(); i++)
 		{
 			for (PointXY xyPoint : clusters[i])
 			{
@@ -86,8 +86,8 @@ std::vector<std::vector<PointXY>> clusterOrderedPoints(std::vector<PointXY> &poi
 {
 	std::vector<std::vector<PointXY>> clusters;
 	std::vector<PointXY> lastCluster;
-	for (int i = 1; i < points.size(); i++)
 	PointXY lastPoint = points[0];
+	for (size_t i = 1; i < points.size(); i++)
 	{
 		float diff = distance(points[i].x, points[i].y, points[i - 1].x, points[i - 1].y);
 		if (diff < sep_threshold)
@@ -175,7 +175,7 @@ std::vector<PointXY> convexHull(std::vector<PointXY> &cluster)
 
 	std::vector<PointXY> top_hull;
 	std::vector<PointXY> bot_hull;
-	for (int i = 0; i < cluster.size(); i++)
+	for (size_t i = 0; i < cluster.size(); i++)
 	{
 		while (top_hull.size() >= 2 &&
 			   orientation(top_hull[top_hull.size() - 2], top_hull[top_hull.size() - 1],

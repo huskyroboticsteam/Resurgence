@@ -24,7 +24,7 @@ TEST_CASE("QuadTree - AddPoints", "[QuadTree]")
 
 	REQUIRE(tree.empty());
 
-	for (int i = 0; i < 50; i++)
+	for (size_t i = 0; i < 50; i++)
 	{
 		const point_t &point = randPoint(100);
 		REQUIRE(tree.getSize() == i);
@@ -42,7 +42,7 @@ TEST_CASE("QuadTree - RemovePoints", "[QuadTree]")
 
 	points_t points;
 
-	for (int i = 0; i < 50; i++)
+	for (size_t i = 0; i < 50; i++)
 	{
 		const point_t &point = randPoint(100);
 		points.push_back(point);
@@ -51,7 +51,7 @@ TEST_CASE("QuadTree - RemovePoints", "[QuadTree]")
 		REQUIRE(tree.getSize() == i + 1);
 	}
 
-	int size = tree.getSize();
+	size_t size = tree.getSize();
 	for (const point_t &point : points)
 	{
 		REQUIRE(tree.getSize() == size);
