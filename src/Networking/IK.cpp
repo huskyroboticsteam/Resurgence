@@ -74,7 +74,7 @@ bool ParseIKPacket(json &message) {
       y = target[1];
       z = target[2];
     }
-    catch (json::type_error)
+    catch (json::type_error&)
     {
       return sendError("Could not parse wrist_base_target");
     }

@@ -156,7 +156,7 @@ bool ParseMotorPacket(json &message)
   {
     motor = message["motor"];
   }
-  catch (json::type_error)
+  catch (json::type_error&)
   {
     return sendError("No motor specified");
   }

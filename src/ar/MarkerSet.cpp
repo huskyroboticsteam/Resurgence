@@ -116,7 +116,7 @@ bool MarkerSet::getMarkerByMappedID(int mapped_id, MarkerPattern &out) const
 		out = markers[this->reverse_mappings.at(mapped_id)];
 		return true;
 	}
-	catch (std::out_of_range)
+	catch (std::out_of_range&)
 	{
 		return false;
 	}
