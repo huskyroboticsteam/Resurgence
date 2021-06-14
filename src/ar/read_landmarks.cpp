@@ -13,7 +13,6 @@ namespace AR
 {
 constexpr size_t NUM_LANDMARKS = 11;
 const point_t ZERO_POINT = {0.0, 0.0, 0.0};
-constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 static points_t make_zero_landmarks(){
 	points_t z;
 	for(int i = 0; i < NUM_LANDMARKS; i++){
