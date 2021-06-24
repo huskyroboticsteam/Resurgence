@@ -14,25 +14,33 @@
 #include "../camera/CameraParams.h"
 #include "Detector.h"
 
+constexpr int NUM_SKIP = 5;
+
 const std::string WINDOW_NAME = "Image";
 
 const std::string keys =
 	"{h help             |        | Show this help message.}"
 	"{cam_config c       | <none> | The path to a camera configuration file "
 	"defining the camera you would like to use.}"
-	"{cam_override co    | -1     | If present, should be the ID of a camera to open "
+	"{file_override fo   |        | If present, should be the name of a video file to open "
 	"rather than the one defined in the configuration file.}"
+	"{cam_override co    | -1     | If present, should be the ID of a camera to open "
+	"rather than the one defined in the configuration file. NOTE: Will take precedence over "
+	"file_override if both are present.}"
 	"{marker_set m       | urc    | The set of markers to look for. Currently "
 	"only \"urc\" and \"circ\" are supported.}"
 	"{frame_by_frame f   |        | If present, program will go frame-by-frame "
 	"instead of capturing continuously.}";
 
-cam::Camera cap;
+// TODO: come up with a better solution for examining video files
+//cam::Camera cap;
+cv::VideoCapture cap;
 cam::CameraParams PARAMS;
 std::shared_ptr<AR::MarkerSet> MARKER_SET;
 
 std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec);
 std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing);
+static inline void noValue(std::string option);
 
 int main(int argc, char *argv[])
 {
@@ -50,7 +58,7 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 
-	if (!parser.has("c"))
+	if (!parser.has("c") || parser.get<std::string>("c").empty())
 	{
 		std::cerr << "Error: camera configuration file is required." << std::endl;
 		parser.printMessage();
@@ -68,6 +76,9 @@ int main(int argc, char *argv[])
 	{
 		MARKER_SET = AR::Markers::URC_MARKERS();
 	}
+	else if (marker_set.empty()){
+		noValue("marker_set");
+	}
 	else
 	{
 		std::cerr << "Unsupported marker set: \"" << marker_set << "\"" << std::endl;
@@ -75,6 +86,8 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	int cam_id = parser.get<int>("co", -1);
+	std::string cam_file = parser.get<std::string>("fo");
 	cv::FileStorage cam_config(parser.get<std::string>("c"), cv::FileStorage::READ);
 	if (!cam_config.isOpened())
 	{
@@ -91,28 +104,38 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 	cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
+	// read filename or camera ID, and open camera.
+	if (!cam_config[cam::KEY_FILENAME].empty() && !parser.has("fo"))
+	{
+		cam_file = (std::string)cam_config[cam::KEY_FILENAME];
+	}
+	else if (!cam_config[cam::KEY_CAMERA_ID].empty() && !parser.has("co"))
+	{
+		cam_id = (int)cam_config[cam::KEY_CAMERA_ID];
+	}
+	else if(!parser.has("fo") && !parser.has("co"))
+	{
+		std::cerr << "Error: no file or camera_id was provided in the configuration file or "
+					 "on the command line!"
+				  << std::endl;
+		std::cerr << "Usage:" << std::endl;
+		parser.printMessage();
+		return EXIT_FAILURE;
+	}
 	cam_config.release();
 
 	cv::Mat frame;
 	uint32_t fnum = 0;
 
 	std::cout << "Opening camera..." << std::endl;
-	int cam_override_id = parser.get<int>("co");
 	bool open_success = false;
-	if (cam_override_id > -1)
+	if (cam_id > -1)
 	{
-		open_success = cap.open(cam_override_id, PARAMS);
+		open_success = cap.open(cam_id);
 	}
-	else
+	else if(!cam_file.empty())
 	{
-		try
-		{
-			open_success = cap.openFromConfigFile(parser.get<std::string>("c"));
-		}
-		catch (cam::invalid_camera_config& c)
-		{
-			std::cerr << c.what() << std::endl;
-		}
+		open_success = cap.open(cam_file);
 	}
 
 	if (!open_success)
@@ -139,11 +162,11 @@ int main(int argc, char *argv[])
 	while (loop)
 	{
 		// Grabs frame
-		if (!cap.hasNext(fnum))
+		if (!cap.grab())
 		{
 			continue;
 		}
-		cap.next(frame, fnum);
+		cap.retrieve(frame);
 		if (frame.empty())
 		{
 			std::cerr << "ERROR! Blank frame grabbed" << std::endl;
@@ -182,14 +205,15 @@ int main(int argc, char *argv[])
 			std::vector<cv::Point2f> grid = projectGrid(imageSize, grid_spacing);
 			for (cv::Point2f pt : grid)
 			{
-				cv::Point2f newPt(pt.x * imageSize.width, pt.y * imageSize.height);
+				cv::Point2f newPt(pt.x * (float)imageSize.width,
+								  pt.y * (float)imageSize.height);
 				cv::drawMarker(frame, newPt, cv::Scalar(255, 0, 0), cv::MARKER_CROSS, 10, 1);
 			}
 		}
 
 		cv::imshow(WINDOW_NAME, frame);
 
-		int delay = (frame_by_frame && count % 10 == 0) ? 0 : 1;
+		int delay = (frame_by_frame && count % NUM_SKIP == 0) ? 0 : 1;
 		switch (cv::waitKey(delay))
 		{
 		case 'q':
@@ -206,6 +230,7 @@ int main(int argc, char *argv[])
 		default:
 			break;
 		}
+		count++;
 	}
 
 	return 0;
@@ -232,23 +257,32 @@ std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec)
 
 std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
 {
-	cv::Point2f center(imageSize.width / 2, imageSize.height / 2);
+	cv::Point2f center((float)imageSize.width / 2.0f, (float)imageSize.height / 2.0f);
 	std::vector<cv::Point2f> grid_points;
 	std::vector<cv::Point2f> projected_points;
+	float xf,yf;
 	for (int x = 0; x < imageSize.width / 2; x += spacing)
 	{
 		for (int y = 0; y < imageSize.height / 2; y += spacing)
 		{
-			grid_points.push_back(cv::Point2f(x, y) + center);
+			xf = (float) x;
+			yf = (float) y;
+			grid_points.push_back(cv::Point2f(xf, yf) + center);
 			if (x != 0 || y != 0)
 			{
-				grid_points.push_back(cv::Point2f(-x, -y) + center);
-				grid_points.push_back(cv::Point2f(-x, y) + center);
-				grid_points.push_back(cv::Point2f(x, -y) + center);
+				grid_points.push_back(cv::Point2f(-xf, -yf) + center);
+				grid_points.push_back(cv::Point2f(-xf, yf) + center);
+				grid_points.push_back(cv::Point2f(xf, -yf) + center);
 			}
 		}
 	}
 	cv::undistortPoints(grid_points, projected_points, PARAMS.getCameraMatrix(),
 						PARAMS.getDistCoeff());
 	return projected_points;
+}
+
+static inline void noValue(std::string option){
+	std::cerr << "Error: No value given for " << option << " option!" << std::endl
+			  << "Please remember to use '=' between flags and values." << std::endl;
+	exit(EXIT_FAILURE);
 }
