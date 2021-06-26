@@ -3,6 +3,7 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include <queue>
 #include <future>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -46,8 +47,8 @@ constexpr std::array<const char *, 7> NAV_STATE_NAMES ({
 class Autonomous : rclcpp::Node
 {
 public:
-	explicit Autonomous(const URCLeg &urc_target, double controlHz);
-	Autonomous(const URCLeg &urc_target, double controlHz, const pose_t &startPose);
+	explicit Autonomous(const std::queue<URCLeg> &urc_targets, double controlHz);
+	Autonomous(const std::queue<URCLeg> &urc_targets, double controlHz, const pose_t &startPose);
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	// Gets the target's coordinate
@@ -55,7 +56,7 @@ public:
 	void autonomyIter();
 
 private:
-	URCLeg urc_target;
+	std::queue<URCLeg> urc_targets;
 	pose_t search_target;
 	// Gate targets are {NAN, NAN, NAN} if unset and {INF, INF, INF} if reached
 	// gate_targets.second(2) is NAN if targets have not been refined with more accurate landmark measurements
@@ -92,6 +93,7 @@ private:
   void updateLandmarkInformation(const transform_t &invTransform);
   void computeGateTargets(const pose_t &pose);
   void updateSearchTarget();
+	void endCurrentLeg();
 
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;

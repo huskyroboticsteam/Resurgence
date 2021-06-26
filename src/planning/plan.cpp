@@ -6,6 +6,7 @@
 #include <queue>
 #include <set>
 
+#include "../log.h"
 #include "../Util.h"
 #include "../simulator/constants.h"
 #include "../simulator/graphics.h"
@@ -110,7 +111,7 @@ bool is_valid(const Node *n, const collides_predicate_t &collides)
 
 plan_t getPlan(const collides_predicate_t &collides, const point_t &goal, double goal_radius) {
 	util::ScopedTimer timer;
-	std::cout << "Planning... " << std::flush;
+	log(LOG_DEBUG, "Planning... ");
 	action_t action = action_t::Zero();
 	std::vector<Node*> allocated_nodes;
 	Node *start = new Node(nullptr, action, goal);
@@ -166,8 +167,8 @@ plan_t getPlan(const collides_predicate_t &collides, const point_t &goal, double
 	std::chrono::milliseconds endTime = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::system_clock::now().time_since_epoch());
 
-	std::cout << "finished in " << counter << " iterations (";
-	std::cout << allocated_nodes.size() << " visited nodes), Time: " << (timer.elapsedTime().count() / 1000) << "ms\n";
+	log(LOG_DEBUG, "finished in %d iterations (%d visited nodes), Time: %dms\n",
+            counter, allocated_nodes.size(), timer.elapsedTime().count() / 1000);
 	for (Node *p : allocated_nodes)
 	{
 		free(p);

@@ -1,0 +1,12 @@
+Example simulator legs close to UW GPS coordinates
+This file is properly formatted and will be parsed correctly
+
+Leg 1:
+0 -1 47.653116 -122.305619
+
+Leg 2:
+1 2 47.653125 -122.305486
+
+3 4 47.653325 -122.325486 (Leg 3)
+
+5 -1 47.653525 -123.305486

@@ -20,6 +20,9 @@ extern "C"
 
 #include <iostream>
 
+const double DEFAULT_X_VEL = 0.5; // m/s
+const double DEFAULT_TH_VEL = 1.0; // rad/s
+
 using nlohmann::json;
 
 bool ParseDrivePacket(json &message);
@@ -74,9 +77,18 @@ bool ParseBaseStationPacket(char const* buffer)
   else if (type == "motor") {
     success = ParseMotorPacket(parsed_message);
   }
+  else if (type == "autonomous") {
+    Globals::AUTONOMOUS = !Globals::AUTONOMOUS;
+    success = setCmdVel(0,0);
+    log(LOG_INFO, "Set autonomous to %d\n", Globals::AUTONOMOUS);
+  } else if (type != "estop") {
+    return sendError("Unrecognized message type '" +  type + "'");
+  }
 
   if (success)
   {
+    //For some reason sending these packets sometimes hangs. Maybe the string is too long?
+    //json response = {{"status", "ok"}, {"data", Globals::status_data}};
     json response = {{"status", "ok"}};
     sendBaseStationPacket(response.dump());
   }
@@ -130,7 +142,5 @@ bool ParseDrivePacket(json &message) {
   {
     return sendError("Drive targets not within bounds +/- 1.0");
   }
-  double MAX_X_VEL = 0.25; // m/s
-  double MAX_TH_VEL = 0.5; // rad/s
-  return setCmdVel(lr * MAX_TH_VEL, fb * MAX_X_VEL);
+  return setCmdVel(lr * DEFAULT_TH_VEL, fb * DEFAULT_X_VEL);
 }

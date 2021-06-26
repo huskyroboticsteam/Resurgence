@@ -4,10 +4,10 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - uses: ./tests-docker-action
+      with:
+        submodules: true
+    - uses: ./.github/tests-docker-action

@@ -20,7 +20,6 @@ extern "C"
     #include "HindsightCAN/CANPacket.h"
 }
 
-const double CONTROL_HZ = 10.0;
 const uint8_t motor_group_id = DEVICE_GROUP_MOTOR_CONTROL;
 
 void cleanup(int signum) {
