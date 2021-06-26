@@ -56,4 +56,12 @@ std::vector<Tag> Detector::detectTags(const cv::Mat &input,
 	return tags;
 }
 
+cv::aruco::DetectorParameters Detector::getDetectorParams(){
+	return *detector_params_;
+}
+
+void Detector::setDetectorParams(cv::aruco::DetectorParameters params){
+	*detector_params_ = params;
+}
+
 } // namespace AR

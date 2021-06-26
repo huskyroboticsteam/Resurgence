@@ -31,6 +31,8 @@ public:
 	std::vector<Tag> detectTags(const cv::Mat &input,
 								std::vector<std::vector<cv::Point2f>> &rejected_points);
 	std::vector<Tag> detectTags(const cv::Mat &input);
+	cv::aruco::DetectorParameters getDetectorParams();
+	void setDetectorParams(cv::aruco::DetectorParameters params);
 };
 /** @} */
 
