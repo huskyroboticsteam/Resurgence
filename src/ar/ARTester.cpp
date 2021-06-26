@@ -144,6 +144,9 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
 	cv::namedWindow(WINDOW_NAME);
@@ -155,6 +158,7 @@ int main(int argc, char *argv[])
 
 	bool show_grid = false;
 	int grid_spacing = 20;
+	bool show_rejected = false;
 
 	bool loop = true;
 	cv::Size imageSize = PARAMS.getImageSize();
@@ -175,7 +179,8 @@ int main(int argc, char *argv[])
 
 		// Passes frame to the detector class.
 		// Tags will be located and returned.
-		std::vector<AR::Tag> tags = detector.detectTags(frame);
+		std::vector<std::vector<cv::Point2f>> rejected;
+		std::vector<AR::Tag> tags = detector.detectTags(frame, rejected);
 
 		// Draws an outline around the tag and a cross in the center
 		// Projects a cube onto the tag to debug TVec and RVec
@@ -197,6 +202,16 @@ int main(int argc, char *argv[])
 				cv::line(frame, cubePoints[i], cubePoints[i + 4], cv::Scalar(0, 255, 0), 3);
 				cv::line(frame, cubePoints[i + 4], cubePoints[next + 4], cv::Scalar(255, 0, 0),
 						 3);
+			}
+		}
+
+		if(show_rejected){
+			for(const auto& points : rejected){
+				for(size_t i = 0; i < points.size() - 1; i++){
+					const auto& p1 = points[i];
+					const auto& p2 = points[i+1];
+					cv::line(frame, p1, p2, cv::Scalar(255, 0, 255));
+				}
 			}
 		}
 
@@ -227,6 +242,13 @@ int main(int argc, char *argv[])
 			show_grid = false;
 			std::cout << "Grid off" << std::endl;
 			break;
+		case 'r':
+			show_rejected = true;
+			std::cout << "Rejected points on" << std::endl;
+			break;
+		case 'l':
+			show_rejected = false;
+			std::cout << "Rejected points off" << std::endl;
 		default:
 			break;
 		}

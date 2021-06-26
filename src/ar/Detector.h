@@ -28,6 +28,8 @@ public:
 	Detector(std::shared_ptr<MarkerSet> marker_set, cam::CameraParams camera_params,
 			 cv::Ptr<cv::aruco::DetectorParameters> detector_params =
 				 cv::aruco::DetectorParameters::create());
+	std::vector<Tag> detectTags(const cv::Mat &input,
+								std::vector<std::vector<cv::Point2f>> &rejected_points);
 	std::vector<Tag> detectTags(const cv::Mat &input);
 };
 /** @} */

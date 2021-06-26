@@ -21,14 +21,22 @@ Detector::Detector(std::shared_ptr<MarkerSet> marker_set,
 	assert(marker_set != nullptr);
 	assert(detector_params != nullptr);
 	this->detector_params_->markerBorderBits = marker_set->getBorderSize();
+	this->detector_params_->cornerRefinementMethod = cv::aruco::CORNER_REFINE_SUBPIX;
 }
 
-std::vector<Tag> Detector::detectTags(const cv::Mat &input)
-{
+std::vector<Tag> Detector::detectTags(const cv::Mat &input){
+	std::vector<std::vector<cv::Point2f>> junk;
+	return detectTags(input, junk);
+}
+
+std::vector<Tag> Detector::detectTags(const cv::Mat &input,
+									  std::vector<std::vector<cv::Point2f>> &rejectedPoints){
 	std::vector<std::vector<cv::Point2f>> corners;
 	std::vector<int> ids;
 	cv::aruco::detectMarkers(input, this->marker_set_->getDict(), corners, ids,
-							 this->detector_params_, cv::noArray(),this->camera_params_.getCameraMatrix(), 
+							 this->detector_params_,
+							 rejectedPoints,
+							 this->camera_params_.getCameraMatrix(),
 							 this->camera_params_.getDistCoeff());
 	int id_count = ids.size();
 
