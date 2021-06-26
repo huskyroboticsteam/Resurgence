@@ -28,7 +28,8 @@ std::vector<Tag> Detector::detectTags(const cv::Mat &input)
 	std::vector<std::vector<cv::Point2f>> corners;
 	std::vector<int> ids;
 	cv::aruco::detectMarkers(input, this->marker_set_->getDict(), corners, ids,
-							 this->detector_params_);
+							 this->detector_params_, cv::noArray(),this->camera_params_.getCameraMatrix(), 
+							 this->camera_params_.getDistCoeff());
 	int id_count = ids.size();
 
 	std::vector<cv::Vec3d> rvecs, tvecs;
