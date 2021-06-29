@@ -79,7 +79,7 @@ private:
 	int mapLoopCounter; // number of times the map has been updated
 	int mapBlindPeriod; // the number of loops to wait before starting to build the map
 	bool mapDoesOverlap;
-	int mapOverlapSampleThreshold; // at least these many points required to overlap map
+	unsigned int mapOverlapSampleThreshold; // at least these many points required to overlap map
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;

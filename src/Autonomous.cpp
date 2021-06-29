@@ -564,7 +564,7 @@ void Autonomous::autonomyIter()
   if (USE_MAP) {
       if (mapLoopCounter++ > mapBlindPeriod) {
           map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
-          mapDoesOverlap = lidar_scan.size() > static_cast<unsigned>(mapOverlapSampleThreshold);
+          mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
       }
   }
 
