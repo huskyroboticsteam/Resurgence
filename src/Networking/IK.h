@@ -1,7 +1,8 @@
-
 #pragma once
 
 #include "json.hpp"
+#include <array>
+
 using nlohmann::json;
 bool ParseIKPacket(json &message);
 

@@ -6,6 +6,9 @@
 #include "../Globals.h"
 #include "../log.h"
 #include <iostream>
+extern "C" {
+	#include "../HindsightCAN/CANSerialNumbers.h"
+}
 
 // Angular positions from the motor boards are given in millidegrees
 double RAD_PER_INT = (2*M_PI) / (360*1000.0);
@@ -47,9 +50,9 @@ std::array<double, 3> forward_kinematics() {
   int shoulder_pos = Globals::status_data["shoulder"]["angular_position"];
   int elbow_pos = Globals::status_data["elbow"]["angular_position"];
   // See IK.h for explanation of sign / offset conventions
-  double arm_base = intToRad(arm_base_pos, 1);
-  double shoulder = intToRad(shoulder_pos, 2);
-  double elbow = intToRad(elbow_pos, 3);
+  double arm_base = intToRad(arm_base_pos, DEVICE_SERIAL_MOTOR_BASE);
+  double shoulder = intToRad(shoulder_pos, DEVICE_SERIAL_MOTOR_SHOULDER);
+  double elbow = intToRad(elbow_pos, DEVICE_SERIAL_MOTOR_ELBOW);
   log(LOG_DEBUG, "Running forward kinematics for %f %f %f\n", arm_base, shoulder, elbow);
   double r1 = Constants::SHOULDER_LENGTH * cos(shoulder);
   double r2 = Constants::ELBOW_LENGTH * cos(shoulder-elbow);
@@ -83,11 +86,11 @@ bool ParseIKPacket(json &message) {
     double height = z;
     // TODO right now we require the base angle to be within 90 degrees of forward.
     // This avoids some gimbal lock issues but limits the targets we can reach.
-    if (baseAngle > M_PI/2)
+    if (baseAngle > Constants::ARM_BASE_MAX)
     {
       baseAngle -= M_PI;
       forward *= -1.0;
-    } else if (baseAngle < -M_PI/2) {
+    } else if (baseAngle < Constants::ARM_BASE_MIN) {
       baseAngle += M_PI;
       forward *= -1.0;
     }

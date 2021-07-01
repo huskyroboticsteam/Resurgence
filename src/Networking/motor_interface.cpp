@@ -147,6 +147,8 @@ void sendPIDPacket(const std::string &motor, int32_t pid_target)
   sendCANPacket(p);
 }
 
+// TODO: if this sends the motor packet, should probably be called
+// "sendMotorPacket" instead of "ParseMotorPacket"
 bool ParseMotorPacket(json &message)
 {
   if (Globals::E_STOP) return sendError("Emergency stop is activated");
