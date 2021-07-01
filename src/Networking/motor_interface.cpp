@@ -13,7 +13,7 @@ extern "C"
 }
 #include "../Globals.h"
 
-#include "../simulator/world_interface.h"
+#include "../world_interface/world_interface.h"
 #include "../simulator/utils.h"
 #include "ParseBaseStation.h"
 #include "motor_interface.h"
@@ -24,21 +24,21 @@ const std::array<std::string, 4> operation_modes = {
 
 // For PWM control, we want to use higher values when acting against gravity
 const std::map<std::string, double> positive_arm_pwm_scales = {
-	{"arm_base",    6000},
+	{"arm_base",   12000},
 	{"shoulder",  -20000},
 	{"elbow",     -32768},
 	{"forearm",    -6000},
 	{"diffleft",    5000},
-	{"diffright",  -5000},
+	{"diffright", -10000},
 	{"hand",       15000}
 };
 const std::map<std::string, double> negative_arm_pwm_scales = {
-	{"arm_base",    6000},
+	{"arm_base",   12000},
 	{"shoulder",  -14000},
 	{"elbow",     -18000},
 	{"forearm",    -6000},
 	{"diffleft",    5000},
-	{"diffright",  -5000},
+	{"diffright", -10000},
 	{"hand",       15000}
 };
 const std::map<std::string, double> incremental_pid_scales = {
@@ -64,7 +64,7 @@ bool motorSupportsPID(int motor_serial)
 
 int getIndex(const std::vector<std::string> &arr, const std::string &value)
 {
-  for (int i = 0; i < arr.size(); i++) {
+  for (size_t i = 0; i < arr.size(); i++) {
     if (arr[i] == value) {
       return i;
     }
@@ -147,6 +147,8 @@ void sendPIDPacket(const std::string &motor, int32_t pid_target)
   sendCANPacket(p);
 }
 
+// TODO: if this sends the motor packet, should probably be called
+// "sendMotorPacket" instead of "ParseMotorPacket"
 bool ParseMotorPacket(json &message)
 {
   if (Globals::E_STOP) return sendError("Emergency stop is activated");
@@ -156,7 +158,7 @@ bool ParseMotorPacket(json &message)
   {
     motor = message["motor"];
   }
-  catch (json::type_error)
+  catch (json::type_error&)
   {
     return sendError("No motor specified");
   }

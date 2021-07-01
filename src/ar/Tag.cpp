@@ -4,7 +4,9 @@ namespace AR
 {
 
 Tag::Tag(MarkerPattern marker, cv::Vec3d rvec, cv::Vec3d tvec)
-	: marker_(marker), rvec_(rvec), tvec_(tvec){}
+	: rvec_(rvec), tvec_(tvec), marker_(marker)
+{
+}
 
 cv::Vec3d Tag::getRVec() const
 {

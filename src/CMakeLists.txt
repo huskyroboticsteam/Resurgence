@@ -15,6 +15,11 @@ include_directories(${rclcpp_INCLUDE_DIRS})
 include_directories(${geometry_msgs_INCLUDE_DIRS})
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
+-Wno-unused-variable \
+-Wno-unused-but-set-variable \
+-Wno-unused-result \
+-Wno-unused-parameter") # -Wconversion") 
 
 enable_testing()
 
@@ -63,13 +68,13 @@ add_library(real_base_station SHARED
   )
 
 add_library(simulator_world_interface SHARED
-  simulator/simulator_world.cpp
+  world_interface/simulator_world.cpp
   )
 add_library(stub_world_interface SHARED
-  simulator/noop_world.cpp
+  world_interface/noop_world.cpp
   )
 add_library(real_world_interface SHARED
-  Networking/real_world_interface.cpp
+  world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
   camera/Camera.cpp
   camera/CameraParams.cpp
@@ -195,7 +200,7 @@ add_subdirectory(ar)
 add_subdirectory(camera)
 
 find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 add_executable(Server
   Networking/Server.cpp)

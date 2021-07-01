@@ -1,5 +1,4 @@
-#ifndef ROVER_DRIVETOGATENOCOMPASS_H
-#define ROVER_DRIVETOGATENOCOMPASS_H
+#pragma once
 
 #include "../simulator/utils.h"
 #include "CommandBase.h"
@@ -44,5 +43,3 @@ private:
 	double angleKP;
 	double vel;
 };
-
-#endif // ROVER_DRIVETOGATENOCOMPASS_H

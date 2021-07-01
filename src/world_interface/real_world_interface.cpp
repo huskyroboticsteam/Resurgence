@@ -4,6 +4,7 @@
 
 #include <opencv2/calib3d.hpp>
 
+#include "world_interface.h"
 #include "../Globals.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
@@ -12,11 +13,10 @@
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../simulator/utils.h"
-#include "../simulator/world_interface.h"
-#include "CANUtils.h"
-#include "motor_interface.h"
+#include "../Networking/CANUtils.h"
+#include "../Networking/motor_interface.h"
 
-#include "json.hpp"
+#include "../Networking/json.hpp"
 
 extern "C"
 {
@@ -45,7 +45,7 @@ transform_t getOdomAt(const struct timeval &time) {
 	double delta_theta = odom_dtheta_ * elapsed;
 	double rel_x, rel_y, rel_th;
 	rel_th = odom_dtheta_ * elapsed;
-	if (abs(odom_dtheta_) < 0.000001) {
+	if (fabs(odom_dtheta_) < 0.000001) {
 		rel_x = odom_dx_ * elapsed;
 		rel_y = 0.0;
 	} else {
@@ -78,7 +78,7 @@ constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
 // This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
 constexpr double MAX_PWM = 20000;
 
-bool setCmdVel(double dtheta, double dx) {
+double setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0))
 		return false;
 
@@ -96,16 +96,20 @@ bool setCmdVel(double dtheta, double dx) {
 			dtheta, dx, right_ground_vel, right_angular_vel, right_pwm);
 	double scale_down_factor = 1.0;
 	if (abs(right_pwm) > MAX_PWM) {
-		std::cout << "WARNING: requested too-large right PWM " << right_pwm << std::endl;
+		log(LOG_WARN, "WARNING: requested too-large right PWM %d\n", right_pwm);
 		scale_down_factor = abs(right_pwm) / MAX_PWM;
 	}
 	if (abs(left_pwm) > MAX_PWM) {
-		std::cout << "WARNING: requested too-large left PWM " << left_pwm << std::endl;
+		log(LOG_WARN, "WARNING: requested too-large left PWM %d\n", left_pwm);
 		double scale_down_factor_left = abs(left_pwm) / MAX_PWM;
 		if (scale_down_factor_left > scale_down_factor) scale_down_factor = scale_down_factor_left;
 	}
 	right_pwm = (int16_t) (right_pwm / scale_down_factor);
 	left_pwm = (int16_t) (left_pwm / scale_down_factor);
+	if (scale_down_factor < 1.0) {
+		log(LOG_WARN, "Scaling down cmd_vel by %f to %f %f\n",
+				scale_down_factor, dtheta / scale_down_factor, dx / scale_down_factor);
+	}
 
 	setCmdVelToIntegrate(dtheta / scale_down_factor, dx / scale_down_factor);
 
@@ -119,7 +123,8 @@ bool setCmdVel(double dtheta, double dx) {
 	sendCANPacket(p);
 	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_BR, right_pwm);
 	sendCANPacket(p);
-	return true;
+
+	return scale_down_factor;
 }
 
 points_t readLandmarks(){

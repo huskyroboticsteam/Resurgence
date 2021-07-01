@@ -226,7 +226,7 @@ point_t QuadTree::getClosestWithin(const point_t &point, double areaSize) const
 		// compute the nearest neighbor in linear time (on a much smaller subset of points)
 		point_t closest = pointsInRange[0];
 		double minDist = (closest - point).topRows<2>().norm();
-		for (int i = 1; i < pointsInRange.size(); i++)
+		for (size_t i = 1; i < pointsInRange.size(); i++)
 		{
 			point_t p = pointsInRange[i];
 			double dist = (p - point).norm();

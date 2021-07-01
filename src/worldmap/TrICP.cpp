@@ -138,14 +138,14 @@ bool TrICP::isDone(int numIter, double mse, double oldMSE) const
 	{
 		return true;
 	}
-	double relErrChange = abs(mse - oldMSE) / mse;
+	double relErrChange = fabs(mse - oldMSE) / mse;
 	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
 }
 
 transform_t TrICP::iterate(points_t &sample, int N, double &mse) const
 {
 	PointPair pairs[sample.size()];
-	for (int i = 0; i < sample.size(); i++)
+	for (size_t i = 0; i < sample.size(); i++)
 	{
 		const point_t &point = sample[i];
 		point_t closestPoint = getClosest(point);

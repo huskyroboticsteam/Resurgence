@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 		{
 			open_success = cap.openFromConfigFile(parser.get<std::string>("c"));
 		}
-		catch (cam::invalid_camera_config c)
+		catch (cam::invalid_camera_config& c)
 		{
 			std::cerr << c.what() << std::endl;
 		}

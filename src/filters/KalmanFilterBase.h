@@ -8,8 +8,8 @@ template <int stateDim, int inputDim, int outputDim> class KalmanFilterBase
 {
 public:
 	KalmanFilterBase()
-		: xHat(Eigen::Matrix<double, stateDim, 1>::Zero()),
-		  P(Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5)
+		: P(Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5),
+		  xHat(Eigen::Matrix<double, stateDim, 1>::Zero())
 	{
 	}
 
