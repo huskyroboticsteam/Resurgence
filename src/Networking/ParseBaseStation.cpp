@@ -6,7 +6,7 @@
 #include "ParseBaseStation.h"
 #include <cmath>
 #include <tgmath.h>
-#include "../simulator/world_interface.h"
+#include "../world_interface/world_interface.h"
 #include "../Globals.h"
 #include "CANUtils.h"
 
@@ -20,8 +20,8 @@ extern "C"
 
 #include <iostream>
 
-const double DEFAULT_X_VEL = 0.5; // m/s
-const double DEFAULT_TH_VEL = 1.0; // rad/s
+const double DEFAULT_X_VEL = 0.3; // m/s
+const double DEFAULT_TH_VEL = 0.5; // rad/s
 
 using nlohmann::json;
 
@@ -79,7 +79,7 @@ bool ParseBaseStationPacket(char const* buffer)
   }
   else if (type == "autonomous") {
     Globals::AUTONOMOUS = !Globals::AUTONOMOUS;
-    success = setCmdVel(0,0);
+    success = (setCmdVel(0,0) == 1.0);
     log(LOG_INFO, "Set autonomous to %d\n", Globals::AUTONOMOUS);
   } else if (type != "estop") {
     return sendError("Unrecognized message type '" +  type + "'");
@@ -107,7 +107,7 @@ bool ParseEmergencyStop(json &message) {
           DEVICE_GROUP_MOTOR_CONTROL, serial, ESTOP_ERR_GENERAL);
       sendCANPacket(p);
   }
-  bool success = setCmdVel(0,0);
+  bool success = (setCmdVel(0,0) == 1.0);
   Globals::E_STOP = true;
   bool release;
   try
@@ -142,5 +142,11 @@ bool ParseDrivePacket(json &message) {
   {
     return sendError("Drive targets not within bounds +/- 1.0");
   }
-  return setCmdVel(lr * DEFAULT_TH_VEL, fb * DEFAULT_X_VEL);
+  double scale_factor = setCmdVel(lr * DEFAULT_TH_VEL, fb * DEFAULT_X_VEL);
+  if (scale_factor < 1.0)
+  {
+    return sendError("Infeasible drive targets. I scaled them down by "
+        + std::to_string(scale_factor));
+  }
+  return true;
 }

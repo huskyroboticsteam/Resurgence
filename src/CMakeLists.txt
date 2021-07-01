@@ -63,13 +63,13 @@ add_library(real_base_station SHARED
   )
 
 add_library(simulator_world_interface SHARED
-  simulator/simulator_world.cpp
+  world_interface/simulator_world.cpp
   )
 add_library(stub_world_interface SHARED
-  simulator/noop_world.cpp
+  world_interface/noop_world.cpp
   )
 add_library(real_world_interface SHARED
-  Networking/real_world_interface.cpp
+  world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
   camera/Camera.cpp
   camera/CameraParams.cpp

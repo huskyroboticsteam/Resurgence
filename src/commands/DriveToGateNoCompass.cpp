@@ -37,7 +37,8 @@ command_t DriveToGateNoCompass::getOutput()
 	{
 		calibrationPoints.clear();
 		double err = calculateHeadingErr();
-		return {.thetaVel = err * angleKP, .xVel = 0};
+		double targthvel = err * angleKP;
+		return {.thetaVel = targthvel, .xVel = 0};
 	}
 
 	log(LOG_WARN, "Unrecognized state: %d\n", state);
@@ -208,7 +209,7 @@ void DriveToGateNoCompass::transitionStates()
 	{
 		double err = calculateHeadingErr();
 		log(LOG_INFO, "Heading Err: %.2f\n", err);
-		if (abs(err) <= M_PI / 16)
+		if (fabs(err) <= M_PI / 16)
 		{
 			state = DriveForward;
 			checkpoint();

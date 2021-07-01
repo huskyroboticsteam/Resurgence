@@ -5,7 +5,7 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
-#include "../simulator/world_interface.h"
+#include "../world_interface/world_interface.h"
 #include "../simulator/utils.h"
 #include "read_hokuyo_lidar.h"
 

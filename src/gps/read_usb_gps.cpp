@@ -4,7 +4,7 @@
 #include <mutex>
 
 #include "../log.h"
-#include "../simulator/world_interface.h"
+#include "../world_interface/world_interface.h"
 #include "../simulator/utils.h"
 
 // UW lat/long is 47.653116, -122.305619

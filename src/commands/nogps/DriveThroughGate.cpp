@@ -69,7 +69,7 @@ pose_t calculateAlignTargetPose(const transform_t &trf, const point_t &leftPost,
 	// now project centerToRobot onto gateNormal and scale to get the offset
 	double dot = centerToRobot.dot(gateNormal);
 	// handle the case where the dot product is zero
-	if (abs(dot) <= 1e-9)
+	if (fabs(dot) <= 1e-9)
 	{
 		dot = 1;
 	}
@@ -265,6 +265,5 @@ command_t DriveThroughGate::getCommandToTarget(const transform_t &trf, const poi
 		vel = 0;
 	}
 	double thetaVel = thetaKP * angleErr;
-
 	return {.thetaVel = thetaVel, .xVel = vel};
 }

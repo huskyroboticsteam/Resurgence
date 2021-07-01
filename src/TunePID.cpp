@@ -7,7 +7,7 @@
 
 #include "Rover.h"
 #include "Globals.h"
-#include "simulator/world_interface.h"
+#include "world_interface/world_interface.h"
 #include "Networking/CANUtils.h"
 #include "Networking/ParseCAN.h"
 #include "log.h"

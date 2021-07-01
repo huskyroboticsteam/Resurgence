@@ -20,7 +20,7 @@
 #include "Networking/ParseBaseStation.h"
 #include "Networking/motor_interface.h"
 #include "Autonomous.h"
-#include "simulator/world_interface.h"
+#include "world_interface/world_interface.h"
 
 extern "C"
 {
@@ -160,12 +160,16 @@ std::queue<URCLeg> parseGPSLegs(std::string filepath) {
 		{
 			point_t leg_map_space = gpsToMeters(lon, lat);
 			URCLeg leg = {left_post_id, right_post_id, leg_map_space};
+			log(LOG_INFO, "Got urc leg at %f %f\n", leg_map_space(0), leg_map_space(1));
 			urc_legs.push(leg);
 		}
 	}
+	log(LOG_INFO, "Got %d urc legs\n", urc_legs.size());
 
 	if (urc_legs.size() == 0)
 	{
+		log(LOG_ERROR, "could not get URC legs\n");
+		exit(0);
 		// File does not exist or has no valid legs, use simulation legs as defaults
 		for (int i = 0; i < 7; i++)
 		{
@@ -187,9 +191,9 @@ int rover_loop(int argc, char **argv)
     Globals::opts = ParseCommandLineOptions(argc, argv);
     InitializeRover(MOTOR_UNIT_MODE_PWM, true);
     CANPacket packet;
-	// Target locations for autonomous navigation
-	// Eventually this will be set by communication from the base station
-	std::queue<URCLeg> urc_legs = parseGPSLegs("../src/gps_legs.txt");
+    // Target locations for autonomous navigation
+    // Eventually this will be set by communication from the base station
+    std::queue<URCLeg> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
     Autonomous autonomous(urc_legs, CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp_rover_start;

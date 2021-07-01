@@ -7,7 +7,7 @@
 #include "Globals.h"
 #include "log.h"
 #include "simulator/constants.h"
-#include "simulator/world_interface.h"
+#include "world_interface/world_interface.h"
 
 #include "commands/nogps/DriveToGate.h"
 #include "commands/nogps/DriveThroughGate.h"
@@ -15,7 +15,7 @@
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2.0;
-constexpr double DRIVE_SPEED = 3.0;
+constexpr double DRIVE_SPEED = 0.8;
 const Eigen::Vector3d gpsStdDev = {2, 2, 3};
 constexpr int numSamples = 1;
 
@@ -90,7 +90,7 @@ double dist(const pose_t &p1, const pose_t &p2, double theta_weight)
 {
 	pose_t diff = p1 - p2;
 	// angles are modular in nature, so wrap at 2pi radians
-	double thetaDiff = std::fmod(abs(diff(2)), 2 * PI);
+	double thetaDiff = std::fmod(fabs(diff(2)), 2 * PI);
 	// change domain from [0, 2pi) to (-pi, pi]
 	if (thetaDiff > PI) {
 		thetaDiff -= 2 * PI;
@@ -227,7 +227,7 @@ double getRelativeAngle(double currAngle, double targetAngle)
 {
 	double range = 2 * PI;
 	double dist = std::fmod(targetAngle - currAngle, range);
-	double absDist = abs(dist);
+	double absDist = fabs(dist);
 
 	int sign = dist > 0 ? 1 : (dist < 0 ? -1 : 0);
 
@@ -242,7 +242,7 @@ double Autonomous::getLinearVel(const pose_t &drive_target, const pose_t &pose, 
 		// (given our relatively low control frequency of 10 Hz)
 		speed = DRIVE_SPEED / 3;
 	}
-	if (abs(thetaErr) > PI / 4 || control_state == ControlState::NEAR_TARGET_POSE) {
+	if (fabs(thetaErr) > PI / 4 || control_state == ControlState::NEAR_TARGET_POSE) {
 		// don't drive forward if pointing away
 		// or if we're already very close to the target
 		speed = 0;
@@ -408,6 +408,15 @@ void Autonomous::autonomyIter()
 {
 	transform_t gps = readGPS();
 
+	points_t landmarks = readLandmarks();
+	point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
+	point_t rightPost = {0,0,0};
+	bool is_gate = (urc_targets.front().right_post_id != -1);
+	if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
+	if (leftPost(2) != 0) log(LOG_INFO, "Cam sees left post: %f %f %f\n", leftPost(0), leftPost(1), leftPost(2));
+	if (rightPost(2) != 0) log(LOG_INFO, "Cam sees right post: %f %f %f\n", rightPost(0), rightPost(1), rightPost(2));
+	if (leftPost(2) == 0 && rightPost(2) == 0) log(LOG_INFO, "Cam sees nothing\n");
+
 #ifdef GATE_TRAVERSAL
 	if (!Globals::AUTONOMOUS)
 	{
@@ -459,23 +468,18 @@ void Autonomous::autonomyIter()
 
 		pose_t pose = poseEstimator.getPose();
 
-		points_t landmarks = readLandmarks();
 		command_t cmd;
 
 		double fast = DRIVE_SPEED;
 		double slow = DRIVE_SPEED / 2;
 
-		bool is_gate = (urc_targets.front().right_post_id != -1);
-		point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
-		point_t rightPost = {0,0,0};
-		if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
 
 		if (!dtgnc.isAlmostDone())
 		{
 			dtgnc.update(odom, gps, pose, leftPost, rightPost);
 			cmd = dtgnc.getOutput();
 		}
-		else if (urc_targets.front().right_post_id != -1) // this is a gate
+		else if (is_gate)
 		{
 			static DriveThroughGate dthg(KP_ANGLE, slow, fast);
 			if (dthg.isDone()) {
@@ -501,8 +505,9 @@ void Autonomous::autonomyIter()
 			}
 		}
 
-		poseEstimator.predict(cmd.thetaVel, cmd.xVel);
-		setCmdVel(cmd.thetaVel, cmd.xVel);
+		log(LOG_INFO, "Requesting vel %f %f\n", cmd.thetaVel, cmd.xVel);
+		double scale_factor = setCmdVel(cmd.thetaVel, cmd.xVel);
+		poseEstimator.predict(scale_factor * cmd.thetaVel, scale_factor * cmd.xVel);
 	}
 #endif
 #endif
@@ -541,6 +546,7 @@ void Autonomous::autonomyIter()
 	}
 	pose_t pose = poseEstimator.getPose();
 	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
+
 	transform_t invTransform = toTransform(pose).inverse();
 
 	if (nav_state == NavState::DONE && Globals::AUTONOMOUS)
@@ -694,8 +700,8 @@ void Autonomous::autonomyIter()
 
   if (!Globals::E_STOP && Globals::AUTONOMOUS)
   {
-    setCmdVel(thetaVel, driveSpeed);
-    poseEstimator.predict(thetaVel, driveSpeed);
+    double scale_factor = setCmdVel(thetaVel, driveSpeed);
+    poseEstimator.predict(scale_factor * thetaVel, scale_factor * driveSpeed);
   }
 }
 

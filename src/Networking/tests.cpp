@@ -5,7 +5,7 @@
 #include "NetworkingStubs.h"
 #include "IK.h"
 #include "motor_interface.h"
-#include "../simulator/world_interface.h"
+#include "../world_interface/world_interface.h"
 extern "C"
 {
     #include "../HindsightCAN/Port.h"

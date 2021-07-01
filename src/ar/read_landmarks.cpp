@@ -37,7 +37,7 @@ void detectLandmarksLoop(){
 	while(true){
 		if (ar_cam.hasNext(last_frame_no)) {
 			ar_cam.next(frame, last_frame_no);
-	
+
 			std::vector<AR::Tag> tags = ar_detector.detectTags(frame);
 			log(LOG_DEBUG, "readLandmarks(): %d tags spotted\n", tags.size());
 
@@ -76,19 +76,40 @@ void detectLandmarksLoop(){
 			}
 
 			landmark_lock.lock();
-			current_landmarks = output;
+			for (int i = 0; i < NUM_LANDMARKS; i++) {
+				// If we already saw this landmark, we don't want to overwrite that with zeros
+				// if we didn't see the landmark on this particular frame. This is because
+				// landmark detection is a bit spotty: even when the rover is not moving,
+				// sometimes an AR tag is only detected in 40% or 50% of frames.
+				//
+				// TODO: We want to make sure that this data eventually *does* expire, so that
+				// if the rover moves or turns significantly, it won't interpret the landmark
+				// location as being relative to the new rover location.
+				//
+				// Note that when we call readLandmarks(), we do zero out the data. But we
+				// don't want that to be the exclusive way to prevent data from getting stale.
+				if (output[i](2) != 0.0) current_landmarks[i] = output[i];
+			}
 			fresh_data = true;
 			landmark_lock.unlock();
 		}
 	}
 }
 
+void zeroCurrent() {
+	current_landmarks.clear();
+	for (int i = 0; i < NUM_LANDMARKS; i++) {
+		current_landmarks.push_back(ZERO_POINT);
+	}
+}
+
 bool initializeLandmarkDetection(){
+	zeroCurrent();
 	try {
 		ar_cam.openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
 		if(!ar_cam.hasIntrinsicParams()){
 			log(LOG_ERROR, "Camera does not have intrinsic parameters! AR tag detection "
-						   "cannot be performed.\n");
+							 "cannot be performed.\n");
 			return false;
 		} else {
 			ar_detector =
@@ -97,7 +118,7 @@ bool initializeLandmarkDetection(){
 		}
 		if(!ar_cam.hasExtrinsicParams()){
 			log(LOG_WARN, "Camera does not have extrinsic parameters! Coordinates returned "
-						  "for AR tags will be relative to camera\n");
+							"for AR tags will be relative to camera\n");
 		}
 		return true;
 	} catch (std::exception& e) {
@@ -117,6 +138,7 @@ points_t readLandmarks(){
 			landmark_lock.lock();
 			output = current_landmarks;
 			fresh_data = false;
+			zeroCurrent();
 			landmark_lock.unlock();
 			return output;
 		}
