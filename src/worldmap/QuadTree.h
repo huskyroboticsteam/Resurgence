@@ -125,7 +125,7 @@ private:
 	point_t center;	  // center of bounding box, in word coords
 	double width;	  // size of square area
 	points_t points;  // the points in this node, 0 <= points.size() <= nodeCapacity
-	int nodeCapacity; // number of points stored in each node
+	size_t nodeCapacity; // number of points stored in each node
 	size_t size;	  // number of nodes stored in this or its descendants
 
 	// create children nodes (doesn't check for already existing)

@@ -25,7 +25,7 @@ void LidarVis::drawPoints(std::vector<PointXY> &pts, cv::Scalar bgr, int pt_radi
 
 void LidarVis::outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr)
 {
-	for (int i = 0; i < vertices.size(); i++)
+	for (size_t i = 0; i < vertices.size(); i++)
 	{
 		cv::Point p1 = worldToCvPoint(vertices[i]);
 		cv::Point p2 = worldToCvPoint(vertices[(i + 1) % vertices.size()]);

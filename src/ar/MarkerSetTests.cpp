@@ -85,10 +85,10 @@ TEST_CASE("Markers can be retrieved from the MarkerSet")
 	std::vector<MarkerPattern> markers = ms.getMarkers();
 	// marker vector should have the same number of markers as are in the
 	// dictionary
-	CHECK(markers.size() == DICT_4X4_50->bytesList.rows);
+	CHECK(markers.size() == static_cast<unsigned>(DICT_4X4_50->bytesList.rows));
 	SECTION("Markers should be the same as in the dictionary")
 	{
-		for (int i = 0; i < markers.size(); i++)
+		for (size_t i = 0; i < markers.size(); i++)
 		{
 			cv::Mat dict_marker_bits =
 				DICT_4X4_50->getBitsFromByteList(DICT_4X4_50->bytesList.row(i),
@@ -102,7 +102,7 @@ TEST_CASE("Markers can be retrieved from the MarkerSet")
 	}
 	SECTION("Markers can be retrieved by ID")
 	{
-		for (int i = 0; i < markers.size(); i++)
+		for (size_t i = 0; i < markers.size(); i++)
 		{
 			MarkerPattern from_vector = markers[i];
 			MarkerPattern from_set;
@@ -112,11 +112,11 @@ TEST_CASE("Markers can be retrieved from the MarkerSet")
 	}
 	SECTION("Markers can be retrieved by a mapped ID")
 	{
-		int nums[] = {0, 3, 7, 11, 13};
-		for(int i = 0; i < (sizeof(nums) / sizeof(int)); i++){
+		std::array<int, 5> nums{0, 3, 7, 11, 13};
+		for(size_t i = 0; i < nums.size(); i++){
 			ms.addIDMapping(nums[i], i);
 		}
-		for(int i = 0; i < (sizeof(nums) / sizeof(int)); i++){
+		for(size_t i = 0; i < nums.size(); i++){
 			MarkerPattern m;
 			CHECK(ms.getMarkerByMappedID(i, m));
 			CHECK(markers[nums[i]] == m);

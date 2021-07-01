@@ -9,8 +9,8 @@
 constexpr double ALIGN_DIST = 2;
 
 DriveThroughGate::DriveThroughGate(double thetaKP, double slowVel, double fastVel)
-	: startOdom(toTransform({0,0,0})), thetaKP(thetaKP), slowVel(slowVel), fastVel(fastVel),
-		state(State::Done), driveTarget(pose_t::Zero())
+	: startOdom(toTransform({0, 0, 0})), driveTarget(pose_t::Zero()), thetaKP(thetaKP),
+	  slowVel(slowVel), fastVel(fastVel), state(State::Done)
 {
 }
 

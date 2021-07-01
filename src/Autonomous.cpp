@@ -312,7 +312,7 @@ void Autonomous::updateLandmarkInformation(const transform_t &invTransform)
 	// get landmark data and filter out invalid data points
 	points_t landmarks = readLandmarks();
 	printLandmarks(landmarks);
-	if (urc_targets.front().left_post_id < 0 || urc_targets.front().left_post_id > landmarks.size())
+	if (urc_targets.front().left_post_id < 0 || static_cast<unsigned>(urc_targets.front().left_post_id) > landmarks.size())
 	{
 		log(LOG_ERROR, "Invalid left_post_id %d\n", urc_targets.front().left_post_id);
 		return;
@@ -714,7 +714,7 @@ pose_t Autonomous::getGPSTargetPose() const
 static void printLandmarks(points_t& landmarks, int log_level){
 	std::ostringstream stream;
 	stream << "Landmarks: [";
-	for(int i = 0; i < landmarks.size(); i++){
+	for(size_t i = 0; i < landmarks.size(); i++){
 		stream << i << ": {"
 			   << landmarks[i][0] << ", "
 			   << landmarks[i][1] << ", "

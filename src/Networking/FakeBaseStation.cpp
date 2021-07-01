@@ -16,7 +16,6 @@ int main()
   pid_t childpid;
   ssize_t n;
   socklen_t len;
-  const int on = 1;
   struct sockaddr_in cliaddr, servaddr;
   void sig_chld(int);
 

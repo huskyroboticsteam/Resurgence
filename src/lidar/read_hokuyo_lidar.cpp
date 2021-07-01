@@ -34,7 +34,7 @@ void readLidarLoop(){
 		std::vector<Polar2D> polarPts = urg_lidar.getLastFrame();
 		std::vector<point_t> pts(polarPts.size());
 		point_t origin({0,0,1});
-		for (int i = 0; i < polarPts.size(); i++)
+		for (size_t i = 0; i < polarPts.size(); i++)
 		{
 			pts[i] = lidar::polarToCartesian2(polarPts[i]);
 			if ((pts[i] - origin).norm() < LIDAR_MIN_RANGE)

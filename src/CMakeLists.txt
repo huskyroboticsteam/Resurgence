@@ -15,6 +15,11 @@ include_directories(${rclcpp_INCLUDE_DIRS})
 include_directories(${geometry_msgs_INCLUDE_DIRS})
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
+-Wno-unused-variable \
+-Wno-unused-but-set-variable \
+-Wno-unused-result \
+-Wno-unused-parameter") # -Wconversion") 
 
 enable_testing()
 
@@ -195,7 +200,7 @@ add_subdirectory(ar)
 add_subdirectory(camera)
 
 find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 add_executable(Server
   Networking/Server.cpp)

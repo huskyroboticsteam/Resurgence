@@ -46,7 +46,7 @@ bool ParseBaseStationPacket(char const* buffer)
   {
     parsed_message = json::parse(buffer);
   }
-  catch (json::parse_error)
+  catch (json::parse_error&)
   {
     return sendError("Parse error");
   }
@@ -55,7 +55,7 @@ bool ParseBaseStationPacket(char const* buffer)
   {
     type = parsed_message["type"];
   }
-  catch (json::type_error)
+  catch (json::type_error&)
   {
     return sendError("Could not find message type");
   }
@@ -114,7 +114,7 @@ bool ParseEmergencyStop(json &message) {
   {
     release = message["release"];
   }
-  catch (json::type_error)
+  catch (json::type_error&)
   {
     return sendError("Malformatted estop packet");
   }
@@ -134,7 +134,7 @@ bool ParseDrivePacket(json &message) {
     fb = message["forward_backward"];
     lr = message["left_right"];
   }
-  catch (json::type_error)
+  catch (json::type_error&)
   {
     return sendError("Malformatted drive packet");
   }

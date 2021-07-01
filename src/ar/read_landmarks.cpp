@@ -13,10 +13,9 @@ namespace AR
 {
 constexpr size_t NUM_LANDMARKS = 11;
 const point_t ZERO_POINT = {0.0, 0.0, 0.0};
-constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 static points_t make_zero_landmarks(){
 	points_t z;
-	for(int i = 0; i < NUM_LANDMARKS; i++){
+	for(size_t i = 0; i < NUM_LANDMARKS; i++){
 		z.push_back(ZERO_POINT);
 	}
 	return z;
@@ -33,7 +32,7 @@ std::thread landmark_thread;
 
 void detectLandmarksLoop(){
 	cv::Mat frame;
-	uint32_t last_frame_no;
+	uint32_t last_frame_no = 0;
 	while(true){
 		if (ar_cam.hasNext(last_frame_no)) {
 			ar_cam.next(frame, last_frame_no);
@@ -54,7 +53,7 @@ void detectLandmarksLoop(){
 			// for every possible landmark ID, go through and if the map contains a value for
 			// that ID, add it to the output array (doing appropriate coordinate space
 			// transforms). If not, add a zero point.
-			for (int i = 0; i < NUM_LANDMARKS; i++) {
+			for (size_t i = 0; i < NUM_LANDMARKS; i++) {
 				if (ids_to_camera_coords.find(i) != ids_to_camera_coords.end()) {
 					cv::Vec3d coords = ids_to_camera_coords[i];
 					// if we have extrinsic parameters, multiply coordinates by them to do

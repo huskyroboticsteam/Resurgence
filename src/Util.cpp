@@ -12,7 +12,7 @@ bool almostEqual(double a, double b, double threshold)
 }
 
 ScopedTimer::ScopedTimer(std::string name)
-	: name(std::move(name)), startTime(std::chrono::high_resolution_clock::now())
+	: startTime(std::chrono::high_resolution_clock::now()), name(std::move(name))
 {
 }
 
