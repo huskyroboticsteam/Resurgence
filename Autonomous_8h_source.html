@@ -151,7 +151,7 @@ $(function() {
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">int</span> mapLoopCounter; <span class="comment">// number of times the map has been updated</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordtype">int</span> mapBlindPeriod; <span class="comment">// the number of loops to wait before starting to build the map</span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">bool</span> mapDoesOverlap;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordtype">int</span> mapOverlapSampleThreshold; <span class="comment">// at least these many points required to overlap map</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> mapOverlapSampleThreshold; <span class="comment">// at least these many points required to overlap map</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr plan_pub;</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr curr_pose_pub;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    rclcpp::Publisher&lt;geometry_msgs::msg::Point&gt;::SharedPtr drive_target_pub;</div>

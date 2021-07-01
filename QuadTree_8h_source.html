@@ -112,7 +112,7 @@ $(function() {
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    point_t center;   <span class="comment">// center of bounding box, in word coords</span></div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordtype">double</span> width;     <span class="comment">// size of square area</span></div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> points;  <span class="comment">// the points in this node, 0 &lt;= points.size() &lt;= nodeCapacity</span></div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">int</span> nodeCapacity; <span class="comment">// number of points stored in each node</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">size_t</span> nodeCapacity; <span class="comment">// number of points stored in each node</span></div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">size_t</span> size;      <span class="comment">// number of nodes stored in this or its descendants</span></div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">// create children nodes (doesn&#39;t check for already existing)</span></div>
