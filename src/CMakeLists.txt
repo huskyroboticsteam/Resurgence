@@ -88,6 +88,11 @@ add_library(real_world_interface SHARED
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
 
+add_library(hr_slam SHARED
+  simulator/graph.cpp
+  simulator/friendly_graph.cpp
+  simulator/factors.cpp
+  )
 add_library(real_can_interface SHARED
   log.cpp
   Networking/CANUtils.cpp
@@ -96,7 +101,7 @@ add_library(stub_can_interface SHARED
   Networking/CANStubs.cpp
   )
 list(APPEND rover_libs
-  rover_common hindsight_can simulator_base simulator_nav)
+  rover_common hindsight_can simulator_base simulator_nav hr_slam)
 
 list(APPEND sfml_libs
   sfml-graphics sfml-window sfml-system pthread)

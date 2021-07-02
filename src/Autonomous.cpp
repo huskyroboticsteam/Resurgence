@@ -61,7 +61,7 @@ Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz)
 		control_state(ControlState::FAR_FROM_TARGET_POSE),
 		time_since_plan(0),
 		plan(0,2),
-        pending_plan(),
+		pending_plan(),
 		plan_cost(INFINITE_COST),
 		plan_base({0,0,0}),
 		plan_idx(0),
@@ -70,13 +70,27 @@ Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz)
 		mapBlindPeriod(15),
 		mapDoesOverlap(false),
 		mapOverlapSampleThreshold(15),
+		pose_graph(0), // for now, we use no landmarks for state estimation
+		pose_id(0),
+		prev_odom(toTransform({0,0,0})),
+		smoothed_traj({}),
 		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
 		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
 		drive_target_pub(this->create_publisher<geometry_msgs::msg::Point>("drive_target", 100)),
 		plan_target_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_target", 100)),
+		pose_graph_pub(this->create_publisher<geometry_msgs::msg::Point>("pose_graph", 100)),
 		lidar_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("lidar_scan", 100)),
 		landmarks_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("landmarks", 100))
 {
+  prev_odom = readOdom();
+  transform_t start_pose_guess = toTransform({13,-1,M_PI*2/3});
+  pose_graph.addPosePrior(0, start_pose_guess, 3.0, 1.0); // informed prior
+  //for (int l = 0; l < L; l++) {
+  //  point_t location({0,0,1});
+  //  fg.addLandmarkPrior(l, location, 20.0); // uninformative prior
+  //}
+  pose_graph.solve();
+  smoothed_traj = pose_graph.getSmoothedTrajectory();
 }
 
 Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz, const pose_t &startPose)
@@ -113,8 +127,8 @@ void Autonomous::endCurrentLeg()
 	{
 		log(LOG_INFO, "All legs complete\n");
 	}
-  else
-  {
+	else
+	{
 		search_target = {urc_targets.front().approx_GPS(0) - PI, urc_targets.front().approx_GPS(1), -PI / 2};
 		setNavState(NavState::GPS);
 		log(LOG_INFO, "Enter autonomous mode to start next leg\n");
@@ -132,7 +146,7 @@ void Autonomous::setNavState(NavState s)
   }
 }
 
-pose_t Autonomous::poseToDraw(pose_t &pose, pose_t &current_pose) const
+pose_t Autonomous::poseToDraw(const pose_t &pose, const pose_t &current_pose) const
 {
 	// Both poses are given in the same frame. (usually GPS frame)
 	// `current_pose` is the current location of the robot, `pose` is the pose we wish to draw
@@ -319,27 +333,27 @@ void Autonomous::updateLandmarkInformation(const transform_t &invTransform)
 	}
 	point_t leftPostLandmark = landmarks[urc_targets.front().left_post_id];
 	point_t rightPostLandmark({0,0,0});
-  if (urc_targets.front().right_post_id != -1)
-  {
-    rightPostLandmark = landmarks[urc_targets.front().right_post_id];
-  }
+	if (urc_targets.front().right_post_id != -1)
+	{
+		rightPostLandmark = landmarks[urc_targets.front().right_post_id];
+	}
 
-  if (leftPostLandmark(2) != 0)
-  {
-    // transform and add the new data to the filter
-    point_t leftLandmarkMapSpace = invTransform * leftPostLandmark;
-    // the filtering is done on the target in map space to reduce any phase lag
-    // caused by filtering
-    leftPostFilter.get(leftLandmarkMapSpace);
-  }
-  if (rightPostLandmark(2) != 0)
-  {
-    point_t rightLandmarkMapSpace = invTransform * rightPostLandmark;
-    rightPostFilter.get(rightLandmarkMapSpace);
-  }
+	if (leftPostLandmark(2) != 0)
+	{
+		// transform and add the new data to the filter
+		point_t leftLandmarkMapSpace = invTransform * leftPostLandmark;
+		// the filtering is done on the target in map space to reduce any phase lag
+		// caused by filtering
+		leftPostFilter.get(leftLandmarkMapSpace);
+	}
+	if (rightPostLandmark(2) != 0)
+	{
+		point_t rightLandmarkMapSpace = invTransform * rightPostLandmark;
+		rightPostFilter.get(rightLandmarkMapSpace);
+	}
 
-  const points_t landmarks_transformed = transformReadings(landmarks, VIZ_BASE_TF);
-  publish_array(landmarks_transformed, landmarks_pub);
+	const points_t landmarks_transformed = transformReadings(landmarks, VIZ_BASE_TF);
+	publish_array(landmarks_transformed, landmarks_pub);
 }
 
 void Autonomous::computeGateTargets(const pose_t &pose)
@@ -400,14 +414,8 @@ plan_t computePlan(std::function<bool(double, double, double)> collide_func, con
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
-// 1 = drive to gate, 2 = drive through gate, 3 = crappy full thing, comment out to run regular code
-// by "crappy full thing" I mean it should navigate to the goal and perform the correct action
-#define GATE_TRAVERSAL 3
-
 void Autonomous::autonomyIter()
 {
-	transform_t gps = readGPS();
-
 	points_t landmarks = readLandmarks();
 	point_t leftPost = landmarks.at(urc_targets.front().left_post_id);
 	point_t rightPost = {0,0,0};
@@ -417,156 +425,50 @@ void Autonomous::autonomyIter()
 	if (rightPost(2) != 0) log(LOG_INFO, "Cam sees right post: %f %f %f\n", rightPost(0), rightPost(1), rightPost(2));
 	if (leftPost(2) == 0 && rightPost(2) == 0) log(LOG_INFO, "Cam sees nothing\n");
 
-#ifdef GATE_TRAVERSAL
-	if (!Globals::AUTONOMOUS)
-	{
-		return;
-	}
-#if GATE_TRAVERSAL == 1
-	static DriveToGate dtg(1, KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
-	points_t posts = readLandmarks();
-	dtg.update(posts[urc_targets.front().left_post_id]);
-	command_t cmd = dtg.getOutput();
-	setCmdVel(cmd.thetaVel, cmd.xVel);
-#elif GATE_TRAVERSAL == 2
-	static DriveThroughGate dthg(readOdom(), KP_ANGLE, DRIVE_SPEED/2, DRIVE_SPEED);
-	points_t posts = readLandmarks();
-	point_t leftPost = posts[urc_targets.front().left_post_id];
-	point_t rightPost = posts[urc_targets.front().right_post_id];
-	dthg.update(readOdom(), leftPost, rightPost);
-	command_t cmd = dthg.getOutput();
-	setCmdVel(cmd.thetaVel, cmd.xVel);
-#elif GATE_TRAVERSAL == 3
-	if (!calibrated && gps.norm() != 0)
-	{
-		// large uncertainty for starting heading
-		poseEstimator.reset(toPose(gps, 0),
-							{gpsStdDev.x(), gpsStdDev.y(), M_PI});
-		calibrated = true;
-	}
-	else if (calibrated)
-	{
-		transform_t odom = readOdom();
-		double initial_heading = 0.0;
-		static DriveToGateNoCompass dtgnc(15, KP_ANGLE, DRIVE_SPEED, initial_heading);
-		if (dtgnc.isDone())
-		{
-			dtgnc.reset(odom, urc_targets.front().approx_GPS);
+	transform_t gps = readGPS();
+	transform_t odom = readOdom();
+
+	if (gps.norm() != 0.0) {
+		if (odom != prev_odom) { // Don't add poses to pose graph if we haven't moved
+			pose_id += 1;
+			pose_graph.addOdomMeasurement(pose_id, pose_id-1, odom, prev_odom);
+			prev_odom = odom;
 		}
-		if (gps.norm() != 0)
-		{
-			static transform_t lastGps = gps;
-			pose_t gpsPose = toPose(gps, 0);
-			pose_t lastGpsPose = toPose(lastGps, 0);
-			gpsPose(2) =
-				atan2(gpsPose.y() - lastGpsPose.y(), gpsPose.x() - lastGpsPose.x());
-			lastGps = gps;
-			gps = toTransform(gpsPose);
-			poseEstimator.correct(gps);
-//				log(LOG_INFO, "GPS: (%.3f, %.3f, %.3f)\n", gpsPose(0), gpsPose(1), gpsPose(2));
-		}
-
-		pose_t pose = poseEstimator.getPose();
-
-		command_t cmd;
-
-		double fast = DRIVE_SPEED;
-		double slow = DRIVE_SPEED / 2;
-
-
-		if (!dtgnc.isAlmostDone())
-		{
-			dtgnc.update(odom, gps, pose, leftPost, rightPost);
-			cmd = dtgnc.getOutput();
-		}
-		else if (is_gate)
-		{
-			static DriveThroughGate dthg(KP_ANGLE, slow, fast);
-			if (dthg.isDone()) {
-				dthg.reset(odom);
-			}
-			dthg.update(odom, leftPost, rightPost);
-			cmd = dthg.getOutput();
-			if (dthg.isDone()) {
-				dtgnc.setDone(odom);
-				endCurrentLeg();
-				return;
-			}
-		}
-		else // this is a single post, but no gate
-		{
-			static DriveToGate dtg(1, KP_ANGLE, slow, fast);
-			dtg.update(leftPost);
-			cmd = dtg.getOutput();
-			if (dtg.isDone()) {
-				dtgnc.setDone(odom);
-				endCurrentLeg();
-				return;
-			}
-		}
-
-		log(LOG_INFO, "Requesting vel %f %f\n", cmd.thetaVel, cmd.xVel);
-		double scale_factor = setCmdVel(cmd.thetaVel, cmd.xVel);
-		poseEstimator.predict(scale_factor * cmd.thetaVel, scale_factor * cmd.xVel);
-	}
-#endif
-#endif
-
-	return; // Temporary for virtual URC
-
-
-	// If we haven't calibrated position, do so now
-	if (!calibrated)
-	{
-		pose_t out;
-		if (gps.norm() != 0.0 && calibratePeriodic(calibrationPoses, toPose(gps, 0), out))
-		{
-			// the standard error of the calculated mean is the std dev of the mean
-			poseEstimator.reset(out, gpsStdDev / sqrt((double)numSamples));
-			calibrated = true;
-			calibrationPoses.clear();
-		}
-		else
-		{
-			return;
-		}
+		pose_graph.addGPSMeasurement(pose_id, gps);
+		pose_graph.solve(); // TODO put in a separate thread
+		// also TODO trim the pose graph so it doesn't grow without bound
+		smoothed_traj = pose_graph.getSmoothedTrajectory();
 	}
 
-	// get the latest pose estimation
-	if (gps.norm() != 0.0)
-	{
-		static transform_t lastGps = gps;
-		pose_t gpsPose = toPose(gps, 0);
-		pose_t lastGpsPose = toPose(lastGps, 0);
-		gpsPose(2) = atan2(gpsPose.y() - lastGpsPose.y(), gpsPose.x() - lastGpsPose.x());
-		lastGps = gps;
-		gps = toTransform(gpsPose);
-		poseEstimator.correct(gps);
-		log(LOG_INFO, "GPS: (%.3f, %.3f, %.3f)\n", gpsPose(0), gpsPose(1), gpsPose(2));
-	}
-	pose_t pose = poseEstimator.getPose();
+	transform_t current_tf = odom * prev_odom.inverse() * smoothed_traj[smoothed_traj.size()-1];
+	pose_t pose = toPose(current_tf, 0.0);
 	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
+
+	for (transform_t &sm_tf : smoothed_traj) {
+		const pose_t sm_tf_transformed = poseToDraw(toPose(sm_tf, 0.0), pose);
+		publish(sm_tf_transformed, pose_graph_pub);
+	}
 
 	transform_t invTransform = toTransform(pose).inverse();
 
 	if (nav_state == NavState::DONE && Globals::AUTONOMOUS)
 	{
-    endCurrentLeg();
+		endCurrentLeg();
 		return;
 	}
 
-  updateLandmarkInformation(invTransform);
-  pose_t plan_target = choose_plan_target(pose);
-  update_nav_state(pose, plan_target);
+	updateLandmarkInformation(invTransform);
+	pose_t plan_target = choose_plan_target(pose);
+	update_nav_state(pose, plan_target);
 
-  points_t lidar_scan = readLidarScan();
+	points_t lidar_scan = readLidarScan();
 
-  if (USE_MAP) {
-      if (mapLoopCounter++ > mapBlindPeriod) {
-          map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
-          mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
-      }
-  }
+	if (USE_MAP) {
+			if (mapLoopCounter++ > mapBlindPeriod) {
+					map.addPoints(toTransform(pose), lidar_scan, mapDoesOverlap ? 0.4 : 0);
+					mapDoesOverlap = lidar_scan.size() > mapOverlapSampleThreshold;
+			}
+	}
 
   // if we don't have a plan pending, we should start computing one.
   if (!pending_plan.valid()) {
@@ -640,9 +542,9 @@ void Autonomous::autonomyIter()
       // We don't care about collisions on already-executed parts of the plan
       bool plan_pose_collides = (i >= plan_idx);
       if (USE_MAP) {
-          plan_pose_collides |= map.hasPointWithin(plan_pose, PLAN_COLLISION_DIST);
+          plan_pose_collides &= map.hasPointWithin(plan_pose, PLAN_COLLISION_DIST);
       } else {
-          plan_pose_collides |= collides(tf_plan_pose, lidar_scan, PLAN_COLLISION_DIST);
+          plan_pose_collides &= collides(tf_plan_pose, lidar_scan, PLAN_COLLISION_DIST);
       }
       if (plan_pose_collides) {
         // We'll replan next timestep
@@ -701,7 +603,6 @@ void Autonomous::autonomyIter()
   if (!Globals::E_STOP && Globals::AUTONOMOUS)
   {
     double scale_factor = setCmdVel(thetaVel, driveSpeed);
-    poseEstimator.predict(scale_factor * thetaVel, scale_factor * driveSpeed);
   }
 }
 
@@ -716,10 +617,10 @@ static void printLandmarks(points_t& landmarks, int log_level){
 	stream << "Landmarks: [";
 	for(size_t i = 0; i < landmarks.size(); i++){
 		stream << i << ": {"
-			   << landmarks[i][0] << ", "
-			   << landmarks[i][1] << ", "
-			   << landmarks[i][2]
-			   << "}";
+				 << landmarks[i][0] << ", "
+				 << landmarks[i][1] << ", "
+				 << landmarks[i][2]
+				 << "}";
 		if (i < landmarks.size() - 1)
 		{
 			stream << ", ";

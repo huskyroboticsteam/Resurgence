@@ -25,6 +25,9 @@ public:
 			plan_target_sub(
 					this->create_subscription<geometry_msgs::msg::Point>(
 						"plan_target", 100, std::bind(&PlanViz::plan_target_callback, this, _1))),
+			pose_graph_sub(
+					this->create_subscription<geometry_msgs::msg::Point>(
+						"pose_graph", 100, std::bind(&PlanViz::pose_graph_callback, this, _1))),
 			lidar_sub(
 					this->create_subscription<geometry_msgs::msg::PoseArray>(
 						"lidar_scan", 100, std::bind(&PlanViz::lidar_callback, this, _1))),
@@ -83,11 +86,17 @@ private:
 		}
 	}
 
+	void pose_graph_callback(const geometry_msgs::msg::Point::SharedPtr message)
+	{
+		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Green);
+	}
+
 	MyWindow viz_window;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr plan_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr curr_pose_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr drive_target_sub;
 	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr plan_target_sub;
+	rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr pose_graph_sub;
 	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr lidar_sub;
 	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_sub;
 };

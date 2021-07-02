@@ -17,6 +17,7 @@
 #include "lidar/PointCloudProcessing.h"
 #include "simulator/graphics.h"
 #include "simulator/utils.h"
+#include "simulator/friendly_graph.h"
 #include "planning/plan.h"
 
 enum ControlState {
@@ -80,10 +81,15 @@ private:
 	int mapBlindPeriod; // the number of loops to wait before starting to build the map
 	bool mapDoesOverlap;
 	unsigned int mapOverlapSampleThreshold; // at least these many points required to overlap map
+  FriendlyGraph pose_graph;
+  int pose_id;
+  transform_t prev_odom;
+  trajectory_t smoothed_traj;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_target_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr pose_graph_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr lidar_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
 
@@ -97,7 +103,7 @@ private:
 
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;
-	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
+	pose_t poseToDraw(const pose_t &pose, const pose_t &current_pose) const;
 	void publish(Eigen::Vector3d pose,
 			rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
 	void publish_array(const points_t &points,
