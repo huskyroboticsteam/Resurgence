@@ -52,10 +52,10 @@ std::vector<Tag> Detector::_detectTagsImpl(const cv::Mat &input,
 		return {};
 	}
 	std::vector<std::vector<cv::Point2f>> corners;
-	std::vector<size_t> ids;
+	std::vector<int> ids;
 	cv::Mat undistorted;
 	cv::remap(input, undistorted, this->map1_, this->map2_, cv::INTER_LINEAR);
-	cv::aruco::detectMarkers(input, this->marker_set_->getDict(), corners, ids,
+	cv::aruco::detectMarkers(undistorted, this->marker_set_->getDict(), corners, ids,
 							 this->detector_params_,
 							 (rejected == nullptr ? cv::noArray() : *rejected),
 							 this->camera_params_.getCameraMatrix(),
@@ -67,7 +67,7 @@ std::vector<Tag> Detector::_detectTagsImpl(const cv::Mat &input,
 										 this->camera_params_.getDistCoeff(), rvecs, tvecs);
 	std::vector<Tag> tags;
 	for(size_t i = 0; i < ids.size(); i++){
-		size_t id = ids[i];
+		size_t id = static_cast<size_t>(ids[i]);
 		MarkerPattern marker = this->marker_set_->getMarkers()[id];
 		Tag current(marker, rvecs[i], tvecs[i]);
 		tags.push_back(current);
