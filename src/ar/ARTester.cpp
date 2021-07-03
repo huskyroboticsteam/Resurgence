@@ -144,8 +144,11 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+	const int w = PARAMS.getImageSize().width;
+	const int h = PARAMS.getImageSize().height;
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
+	std::cout << "Set image dimensions to " << w << " x " << h << std::endl;
 
 	std::cout << "Opening image window, press Q to quit" << std::endl;
 
