@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['widgetaccessor_33928',['WidgetAccessor',['https://docs.opencv.org/4.2.0/d7/dcd/classcv_1_1viz_1_1Widget.html#ad9090b861f080a9dedbd57a7a09fc979',1,'cv::viz::Widget']]],
-  ['workcycleobjectdetectorfunction_33929',['workcycleObjectDetectorFunction',['https://docs.opencv.org/4.2.0/db/de9/classcv_1_1DetectionBasedTracker.html#acbbf5473e3e123f3a376397d703a67af',1,'cv::DetectionBasedTracker']]]
+  ['vizstorage_36498',['VizStorage',['https://docs.opencv.org/4.2.0/d6/d32/classcv_1_1viz_1_1Viz3d.html#ac45aed87eab7bc5de73cd22660f689a5',1,'cv::viz::Viz3d']]]
 ];

@@ -1,3 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structcommand__t.html" title=" " alt="" coords="5,5,96,32"/>
+<area shape="rect" id="node1" href="$classCommandBase.html" title=" " alt="" coords="5,56,116,83"/>
+<area shape="rect" id="node2" href="$classDriveThroughGate.html" title=" " alt="" coords="184,5,311,32"/>
+<area shape="rect" id="node3" href="$classDriveToGate.html" title=" " alt="" coords="200,56,295,83"/>
+<area shape="rect" id="node4" href="$classDriveToGateNoCompass.html" title=" " alt="" coords="164,107,331,133"/>
 </map>

@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['qr_20matrix_20decomposition_34204',['QR matrix decomposition',['https://docs.opencv.org/4.2.0/db/d36/group__core__hal__interface__decomp__qr.html',1,'']]],
-  ['qr_20module_34205',['QR module',['https://eigen.tuxfamily.org/dox/group__QR__Module.html',1,'']]],
-  ['qt_20new_20functions_34206',['Qt New Functions',['https://docs.opencv.org/4.2.0/dc/d46/group__highgui__qt.html',1,'']]],
-  ['query_20i_2fo_20api_20backends_20registry_34207',['Query I/O API backends registry',['https://docs.opencv.org/4.2.0/de/db1/group__videoio__registry.html',1,'']]],
-  ['quick_20reference_20guide_34208',['Quick reference guide',['https://eigen.tuxfamily.org/dox/group__QuickRefPage.html',1,'']]],
-  ['quick_20reference_20guide_20for_20sparse_20matrices_34209',['Quick reference guide for sparse matrices',['https://eigen.tuxfamily.org/dox/group__SparseQuickRefPage.html',1,'']]]
+  ['qr_20matrix_20decomposition_36775',['QR matrix decomposition',['https://docs.opencv.org/4.2.0/db/d36/group__core__hal__interface__decomp__qr.html',1,'']]],
+  ['qr_20module_36776',['QR module',['https://eigen.tuxfamily.org/dox/group__QR__Module.html',1,'']]],
+  ['qt_20new_20functions_36777',['Qt New Functions',['https://docs.opencv.org/4.2.0/dc/d46/group__highgui__qt.html',1,'']]],
+  ['query_20i_2fo_20api_20backends_20registry_36778',['Query I/O API backends registry',['https://docs.opencv.org/4.2.0/de/db1/group__videoio__registry.html',1,'']]],
+  ['quick_20reference_20guide_36779',['Quick reference guide',['https://eigen.tuxfamily.org/dox/group__QuickRefPage.html',1,'']]],
+  ['quick_20reference_20guide_20for_20sparse_20matrices_36780',['Quick reference guide for sparse matrices',['https://eigen.tuxfamily.org/dox/group__SparseQuickRefPage.html',1,'']]]
 ];
