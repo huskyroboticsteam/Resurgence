@@ -24,8 +24,9 @@ private:
 	cam::CameraParams camera_params_;
 	cv::Ptr<cv::aruco::DetectorParameters> detector_params_;
 	cv::Mat map1_, map2_;
-    std::vector<Tag> _detectTagsImpl(const cv::Mat &input,
-									 std::vector<std::vector<cv::Point2f>>* rejected);
+	std::vector<Tag> _detectTagsImpl(const cv::Mat &input,
+									 std::vector<std::vector<cv::Point2f>> *rejected,
+									 bool undistort);
 
 public:
 	Detector();
@@ -33,8 +34,9 @@ public:
 			 cv::Ptr<cv::aruco::DetectorParameters> detector_params =
 				 cv::aruco::DetectorParameters::create());
 	std::vector<Tag> detectTags(const cv::Mat &input,
-								std::vector<std::vector<cv::Point2f>> &rejected_points);
-	std::vector<Tag> detectTags(const cv::Mat &input);
+								std::vector<std::vector<cv::Point2f>> &rejected_points,
+								bool undistort = true);
+	std::vector<Tag> detectTags(const cv::Mat &input, bool undistort = true);
 	cv::aruco::DetectorParameters getDetectorParams();
 	void setDetectorParams(cv::aruco::DetectorParameters params);
 	bool empty() const;

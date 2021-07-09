@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 		// Passes frame to the detector class.
 		// Tags will be located and returned.
 		std::vector<std::vector<cv::Point2f>> rejected;
-		std::vector<AR::Tag> tags = detector.detectTags(frame, rejected);
+		std::vector<AR::Tag> tags = detector.detectTags(frame, rejected, false);
 
 		// Draws an outline around the tag and a cross in the center
 		// Projects a cube onto the tag to debug TVec and RVec
