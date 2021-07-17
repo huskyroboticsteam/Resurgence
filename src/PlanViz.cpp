@@ -88,7 +88,7 @@ private:
 
 	void pose_graph_callback(const geometry_msgs::msg::Point::SharedPtr message)
 	{
-		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Green);
+		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Cyan);
 	}
 
 	MyWindow viz_window;

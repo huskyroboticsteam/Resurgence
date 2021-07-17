@@ -91,10 +91,10 @@ Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz)
                0, prior_xy_std * prior_xy_std, 0,
                0, 0, prior_th_std * prior_th_std;
   pose_graph.addPosePrior(0, start_pose_guess, prior_cov); // informed prior
-  //for (int l = 0; l < L; l++) {
+  // TODO add informed priors for landmark locations
+  // (will require changing the constructor arguments for pose_graph above)
   //  point_t location({0,0,1});
-  //  fg.addLandmarkPrior(l, location, 20.0); // uninformative prior
-  //}
+  //  pose_graph.addLandmarkPrior(lm_id, location, 20.0); // uninformative prior
   pose_graph.solve();
   smoothed_traj = pose_graph.getSmoothedTrajectory();
 }
@@ -442,7 +442,6 @@ void Autonomous::autonomyIter()
 		}
 		pose_graph.addGPSMeasurement(pose_id, gps);
 		pose_graph.solve(); // TODO put in a separate thread
-		// also TODO trim the pose graph so it doesn't grow without bound
 		smoothed_traj = pose_graph.getSmoothedTrajectory();
 	}
 

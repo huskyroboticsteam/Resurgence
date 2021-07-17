@@ -81,10 +81,13 @@ private:
 	int mapBlindPeriod; // the number of loops to wait before starting to build the map
 	bool mapDoesOverlap;
 	unsigned int mapOverlapSampleThreshold; // at least these many points required to overlap map
+
+	/* Variables for pose graph localization */
 	FriendlyGraph pose_graph;
-	int pose_id;
-	transform_t prev_odom;
-	trajectory_t smoothed_traj;
+	int pose_id; // counter for how many poses we've added to the graph
+	transform_t prev_odom; // odom measurement at the time of the most recent pose in the graph
+	trajectory_t smoothed_traj; // cached solution to pose graph optimization
+
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;
