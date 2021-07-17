@@ -3,7 +3,6 @@
 #include <cmath>
 #include <memory>
 #include <vector>
-#include <queue>
 #include <future>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -48,8 +47,8 @@ constexpr std::array<const char *, 7> NAV_STATE_NAMES ({
 class Autonomous : rclcpp::Node
 {
 public:
-	explicit Autonomous(const std::queue<URCLeg> &urc_targets, double controlHz);
-	Autonomous(const std::queue<URCLeg> &urc_targets, double controlHz, const pose_t &startPose);
+	explicit Autonomous(const std::vector<URCLeg> &urc_targets, double controlHz);
+	Autonomous(const std::vector<URCLeg> &urc_targets, double controlHz, const pose_t &startPose);
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	// Gets the target's coordinate
@@ -57,7 +56,8 @@ public:
 	void autonomyIter();
 
 private:
-	std::queue<URCLeg> urc_targets;
+	std::vector<URCLeg> urc_targets;
+  size_t leg_idx; // which of the urc_targets we're currently navigating toward
 	pose_t search_target;
 	// Gate targets are {NAN, NAN, NAN} if unset and {INF, INF, INF} if reached
 	// gate_targets.second(2) is NAN if targets have not been refined with more accurate landmark measurements

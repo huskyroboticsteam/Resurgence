@@ -4,7 +4,6 @@
 #include <csignal>
 #include <unistd.h>
 #include <array>
-#include <queue>
 #include <fstream>
 #include <sstream>
 
@@ -140,8 +139,8 @@ void closeSim(int signum)
     raise(SIGTERM);
 }
 
-std::queue<URCLeg> parseGPSLegs(std::string filepath) {
-	std::queue<URCLeg> urc_legs;
+std::vector<URCLeg> parseGPSLegs(std::string filepath) {
+	std::vector<URCLeg> urc_legs;
 	std::ifstream gps_legs(filepath);
 
 	int left_post_id, right_post_id;
@@ -161,7 +160,7 @@ std::queue<URCLeg> parseGPSLegs(std::string filepath) {
 			point_t leg_map_space = gpsToMeters(lon, lat);
 			URCLeg leg = {left_post_id, right_post_id, leg_map_space};
 			log(LOG_INFO, "Got urc leg at %f %f\n", leg_map_space(0), leg_map_space(1));
-			urc_legs.push(leg);
+			urc_legs.push_back(leg);
 		}
 	}
 	log(LOG_INFO, "Got %d urc legs\n", urc_legs.size());
@@ -173,7 +172,7 @@ std::queue<URCLeg> parseGPSLegs(std::string filepath) {
 		// File does not exist or has no valid legs, use simulation legs as defaults
 		for (int i = 0; i < 7; i++)
 		{
-			urc_legs.push(getLeg(i));
+			urc_legs.push_back(getLeg(i));
 		}
 	}
 
@@ -193,7 +192,7 @@ int rover_loop(int argc, char **argv)
     CANPacket packet;
     // Target locations for autonomous navigation
     // Eventually this will be set by communication from the base station
-    std::queue<URCLeg> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
+    std::vector<URCLeg> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
     Autonomous autonomous(urc_legs, CONTROL_HZ);
     char buffer[MAXLINE];
     struct timeval tp_rover_start;
