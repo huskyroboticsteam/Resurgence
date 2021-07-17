@@ -1,16 +1,16 @@
 var searchData=
 [
-  ['random_20number_20distributions_36781',['Random Number Distributions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01542.html',1,'']]],
-  ['random_20number_20generation_36782',['Random Number Generation',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01500.html',1,'']]],
-  ['random_20number_20generators_36783',['Random Number Generators',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01541.html',1,'']]],
-  ['random_20number_20utilities_36784',['Random Number Utilities',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01547.html',1,'']]],
-  ['rational_20arithmetic_36785',['Rational Arithmetic',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01483.html',1,'']]],
-  ['reconstruction_36786',['Reconstruction',['https://docs.opencv.org/4.2.0/da/db5/group__reconstruction.html',1,'']]],
-  ['reductions_2c_20visitors_20and_20broadcasting_36787',['Reductions, visitors and broadcasting',['https://eigen.tuxfamily.org/dox/group__TutorialReductionsVisitorsBroadcasting.html',1,'']]],
-  ['reference_36788',['Reference',['https://eigen.tuxfamily.org/dox/group__DenseLinearSolvers__Reference.html',1,'(Global Namespace)'],['https://eigen.tuxfamily.org/dox/group__DenseMatrixManipulation__Reference.html',1,'(Global Namespace)'],['https://eigen.tuxfamily.org/dox/group__Geometry__Reference.html',1,'(Global Namespace)'],['https://eigen.tuxfamily.org/dox/group__Sparse__Reference.html',1,'(Global Namespace)']]],
-  ['regular_20expressions_36789',['Regular Expressions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01502.html',1,'']]],
-  ['reshape_36790',['Reshape',['https://eigen.tuxfamily.org/dox/group__TutorialReshape.html',1,'']]],
-  ['rgb_2ddepth_20processing_36791',['RGB-Depth Processing',['https://docs.opencv.org/4.2.0/d2/d3a/group__rgbd.html',1,'']]],
-  ['robust_20estimation_36792',['Robust Estimation',['https://docs.opencv.org/4.2.0/db/d3a/group__robust.html',1,'']]],
-  ['rotation_20estimation_36793',['Rotation Estimation',['https://docs.opencv.org/4.2.0/d7/d74/group__stitching__rotation.html',1,'']]]
+  ['random_20number_20distributions_36792',['Random Number Distributions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01542.html',1,'']]],
+  ['random_20number_20generation_36793',['Random Number Generation',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01500.html',1,'']]],
+  ['random_20number_20generators_36794',['Random Number Generators',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01541.html',1,'']]],
+  ['random_20number_20utilities_36795',['Random Number Utilities',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01547.html',1,'']]],
+  ['rational_20arithmetic_36796',['Rational Arithmetic',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01483.html',1,'']]],
+  ['reconstruction_36797',['Reconstruction',['https://docs.opencv.org/4.2.0/da/db5/group__reconstruction.html',1,'']]],
+  ['reductions_2c_20visitors_20and_20broadcasting_36798',['Reductions, visitors and broadcasting',['https://eigen.tuxfamily.org/dox/group__TutorialReductionsVisitorsBroadcasting.html',1,'']]],
+  ['reference_36799',['Reference',['https://eigen.tuxfamily.org/dox/group__DenseLinearSolvers__Reference.html',1,'(Global Namespace)'],['https://eigen.tuxfamily.org/dox/group__DenseMatrixManipulation__Reference.html',1,'(Global Namespace)'],['https://eigen.tuxfamily.org/dox/group__Geometry__Reference.html',1,'(Global Namespace)'],['https://eigen.tuxfamily.org/dox/group__Sparse__Reference.html',1,'(Global Namespace)']]],
+  ['regular_20expressions_36800',['Regular Expressions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01502.html',1,'']]],
+  ['reshape_36801',['Reshape',['https://eigen.tuxfamily.org/dox/group__TutorialReshape.html',1,'']]],
+  ['rgb_2ddepth_20processing_36802',['RGB-Depth Processing',['https://docs.opencv.org/4.2.0/d2/d3a/group__rgbd.html',1,'']]],
+  ['robust_20estimation_36803',['Robust Estimation',['https://docs.opencv.org/4.2.0/db/d3a/group__robust.html',1,'']]],
+  ['rotation_20estimation_36804',['Rotation Estimation',['https://docs.opencv.org/4.2.0/d7/d74/group__stitching__rotation.html',1,'']]]
 ];
