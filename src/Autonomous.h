@@ -17,6 +17,7 @@
 #include "lidar/PointCloudProcessing.h"
 #include "simulator/graphics.h"
 #include "simulator/utils.h"
+#include "simulator/friendly_graph.h"
 #include "planning/plan.h"
 
 enum ControlState {
@@ -72,6 +73,7 @@ private:
 	int time_since_plan;
 	plan_t plan;
 	std::future<plan_t> pending_plan;
+	std::future<transform_t> pending_solve;
 	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
@@ -80,24 +82,33 @@ private:
 	int mapBlindPeriod; // the number of loops to wait before starting to build the map
 	bool mapDoesOverlap;
 	unsigned int mapOverlapSampleThreshold; // at least these many points required to overlap map
+
+	/* Variables for pose graph localization */
+	FriendlyGraph pose_graph;
+	int pose_id; // counter for how many poses we've added to the graph
+	transform_t prev_odom; // odom measurement at the time of the most recent pose in the graph
+	trajectory_t smoothed_traj; // cached solution to pose graph optimization
+
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_target_pub;
+	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr pose_graph_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr lidar_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
 
-  void setNavState(NavState s);
-  void update_nav_state(const pose_t &pose, const pose_t &plan_target);
-  pose_t choose_plan_target(const pose_t &pose);
-  void updateLandmarkInformation(const transform_t &invTransform);
-  void computeGateTargets(const pose_t &pose);
-  void updateSearchTarget();
+	void setNavState(NavState s);
+	void update_nav_state(const pose_t &pose, const pose_t &plan_target);
+	pose_t choose_plan_target(const pose_t &pose);
+	void updateLandmarkInformation(const transform_t &invTransform);
+	void computeGateTargets(const pose_t &pose);
+	void updateSearchTarget();
 	void endCurrentLeg();
+	transform_t optimizePoseGraph(transform_t current_gps, transform_t current_odom);
 
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;
-	pose_t poseToDraw(pose_t &pose, pose_t &current_pose) const;
+	pose_t poseToDraw(const pose_t &pose, const pose_t &current_pose) const;
 	void publish(Eigen::Vector3d pose,
 			rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
 	void publish_array(const points_t &points,
