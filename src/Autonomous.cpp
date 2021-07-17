@@ -49,7 +49,7 @@ static void printLandmarks(points_t& landmarks, int log_level = LOG_DEBUG);
 Autonomous::Autonomous(const std::vector<URCLeg> &_targets, double controlHz)
 	: Node("autonomous"),
 		urc_targets(_targets),
-    leg_idx(5),
+		leg_idx(5),
 		search_target({_targets[0].approx_GPS(0) - PI, _targets[0].approx_GPS(1), -PI / 2}),
 		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
 		poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
@@ -72,7 +72,11 @@ Autonomous::Autonomous(const std::vector<URCLeg> &_targets, double controlHz)
 		mapBlindPeriod(15),
 		mapDoesOverlap(false),
 		mapOverlapSampleThreshold(15),
-		pose_graph(0, 10), // for now, we use no landmarks for state estimation
+		// For now, we use no landmarks for state estimation in the pose graph.
+		// We also use a gps_xy_std that's larger than the true std because empirically
+		// that leads to smoother changes in the pose estimate (at least in the simulator),
+		// which are easier for the controller to work with.
+		pose_graph(0, 10, 0.3, 5.0, 0.05),
 		pose_id(0),
 		prev_odom(toTransform({0,0,0})),
 		smoothed_traj({}),
