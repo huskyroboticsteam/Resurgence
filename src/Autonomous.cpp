@@ -70,7 +70,7 @@ Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz)
 		mapBlindPeriod(15),
 		mapDoesOverlap(false),
 		mapOverlapSampleThreshold(15),
-		pose_graph(0), // for now, we use no landmarks for state estimation
+		pose_graph(0, 10), // for now, we use no landmarks for state estimation
 		pose_id(0),
 		prev_odom(toTransform({0,0,0})),
 		smoothed_traj({}),
@@ -84,7 +84,13 @@ Autonomous::Autonomous(const std::queue<URCLeg> &_targets, double controlHz)
 {
   prev_odom = readOdom();
   transform_t start_pose_guess = toTransform({13,-1,M_PI*2/3});
-  pose_graph.addPosePrior(0, start_pose_guess, 3.0, 1.0); // informed prior
+  float prior_xy_std = 3.0;
+  float prior_th_std = 1.0;
+  covariance<3> prior_cov = covariance<3>::Zero();
+  prior_cov << prior_xy_std * prior_xy_std, 0, 0,
+               0, prior_xy_std * prior_xy_std, 0,
+               0, 0, prior_th_std * prior_th_std;
+  pose_graph.addPosePrior(0, start_pose_guess, prior_cov); // informed prior
   //for (int l = 0; l < L; l++) {
   //  point_t location({0,0,1});
   //  fg.addLandmarkPrior(l, location, 20.0); // uninformative prior
@@ -421,9 +427,9 @@ void Autonomous::autonomyIter()
 	point_t rightPost = {0,0,0};
 	bool is_gate = (urc_targets.front().right_post_id != -1);
 	if (is_gate) rightPost = landmarks.at(urc_targets.front().right_post_id);
-	if (leftPost(2) != 0) log(LOG_INFO, "Cam sees left post: %f %f %f\n", leftPost(0), leftPost(1), leftPost(2));
-	if (rightPost(2) != 0) log(LOG_INFO, "Cam sees right post: %f %f %f\n", rightPost(0), rightPost(1), rightPost(2));
-	if (leftPost(2) == 0 && rightPost(2) == 0) log(LOG_INFO, "Cam sees nothing\n");
+	if (leftPost(2) != 0) log(LOG_DEBUG, "Cam sees left post: %f %f %f\n", leftPost(0), leftPost(1), leftPost(2));
+	if (rightPost(2) != 0) log(LOG_DEBUG, "Cam sees right post: %f %f %f\n", rightPost(0), rightPost(1), rightPost(2));
+	if (leftPost(2) == 0 && rightPost(2) == 0) log(LOG_DEBUG, "Cam sees nothing\n");
 
 	transform_t gps = readGPS();
 	transform_t odom = readOdom();
@@ -442,7 +448,7 @@ void Autonomous::autonomyIter()
 
 	transform_t current_tf = odom * prev_odom.inverse() * smoothed_traj[smoothed_traj.size()-1];
 	pose_t pose = toPose(current_tf, 0.0);
-	log(LOG_INFO, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
+	log(LOG_DEBUG, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
 
 	for (transform_t &sm_tf : smoothed_traj) {
 		const pose_t sm_tf_transformed = poseToDraw(toPose(sm_tf, 0.0), pose);

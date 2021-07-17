@@ -81,10 +81,10 @@ private:
 	int mapBlindPeriod; // the number of loops to wait before starting to build the map
 	bool mapDoesOverlap;
 	unsigned int mapOverlapSampleThreshold; // at least these many points required to overlap map
-  FriendlyGraph pose_graph;
-  int pose_id;
-  transform_t prev_odom;
-  trajectory_t smoothed_traj;
+	FriendlyGraph pose_graph;
+	int pose_id;
+	transform_t prev_odom;
+	trajectory_t smoothed_traj;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
 	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;
@@ -93,12 +93,12 @@ private:
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr lidar_pub;
 	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
 
-  void setNavState(NavState s);
-  void update_nav_state(const pose_t &pose, const pose_t &plan_target);
-  pose_t choose_plan_target(const pose_t &pose);
-  void updateLandmarkInformation(const transform_t &invTransform);
-  void computeGateTargets(const pose_t &pose);
-  void updateSearchTarget();
+	void setNavState(NavState s);
+	void update_nav_state(const pose_t &pose, const pose_t &plan_target);
+	pose_t choose_plan_target(const pose_t &pose);
+	void updateLandmarkInformation(const transform_t &invTransform);
+	void computeGateTargets(const pose_t &pose);
+	void updateSearchTarget();
 	void endCurrentLeg();
 
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
