@@ -1,12 +1,9 @@
 ## Style Guide
-- Curly braces are always on the next line
+- Opening curly braces are on the same line
 ```
-int MyFunction()
-{
-    if(true)
-    {
-        while(false)
-        {
+int MyFunction() {
+    if(true) {
+        while(false) {
         }
     }
     return 0;
@@ -18,7 +15,7 @@ int MyFunction()
 - Always use C++'s includes: `<cstdint>, <cstdio>`, NOT `<stdint.h>, <stdio.h>`
 - Order of includes is: Our includes, C++ Standard includes, kernel includes.
   Include an extra line between each group.
-Good:
+  Good:
 ```
 #include "Globals.h"
 
@@ -26,7 +23,7 @@ Good:
 
 #include <signal.h>
 ```
-Bad:
+  Bad:
 ```
 #include <iostream>
 #include <signal.h>
@@ -35,8 +32,9 @@ Bad:
 ```
 - ALWAYS guard a header file with `#pragma once`
 - Avoid #define, prefer constexpr
-- Avoid raw pointers, prefer smart pointers (i.e shared_ptr) or references  
+- Avoid raw pointers, prefer smart pointers (i.e shared_ptr) or references
 
 ### Indentation
-Use tabs to indent, and use additional spaces to align multi-line code (i.e. when lines are too long and
-have to be wrapped).
+- Use tabs to indent, and use additional spaces to align multi-line
+code (i.e. when lines are too long and have to be wrapped).
+- Indent `case` labels inside of a `switch` statement.

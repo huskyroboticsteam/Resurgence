@@ -2,7 +2,7 @@ IndentWidth: 4
 TabWidth: 4
 ColumnLimit: 95
 UseTab: Always
-BreakBeforeBraces: Allman
+BreakBeforeBraces: Attach
 AllowShortIfStatementsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AccessModifierOffset: -4
@@ -14,3 +14,4 @@ IncludeCategories:
     Priority:	2
   - Regex:	"<.+>"
     Priority:	1
+IndentCaseLabels: true
