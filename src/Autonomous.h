@@ -73,6 +73,7 @@ private:
 	int time_since_plan;
 	plan_t plan;
 	std::future<plan_t> pending_plan;
+	std::future<transform_t> pending_solve;
 	double plan_cost;
 	pose_t plan_base;
 	int plan_idx;
@@ -103,6 +104,7 @@ private:
 	void computeGateTargets(const pose_t &pose);
 	void updateSearchTarget();
 	void endCurrentLeg();
+	transform_t optimizePoseGraph(transform_t current_gps, transform_t current_odom);
 
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;
