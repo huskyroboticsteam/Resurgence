@@ -67,12 +67,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><ul>
-<li>Curly braces are always on the next line <div class="fragment"><div class="line">int MyFunction()</div>
-<div class="line">{</div>
-<div class="line">    if(true)</div>
-<div class="line">    {</div>
-<div class="line">        while(false)</div>
-<div class="line">        {</div>
+<li>Opening curly braces are on the same line <div class="fragment"><div class="line">int MyFunction() {</div>
+<div class="line">    if(true) {</div>
+<div class="line">        while(false) {</div>
 <div class="line">        }</div>
 <div class="line">    }</div>
 <div class="line">    return 0;</div>
@@ -94,12 +91,14 @@ $(function() {
 </div><!-- fragment --></li>
 <li>ALWAYS guard a header file with <code>#pragma once</code></li>
 <li>Avoid #define, prefer constexpr</li>
-<li>Avoid raw pointers, prefer smart pointers (i.e shared_ptr) or references <br  />
-</li>
+<li>Avoid raw pointers, prefer smart pointers (i.e shared_ptr) or references</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md1"></a>
 Indentation</h2>
-<p>Use tabs to indent, and use additional spaces to align multi-line code (i.e. when lines are too long and have to be wrapped). </p>
+<ul>
+<li>Use tabs to indent, and use additional spaces to align multi-line code (i.e. when lines are too long and have to be wrapped).</li>
+<li>Indent <code>case</code> labels inside of a <code>switch</code> statement. </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
