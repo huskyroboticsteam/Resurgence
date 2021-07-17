@@ -418,7 +418,19 @@ void Autonomous::updateSearchTarget()
   }
 }
 
-plan_t computePlan(std::function<bool(double, double, double)> collide_func, const point_t& goal){
+plan_t computePlan(transform_t invTransform, point_t goal)
+{
+  // We need to readLidar again from within the planning thread, for thread safety
+  points_t lidar_scan = readLidarScan();
+  auto collide_func = [&](double x, double y, double radius) -> bool {
+      // transform the point to check into map space
+      point_t relPoint = {x, y, 1};
+      point_t p = invTransform * relPoint;
+      transform_t coll_tf = toTransform(relPoint);
+      // TODO implement thread-safe access to `map` if `USE_MAP` is true
+      //if (USE_MAP) return map.hasPointWithin(p, radius); // TODO is this thread-safe?
+      return collides(coll_tf, lidar_scan, radius);
+  };
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
@@ -495,16 +507,7 @@ void Autonomous::autonomyIter()
       point_t_goal.topRows(2) = plan_target.topRows(2);
       point_t_goal(2) = 1.0;
       point_t_goal = toTransform(pose) * point_t_goal;
-      auto collide_func = [&](double x, double y, double radius) -> bool {
-          // transform the point to check into map space
-          point_t relPoint = {x, y, 1};
-          point_t p = invTransform * relPoint;
-          transform_t coll_tf = toTransform(relPoint);
-          if (USE_MAP) return map.hasPointWithin(p, radius);
-          else return collides(coll_tf, lidar_scan, radius);
-      };
-      pending_plan =
-          std::async(std::launch::async, &computePlan, collide_func, point_t_goal);
+      pending_plan = std::async(std::launch::async, &computePlan, invTransform, point_t_goal);
   }
   // if there is a plan pending, check if it is ready.
   else if(pending_plan.wait_for(ZERO_DURATION) == std::future_status::ready){
