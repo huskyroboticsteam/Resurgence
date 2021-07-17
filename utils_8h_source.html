@@ -138,10 +138,15 @@ $(function() {
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;transform_t toTransform(<span class="keyword">const</span> pose_t &amp;pose);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">// One sample from a standard normal distribution</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keywordtype">double</span> stdn();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">// One sample from a standard normal distribution.</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">// The thread_id is used to choose which random number generator to use.</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">// This is important when trying to rerun a particular random seed; each thread</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">// needs its own dedicated sequence of random numbers.</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keywordtype">double</span> stdn(<span class="keywordtype">int</span> thread_id);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">// Returns the random seed used for the stdn() function</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keywordtype">long</span> getNormalSeed();</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aa00182_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a></div></div>
 <div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt; obstacle_t &gt;</a></div></div>
 <div class="ttc" id="astructURCLeg_html"><div class="ttname"><a href="structURCLeg.html">URCLeg</a></div><div class="ttdef"><b>Definition:</b> utils.h:23</div></div>

@@ -74,15 +74,17 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#ifndef PRINT_RESULTS_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#define PRINT_RESULTS_H</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;graph.h&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;friendly_graph.h&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;utils.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;graphics.h&quot;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keywordtype">void</span> printResults(<a class="code" href="classMyWindow.html">MyWindow</a> &amp;window, <a class="code" href="classGraph.html">Graph</a> &amp;g, <span class="keyword">const</span> <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">trajectory_t</a> &amp;true_trajectory, <span class="keyword">const</span> <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> &amp;true_landmarks);</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector</a></div></div>
-<div class="ttc" id="aclassGraph_html"><div class="ttname"><a href="classGraph.html">Graph</a></div><div class="ttdef"><b>Definition:</b> graph.h:19</div></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keywordtype">void</span> printResults(<a class="code" href="classMyWindow.html">MyWindow</a> &amp;window, <a class="code" href="classFriendlyGraph.html">FriendlyGraph</a> &amp;fg,</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">const</span> <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">trajectory_t</a> &amp;true_trajectory, <span class="keyword">const</span> <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> &amp;true_landmarks,</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">const</span> <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">trajectory_t</a> &amp;odom_trajectory, <span class="keyword">const</span> <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> &amp;prior_landmarks);</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt; transform_t &gt;</a></div></div>
+<div class="ttc" id="aclassFriendlyGraph_html"><div class="ttname"><a href="classFriendlyGraph.html">FriendlyGraph</a></div><div class="ttdef"><b>Definition:</b> friendly_graph.h:8</div></div>
 <div class="ttc" id="aclassMyWindow_html"><div class="ttname"><a href="classMyWindow.html">MyWindow</a></div><div class="ttdef"><b>Definition:</b> graphics.h:7</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
