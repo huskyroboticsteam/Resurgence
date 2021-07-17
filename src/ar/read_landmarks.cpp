@@ -54,8 +54,9 @@ void detectLandmarksLoop(){
 			// that ID, add it to the output array (doing appropriate coordinate space
 			// transforms). If not, add a zero point.
 			for (size_t i = 0; i < NUM_LANDMARKS; i++) {
-				if (ids_to_camera_coords.find(i) != ids_to_camera_coords.end()) {
-					cv::Vec3d coords = ids_to_camera_coords[i];
+				int id = static_cast<int>(i);
+				if (ids_to_camera_coords.find(id) != ids_to_camera_coords.end()) {
+					cv::Vec3d coords = ids_to_camera_coords[id];
 					// if we have extrinsic parameters, multiply coordinates by them to do
 					// appropriate transformation.
 					if (ar_cam.hasExtrinsicParams()) {
@@ -75,7 +76,7 @@ void detectLandmarksLoop(){
 			}
 
 			landmark_lock.lock();
-			for (int i = 0; i < NUM_LANDMARKS; i++) {
+			for (size_t i = 0; i < NUM_LANDMARKS; i++) {
 				// If we already saw this landmark, we don't want to overwrite that with zeros
 				// if we didn't see the landmark on this particular frame. This is because
 				// landmark detection is a bit spotty: even when the rover is not moving,
@@ -97,7 +98,7 @@ void detectLandmarksLoop(){
 
 void zeroCurrent() {
 	current_landmarks.clear();
-	for (int i = 0; i < NUM_LANDMARKS; i++) {
+	for (size_t i = 0; i < NUM_LANDMARKS; i++) {
 		current_landmarks.push_back(ZERO_POINT);
 	}
 }
