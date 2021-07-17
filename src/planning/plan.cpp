@@ -11,6 +11,8 @@
 #include "../simulator/constants.h"
 #include "../simulator/graphics.h"
 
+const double EPSILON = 1.2; // heuristic weight for weighted A*
+
 using namespace NavSim;
 
 // TODO implement goal orientations?
@@ -90,8 +92,8 @@ class NodeCompare
 public:
   bool operator() (const Node *lhs, const Node *rhs)
   {
-    return (lhs->acc_cost + EPS*(lhs->heuristic_to_goal)) >
-           (rhs->acc_cost + EPS*(rhs->heuristic_to_goal));
+    return (lhs->acc_cost + EPSILON*(lhs->heuristic_to_goal)) >
+           (rhs->acc_cost + EPSILON*(rhs->heuristic_to_goal));
   }
 };
 
