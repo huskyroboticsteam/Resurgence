@@ -66,7 +66,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classAbstractFactor-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">AbstractFactor Class Reference</div>  </div>
+<div class="title">AbstractFactor Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
@@ -88,18 +88,18 @@ Inheritance diagram for AbstractFactor:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5e57b782ce1fc736b90e5358821d6480"><td class="memItemLeft" align="right" valign="top"><a id="a5e57b782ce1fc736b90e5358821d6480"></a>
-virtual double&#160;</td><td class="memItemRight" valign="bottom"><b>eval</b> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a> &amp;)</td></tr>
-<tr class="separator:a5e57b782ce1fc736b90e5358821d6480"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b3c90a3966a2d429d1470662b87f4c5"><td class="memItemLeft" align="right" valign="top"><a id="a8b3c90a3966a2d429d1470662b87f4c5"></a>
-virtual <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a>&#160;</td><td class="memItemRight" valign="bottom"><b>gradient_at</b> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a> &amp;)</td></tr>
-<tr class="separator:a8b3c90a3966a2d429d1470662b87f4c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a981329ff4eeafb6a71345b217b567dba"><td class="memItemLeft" align="right" valign="top"><a id="a981329ff4eeafb6a71345b217b567dba"></a>
-virtual <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">hessian</a>&#160;</td><td class="memItemRight" valign="bottom"><b>hessian_at</b> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a> &amp;)</td></tr>
-<tr class="separator:a981329ff4eeafb6a71345b217b567dba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20094e41ff5c5e0b76c60991527c56dc"><td class="memItemLeft" align="right" valign="top"><a id="a20094e41ff5c5e0b76c60991527c56dc"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>shiftIndices</b> (int poseSize, int firstPoseIdx)</td></tr>
-<tr class="separator:a20094e41ff5c5e0b76c60991527c56dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4d69e392c7c3a71c8eeecf59a216bfe"><td class="memItemLeft" align="right" valign="top"><a id="ad4d69e392c7c3a71c8eeecf59a216bfe"></a>
+virtual double&#160;</td><td class="memItemRight" valign="bottom"><b>eval</b> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a> &amp;)=0</td></tr>
+<tr class="separator:ad4d69e392c7c3a71c8eeecf59a216bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70d874dca1e0f5ccbceb89f80f39d500"><td class="memItemLeft" align="right" valign="top"><a id="a70d874dca1e0f5ccbceb89f80f39d500"></a>
+virtual <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a>&#160;</td><td class="memItemRight" valign="bottom"><b>gradient_at</b> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a> &amp;)=0</td></tr>
+<tr class="separator:a70d874dca1e0f5ccbceb89f80f39d500"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4354e267ce02a5147e65f5bb0b1a43e"><td class="memItemLeft" align="right" valign="top"><a id="ad4354e267ce02a5147e65f5bb0b1a43e"></a>
+virtual <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">hessian</a>&#160;</td><td class="memItemRight" valign="bottom"><b>hessian_at</b> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">values</a> &amp;)=0</td></tr>
+<tr class="separator:ad4354e267ce02a5147e65f5bb0b1a43e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b5fa684bdf49cefe05dd7888b10eaba"><td class="memItemLeft" align="right" valign="top"><a id="a0b5fa684bdf49cefe05dd7888b10eaba"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>shiftIndices</b> (int poseSize, int firstPoseIdx)=0</td></tr>
+<tr class="separator:a0b5fa684bdf49cefe05dd7888b10eaba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/simulator/<a class="el" href="graph_8h_source.html">graph.h</a></li>
