@@ -424,17 +424,17 @@ void Autonomous::updateSearchTarget()
 
 plan_t computePlan(transform_t invTransform, point_t goal)
 {
-  // We need to readLidar again from within the planning thread, for thread safety
-  points_t lidar_scan = readLidarScan();
-  auto collide_func = [&](double x, double y, double radius) -> bool {
-      // transform the point to check into map space
-      point_t relPoint = {x, y, 1};
-      point_t p = invTransform * relPoint;
-      transform_t coll_tf = toTransform(relPoint);
-      // TODO implement thread-safe access to `map` if `USE_MAP` is true
-      //if (USE_MAP) return map.hasPointWithin(p, radius); // TODO is this thread-safe?
-      return collides(coll_tf, lidar_scan, radius);
-  };
+	// We need to readLidar again from within the planning thread, for thread safety
+	points_t lidar_scan = readLidarScan();
+	auto collide_func = [&](double x, double y, double radius) -> bool {
+			// transform the point to check into map space
+			point_t relPoint = {x, y, 1};
+			point_t p = invTransform * relPoint;
+			transform_t coll_tf = toTransform(relPoint);
+			// TODO implement thread-safe access to `map` if `USE_MAP` is true
+			//if (USE_MAP) return map.hasPointWithin(p, radius);
+			return collides(coll_tf, lidar_scan, radius);
+	};
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
