@@ -11,7 +11,7 @@
 #include "../simulator/constants.h"
 #include "../simulator/graphics.h"
 
-const double EPSILON = 1.2; // heuristic weight for weighted A*
+constexpr double EPSILON = 1.2; // heuristic weight for weighted A*
 
 using namespace NavSim;
 
@@ -197,4 +197,3 @@ double planCostFromIndex(plan_t &plan, int idx) {
   }
   return cost;
 }
-
