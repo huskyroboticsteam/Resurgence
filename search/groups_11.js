@@ -1,17 +1,17 @@
 var searchData=
 [
-  ['pardisosupport_20module_36763',['PardisoSupport module',['https://eigen.tuxfamily.org/dox/group__PardisoSupport__Module.html',1,'']]],
-  ['partial_20list_20of_20implemented_20layers_36764',['Partial List of Implemented Layers',['https://docs.opencv.org/4.2.0/d6/d87/group__dnnLayerList.html',1,'']]],
-  ['passing_20eigen_20objects_20by_20value_20to_20functions_36765',['Passing Eigen objects by value to functions',['https://eigen.tuxfamily.org/dox/group__TopicPassingByValue.html',1,'']]],
-  ['pastixsupport_20module_36766',['PaStiXSupport module',['https://eigen.tuxfamily.org/dox/group__PaStiXSupport__Module.html',1,'']]],
-  ['pedestrian_20detection_36767',['Pedestrian Detection',['https://docs.opencv.org/4.2.0/d8/db1/group__datasets__pd.html',1,'']]],
-  ['per_2delement_20operations_36768',['Per-element Operations',['https://docs.opencv.org/4.2.0/d8/d34/group__cudaarithm__elem.html',1,'']]],
-  ['phase_20unwrapping_20api_36769',['Phase Unwrapping API',['https://docs.opencv.org/4.2.0/df/d3a/group__phase__unwrapping.html',1,'']]],
-  ['planar_20subdivision_36770',['Planar Subdivision',['https://docs.opencv.org/4.2.0/df/d5b/group__imgproc__subdiv2d.html',1,'']]],
-  ['plot_20function_20for_20mat_20data_36771',['Plot function for Mat data',['https://docs.opencv.org/4.2.0/db/dfe/group__plot.html',1,'']]],
-  ['pointer_20abstractions_36772',['Pointer Abstractions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01481.html',1,'']]],
-  ['poisson_20distributions_36773',['Poisson Distributions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01546.html',1,'']]],
-  ['policy_2dbased_20data_20structures_36774',['Policy-Based Data Structures',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01536.html',1,'']]],
-  ['private_20implementation_20helpers_36775',['Private implementation helpers',['https://docs.opencv.org/4.2.0/dd/d96/group__core__hal__intrin__impl.html',1,'']]],
-  ['projection_36776',['Projection',['https://docs.opencv.org/4.2.0/d0/daf/group__projection.html',1,'']]]
+  ['pardisosupport_20module_36764',['PardisoSupport module',['https://eigen.tuxfamily.org/dox/group__PardisoSupport__Module.html',1,'']]],
+  ['partial_20list_20of_20implemented_20layers_36765',['Partial List of Implemented Layers',['https://docs.opencv.org/4.2.0/d6/d87/group__dnnLayerList.html',1,'']]],
+  ['passing_20eigen_20objects_20by_20value_20to_20functions_36766',['Passing Eigen objects by value to functions',['https://eigen.tuxfamily.org/dox/group__TopicPassingByValue.html',1,'']]],
+  ['pastixsupport_20module_36767',['PaStiXSupport module',['https://eigen.tuxfamily.org/dox/group__PaStiXSupport__Module.html',1,'']]],
+  ['pedestrian_20detection_36768',['Pedestrian Detection',['https://docs.opencv.org/4.2.0/d8/db1/group__datasets__pd.html',1,'']]],
+  ['per_2delement_20operations_36769',['Per-element Operations',['https://docs.opencv.org/4.2.0/d8/d34/group__cudaarithm__elem.html',1,'']]],
+  ['phase_20unwrapping_20api_36770',['Phase Unwrapping API',['https://docs.opencv.org/4.2.0/df/d3a/group__phase__unwrapping.html',1,'']]],
+  ['planar_20subdivision_36771',['Planar Subdivision',['https://docs.opencv.org/4.2.0/df/d5b/group__imgproc__subdiv2d.html',1,'']]],
+  ['plot_20function_20for_20mat_20data_36772',['Plot function for Mat data',['https://docs.opencv.org/4.2.0/db/dfe/group__plot.html',1,'']]],
+  ['pointer_20abstractions_36773',['Pointer Abstractions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01481.html',1,'']]],
+  ['poisson_20distributions_36774',['Poisson Distributions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01546.html',1,'']]],
+  ['policy_2dbased_20data_20structures_36775',['Policy-Based Data Structures',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01536.html',1,'']]],
+  ['private_20implementation_20helpers_36776',['Private implementation helpers',['https://docs.opencv.org/4.2.0/dd/d96/group__core__hal__intrin__impl.html',1,'']]],
+  ['projection_36777',['Projection',['https://docs.opencv.org/4.2.0/d0/daf/group__projection.html',1,'']]]
 ];

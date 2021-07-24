@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parentview_36450',['parentView',['https://docs.opencv.org/4.2.0/d0/de8/interfaceCvAbstractCamera.html#a1f073867d25d504a7935ac813180518a',1,'CvAbstractCamera']]]
+  ['parentview_36451',['parentView',['https://docs.opencv.org/4.2.0/d0/de8/interfaceCvAbstractCamera.html#a1f073867d25d504a7935ac813180518a',1,'CvAbstractCamera']]]
 ];

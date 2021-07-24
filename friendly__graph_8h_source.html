@@ -106,28 +106,38 @@ $(function() {
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">   * max_num_poses: To prevent the pose graph from growing arbitrarily over time,</span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">   *                we automatically trim the oldest poses once we get enough newer ones.</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">   *                This parameter specifies the maximum number of poses in the graph.</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">   */</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <a class="code" href="classFriendlyGraph.html">FriendlyGraph</a>(<span class="keywordtype">int</span> num_landmarks, <span class="keywordtype">int</span> max_num_poses);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordtype">void</span> addGPSMeasurement(<span class="keywordtype">int</span> pose_id, <span class="keyword">const</span> transform_t &amp;gps_tf);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordtype">void</span> addOdomMeasurement(<span class="keywordtype">int</span> pose2_id, <span class="keywordtype">int</span> pose1_id,</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">const</span> transform_t &amp;pose2_tf, <span class="keyword">const</span> transform_t &amp;pose1_tf);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordtype">void</span> addLandmarkMeasurement(<span class="keywordtype">int</span> pose_id, <span class="keywordtype">int</span> lm_id, <span class="keyword">const</span> point_t &amp;bearing);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordtype">void</span> addLandmarkPrior(<span class="keywordtype">int</span> lm_id, point_t location, <span class="keywordtype">double</span> xy_std);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordtype">void</span> addPosePrior(<span class="keywordtype">int</span> pose_id, <span class="keyword">const</span> transform_t &amp;pose_tf, <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">covariance&lt;3&gt;</a> &amp;cov);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  pose_t getPoseEstimate(<span class="keywordtype">int</span> pose_id);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordtype">void</span> solve();</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> getLandmarkLocations();</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="comment">/* This method will return the smoothed trajectory (assuming you&#39;ve already called</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">   * `solve()`). Note that the length of this trajectory will be at most `max_num_poses`</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">   * (the oldest poses are discarded). */</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">trajectory_t</a> getSmoothedTrajectory();</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordtype">int</span> getMaxNumPoses() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;};</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">   *</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">   * camera_std:    Standard deviation of landmark distance measurements, in meters</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">   *</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">   * gps_xy_std:    Standard deviation of GPS (x,y) measurements, in meters</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">   *</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">   * wheel_noise_rate:</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">   *      The variance of odom measurements will depend on how far the robot traveled.</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">   *      A WHEEL_NOISE_RATE of 0.05 means that when we rotate a wheel through a distance</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">   *      of 1 meter, the standard deviation of the true distance rotated will be 5 cm.</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">   */</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="classFriendlyGraph.html">FriendlyGraph</a>(<span class="keywordtype">int</span> num_landmarks, <span class="keywordtype">int</span> max_num_poses,</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordtype">float</span> camera_std, <span class="keywordtype">float</span> gps_xy_std, <span class="keywordtype">float</span> wheel_noise_rate);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordtype">void</span> addGPSMeasurement(<span class="keywordtype">int</span> pose_id, <span class="keyword">const</span> transform_t &amp;gps_tf);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordtype">void</span> addOdomMeasurement(<span class="keywordtype">int</span> pose2_id, <span class="keywordtype">int</span> pose1_id,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">const</span> transform_t &amp;pose2_tf, <span class="keyword">const</span> transform_t &amp;pose1_tf);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordtype">void</span> addLandmarkMeasurement(<span class="keywordtype">int</span> pose_id, <span class="keywordtype">int</span> lm_id, <span class="keyword">const</span> point_t &amp;bearing);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordtype">void</span> addLandmarkPrior(<span class="keywordtype">int</span> lm_id, point_t location, <span class="keywordtype">double</span> xy_std);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordtype">void</span> addPosePrior(<span class="keywordtype">int</span> pose_id, <span class="keyword">const</span> transform_t &amp;pose_tf, <a class="codeRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">covariance&lt;3&gt;</a> &amp;cov);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  pose_t getPoseEstimate(<span class="keywordtype">int</span> pose_id);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordtype">void</span> solve();</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> getLandmarkLocations();</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">/* This method will return the smoothed trajectory (assuming you&#39;ve already called</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">   * `solve()`). Note that the length of this trajectory will be at most `max_num_poses`</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">   * (the oldest poses are discarded). */</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">trajectory_t</a> getSmoothedTrajectory();</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordtype">int</span> getMaxNumPoses() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt; point_t &gt;</a></div></div>
 <div class="ttc" id="aclassEigen_1_1Matrix_html"><div class="ttname"><a href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">Eigen::Matrix&lt; double, Eigen::Dynamic, 1 &gt;</a></div></div>
 <div class="ttc" id="aclassFriendlyGraph_html"><div class="ttname"><a href="classFriendlyGraph.html">FriendlyGraph</a></div><div class="ttdef"><b>Definition:</b> friendly_graph.h:8</div></div>
