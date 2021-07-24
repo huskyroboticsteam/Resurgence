@@ -49,7 +49,7 @@ static void printLandmarks(points_t& landmarks, int log_level = LOG_DEBUG);
 Autonomous::Autonomous(const std::vector<URCLeg> &_targets, double controlHz)
 	: Node("autonomous"),
 		urc_targets(_targets),
-    leg_idx(5),
+		leg_idx(5),
 		search_target({_targets[0].approx_GPS(0) - PI, _targets[0].approx_GPS(1), -PI / 2}),
 		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
 		poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
@@ -72,7 +72,11 @@ Autonomous::Autonomous(const std::vector<URCLeg> &_targets, double controlHz)
 		mapBlindPeriod(15),
 		mapDoesOverlap(false),
 		mapOverlapSampleThreshold(15),
-		pose_graph(0, 10), // for now, we use no landmarks for state estimation
+		// For now, we use no landmarks for state estimation in the pose graph.
+		// We also use a gps_xy_std that's larger than the true std because empirically
+		// that leads to smoother changes in the pose estimate (at least in the simulator),
+		// which are easier for the controller to work with.
+		pose_graph(0, 10, 0.3, 5.0, 0.05),
 		pose_id(0),
 		prev_odom(toTransform({0,0,0})),
 		smoothed_traj({}),
@@ -418,7 +422,19 @@ void Autonomous::updateSearchTarget()
   }
 }
 
-plan_t computePlan(std::function<bool(double, double, double)> collide_func, const point_t& goal){
+plan_t computePlan(transform_t invTransform, point_t goal)
+{
+	// We need to readLidar again from within the planning thread, for thread safety
+	points_t lidar_scan = readLidarScan();
+	auto collide_func = [&](double x, double y, double radius) -> bool {
+			// transform the point to check into map space
+			point_t relPoint = {x, y, 1};
+			point_t p = invTransform * relPoint;
+			transform_t coll_tf = toTransform(relPoint);
+			// TODO implement thread-safe access to `map` if `USE_MAP` is true
+			//if (USE_MAP) return map.hasPointWithin(p, radius);
+			return collides(coll_tf, lidar_scan, radius);
+	};
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
@@ -495,16 +511,7 @@ void Autonomous::autonomyIter()
       point_t_goal.topRows(2) = plan_target.topRows(2);
       point_t_goal(2) = 1.0;
       point_t_goal = toTransform(pose) * point_t_goal;
-      auto collide_func = [&](double x, double y, double radius) -> bool {
-          // transform the point to check into map space
-          point_t relPoint = {x, y, 1};
-          point_t p = invTransform * relPoint;
-          transform_t coll_tf = toTransform(relPoint);
-          if (USE_MAP) return map.hasPointWithin(p, radius);
-          else return collides(coll_tf, lidar_scan, radius);
-      };
-      pending_plan =
-          std::async(std::launch::async, &computePlan, collide_func, point_t_goal);
+      pending_plan = std::async(std::launch::async, &computePlan, invTransform, point_t_goal);
   }
   // if there is a plan pending, check if it is ready.
   else if(pending_plan.wait_for(ZERO_DURATION) == std::future_status::ready){
