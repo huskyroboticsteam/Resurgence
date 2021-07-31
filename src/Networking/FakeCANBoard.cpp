@@ -91,7 +91,8 @@ int main() {
     if (test_type == TEST_SCIENCE_TELEMETRY) {
         // Serial 0 seems to work. Nothing else (up to 17, the largest I tried)
         serial = prompt("Enter serial");
-        AssembleScienceSensorPullPacket(&p, science_group, (uint8_t) 0x0, 42);
+        uint8_t sensor_code = 42; // Nonsense for now, just testing CAN connection
+        AssembleScienceSensorPullPacket(&p, science_group, (uint8_t) serial, sensor_code);
         sendCANPacket(p);
     }
 
