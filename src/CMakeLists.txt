@@ -29,6 +29,7 @@ add_library(hindsight_can SHARED
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/CANMotorUnit.c
+  HindsightCAN/CANScience.c
   HindsightCAN/PortFiles/PortTemplate.c
   )
 
