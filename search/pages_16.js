@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['yolo_20dnns_37233',['YOLO DNNs',['https://docs.opencv.org/4.2.0/da/d9d/tutorial_dnn_yolo.html',1,'']]]
+  ['yolo_20dnns_37234',['YOLO DNNs',['https://docs.opencv.org/4.2.0/da/d9d/tutorial_dnn_yolo.html',1,'']]]
 ];
