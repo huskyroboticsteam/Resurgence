@@ -462,14 +462,14 @@ void Autonomous::autonomyIter()
 
 	for (transform_t &sm_tf : smoothed_traj) {
 		const pose_t sm_tf_transformed = poseToDraw(toPose(sm_tf, 0.0), pose);
-    rospub::publish(sm_tf_transformed, rospub::PointPub::POSE_GRAPH);
+		rospub::publish(sm_tf_transformed, rospub::PointPub::POSE_GRAPH);
 	}
 
 	transform_t invTransform = toTransform(pose).inverse();
 
 	const points_t landmarks_transformed = transformReadings(smoothed_landmarks,
 			invTransform * VIZ_BASE_TF);
-  rospub::publish_array(landmarks_transformed, rospub::ArrayPub::LANDMARKS);
+	rospub::publish_array(landmarks_transformed, rospub::ArrayPub::LANDMARKS);
 
 	if (nav_state == NavState::DONE && Globals::AUTONOMOUS)
 	{
