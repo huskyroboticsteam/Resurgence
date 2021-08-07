@@ -8,6 +8,7 @@
 #include "log.h"
 #include "simulator/constants.h"
 #include "world_interface/world_interface.h"
+#include "rospub.h"
 
 #include "commands/nogps/DriveToGate.h"
 #include "commands/nogps/DriveThroughGate.h"
@@ -34,8 +35,6 @@ constexpr bool RIGHT = false;
 
 constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 
-constexpr const char * ROVER_FRAME = "rover";
-
 const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,NavSim::DEFAULT_WINDOW_CENTER_Y,M_PI/2});
 
 /**
@@ -51,8 +50,7 @@ const transform_t VIZ_BASE_TF = toTransform({NavSim::DEFAULT_WINDOW_CENTER_X,Nav
 static void printLandmarks(points_t& landmarks, int log_level = LOG_DEBUG);
 
 Autonomous::Autonomous(const std::vector<URCLeg> &_targets, double controlHz)
-	: Node("autonomous"),
-		urc_targets(_targets),
+	: urc_targets(_targets),
 		leg_idx(5),
 		search_target({_targets[0].approx_GPS(0) - PI, _targets[0].approx_GPS(1), -PI / 2}),
 		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}),
@@ -79,15 +77,9 @@ Autonomous::Autonomous(const std::vector<URCLeg> &_targets, double controlHz)
 		pose_id(0),
 		prev_odom(toTransform({0,0,0})),
 		smoothed_traj({}),
-		smoothed_landmarks({}),
-		plan_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_viz", 100)),
-		curr_pose_pub(this->create_publisher<geometry_msgs::msg::Point>("current_pose", 100)),
-		drive_target_pub(this->create_publisher<geometry_msgs::msg::Point>("drive_target", 100)),
-		plan_target_pub(this->create_publisher<geometry_msgs::msg::Point>("plan_target", 100)),
-		pose_graph_pub(this->create_publisher<geometry_msgs::msg::Point>("pose_graph", 100)),
-		lidar_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("lidar_scan", 100)),
-		landmarks_pub(this->create_publisher<geometry_msgs::msg::PoseArray>("landmarks", 100))
+		smoothed_landmarks({})
 {
+
   int num_landmarks = 0;
   for (auto target : _targets) {
     int num_landmarks_for_target = (target.right_post_id == -1) ? 1 : 2;
@@ -175,32 +167,6 @@ pose_t Autonomous::poseToDraw(const pose_t &pose, const pose_t &current_pose) co
 	// `current_pose` is the current location of the robot, `pose` is the pose we wish to draw
 	transform_t inv_curr = toTransform(current_pose).inverse();
 	return toPose(toTransform(pose) * inv_curr * VIZ_BASE_TF, 0);
-}
-
-void Autonomous::publish(Eigen::Vector3d pose,
-		rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const
-{
-	auto message = geometry_msgs::msg::Point();
-	message.x = pose(0);
-	message.y = pose(1);
-	message.z = pose(2);
-	publisher->publish(message);
-}
-
-void Autonomous::publish_array(const points_t &points,
-		rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr &publisher) const
-{
-	auto message = geometry_msgs::msg::PoseArray();
-	message.header.frame_id = ROVER_FRAME; // technically this is in the window frame actually
-	// but we'll figure out our transform situation later
-	for (point_t l : points) {
-		auto p = geometry_msgs::msg::Pose();
-		p.position.x = l(0);
-		p.position.y = l(1);
-		p.position.z = l(2);
-		message.poses.push_back(p);
-	}
-	publisher->publish(message);
 }
 
 void Autonomous::update_nav_state(const pose_t &pose, const pose_t &plan_target) {
@@ -496,14 +462,14 @@ void Autonomous::autonomyIter()
 
 	for (transform_t &sm_tf : smoothed_traj) {
 		const pose_t sm_tf_transformed = poseToDraw(toPose(sm_tf, 0.0), pose);
-		publish(sm_tf_transformed, pose_graph_pub);
+    rospub::publish(sm_tf_transformed, rospub::PointPub::POSE_GRAPH);
 	}
 
 	transform_t invTransform = toTransform(pose).inverse();
 
 	const points_t landmarks_transformed = transformReadings(smoothed_landmarks,
 			invTransform * VIZ_BASE_TF);
-	publish_array(landmarks_transformed, landmarks_pub);
+  rospub::publish_array(landmarks_transformed, rospub::ArrayPub::LANDMARKS);
 
 	if (nav_state == NavState::DONE && Globals::AUTONOMOUS)
 	{
@@ -552,13 +518,13 @@ void Autonomous::autonomyIter()
   // Send lidar points to visualization
   const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
   log(LOG_DEBUG, "Publishing %d lidar points\n", lidar_scan_transformed.size());
-  publish_array(lidar_scan_transformed, lidar_pub);
+  rospub::publish_array(lidar_scan_transformed, rospub::ArrayPub::LIDAR_SCAN);
 
   // Send current pose and plan target to visualization
   const pose_t curr_pose_transformed = poseToDraw(pose, pose);
-  publish(curr_pose_transformed, curr_pose_pub);
+  rospub::publish(curr_pose_transformed, rospub::PointPub::CURRENT_POSE);
   const pose_t plan_target_transformed = poseToDraw(plan_target, pose);
-  publish(plan_target_transformed, plan_target_pub);
+  rospub::publish(plan_target_transformed, rospub::PointPub::PLAN_TARGET);
 
   int plan_size = plan.rows();
   pose_t driveTarget = pose;
@@ -573,7 +539,7 @@ void Autonomous::autonomyIter()
 
     // Send starting plan_pose
     const pose_t start_plan_pose_transformed = poseToDraw(plan_pose, pose);
-    publish(start_plan_pose_transformed, plan_pub);
+    rospub::publish(start_plan_pose_transformed, rospub::PointPub::PLAN_VIZ);
 
     bool found_target = false;
     double accumulated_cost = 0;
@@ -608,7 +574,7 @@ void Autonomous::autonomyIter()
       } else {
         // Send current plan_pose to visualization
         const pose_t curr_plan_transformed = poseToDraw(plan_pose, pose);
-        publish(curr_plan_transformed, plan_pub);
+        rospub::publish(curr_plan_transformed, rospub::PointPub::PLAN_VIZ);
       }
     }
     if (!found_target) {
@@ -624,10 +590,10 @@ void Autonomous::autonomyIter()
 
   // Send drive target to visualization
   const pose_t drive_target_transformed = poseToDraw(driveTarget, pose);
-  publish(drive_target_transformed, drive_target_pub);
+  rospub::publish(drive_target_transformed, rospub::PointPub::DRIVE_TARGET);
 
   // Send message to visualization that all data has been sent
-  publish({NAN, NAN, NAN}, plan_pub);
+  rospub::publish({NAN, NAN, NAN}, rospub::PointPub::PLAN_VIZ);
 
   double d = dist(driveTarget, pose, 0);
   // There's an overlap where either state might apply, to prevent rapidly switching

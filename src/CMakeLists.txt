@@ -48,6 +48,7 @@ add_library(rover_common SHARED
   CommandLineOptions.cpp
   Globals.cpp
   log.cpp
+  rospub.cpp
   Networking/ParseBaseStation.cpp
   Networking/IK.cpp
   Networking/ParseCAN.cpp

@@ -4,9 +4,6 @@
 #include <memory>
 #include <vector>
 #include <future>
-#include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose_array.hpp>
 
 #include "Util.h"
 #include "WorldData.h"
@@ -44,7 +41,7 @@ constexpr std::array<const char *, 7> NAV_STATE_NAMES ({
 	"DONE"
 });
 
-class Autonomous : rclcpp::Node
+class Autonomous
 {
 public:
 	explicit Autonomous(const std::vector<URCLeg> &urc_targets, double controlHz);
@@ -89,14 +86,6 @@ private:
 	trajectory_t smoothed_traj; // cached solution to pose graph optimization (robot trajectory)
 	points_t smoothed_landmarks; // cached solution to pose graph optimization (AR tags)
 
-	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_pub;
-	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr curr_pose_pub;
-	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr drive_target_pub;
-	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr plan_target_pub;
-	rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr pose_graph_pub;
-	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr lidar_pub;
-	rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_pub;
-
 	void setNavState(NavState s);
 	void update_nav_state(const pose_t &pose, const pose_t &plan_target);
 	pose_t choose_plan_target(const pose_t &pose);
@@ -111,9 +100,5 @@ private:
 	double getLinearVel(const pose_t &drive_target, const pose_t &pose, double thetaErr) const;
 	double getThetaVel(const pose_t &drive_target, const pose_t &pose, double &thetaErr) const;
 	pose_t poseToDraw(const pose_t &pose, const pose_t &current_pose) const;
-	void publish(Eigen::Vector3d pose,
-			rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr &publisher) const;
-	void publish_array(const points_t &points,
-			rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr &publisher) const;
 
 };
