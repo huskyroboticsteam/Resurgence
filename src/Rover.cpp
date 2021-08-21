@@ -10,6 +10,7 @@
 #include "CommandLineOptions.h"
 #include "Globals.h"
 #include "log.h"
+#include "rospub.h"
 #include "Rover.h"
 #include "Util.h"
 #include "Networking/NetworkConstants.h"
@@ -135,7 +136,7 @@ void InitializeRover(uint8_t arm_mode, bool zero_encoders)
 
 void closeSim(int signum)
 {
-    rclcpp::shutdown();
+    rospub::shutdown();
     raise(SIGTERM);
 }
 
@@ -184,7 +185,7 @@ int rover_loop(int argc, char **argv)
     LOG_LEVEL = LOG_INFO;
     Globals::AUTONOMOUS = false;
     world_interface_init();
-    rclcpp::init(0, nullptr);
+    rospub::init();
     // Ctrl+C doesn't stop the simulation without this line
     signal(SIGINT, closeSim);
     Globals::opts = ParseCommandLineOptions(argc, argv);
