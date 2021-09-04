@@ -8,10 +8,11 @@ AllowShortFunctionsOnASingleLine: None
 AccessModifierOffset: -4
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:	"\".+\\.h\""
-    Priority:	4
-  - Regex:	"<.+(\\.h|\\.hpp)>"
-    Priority:	2
-  - Regex:	"<.+>"
+  - Regex:	"\".+\""
     Priority:	1
+  - Regex:	"<[^/]+>"
+    Priority:	2
+  - Regex:	"<.+(?:\\.h|\\.hpp)>"
+    Priority:	3
 IndentCaseLabels: true
+PointerAlignment: Left
