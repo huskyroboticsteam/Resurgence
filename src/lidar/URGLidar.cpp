@@ -52,7 +52,7 @@ bool URGLidar::createFrame()
 		return false;
 	}
 	// Allocate memory to store the length data the scan will generate.
-	long *length_data = (long *)malloc(sizeof(long) * urg_max_data_size(&urg));
+	long* length_data = new long[urg_max_data_size(&urg)];
 	lastFrameTime = std::chrono::steady_clock::now();
 	// Record the time just before recording starts and start recording the frame.
 	int length_data_size = urg_get_distance(&urg, length_data, NULL);
@@ -68,7 +68,7 @@ bool URGLidar::createFrame()
 	}
 	lastFrame = frame;
 	error = 0;
-	free(length_data);
+	delete[] length_data;
 	return true;
 }
 
