@@ -3,14 +3,13 @@
 #include "../../simulator/utils.h"
 #include "../CommandBase.h"
 
-class DriveThroughGate : CommandBase
-{
+class DriveThroughGate : CommandBase {
 public:
 	DriveThroughGate(double thetaKP, double slowVel, double fastVel);
 
-	void reset(transform_t &odom);
+	void reset(transform_t& odom);
 
-	void update(const transform_t &odom, const point_t &left, const point_t &right);
+	void update(const transform_t& odom, const point_t& left, const point_t& right);
 
 	bool isDone() override;
 	command_t getOutput() override;
@@ -18,8 +17,7 @@ public:
 	void transitionStates();
 
 private:
-	enum State
-	{
+	enum State {
 		Start,
 		OneVisibleTurn,
 		OneVisibleDrive,
@@ -41,5 +39,5 @@ private:
 	// gets the transform relative to the starting odometry
 	transform_t getTrfFromStart();
 
-	command_t getCommandToTarget(const transform_t &trf, const point_t &target);
+	command_t getCommandToTarget(const transform_t& trf, const point_t& target);
 };

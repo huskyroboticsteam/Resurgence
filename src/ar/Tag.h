@@ -1,11 +1,10 @@
 #pragma once
 
-#include <opencv2/core.hpp>
-
 #include "MarkerPattern.h"
 
-namespace AR
-{
+#include <opencv2/core.hpp>
+
+namespace AR {
 
 /**
    @addtogroup ar
@@ -20,8 +19,7 @@ namespace AR
    a Tag yourself; this is done internally by the detection code. All tags are immutable
    after construction.
  */
-class Tag
-{
+class Tag {
 private:
 	cv::Vec3d rvec_;
 	cv::Vec3d tvec_;

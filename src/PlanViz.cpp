@@ -1,94 +1,80 @@
-#include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose_array.hpp>
-
 #include "simulator/graphics.h"
 #include "simulator/utils.h"
 
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
+#include <rclcpp/rclcpp.hpp>
+
 using std::placeholders::_1;
 
-class PlanViz : public rclcpp::Node
-{
+class PlanViz : public rclcpp::Node {
 public:
 	PlanViz()
-		: Node("plan_visualization"),
-			viz_window("Planning visualization"),
-			plan_sub(
-					this->create_subscription<geometry_msgs::msg::Point>(
-						"plan_viz", 100, std::bind(&PlanViz::plan_callback, this, _1))),
-			curr_pose_sub(
-					this->create_subscription<geometry_msgs::msg::Point>(
-						"current_pose", 100, std::bind(&PlanViz::curr_pose_callback, this, _1))),
-			drive_target_sub(
-					this->create_subscription<geometry_msgs::msg::Point>(
-						"drive_target", 100, std::bind(&PlanViz::drive_target_callback, this, _1))),
-			plan_target_sub(
-					this->create_subscription<geometry_msgs::msg::Point>(
-						"plan_target", 100, std::bind(&PlanViz::plan_target_callback, this, _1))),
-			pose_graph_sub(
-					this->create_subscription<geometry_msgs::msg::Point>(
-						"pose_graph", 100, std::bind(&PlanViz::pose_graph_callback, this, _1))),
-			lidar_sub(
-					this->create_subscription<geometry_msgs::msg::PoseArray>(
-						"lidar_scan", 100, std::bind(&PlanViz::lidar_callback, this, _1))),
-			landmarks_sub(
-					this->create_subscription<geometry_msgs::msg::PoseArray>(
-						"landmarks", 100, std::bind(&PlanViz::landmarks_callback, this, _1)))
-	{
+		: Node("plan_visualization"), viz_window("Planning visualization"),
+		  plan_sub(this->create_subscription<geometry_msgs::msg::Point>(
+			  "plan_viz", 100, std::bind(&PlanViz::plan_callback, this, _1))),
+		  curr_pose_sub(this->create_subscription<geometry_msgs::msg::Point>(
+			  "current_pose", 100, std::bind(&PlanViz::curr_pose_callback, this, _1))),
+		  drive_target_sub(this->create_subscription<geometry_msgs::msg::Point>(
+			  "drive_target", 100, std::bind(&PlanViz::drive_target_callback, this, _1))),
+		  plan_target_sub(this->create_subscription<geometry_msgs::msg::Point>(
+			  "plan_target", 100, std::bind(&PlanViz::plan_target_callback, this, _1))),
+		  pose_graph_sub(this->create_subscription<geometry_msgs::msg::Point>(
+			  "pose_graph", 100, std::bind(&PlanViz::pose_graph_callback, this, _1))),
+		  lidar_sub(this->create_subscription<geometry_msgs::msg::PoseArray>(
+			  "lidar_scan", 100, std::bind(&PlanViz::lidar_callback, this, _1))),
+		  landmarks_sub(this->create_subscription<geometry_msgs::msg::PoseArray>(
+			  "landmarks", 100, std::bind(&PlanViz::landmarks_callback, this, _1))) {
 		viz_window.display();
 	}
 
 private:
-	void curr_pose_callback(const geometry_msgs::msg::Point::SharedPtr message)
-	{
-		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Black);
+	void curr_pose_callback(const geometry_msgs::msg::Point::SharedPtr message) {
+		viz_window.drawRobot(toTransform({message->x, message->y, message->z}),
+							 sf::Color::Black);
 	}
 
-	void drive_target_callback(const geometry_msgs::msg::Point::SharedPtr message)
-	{
-		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Blue);
+	void drive_target_callback(const geometry_msgs::msg::Point::SharedPtr message) {
+		viz_window.drawRobot(toTransform({message->x, message->y, message->z}),
+							 sf::Color::Blue);
 	}
 
-	void plan_target_callback(const geometry_msgs::msg::Point::SharedPtr message)
-	{
-		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Green);
+	void plan_target_callback(const geometry_msgs::msg::Point::SharedPtr message) {
+		viz_window.drawRobot(toTransform({message->x, message->y, message->z}),
+							 sf::Color::Green);
 	}
 
-	void lidar_callback(const geometry_msgs::msg::PoseArray::SharedPtr message)
-	{
-		points_t lidar {};
+	void lidar_callback(const geometry_msgs::msg::PoseArray::SharedPtr message) {
+		points_t lidar{};
 		for (auto l : message->poses) {
 			lidar.push_back({l.position.x, l.position.y, l.position.z});
 		}
 		viz_window.drawPoints(lidar, sf::Color::Red, 3);
 	}
 
-	void landmarks_callback(const geometry_msgs::msg::PoseArray::SharedPtr message)
-	{
-		points_t landmarks {};
+	void landmarks_callback(const geometry_msgs::msg::PoseArray::SharedPtr message) {
+		points_t landmarks{};
 		for (auto l : message->poses) {
 			landmarks.push_back({l.position.x, l.position.y, l.position.z});
 		}
 		viz_window.drawPoints(landmarks, sf::Color::Blue, 5);
 	}
 
-	void plan_callback(const geometry_msgs::msg::Point::SharedPtr message)
-	{
-		if (std::isnan(message->x) && std::isnan(message->y) && std::isnan(message->z))
-		{
+	void plan_callback(const geometry_msgs::msg::Point::SharedPtr message) {
+		if (std::isnan(message->x) && std::isnan(message->y) && std::isnan(message->z)) {
 			// All data has been received, we can draw the visualization
-			while (viz_window.pollWindowEvent() != -1) {}
+			while (viz_window.pollWindowEvent() != -1) {
+			}
 			viz_window.display();
-		}
-		else
-		{
-			viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Red);
+		} else {
+			viz_window.drawRobot(toTransform({message->x, message->y, message->z}),
+								 sf::Color::Red);
 		}
 	}
 
-	void pose_graph_callback(const geometry_msgs::msg::Point::SharedPtr message)
-	{
-		viz_window.drawRobot(toTransform({message->x, message->y, message->z}), sf::Color::Cyan);
+	void pose_graph_callback(const geometry_msgs::msg::Point::SharedPtr message) {
+		viz_window.drawRobot(toTransform({message->x, message->y, message->z}),
+							 sf::Color::Cyan);
 	}
 
 	MyWindow viz_window;
@@ -101,8 +87,7 @@ private:
 	rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr landmarks_sub;
 };
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
 	// Initialize ROS without any commandline arguments
 	rclcpp::init(0, nullptr);
 

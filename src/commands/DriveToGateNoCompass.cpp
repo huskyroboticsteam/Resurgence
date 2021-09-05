@@ -1,10 +1,10 @@
 #include "DriveToGateNoCompass.h"
-#include <iostream>
 
 #include "../log.h"
-
 #include "Eigen/Dense"
 #include "Eigen/LU"
+
+#include <iostream>
 
 DriveToGateNoCompass::DriveToGateNoCompass(double driveDist, double angleKP, double vel,
 										   double initial_heading)
@@ -14,28 +14,22 @@ DriveToGateNoCompass::DriveToGateNoCompass(double driveDist, double angleKP, dou
 
 {
 }
-void DriveToGateNoCompass::reset(transform_t &odom, point_t &target)
-{
+void DriveToGateNoCompass::reset(transform_t& odom, point_t& target) {
 	state = State::Start;
 	calibrationPoints.clear();
 	currOdom = odom;
 	targetPoint = target;
 }
-command_t DriveToGateNoCompass::getOutput()
-{
-	if (state == State::Done || state == State::AlmostDone)
-	{
+command_t DriveToGateNoCompass::getOutput() {
+	if (state == State::Done || state == State::AlmostDone) {
 		return {0, 0};
 	}
 
 	transitionStates();
 
-	if (state == DriveForward)
-	{
+	if (state == DriveForward) {
 		return {0, vel};
-	}
-	else if (state == TurnToTarget)
-	{
+	} else if (state == TurnToTarget) {
 		calibrationPoints.clear();
 		double err = calculateHeadingErr();
 		double targthvel = err * angleKP;
@@ -45,50 +39,42 @@ command_t DriveToGateNoCompass::getOutput()
 	log(LOG_WARN, "Unrecognized state: %d\n", state);
 	return {0, 0};
 }
-bool DriveToGateNoCompass::isDone()
-{
+bool DriveToGateNoCompass::isDone() {
 	return state == State::Done;
 }
-bool DriveToGateNoCompass::isAlmostDone()
-{
+bool DriveToGateNoCompass::isAlmostDone() {
 	return state == State::AlmostDone;
 }
-void DriveToGateNoCompass::setDone(const transform_t &odom)
-{
+void DriveToGateNoCompass::setDone(const transform_t& odom) {
 	currOdom = odom;
 	calibrationPoints.clear();
 	checkpoint();
 	log(LOG_INFO, "Estimated heading on completion: %.2f\n", getCurrentHeading());
 	state = State::Done;
 }
-void DriveToGateNoCompass::update(const transform_t &odom, const transform_t &gps,
-									const pose_t &pose, const point_t &leftPost,
-									const point_t &rightPost)
-{
+void DriveToGateNoCompass::update(const transform_t& odom, const transform_t& gps,
+								  const pose_t& pose, const point_t& leftPost,
+								  const point_t& rightPost) {
 	currOdom = odom;
 	currPose(0) = pose(0);
 	currPose(1) = pose(1);
-	if (state == DriveForward && gps.norm() != 0)
-	{
+	if (state == DriveForward && gps.norm() != 0) {
 		pose_t p = toPose(gps, 0);
 		point_t point = {p.x(), p.y(), 1};
 		calibrationPoints.push_back(point);
 	}
-	if (leftPost(2) != 0 || rightPost(2) != 0)
-	{
+	if (leftPost(2) != 0 || rightPost(2) != 0) {
 		state = AlmostDone;
 	}
 }
 
-double DriveToGateNoCompass::headingChangeSinceCheckpoint()
-{
+double DriveToGateNoCompass::headingChangeSinceCheckpoint() {
 	pose_t odomPose = toPose(currOdom, 0);
 	pose_t checkpointPose = toPose(checkpointOdom, 0);
 	return odomPose(2) - checkpointPose(2);
 }
 
-double DriveToGateNoCompass::distFromCheckpoint()
-{
+double DriveToGateNoCompass::distFromCheckpoint() {
 	pose_t odomPose = toPose(currOdom, 0);
 	pose_t checkpointPose = toPose(checkpointOdom, 0);
 	pose_t diff = odomPose - checkpointPose;
@@ -96,51 +82,45 @@ double DriveToGateNoCompass::distFromCheckpoint()
 	return diff.norm();
 }
 
-double DriveToGateNoCompass::getCurrentHeading()
-{
+double DriveToGateNoCompass::getCurrentHeading() {
 	double delta = headingChangeSinceCheckpoint();
 	return checkpointHeading + delta;
 }
 
-double DriveToGateNoCompass::calculateHeadingErr()
-{
+double DriveToGateNoCompass::calculateHeadingErr() {
 	double diff = getTargetHeading() - getCurrentHeading();
 	return nearestHeadingBranch(diff, 0.0);
 }
 
-Eigen::Matrix2d calculateCovMatrix(const points_t &points)
-{
+Eigen::Matrix2d calculateCovMatrix(const points_t& points) {
 	// calculate center of mass
 	Eigen::Vector2d com = Eigen::Vector2d::Zero();
-	for (const point_t &p : points)
-	{
+	for (const point_t& p : points) {
 		com += p.topRows<2>();
 	}
 	com /= points.size();
 
 	Eigen::Matrix2d covMat;
 	// calculate the covariances
-	//Eigen::Vector2d variances = Eigen::Vector2d::Zero();
-	//double cov = 0;
-	for (const point_t &p : points)
-	{
+	// Eigen::Vector2d variances = Eigen::Vector2d::Zero();
+	// double cov = 0;
+	for (const point_t& p : points) {
 		Eigen::Vector2d diff = p.topRows<2>() - com;
 		covMat += diff * diff.transpose();
-		//Eigen::Vector2d sqrDiff = diff.array().square();
-		//variances += sqrDiff;
-		//cov += diff.x() * diff.y();
+		// Eigen::Vector2d sqrDiff = diff.array().square();
+		// variances += sqrDiff;
+		// cov += diff.x() * diff.y();
 	}
-	//variances /= points.size();
+	// variances /= points.size();
 
-	//covMat << variances.x(), cov, cov, variances.y();
+	// covMat << variances.x(), cov, cov, variances.y();
 	return covMat;
 }
 
-double calculateHeading(const points_t &points, double odom_heading)
-{
+double calculateHeading(const points_t& points, double odom_heading) {
 	size_t n_pts = points.size();
-	double rise = points[n_pts-1](1) - points[0](1);
-	double run = points[n_pts-1](0) - points[0](0);
+	double rise = points[n_pts - 1](1) - points[0](1);
+	double run = points[n_pts - 1](0) - points[0](0);
 	double gps_heading = atan2(rise, run);
 	/*
 	Eigen::Matrix2d covMat = calculateCovMatrix(points);
@@ -156,67 +136,54 @@ double calculateHeading(const points_t &points, double odom_heading)
 	log(LOG_INFO, "calculateHeading %f %f\n", gps_heading, odom_heading);
 	gps_heading = nearestHeadingBranch(gps_heading, odom_heading);
 	// We only know this eigenvector up to sign
-	if (gps_heading - odom_heading > M_PI/2) gps_heading += M_PI;
+	if (gps_heading - odom_heading > M_PI / 2)
+		gps_heading += M_PI;
 	return nearestHeadingBranch(gps_heading, odom_heading);
 }
 
-void DriveToGateNoCompass::checkpoint()
-{
+void DriveToGateNoCompass::checkpoint() {
 	size_t n_pts = calibrationPoints.size();
 	double odom_heading = getCurrentHeading();
-	if (calibrationPoints.size() >= 3)
-	{
+	if (calibrationPoints.size() >= 3) {
 		log(LOG_INFO, "Using GPS-based heading calculation from %d points\n", n_pts);
-		for (point_t &p : calibrationPoints)
-		{
+		for (point_t& p : calibrationPoints) {
 			std::cout << p << std::endl;
 		}
 		checkpointHeading = calculateHeading(calibrationPoints, odom_heading); // gps-based
-	}
-	else
-	{
+	} else {
 		log(LOG_INFO, "Using odom heading calculation\n");
 		checkpointHeading = odom_heading; // odom-based
 	}
 	checkpointOdom = currOdom;
 }
 
-double DriveToGateNoCompass::getTargetHeading()
-{
+double DriveToGateNoCompass::getTargetHeading() {
 	// the third element isn't 1, but it's fine since we only want displacement
 	point_t toTarget = targetPoint - currPose;
 	return atan2(toTarget.y(), toTarget.x());
 }
 
-void DriveToGateNoCompass::transitionStates()
-{
-	if (state == Start)
-	{
+void DriveToGateNoCompass::transitionStates() {
+	if (state == Start) {
 		state = TurnToTarget;
 		checkpoint();
 		calibrationPoints.clear();
 		log(LOG_INFO, "Start->TurnToTarget\n");
-	}
-	else if (state == DriveForward)
-	{
-		if (distFromCheckpoint() >= calibrateDriveDist)
-		{
+	} else if (state == DriveForward) {
+		if (distFromCheckpoint() >= calibrateDriveDist) {
 			checkpoint();
 			state = State::TurnToTarget;
 			log(LOG_INFO, "DriveForward->TurnToTarget\n");
 		}
-	}
-	else if (state == TurnToTarget)
-	{
+	} else if (state == TurnToTarget) {
 		double err = calculateHeadingErr();
 		log(LOG_INFO, "Heading Err: %.2f\n", err);
-		if (fabs(err) <= M_PI / 16)
-		{
+		if (fabs(err) <= M_PI / 16) {
 			state = DriveForward;
 			checkpoint();
 			log(LOG_INFO, "TurnToTarget->DriveForward\n");
 		}
 	}
-	log(LOG_INFO, "Estimated heading: %.2f Target: %.2f\n",
-			getCurrentHeading(), getTargetHeading());
+	log(LOG_INFO, "Estimated heading: %.2f Target: %.2f\n", getCurrentHeading(),
+		getTargetHeading());
 }

@@ -1,13 +1,15 @@
 
+#include "read_hokuyo_lidar.h"
+
+#include "../simulator/utils.h"
+#include "../world_interface/world_interface.h"
 #include "PointCloudProcessing.h"
 #include "PointGenerator.h"
 #include "URGLidar.h"
+
 #include <atomic>
-#include <thread>
 #include <mutex>
-#include "../world_interface/world_interface.h"
-#include "../simulator/utils.h"
-#include "read_hokuyo_lidar.h"
+#include <thread>
 
 // This website may be helpful
 // https://sourceforge.net/p/urgnetwork/wiki/top_en/
@@ -23,22 +25,19 @@ std::mutex points_lock;
 
 namespace lidar {
 
-void readLidarLoop(){
-	while(true){
-		if (!urg_lidar.createFrame())
-		{
+void readLidarLoop() {
+	while (true) {
+		if (!urg_lidar.createFrame()) {
 			perror("failed to create frame");
 			continue;
 		}
 
 		std::vector<Polar2D> polarPts = urg_lidar.getLastFrame();
 		std::vector<point_t> pts(polarPts.size());
-		point_t origin({0,0,1});
-		for (size_t i = 0; i < polarPts.size(); i++)
-		{
+		point_t origin({0, 0, 1});
+		for (size_t i = 0; i < polarPts.size(); i++) {
 			pts[i] = lidar::polarToCartesian2(polarPts[i]);
-			if ((pts[i] - origin).norm() < LIDAR_MIN_RANGE)
-			{
+			if ((pts[i] - origin).norm() < LIDAR_MIN_RANGE) {
 				// We're inside lidar min range, so this is garbage data.
 				// We don't want to include this hit because otherwise the robot
 				// will think it's in collision with an obstacle.
@@ -49,15 +48,15 @@ void readLidarLoop(){
 		points_lock.lock();
 		last_points = pts;
 		points_lock.unlock();
-	}	
+	}
 }
 
-bool isLidarDataFresh(){
+bool isLidarDataFresh() {
 	return lidar_fresh;
 }
 
 bool initializeLidar() {
-	if(!lidar_initialized) {
+	if (!lidar_initialized) {
 		if (!urg_lidar.open()) {
 			perror("failed to open lidar");
 		} else {

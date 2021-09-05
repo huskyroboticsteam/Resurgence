@@ -1,16 +1,14 @@
 #pragma once
 
-#include <Eigen/Core>
-
 #include "StateSpaceUtil.h"
 
-template <int stateDim, int inputDim, int outputDim> class KalmanFilterBase
-{
+#include <Eigen/Core>
+
+template <int stateDim, int inputDim, int outputDim> class KalmanFilterBase {
 public:
 	KalmanFilterBase()
 		: P(Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5),
-		  xHat(Eigen::Matrix<double, stateDim, 1>::Zero())
-	{
+		  xHat(Eigen::Matrix<double, stateDim, 1>::Zero()) {
 	}
 
 	/**
@@ -19,21 +17,20 @@ public:
 	 *
 	 * @param measurement The measurement to use to correct the filter.
 	 */
-	virtual void correct(const Eigen::Matrix<double, outputDim, 1> &measurement) = 0;
+	virtual void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) = 0;
 
 	/**
 	 * Use the model to predict the next system state, given the current inputs.
 	 *
 	 * @param input The current inputs to the system.
 	 */
-	virtual void predict(const Eigen::Matrix<double, inputDim, 1> &input) = 0;
+	virtual void predict(const Eigen::Matrix<double, inputDim, 1>& input) = 0;
 
 	/**
 	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix to
 	 * a diagonal matrix with large values.
 	 */
-	void reset()
-	{
+	void reset() {
 		reset(Eigen::Matrix<double, stateDim, 1>::Zero());
 	}
 
@@ -43,8 +40,7 @@ public:
 	 *
 	 * @param state The state to which the state estimate will be set.
 	 */
-	void reset(const Eigen::Matrix<double, stateDim, 1> &state)
-	{
+	void reset(const Eigen::Matrix<double, stateDim, 1>& state) {
 		Eigen::Matrix<double, stateDim, stateDim> newP =
 			Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5;
 		reset(state, newP);
@@ -58,9 +54,8 @@ public:
 	 * vector. This should not be the zero vector. If you want to represent high certainty, use
 	 * very small values instead.
 	 */
-	void reset(const Eigen::Matrix<double, stateDim, 1> &state,
-			   const Eigen::Matrix<double, stateDim, 1> &stdDevs)
-	{
+	void reset(const Eigen::Matrix<double, stateDim, 1>& state,
+			   const Eigen::Matrix<double, stateDim, 1>& stdDevs) {
 		reset(state, StateSpace::createCovarianceMatrix(stdDevs));
 	}
 
@@ -73,9 +68,8 @@ public:
 	 * the zero matrix. If you want to represent high certainty, use a diagonal matrix with
 	 * very small values.
 	 */
-	void reset(const Eigen::Matrix<double, stateDim, 1> &state,
-			   const Eigen::Matrix<double, stateDim, stateDim> &estCovMat)
-	{
+	void reset(const Eigen::Matrix<double, stateDim, 1>& state,
+			   const Eigen::Matrix<double, stateDim, stateDim>& estCovMat) {
 		xHat = state;
 		P = estCovMat;
 	}
@@ -85,8 +79,7 @@ public:
 	 *
 	 * @return The state estimate.
 	 */
-	Eigen::Matrix<double, stateDim, 1> getState() const
-	{
+	Eigen::Matrix<double, stateDim, 1> getState() const {
 		return xHat;
 	}
 
@@ -96,8 +89,7 @@ public:
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
 	 */
-	Eigen::Matrix<double, stateDim, stateDim> getEstimateCovarianceMat() const
-	{
+	Eigen::Matrix<double, stateDim, stateDim> getEstimateCovarianceMat() const {
 		return P;
 	}
 

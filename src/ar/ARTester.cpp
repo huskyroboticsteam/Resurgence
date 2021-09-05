@@ -1,3 +1,7 @@
+#include "../camera/Camera.h"
+#include "../camera/CameraParams.h"
+#include "Detector.h"
+
 #include <chrono>
 #include <ctime>
 #include <iostream>
@@ -9,10 +13,6 @@
 #include <opencv2/core/utility.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-
-#include "../camera/Camera.h"
-#include "../camera/CameraParams.h"
-#include "Detector.h"
 
 constexpr int NUM_SKIP = 5;
 
@@ -33,7 +33,7 @@ const std::string keys =
 	"instead of capturing continuously.}";
 
 // TODO: come up with a better solution for examining video files
-//cam::Camera cap;
+// cam::Camera cap;
 cv::VideoCapture cap;
 cam::CameraParams PARAMS;
 std::shared_ptr<AR::MarkerSet> MARKER_SET;
@@ -42,24 +42,20 @@ std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec);
 std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing);
 static inline void noValue(std::string option);
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
 	cv::CommandLineParser parser(argc, argv, keys);
-	if (!parser.check())
-	{
+	if (!parser.check()) {
 		parser.printErrors();
 	}
 	parser.about("Program to open a camera and look for AR tags.");
 
 	// print help message if "-h" or "--help" option is passed
-	if (parser.has("h"))
-	{
+	if (parser.has("h")) {
 		parser.printMessage();
 		return EXIT_SUCCESS;
 	}
 
-	if (!parser.has("c") || parser.get<std::string>("c").empty())
-	{
+	if (!parser.has("c") || parser.get<std::string>("c").empty()) {
 		std::cerr << "Error: camera configuration file is required." << std::endl;
 		parser.printMessage();
 		return EXIT_FAILURE;
@@ -68,19 +64,13 @@ int main(int argc, char *argv[])
 	std::string marker_set = parser.get<std::string>("m");
 	std::transform(marker_set.begin(), marker_set.end(), marker_set.begin(), ::tolower);
 
-	if (marker_set == "circ")
-	{
+	if (marker_set == "circ") {
 		MARKER_SET = AR::Markers::CIRC_MARKERS();
-	}
-	else if (marker_set == "urc")
-	{
+	} else if (marker_set == "urc") {
 		MARKER_SET = AR::Markers::URC_MARKERS();
-	}
-	else if (marker_set.empty()){
+	} else if (marker_set.empty()) {
 		noValue("marker_set");
-	}
-	else
-	{
+	} else {
 		std::cerr << "Unsupported marker set: \"" << marker_set << "\"" << std::endl;
 		parser.printMessage();
 		return EXIT_FAILURE;
@@ -89,15 +79,13 @@ int main(int argc, char *argv[])
 	int cam_id = parser.get<int>("co", -1);
 	std::string cam_file = parser.get<std::string>("fo");
 	cv::FileStorage cam_config(parser.get<std::string>("c"), cv::FileStorage::READ);
-	if (!cam_config.isOpened())
-	{
+	if (!cam_config.isOpened()) {
 		std::cerr << "Error: given camera configuration file " << parser.get<std::string>("c")
 				  << " does not exist!" << std::endl;
 		cam_config.release();
 		return EXIT_FAILURE;
 	}
-	if (cam_config[cam::KEY_INTRINSIC_PARAMS].empty())
-	{
+	if (cam_config[cam::KEY_INTRINSIC_PARAMS].empty()) {
 		std::cerr << "Error: Intrinsic parameters are required for AR tag detection!"
 				  << std::endl;
 		cam_config.release();
@@ -105,16 +93,11 @@ int main(int argc, char *argv[])
 	}
 	cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
 	// read filename or camera ID, and open camera.
-	if (!cam_config[cam::KEY_FILENAME].empty() && !parser.has("fo"))
-	{
+	if (!cam_config[cam::KEY_FILENAME].empty() && !parser.has("fo")) {
 		cam_file = (std::string)cam_config[cam::KEY_FILENAME];
-	}
-	else if (!cam_config[cam::KEY_CAMERA_ID].empty() && !parser.has("co"))
-	{
+	} else if (!cam_config[cam::KEY_CAMERA_ID].empty() && !parser.has("co")) {
 		cam_id = (int)cam_config[cam::KEY_CAMERA_ID];
-	}
-	else if(!parser.has("fo") && !parser.has("co"))
-	{
+	} else if (!parser.has("fo") && !parser.has("co")) {
 		std::cerr << "Error: no file or camera_id was provided in the configuration file or "
 					 "on the command line!"
 				  << std::endl;
@@ -129,17 +112,13 @@ int main(int argc, char *argv[])
 
 	std::cout << "Opening camera..." << std::endl;
 	bool open_success = false;
-	if (cam_id > -1)
-	{
+	if (cam_id > -1) {
 		open_success = cap.open(cam_id);
-	}
-	else if(!cam_file.empty())
-	{
+	} else if (!cam_file.empty()) {
 		open_success = cap.open(cam_file);
 	}
 
-	if (!open_success)
-	{
+	if (!open_success) {
 		std::cerr << "ERROR! Unable to open camera" << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -166,16 +145,13 @@ int main(int argc, char *argv[])
 	bool loop = true;
 	cv::Size imageSize = PARAMS.getImageSize();
 
-	while (loop)
-	{
+	while (loop) {
 		// Grabs frame
-		if (!cap.grab())
-		{
+		if (!cap.grab()) {
 			continue;
 		}
 		cap.retrieve(frame);
-		if (frame.empty())
-		{
+		if (frame.empty()) {
 			std::cerr << "ERROR! Blank frame grabbed" << std::endl;
 			continue;
 		}
@@ -187,8 +163,7 @@ int main(int argc, char *argv[])
 
 		// Draws an outline around the tag and a cross in the center
 		// Projects a cube onto the tag to debug TVec and RVec
-		for (AR::Tag tag : tags)
-		{
+		for (AR::Tag tag : tags) {
 			std::cout << "Tag ID: " << tag.getMarker().getId() << std::endl;
 			std::vector<cv::Point2d> cubePoints =
 				projectCube(MARKER_SET->getPhysicalSize(), tag.getRVec(), tag.getTVec());
@@ -198,8 +173,7 @@ int main(int argc, char *argv[])
 			std::cout << "tvec: " << tvec << "(distance: " << dist << ")" << std::endl;
 			std::cout << "coordinates: " << tag.getCoordinates() << std::endl;
 
-			for (size_t i = 0; i < 4; i++)
-			{
+			for (size_t i = 0; i < 4; i++) {
 				size_t next = (i == 3 ? 0 : i + 1);
 				cv::line(frame, cubePoints[i], cubePoints[next], cv::Scalar(0, 0, 255), 3);
 				cv::line(frame, cubePoints[i], cubePoints[i + 4], cv::Scalar(0, 255, 0), 3);
@@ -208,21 +182,19 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		if(show_rejected){
-			for(const auto& points : rejected){
-				for(size_t i = 0; i < points.size() - 1; i++){
+		if (show_rejected) {
+			for (const auto& points : rejected) {
+				for (size_t i = 0; i < points.size() - 1; i++) {
 					const auto& p1 = points[i];
-					const auto& p2 = points[i+1];
+					const auto& p2 = points[i + 1];
 					cv::line(frame, p1, p2, cv::Scalar(255, 0, 255));
 				}
 			}
 		}
 
-		if (show_grid)
-		{
+		if (show_grid) {
 			std::vector<cv::Point2f> grid = projectGrid(imageSize, grid_spacing);
-			for (cv::Point2f pt : grid)
-			{
+			for (cv::Point2f pt : grid) {
 				cv::Point2f newPt(pt.x * (float)imageSize.width,
 								  pt.y * (float)imageSize.height);
 				cv::drawMarker(frame, newPt, cv::Scalar(255, 0, 0), cv::MARKER_CROSS, 10, 1);
@@ -232,28 +204,27 @@ int main(int argc, char *argv[])
 		cv::imshow(WINDOW_NAME, frame);
 
 		int delay = (frame_by_frame && count % NUM_SKIP == 0) ? 0 : 1;
-		switch (cv::waitKey(delay))
-		{
-		case 'q':
-			loop = false;
-			break;
-		case 'g':
-			show_grid = true;
-			std::cout << "Grid on" << std::endl;
-			break;
-		case 'h':
-			show_grid = false;
-			std::cout << "Grid off" << std::endl;
-			break;
-		case 'r':
-			show_rejected = true;
-			std::cout << "Rejected points on" << std::endl;
-			break;
-		case 'l':
-			show_rejected = false;
-			std::cout << "Rejected points off" << std::endl;
-		default:
-			break;
+		switch (cv::waitKey(delay)) {
+			case 'q':
+				loop = false;
+				break;
+			case 'g':
+				show_grid = true;
+				std::cout << "Grid on" << std::endl;
+				break;
+			case 'h':
+				show_grid = false;
+				std::cout << "Grid off" << std::endl;
+				break;
+			case 'r':
+				show_rejected = true;
+				std::cout << "Rejected points on" << std::endl;
+				break;
+			case 'l':
+				show_rejected = false;
+				std::cout << "Rejected points off" << std::endl;
+			default:
+				break;
 		}
 		count++;
 	}
@@ -261,8 +232,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec)
-{
+std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec) {
 	std::vector<cv::Point3d> object_points;
 	std::vector<cv::Point2d> image_points;
 
@@ -280,21 +250,17 @@ std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec)
 	return image_points;
 }
 
-std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
-{
+std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing) {
 	cv::Point2f center((float)imageSize.width / 2.0f, (float)imageSize.height / 2.0f);
 	std::vector<cv::Point2f> grid_points;
 	std::vector<cv::Point2f> projected_points;
-	float xf,yf;
-	for (int x = 0; x < imageSize.width / 2; x += spacing)
-	{
-		for (int y = 0; y < imageSize.height / 2; y += spacing)
-		{
-			xf = (float) x;
-			yf = (float) y;
+	float xf, yf;
+	for (int x = 0; x < imageSize.width / 2; x += spacing) {
+		for (int y = 0; y < imageSize.height / 2; y += spacing) {
+			xf = (float)x;
+			yf = (float)y;
 			grid_points.push_back(cv::Point2f(xf, yf) + center);
-			if (x != 0 || y != 0)
-			{
+			if (x != 0 || y != 0) {
 				grid_points.push_back(cv::Point2f(-xf, -yf) + center);
 				grid_points.push_back(cv::Point2f(-xf, yf) + center);
 				grid_points.push_back(cv::Point2f(xf, -yf) + center);
@@ -306,7 +272,7 @@ std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing)
 	return projected_points;
 }
 
-static inline void noValue(std::string option){
+static inline void noValue(std::string option) {
 	std::cerr << "Error: No value given for " << option << " option!" << std::endl
 			  << "Please remember to use '=' between flags and values." << std::endl;
 	exit(EXIT_FAILURE);

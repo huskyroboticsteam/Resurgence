@@ -1,10 +1,11 @@
 #pragma once
 
 #include "json.hpp"
+
 #include <array>
 
 using nlohmann::json;
-bool ParseIKPacket(json &message);
+bool ParseIKPacket(json& message);
 
 // Convert angle in radians to the discrete number used as a PID target
 //   offset: the radian angle corresponding to int angle 0 (depends on the joint)

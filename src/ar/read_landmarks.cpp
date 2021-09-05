@@ -1,21 +1,23 @@
 #include "read_landmarks.h"
-#include "../camera/Camera.h"
-#include "Detector.h"
+
 #include "../Constants.h"
+#include "../camera/Camera.h"
 #include "../log.h"
+#include "Detector.h"
+
+#include <atomic>
+#include <map>
 #include <mutex>
 #include <thread>
-#include <atomic>
-#include <opencv2/core.hpp>
-#include <map>
 
-namespace AR
-{
+#include <opencv2/core.hpp>
+
+namespace AR {
 constexpr size_t NUM_LANDMARKS = 11;
 const point_t ZERO_POINT = {0.0, 0.0, 0.0};
-static points_t make_zero_landmarks(){
+static points_t make_zero_landmarks() {
 	points_t z;
-	for(size_t i = 0; i < NUM_LANDMARKS; i++){
+	for (size_t i = 0; i < NUM_LANDMARKS; i++) {
 		z.push_back(ZERO_POINT);
 	}
 	return z;
@@ -30,10 +32,10 @@ std::mutex landmark_lock;
 points_t current_landmarks;
 std::thread landmark_thread;
 
-void detectLandmarksLoop(){
+void detectLandmarksLoop() {
 	cv::Mat frame;
 	uint32_t last_frame_no = 0;
-	while(true){
+	while (true) {
 		if (ar_cam.hasNext(last_frame_no)) {
 			ar_cam.next(frame, last_frame_no);
 
@@ -64,7 +66,7 @@ void detectLandmarksLoop(){
 						cv::Mat transformed =
 							ar_cam.getExtrinsicParams() * cv::Mat(coords_homogeneous);
 						output[i] = {transformed.at<double>(0, 0),
-							transformed.at<double>(1, 0), 1.0};
+									 transformed.at<double>(1, 0), 1.0};
 					} else {
 						// just account for coordinate axis change; rover frame has +x front,
 						// +y left, +z up while camera has +x right, +y down, +z front.
@@ -88,7 +90,8 @@ void detectLandmarksLoop(){
 				//
 				// Note that when we call readLandmarks(), we do zero out the data. But we
 				// don't want that to be the exclusive way to prevent data from getting stale.
-				if (output[i](2) != 0.0) current_landmarks[i] = output[i];
+				if (output[i](2) != 0.0)
+					current_landmarks[i] = output[i];
 			}
 			fresh_data = true;
 			landmark_lock.unlock();
@@ -103,22 +106,21 @@ void zeroCurrent() {
 	}
 }
 
-bool initializeLandmarkDetection(){
+bool initializeLandmarkDetection() {
 	zeroCurrent();
 	try {
 		ar_cam.openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
-		if(!ar_cam.hasIntrinsicParams()){
+		if (!ar_cam.hasIntrinsicParams()) {
 			log(LOG_ERROR, "Camera does not have intrinsic parameters! AR tag detection "
-							 "cannot be performed.\n");
+						   "cannot be performed.\n");
 			return false;
 		} else {
-			ar_detector =
-				Detector(Markers::URC_MARKERS(), ar_cam.getIntrinsicParams());
+			ar_detector = Detector(Markers::URC_MARKERS(), ar_cam.getIntrinsicParams());
 			landmark_thread = std::thread(&detectLandmarksLoop);
 		}
-		if(!ar_cam.hasExtrinsicParams()){
+		if (!ar_cam.hasExtrinsicParams()) {
 			log(LOG_WARN, "Camera does not have extrinsic parameters! Coordinates returned "
-							"for AR tags will be relative to camera\n");
+						  "for AR tags will be relative to camera\n");
 		}
 		return true;
 	} catch (std::exception& e) {
@@ -127,13 +129,13 @@ bool initializeLandmarkDetection(){
 	}
 }
 
-bool isLandmarkDetectionInitialized(){
+bool isLandmarkDetectionInitialized() {
 	return ar_cam.isOpen();
 }
 
-points_t readLandmarks(){
-	if(isLandmarkDetectionInitialized()){
-		if (fresh_data)	{
+points_t readLandmarks() {
+	if (isLandmarkDetectionInitialized()) {
+		if (fresh_data) {
 			points_t output;
 			landmark_lock.lock();
 			output = current_landmarks;
@@ -146,4 +148,4 @@ points_t readLandmarks(){
 	return zero_landmarks;
 }
 
-}
+} // namespace AR

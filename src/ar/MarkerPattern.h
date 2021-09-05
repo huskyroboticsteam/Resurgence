@@ -5,8 +5,7 @@
 
 #include <opencv2/core.hpp>
 
-namespace AR
-{
+namespace AR {
 
 /**
    @addtogroup ar
@@ -26,8 +25,7 @@ namespace AR
    You should likely not have to construct any instances of this class yourself; this will be
    done internally by the Detector class.
  */
-class MarkerPattern
-{
+class MarkerPattern {
 private:
 	/**
 	   The width in pixels of the data region of each marker. Does not include the border.
@@ -66,9 +64,9 @@ public:
 	uint8_t getBorderSize() const;
 	const cv::Ptr<cv::Mat> getDataBits() const;
 	int getId() const;
-	bool operator==(const MarkerPattern &other) const;
+	bool operator==(const MarkerPattern& other) const;
 };
 
 /** @} */
 
-} // namespace ar
+} // namespace AR

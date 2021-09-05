@@ -11,27 +11,23 @@ using ar_dict = cv::aruco::Dictionary;
 using ar_dict_ptr = cv::Ptr<cv::aruco::Dictionary>;
 using mat_ptr = cv::Ptr<cv::Mat>;
 
-namespace AR
-{
+namespace AR {
 
 ///////// MarkerSet class implementation //////////////
 MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
-					 ar_dict markerDict)
-{
-	ar_dict *dict_ = new ar_dict(markerDict);
+					 ar_dict markerDict) {
+	ar_dict* dict_ = new ar_dict(markerDict);
 	init(data_region_size, border_size, physical_size, ar_dict_ptr(dict_));
 }
 
 MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
-					 ar_dict_ptr markerDictPtr)
-{
+					 ar_dict_ptr markerDictPtr) {
 	assert(markerDictPtr);
 	init(data_region_size, border_size, physical_size, markerDictPtr);
 }
 
 void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physical_size,
-					 ar_dict_ptr markerDict)
-{
+					 ar_dict_ptr markerDict) {
 	assert(data_region_size > 0);
 	assert(border_size > 0);
 	assert(physical_size > 0);
@@ -43,8 +39,7 @@ void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physic
 	std::vector<MarkerPattern> markerVec;
 	cv::Mat bytesList;
 	dict->bytesList.copyTo(bytesList);
-	for (int i = 0; i < bytesList.rows; i++)
-	{
+	for (int i = 0; i < bytesList.rows; i++) {
 		cv::Mat row = bytesList.row(i);
 		cv::Mat markerBits = ar_dict::getBitsFromByteList(row, data_region_size);
 		MarkerPattern current(data_region_size, border_size, markerBits, i);
@@ -53,77 +48,61 @@ void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physic
 	this->markers = markerVec;
 }
 
-void MarkerSet::addIDMapping(int id, int mapping)
-{
+void MarkerSet::addIDMapping(int id, int mapping) {
 	this->id_mappings[id] = mapping;
 	this->reverse_mappings[mapping] = id;
 }
 
-int MarkerSet::getIDMapping(int id) const
-{
+int MarkerSet::getIDMapping(int id) const {
 	return this->id_mappings.at(id);
 }
 
-int &MarkerSet::operator[](int id)
-{
+int& MarkerSet::operator[](int id) {
 	return this->id_mappings[id];
 }
 
-ar_dict_ptr MarkerSet::getDict() const
-{
+ar_dict_ptr MarkerSet::getDict() const {
 	return this->dict;
 }
 
-uint8_t MarkerSet::getDataRegionSize() const
-{
+uint8_t MarkerSet::getDataRegionSize() const {
 	return this->data_region_size;
 }
 
-uint8_t MarkerSet::getBorderSize() const
-{
+uint8_t MarkerSet::getBorderSize() const {
 	return this->border_size;
 }
 
-float MarkerSet::getPhysicalSize() const
-{
+float MarkerSet::getPhysicalSize() const {
 	return this->physical_size;
 }
 
-std::vector<MarkerPattern> MarkerSet::getMarkers() const
-{
+std::vector<MarkerPattern> MarkerSet::getMarkers() const {
 	return this->markers;
 }
 
-bool MarkerSet::isIDMapped(int id) const
-{
+bool MarkerSet::isIDMapped(int id) const {
 	return this->id_mappings.count(id) == 1;
 }
 
-bool MarkerSet::getMarkerByID(int id, MarkerPattern &out) const
-{
-	if (id < 0 || static_cast<unsigned>(id) > markers.size())
-	{
+bool MarkerSet::getMarkerByID(int id, MarkerPattern& out) const {
+	if (id < 0 || static_cast<unsigned>(id) > markers.size()) {
 		return false;
 	}
 	out = markers[id];
 	return true;
 }
 
-bool MarkerSet::getMarkerByMappedID(int mapped_id, MarkerPattern &out) const
-{
-	try
-	{
+bool MarkerSet::getMarkerByMappedID(int mapped_id, MarkerPattern& out) const {
+	try {
 		out = markers[this->reverse_mappings.at(mapped_id)];
 		return true;
-	}
-	catch (std::out_of_range&)
-	{
+	} catch (std::out_of_range&) {
 		return false;
 	}
 }
 
-namespace Markers
-{
+namespace Markers {
 
 // Constants - please note that these are only used internally.
 /** The number of ALVAR markers stored in the data array. */
@@ -275,13 +254,11 @@ uint8_t __alvar_markers[ALVAR_COUNT][BIT_ARR_SIZE] = {
 /**
    Constructs the "bytes list" (used by the ARUco module to construct dictionaries)
  */
-cv::Mat makeAlvarBytesList(uint8_t marker_array[ALVAR_COUNT][BIT_ARR_SIZE])
-{
+cv::Mat makeAlvarBytesList(uint8_t marker_array[ALVAR_COUNT][BIT_ARR_SIZE]) {
 	cv::Mat bytes_list;
 	cv::Size size(ALVAR_BIT_SIZE, ALVAR_BIT_SIZE);
-	for (size_t m = 0; m < ALVAR_COUNT; m++)
-	{
-		uint8_t *current_marker = marker_array[m];
+	for (size_t m = 0; m < ALVAR_COUNT; m++) {
+		uint8_t* current_marker = marker_array[m];
 		cv::Mat current_marker_mat = cv::Mat(size, CV_8UC1, current_marker);
 		bytes_list.push_back(cv::aruco::Dictionary::getByteListFromBits(current_marker_mat));
 	}
@@ -291,8 +268,7 @@ cv::Mat makeAlvarBytesList(uint8_t marker_array[ALVAR_COUNT][BIT_ARR_SIZE])
 /**
    Constructs the URC marker set
  */
-MarkerSet makeURCSet()
-{
+MarkerSet makeURCSet() {
 	static const cv::aruco::Dictionary alvar_dict(makeAlvarBytesList(__alvar_markers),
 												  ALVAR_BIT_SIZE, 1);
 	MarkerSet set(ALVAR_BIT_SIZE, ALVAR_BORDER_SIZE, ALVAR_PHYS_SIZE, alvar_dict);
@@ -315,8 +291,7 @@ MarkerSet makeURCSet()
 /**
    Constructs the CIRC marker set
  */
-MarkerSet makeCIRCSet()
-{
+MarkerSet makeCIRCSet() {
 	static const cv::Ptr<cv::aruco::Dictionary> circ_dict_ptr =
 		cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 	MarkerSet set(ARUCO_BIT_SIZE, ARUCO_BORDER_SIZE, ARUCO_PHYS_SIZE, circ_dict_ptr);
@@ -325,14 +300,12 @@ MarkerSet makeCIRCSet()
 	return set;
 }
 
-const std::shared_ptr<MarkerSet> URC_MARKERS()
-{
+const std::shared_ptr<MarkerSet> URC_MARKERS() {
 	static const MarkerSet URC_SET = makeURCSet();
 	return std::make_shared<MarkerSet>(URC_SET);
 }
 
-const std::shared_ptr<MarkerSet> CIRC_MARKERS()
-{
+const std::shared_ptr<MarkerSet> CIRC_MARKERS() {
 	static const MarkerSet CIRC_SET = makeCIRCSet();
 	return std::make_shared<MarkerSet>(CIRC_SET);
 }

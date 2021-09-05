@@ -1,17 +1,14 @@
 
 #include "CANUtils.h"
 
-void InitializeCANSocket()
-{
-  return;
+void InitializeCANSocket() {
+	return;
 }
 
-void sendCANPacket(const CANPacket &packet)
-{
-  return;
+void sendCANPacket(const CANPacket& packet) {
+	return;
 }
 
-int recvCANPacket(CANPacket *packet)
-{
-  return 0;
+int recvCANPacket(CANPacket* packet) {
+	return 0;
 }
