@@ -29,7 +29,7 @@ const std::map<std::string, double> positive_arm_pwm_scales = {
 	{"elbow",     -32768},
 	{"forearm",    -6000},
 	{"diffleft",    5000},
-	{"diffright", -10000},
+	{"diffright",  -5000},
 	{"hand",       15000}
 };
 const std::map<std::string, double> negative_arm_pwm_scales = {
@@ -232,6 +232,7 @@ void incrementArmPID()
   for (const std::string &motor : motor_group)
   {
     json op_mode = Globals::status_data[motor]["operation_mode"];
+    log(LOG_DEBUG, "incrementArmPID %s %s\n", motor.c_str(), op_mode.dump().c_str());
     if (!op_mode.is_null() && op_mode == "incremental PID speed")
     {
       struct timeval now;
@@ -242,14 +243,16 @@ void incrementArmPID()
       {
         // timeout for safety
         Globals::status_data[motor]["millideg_per_control_loop"] = 0;
-        return;
+        continue;
       }
 
       int mdpl = Globals::status_data[motor]["millideg_per_control_loop"];
       int target = Globals::status_data[motor]["target_angle"];
       int new_target = target + mdpl;
       Globals::status_data[motor]["target_angle"] = new_target;
-      log(LOG_DEBUG, "Setting target to %d\n", new_target);
+      int current = Globals::status_data[motor]["angular_position"]; // for debug
+      log(LOG_WARN, "PID DEBUG: time %d, mdpl %d old_tgt %d new_tgt %d current %d motor %s\n",
+              now_ms % 10000, mdpl, target, new_target, current, motor.c_str());
       sendPIDPacket(motor, new_target);
     }
   }
