@@ -202,7 +202,6 @@ bool ParseMotorPacket(json &message)
       double speed = message[key];
       int millideg_per_control_loop = (incremental_pid_scales.at(motor) / (2*M_PI) * 360 * 1000) * speed / CONTROL_HZ;
       if (current_millideg != millideg_per_control_loop) {
-        log(LOG_DEBUG, "Current mdeg is %d vs asked %d\n", current_millideg, millideg_per_control_loop);
         Globals::status_data[motor]["millideg_per_control_loop"] = millideg_per_control_loop;
         if (Globals::status_data[motor]["target_angle"].is_null())
         {
@@ -210,8 +209,8 @@ bool ParseMotorPacket(json &message)
           Globals::status_data[motor]["target_angle"] = current_angle;
         }
         int target_angle = Globals::status_data[motor]["target_angle"];
-        log(LOG_DEBUG, "Setting incremental PID for %s to %d starting from %d\n",
-            motor.c_str(), millideg_per_control_loop, target_angle);
+        log(LOG_DEBUG, "Setting incremental PID for %s to %d (prev: %d) starting from %d\n",
+            motor.c_str(), millideg_per_control_loop, current_millideg, target_angle);
       }
     }
     else if (key == "incremental IK speed")
@@ -251,9 +250,9 @@ void incrementArmPID()
       int new_target = target + mdpl;
       Globals::status_data[motor]["target_angle"] = new_target;
       int current = Globals::status_data[motor]["angular_position"]; // for debug
-      log(LOG_WARN, "PID DEBUG: time %d, mdpl %d old_tgt %d new_tgt %d current %d motor %s\n",
+      log(LOG_DEBUG, "PID DEBUG: time %d, mdpl %d old_tgt %d new_tgt %d current %d motor %s\n",
               now_ms % 10000, mdpl, target, new_target, current, motor.c_str());
-      sendPIDPacket(motor, new_target);
+      if (mdpl != 0) sendPIDPacket(motor, new_target);
     }
   }
 }
