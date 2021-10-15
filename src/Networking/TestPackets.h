@@ -1,7 +1,6 @@
 
-extern "C"
-{
-    #include "../HindsightCAN/Port.h"
+extern "C" {
+#include "../HindsightCAN/Port.h"
 }
 
 CANPacket motorTelemetry();

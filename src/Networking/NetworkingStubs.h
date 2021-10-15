@@ -1,9 +1,8 @@
 
 #pragma once
 
-extern "C"
-{
-    #include "../HindsightCAN/CANPacket.h"
+extern "C" {
+#include "../HindsightCAN/CANPacket.h"
 }
 #include <string>
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Eigen/Core>
-#include <Eigen/LU>
-
 #include "KalmanFilterBase.h"
 #include "StateSpaceUtil.h"
+
+#include <Eigen/Core>
+#include <Eigen/LU>
 
 /**
  * Represents a square noise covariance matrix. Returning the zero matrix can sometimes be
@@ -17,8 +17,7 @@
  * @tparam paramSize The dimension of the vector accepted by get() in addition to a state
  * vector.
  */
-template <int stateDim, int size, int paramSize> class NoiseCovMat
-{
+template <int stateDim, int size, int paramSize> class NoiseCovMat {
 public:
 	using state_t = Eigen::Matrix<double, stateDim, 1>;
 	using param_t = Eigen::Matrix<double, paramSize, 1>;
@@ -29,9 +28,8 @@ public:
 	 *
 	 * @param stdDevs The standard deviations of each element.
 	 */
-	explicit NoiseCovMat(const Eigen::Matrix<double, size, 1> &stdDevs)
-		: NoiseCovMat(StateSpace::createCovarianceMatrix(stdDevs))
-	{
+	explicit NoiseCovMat(const Eigen::Matrix<double, size, 1>& stdDevs)
+		: NoiseCovMat(StateSpace::createCovarianceMatrix(stdDevs)) {
 	}
 
 	/**
@@ -39,9 +37,8 @@ public:
 	 *
 	 * @param mat The noise covariance matrix.
 	 */
-	NoiseCovMat(const Eigen::Matrix<double, size, size> &mat)
-		: func([mat](const state_t &x, const param_t &param) { return mat; })
-	{
+	NoiseCovMat(const Eigen::Matrix<double, size, size>& mat)
+		: func([mat](const state_t& x, const param_t& param) { return mat; }) {
 	}
 
 	/**
@@ -52,10 +49,9 @@ public:
 	 * given the state vector and one additional vector. For process noise, this is usually the
 	 * input vector. For output noise, this is usually the output vector.
 	 */
-	NoiseCovMat(const std::function<Eigen::Matrix<double, size, size>(const state_t &,
-																	  const param_t &)> &func)
-		: func(func)
-	{
+	NoiseCovMat(const std::function<Eigen::Matrix<double, size, size>(const state_t&,
+																	  const param_t&)>& func)
+		: func(func) {
 	}
 
 	/**
@@ -68,13 +64,12 @@ public:
 	 * vector.
 	 * @return The noise covariance matrix.
 	 */
-	Eigen::Matrix<double, size, size> get(const state_t &x, const param_t &param)
-	{
+	Eigen::Matrix<double, size, size> get(const state_t& x, const param_t& param) {
 		return func(x, param);
 	}
 
 private:
-	std::function<Eigen::Matrix<double, size, size>(const state_t &, const param_t &)> func;
+	std::function<Eigen::Matrix<double, size, size>(const state_t&, const param_t&)> func;
 };
 
 /**
@@ -93,16 +88,15 @@ private:
  * In systems with additive output noise, this is the same as outputDim.
  */
 template <int stateDim, int inputDim, int outputDim, int processNoiseDim, int outputNoiseDim>
-class ExtendedKalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim>
-{
+class ExtendedKalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim> {
 public:
 	using state_t = Eigen::Matrix<double, stateDim, 1>;
 	using output_t = Eigen::Matrix<double, outputDim, 1>;
 	using input_t = Eigen::Matrix<double, inputDim, 1>;
 	using statefunc_t = std::function<state_t(
-		const state_t &, const input_t &, const Eigen::Matrix<double, processNoiseDim, 1> &)>;
+		const state_t&, const input_t&, const Eigen::Matrix<double, processNoiseDim, 1>&)>;
 	using outputfunc_t = std::function<output_t(
-		const state_t &, const Eigen::Matrix<double, outputNoiseDim, 1> &)>;
+		const state_t&, const Eigen::Matrix<double, outputNoiseDim, 1>&)>;
 	using processnoise_t = Eigen::Matrix<double, processNoiseDim, 1>;
 	using outputnoise_t = Eigen::Matrix<double, outputNoiseDim, 1>;
 
@@ -115,16 +109,15 @@ public:
 	 * @param outputNoise The output noise covariance matrix for this system.
 	 * @param dt The time in seconds between updates.
 	 */
-	ExtendedKalmanFilter(const statefunc_t &stateFunc, const outputfunc_t &outputFunc,
-						 const NoiseCovMat<stateDim, processNoiseDim, inputDim> &processNoise,
-						 const NoiseCovMat<stateDim, outputNoiseDim, outputDim> &outputNoise,
+	ExtendedKalmanFilter(const statefunc_t& stateFunc, const outputfunc_t& outputFunc,
+						 const NoiseCovMat<stateDim, processNoiseDim, inputDim>& processNoise,
+						 const NoiseCovMat<stateDim, outputNoiseDim, outputDim>& outputNoise,
 						 double dt)
-		: stateFunc(stateFunc), outputFunc(outputFunc), Q(processNoise), R(outputNoise), dt(dt)
-	{
+		: stateFunc(stateFunc), outputFunc(outputFunc), Q(processNoise), R(outputNoise),
+		  dt(dt) {
 	}
 
-	void predict(const Eigen::Matrix<double, inputDim, 1> &input) override
-	{
+	void predict(const Eigen::Matrix<double, inputDim, 1>& input) override {
 		Eigen::Matrix<double, stateDim, stateDim> F =
 			getStateFuncJacobianX(stateFunc, this->xHat, input);
 		Eigen::Matrix<double, processNoiseDim, processNoiseDim> processNoise =
@@ -137,8 +130,7 @@ public:
 		this->P = F * this->P * F.transpose() + L * processNoise * L.transpose();
 	}
 
-	void correct(const Eigen::Matrix<double, outputDim, 1> &measurement) override
-	{
+	void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) override {
 		Eigen::Matrix<double, outputDim, stateDim> H =
 			getOutputFuncJacobianX(outputFunc, this->xHat); // output matrix
 
@@ -163,29 +155,29 @@ public:
 	 * Set this to provide an analytic solution to df/dx.
 	 * If this is null, it will be numerically approximated.
 	 */
-	std::function<Eigen::Matrix<double, stateDim, stateDim>(const state_t &, const input_t &,
-															const processnoise_t &)>
+	std::function<Eigen::Matrix<double, stateDim, stateDim>(const state_t&, const input_t&,
+															const processnoise_t&)>
 		stateFuncJacobianX;
 	/**
 	 * Set this to provide an analytic solution to df/dw.
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, stateDim, processNoiseDim>(
-		const state_t &, const input_t &, const processnoise_t &)>
+		const state_t&, const input_t&, const processnoise_t&)>
 		stateFuncJacobianW;
 	/**
 	 * Set this to provide an analytic solution to dh/dx.
 	 * If this is null, it will be numerically approximated.
 	 */
-	std::function<Eigen::Matrix<double, outputDim, stateDim>(const state_t &,
-															 const outputnoise_t &)>
+	std::function<Eigen::Matrix<double, outputDim, stateDim>(const state_t&,
+															 const outputnoise_t&)>
 		outputFuncJacobianX;
 	/**
 	 * Set this to provide an analytic solution to dh/dv.
 	 * If this is null, it will be numerically approximated.
 	 */
-	std::function<Eigen::Matrix<double, outputDim, outputNoiseDim>(const state_t &,
-																   const outputnoise_t &)>
+	std::function<Eigen::Matrix<double, outputDim, outputNoiseDim>(const state_t&,
+																   const outputnoise_t&)>
 		outputFuncJacobianV;
 
 private:
@@ -198,19 +190,14 @@ private:
 	static constexpr double epsilon = 1e-5;
 
 	Eigen::Matrix<double, stateDim, stateDim>
-	getStateFuncJacobianX(const statefunc_t &f, const state_t &x, const input_t &u) const
-	{
+	getStateFuncJacobianX(const statefunc_t& f, const state_t& x, const input_t& u) const {
 		processnoise_t w = processnoise_t::Zero();
 		// If we have an analytic solution, use that
-		if (stateFuncJacobianX)
-		{
+		if (stateFuncJacobianX) {
 			return stateFuncJacobianX(x, u, w);
-		}
-		else
-		{
+		} else {
 			Eigen::Matrix<double, stateDim, stateDim> jacobian;
-			for (int i = 0; i < stateDim; i++)
-			{
+			for (int i = 0; i < stateDim; i++) {
 				state_t delta = state_t::Zero();
 				delta[i] = epsilon;
 				state_t derivative = (f(x + delta, u, w) - f(x - delta, u, w)) / (2 * epsilon);
@@ -221,19 +208,14 @@ private:
 	}
 
 	Eigen::Matrix<double, stateDim, processNoiseDim>
-	getStateFuncJacobianW(const statefunc_t &f, const state_t &x, const input_t &u) const
-	{
+	getStateFuncJacobianW(const statefunc_t& f, const state_t& x, const input_t& u) const {
 		processnoise_t w = processnoise_t::Zero();
 		// If we have an analytic solution, use that
-		if (stateFuncJacobianW)
-		{
+		if (stateFuncJacobianW) {
 			return stateFuncJacobianW(x, u, w);
-		}
-		else
-		{
+		} else {
 			Eigen::Matrix<double, stateDim, processNoiseDim> jacobian;
-			for (int i = 0; i < processNoiseDim; i++)
-			{
+			for (int i = 0; i < processNoiseDim; i++) {
 				processnoise_t delta = processnoise_t::Zero();
 				delta[i] = epsilon;
 				state_t derivative = (f(x, u, w + delta) - f(x, u, w - delta)) / (2 * epsilon);
@@ -243,20 +225,15 @@ private:
 		}
 	}
 
-	Eigen::Matrix<double, outputDim, stateDim> getOutputFuncJacobianX(const outputfunc_t &f,
-																	  const state_t &x) const
-	{
+	Eigen::Matrix<double, outputDim, stateDim> getOutputFuncJacobianX(const outputfunc_t& f,
+																	  const state_t& x) const {
 		outputnoise_t v = outputnoise_t::Zero();
 		// If we have an analytic solution, use that
-		if (outputFuncJacobianX)
-		{
+		if (outputFuncJacobianX) {
 			return outputFuncJacobianX(x, v);
-		}
-		else
-		{
+		} else {
 			Eigen::Matrix<double, outputDim, stateDim> jacobian;
-			for (int i = 0; i < stateDim; i++)
-			{
+			for (int i = 0; i < stateDim; i++) {
 				state_t delta = Eigen::Matrix<double, stateDim, 1>::Zero();
 				delta[i] = epsilon;
 				output_t derivative = (f(x + delta, v) - f(x - delta, v)) / (2 * epsilon);
@@ -267,19 +244,14 @@ private:
 	}
 
 	Eigen::Matrix<double, outputDim, outputNoiseDim>
-	getOutputFuncJacobianV(const outputfunc_t &f, const state_t &x) const
-	{
+	getOutputFuncJacobianV(const outputfunc_t& f, const state_t& x) const {
 		outputnoise_t v = outputnoise_t::Zero();
 		// If we have an analytic solution, use that
-		if (outputFuncJacobianV)
-		{
+		if (outputFuncJacobianV) {
 			return outputFuncJacobianV(x, v);
-		}
-		else
-		{
+		} else {
 			Eigen::Matrix<double, outputDim, outputNoiseDim> jacobian;
-			for (int i = 0; i < outputNoiseDim; i++)
-			{
+			for (int i = 0; i < outputNoiseDim; i++) {
 				outputnoise_t delta = outputnoise_t::Zero();
 				delta[i] = epsilon;
 				output_t derivative = (f(x, v + delta) - f(x, v - delta)) / (2 * epsilon);

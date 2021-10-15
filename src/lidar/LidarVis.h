@@ -1,17 +1,16 @@
 #pragma once
 
+#include "PointCloudProcessing.h"
+#include "PointGenerator.h"
+#include "URGLidar.h"
+
 #include <vector>
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "PointCloudProcessing.h"
-#include "PointGenerator.h"
-#include "URGLidar.h"
-
-namespace lidar
-{
+namespace lidar {
 constexpr int lidar_max_range = 5000;
 constexpr int vis_win_width = 600;
 constexpr int vis_win_height = 600;
@@ -27,8 +26,7 @@ const cv::Scalar vis_grid_color(0, 128, 0);
 constexpr int vis_grid_dist = 1000;
 constexpr int vis_lidar_size = 10;
 
-class LidarVis
-{
+class LidarVis {
 private:
 	cv::Mat view;
 	cv::Scalar bg_color;
@@ -39,8 +37,8 @@ private:
 
 public:
 	LidarVis(int win_width, int win_height, cv::Scalar bgr, int max_range);
-	void drawPoints(std::vector<PointXY> &pts, cv::Scalar bgr, int ptRadius);
-	void outlinePolygon(std::vector<PointXY> &vertices, cv::Scalar bgr);
+	void drawPoints(std::vector<PointXY>& pts, cv::Scalar bgr, int ptRadius);
+	void outlinePolygon(std::vector<PointXY>& vertices, cv::Scalar bgr);
 	void drawLidar(cv::Scalar bgr, int symb_size_px);
 	void setGrid(cv::Scalar bgr, int scale);
 	void clear();

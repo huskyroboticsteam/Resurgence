@@ -1,36 +1,29 @@
 #include "DriveToGate.h"
+
 #include <iostream>
 
 DriveToGate::DriveToGate(double radius, double thetaKP, double slowVel, double fastVel)
-	: post({0, 0, 0}), radius(radius), thetaKP(thetaKP), slowVel(slowVel), fastVel(fastVel)
-{
+	: post({0, 0, 0}), radius(radius), thetaKP(thetaKP), slowVel(slowVel), fastVel(fastVel) {
 }
 
-command_t DriveToGate::getOutput()
-{
-	if (post(2) != 1)
-	{
+command_t DriveToGate::getOutput() {
+	if (post(2) != 1) {
 		return {0, slowVel};
-	}
-	else if (!isDone())
-	{
+	} else if (!isDone()) {
 		double angle = atan2(post.y(), post.x());
 		double vel = (post.topRows<2>().norm() <= 2 * radius) ? slowVel : fastVel;
 		double targthvel = angle * thetaKP;
 		return {targthvel, vel};
-	}
-	else
-	{
+	} else {
 		return {0, 0};
 	}
 }
 
-bool DriveToGate::isDone()
-{
+bool DriveToGate::isDone() {
 	return post(2) == 1 && post.topRows<2>().norm() <= radius;
 }
 
-void DriveToGate::update(const point_t &p)
-{
-		if (p(2) != 0) this->post = p;
+void DriveToGate::update(const point_t& p) {
+	if (p(2) != 0)
+		this->post = p;
 }

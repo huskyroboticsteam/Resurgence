@@ -3,18 +3,17 @@
 #include <chrono>
 #include <string>
 #include <time.h>
+
 #include <sys/time.h>
 
-namespace util
-{
+namespace util {
 bool almostEqual(double a, double b, double threshold = 1e-6);
 
 /**
  * A utility class that helps with timing. Measures the elapsed time from the moment
  * this class is instantiated to the moment that the scope ends.
  */
-class ScopedTimer
-{
+class ScopedTimer {
 public:
 	/**
 	 * Create a scoped timer with the specified name. The elapsed time will be printed
@@ -41,5 +40,5 @@ private:
 };
 } // namespace util
 
-long getElapsedUsecs(const struct timeval &tp_start, const struct timeval &tp_end);
-long getElapsedUsecs(const struct timeval &tp_start);
+long getElapsedUsecs(const struct timeval& tp_start, const struct timeval& tp_end);
+long getElapsedUsecs(const struct timeval& tp_start);

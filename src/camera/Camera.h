@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CameraParams.h"
+
 #include <memory>
 #include <mutex>
 #include <string>
@@ -7,8 +9,6 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
-
-#include "CameraParams.h"
 
 /**
    @defgroup camera Camera Access
@@ -23,8 +23,7 @@
    @namespace cam
    @brief Namespace for camera access system.
  */
-namespace cam
-{
+namespace cam {
 
 /**
    @addtogroup camera
@@ -97,8 +96,7 @@ const std::string KEY_DESCRIPTION = "description";
 	cannot be performed without them. Use Camera::hasIntrinsicParams() and
 	Camera::hasExtrinsicParams() to check for the presence of each.
  */
-class Camera
-{
+class Camera {
 private:
 	std::shared_ptr<cv::Mat> _frame;
 	std::shared_ptr<uint32_t> _frame_num;
@@ -112,7 +110,7 @@ private:
 	cv::Mat _extrinsic_params;
 	std::shared_ptr<bool> _running;
 	void captureLoop();
-	void init(const cv::Mat &extrinsic_params);
+	void init(const cv::Mat& extrinsic_params);
 
 public:
 	/**
@@ -185,7 +183,7 @@ public:
 	   underlying camera with the Camera object it is copying. When all Camera
 	   objects sharing access are destroyed, the camera will be closed.
 	 */
-	Camera(const Camera &other);
+	Camera(const Camera& other);
 
 	/**
 	   @brief Opens the camera using the given configuration file.
@@ -227,7 +225,7 @@ public:
 
 	   @returns true on success, false if some error occurs.
 	 */
-	bool next(cv::Mat &frame, uint32_t &frame_num) const;
+	bool next(cv::Mat& frame, uint32_t& frame_num) const;
 	/**
 	   @brief Returns true if this camera has associated intrinsic parameters.
 	 */
@@ -271,8 +269,7 @@ public:
 /**
    Exception for errors in the camera configuration.
  */
-class invalid_camera_config : public std::exception
-{
+class invalid_camera_config : public std::exception {
 public:
 	/**
 	   Constructs an invalid_camera_config exception with the default message "Invalid camera
@@ -284,11 +281,11 @@ public:
 	   "Invalid camera configuration:".
 	   @param msg The message to use for the exception.
 	 */
-	invalid_camera_config(const std::string &msg);
+	invalid_camera_config(const std::string& msg);
 	/**
 	   Returns the exception message as a C string.
 	 */
-	virtual const char *what() const noexcept;
+	virtual const char* what() const noexcept;
 
 private:
 	std::string _msg;

@@ -1,11 +1,7 @@
-#include <future>
-#include <iostream>
-#include <set>
-
-#include <opencv2/calib3d.hpp>
-
-#include "world_interface.h"
 #include "../Globals.h"
+#include "../Networking/CANUtils.h"
+#include "../Networking/json.hpp"
+#include "../Networking/motor_interface.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../camera/Camera.h"
@@ -13,13 +9,15 @@
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../simulator/utils.h"
-#include "../Networking/CANUtils.h"
-#include "../Networking/motor_interface.h"
+#include "world_interface.h"
 
-#include "../Networking/json.hpp"
+#include <future>
+#include <iostream>
+#include <set>
 
-extern "C"
-{
+#include <opencv2/calib3d.hpp>
+
+extern "C" {
 #include "../HindsightCAN/CANMotorUnit.h"
 }
 
@@ -40,7 +38,7 @@ void world_interface_init() {
 	odom_dx_ = 0.0;
 }
 
-transform_t getOdomAt(const struct timeval &time) {
+transform_t getOdomAt(const struct timeval& time) {
 	double elapsed = getElapsedUsecs(last_odom_reading_, time) / 1000000.0;
 	double delta_theta = odom_dtheta_ * elapsed;
 	double rel_x, rel_y, rel_th;
@@ -73,7 +71,7 @@ constexpr double WHEEL_BASE = 0.66;
 // roughly matches the commanded angular rate.
 constexpr double EFF_WHEEL_BASE = 1.40;
 
-constexpr double WHEEL_RADIUS = 0.15;			 // Eyeballed
+constexpr double WHEEL_RADIUS = 0.15;		  // Eyeballed
 constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
 // This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
 constexpr double MAX_PWM = 20000;
@@ -92,8 +90,8 @@ double setCmdVel(double dtheta, double dx) {
 	double left_angular_vel = left_ground_vel / WHEEL_RADIUS;
 	int16_t right_pwm = (int16_t)(right_angular_vel * PWM_FOR_1RAD_PER_SEC);
 	int16_t left_pwm = (int16_t)(left_angular_vel * PWM_FOR_1RAD_PER_SEC);
-	log(LOG_TRACE, "dtheta %f dx %f right ground %f right angular %f right pwm %d\n",
-			dtheta, dx, right_ground_vel, right_angular_vel, right_pwm);
+	log(LOG_TRACE, "dtheta %f dx %f right ground %f right angular %f right pwm %d\n", dtheta,
+		dx, right_ground_vel, right_angular_vel, right_pwm);
 	double scale_down_factor = 1.0;
 	if (abs(right_pwm) > MAX_PWM) {
 		log(LOG_WARN, "WARNING: requested too-large right PWM %d\n", right_pwm);
@@ -102,13 +100,14 @@ double setCmdVel(double dtheta, double dx) {
 	if (abs(left_pwm) > MAX_PWM) {
 		log(LOG_WARN, "WARNING: requested too-large left PWM %d\n", left_pwm);
 		double scale_down_factor_left = abs(left_pwm) / MAX_PWM;
-		if (scale_down_factor_left > scale_down_factor) scale_down_factor = scale_down_factor_left;
+		if (scale_down_factor_left > scale_down_factor)
+			scale_down_factor = scale_down_factor_left;
 	}
-	right_pwm = (int16_t) (right_pwm / scale_down_factor);
-	left_pwm = (int16_t) (left_pwm / scale_down_factor);
+	right_pwm = (int16_t)(right_pwm / scale_down_factor);
+	left_pwm = (int16_t)(left_pwm / scale_down_factor);
 	if (scale_down_factor < 1.0) {
-		log(LOG_WARN, "Scaling down cmd_vel by %f to %f %f\n",
-				scale_down_factor, dtheta / scale_down_factor, dx / scale_down_factor);
+		log(LOG_WARN, "Scaling down cmd_vel by %f to %f %f\n", scale_down_factor,
+			dtheta / scale_down_factor, dx / scale_down_factor);
 	}
 
 	setCmdVelToIntegrate(dtheta / scale_down_factor, dx / scale_down_factor);
@@ -127,17 +126,14 @@ double setCmdVel(double dtheta, double dx) {
 	return scale_down_factor;
 }
 
-points_t readLandmarks(){
+points_t readLandmarks() {
 	return AR::readLandmarks();
 }
 
-points_t readLidarScan(){
-	if (lidar::isLidarDataFresh())
-	{
+points_t readLidarScan() {
+	if (lidar::isLidarDataFresh()) {
 		return lidar::readLidar();
-	}
-	else
-	{
+	} else {
 		return {};
 	}
 }
@@ -149,5 +145,5 @@ transform_t readOdom() {
 }
 
 URCLeg getLeg(int index) {
-	return URCLeg { 0, -1, {0.,0.,0.}};
+	return URCLeg{0, -1, {0., 0., 0.}};
 }

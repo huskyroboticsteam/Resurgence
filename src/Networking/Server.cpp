@@ -7,8 +7,7 @@ int max(int x, int y) {
 		return y;
 }
 
-int main()
-{
+int main() {
 	int listenfd, connfd, udpfd, nready, maxfdp1;
 	char buffer[MAXLINE];
 	pid_t childpid;
@@ -50,7 +49,7 @@ int main()
 		// if tcp socket is readable then handle
 		// it by accepting the connection
 		if (FD_ISSET(listenfd, &rset)) {
-			len = sizeof(cliaddr); 
+			len = sizeof(cliaddr);
 			connfd = accept(listenfd, (struct sockaddr*)&cliaddr, &len);
 			if ((childpid = fork()) == 0) {
 				close(listenfd);
@@ -71,11 +70,11 @@ int main()
 				close(connfd);
 				exit(0);
 			}
-			
+
 			close(connfd);
 		}
 
-		// if udp socket is readable receive the message. 
+		// if udp socket is readable receive the message.
 		if (FD_ISSET(udpfd, &rset)) {
 			len = sizeof(cliaddr);
 			bzero(buffer, sizeof(buffer));
@@ -84,7 +83,8 @@ int main()
 
 			std::string str(buffer);
 			str = "Echoing \"" + str + "\"";
-			sendto(udpfd, str.c_str(), str.length(), 0, (struct sockaddr*)&cliaddr, sizeof(cliaddr));
+			sendto(udpfd, str.c_str(), str.length(), 0, (struct sockaddr*)&cliaddr,
+				   sizeof(cliaddr));
 		}
 	}
 }
