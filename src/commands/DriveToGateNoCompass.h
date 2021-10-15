@@ -3,26 +3,19 @@
 #include "../simulator/utils.h"
 #include "CommandBase.h"
 
-class DriveToGateNoCompass : CommandBase
-{
+class DriveToGateNoCompass : CommandBase {
 public:
 	DriveToGateNoCompass(double driveDist, double angleKP, double vel, double initial_heading);
-	void reset(transform_t &odom, point_t &target);
-	void update(const transform_t &odom, const transform_t &gps, const pose_t &currPose, const point_t &leftPost, const point_t &rightPost);
+	void reset(transform_t& odom, point_t& target);
+	void update(const transform_t& odom, const transform_t& gps, const pose_t& currPose,
+				const point_t& leftPost, const point_t& rightPost);
 	bool isDone() override;
 	bool isAlmostDone();
-	void setDone(const transform_t &odom);
+	void setDone(const transform_t& odom);
 	command_t getOutput() override;
 
 private:
-	enum State
-	{
-		Start,
-		DriveForward,
-		TurnToTarget,
-		AlmostDone,
-		Done
-	};
+	enum State { Start, DriveForward, TurnToTarget, AlmostDone, Done };
 
 	void transitionStates();
 	void checkpoint();

@@ -1,11 +1,10 @@
 #include "NetworkConstants.h"
 
-int main()
-{
+int main() {
 	int sockfd;
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		std::cout << "socket creation failed";
-		exit(0); 
+		exit(0);
 	}
 
 	struct sockaddr_in servaddr;
@@ -21,7 +20,7 @@ int main()
 	}
 
 	std::string str;
-	char buffer[MAXLINE]; 
+	char buffer[MAXLINE];
 
 	while (1) {
 		std::cout << "Enter message: ";

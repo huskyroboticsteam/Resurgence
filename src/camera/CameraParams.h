@@ -2,8 +2,7 @@
 
 #include <opencv2/core.hpp>
 
-namespace cam
-{
+namespace cam {
 
 /**
    @addtogroup camera
@@ -55,13 +54,12 @@ const std::string KEY_DIST_COEFFS = "distortion_coefficients";
    resolutions. For this reason, a CameraParams object has an associated
    cv::Size which contains the image size the parameters are valid for.
 */
-class CameraParams
-{
+class CameraParams {
 private:
 	cv::Mat _camera_matrix;
 	cv::Mat _dist_coeff;
 	cv::Size _image_size;
-	void init(const cv::Mat &camera_matrix, const cv::Mat &dist_coeff, cv::Size image_size);
+	void init(const cv::Mat& camera_matrix, const cv::Mat& dist_coeff, cv::Size image_size);
 
 public:
 	/**
@@ -84,7 +82,7 @@ public:
 	   @param image_size The size of the image the parameters are calibrated for. Defaults to
 	   640x480 as this is the default resolution of many webcams.
 	 */
-	CameraParams(const cv::Mat &camera_matrix, const cv::Mat &dist_coeff,
+	CameraParams(const cv::Mat& camera_matrix, const cv::Mat& dist_coeff,
 				 cv::Size image_size = cv::Size(640, 480));
 	/**
 	   @brief Copy constructor.
@@ -93,7 +91,7 @@ public:
 	   camera matrix and distortion coefficients are actually copied, so the copy may be
 	   modified without affecting the original.
 	 */
-	CameraParams(const CameraParams &other);
+	CameraParams(const CameraParams& other);
 	bool empty() const;
 	/**
 	   Gets the camera matrix associated with this set of camera parameters.
@@ -115,7 +113,7 @@ public:
 	   Used for serialization - you should not need to call this method directly but should
 	   instead use the >> operator on a cv::FileNode object.
 	 */
-	void readFromFileNode(const cv::FileNode &file_node);
+	void readFromFileNode(const cv::FileNode& file_node);
 	/**
 	   @brief Writes the data for this CameraParams object to the given cv::FileStorage
 	   object.
@@ -123,7 +121,7 @@ public:
 	   Used for serialization - you should not need to call this method directly but should
 	   instead use the << operator on a cv::FileStorage object.
 	 */
-	void writeToFileStorage(cv::FileStorage &file_storage) const;
+	void writeToFileStorage(cv::FileStorage& file_storage) const;
 };
 
 /**
@@ -132,15 +130,15 @@ public:
    Used for serialization - you should not need to call this method directly but should
    instead use the >> operator on a cv::FileNode object.
 */
-void read(const cv::FileNode &node, CameraParams &params,
-		  const CameraParams &default_value = CameraParams());
+void read(const cv::FileNode& node, CameraParams& params,
+		  const CameraParams& default_value = CameraParams());
 /**
    @brief Writes the given CameraParams object to the given cv::FileStorage object.
 
    Used for serialization - you should not need to call this method directly but should
    instead use the << operator on a cv::FileStorage object.
 */
-void write(cv::FileStorage &fs, const std::string &name, const CameraParams &params);
+void write(cv::FileStorage& fs, const std::string& name, const CameraParams& params);
 
 /** @} */
 

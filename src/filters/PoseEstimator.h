@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Eigen/Core>
-
-#include "../simulator/utils.h"
 #include "../kinematics/DiffDriveKinematics.h"
+#include "../simulator/utils.h"
 #include "ExtendedKalmanFilter.h"
+
+#include <Eigen/Core>
 
 constexpr int numStates = 3;
 using statevec_t = Eigen::Matrix<double, numStates, 1>;
@@ -13,8 +13,7 @@ using statevec_t = Eigen::Matrix<double, numStates, 1>;
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
  * The tracked states are x, y, and heading. All of these states are in map space.
  */
-class PoseEstimator
-{
+class PoseEstimator {
 public:
 	/**
 	 * Create a new Pose Estimator.
@@ -29,8 +28,8 @@ public:
 	 * @param wheelBase The distance between the left and right wheels.
 	 * @param dt The time in seconds between updates.
 	 */
-	PoseEstimator(const Eigen::Vector2d &inputNoiseGains,
-				  const Eigen::Vector3d &measurementStdDevs, double wheelBase, double dt);
+	PoseEstimator(const Eigen::Vector2d& inputNoiseGains,
+				  const Eigen::Vector3d& measurementStdDevs, double wheelBase, double dt);
 
 	/**
 	 * Correct the pose estimation with measurement data.
@@ -38,7 +37,7 @@ public:
 	 *
 	 * @param measurement The measurement to use to correct the filter, as a transform.
 	 */
-	void correct(const transform_t &measurement);
+	void correct(const transform_t& measurement);
 
 	/**
 	 * Use the model to predict the next system state, given the current inputs.
@@ -72,7 +71,7 @@ public:
 	 *
 	 * @param pose The pose to which the state estimate will be set.
 	 */
-	void reset(const pose_t &pose);
+	void reset(const pose_t& pose);
 
 	/**
 	 * Sets the state estimate to the supplied vector and sets the estimate covariance matrix
@@ -81,7 +80,7 @@ public:
 	 * @param pose The pose to which the state estimate will be set.
 	 * @param stdDevs The standard deviation for each element in the pose.
 	 */
-	void reset(const pose_t &pose, const pose_t &stdDevs);
+	void reset(const pose_t& pose, const pose_t& stdDevs);
 
 	/**
 	 * Gets the current state estimate.

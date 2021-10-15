@@ -1,7 +1,6 @@
 #include "NetworkConstants.h"
 
-int main()
-{
+int main() {
 	int sockfd;
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		std::cout << "socket creation failed";
@@ -28,8 +27,9 @@ int main()
 		if (str == "exit") {
 			break;
 		}
-		
-		sendto(sockfd, str.c_str(), str.length(), 0, (const struct sockaddr*)&servaddr, sizeof(servaddr));
+
+		sendto(sockfd, str.c_str(), str.length(), 0, (const struct sockaddr*)&servaddr,
+			   sizeof(servaddr));
 
 		bzero(buffer, sizeof(buffer));
 		n = recvfrom(sockfd, buffer, MAXLINE, 0, (struct sockaddr*)&servaddr, &len);
@@ -37,4 +37,4 @@ int main()
 	}
 
 	close(sockfd);
-} 
+}

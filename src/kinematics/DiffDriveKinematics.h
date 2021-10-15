@@ -2,8 +2,7 @@
 
 #include "../simulator/utils.h"
 
-struct wheelvel_t
-{
+struct wheelvel_t {
 	double lVel;
 	double rVel;
 };
@@ -12,8 +11,7 @@ struct wheelvel_t
  * Represents the kinematics of a differential drive. This class can be used to calculate
  * various velocities and pose updates using the mathematical representation of the drivebase.
  */
-class DiffDriveKinematics
-{
+class DiffDriveKinematics {
 public:
 	/**
 	 * Create a new DiffDriveKinematics with the given wheel base width.
@@ -53,7 +51,7 @@ public:
 	 * has been moving at the specified velocity for this much time.
 	 * @return The pose update in the robot's local reference frame.
 	 */
-	pose_t getLocalPoseUpdate(const wheelvel_t &wheelVel, double dt) const;
+	pose_t getLocalPoseUpdate(const wheelvel_t& wheelVel, double dt) const;
 
 	/**
 	 * Calculate the pose update in the global reference frame (map space) assuming the left
@@ -64,7 +62,7 @@ public:
 	 * has been moving at the specified velocity for this much time.
 	 * @return The pose update in the global reference frame.
 	 */
-	pose_t getPoseUpdate(const wheelvel_t &wheelVel, double heading, double dt) const;
+	pose_t getPoseUpdate(const wheelvel_t& wheelVel, double heading, double dt) const;
 
 	/**
 	 * Calculate the next pose of the robot in the global reference frame. (map space)
@@ -76,7 +74,7 @@ public:
 	 * @return The next pose of the robot in the global reference frame after having moved at
 	 * the specified velocity for the specified time.
 	 */
-	pose_t getNextPose(const wheelvel_t &wheelVel, const pose_t &pose, double dt) const;
+	pose_t getNextPose(const wheelvel_t& wheelVel, const pose_t& pose, double dt) const;
 
 private:
 	double wheelBaseWidth;

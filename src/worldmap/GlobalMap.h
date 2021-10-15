@@ -1,25 +1,24 @@
 #pragma once
 
-#include <vector>
-
 #include "../simulator/utils.h"
 #include "QuadTree.h"
 #include "TrICP.h"
+
+#include <vector>
 
 /**
  * Represents a 2D global point cloud map. As the robot moves around, it will store
  * information about its environment for mapping purposes.
  */
-class GlobalMap
-{
+class GlobalMap {
 public:
 	/**
 	 * Creates a new GlobalMap object, for use with building global lidar point clouds.
 	 *
 	 * @param areaSize The side length of the square represented by this global map. The units
 	 * 			don't matter, as long as they're consistent with the data.
-	 * @param scanStride Indicates the amount of points per scan to ignore. The number of points
-	 * kept from each scan is 1/scanStride, rounded down.
+	 * @param scanStride Indicates the amount of points per scan to ignore. The number of
+	 * points kept from each scan is 1/scanStride, rounded down.
 	 * @param maxIter Maximum iterations allowed for fitting new samples to the map
 	 * @param relErrChangeThresh Minimum relative error change threshold for fitting new
 	 * samples to the map. Iteration will terminate early if the relative change in error
@@ -39,7 +38,7 @@ public:
 	 * then no meaningful features can be matched. Set to 0 to add points directly
 	 * with no feature matching.
 	 */
-	void addPoints(const transform_t &robotTrf, const points_t &points, double overlap);
+	void addPoints(const transform_t& robotTrf, const points_t& points, double overlap);
 
 	/**
 	 * Get the points in the global map. This vector is a copy, so modifying it will not
@@ -62,7 +61,7 @@ public:
 	 * @param point The point for which the closest point will be found.
 	 * @return The closest point, or [0,0,0] if no points are in this map.
 	 */
-	point_t getClosest(const point_t &point) const;
+	point_t getClosest(const point_t& point) const;
 
 	/**
 	 * Gets all points in the map within the given distance (inclusive) from the given point.
@@ -71,7 +70,7 @@ public:
 	 * @param dist The distance within which to search.
 	 * @return A vector of points that are within the given distance from the given point.
 	 */
-	points_t getPointsWithin(const point_t &point, double dist) const;
+	points_t getPointsWithin(const point_t& point, double dist) const;
 
 	/**
 	 * Checks if the given point has at least one point within the given distance from it.
@@ -83,7 +82,7 @@ public:
 	 * @return True iff there exists a point in the map, which may be the given point, within
 	 * the given distance from the given point. False otherwise.
 	 */
-	bool hasPointWithin(const point_t &point, double dist) const;
+	bool hasPointWithin(const point_t& point, double dist) const;
 
 private:
 	QuadTree tree;

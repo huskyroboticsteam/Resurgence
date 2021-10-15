@@ -2,38 +2,30 @@
 
 SyntheticLidar::SyntheticLidar()
 	: lastAngle(0.0f), last(std::chrono::steady_clock::now()),
-	  lastFrameTime(std::chrono::steady_clock::now())
-{
+	  lastFrameTime(std::chrono::steady_clock::now()) {
 }
 
-std::shared_ptr<Polar2D> SyntheticLidar::nextPolarCircle(double radius)
-{
+std::shared_ptr<Polar2D> SyntheticLidar::nextPolarCircle(double radius) {
 	bool frame = updateAngle();
 	Polar2D pd{radius, actingAngle()};
 	return completeNext(frame, pd);
 }
 
-std::shared_ptr<Polar2D> SyntheticLidar::nextPolarSquare(double dimension)
-{
+std::shared_ptr<Polar2D> SyntheticLidar::nextPolarSquare(double dimension) {
 	bool frame = updateAngle();
 	double aa = fmod(actingAngle(), 90);
 	double hypotenuse;
-	if (aa > 45)
-	{
+	if (aa > 45) {
 		hypotenuse = (dimension / 2) / cos((90 - aa) * PI / 180.0);
-	}
-	else
-	{
+	} else {
 		hypotenuse = (dimension / 2) / cos(aa * PI / 180.0);
 	}
 	Polar2D pd{hypotenuse, aa};
 	return completeNext(frame, pd);
 }
 
-std::shared_ptr<Polar2D> SyntheticLidar::completeNext(bool frame, Polar2D pd)
-{
-	if (frame)
-	{
+std::shared_ptr<Polar2D> SyntheticLidar::completeNext(bool frame, Polar2D pd) {
+	if (frame) {
 		createFrame();
 	}
 	std::shared_ptr<Polar2D> spd = std::make_shared<Polar2D>(pd);
@@ -41,23 +33,19 @@ std::shared_ptr<Polar2D> SyntheticLidar::completeNext(bool frame, Polar2D pd)
 	return spd;
 }
 
-std::vector<std::shared_ptr<Polar2D>> SyntheticLidar::getLastFrame()
-{
+std::vector<std::shared_ptr<Polar2D>> SyntheticLidar::getLastFrame() {
 	return lastFrame;
 }
 
-double SyntheticLidar::getLastAngle()
-{
+double SyntheticLidar::getLastAngle() {
 	return lastAngle;
 }
 
-auto SyntheticLidar::getLastFrameTime()
-{
+auto SyntheticLidar::getLastFrameTime() {
 	return lastFrameTime;
 }
 
-bool SyntheticLidar::updateAngle()
-{
+bool SyntheticLidar::updateAngle() {
 	long millisSplit = std::chrono::duration_cast<std::chrono::milliseconds>(
 						   std::chrono::steady_clock::now() - last)
 						   .count();
@@ -68,15 +56,13 @@ bool SyntheticLidar::updateAngle()
 	return lastOld > lastAngle;
 }
 
-double SyntheticLidar::actingAngle()
-{
+double SyntheticLidar::actingAngle() {
 	double acting =
 		fmod(lastAngle + 360 + 90, 360); // Converts Lidar Coordinates to Polar standard.
 	return acting;
 }
 
-void SyntheticLidar::createFrame()
-{
+void SyntheticLidar::createFrame() {
 	lastFrame = currentFrame;
 	std::vector<std::shared_ptr<Polar2D>> newFrame;
 	currentFrame = newFrame;

@@ -1,45 +1,38 @@
 #include "DriveThroughGate.h"
 
-#include <cmath>
-
 #include "../../log.h"
-
 #include "Eigen/LU"
+
+#include <cmath>
 
 constexpr double ALIGN_DIST = 2;
 
 DriveThroughGate::DriveThroughGate(double thetaKP, double slowVel, double fastVel)
 	: startOdom(toTransform({0, 0, 0})), driveTarget(pose_t::Zero()), thetaKP(thetaKP),
-	  slowVel(slowVel), fastVel(fastVel), state(State::Done)
-{
+	  slowVel(slowVel), fastVel(fastVel), state(State::Done) {
 }
 
-void DriveThroughGate::reset(transform_t &odom)
-{
+void DriveThroughGate::reset(transform_t& odom) {
 	startOdom = odom;
 	state = State::Start;
 	driveTarget = pose_t::Zero();
 }
 
-bool DriveThroughGate::isDone()
-{
+bool DriveThroughGate::isDone() {
 	return state == State::Done;
 }
 
-double headingErr(const transform_t &trf, const pose_t &target)
-{
+double headingErr(const transform_t& trf, const pose_t& target) {
 	return target(2) - toPose(trf, target(2))(2);
 }
 
-double posErr(const transform_t &trf, const pose_t &target)
-{
+double posErr(const transform_t& trf, const pose_t& target) {
 	point_t targetPoint = {target.x(), target.y(), 1};
 	return (trf * targetPoint).topRows<2>().norm();
 }
 
-pose_t calculateStartTarget(const transform_t &trf, const point_t &leftPost,
-							const point_t &rightPost)
-{
+pose_t calculateStartTarget(const transform_t& trf, const point_t& leftPost,
+							const point_t& rightPost) {
 	point_t post = leftPost(2) == 0 ? rightPost : leftPost;
 
 	double angle = atan2(post.y(), post.x());
@@ -48,9 +41,8 @@ pose_t calculateStartTarget(const transform_t &trf, const point_t &leftPost,
 	return target;
 }
 
-pose_t calculateAlignTargetPose(const transform_t &trf, const point_t &leftPost,
-								const point_t &rightPost)
-{
+pose_t calculateAlignTargetPose(const transform_t& trf, const point_t& leftPost,
+								const point_t& rightPost) {
 	transform_t trfInv = trf.inverse();
 
 	point_t center = (leftPost + rightPost) / 2;
@@ -69,8 +61,7 @@ pose_t calculateAlignTargetPose(const transform_t &trf, const point_t &leftPost,
 	// now project centerToRobot onto gateNormal and scale to get the offset
 	double dot = centerToRobot.dot(gateNormal);
 	// handle the case where the dot product is zero
-	if (fabs(dot) <= 1e-9)
-	{
+	if (fabs(dot) <= 1e-9) {
 		dot = 1;
 	}
 	Eigen::Vector2d offset = ALIGN_DIST * (dot * gateNormal).normalized();
@@ -86,64 +77,48 @@ pose_t calculateAlignTargetPose(const transform_t &trf, const point_t &leftPost,
 	return {targetGlobal.x(), targetGlobal.y(), angle};
 }
 
-command_t DriveThroughGate::getOutput()
-{
+command_t DriveThroughGate::getOutput() {
 	transitionStates();
 
 	transform_t trf = getTrfFromStart();
 	transform_t trfInv = trf.inverse();
 	pose_t pose = toPose(trf, 0);
 
-	if (state == OneVisibleDrive)
-	{
+	if (state == OneVisibleDrive) {
 		return getCommandToTarget(trf, driveTarget);
-	}
-	else if (state == OneVisibleTurn)
-	{
+	} else if (state == OneVisibleTurn) {
 		double thetaVel = thetaKP * headingErr(trf, driveTarget);
 		return {.thetaVel = thetaVel, .xVel = 0};
-	}
-	else if (state == BothVisible)
-	{
+	} else if (state == BothVisible) {
 		// recalculate the driveTarget, if possible
-		if (leftPost(2) != 0 && rightPost(2) != 0)
-		{
+		if (leftPost(2) != 0 && rightPost(2) != 0) {
 			driveTarget = calculateAlignTargetPose(trf, leftPost, rightPost);
 		}
 		return getCommandToTarget(trf, driveTarget);
-	}
-	else if (state == Align)
-	{
+	} else if (state == Align) {
 		// recalculate the driveTarget, if possible
-		if (leftPost(2) != 0 && rightPost(2) != 0)
-		{
+		if (leftPost(2) != 0 && rightPost(2) != 0) {
 			driveTarget = calculateAlignTargetPose(trf, leftPost, rightPost);
 		}
 		double thetaVel = thetaKP * headingErr(trf, driveTarget);
 		return {.thetaVel = thetaVel, .xVel = 0};
-	}
-	else if (state == DriveThrough)
-	{
+	} else if (state == DriveThrough) {
 		command_t cmd = getCommandToTarget(trf, driveTarget);
 		cmd.xVel = slowVel; // always go slow
 		return cmd;
-	}
-	else
-	{
+	} else {
 		return {0, 0};
 	}
 }
 
-void DriveThroughGate::update(const transform_t &odom, const point_t &left,
-								const point_t &right)
-{
+void DriveThroughGate::update(const transform_t& odom, const point_t& left,
+							  const point_t& right) {
 	currOdom = odom;
 	leftPost = left;
 	rightPost = right;
 }
 
-pose_t calculateNextSearchPose(const point_t &postLocal, const transform_t &trf)
-{
+pose_t calculateNextSearchPose(const point_t& postLocal, const transform_t& trf) {
 	transform_t trfInv = trf.inverse();
 
 	// create rotation matrix 90 deg CCW
@@ -162,12 +137,10 @@ pose_t calculateNextSearchPose(const point_t &postLocal, const transform_t &trf)
 	return target;
 }
 
-void DriveThroughGate::transitionStates()
-{
+void DriveThroughGate::transitionStates() {
 	transform_t trf = getTrfFromStart();
 	pose_t pose = toPose(trf, 0);
-	switch (state)
-	{
+	switch (state) {
 		case Start:
 			driveTarget = calculateStartTarget(trf, leftPost, rightPost);
 			state = OneVisibleTurn;
@@ -175,14 +148,11 @@ void DriveThroughGate::transitionStates()
 			break;
 
 		case OneVisibleTurn:
-			if (leftPost(2) == 1 && rightPost(2) == 1)
-			{
+			if (leftPost(2) == 1 && rightPost(2) == 1) {
 				driveTarget = calculateAlignTargetPose(trf, leftPost, rightPost);
 				log(LOG_INFO, "OneVisibleTurn->BothVisible\n");
 				state = BothVisible;
-			}
-			else if (abs(headingErr(trf, driveTarget)) <= M_PI / 9)
-			{
+			} else if (abs(headingErr(trf, driveTarget)) <= M_PI / 9) {
 				point_t postLocal = leftPost(2) != 0 ? leftPost : rightPost;
 				driveTarget = calculateNextSearchPose(postLocal, trf);
 				state = OneVisibleDrive;
@@ -191,45 +161,39 @@ void DriveThroughGate::transitionStates()
 			break;
 
 		case OneVisibleDrive:
-			if (leftPost(2) == 1 && rightPost(2) == 1)
-			{
+			if (leftPost(2) == 1 && rightPost(2) == 1) {
 				driveTarget = calculateAlignTargetPose(trf, leftPost, rightPost);
 				state = BothVisible;
 				log(LOG_INFO, "OneVisibleDrive->BothVisible\n");
-			}
-			else if (posErr(trf, driveTarget) <= 0.75)
-			{
+			} else if (posErr(trf, driveTarget) <= 0.75) {
 				state = OneVisibleTurn;
 				log(LOG_INFO, "OneVisibleDrive->OneVisibleTurn\n");
 			}
 			break;
 
 		case BothVisible:
-			if (posErr(trf, driveTarget) <= 0.5)
-			{
+			if (posErr(trf, driveTarget) <= 0.5) {
 				state = Align;
 				log(LOG_INFO, "BothVisible->Align\n");
 			}
 			break;
 
 		case Align:
-			if (abs(headingErr(trf, driveTarget)) <= M_PI / 9)
-			{
+			if (abs(headingErr(trf, driveTarget)) <= M_PI / 9) {
 				// move the drive target twice the align distance in the current direction
 				double angle = driveTarget(2);
 				double cosTheta = cos(angle);
 				double sinTheta = sin(angle);
 				double dist = 2 * ALIGN_DIST;
 				driveTarget = {driveTarget.x() + dist * cosTheta,
-											 driveTarget.y() + dist * sinTheta, angle};
+							   driveTarget.y() + dist * sinTheta, angle};
 				state = DriveThrough;
 				log(LOG_INFO, "Align->DriveThrough\n");
 			}
 			break;
 
 		case DriveThrough:
-			if (posErr(trf, driveTarget) <= 0.5)
-			{
+			if (posErr(trf, driveTarget) <= 0.5) {
 				state = Done;
 				log(LOG_INFO, "DriveThrough->Done\n");
 			}
@@ -241,27 +205,23 @@ void DriveThroughGate::transitionStates()
 	}
 }
 
-transform_t DriveThroughGate::getTrfFromStart()
-{
+transform_t DriveThroughGate::getTrfFromStart() {
 	// currOdom = A * startOdom
 	// A = currOdom * startOdom^-1
 	return currOdom * startOdom.inverse();
 }
 
-command_t DriveThroughGate::getCommandToTarget(const transform_t &trf, const point_t &target)
-{
+command_t DriveThroughGate::getCommandToTarget(const transform_t& trf, const point_t& target) {
 	point_t targetPoint = {target.x(), target.y(), 1};
 	point_t targetLocal = trf * targetPoint;
-	if (targetLocal.isZero())
-	{
+	if (targetLocal.isZero()) {
 		return {0, 0};
 	}
 
 	double dist = targetLocal.topRows<2>().norm();
 	double vel = dist <= 1.5 ? slowVel : fastVel;
 	double angleErr = atan2(targetLocal.y(), targetLocal.x());
-	if (angleErr >= M_PI / 6)
-	{
+	if (angleErr >= M_PI / 6) {
 		vel = 0;
 	}
 	double thetaVel = thetaKP * angleErr;

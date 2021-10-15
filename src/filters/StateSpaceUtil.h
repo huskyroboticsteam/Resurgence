@@ -7,8 +7,7 @@
 /**
  * Collection of utility methods for use with state space applications.
  */
-namespace StateSpace
-{
+namespace StateSpace {
 
 constexpr double epsilon = 1e-5;
 
@@ -22,8 +21,7 @@ constexpr double epsilon = 1e-5;
  */
 template <int size>
 Eigen::Matrix<double, size, size>
-createCovarianceMatrix(const Eigen::Matrix<double, size, 1> &stdDevs)
-{
+createCovarianceMatrix(const Eigen::Matrix<double, size, 1>& stdDevs) {
 	Eigen::Matrix<double, size, 1> variances = stdDevs.array().square();
 	Eigen::Matrix<double, size, size> mat = variances.asDiagonal();
 	return mat;
@@ -39,8 +37,7 @@ createCovarianceMatrix(const Eigen::Matrix<double, size, 1> &stdDevs)
  */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
-discreteToContinuous(const Eigen::Matrix<double, numStates, numStates> &A, double dt)
-{
+discreteToContinuous(const Eigen::Matrix<double, numStates, numStates>& A, double dt) {
 	return A.log() / dt;
 }
 
@@ -55,9 +52,8 @@ discreteToContinuous(const Eigen::Matrix<double, numStates, numStates> &A, doubl
  * @param dt The time in seconds between updates.
  */
 template <int numStates, int numInputs>
-void discreteToContinuous(Eigen::Matrix<double, numStates, numStates> &A,
-						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
-{
+void discreteToContinuous(Eigen::Matrix<double, numStates, numStates>& A,
+						  Eigen::Matrix<double, numStates, numInputs>& B, double dt) {
 	// Reference paper: https://doi.org/10.1016/0307-904X(80)90177-8
 	auto discA = A;
 	auto discB = B;
@@ -77,9 +73,8 @@ void discreteToContinuous(Eigen::Matrix<double, numStates, numStates> &A,
  * @param dt The time in seconds between updates.
  */
 template <int numStates, int numInputs>
-void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
-						  Eigen::Matrix<double, numStates, numInputs> &B, double dt)
-{
+void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates>& A,
+						  Eigen::Matrix<double, numStates, numInputs>& B, double dt) {
 	// zero order hold discretization for system and input matrices
 	// reference:
 	// https://en.wikipedia.org/wiki/Discretization#Discretization_of_linear_state_space_models
@@ -104,8 +99,7 @@ void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates> &A,
  */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
-discretizeA(const Eigen::Matrix<double, numStates, numStates> &contA, double dt)
-{
+discretizeA(const Eigen::Matrix<double, numStates, numStates>& contA, double dt) {
 	// Derived from equations in discreteToContinuous()
 	return (contA * dt).exp();
 }
@@ -122,11 +116,10 @@ discretizeA(const Eigen::Matrix<double, numStates, numStates> &contA, double dt)
  * @param dt The time in seconds between updates.
  */
 template <int numStates>
-void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
-				  const Eigen::Matrix<double, numStates, numStates> &contQ,
-				  Eigen::Matrix<double, numStates, numStates> &discA,
-				  Eigen::Matrix<double, numStates, numStates> &discQ, double dt)
-{
+void discretizeAQ(const Eigen::Matrix<double, numStates, numStates>& contA,
+				  const Eigen::Matrix<double, numStates, numStates>& contQ,
+				  Eigen::Matrix<double, numStates, numStates>& discA,
+				  Eigen::Matrix<double, numStates, numStates>& discQ, double dt) {
 	// zero order hold discretization of the system and state covariance matrices
 	// reference:
 	// https://en.wikipedia.org/wiki/Discretization#Discretization_of_process_noise
@@ -137,7 +130,7 @@ void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
 	M.template block<numStates, numStates>(numStates, numStates) = contA.transpose();
 	M *= dt;
 
-	Eigen::Matrix<double, numStates * 2, numStates * 2> G = M.exp();
+	Eigen::Matrix<double, numStates * 2, numStates* 2> G = M.exp();
 
 	Eigen::Matrix<double, numStates, numStates> AinvQ =
 		G.block(0, numStates, numStates, numStates); // this is discA^-1 * Q
@@ -158,9 +151,8 @@ void discretizeAQ(const Eigen::Matrix<double, numStates, numStates> &contA,
  */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
-discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
-			const Eigen::Matrix<double, numStates, numStates> &contQ, double dt)
-{
+discretizeQ(const Eigen::Matrix<double, numStates, numStates>& contA,
+			const Eigen::Matrix<double, numStates, numStates>& contQ, double dt) {
 	Eigen::Matrix<double, numStates, numStates> discA;
 	Eigen::Matrix<double, numStates, numStates> discQ;
 	discretizeAQ(contA, contQ, discA, discQ, dt);
@@ -177,8 +169,7 @@ discretizeQ(const Eigen::Matrix<double, numStates, numStates> &contA,
  */
 template <int numStates>
 Eigen::Matrix<double, numStates, numStates>
-discretizeR(const Eigen::Matrix<double, numStates, numStates> &contR, double dt)
-{
+discretizeR(const Eigen::Matrix<double, numStates, numStates>& contR, double dt) {
 	return contR / dt;
 }
 
@@ -198,11 +189,10 @@ discretizeR(const Eigen::Matrix<double, numStates, numStates> &contR, double dt)
  */
 template <int numStates>
 static Eigen::Matrix<double, numStates, numStates>
-DARE(const Eigen::Matrix<double, numStates, numStates> &A0,
-	 const Eigen::Matrix<double, numStates, numStates> &Ctrans,
-	 const Eigen::Matrix<double, numStates, numStates> &Q,
-	 const Eigen::Matrix<double, numStates, numStates> &R)
-{
+DARE(const Eigen::Matrix<double, numStates, numStates>& A0,
+	 const Eigen::Matrix<double, numStates, numStates>& Ctrans,
+	 const Eigen::Matrix<double, numStates, numStates>& Q,
+	 const Eigen::Matrix<double, numStates, numStates>& R) {
 	// reference:
 	// https://scicomp.stackexchange.com/questions/30757/discrete-time-algebraic-riccati-equation-dare-solver-in-c
 	Eigen::Matrix<double, numStates, numStates> A = A0;
@@ -215,8 +205,7 @@ DARE(const Eigen::Matrix<double, numStates, numStates> &A0,
 	Eigen::Matrix<double, numStates, numStates> lastG;
 	Eigen::Matrix<double, numStates, numStates> lastH;
 	// converges quadratically
-	do
-	{
+	do {
 		lastA = A;
 		lastG = G;
 		lastH = H;

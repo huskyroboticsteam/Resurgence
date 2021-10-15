@@ -1,27 +1,28 @@
 
-#include <string>
-#include <time.h>
-#include <sys/time.h>
-
-#include "../log.h"
 #include "../Rover.h"
+#include "../log.h"
 #include "CANUtils.h"
 #include "ParseCAN.h"
-extern "C"
-{
-    #include "../HindsightCAN/CANMotorUnit.h"
+
+#include <string>
+#include <time.h>
+
+#include <sys/time.h>
+extern "C" {
+#include "../HindsightCAN/CANMotorUnit.h"
 }
 #include "../Globals.h"
-
-#include "../world_interface/world_interface.h"
 #include "../simulator/utils.h"
+#include "../world_interface/world_interface.h"
 #include "ParseBaseStation.h"
 #include "motor_interface.h"
 
-// It's important that all of these vectors are sorted in the same order (the indices correspond)
+// It's important that all of these vectors are sorted in the same order (the indices
+// correspond)
 const std::array<std::string, 4> operation_modes = {
 	"PID target", "PWM target", "incremental PID speed", "incremental IK speed"};
 
+// clang-format off
 // For PWM control, we want to use higher values when acting against gravity
 const std::map<std::string, double> positive_arm_pwm_scales = {
 	{"arm_base",   12000},
@@ -30,26 +31,24 @@ const std::map<std::string, double> positive_arm_pwm_scales = {
 	{"forearm",    -6000},
 	{"diffleft",    5000},
 	{"diffright",  -5000},
-	{"hand",       15000}
-};
+	{"hand",       15000}};
 const std::map<std::string, double> negative_arm_pwm_scales = {
-	{"arm_base",   12000},
-	{"shoulder",  -14000},
-	{"elbow",     -18000},
-	{"forearm",    -6000},
-	{"diffleft",    5000},
+	{"arm_base", 12000},
+	{"shoulder", -14000},
+	{"elbow", -18000},
+	{"forearm", -6000},
+	{"diffleft", 5000},
 	{"diffright", -10000},
-	{"hand",       15000}
-};
+	{"hand", 15000}};
 const std::map<std::string, double> incremental_pid_scales = {
-	{"arm_base",   M_PI/8}, // TODO: Check signs
-	{"shoulder",  -M_PI/8},
-	{"elbow",     -M_PI/8},
-	{"forearm",         0}, // We haven't implemented PID on these motors yet
-	{"diffleft",        0},
-	{"diffright",       0},
-	{"hand",            0}
-};
+	{"arm_base", M_PI / 8}, // TODO: Check signs
+	{"shoulder", -M_PI / 8},
+	{"elbow", -M_PI / 8},
+	{"forearm", 0}, // We haven't implemented PID on these motors yet
+	{"diffleft", 0},
+	{"diffright", 0},
+	{"hand", 0}};
+// clang-format on
 constexpr double incremental_ik_scale = 0.1; // m/s
 
 std::vector<std::string> ik_axes = {"IK_X", "IK_Y", "IK_Z"};
@@ -57,94 +56,88 @@ const std::array<std::string, 3> ik_motors = {"arm_base", "shoulder", "elbow"};
 
 constexpr int INCREMENTAL_TIMEOUT_MS = 300;
 
-bool motorSupportsPID(int motor_serial)
-{
-  return motor_serial >= DEVICE_SERIAL_MOTOR_BASE && motor_serial <= DEVICE_SERIAL_MOTOR_ELBOW;
+bool motorSupportsPID(int motor_serial) {
+	return motor_serial >= DEVICE_SERIAL_MOTOR_BASE &&
+		   motor_serial <= DEVICE_SERIAL_MOTOR_ELBOW;
 }
 
-int getIndex(const std::vector<std::string> &arr, const std::string &value)
-{
-  for (size_t i = 0; i < arr.size(); i++) {
-    if (arr[i] == value) {
-      return i;
-    }
-  }
-  return -1;
+int getIndex(const std::vector<std::string>& arr, const std::string& value) {
+	for (size_t i = 0; i < arr.size(); i++) {
+		if (arr[i] == value) {
+			return i;
+		}
+	}
+	return -1;
 }
 
-bool isValidOperationMode(int motor_serial, int ik_axis, const std::string &op_mode)
-{
-  if (op_mode != "PWM target" && !motorSupportsPID(motor_serial) && ik_axis < 0)
-  {
-    return false;
-  }
-  else if ((op_mode != "incremental IK speed") ^ (ik_axis < 0))
-  {
-    return false;
-  }
-  return true;
+bool isValidOperationMode(int motor_serial, int ik_axis, const std::string& op_mode) {
+	if (op_mode != "PWM target" && !motorSupportsPID(motor_serial) && ik_axis < 0) {
+		return false;
+	} else if ((op_mode != "incremental IK speed") ^ (ik_axis < 0)) {
+		return false;
+	}
+	return true;
 }
 
 // `motor` here is required to be an actual motor (e.g. `arm_base`)
-bool setMotorOperationMode(const std::string &motor, const std::string &op_mode) {
-  int motor_serial = getIndex(motor_group, motor);
-  std::string prev_mode = "PWM target";
-  json prev_mode_json = Globals::status_data[motor]["operation_mode"];
-  if (!prev_mode_json.is_null()) prev_mode = prev_mode_json;
-  if (prev_mode != op_mode) {
-    log(LOG_INFO, "Changing operation mode for %s (%s -> %s)\n",
-        motor.c_str(), prev_mode.c_str(), op_mode.c_str());
-    if (op_mode == "PWM target") {
-      setMotorMode(motor_serial, MOTOR_UNIT_MODE_PWM);
-    } else if (prev_mode == "PWM target") {
-      bool missing_encoder = Globals::status_data[motor]["angular_position"].is_null();
-      if (missing_encoder) return false;
-      setMotorMode(motor_serial, MOTOR_UNIT_MODE_PID);
-    }
-    Globals::status_data[motor]["operation_mode"] = op_mode;
-    // Clear state for other operating modes
-    Globals::status_data[motor].erase("millideg_per_control_loop");
-    Globals::status_data[motor].erase("target_angle");
-  }
-  return true;
+bool setMotorOperationMode(const std::string& motor, const std::string& op_mode) {
+	int motor_serial = getIndex(motor_group, motor);
+	std::string prev_mode = "PWM target";
+	json prev_mode_json = Globals::status_data[motor]["operation_mode"];
+	if (!prev_mode_json.is_null())
+		prev_mode = prev_mode_json;
+	if (prev_mode != op_mode) {
+		log(LOG_INFO, "Changing operation mode for %s (%s -> %s)\n", motor.c_str(),
+			prev_mode.c_str(), op_mode.c_str());
+		if (op_mode == "PWM target") {
+			setMotorMode(motor_serial, MOTOR_UNIT_MODE_PWM);
+		} else if (prev_mode == "PWM target") {
+			bool missing_encoder = Globals::status_data[motor]["angular_position"].is_null();
+			if (missing_encoder)
+				return false;
+			setMotorMode(motor_serial, MOTOR_UNIT_MODE_PID);
+		}
+		Globals::status_data[motor]["operation_mode"] = op_mode;
+		// Clear state for other operating modes
+		Globals::status_data[motor].erase("millideg_per_control_loop");
+		Globals::status_data[motor].erase("target_angle");
+	}
+	return true;
 }
 
 // `motor` here could be an IK axis rather than an actual motor
-bool setOperationMode(const std::string &motor, int ik_axis, const std::string &op_mode)
-{
-  bool success = true;
-  if (ik_axis < 0) {
-    success &= setMotorOperationMode(motor, op_mode);
-  } else {
-    for (const std::string &physical_motor : ik_motors) {
-      success &= setMotorOperationMode(physical_motor, op_mode);
-    }
-  }
-  if (success) {
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    long now_ms = now.tv_sec * 1000 + now.tv_usec / 1000;
-    Globals::status_data[motor]["most_recent_command"] = now_ms;
-  }
-  return success;
+bool setOperationMode(const std::string& motor, int ik_axis, const std::string& op_mode) {
+	bool success = true;
+	if (ik_axis < 0) {
+		success &= setMotorOperationMode(motor, op_mode);
+	} else {
+		for (const std::string& physical_motor : ik_motors) {
+			success &= setMotorOperationMode(physical_motor, op_mode);
+		}
+	}
+	if (success) {
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		long now_ms = now.tv_sec * 1000 + now.tv_usec / 1000;
+		Globals::status_data[motor]["most_recent_command"] = now_ms;
+	}
+	return success;
 }
 
-void sendPWMPacket(const std::string &motor, double normalized_pwm)
-{
-  CANPacket p;
-  auto& scale_map = (normalized_pwm > 0 ? positive_arm_pwm_scales : negative_arm_pwm_scales);
-  double pwm = normalized_pwm * scale_map.at(motor);
-  int motor_serial = getIndex(motor_group, motor);
-  AssemblePWMDirSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pwm);
-  sendCANPacket(p);
+void sendPWMPacket(const std::string& motor, double normalized_pwm) {
+	CANPacket p;
+	auto& scale_map = (normalized_pwm > 0 ? positive_arm_pwm_scales : negative_arm_pwm_scales);
+	double pwm = normalized_pwm * scale_map.at(motor);
+	int motor_serial = getIndex(motor_group, motor);
+	AssemblePWMDirSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pwm);
+	sendCANPacket(p);
 }
 
-void sendPIDPacket(const std::string &motor, int32_t pid_target)
-{
-  CANPacket p;
-  int motor_serial = getIndex(motor_group, motor);
-  AssemblePIDTargetSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pid_target);
-  sendCANPacket(p);
+void sendPIDPacket(const std::string& motor, int32_t pid_target) {
+	CANPacket p;
+	int motor_serial = getIndex(motor_group, motor);
+	AssemblePIDTargetSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pid_target);
+	sendCANPacket(p);
 }
 
 // TODO: if this sends the motor packet, should probably be called
@@ -257,8 +250,7 @@ void incrementArmPID()
   }
 }
 
-void incrementArm()
-{
-  incrementArmPID();
-  // incrementArmIK(); // TODO implement
+void incrementArm() {
+	incrementArmPID();
+	// incrementArmIK(); // TODO implement
 }

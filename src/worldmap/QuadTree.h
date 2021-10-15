@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-
 #include "../simulator/utils.h"
+
+#include <memory>
 
 /**
  * Implements a quadtree for fast point lookups in 2D space. All points are expected
@@ -13,8 +13,7 @@
  *
  * @see <a href="https://en.wikipedia.org/wiki/Quadtree">Quadtree</a>
  */
-class QuadTree
-{
+class QuadTree {
 public:
 	/**
 	 * Creates a new quadtree with the given area size centered at the origin.
@@ -59,7 +58,7 @@ public:
 	 * @return True if the point was successfully added. The only way this will return false
 	 * is if the given point is outside of the area spanned by the quadtree.
 	 */
-	bool add(const point_t &point);
+	bool add(const point_t& point);
 
 	/**
 	 * Remove the first occurrence of the given point from this quadtree.
@@ -67,7 +66,7 @@ public:
 	 * @return True if the point was successfully removed. False if the point was not in
 	 * the quadtree to begin with.
 	 */
-	bool remove(const point_t &point);
+	bool remove(const point_t& point);
 
 	/**
 	 * Gets the closest point to the given point in this quadtree.
@@ -76,7 +75,7 @@ public:
 	 * @return The closest point to this point in the quadtree, or {0,0,0} if this quadtree is
 	 * empty.
 	 */
-	point_t getClosest(const point_t &point) const;
+	point_t getClosest(const point_t& point) const;
 
 	/**
 	 * Get the point in this quadtree that is closest to the given point.
@@ -85,7 +84,7 @@ public:
 	 * point in which to perform the search. Larger values will slow down the search.
 	 * @return The nearest neighbor to the given point, or {0,0,0} if none found.
 	 */
-	point_t getClosestWithin(const point_t &point, double areaSize) const;
+	point_t getClosestWithin(const point_t& point, double areaSize) const;
 
 	/**
 	 * Checks if the given point has at least one point within the given distance from it.
@@ -97,7 +96,7 @@ public:
 	 * @return True iff there exists a point in the tree, which may be the given point, within
 	 * the given distance from the given point. False otherwise.
 	 */
-	bool hasPointWithin(const point_t &point, double areaSize) const;
+	bool hasPointWithin(const point_t& point, double areaSize) const;
 
 	/**
 	 * Gets all points in the quadtree that lie in the axis-aligned square bounding box
@@ -106,7 +105,7 @@ public:
 	 * @param areaSize The size of the bounding box.
 	 * @return All points that lie within that bounding box. This vector may be empty.
 	 */
-	points_t getPointsWithin(const point_t &point, double areaSize) const;
+	points_t getPointsWithin(const point_t& point, double areaSize) const;
 
 	/**
 	 * Gets an arbitrary point stored in this QuadTree. It is undefined which specific
@@ -122,16 +121,16 @@ private:
 	// 0=SW,1=SE,2=NW,3=NE, so bit 1 is north-south and bit 0 is east-west
 	// if one is initialized then all are initialized
 	std::shared_ptr<QuadTree> children[4];
-	point_t center;	  // center of bounding box, in word coords
-	double width;	  // size of square area
-	points_t points;  // the points in this node, 0 <= points.size() <= nodeCapacity
+	point_t center;		 // center of bounding box, in word coords
+	double width;		 // size of square area
+	points_t points;	 // the points in this node, 0 <= points.size() <= nodeCapacity
 	size_t nodeCapacity; // number of points stored in each node
-	size_t size;	  // number of nodes stored in this or its descendants
+	size_t size;		 // number of nodes stored in this or its descendants
 
 	// create children nodes (doesn't check for already existing)
 	void subdivide();
 	// check if children exist
 	bool hasChildren() const;
 	// private method paired with QuadTree::getAllPoints()
-	void getAllPoints(const QuadTree &tree, points_t &allPoints) const;
+	void getAllPoints(const QuadTree& tree, points_t& allPoints) const;
 };

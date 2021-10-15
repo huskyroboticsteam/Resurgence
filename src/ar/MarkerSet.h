@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MarkerPattern.h"
+
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -7,10 +9,7 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core.hpp>
 
-#include "MarkerPattern.h"
-
-namespace AR
-{
+namespace AR {
 /**
    @addtogroup ar
    @{
@@ -36,8 +35,7 @@ namespace AR
    Note that you should probably not need to construct any instances of this class yourself;
    Markers.h will contain predefined MarkerSets that you should use.
  */
-class MarkerSet
-{
+class MarkerSet {
 private:
 	cv::Ptr<cv::aruco::Dictionary> dict;
 	std::vector<MarkerPattern> markers;
@@ -107,8 +105,7 @@ public:
 	   (e.g. enums). This method will throw a std::out_of_range exception if the ID mapping
 	   does not exist. See isIDMapped().
 	 */
-	template <class IDMapping_t> IDMapping_t getIDMappingCast(int id) const
-	{
+	template <class IDMapping_t> IDMapping_t getIDMappingCast(int id) const {
 		return static_cast<IDMapping_t>(this->getIDMapping(id));
 	}
 	/**
@@ -142,14 +139,14 @@ public:
 	   it does not exist, this method will return false and the output parameter will not be
 	   modified.
 	 */
-	bool getMarkerByID(int id, MarkerPattern &out) const;
+	bool getMarkerByID(int id, MarkerPattern& out) const;
 	/**
 	   Gets a Marker by its mapped ID (as defined with addIDMapping()). If the mapping exists,
 	   this method will return true and the Marker will be returned through the output
 	   parameter; if it does not exist, this method will return false and the output parameter
 	   will not be modified.
 	*/
-	bool getMarkerByMappedID(int mapped_id, MarkerPattern &out) const;
+	bool getMarkerByMappedID(int mapped_id, MarkerPattern& out) const;
 	/**
 	   Returns true if the given user-defined ID mapping exists and false if it does not.
 	 */
@@ -157,16 +154,14 @@ public:
 	/**
 	   Operator to add or get ID mappings; can be used instead of addIDMapping/getIDMapping.
 	 */
-	int &operator[](int id);
+	int& operator[](int id);
 };
 
-namespace Markers
-{
+namespace Markers {
 /**
    Enum of marker names for URC.
  */
-enum URCMarkerName
-{
+enum URCMarkerName {
 	LEG1,
 	LEG2,
 	LEG3,
@@ -187,11 +182,7 @@ enum URCMarkerName
    which marker IDs are important. Will update when I get more information about that. As of
    right now, all members of this enum are placeholders.
  */
-enum CIRCMarkerName
-{
-	CIRCMarker1,
-	CIRCMarker2
-};
+enum CIRCMarkerName { CIRCMarker1, CIRCMarker2 };
 
 /**
    Returns the set of markers that will be used in URC.

@@ -10,38 +10,31 @@ struct PointPair // NOLINT(cppcoreguidelines-pro-type-member-init)
 	double dist;
 };
 
-void heapify(PointPair arr[], int len, int i)
-{
+void heapify(PointPair arr[], int len, int i) {
 	int smallest = i;
 	int l = 2 * i + 1;
 	int r = 2 * i + 2;
-	if (l < len && arr[l].dist < arr[smallest].dist)
-	{
+	if (l < len && arr[l].dist < arr[smallest].dist) {
 		smallest = l;
 	}
-	if (r < len && arr[r].dist < arr[smallest].dist)
-	{
+	if (r < len && arr[r].dist < arr[smallest].dist) {
 		smallest = r;
 	}
 
-	if (smallest != i)
-	{
+	if (smallest != i) {
 		std::swap(arr[i], arr[smallest]);
 		heapify(arr, len, smallest);
 	}
 }
 
 // get some of the point pairs with the least distance using heapsort
-std::vector<PointPair> getMinN(PointPair *arr, int len, int minNum)
-{
-	for (int i = len / 2 - 1; i >= 0; i--)
-	{
+std::vector<PointPair> getMinN(PointPair* arr, int len, int minNum) {
+	for (int i = len / 2 - 1; i >= 0; i--) {
 		heapify(arr, len, i);
 	}
 
 	std::vector<PointPair> ret;
-	for (int i = len - 1; i > len - 1 - minNum; i--)
-	{
+	for (int i = len - 1; i > len - 1 - minNum; i--) {
 		ret.push_back(arr[0]);
 		std::swap(arr[0], arr[i]);
 		heapify(arr, i, 0);
@@ -50,8 +43,7 @@ std::vector<PointPair> getMinN(PointPair *arr, int len, int minNum)
 	return ret;
 }
 
-transform_t computeTransformation(const std::vector<PointPair> &pairs)
-{
+transform_t computeTransformation(const std::vector<PointPair>& pairs) {
 	/*
 	 * We need to find a rigid transformation that maps points in the sample to points in
 	 * the map. This transformation is not a regular affine, as only rotations and translations
@@ -63,8 +55,7 @@ transform_t computeTransformation(const std::vector<PointPair> &pairs)
 	Eigen::Vector2d mapCentroid = Eigen::Vector2d::Zero();
 	Eigen::Vector2d sampleCentroid = Eigen::Vector2d::Zero();
 
-	for (const PointPair &pair : pairs)
-	{
+	for (const PointPair& pair : pairs) {
 		mapCentroid += pair.mapPoint.topRows<2>();
 		sampleCentroid += pair.samplePoint.topRows<2>();
 	}
@@ -75,8 +66,7 @@ transform_t computeTransformation(const std::vector<PointPair> &pairs)
 	int size = pairs.size();
 	Eigen::Matrix<double, Eigen::Dynamic, 2> P(size, 2);
 	Eigen::Matrix<double, Eigen::Dynamic, 2> Q(size, 2);
-	for (int i = 0; i < size; i++)
-	{
+	for (int i = 0; i < size; i++) {
 		P.row(i) = pairs[i].samplePoint.topRows<2>() - sampleCentroid;
 		Q.row(i) = pairs[i].mapPoint.topRows<2>() - mapCentroid;
 	}
@@ -103,16 +93,13 @@ transform_t computeTransformation(const std::vector<PointPair> &pairs)
 }
 
 TrICP::TrICP(int maxIter, double relErrChangeThresh,
-			 std::function<point_t(const point_t &)> getClosest)
+			 std::function<point_t(const point_t&)> getClosest)
 	: maxIter(maxIter), relErrChangeThresh(relErrChangeThresh),
-	  getClosest(std::move(getClosest))
-{
+	  getClosest(std::move(getClosest)) {
 }
 
-transform_t TrICP::correct(const points_t &sample, double overlap)
-{
-	if (sample.empty() || overlap == 0)
-	{
+transform_t TrICP::correct(const points_t& sample, double overlap) {
+	if (sample.empty() || overlap == 0) {
 		return transform_t::Identity();
 	}
 	int i = 0;
@@ -121,8 +108,7 @@ transform_t TrICP::correct(const points_t &sample, double overlap)
 	points_t points = sample;
 	transform_t trf = transform_t::Identity();
 	int N = static_cast<int>(overlap * sample.size());
-	do
-	{
+	do {
 		i++;
 		oldMSE = mse;
 		transform_t t = iterate(points, N, mse);
@@ -132,22 +118,18 @@ transform_t TrICP::correct(const points_t &sample, double overlap)
 	return trf;
 }
 
-bool TrICP::isDone(int numIter, double mse, double oldMSE) const
-{
-	if (mse <= 1e-9)
-	{
+bool TrICP::isDone(int numIter, double mse, double oldMSE) const {
+	if (mse <= 1e-9) {
 		return true;
 	}
 	double relErrChange = fabs(mse - oldMSE) / mse;
 	return numIter >= maxIter || relErrChange <= relErrChangeThresh;
 }
 
-transform_t TrICP::iterate(points_t &sample, int N, double &mse) const
-{
+transform_t TrICP::iterate(points_t& sample, int N, double& mse) const {
 	PointPair pairs[sample.size()];
-	for (size_t i = 0; i < sample.size(); i++)
-	{
-		const point_t &point = sample[i];
+	for (size_t i = 0; i < sample.size(); i++) {
+		const point_t& point = sample[i];
 		point_t closestPoint = getClosest(point);
 		double dist = (point - closestPoint).norm();
 		PointPair pair{closestPoint, point, dist};
@@ -157,16 +139,14 @@ transform_t TrICP::iterate(points_t &sample, int N, double &mse) const
 	std::vector<PointPair> closestPairs = getMinN(pairs, sample.size(), N);
 
 	double newS = 0;
-	for (const PointPair &pair : closestPairs)
-	{
+	for (const PointPair& pair : closestPairs) {
 		newS += pair.dist * pair.dist;
 	}
 	mse = newS / N;
 
 	transform_t trf = computeTransformation(closestPairs);
 
-	for (point_t &point : sample)
-	{
+	for (point_t& point : sample) {
 		point = trf * point;
 	}
 	return trf;

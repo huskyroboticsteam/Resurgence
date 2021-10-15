@@ -5,8 +5,7 @@
 /**
  * Implements a rolling average filter of the specified type. Can only use double vectors.
  */
-template <int numPoints, int numDims> class RollingAvgFilter
-{
+template <int numPoints, int numDims> class RollingAvgFilter {
 public:
 	/**
 	 * Get the output of the filter.
@@ -14,16 +13,13 @@ public:
 	 * @return The output of the filter. If no data has been entered, returns the default
 	 * value.
 	 */
-	Eigen::Matrix<double, numDims, 1> get() const
-	{
+	Eigen::Matrix<double, numDims, 1> get() const {
 		Eigen::Matrix<double, numDims, 1> ret = Eigen::Matrix<double, numDims, 1>::Zero();
-		if (size == 0)
-		{
+		if (size == 0) {
 			return ret;
 		}
 		int numData = std::min(numPoints, size);
-		for (int i = 0; i < numData; i++)
-		{
+		for (int i = 0; i < numData; i++) {
 			ret += data.col(i);
 		}
 		return ret / numData;
@@ -35,12 +31,10 @@ public:
 	 * @param val The data to add to the filter.
 	 * @return The new output of the filter after adding this data.
 	 */
-	Eigen::Matrix<double, numDims, 1> get(const Eigen::Matrix<double, numDims, 1> &val)
-	{
+	Eigen::Matrix<double, numDims, 1> get(const Eigen::Matrix<double, numDims, 1>& val) {
 		data.col(index) = val;
 		index = (index + 1) % numPoints;
-		if (size < numPoints)
-		{
+		if (size < numPoints) {
 			size++;
 		}
 
@@ -50,8 +44,7 @@ public:
 	/**
 	 * Clears all data in the buffer.
 	 */
-	void reset()
-	{
+	void reset() {
 		size = 0;
 		index = 0;
 	}
@@ -61,8 +54,7 @@ public:
 	 *
 	 * @return The number of points stored in the buffer, in the range [0, numPoints]
 	 */
-	int getSize() const
-	{
+	int getSize() const {
 		return size;
 	}
 
@@ -71,8 +63,7 @@ public:
 	 *
 	 * @return The maximum number of points that can be stored in the buffer.
 	 */
-	int getBufferSize() const
-	{
+	int getBufferSize() const {
 		return numPoints;
 	}
 
@@ -82,8 +73,7 @@ public:
 	 * @return The Matrix representing the buffer of the filter. Data points are stored in each
 	 * column.
 	 */
-	Eigen::Matrix<double, numDims, numPoints> getData() const
-	{
+	Eigen::Matrix<double, numDims, numPoints> getData() const {
 		return data;
 	}
 
