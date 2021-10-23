@@ -1,6 +1,6 @@
 # Rover Config
 
-This directory (`PY2020/rover-config`) is where configuration files
+This directory (`Resurgence/rover-config`) is where configuration files
 for the rover's onboard computer should live. If you add any
 configuration files to this directory, please list them below with a
 description and the location they should be placed on the rover's

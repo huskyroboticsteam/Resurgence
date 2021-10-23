@@ -1,14 +1,7 @@
-# PY2020
-PY2020 Jetson TX2 Codebase Hindsight
+# Resurgence
+Resurgence Jetson TX2 Codebase Hindsight
 
 # Project Setup
-
-There are a few setup steps that are necessary before development on the
-codebase can be done.
-
-Note: Terminal commands to perform many of these steps can be found in the file
-`tests-docker-action/entrypoint.sh`, which is used to automatically set up an
-Ubuntu computer in order to run our integration tests.
 
 **Note for Windows users:** It is highly recommended you use Windows Subsystem
 for Linux or a VM with a GNU/Linux distribution installed. If you are going to
@@ -16,7 +9,32 @@ need USB hardware access (e.g. cameras, LIDAR, etc.) then it is highly
 recommended to use a VM, because WSL does not currently support hardware
 access.
 
+## Setup Project Repository
+This step will require you to have CMake and Git installed.
+
+These instructions will also assume you are using a Unix-like environment;
+GNU/Linux and Mac users should be fine here, Windows users should run these
+commands in their WSL terminal.
+
+Enter the home directory (or wherever you would like to put the project files).
+`cd ~` (If you would like to put the project somewhere else, replace `~` with
+the folder path.)
+
+Clone the repository.
+`git clone https://github.com/huskyroboticsteam/Resurgence/`
+
+Navigate into the repository.
+`cd Resurgence`
+
+Clone the submodules (we use git submodules, unfortunately)
+`git submodule init`
+`git submodule update` or `git pull --recurse-submodules`
+
 ## Install OpenCV
+
+OpenCV takes a while to install and is **optional** unless you're running
+computer vision code.
+
 OpenCV is a computer vision library that's used for the AR tag detection code
 and as such is needed to compile the project. We will also need the OpenCV
 contrib modules for the AR tag detection code. Either OpenCV 3 or OpenCV 4
@@ -69,6 +87,8 @@ command:
 
 ## Install URG library (Hokuyo lidar)
 
+This is **optional** unless you are connecting to our hardware lidar sensor.
+
 Tested on Ubuntu. Not sure how to install on Mac and Windows.
 
 ```
@@ -88,10 +108,19 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 
 ## Install SFML and Eigen (navigation simulator)
 
-Follow instructions in `src/simulator/README.md`, or just execute the commands
-from `tests-docker-action/entrypoint.sh`.
+ * [Eigen](http://eigen.tuxfamily.org)
+ * [SFML](https://www.sfml-dev.org/tutorials/2.5/)
+
+On Ubuntu, you might be able to install these via
+
+```
+sudo apt-get install libeigen3-dev
+sudo apt-get install libsfml-dev
+```
 
 ## Install GPS libraries
+
+This is **optional** unless you are connecting to our hardware GPS sensor.
 
 On Ubuntu, just run:
 
@@ -146,37 +175,22 @@ Follow the instructions here: https://index.ros.org/doc/ros2/Installation/Foxy/
 
 If your system doesn't support ROS Foxy, install ROS Dashing by following the instructions here: https://index.ros.org/doc/ros2/Installation/Dashing/
 
-## Setup Project Repository
-This step will require you to have CMake and Git. If you've followed the above
-OpenCV setup instructions, you should have these installed already. The
-following instructions will assume you have them installed.
-
-These instructions will also assume you are using a Unix-like environment;
-GNU/Linux and Mac users should be fine here, Windows users should run these
-commands in their WSL terminal.
-
-Enter the home directory (or wherever you would like to put the project files).
-`cd ~` (If you would like to put the project somewhere else, replace `~` with
-the folder path.)
-
-Clone the repository.
-`git clone https://github.com/huskyroboticsteam/PY2020/`
-
-Navigate into the repository.
-`cd PY2020`
-
-Clone the submodules
-`git submodule init`
-`git submodule update`
+## Set up the build directory
   
-Now, you're ready to build the project.
+Now, you're ready to build the Resurgence project. Return to the Resurgence directory and run:
 
-## Building
-Ensure you have CMake installed.
-Run
 ```
 mkdir -p build
 cd build
 cmake ../src
-make -j$(nproc)
 ```
+
+## Compile the code
+
+To build all of our executables (requires having all optional dependencies installed, e.g. OpenCV and URG), run
+
+`make -j$(nproc)`
+
+Otherwise you can specify just the specific executable you would like to run, e.g. `make RoverSim`. (You can still use the `-j` flag to parallelize the build.)
+
+To run our unit tests, run `make tests` and then execute `./tests`.
