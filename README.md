@@ -3,6 +3,15 @@ Resurgence Jetson TX2 Codebase Hindsight
 
 # Project Setup
 
+First pull the code:
+
+```
+git clone https://github.com/huskyroboticsteam/Resurgence`
+cd Resurgence
+git submodule init # We use git submodules, unfortunately
+git pull --recurse-submodules
+```
+
 There are a few setup steps that are necessary before development on the
 codebase can be done.
 
@@ -17,6 +26,10 @@ recommended to use a VM, because WSL does not currently support hardware
 access.
 
 ## Install OpenCV
+
+OpenCV takes a while to install and is **optional** unless you're running
+computer vision code.
+
 OpenCV is a computer vision library that's used for the AR tag detection code
 and as such is needed to compile the project. We will also need the OpenCV
 contrib modules for the AR tag detection code. Either OpenCV 3 or OpenCV 4
@@ -88,8 +101,15 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 
 ## Install SFML and Eigen (navigation simulator)
 
-Follow instructions in `src/simulator/README.md`, or just execute the commands
-from `tests-docker-action/entrypoint.sh`.
+ * [Eigen](http://eigen.tuxfamily.org)
+ * [SFML](https://www.sfml-dev.org/tutorials/2.5/)
+
+On Ubuntu, you might be able to install these via
+
+```
+sudo apt-get install libeigen3-dev
+sudo apt-get install libsfml-dev
+```
 
 ## Install GPS libraries
 
