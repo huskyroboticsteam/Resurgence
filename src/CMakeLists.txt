@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 
@@ -140,7 +140,7 @@ target_link_libraries(RoverSim ${rover_libs}
   stub_can_interface
   simulator_world_interface
   )
-target_link_libraries(RoverSim ${OpenCV_LIBS} ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(RoverSim ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 
 add_executable(TunePID TunePID.cpp)
 target_link_libraries(TunePID ${rover_libs}
