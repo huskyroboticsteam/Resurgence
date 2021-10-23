@@ -1,5 +1,5 @@
-# PY2020
-PY2020 Jetson TX2 Codebase Hindsight
+# Resurgence
+Resurgence Jetson TX2 Codebase Hindsight
 
 # Project Setup
 
@@ -160,10 +160,10 @@ Enter the home directory (or wherever you would like to put the project files).
 the folder path.)
 
 Clone the repository.
-`git clone https://github.com/huskyroboticsteam/PY2020/`
+`git clone https://github.com/huskyroboticsteam/Resurgence/`
 
 Navigate into the repository.
-`cd PY2020`
+`cd Resurgence`
 
 Clone the submodules
 `git submodule init`
