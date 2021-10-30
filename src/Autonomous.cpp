@@ -376,13 +376,16 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_gps, transform_t c
 	}
 
 	points_t landmarks = readLandmarks();
-	printLandmarks(landmarks);
+	printLandmarks(landmarks, LOG_INFO);
 	for (size_t lm_id = 0; lm_id < landmarks.size(); lm_id++) {
 		point_t lm = landmarks[lm_id];
 		if (lm(2) != 0.0)
 			pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm);
 	}
-	pose_graph.addGPSMeasurement(pose_id, current_gps);
+	if (current_gps.norm() != 0.0) {
+		// TODO Currently the solver goes crazy if there is no GPS data (should add prior on x,y)
+		pose_graph.addGPSMeasurement(pose_id, current_gps);
+	}
 	pose_graph.solve();
 
 	return current_odom;
@@ -392,7 +395,7 @@ void Autonomous::autonomyIter() {
 	transform_t gps = readGPS();
 	transform_t odom = readOdom();
 
-	if ((gps.norm() != 0.0) && !pending_solve.valid()) {
+	if (!pending_solve.valid()) {
 		// TODO even if we already have a pose graph optimization running, we should still
 		// add this GPS measurement to the pose graph. However, that situation should never
 		// occur as long as pose graph solves take significantly less time than one second.
