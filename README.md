@@ -1,52 +1,104 @@
 # Resurgence
-Resurgence Jetson TX2 Codebase Hindsight
+Main onboard codebase for the Husky Robotics 2021-2022 rover Resurgence.
 
 # Project Setup
+### Notes for users of non-Linux operating systems
 
-**Note for Windows users:** It is highly recommended you use Windows Subsystem
-for Linux or a VM with a GNU/Linux distribution installed. If you are going to
-need USB hardware access (e.g. cameras, LIDAR, etc.) then it is highly
-recommended to use a VM, because WSL does not currently support hardware
-access.
+Our codebase is developed for an NVIDIA Jetson TX2, which runs Ubuntu Linux; as such, much
+of our code will be Unix-specific. Mac is Unix-like, so most things should work on Mac
+(except for a few Linux-specific bits) but Windows will not be compatible as it uses a
+completely different API.
 
+**Windows users:** You should use either [Windows Subsystem for
+Linux](https://docs.microsoft.com/en-us/windows/wsl/about) or a VM with a Linux
+distribution installed (Ubuntu recommended). **In most cases, it's highly recommended you
+use a VM**, since WSL does not support USB hardware access (for cameras, LiDAR, etc.,
+**and only supports graphics on Windows 11**. If you are going to need either of these,
+**please use a VM.**
+
+**Mac users:** Mac does not support CAN, the protocol which we use to communicate
+with hardware made by the Electronics team; if you are doing any low-level hardware
+integration (e.g. controlling motors or communicating with any Electronics board) then
+**please use a VM.** Otherwise, Mac should mostly work out of the box (_TODO: verify this_)
+although the installation instructions are different.
+
+**From here on out, the installation instructions will assume you are using Linux or
+Mac**. Windows users should run commands in either their Linux VM or their WSL
+terminal. For Linux users, we'll assume you're running Ubuntu; users of another
+distribution may need to change some instructions (e.g. package managers) depending on
+your distro. If you are using a GNU/Linux distribution natively or in a VM, you can often
+paste with `CTRL+SHIFT+v`. If you are using Windows Subsystem for Linux, these commands
+should be executed in your WSL terminal, and you can paste with right click. Mac users
+should be able to paste with `Command+v`.
+
+## Install System Tools
+For further steps (and development in general) you'll need:
+- Git
+- C++ compiler
+- CMake (the build system we use; takes care of finding libraries, setting appropriate
+  compiler options, etc.)
+
+### Linux
+First, update your software with 
+```bash
+sudo apt update && sudo apt upgrade
+```
+Then, to install the tools, run
+```bash
+sudo apt install build-essential cmake git
+```
+
+### Mac
+First, you'll need to get the [Homebrew](https://brew.sh) package manager
+installed. To do this, run the following command in a terminal:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Then, to install the tools, run
+```bash
+brew install cmake
+```
+	
 ## Setup Project Repository
-This step will require you to have CMake and Git installed.
 
-These instructions will also assume you are using a Unix-like environment;
-GNU/Linux and Mac users should be fine here, Windows users should run these
-commands in their WSL terminal.
-
-Enter the home directory (or wherever you would like to put the project files).
+1. Enter the home directory (or wherever you would like to put the project files).
 `cd ~` (If you would like to put the project somewhere else, replace `~` with
 the folder path.)
 
-Clone the repository.
-`git clone https://github.com/huskyroboticsteam/Resurgence/`
+2. Clone the repository.
+```bash
+git clone https://github.com/huskyroboticsteam/Resurgence/
+```
 
-Navigate into the repository.
-`cd Resurgence`
+3. Navigate into the repository.
+```bash
+cd Resurgence
+```
 
-Clone the submodules (we use git submodules, unfortunately)
-`git submodule init`
-`git submodule update` or `git pull --recurse-submodules`
+4. Clone the 2D simulator and CAN library submodules (we use git submodules, unfortunately)
+```bash
+git submodule init
+git submodule update
+```
+
+5. Finally, navigate back to the parent directory:
+```bash
+cd ..
+```
 
 ## Install OpenCV
 
-OpenCV takes a while to install and is **optional** unless you're running
-computer vision code.
+OpenCV takes a while to install ~~and is **optional** unless you're running
+computer vision code.~~ (not yet!)
 
-OpenCV is a computer vision library that's used for the AR tag detection code
-and as such is needed to compile the project. We will also need the OpenCV
-contrib modules for the AR tag detection code. Either OpenCV 3 or OpenCV 4
-should work, but we are developing and testing against OpenCV 4 so you should
-try to get that version for best results.
+OpenCV is a computer vision library that's used for our computer vision code, including
+the AR tag detection. We will also need its extra contributed ("contrib") modules for its
+ARUco implementation. **You must install OpenCV 4, preferably at least OpenCV 4.1.0**
+(although most of our code will be built against 4.2.0, since that is what is packaged in
+Ubuntu's repositories, any 4.X.X version should theoretically work).
 
-### On GNU/Linux (including Windows Subsystem for Linux)
-
-Open your terminal and execute the following commands. If you are using a
-GNU/Linux distribution natively or in a VM, you can often paste with
-`CTRL+SHIFT+v`. If you are using Windows Subsystem for Linux, these commands
-should be executed in your WSL terminal, and you can paste with right click.
+### Linux
 
 OpenCV and its contrib modules are packaged for Ubuntu GNU/Linux. For other
 distributions, check to see if `libopencv` and `libopencv-contrib` are included
