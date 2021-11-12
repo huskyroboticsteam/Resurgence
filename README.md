@@ -100,22 +100,20 @@ Ubuntu's repositories, any 4.X.X version should theoretically work).
 
 ### Linux
 
-OpenCV and its contrib modules are packaged for Ubuntu GNU/Linux. For other
-distributions, check to see if `libopencv` and `libopencv-contrib` are included
-in your distribution's package catalog. 
+OpenCV and its contrib modules are packaged for Ubuntu. For other distributions, check to
+see if `libopencv` and `libopencv-contrib` are included in your distribution's package
+catalog.
 
-To install, simply run the following commands:
-
-1. `sudo apt update && sudo apt -y upgrade`
-2. `sudo apt install libopencv-dev libopencv-contrib-dev`
+To install, run the following command:
+```bash
+sudo apt install libopencv-dev libopencv-contrib-dev
+```
 
 ### On Mac
-There is a Homebrew package available for OpenCV on Mac OS. Open the Terminal
-and run these commands:
-1. `/usr/bin/ruby -e "$(curl -fsSL
-   https://raw.githubusercontent.com/Homebrew/install/master/install)"` (If you
-   already have Homebrew installed, you can skip this step.)
-2. `brew install opencv@4`
+There is a Homebrew package available for OpenCV on Mac OS; run this command to install it:
+```bash
+brew install opencv@4
+```
 
 ## Install Catch2 (for unit testing)
 These instructions assume you've followed the steps above to set up OpenCV,
