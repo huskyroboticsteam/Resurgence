@@ -16,11 +16,16 @@ use a VM**, since WSL does not support USB hardware access (for cameras, LiDAR, 
 **and only supports graphics on Windows 11**. If you are going to need either of these,
 **please use a VM.**
 
-**Mac users:** Mac does not support CAN, the protocol which we use to communicate
-with hardware made by the Electronics team; if you are doing any low-level hardware
-integration (e.g. controlling motors or communicating with any Electronics board) then
-**please use a VM.** Otherwise, Mac should mostly work out of the box (_TODO: verify this_)
-although the installation instructions are different.
+**Mac users:** Mac does not support
+[CAN](https://en.wikipedia.org/wiki/CAN_bus), the protocol which we
+use to communicate with hardware made by the Electronics team. If you
+are doing any low-level hardware integration (e.g. controlling motors
+or communicating with any Electronics board) then **please use a VM**
+to develop the code (so that Linux kernel headers are present); you
+may need to use the Jetson anyway to test the CAN code since usually
+only embedded computers have CAN hardware. Otherwise, Mac should
+mostly work out of the box (_TODO: verify this_) although the
+installation instructions are different.
 
 **From here on out, the installation instructions will assume you are using Linux or
 Mac**. Windows users should run commands in either their Linux VM or their WSL
@@ -125,6 +130,7 @@ the home directory `~` here but you can use whatever you'd like.)
 4. Create and enter a directory to put the compiled code into: `mkdir build && cd build`
 6. Configure CMake: `cmake -DBUILD_TESTING=OFF ..`
 7. Build/install Catch2: `sudo cmake --build . --target install`
+8. Navigate back to the directory from Step 1: `cd ../..`
 
 ### On Mac
 There is a Homebrew package for Catch2 as well. Open the Terminal and run this
