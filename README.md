@@ -116,19 +116,15 @@ brew install opencv@4
 ```
 
 ## Install Catch2 (for unit testing)
-These instructions assume you've followed the steps above to set up OpenCV,
-which should also set up some things in the process like the C++ compiler and
-CMake, or Homebrew for Mac users.
-
-### On GNU/Linux (including Windows Subsystem for Linux)
-Execute the following commands in your terminal:
-1. `git clone https://github.com/catchorg/Catch2.git`
-2. `cd Catch2`
-3. `git checkout v2.13.4`
-4. `mkdir build`
-5. `cd build`
-6. `cmake -H.. -DBUILD_TESTING=OFF`
-7. `sudo cmake --build . --target install`
+### Linux
+1. Navigate to a directory where you would like to put Catch2: `cd ~` (Again, we're using
+the home directory `~` here but you can use whatever you'd like.)
+1. Clone Catch2: `git clone https://github.com/catchorg/Catch2.git`
+2. Enter the cloned directory: `cd Catch2`
+3. Check out the correct version: `git checkout v2.13.7`
+4. Create and enter a directory to put the compiled code into: `mkdir build && cd build`
+6. Configure CMake: `cmake -DBUILD_TESTING=OFF ..`
+7. Build/install Catch2: `sudo cmake --build . --target install`
 
 ### On Mac
 There is a Homebrew package for Catch2 as well. Open the Terminal and run this
