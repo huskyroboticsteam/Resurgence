@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
+
 cmake_policy(SET CMP0057 NEW)
 set(CMAKE_CXX_STANDARD 17) # 11 For the json library, 14 for ROS2, 17 for std library features
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,6 +10,7 @@ find_package(OpenCV)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(Catch2 REQUIRED)
+find_package(URGLidar)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 include_directories(${rclcpp_INCLUDE_DIRS})
@@ -110,7 +112,7 @@ list(APPEND real_world_libs
   real_world_interface
   gps
   lidar_base
-  liburg_c.a)
+  URGLidar::urg_c)
 
 list(APPEND vision_libs
   ${OpenCV_LIBS}

@@ -139,19 +139,33 @@ command:
 
 ## Install URG library (Hokuyo lidar)
 
-This is **optional** unless you are connecting to our hardware lidar sensor.
-
-Tested on Ubuntu. Not sure how to install on Mac and Windows.
-
-```
-git clone https://github.com/andrewbriand/urg_library-1.2.5.git
-cd urg_library-1.2.5
-make
+~~This is **optional** unless you are connecting to our hardware lidar
+sensor.~~ (not yet!)
+The same instructions will work for Linux and Mac. These instructions
+can also be found in the
+[huskyrobotics/urg-lidar](https://github.com/huskyroboticsteam/urg-lidar)
+repository's README.
+```bash
+# Clone repository
+git clone https://github.com/huskyroboticsteam/urg-lidar.git
+# Enter cloned directory
+cd urg-lidar
+# Make a build directory to hold compiled code
+mkdir -p build
+# Enter build directory
+cd build
+# Configure CMake
+cmake ..
+# Build/Install URG lidar library
 sudo make install
+# Navigate back to working directory
+cd ../..
 ```
 
-By default on Ubuntu, the USB lidar device will only be accessible to the
-root user (e.g. via sudo). To make it accessible to everyone:
+
+(TODO: actually include udev rules) ~~By default on Ubuntu, the USB
+lidar device will only be accessible to the root user (e.g. via
+sudo). To make it accessible to everyone:~~
 
 ```
 sudo cp src/lidar/50-usb-hokuyo-lidar.rules /etc/udev/rules.d
