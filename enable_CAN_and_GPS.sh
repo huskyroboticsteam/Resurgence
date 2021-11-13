@@ -21,8 +21,10 @@ if [[ $? != 0 ]]; then
   sudo ip link set dev vcan0 up
 fi
 
+sudo killall gpsd
 sudo service gpsd start
 sudo service gpsd stop
+sudo systemctl stop gpsd.socket
 if [[ -e "${GPS_PATH}" ]]; then
   sudo gpsd -n "${GPS_PATH}"
 else
