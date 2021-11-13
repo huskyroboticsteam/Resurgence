@@ -57,18 +57,20 @@ WORKDIR "/"
 WORKDIR "/tmp/"
 
 # Download the URG Lidar library
-RUN git clone https://github.com/andrewbriand/urg_library-1.2.5.git
-WORKDIR "/tmp/urg_library-1.2.5"
+RUN git clone https://github.com/huskyroboticsteam/urg-lidar.git
+WORKDIR "/tmp/urg-lidar"
 
 # Build URG library
-RUN make
+RUN mkdir -p build
+WORKDIR "/tmp/urg-lidar/build"
+RUN cmake ..
 
 # Install URG library
 RUN make install
 
 # Clean up sources to save storage space
 WORKDIR "/tmp"
-RUN rm -rf urg_library-1.2.5
+RUN rm -rf urg-lidar
 
 WORKDIR "/"
 
