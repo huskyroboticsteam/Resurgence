@@ -89,7 +89,7 @@ private:
 	void computeGateTargets(const pose_t& pose, bool choose_direction);
 	void updateSearchTarget();
 	void endCurrentLeg();
-	transform_t optimizePoseGraph(transform_t current_gps, transform_t current_odom);
+	transform_t optimizePoseGraph(transform_t current_odom);
 
 	double getLinearVel(const pose_t& drive_target, const pose_t& pose, double thetaErr) const;
 	double getThetaVel(const pose_t& drive_target, const pose_t& pose, double& thetaErr) const;
