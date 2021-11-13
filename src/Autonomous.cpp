@@ -29,6 +29,7 @@ constexpr double INFINITE_COST = 1e10;
 constexpr int REPLAN_PERIOD = 20;
 
 constexpr bool USE_MAP = false;
+constexpr bool USE_SLAM = false;
 
 constexpr bool LEFT = true;
 constexpr bool RIGHT = false;
@@ -391,30 +392,36 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_gps, transform_t c
 void Autonomous::autonomyIter() {
 	transform_t gps = readGPS();
 	transform_t odom = readOdom();
+	pose_t pose {0,0,0};
 
-	if ((gps.norm() != 0.0) && !pending_solve.valid()) {
-		// TODO even if we already have a pose graph optimization running, we should still
-		// add this GPS measurement to the pose graph. However, that situation should never
-		// occur as long as pose graph solves take significantly less time than one second.
-		pending_solve =
-			std::async(std::launch::async, &Autonomous::optimizePoseGraph, this, gps, odom);
-	}
+	if (USE_SLAM) {
+		if ((gps.norm() != 0.0) && !pending_solve.valid()) {
+			// TODO even if we already have a pose graph optimization running, we should still
+			// add this GPS measurement to the pose graph. However, that situation should never
+			// occur as long as pose graph solves take significantly less time than one second.
+			pending_solve =
+				std::async(std::launch::async, &Autonomous::optimizePoseGraph, this, gps, odom);
+		}
 
-	if (pending_solve.valid() &&
-		pending_solve.wait_for(ZERO_DURATION) == std::future_status::ready) {
-		prev_odom = pending_solve.get();
-		smoothed_traj = pose_graph.getSmoothedTrajectory();
-		smoothed_landmarks = pose_graph.getLandmarkLocations();
-	}
+		if (pending_solve.valid() &&
+			pending_solve.wait_for(ZERO_DURATION) == std::future_status::ready) {
+			prev_odom = pending_solve.get();
+			smoothed_traj = pose_graph.getSmoothedTrajectory();
+			smoothed_landmarks = pose_graph.getLandmarkLocations();
+		}
 
-	transform_t current_tf =
-		odom * prev_odom.inverse() * smoothed_traj[smoothed_traj.size() - 1];
-	pose_t pose = toPose(current_tf, 0.0);
-	log(LOG_DEBUG, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
+		transform_t current_tf =
+			odom * prev_odom.inverse() * smoothed_traj[smoothed_traj.size() - 1];
+		pose = toPose(current_tf, 0.0);
+		log(LOG_DEBUG, "Pose %f %f %f\n", pose(0), pose(1), pose(2));
 
-	for (transform_t& sm_tf : smoothed_traj) {
-		const pose_t sm_tf_transformed = poseToDraw(toPose(sm_tf, 0.0), pose);
-		rospub::publish(sm_tf_transformed, rospub::PointPub::POSE_GRAPH);
+		for (transform_t& sm_tf : smoothed_traj) {
+			const pose_t sm_tf_transformed = poseToDraw(toPose(sm_tf, 0.0), pose);
+			rospub::publish(sm_tf_transformed, rospub::PointPub::POSE_GRAPH);
+		}
+	} else {
+		smoothed_landmarks = readLandmarks();
+		printLandmarks(smoothed_landmarks, LOG_INFO);
 	}
 
 	transform_t invTransform = toTransform(pose).inverse();
@@ -572,11 +579,14 @@ pose_t Autonomous::getGPSTargetPose() const {
 
 static void printLandmarks(points_t& landmarks, int log_level) {
 	std::ostringstream stream;
+	bool found_one = false;
 	for (size_t i = 0; i < landmarks.size(); i++) {
 		if (landmarks[i][2] != 0) {
+			found_one = true;
 			stream << "Landmark " << i
 				<< " at {" << landmarks[i][0] << ", " << landmarks[i][1] << "} ";
 		}
 	}
+	if (found_one) stream << std::endl;
 	log(log_level, stream.str().c_str());
 }
