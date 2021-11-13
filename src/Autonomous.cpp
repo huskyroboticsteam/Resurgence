@@ -271,7 +271,7 @@ bool Autonomous::getPostVisibility(bool left) {
 	double diff = (location - prior_location).norm();
 	bool different_from_prior = (diff > 0.001);
 	bool visible = different_from_prior && (location(2) != 0);
-	log(LOG_INFO,
+	log(LOG_DEBUG,
 		"Visibility %d is %d: diff %.3f loc (%.3f %.3f %.3f) prior (%.3f %.3f %.3f)\n",
 		left, visible, diff,
 		location(0), location(1), location(2),
