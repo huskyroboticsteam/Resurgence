@@ -186,7 +186,8 @@ sudo apt-get install libsfml-dev
 
 ## Install GPS libraries
 
-This is **optional** unless you are connecting to our hardware GPS sensor.
+This is **optional** unless you are connecting to our hardware GPS
+sensor.
 
 On Ubuntu, just run:
 
@@ -196,7 +197,7 @@ sudo apt-get install gpsd gpsd-clients libgps-dev
 
 ## Install ROS (planning visualization)
 
-### On Ubuntu (Including Windows Subsystem for Linux)
+### On Linux
 
 Make sure you have a locale which supports UTF-8:
 
@@ -204,7 +205,10 @@ Make sure you have a locale which supports UTF-8:
 locale  # check for UTF-8
 ```
 
-If your locale does not support UTF-8, run the following commands:
+If the output of the previous command *does not* say `UTF-8`, then
+your locale does not support UTF-8, and you should run the following
+commands. **If it does say `UTF-8`, you can skip this step; most users
+should be able to skip this step.**
 
 ```bash
 sudo apt update && sudo apt install locales
@@ -224,12 +228,15 @@ sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.or
 sudo apt update
 ```
 
-Ubuntu 18.04 and 20.04 support different ROS distributions, so replace `<version>` in the commands below with the appropriate version for your system.
+Ubuntu 18.04 and 20.04 support different ROS distributions, so replace
+`<version>` in the commands below with the appropriate version for
+your system. **Please note you shouldn't include the `<>` characters.**
 
-18.04: `dashing`  
-20.04: `foxy`  
+18.04: `dashing`
+20.04: `foxy`
 
 ```bash
+# Replace "<version>" with "dashing"/"foxy"; don't include <>!
 sudo apt install ros-<version>-ros-base
 source /opt/ros/<version>/setup.bash
 echo "source /opt/ros/<version>/setup.bash" >> ~/.bashrc
