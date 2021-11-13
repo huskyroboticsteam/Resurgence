@@ -52,7 +52,7 @@ const transform_t VIZ_BASE_TF =
 static void printLandmarks(points_t& landmarks, int log_level = LOG_DEBUG);
 
 Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
-	: urc_targets(_targets), leg_idx(5),
+	: urc_targets(_targets), leg_idx(0),
 	  search_target({_targets[0].approx_GPS(0) - PI, _targets[0].approx_GPS(1), -PI / 2}),
 	  gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}), gate_direction(true),
 	  poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
