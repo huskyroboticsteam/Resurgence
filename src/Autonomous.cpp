@@ -382,9 +382,7 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_gps, transform_t c
 		if (lm(2) != 0.0)
 			pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm);
 	}
-	if (current_gps.norm() != 0.0) {
-		pose_graph.addGPSMeasurement(pose_id, current_gps);
-	}
+	pose_graph.addGPSMeasurement(pose_id, current_gps);
 	pose_graph.solve();
 
 	return current_odom;
@@ -394,7 +392,7 @@ void Autonomous::autonomyIter() {
 	transform_t gps = readGPS();
 	transform_t odom = readOdom();
 
-	if (!pending_solve.valid()) {
+	if ((gps.norm() != 0.0) && !pending_solve.valid()) {
 		// TODO even if we already have a pose graph optimization running, we should still
 		// add this GPS measurement to the pose graph. However, that situation should never
 		// occur as long as pose graph solves take significantly less time than one second.
@@ -575,10 +573,10 @@ pose_t Autonomous::getGPSTargetPose() const {
 static void printLandmarks(points_t& landmarks, int log_level) {
 	std::ostringstream stream;
 	for (size_t i = 0; i < landmarks.size(); i++) {
-        if (landmarks[i][2] != 0) {
-            stream << "Landmark " << i
-                << " at {" << landmarks[i][0] << ", " << landmarks[i][1] << "} ";
-        }
+		if (landmarks[i][2] != 0) {
+			stream << "Landmark " << i
+				<< " at {" << landmarks[i][0] << ", " << landmarks[i][1] << "} ";
+		}
 	}
 	log(log_level, stream.str().c_str());
 }
