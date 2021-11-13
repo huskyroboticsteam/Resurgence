@@ -383,7 +383,6 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_gps, transform_t c
 			pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm);
 	}
 	if (current_gps.norm() != 0.0) {
-		// TODO Currently the solver goes crazy if there is no GPS data (should add prior on x,y)
 		pose_graph.addGPSMeasurement(pose_id, current_gps);
 	}
 	pose_graph.solve();
@@ -575,14 +574,11 @@ pose_t Autonomous::getGPSTargetPose() const {
 
 static void printLandmarks(points_t& landmarks, int log_level) {
 	std::ostringstream stream;
-	stream << "Landmarks: [";
 	for (size_t i = 0; i < landmarks.size(); i++) {
-		stream << i << ": {" << landmarks[i][0] << ", " << landmarks[i][1] << ", "
-			   << landmarks[i][2] << "}";
-		if (i < landmarks.size() - 1) {
-			stream << ", ";
-		}
+        if (landmarks[i][2] != 0) {
+            stream << "Landmark " << i
+                << " at {" << landmarks[i][0] << ", " << landmarks[i][1] << "} ";
+        }
 	}
-	stream << "}" << std::endl;
 	log(log_level, stream.str().c_str());
 }
