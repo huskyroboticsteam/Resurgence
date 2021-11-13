@@ -134,7 +134,8 @@ void Autonomous::setNavState(NavState s) {
 	NavState old_state = nav_state;
 	nav_state = s;
 	if (old_state != s) {
-		log(LOG_INFO, "Changing navigation state to %s\n", NAV_STATE_NAMES[nav_state]);
+		log(LOG_INFO, "Changing navigation state %s -> %s\n",
+		NAV_STATE_NAMES[old_state], NAV_STATE_NAMES[nav_state]);
 		plan_cost = INFINITE_COST;
 	}
 }
@@ -243,18 +244,20 @@ double Autonomous::getThetaVel(const pose_t& drive_target, const pose_t& pose,
 }
 
 int Autonomous::getPostID(bool left) {
-	if (urc_targets[leg_idx].left_post_id < 0 ||
-		static_cast<unsigned>(urc_targets[leg_idx].left_post_id) > smoothed_landmarks.size()) {
-		log(LOG_ERROR, "Invalid left_post_id %d\n", urc_targets[leg_idx].left_post_id);
-		return 0;
-	}
 	int post_id =
 		left ? urc_targets[leg_idx].left_post_id : urc_targets[leg_idx].right_post_id;
 	return post_id;
 }
 
-point_t Autonomous::getPostLocation(bool left) {
-	return smoothed_landmarks[getPostID(left)];
+point_t Autonomous::getPostLocation(bool left, bool verbose) {
+	int post_id = getPostID(left);
+	if (post_id < 0 || static_cast<unsigned>(post_id) > smoothed_landmarks.size()) {
+		if (verbose) {
+			log(LOG_ERROR, "Invalid post_id %d\n", urc_targets[leg_idx].left_post_id);
+		}
+		return {0,0,0};
+	}
+	return smoothed_landmarks[post_id];
 }
 
 bool Autonomous::getPostVisibility(bool left) {
@@ -264,14 +267,16 @@ bool Autonomous::getPostVisibility(bool left) {
 	// that tells us how uncertain we are about the location of the post, but that's
 	// more complicated to implement.
 	point_t prior_location = urc_targets[leg_idx].approx_GPS;
-	point_t location = getPostLocation(left);
+	point_t location = getPostLocation(left, false);
 	double diff = (location - prior_location).norm();
 	bool different_from_prior = (diff > 0.001);
-	log(LOG_DEBUG,
-		"Visibility %d is %d: diff %.3f loc (%.3f %.3f %.3f) prior (%.3f %.3f %.3f)\n", left,
-		different_from_prior, diff, location(0), location(1), location(2), prior_location(0),
-		prior_location(1), prior_location(2));
-	return different_from_prior;
+	bool visible = different_from_prior && (location(2) != 0);
+	log(LOG_INFO,
+		"Visibility %d is %d: diff %.3f loc (%.3f %.3f %.3f) prior (%.3f %.3f %.3f)\n",
+		left, visible, diff,
+		location(0), location(1), location(2),
+		prior_location(0), prior_location(1), prior_location(2));
+	return visible;
 }
 
 pose_t Autonomous::choose_plan_target(const pose_t& pose) {

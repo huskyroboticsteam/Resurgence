@@ -39,7 +39,7 @@ bool gpsHasFreshData() {
 point_t gpsToMeters__private(double lon, double lat) {
 	double x = (lon - first_fix_lon) * METERS_PER_DEG_EW;
 	double y = (lat - first_fix_lat) * METERS_PER_DEG_NS;
-	return {x, y, 0};
+	return {x, y, 1};
 }
 
 point_t gpsToMeters(double lon, double lat) {

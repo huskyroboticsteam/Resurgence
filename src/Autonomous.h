@@ -84,7 +84,7 @@ private:
 	void update_nav_state(const pose_t& pose, const pose_t& plan_target);
 	pose_t choose_plan_target(const pose_t& pose);
 	int getPostID(bool left);
-	point_t getPostLocation(bool left);
+	point_t getPostLocation(bool left, bool verbose = true);
 	bool getPostVisibility(bool left);
 	void computeGateTargets(const pose_t& pose, bool choose_direction);
 	void updateSearchTarget();
