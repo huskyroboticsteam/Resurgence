@@ -126,19 +126,19 @@ double setCmdVel(double dtheta, double dx) {
 	return scale_down_factor;
 }
 
-points_t readLandmarks() {
+DataPoint<points_t> readLandmarks() {
 	return AR::readLandmarks();
 }
 
-points_t readLidarScan() {
+DataPoint<points_t> readLidarScan() {
 	if (lidar::isLidarDataFresh()) {
 		return lidar::readLidar();
 	} else {
-		return {};
+		return points_t{};
 	}
 }
 
-transform_t readOdom() {
+DataPoint<transform_t> readOdom() {
 	struct timeval now;
 	gettimeofday(&now, NULL);
 	return getOdomAt(now);
