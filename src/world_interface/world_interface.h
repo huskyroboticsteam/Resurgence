@@ -16,10 +16,10 @@ using datatime_t = std::chrono::time_point<dataclock>;
  */
 template <typename T> class DataPoint {
 public:
-    /**
-     * @brief Construct an invalid DataPoint, holding no data
-     */
-    DataPoint() : valid(false), time(), data() {}
+	/**
+	 * @brief Construct an invalid DataPoint, holding no data
+	 */
+	DataPoint() : valid(false), time(), data() {}
 
 	/**
 	 * @brief Construct a new DataPoint object, measured now.
@@ -39,21 +39,32 @@ public:
 	// provide an implicit conversion to the data type. Helps with backwards compatability.
 	operator T() const { return data; }
 
-    // check if this object holds any data
-    operator bool() const { return valid; }
+	// Check if this measurement is valid
+	operator bool() const { return valid; }
 
-    /**
-     * @brief Check if this measurement was taken recently.
-     * 
-     * @param duration The data is fresh if it was taken at most this many milliseconds ago.
-     * @return true if the data was measured at most \p duration milliseconds ago, false otherwise.
-     */
-    bool isFresh(std::chrono::milliseconds duration) {
-        return dataclock::now() - duration <= time;
-    }
+	/**
+	 * @brief Check if this measurement was taken recently.
+	 *
+	 * @param duration The data is fresh if it was taken at most this many milliseconds ago.
+	 * @return true if the data is valid and was measured at most \p duration milliseconds ago,
+	 * false otherwise.
+	 */
+	bool isFresh(std::chrono::milliseconds duration) {
+		return valid && dataclock::now() - duration <= time;
+	}
 
-    // true iff this measurement is valid, false otherwise.
-    bool valid; 
+	// Check if this measurement is valid
+	bool isValid() { return valid; }
+
+	// The time at which the data was measured. Use only if data is valid.
+	datatime_t getTime() { return time; }
+
+	// The measurement data. Use only if data is valid.
+	T getData() { return data; }
+
+private:
+	// true iff this measurement is valid, false otherwise.
+	bool valid;
 	// the time at which the data was measured. Use only if valid == true.
 	datatime_t time;
 	// the measurement data. Use only if valid == true.
@@ -75,8 +86,9 @@ DataPoint<points_t> readLidarScan();
  * @brief Read measurement from the CV system. As of now, returns a vector of fixed length, one
  * for each post in the competition.
  *
- * @return DataPoint<points_t> A vector of fixed lengths. Non-visible markers are denoted with {0,0,0}, while all
- * nonzero points are visible marker. The index of a landmark in this vector is its id.
+ * @return DataPoint<points_t> A vector of fixed lengths. Non-visible markers are denoted with
+ * {0,0,0}, while all nonzero points are visible marker. The index of a landmark in this vector
+ * is its id.
  */
 DataPoint<points_t> readLandmarks();
 
