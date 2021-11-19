@@ -18,15 +18,15 @@ double setCmdVel(double dtheta, double dx) {
 	return 1.0;
 }
 
-points_t readLidarScan() {
+DataPoint<points_t> readLidarScan() {
 	return world.readLidar();
 }
 
-points_t readLandmarks() {
+DataPoint<points_t> readLandmarks() {
 	return world.readLandmarks();
 }
 
-transform_t readGPS() {
+DataPoint<transform_t> readGPS() {
 	return world.readGPS();
 }
 
@@ -34,7 +34,7 @@ point_t gpsToMeters(double lon, double lat) {
 	return {lon, lat, 1.0};
 }
 
-transform_t readOdom() {
+DataPoint<transform_t> readOdom() {
 	return world.readOdom();
 }
 
