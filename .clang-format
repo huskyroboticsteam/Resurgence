@@ -4,7 +4,7 @@ ColumnLimit: 95
 UseTab: Always
 BreakBeforeBraces: Attach
 AllowShortIfStatementsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
+AllowShortFunctionsOnASingleLine: true
 AccessModifierOffset: -4
 IncludeBlocks: Regroup
 IncludeCategories:
