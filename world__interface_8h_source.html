@@ -70,24 +70,87 @@ $(function() {
   <div class="headertitle"><div class="title">world_interface.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;../simulator/utils.h&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keywordtype">void</span> world_interface_init(); <span class="comment">// Call this before trying to do anything else</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">// If the requested dtheta/dx is too fast for the robot to execute, it will</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// scale them down and return the corresponding scale factor.</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keywordtype">double</span> setCmdVel(<span class="keywordtype">double</span> dtheta, <span class="keywordtype">double</span> dx);</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> readLidarScan();</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> readLandmarks();</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>transform_t readGPS();</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>transform_t readOdom();</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>point_t gpsToMeters(<span class="keywordtype">double</span> lon, <span class="keywordtype">double</span> lat);</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// `index` must be in the range 0-6 (the URC competition will have 7 legs)</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><a class="code hl_struct" href="structURCLeg.html">URCLeg</a> getLeg(<span class="keywordtype">int</span> <a class="code hl_variableRef" href="https://docs.opencv.org/4.2.0/d9/db7/group__datasets__gr.html#gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c">index</a>);</div>
-<div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt; point_t &gt;</a></div></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;../simulator/utils.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a>&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// the clock used for time measurements for data</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">using</span> dataclock = std::chrono::steady_clock;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// a point in time as measured by dataclock</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">using</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> = <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">std::chrono::time_point&lt;dataclock&gt;</a>;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classDataPoint.html">   17</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code hl_class" href="classDataPoint.html">DataPoint</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">   22</a></span>    <a class="code hl_function" href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">DataPoint</a>() : valid(false), time(), data() {}</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">   29</a></span>    <a class="code hl_function" href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">DataPoint</a>(T data) : <a class="code hl_class" href="classDataPoint.html">DataPoint</a>(dataclock::now(), data) {}</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">   37</a></span>    <a class="code hl_function" href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">DataPoint</a>(<a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> time, T data) : valid(true), time(time), data(data) {}</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="comment">// provide an implicit conversion to the data type. Helps with backwards compatability.</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keyword">operator</span> T()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> data; }</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="comment">// Check if this measurement is valid</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keyword">operator</span> bool()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> valid; }</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="classDataPoint.html#ad96f75187a599a678fd8afd359ac4621">   52</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDataPoint.html#ad96f75187a599a678fd8afd359ac4621">isFresh</a>(<a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::milliseconds</a> duration) {</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="keywordflow">return</span> valid &amp;&amp; dataclock::now() - duration &lt;= time;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    }</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// Check if this measurement is valid</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordtype">bool</span> isValid() { <span class="keywordflow">return</span> valid; }</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="comment">// The time at which the data was measured. Use only if data is valid.</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> getTime() { <span class="keywordflow">return</span> time; }</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="comment">// The measurement data. Use only if data is valid.</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    T getData() { <span class="keywordflow">return</span> data; }</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="comment">// true iff this measurement is valid, false otherwise.</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordtype">bool</span> valid;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="comment">// the time at which the data was measured. Use only if valid == true.</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> time;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="comment">// the measurement data. Use only if valid == true.</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    T data;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>};</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment">// Call this before trying to do anything else</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="keywordtype">void</span> world_interface_init();</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment">// If the requested dtheta/dx is too fast for the robot to execute, it will</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment">// scale them down and return the corresponding scale factor.</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment">// TODO: indicate what the return value of setCmdVel() means</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="keywordtype">double</span> setCmdVel(<span class="keywordtype">double</span> dtheta, <span class="keywordtype">double</span> dx);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment">// read measurement from the lidar</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;points_t&gt;</a> readLidarScan();</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;points_t&gt;</a> readLandmarks();</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment">// Get the current transform in the global frame based on a GPS measurement.</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment">// Note that these values are NOT lat/long.</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment">// TODO: figure out differential correction and adjust API accordingly</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;transform_t&gt;</a> readGPS();</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment">// Calculates the current transform in the global frame based purely on forward kinematics</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;transform_t&gt;</a> readOdom();</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment">// Given the current longitude and latitude, convert to a point_t position representation</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>point_t gpsToMeters(<span class="keywordtype">double</span> lon, <span class="keywordtype">double</span> lat);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment">// `index` must be in the range 0-6 (the URC competition will have 7 legs)</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><a class="code hl_struct" href="structURCLeg.html">URCLeg</a> getLeg(<span class="keywordtype">int</span> <a class="code hl_variableRef" href="https://docs.opencv.org/4.2.0/d9/db7/group__datasets__gr.html#gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c">index</a>);</div>
+<div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
+<div class="ttc" id="aa01839_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::duration</a></div></div>
+<div class="ttc" id="aa01843_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">std::chrono::time_point&lt; dataclock &gt;</a></div></div>
+<div class="ttc" id="aclassDataPoint_html"><div class="ttname"><a href="classDataPoint.html">DataPoint</a></div><div class="ttdoc">Represents data measured using a sensor at a given time.</div><div class="ttdef"><b>Definition:</b> world_interface.h:17</div></div>
+<div class="ttc" id="aclassDataPoint_html_a0db55d9ee2768d0c34660be3587085b0"><div class="ttname"><a href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(datatime_t time, T data)</div><div class="ttdoc">Construct a new DataPoint object, measured at the given time.</div><div class="ttdef"><b>Definition:</b> world_interface.h:37</div></div>
+<div class="ttc" id="aclassDataPoint_html_a56fa702e3dd61a1b51656b9a064b074e"><div class="ttname"><a href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint()</div><div class="ttdoc">Construct an invalid DataPoint, holding no data.</div><div class="ttdef"><b>Definition:</b> world_interface.h:22</div></div>
+<div class="ttc" id="aclassDataPoint_html_a5b55a21f5a944caad3e3e7cbf45152ed"><div class="ttname"><a href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(T data)</div><div class="ttdoc">Construct a new DataPoint object, measured now.</div><div class="ttdef"><b>Definition:</b> world_interface.h:29</div></div>
+<div class="ttc" id="aclassDataPoint_html_ad96f75187a599a678fd8afd359ac4621"><div class="ttname"><a href="classDataPoint.html#ad96f75187a599a678fd8afd359ac4621">DataPoint::isFresh</a></div><div class="ttdeci">bool isFresh(std::chrono::milliseconds duration)</div><div class="ttdoc">Check if this measurement was taken recently.</div><div class="ttdef"><b>Definition:</b> world_interface.h:52</div></div>
 <div class="ttc" id="agroup__datasets__gr_html_gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d9/db7/group__datasets__gr.html#gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c">index</a></div><div class="ttdeci">index</div></div>
 <div class="ttc" id="astructURCLeg_html"><div class="ttname"><a href="structURCLeg.html">URCLeg</a></div><div class="ttdef"><b>Definition:</b> utils.h:23</div></div>
 </div><!-- fragment --></div><!-- contents -->
