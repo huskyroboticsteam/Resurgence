@@ -49,7 +49,7 @@ const transform_t VIZ_BASE_TF =
 	 @param log_level The optional log level to use; defaults to LOG_DEBUG so the message isn't
 	 seen if on a higher logging level.
  */
-static void printLandmarks(points_t& landmarks, int log_level = LOG_DEBUG);
+static bool printLandmarks(const points_t& landmarks, int log_level = LOG_DEBUG);
 
 Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	: urc_targets(_targets), leg_idx(0),
@@ -406,6 +406,10 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, gps);
 
 		pose_graph.solve();
+		int log_level = LOG_INFO;
+		log(log_level, "Found pose graph solution: ");
+		bool found_one = printLandmarks(pose_graph.getLandmarkLocations(), log_level);
+		if (!found_one) log(log_level, "No landmarks found.\n");
 		return current_odom;
 	} else {
 		return prev_odom;
@@ -596,16 +600,18 @@ pose_t Autonomous::getGPSTargetPose() const {
 	return ret;
 }
 
-static void printLandmarks(points_t& landmarks, int log_level) {
+static bool printLandmarks(const points_t& landmarks, int log_level) {
 	std::ostringstream stream;
 	bool found_one = false;
 	for (size_t i = 0; i < landmarks.size(); i++) {
-		if (landmarks[i][2] != 0) {
+		point_t lm = landmarks[i];
+		if (lm[2] != 0 && lm.topRows(2).norm() != 0) {
 			found_one = true;
 			stream << "Landmark " << i
-				<< " at {" << landmarks[i][0] << ", " << landmarks[i][1] << "} ";
+				<< " at {" << lm[0] << ", " << lm[1] << "} ";
 		}
 	}
 	if (found_one) stream << std::endl;
 	log(log_level, stream.str().c_str());
+	return found_one;
 }
