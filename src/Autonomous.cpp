@@ -272,8 +272,8 @@ bool Autonomous::getPostVisibility(bool left) {
 	bool different_from_prior = (diff > 0.001);
 	bool visible = different_from_prior && (location(2) != 0);
 	log(LOG_DEBUG,
-		"Visibility %d is %d: diff %.3f loc (%.3f %.3f %.3f) prior (%.3f %.3f %.3f)\n",
-		left, visible, diff,
+		"Visibility %s is %d: diff %.3f loc (%.3f %.3f %.3f) prior (%.3f %.3f %.3f)\n",
+		left ? "LEFT " : "RIGHT", visible, diff,
 		location(0), location(1), location(2),
 		prior_location(0), prior_location(1), prior_location(2));
 	return visible;
@@ -553,23 +553,14 @@ pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan
 	// It also handles estimating the cost of following the current plan, so that
 	// we can replace it with a better plan if we find one.
 	int plan_size = plan.rows();
-	if (plan_size == 0) return pose; // Plan is invalid
 
 	pose_t plan_pose = plan_base;
 	pose_t driveTarget = pose;
 	transform_t invTransform = toTransform(pose).inverse();
 
-	// Send starting plan_pose
-	const pose_t start_plan_pose_transformed = poseToDraw(plan_pose, pose);
-	rospub::publish(start_plan_pose_transformed, rospub::PointPub::PLAN_VIZ);
-
 	bool found_target = false;
 	double accumulated_cost = 0; // Estimates the cost-to-go for following the current plan
-	for (int i = 0; i < plan_size; i++) {
-		action_t action = plan.row(i);
-		plan_pose(2) += action(0);
-		plan_pose(0) += action(1) * cos(plan_pose(2));
-		plan_pose(1) += action(1) * sin(plan_pose(2));
+	for (int i = 0; i <= plan_size; i++) {
 		transform_t tf_plan_pose = toTransform(plan_pose) * invTransform;
 		// We don't care about collisions on already-executed parts of the plan
 		bool plan_pose_collides = (i >= plan_idx);
@@ -603,6 +594,12 @@ pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan
 			// Send current plan_pose to visualization
 			const pose_t curr_plan_transformed = poseToDraw(plan_pose, pose);
 			rospub::publish(curr_plan_transformed, rospub::PointPub::PLAN_VIZ);
+		}
+		if (i < plan_size) {
+			action_t action = plan.row(i);
+			plan_pose(2) += action(0);
+			plan_pose(0) += action(1) * cos(plan_pose(2));
+			plan_pose(1) += action(1) * sin(plan_pose(2));
 		}
 	}
 	pose_t final_plan_pose = plan_pose; // Renaming for clarity
