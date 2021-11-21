@@ -173,7 +173,7 @@ int rover_loop(int argc, char** argv) {
 	CANPacket packet;
 	// Target locations for autonomous navigation
 	// Eventually this will be set by communication from the base station
-	std::vector<URCLeg> urc_legs = parseGPSLegs("../src/gps/zero_legs.txt");
+	std::vector<URCLeg> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
 	Autonomous autonomous(urc_legs, CONTROL_HZ);
 	char buffer[MAXLINE];
 	struct timeval tp_rover_start;
