@@ -49,7 +49,7 @@ point_t gpsToMeters(double lon, double lat) {
 	return r;
 }
 
-transform_t readGPS() {
+DataPoint<transform_t> readGPS() {
 	transform_t tf;
 	gps_mutex.lock();
 	if (fresh_data) {
