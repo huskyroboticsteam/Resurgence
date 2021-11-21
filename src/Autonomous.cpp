@@ -29,7 +29,7 @@ constexpr double INFINITE_COST = 1e10;
 constexpr int REPLAN_PERIOD = 20;
 
 constexpr bool USE_MAP = false;
-constexpr bool MOVING_LANDMARKS = true;
+constexpr bool MOVING_LANDMARKS = false;
 
 constexpr bool LEFT = true;
 constexpr bool RIGHT = false;
@@ -74,15 +74,17 @@ Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	// We use a gps_xy_std that's larger than the true std because empirically
 	// that leads to smoother changes in the pose estimate (at least in the simulator),
 	// which are easier for the controller to work with.
-	pose_graph = FriendlyGraph(num_landmarks, 10, 0.3, 5.0, 0.05), prev_odom = readOdom();
-	transform_t start_pose_guess = toTransform({13, -1, M_PI * 2 / 3});
+	pose_graph = FriendlyGraph(num_landmarks, 10, 0.3, 5.0, 0.05);
+	prev_odom = readOdom();
+	// TODO how to make this start pose configurable?
+	transform_t start_pose_guess = toTransform({0, 0, 0});
 	double pose_prior_xy_std = 3.0;
 	double pose_prior_th_std = 1.0;
 	covariance<3> pose_prior_cov = covariance<3>::Zero();
 	pose_prior_cov << pose_prior_xy_std * pose_prior_xy_std, 0, 0, 0,
 		pose_prior_xy_std * pose_prior_xy_std, 0, 0, 0, pose_prior_th_std * pose_prior_th_std;
 	pose_graph.addPosePrior(0, start_pose_guess, pose_prior_cov);
-	double lm_std = 5.0;
+	double lm_std = 100.0;
 	for (auto target : _targets) {
 		pose_graph.addLandmarkPrior(target.left_post_id, target.approx_GPS, lm_std);
 		if (target.right_post_id != -1) {
