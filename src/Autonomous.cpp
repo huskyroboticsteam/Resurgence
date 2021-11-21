@@ -379,7 +379,7 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 	bool new_gps_data = (gps.norm() != 0.0);
 
 	points_t landmarks = readLandmarks();
-	printLandmarks(landmarks, LOG_INFO);
+	printLandmarks(landmarks, LOG_DEBUG);
 	bool new_landmark_data = false;
 	for (point_t l : landmarks) {
 		if (l(2) != 0) {
@@ -389,7 +389,8 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 	}
 
 	double odom_diff = toPose(current_odom * prev_odom.inverse(), 0.0).norm();
-	bool new_data = new_gps_data || (odom_diff > 0.5 && new_landmark_data);
+	bool overwrite_landmark = (current_odom == prev_odom) && new_landmark_data;
+	bool new_data = new_gps_data || (odom_diff > 0.5 && new_landmark_data) || overwrite_landmark;
 
 	if (new_data) {
 		if (current_odom != prev_odom) { // Don't add poses to pose graph if we haven't moved
@@ -399,7 +400,8 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 		for (size_t lm_id = 0; lm_id < landmarks.size(); lm_id++) {
 			point_t lm = landmarks[lm_id];
 			if (lm(2) != 0.0) {
-				pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm, MOVING_LANDMARKS);
+				bool overwrite = overwrite_landmark || MOVING_LANDMARKS;
+				pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm, overwrite);
 			}
 		}
 		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, gps);
