@@ -1,6 +1,5 @@
-Coordinates for the default configuration of simulator legs
-Note these are in meters, not GPS degrees.
-Also note: (lat, long) corresponds to (y,x) not (x,y)
+Autonomy leg configuration where we have no prior information
+(just assume all landmarks are at 0,0).
 
 0 -1 0 0
 
