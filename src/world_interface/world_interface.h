@@ -79,6 +79,8 @@ void world_interface_init();
 // TODO: indicate what the return value of setCmdVel() means
 double setCmdVel(double dtheta, double dx);
 
+std::pair<double, double> getCmdVel();
+
 // read measurement from the lidar
 DataPoint<points_t> readLidarScan();
 
@@ -100,8 +102,27 @@ DataPoint<transform_t> readGPS();
 // Calculates the current transform in the global frame based purely on forward kinematics
 DataPoint<transform_t> readOdom();
 
+// Calculate the current pose velocity (in the robot's reference frame) using visual odometry.
+DataPoint<pose_t> readVisualOdomVel();
+
 // Given the current longitude and latitude, convert to a point_t position representation
 point_t gpsToMeters(double lon, double lat);
 
 // `index` must be in the range 0-6 (the URC competition will have 7 legs)
 URCLeg getLeg(int index);
+
+/**
+ * @brief Set the PWM command of the given motor.
+ * 
+ * @param motor The name of the motor. Must be a valid motor name.
+ * @param normalizedPWM The PWM command, in the range [-1, 1]
+ */
+void setMotorPWM(const std::string &motor, double normalizedPWM);
+
+/**
+ * @brief Set the target position of the motor.
+ * 
+ * @param motor The name of the motor. Must be a valid motor name.
+ * @param targetPos The target position. Refer to the specific motor for more information.
+ */
+void setMotorPos(const std::string &motor, int32_t targetPos);

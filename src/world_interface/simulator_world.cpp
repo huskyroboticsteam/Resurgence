@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 World world;
+std::pair<double, double> cmdVel(0, 0);
 
 void world_interface_init() {
 	world.addURCObstacles();
@@ -15,7 +16,12 @@ void world_interface_init() {
 
 double setCmdVel(double dtheta, double dx) {
 	world.setCmdVel(dtheta, dx);
+    cmdVel = {dtheta, dx};
 	return 1.0;
+}
+
+std::pair<double, double> getCmdVel() {
+    return cmdVel;
 }
 
 DataPoint<points_t> readLidarScan() {
@@ -30,6 +36,10 @@ DataPoint<transform_t> readGPS() {
 	return world.readGPS();
 }
 
+DataPoint<pose_t> readVisualOdomVel() {
+    return DataPoint<pose_t>{};
+}
+
 point_t gpsToMeters(double lon, double lat) {
 	return {lon, lat, 1.0};
 }
@@ -41,3 +51,7 @@ DataPoint<transform_t> readOdom() {
 URCLeg getLeg(int index) {
 	return world.getLeg(index);
 }
+
+void setMotorPWM(const std::string &motor, double normalizedPWM) {}
+
+void setMotorPos(const std::string &motor, int32_t targetPos) {}
