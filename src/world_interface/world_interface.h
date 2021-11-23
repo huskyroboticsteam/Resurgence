@@ -37,10 +37,14 @@ public:
 	DataPoint(datatime_t time, T data) : valid(true), time(time), data(data) {}
 
 	// provide an implicit conversion to the data type. Helps with backwards compatability.
-	operator T() const { return data; }
+	operator T() const {
+		return data;
+	}
 
 	// Check if this measurement is valid
-	operator bool() const { return valid; }
+	operator bool() const {
+		return valid;
+	}
 
 	/**
 	 * @brief Check if this measurement was taken recently.
@@ -54,13 +58,19 @@ public:
 	}
 
 	// Check if this measurement is valid
-	bool isValid() { return valid; }
+	bool isValid() {
+		return valid;
+	}
 
 	// The time at which the data was measured. Use only if data is valid.
-	datatime_t getTime() { return time; }
+	datatime_t getTime() {
+		return time;
+	}
 
 	// The measurement data. Use only if data is valid.
-	T getData() { return data; }
+	T getData() {
+		return data;
+	}
 
 private:
 	// true iff this measurement is valid, false otherwise.
@@ -113,16 +123,16 @@ URCLeg getLeg(int index);
 
 /**
  * @brief Set the PWM command of the given motor.
- * 
+ *
  * @param motor The name of the motor. Must be a valid motor name.
  * @param normalizedPWM The PWM command, in the range [-1, 1]
  */
-void setMotorPWM(const std::string &motor, double normalizedPWM);
+void setMotorPWM(const std::string& motor, double normalizedPWM);
 
 /**
  * @brief Set the target position of the motor.
- * 
+ *
  * @param motor The name of the motor. Must be a valid motor name.
  * @param targetPos The target position. Refer to the specific motor for more information.
  */
-void setMotorPos(const std::string &motor, int32_t targetPos);
+void setMotorPos(const std::string& motor, int32_t targetPos);

@@ -16,12 +16,12 @@ void world_interface_init() {
 
 double setCmdVel(double dtheta, double dx) {
 	world.setCmdVel(dtheta, dx);
-    cmdVel = {dtheta, dx};
+	cmdVel = {dtheta, dx};
 	return 1.0;
 }
 
 std::pair<double, double> getCmdVel() {
-    return cmdVel;
+	return cmdVel;
 }
 
 DataPoint<points_t> readLidarScan() {
@@ -37,7 +37,7 @@ DataPoint<transform_t> readGPS() {
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
-    return DataPoint<pose_t>{};
+	return DataPoint<pose_t>{};
 }
 
 point_t gpsToMeters(double lon, double lat) {
@@ -52,6 +52,6 @@ URCLeg getLeg(int index) {
 	return world.getLeg(index);
 }
 
-void setMotorPWM(const std::string &motor, double normalizedPWM) {}
+void setMotorPWM(const std::string& motor, double normalizedPWM) {}
 
-void setMotorPos(const std::string &motor, int32_t targetPos) {}
+void setMotorPos(const std::string& motor, int32_t targetPos) {}

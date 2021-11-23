@@ -10,7 +10,7 @@ double setCmdVel(double /*dtheta*/, double /*dx*/) {
 }
 
 std::pair<double, double> getCmdVel() {
-    return {0, 0};
+	return {0, 0};
 }
 
 DataPoint<points_t> readLidarScan() {
@@ -26,7 +26,7 @@ DataPoint<transform_t> readGPS() {
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
-    return DataPoint<pose_t>{};
+	return DataPoint<pose_t>{};
 }
 
 point_t gpsToMeters(double lon, double lat) {
@@ -41,6 +41,6 @@ URCLeg getLeg(int /*id*/) {
 	return URCLeg{-1, -1, {0., 0., 0.}};
 }
 
-void setMotorPWM(const std::string &motor, double normalizedPWM) {}
+void setMotorPWM(const std::string& motor, double normalizedPWM) {}
 
-void setMotorPos(const std::string &motor, int32_t targetPos) {}
+void setMotorPos(const std::string& motor, int32_t targetPos) {}

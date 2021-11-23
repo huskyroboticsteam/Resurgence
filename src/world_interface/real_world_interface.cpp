@@ -1,8 +1,8 @@
 #include "../Globals.h"
 #include "../Networking/CANUtils.h"
+#include "../Networking/ParseCAN.h"
 #include "../Networking/json.hpp"
 #include "../Networking/motor_interface.h"
-#include "../Networking/ParseCAN.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../camera/Camera.h"
@@ -128,7 +128,7 @@ double setCmdVel(double dtheta, double dx) {
 }
 
 std::pair<double, double> getCmdVel() {
-    return {odom_dtheta_, odom_dx_};
+	return {odom_dtheta_, odom_dx_};
 }
 
 DataPoint<points_t> readLandmarks() {
@@ -150,7 +150,7 @@ DataPoint<transform_t> readOdom() {
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
-    return DataPoint<pose_t>{};
+	return DataPoint<pose_t>{};
 }
 
 URCLeg getLeg(int index) {
@@ -158,21 +158,11 @@ URCLeg getLeg(int index) {
 }
 
 const std::map<std::string, double> positive_arm_pwm_scales = {
-	{"arm_base",   12000},
-	{"shoulder",  -20000},
-	{"elbow",     -32768},
-	{"forearm",    -6000},
-	{"diffleft",    5000},
-	{"diffright",  -5000},
-	{"hand",       15000}};
+	{"arm_base", 12000}, {"shoulder", -20000}, {"elbow", -32768}, {"forearm", -6000},
+	{"diffleft", 5000},	 {"diffright", -5000}, {"hand", 15000}};
 const std::map<std::string, double> negative_arm_pwm_scales = {
-	{"arm_base", 12000},
-	{"shoulder", -14000},
-	{"elbow", -18000},
-	{"forearm", -6000},
-	{"diffleft", 5000},
-	{"diffright", -10000},
-	{"hand", 15000}};
+	{"arm_base", 12000}, {"shoulder", -14000},	{"elbow", -18000}, {"forearm", -6000},
+	{"diffleft", 5000},	 {"diffright", -10000}, {"hand", 15000}};
 const std::map<std::string, double> incremental_pid_scales = {
 	{"arm_base", M_PI / 8}, // TODO: Check signs
 	{"shoulder", -M_PI / 8},
@@ -182,14 +172,13 @@ const std::map<std::string, double> incremental_pid_scales = {
 	{"diffright", 0},
 	{"hand", 0}};
 
-
-template <typename T> int getIndex(const std::vector<T> &vec, const T &val) {
-    auto itr = std::find(vec.begin(), vec.end(), val);
-    return itr == vec.end() ? -1 : itr - vec.begin();
+template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
+	auto itr = std::find(vec.begin(), vec.end(), val);
+	return itr == vec.end() ? -1 : itr - vec.begin();
 }
 
-void setMotorPWM(const std::string &motor, double normalizedPWM) {
-    CANPacket p;
+void setMotorPWM(const std::string& motor, double normalizedPWM) {
+	CANPacket p;
 	auto& scale_map = (normalizedPWM > 0 ? positive_arm_pwm_scales : negative_arm_pwm_scales);
 	double pwm = normalizedPWM * scale_map.at(motor);
 	int motor_serial = getIndex(motor_group, motor);
@@ -197,8 +186,8 @@ void setMotorPWM(const std::string &motor, double normalizedPWM) {
 	sendCANPacket(p);
 }
 
-void setMotorPos(const std::string &motor, int32_t targetPos) {
-    CANPacket p;
+void setMotorPos(const std::string& motor, int32_t targetPos) {
+	CANPacket p;
 	int motor_serial = getIndex(motor_group, motor);
 	AssemblePIDTargetSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, targetPos);
 	sendCANPacket(p);
