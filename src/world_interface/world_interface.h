@@ -9,6 +9,8 @@ using dataclock = std::chrono::steady_clock;
 // a point in time as measured by dataclock
 using datatime_t = std::chrono::time_point<dataclock>;
 
+enum class indication_t { off, autonomous, teleop, arrivedAtDest };
+
 /**
  * @brief Represents data measured using a sensor at a given time.
  *
@@ -120,6 +122,9 @@ point_t gpsToMeters(double lon, double lat);
 
 // `index` must be in the range 0-6 (the URC competition will have 7 legs)
 URCLeg getLeg(int index);
+
+// set the indicator to indicate the given signal. May no-op if indicator is not supported.
+void setIndicator(indication_t signal);
 
 /**
  * @brief Set the PWM command of the given motor.

@@ -44,3 +44,5 @@ URCLeg getLeg(int /*id*/) {
 void setMotorPWM(const std::string& motor, double normalizedPWM) {}
 
 void setMotorPos(const std::string& motor, int32_t targetPos) {}
+
+void setIndicator(indication_t signal) {}

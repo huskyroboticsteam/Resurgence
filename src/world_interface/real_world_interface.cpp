@@ -192,3 +192,6 @@ void setMotorPos(const std::string& motor, int32_t targetPos) {
 	AssemblePIDTargetSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, targetPos);
 	sendCANPacket(p);
 }
+
+// TODO: implement
+void setIndicator(indication_t signal) {}

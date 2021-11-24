@@ -1,6 +1,7 @@
 #include "../simulator/world.h"
 #include "world_interface.h"
 
+#include <iostream>
 #include <unistd.h>
 
 World world;
@@ -52,6 +53,14 @@ URCLeg getLeg(int index) {
 	return world.getLeg(index);
 }
 
+// not supported in 2D sim
 void setMotorPWM(const std::string& motor, double normalizedPWM) {}
 
+// not supported in 2D sim
 void setMotorPos(const std::string& motor, int32_t targetPos) {}
+
+void setIndicator(indication_t signal) {
+	std::string signals[] = {"off", "autonomous", "teleop", "arrivedAtDest"};
+	auto idx = static_cast<int>(signal);
+	std::cout << "Setting indicator: " << signals[idx] << std::endl;
+}
