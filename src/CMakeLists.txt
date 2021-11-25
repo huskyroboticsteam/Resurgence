@@ -15,7 +15,7 @@ include_directories(${rclcpp_INCLUDE_DIRS})
 include_directories(${geometry_msgs_INCLUDE_DIRS})
 
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall \
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-variable \
 -Wno-unused-but-set-variable \
 -Wno-unused-result \
