@@ -6,6 +6,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
+# If a build type was not explicitly specified, default to "RelWithDebInfo" (Same optimization
+# as the "Release" configuration but with debugging symbols).
+# To change, you can pass -DCMAKE_BUILD_TYPE=... where ... is the configuration you would
+# like to use. For example, if you want to do a debug build (little to no optimization and
+# debugging symbols), add -DCMAKE_BUILD_TYPE=Debug to your `cmake` command.
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
+      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
+message("========================================\n\
+Building ${CMAKE_BUILD_TYPE} configuration...\n\
+Add -DCMAKE_BUILD_TYPE=... to change\n\
+========================================")
 find_package(OpenCV)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
