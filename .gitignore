@@ -9,5 +9,6 @@ CMakeCache.txt
 Makefile
 CMakeFiles
 *.cmake
+*.swp
 .DS_Store
 /docs/

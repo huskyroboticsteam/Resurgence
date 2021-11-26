@@ -8,7 +8,7 @@ project(Rover LANGUAGES CXX C)
 find_package(OpenCV)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
-
+find_package(Catch2 REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 include_directories(${rclcpp_INCLUDE_DIRS})
@@ -22,8 +22,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-parameter") # -Wconversion") 
 
 enable_testing()
-
-find_package(Catch2 REQUIRED)
 
 add_library(hindsight_can SHARED
   HindsightCAN/CANPacket.c
