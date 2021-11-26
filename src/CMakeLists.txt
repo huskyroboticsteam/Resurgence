@@ -19,6 +19,15 @@ message("========================================\n\
 Building ${CMAKE_BUILD_TYPE} configuration...\n\
 Add -DCMAKE_BUILD_TYPE=... to change\n\
 ========================================")
+
+# Generate a compile_commands.json file by default unless explicitly disabled.
+# This allows editors like Visual Studio Code to be able to index the project correctly and
+# locate header files and libraries.
+if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE STRING "Enable/Disable output of compile commands
+  during generation." FORCE)
+endif()
+
 find_package(OpenCV)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
