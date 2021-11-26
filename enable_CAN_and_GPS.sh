@@ -21,10 +21,17 @@ if [[ $? != 0 ]]; then
   sudo ip link set dev vcan0 up
 fi
 
-sudo service gpsd start
-sudo service gpsd stop
+# For some reason, on the rover, the gpsd that starts on boot does not
+# seem to properly publish information from our GPS.
+# Hence, we first make sure that it is not running, and then we restart it.
+sudo killall gpsd
+sudo systemctl stop gpsd.socket
 if [[ -e "${GPS_PATH}" ]]; then
   sudo gpsd -n "${GPS_PATH}"
 else
+  # This code also ensures we do *not* start gpsd if there is no GPS connected,
+  # which allows for some performance optimizations. (For some reason, in the
+  # C++ gps library, it is easy to check whether gpsd is running, but it is hard
+  # to check whether gpsd is actually connected to any GPS hardware.)
   echo "No device connected at ${GPS_PATH}; gpsd not started!"
 fi

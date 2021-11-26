@@ -29,14 +29,14 @@ enum NavState {
 };
 
 constexpr std::array<const char*, 7> NAV_STATE_NAMES({"GPS", "POST_VISIBLE", "SEARCH_PATTERN",
-													  "SEARCH_PATTERN_SECOND_POST",
-													  "GATE_ALIGN", "GATE_TRAVERSE", "DONE"});
+														"SEARCH_PATTERN_SECOND_POST",
+														"GATE_ALIGN", "GATE_TRAVERSE", "DONE"});
 
 class Autonomous {
 public:
 	explicit Autonomous(const std::vector<URCLeg>& urc_targets, double controlHz);
 	Autonomous(const std::vector<URCLeg>& urc_targets, double controlHz,
-			   const pose_t& startPose);
+				 const pose_t& startPose);
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	// Gets the target's coordinate
@@ -74,7 +74,7 @@ private:
 
 	/* Variables for pose graph localization */
 	FriendlyGraph pose_graph;
-	int pose_id;		   // counter for how many poses we've added to the graph
+	int pose_id;			 // counter for how many poses we've added to the graph
 	transform_t prev_odom; // odom measurement at the time of the most recent pose in the graph
 	trajectory_t
 		smoothed_traj; // cached solution to pose graph optimization (robot trajectory)
@@ -83,13 +83,15 @@ private:
 	void setNavState(NavState s);
 	void update_nav_state(const pose_t& pose, const pose_t& plan_target);
 	pose_t choose_plan_target(const pose_t& pose);
+	pose_t getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan_target,
+		const points_t& lidar_scan);
 	int getPostID(bool left);
-	point_t getPostLocation(bool left);
+	point_t getPostLocation(bool left, bool verbose = true);
 	bool getPostVisibility(bool left);
 	void computeGateTargets(const pose_t& pose, bool choose_direction);
 	void updateSearchTarget();
 	void endCurrentLeg();
-	transform_t optimizePoseGraph(transform_t current_gps, transform_t current_odom);
+	transform_t optimizePoseGraph(transform_t current_odom);
 
 	double getLinearVel(const pose_t& drive_target, const pose_t& pose, double thetaErr) const;
 	double getThetaVel(const pose_t& drive_target, const pose_t& pose, double& thetaErr) const;

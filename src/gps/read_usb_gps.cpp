@@ -6,6 +6,7 @@
 #include <libgpsmm.h>
 #include <mutex>
 #include <thread>
+#include <unistd.h>
 
 // UW lat/long is 47.653116, -122.305619
 // source: http://www.csgnetwork.com/degreelenllavcalc.html
@@ -38,7 +39,7 @@ bool gpsHasFreshData() {
 point_t gpsToMeters__private(double lon, double lat) {
 	double x = (lon - first_fix_lon) * METERS_PER_DEG_EW;
 	double y = (lat - first_fix_lat) * METERS_PER_DEG_NS;
-	return {x, y, 0};
+	return {x, y, 1};
 }
 
 point_t gpsToMeters(double lon, double lat) {
@@ -73,8 +74,8 @@ void gps_loop() {
 		if ((newdata = gps_rec.read()) == NULL) {
 			log(LOG_ERROR, "GPS read error.\n");
 			continue;
-		} else {
-			if (std::isnan(newdata->fix.latitude)) {
+		} else if (newdata->set & STATUS_SET) {
+			if (!(newdata->set & LATLON_SET) || std::isnan(newdata->fix.latitude)) {
 				log(LOG_WARN, "No GPS fix.\n");
 				continue;
 			} else {
@@ -95,8 +96,27 @@ void gps_loop() {
 				most_recent_tf = toTransform(p);
 				gps_mutex.unlock();
 			}
+		} else {
+			log(LOG_WARN, "Got packet with no STATUS_SET.\n");
 		}
 	}
+}
+
+bool detectHardware() {
+	struct gps_data_t* packet;
+
+	int attempts = 0;
+	while (attempts++ < 10) {
+		if (!gps_rec.waiting(5000000)) {
+			return false;
+		} else if ((packet = gps_rec.read()) == NULL) {
+			log(LOG_ERROR, "GPS read error.\n");
+		} else if (packet->set & STATUS_SET) {
+			return true;
+		}
+		usleep(100 * 1000);
+	}
+	return false;
 }
 
 bool startGPSThread() {
@@ -104,8 +124,8 @@ bool startGPSThread() {
 		log(LOG_ERROR, "No GPSD running.\n");
 		return false;
 	}
-	if (!gps_rec.waiting(5000000)) {
-		log(LOG_ERROR, "No GPS hardware detected.\n");
+	if (!detectHardware()) {
+		log(LOG_ERROR, "No GPS hardware detected. (If not using GPS, please re-run enable_CAN_and_GPS.sh to stop gpsd.)\n");
 		return false;
 	}
 	gps_thread = std::thread(gps_loop);
