@@ -125,19 +125,11 @@ bool setOperationMode(const std::string& motor, int ik_axis, const std::string& 
 }
 
 void sendPWMPacket(const std::string& motor, double normalized_pwm) {
-	CANPacket p;
-	auto& scale_map = (normalized_pwm > 0 ? positive_arm_pwm_scales : negative_arm_pwm_scales);
-	double pwm = normalized_pwm * scale_map.at(motor);
-	int motor_serial = getIndex(motor_group, motor);
-	AssemblePWMDirSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pwm);
-	sendCANPacket(p);
+    setMotorPWM(motor, normalized_pwm);
 }
 
 void sendPIDPacket(const std::string& motor, int32_t pid_target) {
-	CANPacket p;
-	int motor_serial = getIndex(motor_group, motor);
-	AssemblePIDTargetSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pid_target);
-	sendCANPacket(p);
+	setMotorPos(motor, pid_target);
 }
 
 // TODO: if this sends the motor packet, should probably be called

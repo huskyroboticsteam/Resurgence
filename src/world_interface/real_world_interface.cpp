@@ -1,5 +1,6 @@
 #include "../Globals.h"
 #include "../Networking/CANUtils.h"
+#include "../Networking/ParseCAN.h"
 #include "../Networking/json.hpp"
 #include "../Networking/motor_interface.h"
 #include "../Util.h"
@@ -126,6 +127,10 @@ double setCmdVel(double dtheta, double dx) {
 	return scale_down_factor;
 }
 
+std::pair<double, double> getCmdVel() {
+	return {odom_dtheta_, odom_dx_};
+}
+
 DataPoint<points_t> readLandmarks() {
 	return AR::readLandmarks();
 }
@@ -144,6 +149,49 @@ DataPoint<transform_t> readOdom() {
 	return getOdomAt(now);
 }
 
+DataPoint<pose_t> readVisualOdomVel() {
+	return DataPoint<pose_t>{};
+}
+
 URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
+
+const std::map<std::string, double> positive_arm_pwm_scales = {
+	{"arm_base", 12000}, {"shoulder", -20000}, {"elbow", -32768}, {"forearm", -6000},
+	{"diffleft", 5000},	 {"diffright", -5000}, {"hand", 15000}};
+const std::map<std::string, double> negative_arm_pwm_scales = {
+	{"arm_base", 12000}, {"shoulder", -14000},	{"elbow", -18000}, {"forearm", -6000},
+	{"diffleft", 5000},	 {"diffright", -10000}, {"hand", 15000}};
+const std::map<std::string, double> incremental_pid_scales = {
+	{"arm_base", M_PI / 8}, // TODO: Check signs
+	{"shoulder", -M_PI / 8},
+	{"elbow", -M_PI / 8},
+	{"forearm", 0}, // We haven't implemented PID on these motors yet
+	{"diffleft", 0},
+	{"diffright", 0},
+	{"hand", 0}};
+
+template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
+	auto itr = std::find(vec.begin(), vec.end(), val);
+	return itr == vec.end() ? -1 : itr - vec.begin();
+}
+
+void setMotorPWM(const std::string& motor, double normalizedPWM) {
+	CANPacket p;
+	auto& scale_map = (normalizedPWM > 0 ? positive_arm_pwm_scales : negative_arm_pwm_scales);
+	double pwm = normalizedPWM * scale_map.at(motor);
+	int motor_serial = getIndex(motor_group, motor);
+	AssemblePWMDirSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pwm);
+	sendCANPacket(p);
+}
+
+void setMotorPos(const std::string& motor, int32_t targetPos) {
+	CANPacket p;
+	int motor_serial = getIndex(motor_group, motor);
+	AssemblePIDTargetSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, targetPos);
+	sendCANPacket(p);
+}
+
+// TODO: implement
+void setIndicator(indication_t signal) {}
