@@ -29,6 +29,44 @@ if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
 endif()
 
 find_package(OpenCV)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(WITH_CAN_DEFAULT ON)
+else()
+  set(WITH_CAN_DEFAULT OFF)
+endif()
+
+## Module settings
+# These variables control whether various modules are enabled or disabled. The goal is to allow
+# a user to selectively exclude modules that they do not need; for example if we are just
+# trying to drive the rover for a demo, we don't need computer vision or autonomous navigation
+# code. We also need a way to disable CAN on non-Linux systems that don't support it, so this
+# is a way to do that.
+set(WITH_CV ON CACHE BOOL "Enable/Disable computer vision code.")
+set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
+systems.")
+set(WITH_AUTO_NAV ON CACHE BOOL "Enable/Disable the autonomous navigation code.")
+set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
+set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
+set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
+set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
+
+if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
+  message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${WORLD_INTERFACE}\n\
+Valid values are ${AVAILABLE_WORLD_INTERFACES}")
+endif()
+
+message("========================================\n\
+Module settings:")
+message("  Computer Vision:\t${WITH_CV}")
+if(NOT WITH_CAN_DEFAULT)
+  message("  CAN Networking:\t${WITH_CAN} (non-Linux system - disabled by default)")
+else()
+  message("  CAN Networking:\t${WITH_CAN}")
+endif()
+message("  Autonomous Nav:\t${WITH_AUTO_NAV}")
+message("  Test Suite:\t\t${WITH_TESTS}")
+message("  World Interface:\t${WORLD_INTERFACE}")
+message("========================================")
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(Catch2 REQUIRED)
