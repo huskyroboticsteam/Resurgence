@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 cmake_policy(SET CMP0057 NEW)
-set(CMAKE_CXX_STANDARD 14) # 11 For the json library, 14 for ROS2
+set(CMAKE_CXX_STANDARD 17) # 11 For the json library, 14 for ROS2, 17 for std library features
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)

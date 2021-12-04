@@ -1,100 +1,58 @@
 #pragma once
 
+#include "../camera/CameraParams.h"
 #include "../simulator/utils.h"
+#include "data.h"
 
-#include <chrono>
-
-// the clock used for time measurements for data
-using dataclock = std::chrono::steady_clock;
-// a point in time as measured by dataclock
-using datatime_t = std::chrono::time_point<dataclock>;
-
-enum class indication_t { off, autonomous, teleop, arrivedAtDest };
-
-/**
- * @brief Represents data measured using a sensor at a given time.
- *
- * @tparam T The type of data measured from the sensor. Requires defined default constructor.
- */
-template <typename T> class DataPoint {
-public:
-	/**
-	 * @brief Construct an invalid DataPoint, holding no data
-	 */
-	DataPoint() : valid(false), time(), data() {}
-
-	/**
-	 * @brief Construct a new DataPoint object, measured now.
-	 *
-	 * @param data The piece of data
-	 */
-	DataPoint(T data) : DataPoint(dataclock::now(), data) {}
-
-	/**
-	 * @brief Construct a new DataPoint object, measured at the given time.
-	 *
-	 * @param time The time at which the data was measured.
-	 * @param data The piece of data.
-	 */
-	DataPoint(datatime_t time, T data) : valid(true), time(time), data(data) {}
-
-	// provide an implicit conversion to the data type. Helps with backwards compatability.
-	operator T() const {
-		return data;
-	}
-
-	// Check if this measurement is valid
-	operator bool() const {
-		return valid;
-	}
-
-	/**
-	 * @brief Check if this measurement was taken recently.
-	 *
-	 * @param duration The data is fresh if it was taken at most this many milliseconds ago.
-	 * @return true if the data is valid and was measured at most \p duration milliseconds ago,
-	 * false otherwise.
-	 */
-	bool isFresh(std::chrono::milliseconds duration) {
-		return valid && dataclock::now() - duration <= time;
-	}
-
-	// Check if this measurement is valid
-	bool isValid() {
-		return valid;
-	}
-
-	// The time at which the data was measured. Use only if data is valid.
-	datatime_t getTime() {
-		return time;
-	}
-
-	// The measurement data. Use only if data is valid.
-	T getData() {
-		return data;
-	}
-
-private:
-	// true iff this measurement is valid, false otherwise.
-	bool valid;
-	// the time at which the data was measured. Use only if valid == true.
-	datatime_t time;
-	// the measurement data. Use only if valid == true.
-	T data;
-};
+#include <optional>
 
 // Call this before trying to do anything else
 void world_interface_init();
 
 // If the requested dtheta/dx is too fast for the robot to execute, it will
 // scale them down and return the corresponding scale factor.
-// TODO: indicate what the return value of setCmdVel() means
 double setCmdVel(double dtheta, double dx);
 
 std::pair<double, double> getCmdVel();
 
 // read measurement from the lidar
 DataPoint<points_t> readLidarScan();
+
+/**
+ * @brief Check if a new camera frame from the specified camera is available.
+ *
+ * @param camera The ID of the camera to check
+ * @param oldFrameNum The frame number of the old frame. A camera frame is "new" if its id is
+ * different than this.
+ * @returns true iff a new camera frame is available.
+ */
+bool hasNewCameraFrame(CameraID camera, uint32_t oldFrameNum);
+
+/**
+ * @brief Read the latest frame from the given camera. This is not guaranteed to change between
+ * calls, so use hasNewCameraFrame() to check if a new frame is available.
+ *
+ * @param camera The ID of the camera to read from.
+ * @return DataPoint<CameraFrame> A datapoint containing the latest frame.
+ * If an error occurs or the ID is invalid, returns an invalid datapoint.
+ */
+DataPoint<CameraFrame> readCamera(CameraID camera);
+
+/**
+ * @brief Get the intrinsic params of the specified camera, if it exists.
+ *
+ * @param camera The ID of the camera for which to get the intrinsic params.
+ * @returns The intrinsic params if it exists, else an empty optional object.
+ */
+std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID camera);
+
+/**
+ * @brief Get the extrinsic params of the specified camera, if it exists.
+ *
+ * @param camera The ID of the camera for which to get the extrinsic params.
+ * @returns The extrinsic params if it exists, else an empty optional object.
+ */
+std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera);
 
 /**
  * @brief Read measurement from the CV system. As of now, returns a vector of fixed length, one

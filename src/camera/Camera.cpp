@@ -156,6 +156,7 @@ void Camera::captureLoop() {
 		_frame_lock->lock();
 		frame.copyTo(*(this->_frame));
 		(*_frame_num)++;
+		*_frame_time = dataclock::now();
 		_frame_lock->unlock();
 	}
 }
@@ -183,6 +184,18 @@ bool Camera::next(cv::Mat& frame, uint32_t& frame_num) const {
 	_frame_lock->lock();
 	frame = this->_frame->clone();
 	frame_num = *(this->_frame_num);
+	_frame_lock->unlock();
+	return true;
+}
+
+bool Camera::next(cv::Mat& frame, uint32_t& frame_num, datatime_t& frame_time) const {
+	if (!isOpen()) {
+		return false;
+	}
+	_frame_lock->lock();
+	frame = this->_frame->clone();
+	frame_num = *(this->_frame_num);
+	frame_time = *_frame_time;
 	_frame_lock->unlock();
 	return true;
 }

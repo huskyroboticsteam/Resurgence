@@ -64,3 +64,19 @@ void setIndicator(indication_t signal) {
 	auto idx = static_cast<int>(signal);
 	std::cout << "Setting indicator: " << signals[idx] << std::endl;
 }
+
+bool hasNewCameraFrame(CameraID camera, uint32_t oldFrameNum) {
+	return false;
+}
+
+DataPoint<CameraFrame> readCamera(CameraID camera) {
+	return {};
+}
+
+std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID camera) {
+	return {};
+}
+
+std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera) {
+	return {};
+}

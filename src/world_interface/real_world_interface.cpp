@@ -14,6 +14,7 @@
 
 #include <future>
 #include <iostream>
+#include <map>
 #include <set>
 
 #include <opencv2/calib3d.hpp>
@@ -28,15 +29,84 @@ struct timeval last_odom_reading_;
 transform_t last_odom_tf_;
 double odom_dtheta_, odom_dx_;
 
+// map that associates camera id to the camera object
+std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+
+void setupCameras() {
+	try {
+		auto arCam = std::make_shared<cam::Camera>();
+		arCam->openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
+		cameraMap[Constants::AR_CAMERA_ID] = arCam;
+	} catch (const std::exception &e) {
+		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n", Constants::AR_CAMERA_ID, e.what());
+	}
+
+	// Set up the rest of the cameras here
+}
+
 void world_interface_init() {
 	bool gps_success = startGPSThread();
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
 
+	setupCameras();
+
 	gettimeofday(&last_odom_reading_, NULL);
 	last_odom_tf_ = toTransform({0., 0., 0.});
 	odom_dtheta_ = 0.0;
 	odom_dx_ = 0.0;
+}
+
+bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
+	auto itr = cameraMap.find(cameraID);
+	if (itr != cameraMap.end()) {
+		return itr->second->hasNext(oldFrameNum);
+	} else {
+		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		return false;
+	}
+}
+
+DataPoint<CameraFrame> readCamera(CameraID cameraID) {
+	cv::Mat mat;
+	uint32_t frameNum;
+	datatime_t time;
+	auto itr = cameraMap.find(cameraID);
+	if (itr != cameraMap.end()) {
+		bool success = itr->second->next(mat, frameNum, time);
+		if (success) {
+			return DataPoint<CameraFrame>{time, {mat, frameNum}};
+		} else {
+			return DataPoint<CameraFrame>{};
+		}
+	} else {
+		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		return DataPoint<CameraFrame>{};
+	}
+}
+
+std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
+	auto itr = cameraMap.find(cameraID);
+	if (itr != cameraMap.end()) {
+		auto camera = itr->second;
+		return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
+											: std::optional<cam::CameraParams>{};
+	} else {
+		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		return {};
+	}
+}
+
+std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
+	auto itr = cameraMap.find(cameraID);
+	if (itr != cameraMap.end()) {
+		auto camera = itr->second;
+		return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
+											: std::optional<cv::Mat>{};
+	} else {
+		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		return {};
+	}
 }
 
 transform_t getOdomAt(const struct timeval& time) {

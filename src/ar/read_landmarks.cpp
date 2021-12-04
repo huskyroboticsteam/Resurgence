@@ -3,6 +3,7 @@
 #include "../Constants.h"
 #include "../camera/Camera.h"
 #include "../log.h"
+#include "../world_interface/world_interface.h"
 #include "Detector.h"
 
 #include <atomic>
@@ -24,20 +25,24 @@ static points_t make_zero_landmarks() {
 }
 const points_t zero_landmarks = make_zero_landmarks();
 
-cam::Camera ar_cam;
 Detector ar_detector(Markers::URC_MARKERS(), cam::CameraParams());
 
 std::atomic<bool> fresh_data(false);
 std::mutex landmark_lock;
 points_t current_landmarks;
 std::thread landmark_thread;
+bool initialized = false;
 
 void detectLandmarksLoop() {
 	cv::Mat frame;
 	uint32_t last_frame_no = 0;
 	while (true) {
-		if (ar_cam.hasNext(last_frame_no)) {
-			ar_cam.next(frame, last_frame_no);
+		if (hasNewCameraFrame(Constants::AR_CAMERA_ID, last_frame_no)) {
+			auto camData = readCamera(Constants::AR_CAMERA_ID);
+			if (!camData) continue;
+			auto camFrame = camData.getData();
+			frame = camFrame.first;
+			last_frame_no = camFrame.second;
 
 			std::vector<AR::Tag> tags = ar_detector.detectTags(frame);
 			log(LOG_DEBUG, "readLandmarks(): %d tags spotted\n", tags.size());
@@ -61,10 +66,10 @@ void detectLandmarksLoop() {
 					cv::Vec3d coords = ids_to_camera_coords[id];
 					// if we have extrinsic parameters, multiply coordinates by them to do
 					// appropriate transformation.
-					if (ar_cam.hasExtrinsicParams()) {
+					auto extrinsic = getCameraExtrinsicParams(Constants::AR_CAMERA_ID);
+					if (extrinsic) {
 						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
-						cv::Mat transformed =
-							ar_cam.getExtrinsicParams() * cv::Mat(coords_homogeneous);
+						cv::Mat transformed = extrinsic.value() * cv::Mat(coords_homogeneous);
 						output[i] = {transformed.at<double>(0, 0),
 									 transformed.at<double>(1, 0), 1.0};
 					} else {
@@ -109,19 +114,20 @@ void zeroCurrent() {
 bool initializeLandmarkDetection() {
 	zeroCurrent();
 	try {
-		ar_cam.openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
-		if (!ar_cam.hasIntrinsicParams()) {
+		auto intrinsic = getCameraIntrinsicParams(Constants::AR_CAMERA_ID);
+		if (intrinsic) {
+			ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
+			landmark_thread = std::thread(&detectLandmarksLoop);
+		} else {
 			log(LOG_ERROR, "Camera does not have intrinsic parameters! AR tag detection "
 						   "cannot be performed.\n");
 			return false;
-		} else {
-			ar_detector = Detector(Markers::URC_MARKERS(), ar_cam.getIntrinsicParams());
-			landmark_thread = std::thread(&detectLandmarksLoop);
 		}
-		if (!ar_cam.hasExtrinsicParams()) {
+		if (!getCameraExtrinsicParams(Constants::AR_CAMERA_ID)) {
 			log(LOG_WARN, "Camera does not have extrinsic parameters! Coordinates returned "
 						  "for AR tags will be relative to camera\n");
 		}
+		initialized = true;
 		return true;
 	} catch (std::exception& e) {
 		log(LOG_ERROR, "Error opening camera for AR tag detection:\n%s\n", e.what());
@@ -130,7 +136,7 @@ bool initializeLandmarkDetection() {
 }
 
 bool isLandmarkDetectionInitialized() {
-	return ar_cam.isOpen();
+	return initialized;
 }
 
 points_t readLandmarks() {

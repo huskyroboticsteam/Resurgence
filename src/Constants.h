@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstddef>
 #include <string>
+#include "world_interface/data.h"
 
 namespace Constants {
 constexpr size_t PACKET_PAYLOAD_SIZE = 8;
@@ -22,4 +23,5 @@ constexpr double ELBOW_MIN = 0.0;
 constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent self-collisions
 
 const std::string AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
+const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
 } // namespace Constants

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../world_interface/data.h"
 #include "CameraParams.h"
 
 #include <memory>
@@ -100,6 +101,7 @@ class Camera {
 private:
 	std::shared_ptr<cv::Mat> _frame;
 	std::shared_ptr<uint32_t> _frame_num;
+	std::shared_ptr<datatime_t> _frame_time;
 	std::shared_ptr<cv::VideoCapture> _capture;
 	std::string _name;
 	std::string _description;
@@ -226,6 +228,18 @@ public:
 	   @returns true on success, false if some error occurs.
 	 */
 	bool next(cv::Mat& frame, uint32_t& frame_num) const;
+	/**
+	 * @brief Retrives the next frame.
+	 *
+	 * @param[out] frame An output parameter for the frame. All data will be
+	 * overwritten so you do not need to worry about the passed-in Mat having
+	 * the correct size or format.
+	 * @param[out] frame_num An output parameter for the frame number.
+	 * @param[out] frame_time An output parameter for the time at which the frame was captured.
+	 * Note that this is not the same as the current time.
+	 * @returns true on success, false if some error occurs.
+	 */
+	bool next(cv::Mat& frame, uint32_t& frame_num, datatime_t& frame_time) const;
 	/**
 	   @brief Returns true if this camera has associated intrinsic parameters.
 	 */
