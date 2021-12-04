@@ -28,7 +28,6 @@ if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
   during generation." FORCE)
 endif()
 
-find_package(OpenCV)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(WITH_CAN_DEFAULT ON)
 else()
@@ -67,10 +66,21 @@ message("  Autonomous Nav:\t${WITH_AUTO_NAV}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
 message("========================================")
+
+if(WITH_CV)
+  find_package(OpenCV REQUIRED)
+endif()
 find_package(Eigen3 REQUIRED NO_MODULE)
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 find_package(Threads REQUIRED)
-find_package(Catch2 REQUIRED)
-find_package(URGLidar)
+if(WITH_TESTS)
+  find_package(Catch2 REQUIRED)
+endif()
+if(WORLD_INTERFACE STREQUAL "REAL")
+  find_package(URGLidar REQUIRED)
+endif()
+
+# TODO: remove ROS
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 include_directories(${rclcpp_INCLUDE_DIRS})
@@ -83,15 +93,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-result \
 -Wno-unused-parameter") # -Wconversion") 
 
-enable_testing()
+if(WITH_TESTS)
+  enable_testing()
+endif()
 
 add_library(hindsight_can SHARED
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/CANMotorUnit.c
   HindsightCAN/CANScience.c
-  HindsightCAN/PortFiles/PortTemplate.c
-  )
+  HindsightCAN/PortFiles/PortTemplate.c)
 
 add_library(simulator_base SHARED
   simulator/utils.cpp
@@ -155,13 +166,10 @@ add_library(hr_slam SHARED
   simulator/friendly_graph.cpp
   simulator/factors.cpp
   )
-add_library(real_can_interface SHARED
+
+add_library(can_interface SHARED
   log.cpp
-  Networking/CANUtils.cpp
-  )
-add_library(stub_can_interface SHARED
-  Networking/CANStubs.cpp
-  )
+  $<IF:$<BOOL:${WITH_CAN}>, Networking/CANUtils.cpp, Networking/CANStubs.cpp>)
 list(APPEND rover_libs
   rover_common hindsight_can simulator_base simulator_nav hr_slam)
 
@@ -215,38 +223,40 @@ add_executable(PlanViz
 target_link_libraries(PlanViz simulator_base)
 target_link_libraries(PlanViz ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
 
-add_executable(tests
-  Tests.cpp
-  Autonomous.cpp
-  # AR Detection tests
-  ar/DetectorTests.cpp
-  ar/MarkerSetTests.cpp
-  # CAN tests
-  Networking/tests.cpp
-  Networking/TestPackets.cpp
-  Networking/NetworkingStubs.cpp
-  # Camera tests
-  camera/CameraParamsTests.cpp
-  # Autonomy tests
-  ../tests/kinematics/DiffDriveKinematicsTest.cpp
-  ../tests/filters/RollingAvgFilterTest.cpp
-  ../tests/filters/EKFTest.cpp
-  ../tests/filters/StateSpaceUtilsTest.cpp
-  ../tests/worldmap/TrICPTest.cpp
-  ../tests/worldmap/GlobalMapTest.cpp
-  ../tests/worldmap/QuadTreeTest.cpp)
+if(WITH_TESTS)
+  add_executable(tests
+    Tests.cpp
+    Autonomous.cpp
+    # AR Detection tests
+    ar/DetectorTests.cpp
+    ar/MarkerSetTests.cpp
+    # CAN tests
+    Networking/tests.cpp
+    Networking/TestPackets.cpp
+    Networking/NetworkingStubs.cpp
+    # Camera tests
+    camera/CameraParamsTests.cpp
+    # Autonomy tests
+    ../tests/kinematics/DiffDriveKinematicsTest.cpp
+    ../tests/filters/RollingAvgFilterTest.cpp
+    ../tests/filters/EKFTest.cpp
+    ../tests/filters/StateSpaceUtilsTest.cpp
+    ../tests/worldmap/TrICPTest.cpp
+    ../tests/worldmap/GlobalMapTest.cpp
+    ../tests/worldmap/QuadTreeTest.cpp)
 
-target_link_libraries(tests
-  ${rover_libs}
-  stub_can_interface
-  ${real_world_libs}
-  )
-include(CTest)
-include(Catch)
-target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
-target_link_libraries(tests Catch2::Catch2)
-target_link_libraries(tests ${OpenCV_LIBS} opencv_aruco)
-catch_discover_tests(tests)
+  target_link_libraries(tests
+    ${rover_libs}
+    stub_can_interface
+    ${real_world_libs}
+    )
+  include(CTest)
+  include(Catch)
+  target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+  target_link_libraries(tests Catch2::Catch2)
+  target_link_libraries(tests ${OpenCV_LIBS} opencv_aruco)
+  catch_discover_tests(tests)
+endif()
 
 add_library(lidar_base
     lidar/LidarVis.cpp
@@ -265,9 +275,6 @@ target_link_libraries(gpsd_test gps)
 
 add_subdirectory(ar)
 add_subdirectory(camera)
-
-find_package(Eigen3 REQUIRED)
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 add_executable(Server
   Networking/Server.cpp)
