@@ -113,26 +113,21 @@ void zeroCurrent() {
 
 bool initializeLandmarkDetection() {
 	zeroCurrent();
-	try {
-		auto intrinsic = getCameraIntrinsicParams(Constants::AR_CAMERA_ID);
-		if (intrinsic) {
-			ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
-			landmark_thread = std::thread(&detectLandmarksLoop);
-		} else {
-			log(LOG_ERROR, "Camera does not have intrinsic parameters! AR tag detection "
-						   "cannot be performed.\n");
-			return false;
-		}
-		if (!getCameraExtrinsicParams(Constants::AR_CAMERA_ID)) {
-			log(LOG_WARN, "Camera does not have extrinsic parameters! Coordinates returned "
-						  "for AR tags will be relative to camera\n");
-		}
-		initialized = true;
-		return true;
-	} catch (std::exception& e) {
-		log(LOG_ERROR, "Error opening camera for AR tag detection:\n%s\n", e.what());
+	auto intrinsic = getCameraIntrinsicParams(Constants::AR_CAMERA_ID);
+	if (intrinsic) {
+		ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
+		landmark_thread = std::thread(&detectLandmarksLoop);
+	} else {
+		log(LOG_ERROR, "Camera does not have intrinsic parameters! AR tag detection "
+						"cannot be performed.\n");
 		return false;
 	}
+	if (!getCameraExtrinsicParams(Constants::AR_CAMERA_ID)) {
+		log(LOG_WARN, "Camera does not have extrinsic parameters! Coordinates returned "
+						"for AR tags will be relative to camera\n");
+	}
+	initialized = true;
+	return true;
 }
 
 bool isLandmarkDetectionInitialized() {
