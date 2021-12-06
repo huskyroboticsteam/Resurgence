@@ -1,5 +1,6 @@
 #include "../simulator/world.h"
 #include "world_interface.h"
+#include "dummy_cv_classes.h"
 
 #include <iostream>
 #include <unistd.h>

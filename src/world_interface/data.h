@@ -4,6 +4,7 @@
 #include <optional>
 
 // forward declare cv::Mat instead of importing OpenCV
+// we do this to avoid unnecessarily including OpenCV in all build targets
 namespace cv {
 class Mat;
 }

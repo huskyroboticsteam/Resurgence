@@ -1,10 +1,15 @@
 #pragma once
 
-#include "../camera/CameraParams.h"
 #include "../simulator/utils.h"
 #include "data.h"
 
 #include <optional>
+
+// forward declare cam::CameraParams instead of including it
+// we do this to avoid unnecessarily including OpenCV in all build targets
+namespace cam {
+class CameraParams;
+}
 
 // Call this before trying to do anything else
 void world_interface_init();

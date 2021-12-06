@@ -1,9 +1,9 @@
 #include "world_interface.h"
+#include "dummy_cv_classes.h"
 
 #include <unistd.h>
 
-void world_interface_init() {
-}
+void world_interface_init() {}
 
 double setCmdVel(double /*dtheta*/, double /*dx*/) {
 	return 1.0;
