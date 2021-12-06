@@ -3,7 +3,10 @@
 #include <chrono>
 #include <optional>
 
-#include <opencv2/core.hpp>
+// forward declare cv::Mat instead of importing OpenCV
+namespace cv {
+class Mat;
+}
 
 // the clock used for time measurements for data
 using dataclock = std::chrono::steady_clock;
