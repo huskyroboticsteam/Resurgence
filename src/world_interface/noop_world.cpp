@@ -1,5 +1,4 @@
 #include "world_interface.h"
-#include "dummy_cv_classes.h"
 
 #include <unistd.h>
 
@@ -46,19 +45,3 @@ void setMotorPWM(const std::string& motor, double normalizedPWM) {}
 void setMotorPos(const std::string& motor, int32_t targetPos) {}
 
 void setIndicator(indication_t signal) {}
-
-bool hasNewCameraFrame(CameraID camera, uint32_t oldFrameNum) {
-	return false;
-}
-
-DataPoint<CameraFrame> readCamera(CameraID camera) {
-	return {};
-}
-
-std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID camera) {
-	return {};
-}
-
-std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera) {
-	return {};
-}
