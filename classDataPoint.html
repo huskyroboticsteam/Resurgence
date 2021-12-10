@@ -73,7 +73,7 @@ $(function() {
 <p>Represents data measured using a sensor at a given time.  
  <a href="classDataPoint.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="world__interface_8h_source.html">world_interface.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="data_8h_source.html">data.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -93,25 +93,25 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a99c5ca9cd823f7c582277d7d7dec7c4b"><td class="memItemLeft" align="right" valign="top"><a id="a99c5ca9cd823f7c582277d7d7dec7c4b" name="a99c5ca9cd823f7c582277d7d7dec7c4b"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>operator bool</b> () const</td></tr>
 <tr class="separator:a99c5ca9cd823f7c582277d7d7dec7c4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad96f75187a599a678fd8afd359ac4621"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDataPoint.html#ad96f75187a599a678fd8afd359ac4621">isFresh</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> duration)</td></tr>
-<tr class="memdesc:ad96f75187a599a678fd8afd359ac4621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if this measurement was taken recently.  <a href="classDataPoint.html#ad96f75187a599a678fd8afd359ac4621">More...</a><br /></td></tr>
-<tr class="separator:ad96f75187a599a678fd8afd359ac4621"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43e672fd2d9709c9a1d094a8cf2a6517"><td class="memItemLeft" align="right" valign="top"><a id="a43e672fd2d9709c9a1d094a8cf2a6517" name="a43e672fd2d9709c9a1d094a8cf2a6517"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>isValid</b> ()</td></tr>
-<tr class="separator:a43e672fd2d9709c9a1d094a8cf2a6517"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42a51e520be915f0cd5812df053ae498"><td class="memItemLeft" align="right" valign="top"><a id="a42a51e520be915f0cd5812df053ae498" name="a42a51e520be915f0cd5812df053ae498"></a>
-<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getTime</b> ()</td></tr>
-<tr class="separator:a42a51e520be915f0cd5812df053ae498"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d80da7d3667b364f78a09cd8d768571"><td class="memItemLeft" align="right" valign="top"><a id="a3d80da7d3667b364f78a09cd8d768571" name="a3d80da7d3667b364f78a09cd8d768571"></a>
-T&#160;</td><td class="memItemRight" valign="bottom"><b>getData</b> ()</td></tr>
-<tr class="separator:a3d80da7d3667b364f78a09cd8d768571"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05b3f45801385657196aafb10b7f44fe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">isFresh</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> duration) const</td></tr>
+<tr class="memdesc:a05b3f45801385657196aafb10b7f44fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if this measurement was taken recently.  <a href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">More...</a><br /></td></tr>
+<tr class="separator:a05b3f45801385657196aafb10b7f44fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a148257b6d956045e08a6fde226637bbe"><td class="memItemLeft" align="right" valign="top"><a id="a148257b6d956045e08a6fde226637bbe" name="a148257b6d956045e08a6fde226637bbe"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isValid</b> () const</td></tr>
+<tr class="separator:a148257b6d956045e08a6fde226637bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9377a316483799b274ee416fdca9da6d"><td class="memItemLeft" align="right" valign="top"><a id="a9377a316483799b274ee416fdca9da6d" name="a9377a316483799b274ee416fdca9da6d"></a>
+<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getTime</b> () const</td></tr>
+<tr class="separator:a9377a316483799b274ee416fdca9da6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82cfffa6f2a228f7921e39a4e16f5ce7"><td class="memItemLeft" align="right" valign="top"><a id="a82cfffa6f2a228f7921e39a4e16f5ce7" name="a82cfffa6f2a228f7921e39a4e16f5ce7"></a>
+T&#160;</td><td class="memItemRight" valign="bottom"><b>getData</b> () const</td></tr>
+<tr class="separator:a82cfffa6f2a228f7921e39a4e16f5ce7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
 class DataPoint&lt; T &gt;</div><p >Represents data measured using a sensor at a given time. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>The type of data measured from the sensor. Requires defined default constructor. </td></tr>
+    <tr><td class="paramname">T</td><td>The type of data measured from the sensor. </td></tr>
   </table>
   </dd>
 </dl>
@@ -200,8 +200,8 @@ template&lt;typename T &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad96f75187a599a678fd8afd359ac4621" name="ad96f75187a599a678fd8afd359ac4621"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad96f75187a599a678fd8afd359ac4621">&#9670;&nbsp;</a></span>isFresh()</h2>
+<a id="a05b3f45801385657196aafb10b7f44fe" name="a05b3f45801385657196aafb10b7f44fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05b3f45801385657196aafb10b7f44fe">&#9670;&nbsp;</a></span>isFresh()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -216,7 +216,7 @@ template&lt;typename T &gt; </div>
           <td>(</td>
           <td class="paramtype"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a>&#160;</td>
           <td class="paramname"><em>duration</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -238,7 +238,7 @@ template&lt;typename T &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/world_interface/<a class="el" href="world__interface_8h_source.html">world_interface.h</a></li>
+<li>src/world_interface/<a class="el" href="data_8h_source.html">data.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

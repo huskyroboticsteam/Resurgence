@@ -1,9 +1,9 @@
 var searchData=
 [
   ['target_0',['Target',['https://docs.opencv.org/4.2.0/d3/d68/classcv_1_1ogl_1_1Buffer.html#a830568a629457171cb07918537ec66be',1,'cv::ogl::Buffer::Target()'],['https://docs.opencv.org/4.2.0/d6/d0f/group__dnn.html#ga709af7692ba29788182cf573531b0ff5',1,'Target()(Global Namespace)'],['https://docs.opencv.org/4.2.0/d6/d0f/group__dnn.html#ga709af7692ba29788182cf573531b0ff5',1,'cv::dnn::Target()']]],
-  ['templatematchmodes_1',['TemplateMatchModes',['https://docs.opencv.org/4.2.0/df/dfb/group__imgproc__object.html#ga3a7850640f1fe1f58fe91a2d7583695d',1,'TemplateMatchModes()(Global Namespace)'],['https://docs.opencv.org/4.2.0/df/dfb/group__imgproc__object.html#ga3a7850640f1fe1f58fe91a2d7583695d',1,'cv::TemplateMatchModes()']]],
+  ['templatematchmodes_1',['TemplateMatchModes',['https://docs.opencv.org/4.2.0/df/dfb/group__imgproc__object.html#ga3a7850640f1fe1f58fe91a2d7583695d',1,]]],
   ['thinningtypes_2',['ThinningTypes',['https://docs.opencv.org/4.2.0/d9/d29/namespacecv_1_1ximgproc.html#aa244a73deb4e58ae70ee96afe9d2460b',1,'cv::ximgproc']]],
-  ['thresholdtypes_3',['ThresholdTypes',['https://docs.opencv.org/4.2.0/d7/d1b/group__imgproc__misc.html#gaa9e58d2860d4afa658ef70a9b1115576',1,'ThresholdTypes()(Global Namespace)'],['https://docs.opencv.org/4.2.0/d7/d1b/group__imgproc__misc.html#gaa9e58d2860d4afa658ef70a9b1115576',1,'cv::ThresholdTypes()']]],
+  ['thresholdtypes_3',['ThresholdTypes',['https://docs.opencv.org/4.2.0/d7/d1b/group__imgproc__misc.html#gaa9e58d2860d4afa658ef70a9b1115576',1,]]],
   ['topicstatisticsstate_4',['TopicStatisticsState',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a1faa0b05040d3cf0f74c231b6800bffc',1,'rclcpp']]],
   ['trainflags_5',['TrainFlags',['https://docs.opencv.org/4.2.0/d0/dce/classcv_1_1ml_1_1ANN__MLP.html#afb51e414f22dd69f281a569145ccfad7',1,'cv::ml::ANN_MLP']]],
   ['trainingmethods_6',['TrainingMethods',['https://docs.opencv.org/4.2.0/d0/dce/classcv_1_1ml_1_1ANN__MLP.html#a012b34ee340b5d4d11b6844e12816181',1,'cv::ml::ANN_MLP']]],
