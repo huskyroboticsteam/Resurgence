@@ -12,5 +12,3 @@ add_executable(ar_tester
 
 target_link_libraries(ar_tester ${OpenCV_LIBS} opencv_aruco)
 target_link_libraries(ar_tester Threads::Threads)
-
-set_property(TARGET ar_tester PROPERTY CXX_STANDARD 14)

@@ -2,8 +2,7 @@
 
 #include <unistd.h>
 
-void world_interface_init() {
-}
+void world_interface_init() {}
 
 double setCmdVel(double /*dtheta*/, double /*dx*/) {
 	return 1.0;
