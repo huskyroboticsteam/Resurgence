@@ -10,11 +10,13 @@
 #include "simulator/graphics.h"
 #include "simulator/utils.h"
 #include "worldmap/GlobalMap.h"
+#include "world_interface/data.h"
 
 #include <cmath>
 #include <future>
 #include <memory>
 #include <vector>
+#include <optional>
 
 enum ControlState { NEAR_TARGET_POSE, FAR_FROM_TARGET_POSE };
 
@@ -71,6 +73,8 @@ private:
 	bool mapDoesOverlap;
 	unsigned int
 		mapOverlapSampleThreshold; // at least these many points required to overlap map
+
+	std::optional<datatime_t> lastLidarTime;
 
 	/* Variables for pose graph localization */
 	FriendlyGraph pose_graph;

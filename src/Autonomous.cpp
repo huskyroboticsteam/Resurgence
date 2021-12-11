@@ -36,6 +36,9 @@ constexpr bool RIGHT = false;
 
 constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 
+// twice the scan period, should be adjusted as necessary
+constexpr auto LIDAR_FRESH_PERIOD = std::chrono::milliseconds(200);
+
 const transform_t VIZ_BASE_TF =
 	toTransform({NavSim::DEFAULT_WINDOW_CENTER_X, NavSim::DEFAULT_WINDOW_CENTER_Y, M_PI / 2});
 
@@ -363,16 +366,28 @@ void Autonomous::updateSearchTarget() {
 
 plan_t computePlan(transform_t invTransform, point_t goal) {
 	// We need to readLidar again from within the planning thread, for thread safety
-	points_t lidar_scan = readLidarScan();
-	auto collide_func = [&](double x, double y, double radius) -> bool {
-		// transform the point to check into map space
-		point_t relPoint = {x, y, 1};
-		point_t p = invTransform * relPoint;
-		transform_t coll_tf = toTransform(relPoint);
-		// TODO implement thread-safe access to `map` if `USE_MAP` is true
-		// if (USE_MAP) return map.hasPointWithin(p, radius);
-		return collides(coll_tf, lidar_scan, radius);
-	};
+	auto lidarData = readLidarScan();
+	points_t lidar_scan;
+	std::function<bool(double, double, double)> collide_func;
+	if (lidarData.isFresh(LIDAR_FRESH_PERIOD)) {
+		lidar_scan = lidarData.getData();
+		collide_func = [&](double x, double y, double radius) -> bool {
+			// transform the point to check into map space
+			point_t relPoint = {x, y, 1};
+			point_t p = invTransform * relPoint;
+			transform_t coll_tf = toTransform(relPoint);
+			// TODO implement thread-safe access to `map` if `USE_MAP` is true
+			// if (USE_MAP) return map.hasPointWithin(p, radius);
+			return collides(coll_tf, lidar_scan, radius);
+		};
+	} else {
+		if (!lidarData) {
+			log(LOG_ERROR, "Tried to read from the lidar before it was initialized!\n");
+		} else {
+			log(LOG_WARN, "Data is older than %dms!\n", LIDAR_FRESH_PERIOD);
+		}
+		collide_func = [](double, double, double) -> bool { return false; };
+	}
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
@@ -465,7 +480,20 @@ void Autonomous::autonomyIter() {
 	log(LOG_DEBUG, "plan_target %f %f %f\n", plan_target(0), plan_target(1), plan_target(2));
 	update_nav_state(pose, plan_target);
 
-	points_t lidar_scan = readLidarScan();
+	auto lidarData = readLidarScan();
+	points_t lidar_scan;
+	if (lidarData.isFresh(LIDAR_FRESH_PERIOD)) {
+		if (!lastLidarTime || lastLidarTime != lidarData.getTime()) {
+			lidar_scan = lidarData.getData();
+			lastLidarTime = lidarData.getTime();
+		} else {
+			log(LOG_WARN, "No new lidar data available!\n");
+		}
+	} else if (!lidarData) {
+		log(LOG_ERROR, "Tried to read from the lidar before it was initialized!\n");
+	} else {
+		log(LOG_WARN, "Data is older than %dms!\n", LIDAR_FRESH_PERIOD);
+	}
 
 	if (USE_MAP) {
 		if (mapLoopCounter++ > mapBlindPeriod) {
