@@ -74,6 +74,10 @@ message("========================================")
 # avoid the compiler spamming warnings at us for stuff in the Eigen headers.
 find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+
+find_package(websocketpp REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
+
 find_package(Threads REQUIRED)
 if(WITH_CV)
   find_package(OpenCV REQUIRED)
@@ -140,6 +144,7 @@ add_library(rover_common SHARED
   commands/nogps/DriveThroughGate.cpp
   commands/DriveToGateNoCompass.cpp
   )
+target_link_libraries(rover_common ${Boost_LIBRARIES} websocketpp::websocketpp)
 
 add_library(real_base_station SHARED
   Networking/Network.cpp

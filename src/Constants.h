@@ -24,4 +24,6 @@ constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent se
 
 const std::string AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
 const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
+
+constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
 } // namespace Constants

@@ -1,73 +1,141 @@
-
 #include "rospub.h"
 
-#include <map>
-#include <string>
+#include "Constants.h"
+#include "Networking/json.hpp"
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose_array.hpp>
-#include <rclcpp/rclcpp.hpp>
+#include <array>
+#include <map>
+#include <set>
+#include <string>
+#include <thread>
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/server.hpp>
+
+using json = nlohmann::json;
 
 namespace rospub {
+namespace ws = websocketpp;
 
-constexpr const char* ROVER_FRAME = "rover";
+class PlanVizServer {
+public:
+	PlanVizServer();
+	~PlanVizServer();
+	void run(uint16_t port);
+	void stop();
+	bool running();
+	void publish(const pose_t& pose, PointPub topic);
+	void publish(const points_t& points, ArrayPub topic);
 
-std::map<PointPub, std::string> point_pub_names = {{PointPub::PLAN_VIZ, "plan_viz"},
-												   {PointPub::CURRENT_POSE, "current_pose"},
-												   {PointPub::DRIVE_TARGET, "drive_target"},
-												   {PointPub::PLAN_TARGET, "plan_target"},
-												   {PointPub::POSE_GRAPH, "pose_graph"}};
+private:
+	typedef ws::server<ws::config::asio> server;
+	typedef std::set<ws::connection_hdl, std::owner_less<ws::connection_hdl>> conn_set;
 
-std::map<ArrayPub, std::string> array_pub_names = {{ArrayPub::LIDAR_SCAN, "lidar_scan"},
-												   {ArrayPub::LANDMARKS, "landmarks"}};
+	void onOpen(ws::connection_hdl handle);
+	void onClose(ws::connection_hdl handle);
+	void publish(const json& msg);
 
-rclcpp::Node* node;
+	bool _running;
+	server _endpoint;
+	conn_set _connections;
+	std::thread _server_thread;
+};
 
-std::map<PointPub, rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr> point_pubs;
-std::map<ArrayPub, rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr> array_pubs;
+NLOHMANN_JSON_SERIALIZE_ENUM(PointPub, {{PLAN_VIZ, "plan_viz"},
+										{CURRENT_POSE, "current_pose"},
+										{DRIVE_TARGET, "drive_target"},
+										{PLAN_TARGET, "plan_target"},
+										{POSE_GRAPH, "pose_graph"}})
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ArrayPub, {{LIDAR_SCAN, "lidar_scan"}, {LANDMARKS, "landmarks"}})
+
+static PlanVizServer server;
 
 void init() {
-	rclcpp::init(0, nullptr);
-	node = new rclcpp::Node("husky_pub");
-
-	for (int idx = PointPub::PLAN_VIZ; idx <= PointPub::POSE_GRAPH; idx++) {
-		PointPub idx_ = static_cast<PointPub>(idx);
-		point_pubs[idx_] =
-			node->create_publisher<geometry_msgs::msg::Point>(point_pub_names[idx_], 100);
-	}
-
-	for (int idx = ArrayPub::LIDAR_SCAN; idx <= ArrayPub::LANDMARKS; idx++) {
-		ArrayPub idx_ = static_cast<ArrayPub>(idx);
-		array_pubs[idx_] =
-			node->create_publisher<geometry_msgs::msg::PoseArray>(array_pub_names[idx_], 100);
+	if (!server.running()) {
+		server.run(Constants::PLANVIZ_SERVER_PORT);
 	}
 }
 
 void shutdown() {
-	rclcpp::shutdown();
-	free(node);
+	server.stop();
 }
 
 void publish(const pose_t& pose, PointPub topic) {
-	auto message = geometry_msgs::msg::Point();
-	message.x = pose(0);
-	message.y = pose(1);
-	message.z = pose(2);
-	point_pubs[topic]->publish(message);
+	server.publish(pose, topic);
+}
+
+void PlanVizServer::publish(const pose_t& pose, PointPub topic) {
+	json message;
+	message["topic"] = topic;
+	message["x"] = pose(0);
+	message["y"] = pose(1);
+	message["theta"] = pose(2);
+	this->publish(message);
 }
 
 void publish_array(const points_t& points, ArrayPub topic) {
-	auto message = geometry_msgs::msg::PoseArray();
-	message.header.frame_id = ROVER_FRAME; // technically this is in the window frame actually
-	// but we'll figure out our transform situation later
-	for (point_t l : points) {
-		auto p = geometry_msgs::msg::Pose();
-		p.position.x = l(0);
-		p.position.y = l(1);
-		p.position.z = l(2);
-		message.poses.push_back(p);
+	server.publish(points, topic);
+}
+
+void PlanVizServer::publish(const points_t& points, ArrayPub topic) {
+	json message;
+	message["topic"] = topic;
+	message["points"] = json::array();
+	for (point_t current : points) {
+		auto obj = json::object();
+		obj["x"] = current(0);
+		obj["y"] = current(1);
+		obj["theta"] = current(2);
+		message["points"].push_back(obj);
 	}
-	array_pubs[topic]->publish(message);
+	this->publish(message);
+}
+
+void PlanVizServer::publish(const json& message) {
+	std::string msg_str = message;
+	for (ws::connection_hdl handle : _connections) {
+		_endpoint.send(handle, msg_str, ws::frame::opcode::text);
+	}
+}
+
+PlanVizServer::PlanVizServer() {
+	using ws::lib::placeholders::_1;
+	_endpoint.init_asio();
+	_endpoint.set_open_handler(ws::lib::bind(&PlanVizServer::onOpen, this, _1));
+	_endpoint.set_close_handler(ws::lib::bind(&PlanVizServer::onClose, this, _1));
+}
+
+PlanVizServer::~PlanVizServer() {
+	this->stop();
+}
+
+void PlanVizServer::run(uint16_t port) {
+	if (!_running) {
+		_endpoint.listen(port);
+		_endpoint.start_accept();
+		_server_thread = std::thread([this] { this->_endpoint.run(); });
+		_running = true;
+	}
+}
+
+void PlanVizServer::onOpen(ws::connection_hdl handle) {
+	this->_connections.insert(handle);
+}
+
+void PlanVizServer::onClose(ws::connection_hdl handle) {
+	this->_connections.erase(handle);
+}
+
+void PlanVizServer::stop() {
+	if (_running) {
+		_endpoint.stop();
+		_server_thread.join();
+		_running = false;
+	}
+}
+
+bool PlanVizServer::running() {
+	return _running;
 }
 
 } // namespace rospub
