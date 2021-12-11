@@ -28,6 +28,8 @@ if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
   during generation." FORCE)
 endif()
 
+# CAN should be disabled by default if we are not on a Linux system, since it depends on Linux
+# kernel-specific header files.
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(WITH_CAN_DEFAULT ON)
 else()
@@ -67,12 +69,15 @@ message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
 message("========================================")
 
-if(WITH_CV)
-  find_package(OpenCV REQUIRED)
-endif()
+# The Eigen linear algebra library. Eigen's CMake config includes its headers as user headers
+# instead of system headers by default, so explicitly force them to be system includes here to
+# avoid the compiler spamming warnings at us for stuff in the Eigen headers.
 find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 find_package(Threads REQUIRED)
+if(WITH_CV)
+  find_package(OpenCV REQUIRED)
+endif()
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()
