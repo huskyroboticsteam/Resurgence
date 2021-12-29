@@ -40,14 +40,6 @@ private:
 	std::thread _server_thread;
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(PointPub, {{PLAN_VIZ, "plan_viz"},
-										{CURRENT_POSE, "current_pose"},
-										{DRIVE_TARGET, "drive_target"},
-										{PLAN_TARGET, "plan_target"},
-										{POSE_GRAPH, "pose_graph"}})
-
-NLOHMANN_JSON_SERIALIZE_ENUM(ArrayPub, {{LIDAR_SCAN, "lidar_scan"}, {LANDMARKS, "landmarks"}})
-
 static PlanVizServer server;
 
 void init() {
@@ -92,7 +84,7 @@ void PlanVizServer::publish(const points_t& points, ArrayPub topic) {
 }
 
 void PlanVizServer::publish(const json& message) {
-	std::string msg_str = message;
+	std::string msg_str = message.dump();
 	for (ws::connection_hdl handle : _connections) {
 		_endpoint.send(handle, msg_str, ws::frame::opcode::text);
 	}
