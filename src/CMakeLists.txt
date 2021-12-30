@@ -1,19 +1,20 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.8) # Latest versions of Ubuntu should have at least 3.8
 
-cmake_policy(SET CMP0057 NEW)
-set(CMAKE_CXX_STANDARD 17) # 11 For the json library, 14 for ROS2, 17 for std library features
+set(CMAKE_CXX_STANDARD 17) # 11 For the json library, 17 for std library features
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
 # If a build type was not explicitly specified, default to "RelWithDebInfo" (Same optimization
 # as the "Release" configuration but with debugging symbols).
-# To change, you can pass -DCMAKE_BUILD_TYPE=... where ... is the configuration you would
-# like to use. For example, if you want to do a debug build (little to no optimization and
-# debugging symbols), add -DCMAKE_BUILD_TYPE=Debug to your `cmake` command.
+#
+# To change, you can pass -DCMAKE_BUILD_TYPE=... where ... is the configuration you would like
+# to use. For example, if you want to do a full debug build (little to no optimization, with
+# debugging symbols), add -DCMAKE_BUILD_TYPE=Debug to your `cmake` command. You may want to do
+# a full debug build if code you want to debug gets optimized out by the compiler.
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 message("========================================\n\
 Building ${CMAKE_BUILD_TYPE} configuration...\n\
@@ -36,7 +37,7 @@ else()
   set(WITH_CAN_DEFAULT OFF)
 endif()
 
-## Module settings
+##====== Module settings ======
 # These variables control whether various modules are enabled or disabled. The goal is to allow
 # a user to selectively exclude modules that they do not need; for example if we are just
 # trying to drive the rover for a demo, we don't need computer vision or autonomous navigation
@@ -69,12 +70,19 @@ message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
 message("========================================")
 
-# The Eigen linear algebra library. Eigen's CMake config includes its headers as user headers
-# instead of system headers by default, so explicitly force them to be system includes here to
-# avoid the compiler spamming warnings at us for stuff in the Eigen headers.
+##====== Dependencies ======
+# Some of these are optional depending on module settings above. For example, the lidar
+# libraries are not needed if using the simulator world interface.
+
+# Get the Eigen linear algebra library. Eigen's CMake config includes its headers as user
+# headers instead of system headers by default, so explicitly force them to be system includes
+# here to avoid the compiler spamming warnings at us for stuff in the Eigen headers.
 find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
+# Find the WebSocket++ library and Boost (provides the ASIO backend for Websocket++ and also
+# provides the program_options argument parser). Only the `system` component of Boost is
+# currently required.
 find_package(websocketpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
@@ -85,17 +93,28 @@ endif()
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()
-if(WORLD_INTERFACE STREQUAL "REAL")
-  find_package(URGLidar REQUIRED)
-endif()
 
-# TODO: remove ROS
-find_package(rclcpp REQUIRED)
-find_package(geometry_msgs REQUIRED)
-include_directories(${rclcpp_INCLUDE_DIRS})
-include_directories(${geometry_msgs_INCLUDE_DIRS})
+# Find the SFML graphics library, used for the planar simulator
+find_package(SFML REQUIRED COMPONENTS graphics window system)
+list(APPEND sfml_libs
+  sfml-graphics sfml-window sfml-system Threads::Threads)
 
+# Find pkg-config (needed for libgps, as it doesn't have CMake configuration)
+find_package(PkgConfig REQUIRED)
+# Find the libgps USB GPS library.
+# TODO: Remove this when interface with Electronics' IMU board is implemented.
+pkg_check_modules(libgps REQUIRED libgps)
+#if(WORLD_INTERFACE STREQUAL "REAL")
+# Find the URGLidar library.
+# TODO: Decide if we want to use those RPLidars we found
+find_package(URGLidar REQUIRED)
+#endif()
+
+# Preprocessor flag required for the CAN library; see
+# https://github.com/huskyroboticsteam/HindsightCAN#how-to-port-to-a-new-chip
 add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
+
+# Enable all warnings except a few (unused variable/parameter/result)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-variable \
 -Wno-unused-but-set-variable \
@@ -117,10 +136,10 @@ add_library(simulator_base SHARED
   simulator/utils.cpp
   simulator/world.cpp
   simulator/graphics.cpp)
+target_link_libraries(simulator_base ${sfml_libs})
 
 add_library(simulator_nav SHARED
-        planning/plan.cpp
-  )
+  planning/plan.cpp)
 
 add_library(rover_common SHARED
   Rover.cpp
@@ -142,8 +161,7 @@ add_library(rover_common SHARED
   worldmap/QuadTree.cpp
   commands/nogps/DriveToGate.cpp
   commands/nogps/DriveThroughGate.cpp
-  commands/DriveToGateNoCompass.cpp
-  )
+  commands/DriveToGateNoCompass.cpp)
 target_link_libraries(rover_common ${Boost_LIBRARIES} websocketpp::websocketpp)
 
 add_library(real_base_station SHARED
@@ -177,24 +195,28 @@ add_library(hr_slam SHARED
   simulator/factors.cpp
   )
 
-add_library(can_interface SHARED
+add_library(real_can_interface SHARED
   log.cpp
-  $<IF:$<BOOL:${WITH_CAN}>, Networking/CANUtils.cpp, Networking/CANStubs.cpp>)
+  Networking/CANUtils.cpp)
 list(APPEND rover_libs
   rover_common hindsight_can simulator_base simulator_nav hr_slam)
 
-list(APPEND sfml_libs
-  sfml-graphics sfml-window sfml-system pthread)
+add_library(stub_can_interface SHARED
+  log.cpp
+  Networking/CANStubs.cpp)
 
 list(APPEND real_world_libs
   real_world_interface
-  gps
+  ${libgps_LIBRARIES}
   lidar_base
   URGLidar::urg_c)
 
 list(APPEND vision_libs
   ${OpenCV_LIBS}
   opencv_aruco)
+
+# TODO: Clean all this up; ideally we should have one rover target with options like CAN/no
+# CAN, world interface, etc chosen by CMake options
 
 add_executable(Rover rover_main.cpp)
 target_link_libraries(Rover ${rover_libs}
@@ -218,7 +240,7 @@ target_link_libraries(RoverSim ${rover_libs}
   stub_can_interface
   simulator_world_interface
   )
-target_link_libraries(RoverSim ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(Rover ${vision_libs} ${sfml_libs})
 
 add_executable(TunePID TunePID.cpp)
 target_link_libraries(TunePID ${rover_libs}
@@ -226,24 +248,20 @@ target_link_libraries(TunePID ${rover_libs}
   real_can_interface
   ${real_world_libs}
   )
-target_link_libraries(TunePID ${vision_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
+target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
 
 add_executable(PlanViz
   PlanViz.cpp)
-target_link_libraries(PlanViz simulator_base)
-target_link_libraries(PlanViz ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(PlanViz simulator_base ${sfml_libs})
 
 if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
     Autonomous.cpp
+    rospub_test.cpp
     # AR Detection tests
     ar/DetectorTests.cpp
     ar/MarkerSetTests.cpp
-    # CAN tests
-    Networking/tests.cpp
-    Networking/TestPackets.cpp
-    Networking/NetworkingStubs.cpp
     # Camera tests
     camera/CameraParamsTests.cpp
     # Autonomy tests
@@ -262,7 +280,7 @@ if(WITH_TESTS)
     )
   include(CTest)
   include(Catch)
-  target_link_libraries(tests ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+  target_link_libraries(tests ${sfml_libs})
   target_link_libraries(tests Catch2::Catch2)
   target_link_libraries(tests ${OpenCV_LIBS} opencv_aruco)
   catch_discover_tests(tests)
@@ -285,18 +303,4 @@ target_link_libraries(gpsd_test gps)
 
 add_subdirectory(ar)
 add_subdirectory(camera)
-
-add_executable(Server
-  Networking/Server.cpp)
-
-add_executable(TCPClient
-  Networking/TCPClient.cpp)
-
-add_executable(FakeBaseStation
-  Networking/FakeBaseStation.cpp)
-
-add_executable(FakeCANBoard
-  Networking/FakeCANBoard.cpp
-  Networking/TestPackets.cpp
-  )
-target_link_libraries(FakeCANBoard hindsight_can real_can_interface)
+add_subdirectory(Networking)
