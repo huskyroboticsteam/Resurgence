@@ -1,34 +1,25 @@
+# -*- mode: dockerfile -*-
 FROM ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-WORKDIR "/"
-
 # Run system software update
-RUN apt-get update
-RUN apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y
 
 # Install system dependencies
-RUN apt-get install -y wget unzip curl gnupg2 lsb-release git cmake g++ make
+RUN apt-get install -y build-essential wget unzip curl gnupg2 lsb-release git cmake
 
-################### SFML ###################
+# Install project dependencies; this includes SFML, Eigen, OpenCV, WebSocket++, and Boost
+# System.
 
-RUN apt-get install -y libsfml-dev
+RUN apt-get install -y libsfml-dev libeigen3-dev libopencv-dev libopencv-contrib-dev \
+	libwebsocketpp-dev libboost-system-dev
 
-################### EIGEN ###################
-
-RUN apt-get install -y libeigen3-dev
-
-################### OPENCV ###################
-
-# Install OpenCV
-RUN apt-get install -y libopencv-dev libopencv-contrib-dev
-
+# Install project dependencies that need to be built from source.
 ################### CATCH2 ###################
-WORKDIR "/tmp"
 
 # Download Catch2
-RUN git clone https://github.com/catchorg/catch2
+RUN git clone https://github.com/catchorg/catch2 /tmp/catch2
 
 # Configure Catch2
 WORKDIR "/tmp/catch2"
@@ -37,53 +28,22 @@ RUN git checkout v2.13.4
 # Make build directory
 RUN mkdir build
 WORKDIR "/tmp/catch2/build"
-# Run CMake config
-RUN cmake ..
-
-# Build Catch2
-RUN make
-
-# Install Catch2
-RUN make install
-
-# Clean up sources to save storage space
-WORKDIR "/tmp"
-RUN rm -rf catch2
-
-WORKDIR "/"
+# Run CMake config; build and install
+RUN cmake .. -DBUILD_TESTING=OFF && cmake --build . --target install
 
 ################### LIDAR ###################
 
-WORKDIR "/tmp/"
-
 # Download the URG Lidar library
-RUN git clone https://github.com/huskyroboticsteam/urg-lidar.git
+RUN git clone https://github.com/huskyroboticsteam/urg-lidar.git /tmp/urg-lidar
 WORKDIR "/tmp/urg-lidar"
 
 # Build URG library
 RUN mkdir -p build
 WORKDIR "/tmp/urg-lidar/build"
-RUN cmake ..
+RUN cmake .. && cmake --build . --target install
 
-# Install URG library
-RUN make install
-
-# Clean up sources to save storage space
-WORKDIR "/tmp"
-RUN rm -rf urg-lidar
+#############################################
+# Clean up sources to save space
+RUN rm -rf /tmp/urg-lidar /tmp/catch2
 
 WORKDIR "/"
-
-################### ROS2 ###################
-
-# Update locale
-RUN apt-get install -y locales
-RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-ENV LANG=en_US.UTF-8
-
-# Add ROS GPG keys
-RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
-RUN sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
-
-# Install ROS
-RUN apt-get update && apt-get install -y ros-foxy-ros-base
