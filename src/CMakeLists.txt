@@ -161,40 +161,14 @@ target_link_libraries(simulator_base ${sfml_libs})
 add_library(simulator_nav SHARED
   planning/plan.cpp)
 
-add_library(rover_common SHARED
-  Rover.cpp
-  Autonomous.cpp
-  CommandLineOptions.cpp
-  Globals.cpp
-  log.cpp
-  rospub.cpp
-  Networking/ParseBaseStation.cpp
-  Networking/IK.cpp
-  Networking/ParseCAN.cpp
-  Networking/motor_interface.cpp
-  Util.cpp
-  filters/PoseEstimator.cpp
-  filters/PoseEstimatorLinear.cpp
-  kinematics/DiffDriveKinematics.cpp
-  worldmap/GlobalMap.cpp
-  worldmap/TrICP.cpp
-  worldmap/QuadTree.cpp
-  commands/nogps/DriveToGate.cpp
-  commands/nogps/DriveThroughGate.cpp
-  commands/DriveToGateNoCompass.cpp)
-target_link_libraries(rover_common ${Boost_LIBRARIES} websocketpp::websocketpp)
-
 add_library(real_base_station SHARED
-  Networking/Network.cpp
-  )
+  Networking/Network.cpp)
 
-add_library(simulator_world_interface SHARED
-  world_interface/simulator_world.cpp
-  )
-add_library(stub_world_interface SHARED
-  world_interface/noop_world.cpp
-  )
-add_library(real_world_interface SHARED
+add_library(simulator_world_interface STATIC
+  world_interface/simulator_world.cpp)
+add_library(stub_world_interface STATIC
+  world_interface/noop_world.cpp)
+add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
   camera/Camera.cpp
@@ -222,19 +196,45 @@ list(APPEND real_world_libs
   lidar_interface
   URGLidar::urg_c)
 
+add_executable(Rover rover_main.cpp)
+add_library(rover_common SHARED
+  Rover.cpp
+  Autonomous.cpp
+  CommandLineOptions.cpp
+  Globals.cpp
+  log.cpp
+  rospub.cpp
+  Networking/ParseBaseStation.cpp
+  Networking/IK.cpp
+  Networking/ParseCAN.cpp
+  Networking/motor_interface.cpp
+  Util.cpp
+  filters/PoseEstimator.cpp
+  filters/PoseEstimatorLinear.cpp
+  kinematics/DiffDriveKinematics.cpp
+  worldmap/GlobalMap.cpp
+  worldmap/TrICP.cpp
+  worldmap/QuadTree.cpp
+  commands/nogps/DriveToGate.cpp
+  commands/nogps/DriveThroughGate.cpp
+  commands/DriveToGateNoCompass.cpp)
+
+list(APPEND rover_libs
+  rover_common
+  hindsight_can
+  simulator_base
+  simulator_nav
+  hr_slam
+  ${Boost_LIBRARIES}
+  websocketpp::websocketpp)
+target_link_libraries(Rover ${rover_libs})
+target_link_libraries(Rover
+  ${rover_libs} real_base_station ${real_world_libs})
+
 list(APPEND vision_libs
   ${OpenCV_LIBS}
   opencv_aruco)
 
-# TODO: Clean all this up; ideally we should have one rover target with options like CAN/no
-# CAN, world interface, etc chosen by CMake options
-
-add_executable(Rover rover_main.cpp)
-target_link_libraries(Rover ${rover_libs}
-  real_base_station
-  real_can_interface
-  ${real_world_libs}
-  )
 target_link_libraries(Rover ${vision_libs})
 
 ## ====== CAN Interfaces =======
