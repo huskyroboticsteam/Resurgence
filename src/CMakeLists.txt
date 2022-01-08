@@ -295,12 +295,10 @@ if(WITH_TESTS)
     ${rover_libs}
     stub_can_interface
     ${real_world_libs}
-    )
+	${OpenCV_LIBS})
   include(CTest)
   include(Catch)
-  target_link_libraries(tests ${sfml_libs})
   target_link_libraries(tests Catch2::Catch2)
-  target_link_libraries(tests ${OpenCV_LIBS} opencv_aruco)
   catch_discover_tests(tests)
 endif()
 
