@@ -1,9 +1,10 @@
 #pragma once
 
 #include "../simulator/utils.h"
+#include "../world_interface/data.h"
 
 namespace AR {
 bool initializeLandmarkDetection();
 bool isLandmarkDetectionInitialized();
-points_t readLandmarks();
+landmarks_t readLandmarks();
 } // namespace AR

@@ -201,7 +201,7 @@ std::pair<double, double> getCmdVel() {
 	return {odom_dtheta_, odom_dx_};
 }
 
-DataPoint<points_t> readLandmarks() {
+landmarks_t readLandmarks() {
 	return AR::readLandmarks();
 }
 

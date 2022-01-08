@@ -37,7 +37,7 @@ constexpr bool RIGHT = false;
 constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 
 // twice the scan period, should be adjusted as necessary
-constexpr auto LIDAR_FRESH_PERIOD = std::chrono::milliseconds(200);
+constexpr std::chrono::milliseconds LIDAR_FRESH_PERIOD(200);
 
 const transform_t VIZ_BASE_TF =
 	toTransform({NavSim::DEFAULT_WINDOW_CENTER_X, NavSim::DEFAULT_WINDOW_CENTER_Y, M_PI / 2});
@@ -53,6 +53,8 @@ const transform_t VIZ_BASE_TF =
 	 seen if on a higher logging level.
  */
 static bool printLandmarks(const points_t& landmarks, int log_level = LOG_DEBUG);
+
+static bool printLandmarks(const landmarks_t& landmarks, int log_level = LOG_DEBUG);
 
 Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	: urc_targets(_targets), leg_idx(0),
@@ -395,15 +397,9 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 	transform_t gps = readGPS();
 	bool new_gps_data = (gps.norm() != 0.0);
 
-	points_t landmarks = readLandmarks();
+	landmarks_t landmarks = readLandmarks();
 	printLandmarks(landmarks, LOG_DEBUG);
-	bool new_landmark_data = false;
-	for (point_t l : landmarks) {
-		if (l(2) != 0) {
-			new_landmark_data = true;
-			break;
-		}
-	}
+	bool new_landmark_data = std::any_of(landmarks.begin(), landmarks.end(), [](const auto &lm) { return lm; });
 
 	double odom_diff = toPose(current_odom * prev_odom.inverse(), 0.0).norm();
 	bool overwrite_landmark = (current_odom == prev_odom) && new_landmark_data;
@@ -415,8 +411,9 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 			pose_graph.addOdomMeasurement(pose_id, pose_id - 1, current_odom, prev_odom);
 		}
 		for (size_t lm_id = 0; lm_id < landmarks.size(); lm_id++) {
-			point_t lm = landmarks[lm_id];
-			if (lm(2) != 0.0) {
+			auto lmData = landmarks[lm_id];
+			if (lmData) {
+				point_t lm = lmData.getData();
 				bool overwrite = overwrite_landmark || MOVING_LANDMARKS;
 				pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm, overwrite);
 			}
@@ -665,6 +662,23 @@ static bool printLandmarks(const points_t& landmarks, int log_level) {
 	for (size_t i = 0; i < landmarks.size(); i++) {
 		point_t lm = landmarks[i];
 		if (lm[2] != 0 && lm.topRows(2).norm() != 0) {
+			found_one = true;
+			stream << "Landmark " << i
+				<< " at {" << lm[0] << ", " << lm[1] << "} ";
+		}
+	}
+	if (found_one) stream << std::endl;
+	log(log_level, stream.str().c_str());
+	return found_one;
+}
+
+static bool printLandmarks(const landmarks_t& landmarks, int log_level) {
+	std::ostringstream stream;
+	bool found_one = false;
+	for (size_t i = 0; i < landmarks.size(); i++) {
+		auto lmData = landmarks[i];
+		if (lmData && lmData.getData().topRows(2).norm() != 0) {
+			point_t lm = lmData.getData();
 			found_one = true;
 			stream << "Landmark " << i
 				<< " at {" << lm[0] << ", " << lm[1] << "} ";

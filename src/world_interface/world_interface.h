@@ -67,7 +67,7 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera);
  * {0,0,0}, while all nonzero points are visible marker. The index of a landmark in this vector
  * is its id.
  */
-DataPoint<points_t> readLandmarks();
+landmarks_t readLandmarks();
 
 // Get the current transform in the global frame based on a GPS measurement.
 // Note that these values are NOT lat/long.
