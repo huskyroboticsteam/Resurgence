@@ -223,10 +223,11 @@ add_library(stub_can_interface SHARED
   log.cpp
   Networking/CANStubs.cpp)
 
+add_subdirectory(lidar)
 list(APPEND real_world_libs
   real_world_interface
   ${libgps_LIBRARIES}
-  lidar_base
+  lidar_interface
   URGLidar::urg_c)
 
 list(APPEND vision_libs
@@ -287,17 +288,6 @@ if(WITH_TESTS)
   target_link_libraries(tests Catch2::Catch2)
   catch_discover_tests(tests)
 endif()
-
-add_library(lidar_base
-    lidar/LidarVis.cpp
-    lidar/PointCloudProcessing.cpp
-    lidar/URGLidar.cpp)
-target_include_directories(lidar_base SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-
-add_executable(lidar_vis
-    lidar/MainVis.cpp)
-target_link_libraries(lidar_vis lidar_base)
-target_link_libraries(lidar_vis liburg_c.a ${OpenCV_LIBS})
 
 add_executable(gpsd_test
   gps/gpsd_test.cpp)
