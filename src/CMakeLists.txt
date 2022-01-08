@@ -242,23 +242,7 @@ target_link_libraries(Rover ${rover_libs}
   real_can_interface
   ${real_world_libs}
   )
-target_link_libraries(Rover ${vision_libs} ${sfml_libs})
-
-add_executable(RoverNoCAN rover_main.cpp)
-target_link_libraries(RoverNoCAN ${rover_libs}
-  real_base_station
-  stub_can_interface
-  stub_world_interface
-  )
-target_link_libraries(RoverNoCAN ${sfml_libs})
-
-add_executable(RoverSim rover_main.cpp)
-target_link_libraries(RoverSim ${rover_libs}
-  real_base_station
-  stub_can_interface
-  simulator_world_interface
-  )
-target_link_libraries(Rover ${vision_libs} ${sfml_libs})
+target_link_libraries(Rover ${vision_libs})
 
 add_executable(TunePID TunePID.cpp)
 target_link_libraries(TunePID ${rover_libs}
