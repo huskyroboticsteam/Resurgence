@@ -242,7 +242,7 @@ target_link_libraries(Rover ${rover_libs}
   real_can_interface
   ${real_world_libs}
   )
-target_link_libraries(Rover ${vision_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES} ${sfml_libs})
+target_link_libraries(Rover ${vision_libs} ${sfml_libs})
 
 add_executable(RoverNoCAN rover_main.cpp)
 target_link_libraries(RoverNoCAN ${rover_libs}
@@ -250,7 +250,7 @@ target_link_libraries(RoverNoCAN ${rover_libs}
   stub_can_interface
   stub_world_interface
   )
-target_link_libraries(RoverNoCAN ${sfml_libs} ${rclcpp_LIBRARIES} ${geometry_msgs_LIBRARIES})
+target_link_libraries(RoverNoCAN ${sfml_libs})
 
 add_executable(RoverSim rover_main.cpp)
 target_link_libraries(RoverSim ${rover_libs}
