@@ -244,13 +244,15 @@ target_link_libraries(Rover ${rover_libs}
   )
 target_link_libraries(Rover ${vision_libs})
 
-add_executable(TunePID TunePID.cpp)
-target_link_libraries(TunePID ${rover_libs}
-  real_base_station
-  real_can_interface
-  ${real_world_libs}
-  )
-target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
+if(WITH_CAN)
+  add_executable(TunePID TunePID.cpp)
+  target_link_libraries(TunePID ${rover_libs}
+	real_base_station
+	real_can_interface
+	${real_world_libs}
+	)
+  target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
+endif()
 
 add_executable(PlanViz
   PlanViz.cpp)
