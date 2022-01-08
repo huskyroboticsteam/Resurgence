@@ -36,6 +36,14 @@ else()
   set(WITH_CAN_DEFAULT OFF)
 endif()
 
+# GPS should be disabled on Windows (at least for now) since we haven't (yet) successfully
+# gotten libgps to compile on Windows under MSYS2
+if(WIN32)
+  set(WITH_GPS_DEFAULT OFF)
+else()
+  set(WITH_GPS_DEFAULT ON)
+endif()
+
 ##====== Module settings ======
 # These variables control whether various modules are enabled or disabled. The goal is to allow
 # a user to selectively exclude modules that they do not need; for example if we are just
@@ -45,7 +53,9 @@ endif()
 set(WITH_CV ON CACHE BOOL "Enable/Disable computer vision code.")
 set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
 systems.")
-set(WITH_AUTO_NAV ON CACHE BOOL "Enable/Disable the autonomous navigation code.")
+set(WITH_GPS ${WITH_GPS_DEFAULT} CACHE BOOL "Enable/Disable the USB GPS interface. Disabled on
+Windows systems.")
+set(WITH_LIDAR ON CACHE BOOL "Enable/Disable the USB LiDAR interface.")
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
 set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
@@ -64,7 +74,12 @@ if(NOT WITH_CAN_DEFAULT)
 else()
   message("  CAN Networking:\t${WITH_CAN}")
 endif()
-message("  Autonomous Nav:\t${WITH_AUTO_NAV}")
+if(NOT WITH_GPS_DEFAULT)
+  message("  USB GPS code:\t\t${WITH_GPS} (WINDOWS system - disabled by default)")
+else()
+  message("  USB GPS code:\t\t${WITH_GPS}")
+endif()
+message("  USB LiDAR code:\t${WITH_LIDAR}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
 message("========================================")
@@ -98,16 +113,20 @@ find_package(SFML REQUIRED COMPONENTS graphics window system)
 list(APPEND sfml_libs
   sfml-graphics sfml-window sfml-system Threads::Threads)
 
-# Find pkg-config (needed for libgps, as it doesn't have CMake configuration)
-find_package(PkgConfig REQUIRED)
-# Find the libgps USB GPS library.
-# TODO: Remove this when interface with Electronics' IMU board is implemented.
-pkg_check_modules(libgps REQUIRED libgps)
-#if(WORLD_INTERFACE STREQUAL "REAL")
-# Find the URGLidar library.
-# TODO: Decide if we want to use those RPLidars we found
-find_package(URGLidar REQUIRED)
-#endif()
+# Libraries needed to interface with real-life sensors. If we aren't using the real world
+# interface, these aren't needed.
+if(WORLD_INTERFACE STREQUAL "REAL")
+  # Find pkg-config (needed for libgps, as it doesn't have CMake configuration)
+  find_package(PkgConfig REQUIRED)
+  # Find the libgps USB GPS library.
+  # TODO: Remove this when interface with Electronics' IMU board is implemented.
+  pkg_check_modules(libgps REQUIRED libgps)
+  if(WITH_LIDAR)
+	# Find the URGLidar library.
+	# TODO: Decide if we want to use those RPLidars we found
+	find_package(URGLidar REQUIRED)
+  endif()
+endif()
 
 # Preprocessor flag required for the CAN library; see
 # https://github.com/huskyroboticsteam/HindsightCAN#how-to-port-to-a-new-chip
