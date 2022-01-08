@@ -7,6 +7,7 @@ project(Rover LANGUAGES CXX C)
 
 find_package(OpenCV)
 find_package(Eigen3 REQUIRED NO_MODULE)
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 find_package(Threads REQUIRED)
 find_package(Catch2 REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -203,9 +204,6 @@ target_link_libraries(gpsd_test gps)
 
 add_subdirectory(ar)
 add_subdirectory(camera)
-
-find_package(Eigen3 REQUIRED)
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 add_executable(Server
   Networking/Server.cpp)
