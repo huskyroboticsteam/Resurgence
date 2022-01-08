@@ -143,6 +143,8 @@ if(WITH_TESTS)
   enable_testing()
 endif()
 
+# The CAN library; contains packet and protocol definitions and does not
+# actually require physical CAN to be present.
 add_library(hindsight_can SHARED
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
@@ -213,16 +215,6 @@ add_library(hr_slam SHARED
   simulator/factors.cpp
   )
 
-add_library(real_can_interface SHARED
-  log.cpp
-  Networking/CANUtils.cpp)
-list(APPEND rover_libs
-  rover_common hindsight_can simulator_base simulator_nav hr_slam)
-
-add_library(stub_can_interface SHARED
-  log.cpp
-  Networking/CANStubs.cpp)
-
 add_subdirectory(lidar)
 list(APPEND real_world_libs
   real_world_interface
@@ -244,6 +236,26 @@ target_link_libraries(Rover ${rover_libs}
   ${real_world_libs}
   )
 target_link_libraries(Rover ${vision_libs})
+
+## ====== CAN Interfaces =======
+# Stub CAN interface is used for the tests (and for the Rover if
+# CAN is disabled) and the real CAN interface is used for the Rover if CAN is
+# enabled.
+if(WITH_CAN)
+  add_library(real_can_interface STATIC
+	log.cpp
+	Networking/CANUtils.cpp)
+endif()
+add_library(stub_can_interface STATIC
+  log.cpp
+  Networking/CANStubs.cpp)
+
+# Link the appropriate CAN interface to the Rover executable.
+if(WITH_CAN)
+  target_link_libraries(Rover real_can_interface)
+else()
+  target_link_libraries(Rover stub_can_interface)
+endif()
 
 if(WITH_CAN)
   add_executable(TunePID TunePID.cpp)
