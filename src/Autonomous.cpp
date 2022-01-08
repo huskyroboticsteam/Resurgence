@@ -38,6 +38,7 @@ constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 
 // twice the scan period, should be adjusted as necessary
 constexpr std::chrono::milliseconds LIDAR_FRESH_PERIOD(200);
+constexpr std::chrono::milliseconds GPS_FRESH_PERIOD(1000);
 
 const transform_t VIZ_BASE_TF =
 	toTransform({NavSim::DEFAULT_WINDOW_CENTER_X, NavSim::DEFAULT_WINDOW_CENTER_Y, M_PI / 2});
@@ -394,8 +395,11 @@ plan_t computePlan(transform_t invTransform, point_t goal) {
 }
 
 transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
-	transform_t gps = readGPS();
-	bool new_gps_data = (gps.norm() != 0.0);
+	auto gpsData = readGPS();
+	bool new_gps_data = gpsData.isFresh(GPS_FRESH_PERIOD) && lastGPSTime != gpsData.getTime();
+	if (new_gps_data) {
+		lastGPSTime = gpsData.getTime();
+	}
 
 	landmarks_t landmarks = readLandmarks();
 	printLandmarks(landmarks, LOG_DEBUG);
@@ -418,7 +422,7 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 				pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm, overwrite);
 			}
 		}
-		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, gps);
+		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, gpsData.getData());
 
 		pose_graph.solve();
 		int log_level = LOG_DEBUG;
@@ -480,7 +484,7 @@ void Autonomous::autonomyIter() {
 	auto lidarData = readLidarScan();
 	points_t lidar_scan;
 	if (lidarData.isFresh(LIDAR_FRESH_PERIOD)) {
-		if (!lastLidarTime || lastLidarTime != lidarData.getTime()) {
+		if (lastLidarTime != lidarData.getTime()) {
 			lidar_scan = lidarData.getData();
 			lastLidarTime = lidarData.getTime();
 		} else {

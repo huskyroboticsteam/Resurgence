@@ -1,4 +1,4 @@
-
+#include "read_usb_gps.h"
 #include "../log.h"
 #include "../simulator/utils.h"
 #include "../world_interface/world_interface.h"
@@ -8,6 +8,7 @@
 #include <thread>
 #include <unistd.h>
 
+// TODO: the following calculations should be easier to change (ideally, take in lat/long from mission control)
 // UW lat/long is 47.653116, -122.305619
 // source: http://www.csgnetwork.com/degreelenllavcalc.html
 constexpr double METERS_PER_DEG_NS = 111183.53599983045;
@@ -19,19 +20,12 @@ std::thread gps_thread;
 std::mutex gps_mutex;
 double first_fix_lat = 0.0;
 double first_fix_lon = 0.0;
-bool fresh_data = false;
 transform_t most_recent_tf;
+datatime_t gps_time;
 
 bool gpsHasFix() {
 	gps_mutex.lock();
 	bool r = first_fix_lat != 0.0;
-	gps_mutex.unlock();
-	return r;
-}
-
-bool gpsHasFreshData() {
-	gps_mutex.lock();
-	bool r = fresh_data;
 	gps_mutex.unlock();
 	return r;
 }
@@ -49,17 +43,15 @@ point_t gpsToMeters(double lon, double lat) {
 	return r;
 }
 
+// implements method from world_interface.h
 DataPoint<transform_t> readGPS() {
-	transform_t tf;
+	DataPoint<transform_t> data;
 	gps_mutex.lock();
-	if (fresh_data) {
-		tf = most_recent_tf;
-		fresh_data = false;
-	} else {
-		tf = transform_t::Zero();
+	if (gpsHasFix()) {
+		data = DataPoint<transform_t>(gps_time, most_recent_tf);
 	}
 	gps_mutex.unlock();
-	return tf;
+	return data;
 }
 
 void gps_loop() {
@@ -91,9 +83,9 @@ void gps_loop() {
 					first_fix_lon = lon;
 				}
 
-				fresh_data = true;
 				// TODO no heading information
 				most_recent_tf = toTransform(p);
+				gps_time = dataclock::now();
 				gps_mutex.unlock();
 			}
 		} else {
