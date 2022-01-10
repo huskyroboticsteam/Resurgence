@@ -294,7 +294,7 @@ if(WITH_TESTS)
     ${rover_libs}
     stub_can_interface
     ${real_world_libs}
-	${OpenCV_LIBS})
+    ${OpenCV_LIBS})
   include(CTest)
   include(Catch)
   target_link_libraries(tests Catch2::Catch2)
