@@ -26,9 +26,11 @@ void clearTestGlobals() {
 	Globals::status_data = nlohmann::json();
 }
 
-void sendCANPacket(const CANPacket& packet) {
-	can_packets.push(packet);
-}
+//// Commented out to avoid a duplicate definition. I know it's not going to be
+////   correct but all these tests are going to get superseded soon anyway
+//   void sendCANPacket(const CANPacket& packet) {
+//   	can_packets.push(packet);
+//   }
 
 void sendBaseStationPacket(const std::string& packet) {
 	base_station_packets.push(packet);

@@ -26,6 +26,7 @@ transform_t randTransform(double centerX, double centerY)
 double calculateMSE(const points_t &p1, const points_t &p2)
 {
 	double mse = 0;
+	REQUIRE(p2.size() >= p1.size());
 	for (size_t i = 0; i < p1.size(); i++)
 	{
 		point_t truth = p1[i];
