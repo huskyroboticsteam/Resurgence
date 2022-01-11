@@ -55,6 +55,18 @@ const transform_t VIZ_BASE_TF =
  */
 static bool printLandmarks(const points_t& landmarks, int log_level = LOG_DEBUG);
 
+/**
+	 @brief Prints a list of landmarks using the logging mechanism.
+
+	 The message is formatted as "Landmarks: [i: {x, y, z}, ...]" where i is the index of the
+	 landmark in the list.
+
+	 This is a duplicate of above, but modified to handle the DataPoint class.
+
+	 @param landmarks The landmarks data to print.
+	 @param log_level The optional log level to use; defaults to LOG_DEBUG so the message isn't
+	 seen if on a higher logging level.
+ */
 static bool printLandmarks(const landmarks_t& landmarks, int log_level = LOG_DEBUG);
 
 Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
