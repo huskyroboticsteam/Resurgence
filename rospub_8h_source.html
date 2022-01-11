@@ -73,20 +73,32 @@ $(function() {
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;simulator/utils.h&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">namespace </span>rospub {</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">enum</span> PointPub { PLAN_VIZ, CURRENT_POSE, DRIVE_TARGET, PLAN_TARGET, POSE_GRAPH };</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">enum</span> ArrayPub { LIDAR_SCAN, LANDMARKS };</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keywordtype">void</span> <a class="code hl_functionRef" href="https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a2db29afebba8f677bc8660a45bb910bb">init</a>();</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keywordtype">void</span> <a class="code hl_functionRef" href="https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a493714a679d1591142800416a286689f">shutdown</a>();</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keywordtype">void</span> publish(<span class="keyword">const</span> pose_t&amp; pose, PointPub topic); <span class="comment">// Also can be used for point_t</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keywordtype">void</span> publish_array(<span class="keyword">const</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a>&amp; points, ArrayPub topic);</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>} <span class="comment">// namespace rospub</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Networking/json.hpp&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;simulator/utils.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">namespace </span>rospub {</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">enum</span> PointPub { PP_INVALID, PLAN_VIZ, CURRENT_POSE, DRIVE_TARGET, PLAN_TARGET, POSE_GRAPH };</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">enum</span> ArrayPub { AP_INVALID, LIDAR_SCAN, LANDMARKS };</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>NLOHMANN_JSON_SERIALIZE_ENUM(PointPub, {{PP_INVALID, <span class="keyword">nullptr</span>},</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>                                        {PLAN_VIZ, <span class="stringliteral">&quot;plan_viz&quot;</span>},</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>                                        {CURRENT_POSE, <span class="stringliteral">&quot;current_pose&quot;</span>},</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>                                        {DRIVE_TARGET, <span class="stringliteral">&quot;drive_target&quot;</span>},</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>                                        {PLAN_TARGET, <span class="stringliteral">&quot;plan_target&quot;</span>},</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>                                        {POSE_GRAPH, <span class="stringliteral">&quot;pose_graph&quot;</span>}})</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>NLOHMANN_JSON_SERIALIZE_ENUM(ArrayPub, {{AP_INVALID, <span class="keyword">nullptr</span>},</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>                                        {LIDAR_SCAN, <span class="stringliteral">&quot;lidar_scan&quot;</span>},</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>                                        {LANDMARKS, <span class="stringliteral">&quot;landmarks&quot;</span>}})</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keywordtype">void</span> <a class="code hl_functionRef" href="https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a2db29afebba8f677bc8660a45bb910bb">init</a>();</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keywordtype">void</span> <a class="code hl_functionRef" href="https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a493714a679d1591142800416a286689f">shutdown</a>();</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keywordtype">void</span> publish(<span class="keyword">const</span> pose_t&amp; pose, PointPub topic); <span class="comment">// Also can be used for point_t</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keywordtype">void</span> publish_array(<span class="keyword">const</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a>&amp; points, ArrayPub topic);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>} <span class="comment">// namespace rospub</span></div>
 <div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt; point_t &gt;</a></div></div>
 <div class="ttc" id="anamespacerclcpp_html_a2db29afebba8f677bc8660a45bb910bb"><div class="ttname"><a href="https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a2db29afebba8f677bc8660a45bb910bb">init</a></div><div class="ttdeci">void init(int argc, char const *const argv[], const InitOptions &amp;init_options=InitOptions())</div></div>
 <div class="ttc" id="anamespacerclcpp_html_a493714a679d1591142800416a286689f"><div class="ttname"><a href="https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a493714a679d1591142800416a286689f">shutdown</a></div><div class="ttdeci">bool shutdown(rclcpp::Context::SharedPtr context=nullptr, const std::string &amp;reason=&quot;user called rclcpp::shutdown()&quot;)</div></div>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): PlanViz Class Reference</title>
+<title>Resurgence (PY2022): rospub::PlanVizServer Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -61,23 +61,39 @@ $(function() {
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>rospub</b></li><li class="navelem"><a class="el" href="classrospub_1_1PlanVizServer.html">PlanVizServer</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classPlanViz-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">PlanViz Class Reference</div></div>
+<a href="classrospub_1_1PlanVizServer-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">rospub::PlanVizServer Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2e6024fe3bb2dcaea21b6e22c1191842"><td class="memItemLeft" align="right" valign="top"><a id="a2e6024fe3bb2dcaea21b6e22c1191842" name="a2e6024fe3bb2dcaea21b6e22c1191842"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;uri)</td></tr>
-<tr class="separator:a2e6024fe3bb2dcaea21b6e22c1191842"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4bf8779986702b67bbc792d95c2beed"><td class="memItemLeft" align="right" valign="top"><a id="af4bf8779986702b67bbc792d95c2beed" name="af4bf8779986702b67bbc792d95c2beed"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a> port)</td></tr>
+<tr class="separator:af4bf8779986702b67bbc792d95c2beed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98c2542f32b685c74d830f3831fcec54"><td class="memItemLeft" align="right" valign="top"><a id="a98c2542f32b685c74d830f3831fcec54" name="a98c2542f32b685c74d830f3831fcec54"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>stop</b> ()</td></tr>
+<tr class="separator:a98c2542f32b685c74d830f3831fcec54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a798dbb3985e876e9672298b27da7e7d2"><td class="memItemLeft" align="right" valign="top"><a id="a798dbb3985e876e9672298b27da7e7d2" name="a798dbb3985e876e9672298b27da7e7d2"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>running</b> ()</td></tr>
+<tr class="separator:a798dbb3985e876e9672298b27da7e7d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71d8a5ad883b896a71d4c3d9162df86c"><td class="memItemLeft" align="right" valign="top"><a id="a71d8a5ad883b896a71d4c3d9162df86c" name="a71d8a5ad883b896a71d4c3d9162df86c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>publish</b> (const pose_t &amp;pose, PointPub topic)</td></tr>
+<tr class="separator:a71d8a5ad883b896a71d4c3d9162df86c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b64977feedb2bcb642d6988c0d8d4e0"><td class="memItemLeft" align="right" valign="top"><a id="a0b64977feedb2bcb642d6988c0d8d4e0" name="a0b64977feedb2bcb642d6988c0d8d4e0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>publish</b> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> &amp;points, ArrayPub topic)</td></tr>
+<tr class="separator:a0b64977feedb2bcb642d6988c0d8d4e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/PlanViz.cpp</li>
+<li>src/rospub.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
