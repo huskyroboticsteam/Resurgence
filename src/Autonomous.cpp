@@ -38,7 +38,7 @@ constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 
 // twice the scan period, should be adjusted as necessary
 constexpr std::chrono::milliseconds LIDAR_FRESH_PERIOD(200);
-constexpr std::chrono::milliseconds GPS_FRESH_PERIOD(1000);
+constexpr std::chrono::milliseconds GPS_FRESH_PERIOD(2000); // update to match gps specs
 
 const transform_t VIZ_BASE_TF =
 	toTransform({NavSim::DEFAULT_WINDOW_CENTER_X, NavSim::DEFAULT_WINDOW_CENTER_Y, M_PI / 2});
