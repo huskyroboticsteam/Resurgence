@@ -76,6 +76,7 @@ private:
 
 	std::optional<datatime_t> lastLidarTime; // last timestamp of lidar data
 	std::optional<datatime_t> lastGPSTime; // last timestamp of gps data
+	std::map<int, datatime_t> lastLandmarkTimes; // maps landmark idx -> last datapoint time
 
 	/* Variables for pose graph localization */
 	FriendlyGraph pose_graph;

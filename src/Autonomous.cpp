@@ -403,7 +403,23 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 
 	landmarks_t landmarks = readLandmarks();
 	printLandmarks(landmarks, LOG_DEBUG);
-	bool new_landmark_data = std::any_of(landmarks.begin(), landmarks.end(), [](const auto &lm) { return lm; });
+	// check if any of the landmark data is new
+	bool new_landmark_data = false;
+	for (int i = 0; i < landmarks.size(); i++) {
+		const auto &lm = landmarks[i];
+		// we don't check isFresh() because that's handled in the AR code
+		if (lm) {
+			auto lastTimeItr = lastLandmarkTimes.find(i);
+			// if we haven't gotten any data before, or if the current data is more recent, mark as new
+			if (lastTimeItr == lastLandmarkTimes.end() || lastTimeItr->second != lm.getTime()) {
+				new_landmark_data = true;
+				lastLandmarkTimes[i] = lm.getTime();
+			} else {
+				// we've seen this data point before, so mark as empty (so it won't be used later)
+				landmarks[i] = {};
+			}
+		}
+	}
 
 	double odom_diff = toPose(current_odom * prev_odom.inverse(), 0.0).norm();
 	bool overwrite_landmark = (current_odom == prev_odom) && new_landmark_data;
@@ -417,6 +433,7 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 		for (size_t lm_id = 0; lm_id < landmarks.size(); lm_id++) {
 			auto lmData = landmarks[lm_id];
 			if (lmData) {
+				// data is assumed to be new here (since it should have been checked above)
 				point_t lm = lmData.getData();
 				bool overwrite = overwrite_landmark || MOVING_LANDMARKS;
 				pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm, overwrite);
