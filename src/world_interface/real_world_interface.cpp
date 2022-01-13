@@ -68,11 +68,11 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 }
 
 DataPoint<CameraFrame> readCamera(CameraID cameraID) {
-	cv::Mat mat;
-	uint32_t frameNum;
-	datatime_t time;
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
+		cv::Mat mat;
+		uint32_t frameNum;
+		datatime_t time;
 		bool success = itr->second->next(mat, frameNum, time);
 		if (success) {
 			return DataPoint<CameraFrame>{time, {mat, frameNum}};
@@ -149,7 +149,7 @@ constexpr double MAX_PWM = 20000;
 
 double setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0))
-		return false;
+		return 0;
 
 	/* This is the inverse of the formula:
 	 *		dx = (right_ground_vel + left_ground_vel) / 2
@@ -201,16 +201,12 @@ std::pair<double, double> getCmdVel() {
 	return {odom_dtheta_, odom_dx_};
 }
 
-DataPoint<points_t> readLandmarks() {
+landmarks_t readLandmarks() {
 	return AR::readLandmarks();
 }
 
 DataPoint<points_t> readLidarScan() {
-	if (lidar::isLidarDataFresh()) {
-		return lidar::readLidar();
-	} else {
-		return points_t{};
-	}
+	return lidar::readLidar();
 }
 
 DataPoint<transform_t> readOdom() {

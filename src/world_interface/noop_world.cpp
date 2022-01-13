@@ -16,8 +16,8 @@ DataPoint<points_t> readLidarScan() {
 	return points_t{};
 }
 
-DataPoint<points_t> readLandmarks() {
-	return points_t{};
+landmarks_t readLandmarks() {
+	return landmarks_t{};
 }
 
 DataPoint<transform_t> readGPS() {

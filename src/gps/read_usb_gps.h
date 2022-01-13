@@ -4,5 +4,4 @@
 #include "../simulator/utils.h"
 
 bool gpsHasFix();
-bool gpsHasFreshData();
 bool startGPSThread();

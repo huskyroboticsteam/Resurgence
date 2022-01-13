@@ -29,8 +29,18 @@ DataPoint<points_t> readLidarScan() {
 	return world.readLidar();
 }
 
-DataPoint<points_t> readLandmarks() {
-	return world.readLandmarks();
+landmarks_t readLandmarks() {
+	points_t lm = world.readLandmarks();
+	datatime_t now = dataclock::now();
+	landmarks_t ret;
+	for (const point_t &point : lm) {
+		if (point(2) != 0) {
+			ret.emplace_back(now, point);
+		} else {
+			ret.emplace_back();
+		}
+	}
+	return ret;
 }
 
 DataPoint<transform_t> readGPS() {

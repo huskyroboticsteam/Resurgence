@@ -2,6 +2,8 @@
 
 #include <chrono>
 #include <optional>
+#include <vector>
+#include "../simulator/utils.h"
 
 // forward declare cv::Mat instead of importing OpenCV
 // we do this to avoid unnecessarily including OpenCV in all build targets
@@ -13,6 +15,9 @@ class Mat;
 using dataclock = std::chrono::steady_clock;
 // a point in time as measured by dataclock
 using datatime_t = std::chrono::time_point<dataclock>;
+
+template<typename T> class DataPoint;
+using landmarks_t = std::vector<DataPoint<point_t>>;
 
 // A pair of a camera frame and its corresponding frame number
 using CameraFrame = std::pair<cv::Mat, uint32_t>;

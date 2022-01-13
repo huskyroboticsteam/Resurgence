@@ -36,6 +36,10 @@ constexpr bool RIGHT = false;
 
 constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 
+// twice the scan period, should be adjusted as necessary
+constexpr std::chrono::milliseconds LIDAR_FRESH_PERIOD(200);
+constexpr std::chrono::milliseconds GPS_FRESH_PERIOD(2000); // update to match gps specs
+
 const transform_t VIZ_BASE_TF =
 	toTransform({NavSim::DEFAULT_WINDOW_CENTER_X, NavSim::DEFAULT_WINDOW_CENTER_Y, M_PI / 2});
 
@@ -50,6 +54,20 @@ const transform_t VIZ_BASE_TF =
 	 seen if on a higher logging level.
  */
 static bool printLandmarks(const points_t& landmarks, int log_level = LOG_DEBUG);
+
+/**
+	 @brief Prints a list of landmarks using the logging mechanism.
+
+	 The message is formatted as "Landmarks: [i: {x, y, z}, ...]" where i is the index of the
+	 landmark in the list.
+
+	 This is a duplicate of above, but modified to handle the DataPoint class.
+
+	 @param landmarks The landmarks data to print.
+	 @param log_level The optional log level to use; defaults to LOG_DEBUG so the message isn't
+	 seen if on a higher logging level.
+ */
+static bool printLandmarks(const landmarks_t& landmarks, int log_level = LOG_DEBUG);
 
 Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	: urc_targets(_targets), leg_idx(0),
@@ -363,30 +381,55 @@ void Autonomous::updateSearchTarget() {
 
 plan_t computePlan(transform_t invTransform, point_t goal) {
 	// We need to readLidar again from within the planning thread, for thread safety
-	points_t lidar_scan = readLidarScan();
-	auto collide_func = [&](double x, double y, double radius) -> bool {
-		// transform the point to check into map space
-		point_t relPoint = {x, y, 1};
-		point_t p = invTransform * relPoint;
-		transform_t coll_tf = toTransform(relPoint);
-		// TODO implement thread-safe access to `map` if `USE_MAP` is true
-		// if (USE_MAP) return map.hasPointWithin(p, radius);
-		return collides(coll_tf, lidar_scan, radius);
-	};
+	auto lidarData = readLidarScan();
+	points_t lidar_scan;
+	std::function<bool(double, double, double)> collide_func;
+	if (lidarData.isFresh(LIDAR_FRESH_PERIOD)) {
+		lidar_scan = lidarData.getData();
+		collide_func = [&](double x, double y, double radius) -> bool {
+			// transform the point to check into map space
+			point_t relPoint = {x, y, 1};
+			point_t p = invTransform * relPoint;
+			transform_t coll_tf = toTransform(relPoint);
+			// TODO implement thread-safe access to `map` if `USE_MAP` is true
+			// if (USE_MAP) return map.hasPointWithin(p, radius);
+			return collides(coll_tf, lidar_scan, radius);
+		};
+	} else {
+		if (!lidarData) {
+			log(LOG_ERROR, "Tried to read from the lidar before it was initialized!\n");
+		} else {
+			log(LOG_WARN, "Data is older than %dms!\n", LIDAR_FRESH_PERIOD);
+		}
+		collide_func = [](double, double, double) -> bool { return false; };
+	}
 	return getPlan(collide_func, goal, PLANNING_GOAL_REGION_RADIUS);
 }
 
 transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
-	transform_t gps = readGPS();
-	bool new_gps_data = (gps.norm() != 0.0);
+	auto gpsData = readGPS();
+	bool new_gps_data = gpsData.isFresh(GPS_FRESH_PERIOD) && lastGPSTime != gpsData.getTime();
+	if (new_gps_data) {
+		lastGPSTime = gpsData.getTime();
+	}
 
-	points_t landmarks = readLandmarks();
+	landmarks_t landmarks = readLandmarks();
 	printLandmarks(landmarks, LOG_DEBUG);
+	// check if any of the landmark data is new
 	bool new_landmark_data = false;
-	for (point_t l : landmarks) {
-		if (l(2) != 0) {
-			new_landmark_data = true;
-			break;
+	for (int i = 0; i < landmarks.size(); i++) {
+		const auto &lm = landmarks[i];
+		// we don't check isFresh() because that's handled in the AR code
+		if (lm) {
+			auto lastTimeItr = lastLandmarkTimes.find(i);
+			// if we haven't gotten any data before, or if the current data is more recent, mark as new
+			if (lastTimeItr == lastLandmarkTimes.end() || lastTimeItr->second != lm.getTime()) {
+				new_landmark_data = true;
+				lastLandmarkTimes[i] = lm.getTime();
+			} else {
+				// we've seen this data point before, so mark as empty (so it won't be used later)
+				landmarks[i] = {};
+			}
 		}
 	}
 
@@ -400,13 +443,15 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 			pose_graph.addOdomMeasurement(pose_id, pose_id - 1, current_odom, prev_odom);
 		}
 		for (size_t lm_id = 0; lm_id < landmarks.size(); lm_id++) {
-			point_t lm = landmarks[lm_id];
-			if (lm(2) != 0.0) {
+			auto lmData = landmarks[lm_id];
+			if (lmData) {
+				// data is assumed to be new here (since it should have been checked above)
+				point_t lm = lmData.getData();
 				bool overwrite = overwrite_landmark || MOVING_LANDMARKS;
 				pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm, overwrite);
 			}
 		}
-		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, gps);
+		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, gpsData.getData());
 
 		pose_graph.solve();
 		int log_level = LOG_DEBUG;
@@ -465,7 +510,20 @@ void Autonomous::autonomyIter() {
 	log(LOG_DEBUG, "plan_target %f %f %f\n", plan_target(0), plan_target(1), plan_target(2));
 	update_nav_state(pose, plan_target);
 
-	points_t lidar_scan = readLidarScan();
+	auto lidarData = readLidarScan();
+	points_t lidar_scan;
+	if (lidarData.isFresh(LIDAR_FRESH_PERIOD)) {
+		if (lastLidarTime != lidarData.getTime()) {
+			lidar_scan = lidarData.getData();
+			lastLidarTime = lidarData.getTime();
+		} else {
+			log(LOG_WARN, "No new lidar data available!\n");
+		}
+	} else if (!lidarData) {
+		log(LOG_ERROR, "Tried to read from the lidar before it was initialized!\n");
+	} else {
+		log(LOG_WARN, "Data is older than %dms!\n", LIDAR_FRESH_PERIOD);
+	}
 
 	if (USE_MAP) {
 		if (mapLoopCounter++ > mapBlindPeriod) {
@@ -637,6 +695,23 @@ static bool printLandmarks(const points_t& landmarks, int log_level) {
 	for (size_t i = 0; i < landmarks.size(); i++) {
 		point_t lm = landmarks[i];
 		if (lm[2] != 0 && lm.topRows(2).norm() != 0) {
+			found_one = true;
+			stream << "Landmark " << i
+				<< " at {" << lm[0] << ", " << lm[1] << "} ";
+		}
+	}
+	if (found_one) stream << std::endl;
+	log(log_level, stream.str().c_str());
+	return found_one;
+}
+
+static bool printLandmarks(const landmarks_t& landmarks, int log_level) {
+	std::ostringstream stream;
+	bool found_one = false;
+	for (size_t i = 0; i < landmarks.size(); i++) {
+		auto lmData = landmarks[i];
+		if (lmData && lmData.getData().topRows(2).norm() != 0) {
+			point_t lm = lmData.getData();
 			found_one = true;
 			stream << "Landmark " << i
 				<< " at {" << lm[0] << ", " << lm[1] << "} ";

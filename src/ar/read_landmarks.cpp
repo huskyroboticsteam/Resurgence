@@ -15,21 +15,15 @@
 
 namespace AR {
 constexpr size_t NUM_LANDMARKS = 11;
-const point_t ZERO_POINT = {0.0, 0.0, 0.0};
-static points_t make_zero_landmarks() {
-	points_t z;
-	for (size_t i = 0; i < NUM_LANDMARKS; i++) {
-		z.push_back(ZERO_POINT);
-	}
-	return z;
-}
-const points_t zero_landmarks = make_zero_landmarks();
+constexpr std::chrono::milliseconds LANDMARK_FRESH_PERIOD(100);
+
+const landmarks_t zero_landmarks(NUM_LANDMARKS);
 
 Detector ar_detector(Markers::URC_MARKERS(), cam::CameraParams());
 
 std::atomic<bool> fresh_data(false);
 std::mutex landmark_lock;
-points_t current_landmarks;
+landmarks_t current_landmarks(NUM_LANDMARKS);
 std::thread landmark_thread;
 bool initialized = false;
 
@@ -41,6 +35,7 @@ void detectLandmarksLoop() {
 			auto camData = readCamera(Constants::AR_CAMERA_ID);
 			if (!camData) continue;
 			auto camFrame = camData.getData();
+			datatime_t frameTime = camData.getTime();
 			frame = camFrame.first;
 			last_frame_no = camFrame.second;
 
@@ -48,7 +43,7 @@ void detectLandmarksLoop() {
 			log(LOG_DEBUG, "readLandmarks(): %d tags spotted\n", tags.size());
 
 			// build up map with first tag of each ID spotted.
-			points_t output(NUM_LANDMARKS);
+			landmarks_t output(NUM_LANDMARKS);
 			std::map<int, cv::Vec3d> ids_to_camera_coords;
 			for (AR::Tag tag : tags) {
 				int id = tag.getMarker().getId();
@@ -70,33 +65,25 @@ void detectLandmarksLoop() {
 					if (extrinsic) {
 						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
 						cv::Mat transformed = extrinsic.value() * cv::Mat(coords_homogeneous);
-						output[i] = {transformed.at<double>(0, 0),
-									 transformed.at<double>(1, 0), 1.0};
+						output[i] = {frameTime, {transformed.at<double>(0, 0),
+									 transformed.at<double>(1, 0), 1.0}};
 					} else {
 						// just account for coordinate axis change; rover frame has +x front,
 						// +y left, +z up while camera has +x right, +y down, +z front.
-						output[i] = {coords[2], -coords[0], 1.0};
+						output[i] = {frameTime, {coords[2], -coords[0], 1.0}};
 					}
 				} else {
-					output[i] = ZERO_POINT;
+					output[i] = {};
 				}
 			}
 
 			landmark_lock.lock();
 			for (size_t i = 0; i < NUM_LANDMARKS; i++) {
-				// If we already saw this landmark, we don't want to overwrite that with zeros
-				// if we didn't see the landmark on this particular frame. This is because
-				// landmark detection is a bit spotty: even when the rover is not moving,
-				// sometimes an AR tag is only detected in 40% or 50% of frames.
-				//
-				// TODO: We want to make sure that this data eventually *does* expire, so that
-				// if the rover moves or turns significantly, it won't interpret the landmark
-				// location as being relative to the new rover location.
-				//
-				// Note that when we call readLandmarks(), we do zero out the data. But we
-				// don't want that to be the exclusive way to prevent data from getting stale.
-				if (output[i](2) != 0.0)
+				// only overwrite data if the new data is valid or the previous data is expired
+				// detection is a bit spotty, so we don't want to overwrite good data witih false negatives
+				if (output[i].isValid() || !current_landmarks[i].isFresh(LANDMARK_FRESH_PERIOD)) {
 					current_landmarks[i] = output[i];
+				}
 			}
 			fresh_data = true;
 			landmark_lock.unlock();
@@ -104,15 +91,7 @@ void detectLandmarksLoop() {
 	}
 }
 
-void zeroCurrent() {
-	current_landmarks.clear();
-	for (size_t i = 0; i < NUM_LANDMARKS; i++) {
-		current_landmarks.push_back(ZERO_POINT);
-	}
-}
-
 bool initializeLandmarkDetection() {
-	zeroCurrent();
 	auto intrinsic = getCameraIntrinsicParams(Constants::AR_CAMERA_ID);
 	if (intrinsic) {
 		ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
@@ -134,14 +113,13 @@ bool isLandmarkDetectionInitialized() {
 	return initialized;
 }
 
-points_t readLandmarks() {
+landmarks_t readLandmarks() {
 	if (isLandmarkDetectionInitialized()) {
 		if (fresh_data) {
-			points_t output;
+			landmarks_t output;
 			landmark_lock.lock();
 			output = current_landmarks;
 			fresh_data = false;
-			zeroCurrent();
 			landmark_lock.unlock();
 			return output;
 		}

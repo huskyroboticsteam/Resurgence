@@ -17,7 +17,7 @@
 constexpr double LIDAR_MIN_RANGE = 0.15;
 
 std::atomic<bool> lidar_initialized(false);
-std::atomic<bool> lidar_fresh(false);
+std::atomic<datatime_t> lidar_time(datatime_t{});
 URGLidar urg_lidar;
 std::thread lidar_thread;
 points_t last_points = {};
@@ -33,6 +33,7 @@ void readLidarLoop() {
 		}
 
 		std::vector<Polar2D> polarPts = urg_lidar.getLastFrame();
+		lidar_time = dataclock::now();
 		std::vector<point_t> pts(polarPts.size());
 		point_t origin({0, 0, 1});
 		for (size_t i = 0; i < polarPts.size(); i++) {
@@ -44,15 +45,11 @@ void readLidarLoop() {
 				pts[i](2) = 0.0;
 			}
 		}
-		lidar_fresh = true;
 		points_lock.lock();
 		last_points = pts;
 		points_lock.unlock();
+		lidar_initialized = true;
 	}
-}
-
-bool isLidarDataFresh() {
-	return lidar_fresh;
 }
 
 bool initializeLidar() {
@@ -61,20 +58,20 @@ bool initializeLidar() {
 			perror("failed to open lidar");
 		} else {
 			lidar_thread = std::thread(&readLidarLoop);
-			lidar_initialized = true;
+			// we won't mark the lidar as initialized until the first scan has been read
 		}
 	}
 	return lidar_initialized;
 }
 
-points_t readLidar() {
+DataPoint<points_t> readLidar() {
 	if (lidar_initialized) {
 		points_t pts;
 		points_lock.lock();
 		pts = last_points;
 		points_lock.unlock();
-		lidar_fresh = false;
-		return pts;
+		datatime_t time = lidar_time;
+		return {time, pts};
 	} else {
 		return {};
 	}
