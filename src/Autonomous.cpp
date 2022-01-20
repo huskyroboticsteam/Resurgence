@@ -407,7 +407,7 @@ plan_t computePlan(transform_t invTransform, point_t goal) {
 }
 
 transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
-	auto gpsData = readGPS();
+	DataPoint<point_t> gpsData = readGPS();
 	bool new_gps_data = gpsData.isFresh(GPS_FRESH_PERIOD) && lastGPSTime != gpsData.getTime();
 	if (new_gps_data) {
 		lastGPSTime = gpsData.getTime();
@@ -451,7 +451,8 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 				pose_graph.addLandmarkMeasurement(pose_id, (int)lm_id, lm, overwrite);
 			}
 		}
-		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, gpsData.getData());
+		// TODO: change addGPSMeasurement() to accept a point_t instead of transform_t
+		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, toTransform(gpsData.getData()));
 
 		pose_graph.solve();
 		int log_level = LOG_DEBUG;

@@ -7,6 +7,11 @@
 World world;
 std::pair<double, double> cmdVel(0, 0);
 
+// gps coords of UW
+static double ORIGIN_LAT = 47.6553;
+static double ORIGIN_LON = -122.3035;
+static GPSToMetersConverter converter(GPSDatum::WGS84, {ORIGIN_LAT, ORIGIN_LON});
+
 void world_interface_init() {
 	world.addURCObstacles();
 	world.start();
@@ -43,16 +48,14 @@ landmarks_t readLandmarks() {
 	return ret;
 }
 
-DataPoint<transform_t> readGPS() {
-	return world.readGPS();
+DataPoint<gpscoords_t> readGPS_private() {
+	pose_t pose = toPose(world.readGPS(), 0);
+	gpscoords_t coords = converter.metersToGPS(pose);
+	return coords;
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
-}
-
-point_t gpsToMeters(double lon, double lat) {
-	return {lon, lat, 1.0};
 }
 
 DataPoint<transform_t> readOdom() {

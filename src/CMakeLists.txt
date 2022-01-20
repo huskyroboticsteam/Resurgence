@@ -209,6 +209,8 @@ add_library(rover_common SHARED
   Networking/ParseCAN.cpp
   Networking/motor_interface.cpp
   Util.cpp
+  gps/gps_util.cpp
+  world_interface/gps_common_interface.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp

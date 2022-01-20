@@ -2,6 +2,7 @@
 
 #include "../simulator/utils.h"
 #include "data.h"
+#include "../gps/gps_util.h"
 
 #include <optional>
 
@@ -69,19 +70,27 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera);
  */
 landmarks_t readLandmarks();
 
-// Get the current transform in the global frame based on a GPS measurement.
+// read from the sensor and return unmodified lat/long coordinates
+// this should be implemented by hardware-specific code and should not be
+// used by client code
+DataPoint<gpscoords_t> readGPS_private();
+
+// returns true iff the GPS has a fix
+bool gpsHasFix();
+
+// Get the current position in the global frame based on a GPS measurement.
 // Note that these values are NOT lat/long.
-// TODO: figure out differential correction and adjust API accordingly
-DataPoint<transform_t> readGPS();
+DataPoint<point_t> readGPS();
+
+// Given the current longitude and latitude, convert to a point_t position representation
+// If the GPS has not acquired a fix yet, return an empty optional
+std::optional<point_t> gpsToMeters(const gpscoords_t &coord);
 
 // Calculates the current transform in the global frame based purely on forward kinematics
 DataPoint<transform_t> readOdom();
 
 // Calculate the current pose velocity (in the robot's reference frame) using visual odometry.
 DataPoint<pose_t> readVisualOdomVel();
-
-// Given the current longitude and latitude, convert to a point_t position representation
-point_t gpsToMeters(double lon, double lat);
 
 // `index` must be in the range 0-6 (the URC competition will have 7 legs)
 URCLeg getLeg(int index);

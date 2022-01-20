@@ -2,53 +2,34 @@
 #include "../log.h"
 #include "../simulator/utils.h"
 #include "../world_interface/world_interface.h"
+#include "gps_util.h"
 
 #include <libgpsmm.h>
 #include <mutex>
 #include <thread>
 #include <unistd.h>
-
-// TODO: the following calculations should be easier to change (ideally, take in lat/long from mission control)
-// UW lat/long is 47.653116, -122.305619
-// source: http://www.csgnetwork.com/degreelenllavcalc.html
-constexpr double METERS_PER_DEG_NS = 111183.53599983045;
-constexpr double METERS_PER_DEG_EW = 75124.2106730417; // Seattle, WA, USA
-// constexpr double METERS_PER_DEG_EW = 69498.37410392637 // Drumheller, Alberta, CA
+#include <optional>
 
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 std::thread gps_thread;
 std::mutex gps_mutex;
-double first_fix_lat = 0.0;
-double first_fix_lon = 0.0;
-transform_t most_recent_tf;
+bool has_fix;
+gpscoords_t most_recent_coords;
 datatime_t gps_time;
 
 bool gpsHasFix() {
 	gps_mutex.lock();
-	bool r = first_fix_lat != 0.0;
-	gps_mutex.unlock();
-	return r;
-}
-
-point_t gpsToMeters__private(double lon, double lat) {
-	double x = (lon - first_fix_lon) * METERS_PER_DEG_EW;
-	double y = (lat - first_fix_lat) * METERS_PER_DEG_NS;
-	return {x, y, 1};
-}
-
-point_t gpsToMeters(double lon, double lat) {
-	gps_mutex.lock();
-	point_t r = gpsToMeters__private(lon, lat);
+	bool r = has_fix;
 	gps_mutex.unlock();
 	return r;
 }
 
 // implements method from world_interface.h
-DataPoint<transform_t> readGPS() {
-	DataPoint<transform_t> data;
+DataPoint<gpscoords_t> readGPS_private() {
+	DataPoint<gpscoords_t> data;
 	gps_mutex.lock();
 	if (gpsHasFix()) {
-		data = DataPoint<transform_t>(gps_time, most_recent_tf);
+		data = DataPoint<gpscoords_t>(gps_time, most_recent_coords);
 	}
 	gps_mutex.unlock();
 	return data;
@@ -73,18 +54,14 @@ void gps_loop() {
 			} else {
 				double lat = newdata->fix.latitude;
 				double lon = newdata->fix.longitude;
-				point_t p = gpsToMeters__private(lon, lat);
-				log(LOG_DEBUG, "Received fresh GPS data: %.2f %.2f (lat %.6f, lon %.6f).\n",
-					p(0), p(1), lat, lon);
+				log(LOG_DEBUG, "Received fresh GPS data: (lat %.6f, lon %.6f).\n", lat, lon);
 				gps_mutex.lock();
-				if (first_fix_lat == 0.0) {
+				if (!has_fix) {
 					// This is our first fix
-					first_fix_lat = lat;
-					first_fix_lon = lon;
+					has_fix = true;
 				}
 
-				// TODO no heading information
-				most_recent_tf = toTransform(p);
+				most_recent_coords = {lat, lon};
 				gps_time = dataclock::now();
 				gps_mutex.unlock();
 			}

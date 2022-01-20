@@ -1,0 +1,34 @@
+#include "world_interface.h"
+
+#include <optional>
+
+static std::optional<GPSToMetersConverter> converter;
+
+DataPoint<point_t> readGPS() {
+	DataPoint<gpscoords_t> coords = readGPS_private();
+	if (!coords) {
+		return {};
+	}
+
+	if (!converter) {
+		// just recieved first fix, construct map centered at the first datapoint
+		converter.emplace(GPSDatum::WGS84, coords);
+	}
+
+	datatime_t time = coords.getTime();
+	point_t pos = converter->gpsToMeters(coords);
+
+	return {time, pos};
+}
+
+std::optional<point_t> gpsToMeters(const gpscoords_t &coord) {
+	if (converter) {
+		return converter->gpsToMeters(coord);
+	} else {
+		return {};
+	}
+}
+
+bool gpsHasFix() {
+	return converter.has_value();
+}
