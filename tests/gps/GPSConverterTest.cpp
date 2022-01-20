@@ -24,6 +24,7 @@ void assertCoordEquals(const gpscoords_t& expected, const gpscoords_t& actual) {
 	CHECK(actual.lon == Approx(expected.lon));
 }
 
+// only works when coords is near seattle
 gpscoords_t offsetGPSByMeters(const gpscoords_t& coords, double x, double y) {
 	double degLatPerM = 1.0 / M_PER_DEG_LAT;
 	double degLonPerM = 1.0 / M_PER_DEG_LON;

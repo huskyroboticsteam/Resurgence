@@ -35,6 +35,7 @@ double GPSDatum::getSquareEccentricity() const {
 
 GPSToMetersConverter::GPSToMetersConverter(const GPSDatum& datum, const gpscoords_t& origin)
 	: datum(datum), origin(origin) {
+	// see comments at top of file for source for math
 	double phi = PI * origin.lat / 180.0;
 	double cosPhi = std::cos(phi);
 	double sinPhi = std::sin(phi);

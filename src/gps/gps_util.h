@@ -2,10 +2,11 @@
 
 #include "../simulator/utils.h"
 
+// Represents a GPS coordinate in degrees. Positive is north/east.
 struct gpscoords_t {
-	// the latitude of the gps coordinate
+	// the latitude of the gps coordinate, in degrees
 	double lat;
-	// the longitude of the gps coordinate
+	// the longitude of the gps coordinate, in degrees
 	double lon;
 };
 
