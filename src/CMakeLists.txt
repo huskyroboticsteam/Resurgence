@@ -283,6 +283,9 @@ if(WITH_TESTS)
     ar/MarkerSetTests.cpp
     # Camera tests
     camera/CameraParamsTests.cpp
+    # GPS tests
+    ../tests/gps/GPSDatumTest.cpp
+    ../tests/gps/GPSConverterTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
