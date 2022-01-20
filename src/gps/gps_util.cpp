@@ -50,12 +50,14 @@ GPSToMetersConverter::GPSToMetersConverter(const GPSDatum& datum, const gpscoord
 point_t GPSToMetersConverter::gpsToMeters(const gpscoords_t& coords) const {
 	double degDiffLat = coords.lat - origin.lat;
 	double degDiffLon = coords.lon - origin.lon;
-	return {degDiffLon * metersPerDegLon, degDiffLat * metersPerDegLat, 1};
+	// +lat is +x, +lon is -y
+	return {degDiffLat * metersPerDegLat, -degDiffLon * metersPerDegLon, 1};
 }
 
 gpscoords_t GPSToMetersConverter::metersToGPS(const point_t& pos) const {
-	double degDiffLon = pos(0) / metersPerDegLon;
-	double degDiffLat = pos(1) / metersPerDegLat;
+	// +x is +lat, +y is -lon
+	double degDiffLat = pos(0) / metersPerDegLat;
+	double degDiffLon = -pos(1) / metersPerDegLon;
 	return {origin.lat + degDiffLat, origin.lon + degDiffLon};
 }
 

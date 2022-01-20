@@ -45,7 +45,7 @@ private:
 /**
  * @brief A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice
  * versa. The xy-plane will always be measured in meters. Additionally, the xy-plane will be
- * aligned such that +x = +lon, +y=+lat.
+ * aligned such that +x = +lat, +y = -lon.
  */
 class GPSToMetersConverter {
 public:
