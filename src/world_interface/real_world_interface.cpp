@@ -6,7 +6,7 @@
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../camera/Camera.h"
-#include "../gps/read_usb_gps.h"
+#include "../gps/usb_gps/read_usb_gps.h"
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../simulator/utils.h"

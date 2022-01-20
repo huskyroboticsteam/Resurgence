@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../simulator/utils.h"
+#include "../../simulator/utils.h"
 
 bool gpsHasFix();
 bool startGPSThread();

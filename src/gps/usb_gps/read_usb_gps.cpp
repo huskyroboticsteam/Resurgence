@@ -1,8 +1,8 @@
 #include "read_usb_gps.h"
-#include "../log.h"
-#include "../simulator/utils.h"
-#include "../world_interface/world_interface.h"
-#include "gps_util.h"
+#include "../../log.h"
+#include "../../simulator/utils.h"
+#include "../../world_interface/world_interface.h"
+#include "../gps_util.h"
 
 #include <libgpsmm.h>
 #include <mutex>
