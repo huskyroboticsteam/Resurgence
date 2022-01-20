@@ -43,6 +43,32 @@ TEST_CASE("Test GPS Linearization") {
 	CHECK(sydneyConverter.getMetersPerDegLon() == Approx(92530.49037782029));
 }
 
+TEST_CASE("Test map axes") {
+	// assert that +lat = +x
+	point_t plusX = converter.gpsToMeters({seattle.lat + 0.1, seattle.lon});
+	CHECK(plusX(0) > 0);
+	CHECK(plusX(1) == Approx(0));
+	CHECK(plusX(2) == 1);
+
+	// assert that -lat = -x
+	point_t minusX = converter.gpsToMeters({seattle.lat - 0.1, seattle.lon});
+	CHECK(minusX(0) < 0);
+	CHECK(minusX(1) == Approx(0));
+	CHECK(minusX(2) == 1);
+
+	// assert that +lon = -y
+	point_t minusY = converter.gpsToMeters({seattle.lat, seattle.lon + 0.1});
+	CHECK(minusY(0) == Approx(0));
+	CHECK(minusY(1) < 0);
+	CHECK(minusY(2) == 1);
+
+	// assert that -lon = +y
+	point_t plusY = converter.gpsToMeters({seattle.lat, seattle.lon - 0.1});
+	CHECK(plusY(0) == Approx(0));
+	CHECK(plusY(1) > 0);
+	CHECK(plusY(2) == 1);
+}
+
 TEST_CASE("Test GPS to meters") {
 	// test specific points
 	assertPointEquals({0, 0, 1}, converter.gpsToMeters(seattle));
