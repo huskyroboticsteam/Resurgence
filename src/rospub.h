@@ -1,8 +1,9 @@
 
 #pragma once
 
-#include "Networking/json.hpp"
 #include "simulator/utils.h"
+
+#include <nlohmann/json.hpp>
 
 namespace rospub {
 

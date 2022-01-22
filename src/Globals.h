@@ -2,9 +2,10 @@
 
 #include "CommandLineOptions.h"
 #include "Networking/Network.h"
-#include "Networking/json.hpp"
 
 #include <vector>
+
+#include <nlohmann/json.hpp>
 
 enum class RoverState {
 	RemoteControl,

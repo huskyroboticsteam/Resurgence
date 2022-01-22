@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Constants.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 extern "C" {
 #include "../HindsightCAN/CANCommon.h"
