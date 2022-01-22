@@ -187,10 +187,14 @@ sudo apt-get install libsfml-dev
 ## Install JSON library
 
 ### Ubuntu 20.04
-`sudo apt-get install nlohmann-json3-dev`
+```bash
+sudo apt-get install nlohmann-json3-dev
+```
 
 ### Mac
-`brew install nlohmann-json`
+```bash
+brew install nlohmann-json
+```
 
 ## Install GPS libraries
 
