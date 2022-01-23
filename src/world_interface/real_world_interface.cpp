@@ -1,7 +1,6 @@
 #include "../Globals.h"
 #include "../Networking/CANUtils.h"
 #include "../Networking/ParseCAN.h"
-#include "../Networking/json.hpp"
 #include "../Networking/motor_interface.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
@@ -18,6 +17,8 @@
 #include <set>
 
 #include <opencv2/calib3d.hpp>
+
+#include <nlohmann/json.hpp>
 
 extern "C" {
 #include "../HindsightCAN/CANMotorUnit.h"
