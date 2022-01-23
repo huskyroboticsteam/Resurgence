@@ -21,6 +21,8 @@
 #include <sstream>
 #include <time.h>
 #include <unistd.h>
+#include <chrono>
+#include <thread>
 
 #include <sys/time.h>
 
@@ -141,7 +143,8 @@ std::vector<URCLeg> parseGPSLegs(std::string filepath) {
 	while (getline(gps_legs, line)) {
 		std::istringstream line_stream(line);
 		if (line_stream >> left_post_id >> right_post_id >> lat >> lon) {
-			point_t leg_map_space = gpsToMeters(lon, lat);
+			// we assume that gps already has a fix
+			point_t leg_map_space = gpsToMeters({lat, lon}).value();
 			URCLeg leg = {left_post_id, right_post_id, leg_map_space};
 			log(LOG_INFO, "Got urc leg at %f %f\n", leg_map_space(0), leg_map_space(1));
 			urc_legs.push_back(leg);
@@ -171,6 +174,13 @@ int rover_loop(int argc, char** argv) {
 	Globals::opts = ParseCommandLineOptions(argc, argv);
 	InitializeRover(MOTOR_UNIT_MODE_PWM, true);
 	CANPacket packet;
+
+	// wait for GPS to get fix
+	while (!gpsHasFix()) {
+		log(LOG_INFO, "Waiting for GPS fix...\n");
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+
 	// Target locations for autonomous navigation
 	// Eventually this will be set by communication from the base station
 	std::vector<URCLeg> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");

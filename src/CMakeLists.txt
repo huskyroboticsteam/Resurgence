@@ -181,7 +181,7 @@ add_library(real_world_interface STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  gps/read_usb_gps.cpp
+  gps/usb_gps/read_usb_gps.cpp
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
@@ -212,6 +212,8 @@ add_library(rover_common SHARED
   Networking/ParseCAN.cpp
   Networking/motor_interface.cpp
   Util.cpp
+  gps/gps_util.cpp
+  world_interface/gps_common_interface.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
@@ -285,6 +287,9 @@ if(WITH_TESTS)
     ar/MarkerSetTests.cpp
     # Camera tests
     camera/CameraParamsTests.cpp
+    # GPS tests
+    ../tests/gps/GPSDatumTest.cpp
+    ../tests/gps/GPSConverterTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp

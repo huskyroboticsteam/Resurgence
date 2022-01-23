@@ -20,16 +20,12 @@ landmarks_t readLandmarks() {
 	return landmarks_t{};
 }
 
-DataPoint<transform_t> readGPS() {
-	return toTransform({0, 0, 0});
+DataPoint<gpscoords_t> gps::readGPSCoords() {
+	return {};
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
-}
-
-point_t gpsToMeters(double lon, double lat) {
-	return {lon, lat, 1.0};
 }
 
 DataPoint<transform_t> readOdom() {

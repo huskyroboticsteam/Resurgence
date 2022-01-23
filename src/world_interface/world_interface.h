@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../gps/gps_util.h"
 #include "../simulator/utils.h"
 #include "data.h"
 
@@ -69,19 +70,46 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera);
  */
 landmarks_t readLandmarks();
 
-// Get the current transform in the global frame based on a GPS measurement.
-// Note that these values are NOT lat/long.
-// TODO: figure out differential correction and adjust API accordingly
-DataPoint<transform_t> readGPS();
+namespace gps {
+/**
+ * @brief read from the sensor and return unmodified lat/long coordinates
+ * this should be implemented by hardware-specific code. (readGPS() should NOT be overridden)
+ *
+ * @return DataPoint<gpscoords_t> The last GPS coordinates measured by the sensor, or empty if
+ * no fix.
+ */
+DataPoint<gpscoords_t> readGPSCoords();
+} // namespace gps
+
+/**
+ * @brief Check if the GPS sensor has acquired a fix.
+ *
+ * @return true iff the GPS has a fix
+ */
+bool gpsHasFix();
+
+/**
+ * @brief Get the current position in the global map frame based on a GPS measurement.
+ * Note that these values are NOT lat/long. Note that for the map frame, +x=+lat,+y=-lon.
+ *
+ * @return DataPoint<point_t> The last GPS reading, in the map space.
+ */
+DataPoint<point_t> readGPS();
+
+/**
+ * @brief Convert GPS coordinates into a coordinate on the map frame.
+ *
+ * @param coord The coord to transform into map space.
+ * @return std::optional<point_t> The transformed point, or an empty datapoint
+ * if the GPS does not have a fix.
+ */
+std::optional<point_t> gpsToMeters(const gpscoords_t &coord);
 
 // Calculates the current transform in the global frame based purely on forward kinematics
 DataPoint<transform_t> readOdom();
 
 // Calculate the current pose velocity (in the robot's reference frame) using visual odometry.
 DataPoint<pose_t> readVisualOdomVel();
-
-// Given the current longitude and latitude, convert to a point_t position representation
-point_t gpsToMeters(double lon, double lat);
 
 // `index` must be in the range 0-6 (the URC competition will have 7 legs)
 URCLeg getLeg(int index);
