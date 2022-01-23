@@ -2,11 +2,11 @@
 
 #include "../simulator/utils.h"
 
-// Represents a GPS coordinate in degrees. Positive is north/east.
+/** Represents a GPS coordinate in degrees. Positive is north/east. */
 struct gpscoords_t {
-	// the latitude of the gps coordinate, in degrees
+	/** the latitude of the gps coordinate, in degrees */
 	double lat;
-	// the longitude of the gps coordinate, in degrees
+	/** the longitude of the gps coordinate, in degrees */
 	double lon;
 };
 
@@ -26,16 +26,16 @@ public:
 	 */
 	GPSDatum(double a, double b);
 
-	// Get the semi-major axis of the reference ellipsoid
+	/** Get the semi-major axis of the reference ellipsoid */
 	double getA() const;
 
-	// Get the semi-minor axis of the reference ellipsoid
+	/** Get the semi-minor axis of the reference ellipsoid */
 	double getB() const;
 
-	// Get the flattening parameter of the reference ellipsoid
+	/** Get the flattening parameter of the reference ellipsoid */
 	double getFlattening() const;
 
-	// Get the square of the (first) eccentricity of the ellipsoid
+	/** Get the square of the (first) eccentricity of the ellipsoid */
 	double getSquareEccentricity() const;
 
 private:
@@ -58,18 +58,22 @@ public:
 	 */
 	GPSToMetersConverter(const GPSDatum& datum, const gpscoords_t& origin);
 
-	// convert the given gps coordinates to a coordinate on the xy plane, in meters
+	/** convert the given gps coordinates to a coordinate on the xy plane, in meters */
 	point_t gpsToMeters(const gpscoords_t& coords) const;
 
-	// convert a coordinate on the xy-plane to a gps coordinate
+	/** convert a coordinate on the xy-plane to a gps coordinate */
 	gpscoords_t metersToGPS(const point_t& pos) const;
 
-	// Get the number of meters per degree of latitude.
-	// Given the datum and the origin, this is a constant.
+	/**
+	 * Get the number of meters per degree of latitude.
+	 * Given the datum and the origin, this is a constant.
+	 */
 	double getMetersPerDegLat() const;
 
-	// Get the number of meters per degree of longitude.
-	// Given the datum and the origin, this is a constant.
+	/**
+	 * Get the number of meters per degree of longitude.
+	 * Given the datum and the origin, this is a constant.
+	 */
 	double getMetersPerDegLon() const;
 
 private:

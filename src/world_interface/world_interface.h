@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../gps/gps_util.h"
 #include "../simulator/utils.h"
 #include "data.h"
-#include "../gps/gps_util.h"
 
 #include <optional>
 
@@ -70,20 +70,38 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera);
  */
 landmarks_t readLandmarks();
 
-// read from the sensor and return unmodified lat/long coordinates
-// this should be implemented by hardware-specific code and should not be
-// used by client code
+/**
+ * @brief read from the sensor and return unmodified lat/long coordinates
+ * this should be implemented by hardware-specific code and should not be
+ * used by client code
+ *
+ * @return DataPoint<gpscoords_t> The last GPS coordinates measured by the sensor, or empty if
+ * no fix.
+ */
 DataPoint<gpscoords_t> readGPS_private();
 
-// returns true iff the GPS has a fix
+/**
+ * @brief Check if the GPS sensor has acquired a fix.
+ *
+ * @return true iff the GPS has a fix
+ */
 bool gpsHasFix();
 
-// Get the current position in the global frame based on a GPS measurement.
-// Note that these values are NOT lat/long.
+/**
+ * @brief Get the current position in the global map frame based on a GPS measurement.
+ * Note that these values are NOT lat/long. Note that for the map frame, +x=+lat,+y=-lon.
+ *
+ * @return DataPoint<point_t> The last GPS reading, in the map space.
+ */
 DataPoint<point_t> readGPS();
 
-// Given the current longitude and latitude, convert to a point_t position representation
-// If the GPS has not acquired a fix yet, return an empty optional
+/**
+ * @brief Convert GPS coordinates into a coordinate on the map frame.
+ *
+ * @param coord The coord to transform into map space.
+ * @return std::optional<point_t> The transformed point, or an empty datapoint
+ * if the GPS does not have a fix.
+ */
 std::optional<point_t> gpsToMeters(const gpscoords_t &coord);
 
 // Calculates the current transform in the global frame based purely on forward kinematics

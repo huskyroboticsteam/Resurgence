@@ -8,8 +8,8 @@ World world;
 std::pair<double, double> cmdVel(0, 0);
 
 // gps coords of UW
-static double ORIGIN_LAT = 47.6553;
-static double ORIGIN_LON = -122.3035;
+static constexpr double ORIGIN_LAT = 47.6553;
+static constexpr double ORIGIN_LON = -122.3035;
 static GPSToMetersConverter converter(GPSDatum::WGS84, {ORIGIN_LAT, ORIGIN_LON});
 
 void world_interface_init() {
