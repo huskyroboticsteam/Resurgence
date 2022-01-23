@@ -20,7 +20,7 @@ landmarks_t readLandmarks() {
 	return landmarks_t{};
 }
 
-DataPoint<gpscoords_t> gps::readGPS_private() {
+DataPoint<gpscoords_t> gps::readGPSCoords() {
 	return {};
 }
 

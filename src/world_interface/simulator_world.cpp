@@ -48,7 +48,7 @@ landmarks_t readLandmarks() {
 	return ret;
 }
 
-DataPoint<gpscoords_t> gps::readGPS_private() {
+DataPoint<gpscoords_t> gps::readGPSCoords() {
 	pose_t pose = toPose(world.readGPS(), 0);
 	gpscoords_t coords = converter.metersToGPS(pose);
 	return coords;

@@ -73,13 +73,12 @@ landmarks_t readLandmarks();
 namespace gps {
 /**
  * @brief read from the sensor and return unmodified lat/long coordinates
- * this should be implemented by hardware-specific code and should not be
- * used by client code
+ * this should be implemented by hardware-specific code. (readGPS() should NOT be overridden)
  *
  * @return DataPoint<gpscoords_t> The last GPS coordinates measured by the sensor, or empty if
  * no fix.
  */
-DataPoint<gpscoords_t> readGPS_private();
+DataPoint<gpscoords_t> readGPSCoords();
 } // namespace gps
 
 /**

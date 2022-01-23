@@ -5,7 +5,7 @@
 static std::optional<GPSToMetersConverter> converter;
 
 DataPoint<point_t> readGPS() {
-	DataPoint<gpscoords_t> coords = gps::readGPS_private();
+	DataPoint<gpscoords_t> coords = gps::readGPSCoords();
 	if (!coords) {
 		return {};
 	}

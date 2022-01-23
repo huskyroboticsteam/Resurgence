@@ -20,7 +20,7 @@ gpscoords_t most_recent_coords;
 datatime_t gps_time;
 
 // implements method from world_interface.h
-DataPoint<gpscoords_t> readGPS_private() {
+DataPoint<gpscoords_t> readGPSCoords() {
 	DataPoint<gpscoords_t> data;
 	gps_mutex.lock();
 	if (gpsHasFix()) {
