@@ -100,6 +100,9 @@ include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 find_package(websocketpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
+# Find the JSON library
+find_package(nlohmann_json 3.2.0 REQUIRED)
+
 find_package(Threads REQUIRED)
 if(WITH_CV)
   find_package(OpenCV REQUIRED)
@@ -228,7 +231,8 @@ list(APPEND rover_libs
   simulator_nav
   hr_slam
   ${Boost_LIBRARIES}
-  websocketpp::websocketpp)
+  websocketpp::websocketpp
+  nlohmann_json::nlohmann_json)
 target_link_libraries(Rover ${rover_libs})
 target_link_libraries(Rover
   ${rover_libs} real_base_station ${real_world_libs})

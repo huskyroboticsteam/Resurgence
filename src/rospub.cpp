@@ -1,7 +1,6 @@
 #include "rospub.h"
 
 #include "Constants.h"
-#include "Networking/json.hpp"
 
 #include <array>
 #include <map>
@@ -10,6 +9,7 @@
 #include <thread>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
