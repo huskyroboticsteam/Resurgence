@@ -1,4 +1,5 @@
 #include "read_usb_gps.h"
+
 #include "../../log.h"
 #include "../../simulator/utils.h"
 #include "../../world_interface/world_interface.h"
@@ -6,23 +7,17 @@
 
 #include <libgpsmm.h>
 #include <mutex>
+#include <optional>
 #include <thread>
 #include <unistd.h>
-#include <optional>
 
+namespace gps {
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 std::thread gps_thread;
 std::mutex gps_mutex;
 bool has_fix;
 gpscoords_t most_recent_coords;
 datatime_t gps_time;
-
-bool gpsHasFix() {
-	gps_mutex.lock();
-	bool r = has_fix;
-	gps_mutex.unlock();
-	return r;
-}
 
 // implements method from world_interface.h
 DataPoint<gpscoords_t> readGPS_private() {
@@ -33,6 +28,14 @@ DataPoint<gpscoords_t> readGPS_private() {
 	}
 	gps_mutex.unlock();
 	return data;
+}
+
+namespace usb {
+bool gpsHasFix() {
+	gps_mutex.lock();
+	bool r = has_fix;
+	gps_mutex.unlock();
+	return r;
 }
 
 void gps_loop() {
@@ -94,9 +97,12 @@ bool startGPSThread() {
 		return false;
 	}
 	if (!detectHardware()) {
-		log(LOG_ERROR, "No GPS hardware detected. (If not using GPS, please re-run enable_CAN_and_GPS.sh to stop gpsd.)\n");
+		log(LOG_ERROR, "No GPS hardware detected. (If not using GPS, please re-run "
+					   "enable_CAN_and_GPS.sh to stop gpsd.)\n");
 		return false;
 	}
 	gps_thread = std::thread(gps_loop);
 	return true;
 }
+} // namespace usb
+} // namespace gps

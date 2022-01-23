@@ -70,6 +70,7 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID camera);
  */
 landmarks_t readLandmarks();
 
+namespace gps {
 /**
  * @brief read from the sensor and return unmodified lat/long coordinates
  * this should be implemented by hardware-specific code and should not be
@@ -79,6 +80,7 @@ landmarks_t readLandmarks();
  * no fix.
  */
 DataPoint<gpscoords_t> readGPS_private();
+} // namespace gps
 
 /**
  * @brief Check if the GPS sensor has acquired a fix.

@@ -46,7 +46,7 @@ void setupCameras() {
 }
 
 void world_interface_init() {
-	bool gps_success = startGPSThread();
+	bool gps_success = gps::usb::startGPSThread();
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
 
