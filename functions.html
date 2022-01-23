@@ -98,8 +98,10 @@ $(function() {
 
 <h3><a id="index_g" name="index_g"></a>- g -</h3><ul>
 <li>get()&#160;:&#160;<a class="el" href="classNoiseCovMat.html#a7ce7d35d5dd097046e77d988c5da21a5">NoiseCovMat&lt; stateDim, size, paramSize &gt;</a>, <a class="el" href="classRollingAvgFilter.html#af02e803dd578d70a0bef73ea5ad73ff4">RollingAvgFilter&lt; numPoints, numDims &gt;</a></li>
+<li>getA()&#160;:&#160;<a class="el" href="classGPSDatum.html#aa6199b4c53d6ab5fbe14774f99b296ee">GPSDatum</a></li>
 <li>getAllPoints()&#160;:&#160;<a class="el" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">QuadTree</a></li>
 <li>getArbitraryPoint()&#160;:&#160;<a class="el" href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">QuadTree</a></li>
+<li>getB()&#160;:&#160;<a class="el" href="classGPSDatum.html#acf74954b42657295aa8c4a48275596ef">GPSDatum</a></li>
 <li>getBorderSize()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#a7645478c8404ec788c833c64ae1a918d">AR::MarkerSet</a></li>
 <li>getBufferSize()&#160;:&#160;<a class="el" href="classRollingAvgFilter.html#aed7f93d63e9dcfc20171092460ec268b">RollingAvgFilter&lt; numPoints, numDims &gt;</a></li>
 <li>getCameraMatrix()&#160;:&#160;<a class="el" href="classcam_1_1CameraParams.html#a8326e701816b8175d460bc83794a222b">cam::CameraParams</a></li>
@@ -114,6 +116,7 @@ $(function() {
 <li>getError()&#160;:&#160;<a class="el" href="classURGLidar.html#ad36748a52fcf5acc4178521d7d0af751">URGLidar</a></li>
 <li>getEstimateCovarianceMat()&#160;:&#160;<a class="el" href="classKalmanFilterBase.html#a62fc4972193bca45c21612d99085a022">KalmanFilterBase&lt; stateDim, inputDim, outputDim &gt;</a>, <a class="el" href="classPoseEstimator.html#a2fdadf6696a029e5de83823f0d6e34f2">PoseEstimator</a>, <a class="el" href="classPoseEstimatorLinear.html#a33646061bbe356ef1d715e7d5e985996">PoseEstimatorLinear</a></li>
 <li>getExtrinsicParams()&#160;:&#160;<a class="el" href="classcam_1_1Camera.html#ab0f6887ce54500a354981f39cbe1e948">cam::Camera</a></li>
+<li>getFlattening()&#160;:&#160;<a class="el" href="classGPSDatum.html#a0d68b6684d03a624c5f03ed2d5eceaaf">GPSDatum</a></li>
 <li>getIDMapping()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#a2fe7b334d83c3f7f2593c429c9832d03">AR::MarkerSet</a></li>
 <li>getIDMappingCast()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#a107fa69fb38c56bf63edf3707f0df84f">AR::MarkerSet</a></li>
 <li>getImageSize()&#160;:&#160;<a class="el" href="classcam_1_1CameraParams.html#a3610c3796220505394f18f65540bc88c">cam::CameraParams</a></li>
@@ -125,6 +128,8 @@ $(function() {
 <li>getMarkerByID()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#acf9ab0b6d35c785cc1671abe908edcce">AR::MarkerSet</a></li>
 <li>getMarkerByMappedID()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#a624d7c10d2d6b2101523b2d1a2f42f11">AR::MarkerSet</a></li>
 <li>getMarkers()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#a6c4915657c043e485b5c65e331bd758c">AR::MarkerSet</a></li>
+<li>getMetersPerDegLat()&#160;:&#160;<a class="el" href="classGPSToMetersConverter.html#ac2c717dd7f0006b8bfefcadf062f3bc2">GPSToMetersConverter</a></li>
+<li>getMetersPerDegLon()&#160;:&#160;<a class="el" href="classGPSToMetersConverter.html#a3afc3dde00581f9cbdc2360cd8899a82">GPSToMetersConverter</a></li>
 <li>getName()&#160;:&#160;<a class="el" href="classcam_1_1Camera.html#a32cad2f8cf6533b1d7764ab0165d6b49">cam::Camera</a></li>
 <li>getNextPose()&#160;:&#160;<a class="el" href="classDiffDriveKinematics.html#a1edebe22228462fd5e14612591976da7">DiffDriveKinematics</a></li>
 <li>getPhysicalSize()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#af12b8ab24b3670123d2ae5d717b0e53f">AR::MarkerSet</a></li>
@@ -134,9 +139,13 @@ $(function() {
 <li>getPoseUpdate()&#160;:&#160;<a class="el" href="classDiffDriveKinematics.html#aa0d0f3830ee9cc483a110f8e42c43e72">DiffDriveKinematics</a></li>
 <li>getRVec()&#160;:&#160;<a class="el" href="classAR_1_1Tag.html#a5c106533bf2eef5fffe633112ccec6fe">AR::Tag</a></li>
 <li>getSize()&#160;:&#160;<a class="el" href="classQuadTree.html#a1528c5a86d608cf01358acfa289db273">QuadTree</a>, <a class="el" href="classRollingAvgFilter.html#a752613fea1fc86684ab5b940cb2506f5">RollingAvgFilter&lt; numPoints, numDims &gt;</a></li>
+<li>getSquareEccentricity()&#160;:&#160;<a class="el" href="classGPSDatum.html#a950d3a9a6a4b00167eb6d7d3960346c0">GPSDatum</a></li>
 <li>getState()&#160;:&#160;<a class="el" href="classKalmanFilterBase.html#aeb92f711da3a389c0c892ee9b27401de">KalmanFilterBase&lt; stateDim, inputDim, outputDim &gt;</a></li>
 <li>getTVec()&#160;:&#160;<a class="el" href="classAR_1_1Tag.html#adf13474e6584539c096be20ee7fc61be">AR::Tag</a></li>
 <li>GlobalMap()&#160;:&#160;<a class="el" href="classGlobalMap.html#a77e3288317a748f83775d7280e8f7410">GlobalMap</a></li>
+<li>GPSDatum()&#160;:&#160;<a class="el" href="classGPSDatum.html#aa8cf8c82596db122af4edb702aaa808d">GPSDatum</a></li>
+<li>gpsToMeters()&#160;:&#160;<a class="el" href="classGPSToMetersConverter.html#a10bf63f99a1d5e3d9c6a45870b081307">GPSToMetersConverter</a></li>
+<li>GPSToMetersConverter()&#160;:&#160;<a class="el" href="classGPSToMetersConverter.html#afd5e575a5f302309fa5f4fbeac718ef3">GPSToMetersConverter</a></li>
 </ul>
 
 
@@ -156,9 +165,16 @@ $(function() {
 </ul>
 
 
+<h3><a id="index_l" name="index_l"></a>- l -</h3><ul>
+<li>lat&#160;:&#160;<a class="el" href="structgpscoords__t.html#af70fa31bfe9ab8363f314d7c874ce0cb">gpscoords_t</a></li>
+<li>lon&#160;:&#160;<a class="el" href="structgpscoords__t.html#a7d6fea32d13d096a77a32897284dbe01">gpscoords_t</a></li>
+</ul>
+
+
 <h3><a id="index_m" name="index_m"></a>- m -</h3><ul>
 <li>MarkerPattern()&#160;:&#160;<a class="el" href="classAR_1_1MarkerPattern.html#aff809f5b8e8c885380b480df80f7903a">AR::MarkerPattern</a></li>
 <li>MarkerSet()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#aa4fde560f82e5b8e822855e6d5934f65">AR::MarkerSet</a></li>
+<li>metersToGPS()&#160;:&#160;<a class="el" href="classGPSToMetersConverter.html#afac7427d17a5f265c6c6220507b0a0ea">GPSToMetersConverter</a></li>
 </ul>
 
 
@@ -220,6 +236,7 @@ $(function() {
 
 
 <h3><a id="index_w" name="index_w"></a>- w -</h3><ul>
+<li>WGS84&#160;:&#160;<a class="el" href="classGPSDatum.html#a9797e6a1da01ead0d64a961fdb7b3f40">GPSDatum</a></li>
 <li>what()&#160;:&#160;<a class="el" href="classcam_1_1invalid__camera__config.html#addc799d33e70a44dd27396b0cb1d3ddd">cam::invalid_camera_config</a></li>
 <li>wheelVelToRobotVel()&#160;:&#160;<a class="el" href="classDiffDriveKinematics.html#af4f04aecd5ab5c7361f0958c9c3b0138">DiffDriveKinematics</a></li>
 <li>writeToFileStorage()&#160;:&#160;<a class="el" href="classcam_1_1CameraParams.html#a2b2311039851a446ad081f6532bc6c15">cam::CameraParams</a></li>
