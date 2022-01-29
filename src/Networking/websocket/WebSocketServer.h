@@ -44,6 +44,9 @@ public:
 	 */
 	~SingleClientWSServer();
 
+	// delete the assignment operator
+	SingleClientWSServer& operator=(const SingleClientWSServer&) = delete;
+
 	/**
 	 * @brief Start the server.
 	 *
