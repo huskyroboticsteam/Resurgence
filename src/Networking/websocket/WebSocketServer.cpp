@@ -49,18 +49,20 @@ bool SingleClientWSServer::start() {
 }
 
 void SingleClientWSServer::stop() {
-	isRunning = false;
-	server.stop_listening();
-	for (auto& entry : protocolMap) {
-		if (entry.second.client) {
-			try {
-				server.close(entry.second.client.value(),
-							 websocketpp::close::status::going_away, "Server shutting down");
-			} catch (const websocketpp::exception& e) {
-				log(LOG_ERROR, "Server %s : An error occurred while shutting down: %s",
-					serverName.c_str(), e.what());
+	if (isRunning) {
+		isRunning = false;
+		server.stop_listening();
+		for (auto& entry : protocolMap) {
+			if (entry.second.client) {
+				try {
+					server.close(entry.second.client.value(),
+								websocketpp::close::status::going_away, "Server shutting down");
+				} catch (const websocketpp::exception& e) {
+					log(LOG_ERROR, "Server %s : An error occurred while shutting down: %s",
+						serverName.c_str(), e.what());
+				}
+				entry.second.client.reset();
 			}
-			entry.second.client.reset();
 		}
 	}
 }

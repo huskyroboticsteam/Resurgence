@@ -15,14 +15,14 @@
 #include "world_interface/world_interface.h"
 
 #include <array>
+#include <chrono>
 #include <csignal>
 #include <ctime>
 #include <fstream>
 #include <sstream>
+#include <thread>
 #include <time.h>
 #include <unistd.h>
-#include <chrono>
-#include <thread>
 
 #include <sys/time.h>
 
@@ -124,8 +124,9 @@ void InitializeRover(uint8_t arm_mode, bool zero_encoders) {
 	Globals::websocketServer.start();
 }
 
-void closeSim(int signum) {
+void closeRover(int signum) {
 	rospub::shutdown();
+	Globals::websocketServer.stop();
 	raise(SIGTERM);
 }
 
@@ -172,7 +173,7 @@ int rover_loop(int argc, char** argv) {
 	world_interface_init();
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
-	signal(SIGINT, closeSim);
+	signal(SIGINT, closeRover);
 	Globals::opts = ParseCommandLineOptions(argc, argv);
 	InitializeRover(MOTOR_UNIT_MODE_PWM, true);
 	CANPacket packet;
