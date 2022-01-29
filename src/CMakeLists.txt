@@ -208,6 +208,8 @@ add_library(rover_common SHARED
   Networking/IK.cpp
   Networking/ParseCAN.cpp
   Networking/motor_interface.cpp
+  Networking/websocket/WebSocketServer.cpp
+  Networking/websocket/WebSocketProtocol.cpp
   Util.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
