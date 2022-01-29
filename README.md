@@ -184,6 +184,18 @@ sudo apt-get install libeigen3-dev
 sudo apt-get install libsfml-dev
 ```
 
+## Install JSON library
+
+### Ubuntu 20.04
+```bash
+sudo apt-get install nlohmann-json3-dev
+```
+
+### Mac
+```bash
+brew install nlohmann-json
+```
+
 ## Install GPS libraries
 
 This is **optional** unless you are connecting to our hardware GPS

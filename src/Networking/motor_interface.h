@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 using nlohmann::json;
 
 bool ParseMotorPacket(json& message);

@@ -1,6 +1,6 @@
 #include "../Globals.h"
 #include "../log.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 #include <iostream>
 

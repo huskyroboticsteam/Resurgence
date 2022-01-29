@@ -1,9 +1,10 @@
 #include "Globals.h"
 
 #include "CommandLineOptions.h"
-#include "Networking/json.hpp"
 
 #include <vector>
+
+#include <nlohmann/json.hpp>
 
 namespace Globals {
 CommandLineOptions opts;

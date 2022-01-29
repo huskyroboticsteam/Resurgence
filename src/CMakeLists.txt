@@ -100,6 +100,9 @@ include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 find_package(websocketpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
+# Find the JSON library
+find_package(nlohmann_json 3.2.0 REQUIRED)
+
 find_package(Threads REQUIRED)
 if(WITH_CV)
   find_package(OpenCV REQUIRED)
@@ -178,7 +181,7 @@ add_library(real_world_interface STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  gps/read_usb_gps.cpp
+  gps/usb_gps/read_usb_gps.cpp
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
@@ -211,6 +214,8 @@ add_library(rover_common SHARED
   Networking/websocket/WebSocketServer.cpp
   Networking/websocket/WebSocketProtocol.cpp
   Util.cpp
+  gps/gps_util.cpp
+  world_interface/gps_common_interface.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
@@ -228,7 +233,8 @@ list(APPEND rover_libs
   simulator_nav
   hr_slam
   ${Boost_LIBRARIES}
-  websocketpp::websocketpp)
+  websocketpp::websocketpp
+  nlohmann_json::nlohmann_json)
 target_link_libraries(Rover ${rover_libs})
 target_link_libraries(Rover
   ${rover_libs} real_base_station ${real_world_libs})
@@ -283,6 +289,9 @@ if(WITH_TESTS)
     ar/MarkerSetTests.cpp
     # Camera tests
     camera/CameraParamsTests.cpp
+    # GPS tests
+    ../tests/gps/GPSDatumTest.cpp
+    ../tests/gps/GPSConverterTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp

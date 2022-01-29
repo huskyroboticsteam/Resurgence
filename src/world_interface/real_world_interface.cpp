@@ -1,12 +1,11 @@
 #include "../Globals.h"
 #include "../Networking/CANUtils.h"
 #include "../Networking/ParseCAN.h"
-#include "../Networking/json.hpp"
 #include "../Networking/motor_interface.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../camera/Camera.h"
-#include "../gps/read_usb_gps.h"
+#include "../gps/usb_gps/read_usb_gps.h"
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../simulator/utils.h"
@@ -18,6 +17,8 @@
 #include <set>
 
 #include <opencv2/calib3d.hpp>
+
+#include <nlohmann/json.hpp>
 
 extern "C" {
 #include "../HindsightCAN/CANMotorUnit.h"
@@ -45,7 +46,7 @@ void setupCameras() {
 }
 
 void world_interface_init() {
-	bool gps_success = startGPSThread();
+	bool gps_success = gps::usb::startGPSThread();
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
 
