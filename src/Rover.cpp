@@ -120,6 +120,8 @@ void InitializeRover(uint8_t arm_mode, bool zero_encoders) {
 	// we use PWM control later. (This problem does not arise if we do not call initEncoders.)
 	usleep(1 * 1000 * 1000);
 	setArmMode(arm_mode);
+
+	Globals::websocketServer.start();
 }
 
 void closeSim(int signum) {

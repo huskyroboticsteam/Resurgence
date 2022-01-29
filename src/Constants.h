@@ -26,4 +26,5 @@ const std::string AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibratio
 const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
 
 constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
+constexpr uint16_t WS_SERVER_PORT = 3001;
 } // namespace Constants
