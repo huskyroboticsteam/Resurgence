@@ -14,8 +14,11 @@ SingleClientWSServer::ProtocolData::ProtocolData(const WebSocketProtocol& protoc
 	: protocol(protocol) {}
 
 SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16_t port)
-	: serverName(serverName), port(port), server(), isRunning(false), protocolMap() {
-	server.clear_access_channels(websocketpp::log::alevel::all); // disable default logging
+	: serverName(serverName), port(port), server(), isRunning(false), protocolMap(),
+	  serverThread() {
+	// disable websocket logging
+	server.set_access_channels(websocketpp::log::alevel::none);
+	server.set_error_channels(websocketpp::log::elevel::none);
 	server.set_reuse_addr(true);
 	server.init_asio();
 
@@ -33,18 +36,21 @@ SingleClientWSServer::~SingleClientWSServer() {
 bool SingleClientWSServer::start() {
 	if (isRunning) {
 		return false;
+	} else {
+		isRunning = true;
+		serverThread = std::thread([&]() { return this->serverTask(); });
+		return true;
 	}
+}
 
+void SingleClientWSServer::serverTask() {
 	try {
 		server.listen(port);
 		server.start_accept();
 		server.run();
-		isRunning = true;
-		return true;
 	} catch (const websocketpp::exception& e) {
 		log(LOG_ERROR, "Server %s - An error occurred while starting: %s\n",
 			serverName.c_str(), e.what());
-		return false;
 	}
 }
 
@@ -56,13 +62,17 @@ void SingleClientWSServer::stop() {
 			if (entry.second.client) {
 				try {
 					server.close(entry.second.client.value(),
-								websocketpp::close::status::going_away, "Server shutting down");
+								 websocketpp::close::status::going_away,
+								 "Server shutting down");
 				} catch (const websocketpp::exception& e) {
 					log(LOG_ERROR, "Server %s : An error occurred while shutting down: %s",
 						serverName.c_str(), e.what());
 				}
 				entry.second.client.reset();
 			}
+		}
+		if (serverThread.joinable()) {
+			serverThread.join();
 		}
 	}
 }

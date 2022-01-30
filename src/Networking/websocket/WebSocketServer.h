@@ -5,6 +5,7 @@
 #include <functional>
 #include <map>
 #include <optional>
+#include <thread>
 
 #include <nlohmann/json.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
@@ -102,10 +103,12 @@ private:
 	websocketpp::server<websocketpp::config::asio> server;
 	bool isRunning;
 	std::map<std::string, ProtocolData> protocolMap;
+	std::thread serverThread;
 
 	bool validate(connection_hdl hdl);
 	void onOpen(connection_hdl hdl);
 	void onClose(connection_hdl hdl);
 	void onMessage(connection_hdl hdl, message_t message);
+	void serverTask();
 };
 } // namespace websocket
