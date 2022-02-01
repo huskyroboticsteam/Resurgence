@@ -46,11 +46,11 @@ void setupCameras() {
 }
 
 void world_interface_init() {
+	setupCameras();
+
 	bool gps_success = gps::usb::startGPSThread();
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
-
-	setupCameras();
 
 	gettimeofday(&last_odom_reading_, NULL);
 	last_odom_tf_ = toTransform({0., 0., 0.});
