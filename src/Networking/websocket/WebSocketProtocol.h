@@ -19,6 +19,14 @@ using nlohmann::json;
  */
 class WebSocketProtocol {
 public:
+	/**
+	 * @brief Construct a new WebSocket protocol.
+	 * This object doesn't itself "do" anything, but users should register this object with a
+	 * server, which will then handle dispatching events.
+	 *
+	 * @param protocolPath The resource path that this protocol should be served on.
+	 * This should be of the form "/foo/bar", for example.
+	 */
 	WebSocketProtocol(const std::string& protocolPath);
 
 	/**
