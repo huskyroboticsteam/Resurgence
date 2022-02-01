@@ -74,29 +74,32 @@ $(function() {
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;CommandLineOptions.h&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Networking/Network.h&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a>&gt;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">enum class</span> RoverState {</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    RemoteControl,</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    DrivingToWaypoint,</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    LookingForTennisball,</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>};</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// NOTE(sasha): To keep linker happy, declare globals with &quot;extern&quot; here and then</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">//              provide variable definition in Globals.cpp</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span>Globals {</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">extern</span> <a class="code hl_struct" href="structCommandLineOptions.html">CommandLineOptions</a> opts;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">extern</span> RoverState curr_state;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">extern</span> <a class="code hl_classRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">nlohmann::json</a> status_data;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">extern</span> <a class="code hl_classRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">nlohmann::json</a> motor_status;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">extern</span> <span class="keywordtype">bool</span> E_STOP;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">extern</span> <span class="keywordtype">bool</span> AUTONOMOUS;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>} <span class="comment">// namespace Globals</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;Networking/websocket/WebSocketServer.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">enum class</span> RoverState {</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    RemoteControl,</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    DrivingToWaypoint,</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    LookingForTennisball,</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>};</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">// NOTE(sasha): To keep linker happy, declare globals with &quot;extern&quot; here and then</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">//              provide variable definition in Globals.cpp</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span>Globals {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">extern</span> <a class="code hl_struct" href="structCommandLineOptions.html">CommandLineOptions</a> opts;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">extern</span> RoverState curr_state;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">extern</span> <a class="code hl_classRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">nlohmann::json</a> status_data;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">extern</span> <a class="code hl_classRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">nlohmann::json</a> motor_status;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">extern</span> <a class="code hl_class" href="classwebsocket_1_1SingleClientWSServer.html">websocket::SingleClientWSServer</a> websocketServer;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">extern</span> <span class="keywordtype">bool</span> E_STOP;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keyword">extern</span> <span class="keywordtype">bool</span> AUTONOMOUS;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>} <span class="comment">// namespace Globals</span></div>
 <div class="ttc" id="aa00182_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a></div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div></div>
+<div class="ttc" id="aclasswebsocket_1_1SingleClientWSServer_html"><div class="ttname"><a href="classwebsocket_1_1SingleClientWSServer.html">websocket::SingleClientWSServer</a></div><div class="ttdoc">A WebSocket server class that only accepts a single client at a time to each endpoint served by this ...</div><div class="ttdef"><b>Definition:</b> WebSocketServer.h:32</div></div>
 <div class="ttc" id="astructCommandLineOptions_html"><div class="ttname"><a href="structCommandLineOptions.html">CommandLineOptions</a></div><div class="ttdef"><b>Definition:</b> CommandLineOptions.h:3</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
