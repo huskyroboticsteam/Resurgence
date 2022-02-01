@@ -211,6 +211,8 @@ add_library(rover_common SHARED
   Networking/IK.cpp
   Networking/ParseCAN.cpp
   Networking/motor_interface.cpp
+  Networking/websocket/WebSocketServer.cpp
+  Networking/websocket/WebSocketProtocol.cpp
   Util.cpp
   gps/gps_util.cpp
   world_interface/gps_common_interface.cpp
