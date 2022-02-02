@@ -49,7 +49,7 @@ void SingleClientWSServer::serverTask() {
 		server.start_accept();
 		server.run();
 	} catch (const websocketpp::exception& e) {
-		log(LOG_ERROR, "Server %s - An error occurred while starting: %s\n",
+		log(LOG_ERROR, "Server=%s - An error occurred while starting: %s\n",
 			serverName.c_str(), e.what());
 	}
 }
@@ -65,7 +65,7 @@ void SingleClientWSServer::stop() {
 								 websocketpp::close::status::going_away,
 								 "Server shutting down");
 				} catch (const websocketpp::exception& e) {
-					log(LOG_ERROR, "Server %s : An error occurred while shutting down: %s",
+					log(LOG_ERROR, "Server=%s : An error occurred while shutting down: %s",
 						serverName.c_str(), e.what());
 				}
 				entry.second.client.reset();
@@ -98,7 +98,7 @@ void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 			conn->send(str, websocketpp::frame::opcode::text);
 		}
 	} else {
-		log(LOG_WARN, "Server=%s : Can't send message to nonexistent protocol path: %s\n",
+		log(LOG_WARN, "Server=%s : Can't send message to nonexistent endpoint: %s\n",
 			serverName.c_str(), protocolPath.c_str());
 	}
 }
@@ -116,14 +116,14 @@ bool SingleClientWSServer::validate(connection_hdl hdl) {
 			return true;
 		} else {
 			log(LOG_INFO,
-				"Server=%s : Rejected connection to path %s from %s - A client is already "
+				"Server=%s, Endpoint=%s : Rejected connection from %s - A client is already "
 				"connected!\n",
 				serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str());
 			return false;
 		}
 		return !entry->second.client.has_value();
 	} else {
-		log(LOG_INFO, "Server=%s : Rejected connection to unrecognized path %s from %s\n",
+		log(LOG_INFO, "Server=%s : Rejected connection to unrecognized endpoint %s from %s\n",
 			serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str());
 		return false;
 	}
@@ -133,17 +133,24 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string client = conn->get_remote_endpoint();
 	std::string path = conn->get_resource();
-	log(LOG_INFO, "Server=%s : Connection opened on path %s from %s\n", serverName.c_str(),
+	log(LOG_INFO, "Server=%s, Endpoint=%s : Connection opened from %s\n", serverName.c_str(),
 		path.c_str(), client.c_str());
 
-	protocolMap.at(path).client = hdl;
+	auto& protocolData = protocolMap.at(path);
+	protocolData.client = hdl;
+	protocolData.protocol.clientConnected();
 }
 
 void SingleClientWSServer::onClose(connection_hdl hdl) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string client = conn->get_remote_endpoint();
-	log(LOG_INFO, "Server=%s : Connection disconnected from path %s from %s\n",
-		serverName.c_str(), conn->get_resource().c_str(), client.c_str());
+	std::string path = conn->get_resource();
+	log(LOG_INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s\n",
+		serverName.c_str(), path.c_str(), client.c_str());
+	
+	auto& protocolData = protocolMap.at(path);
+	protocolData.client.reset();
+	protocolData.protocol.clientDisconnected();
 }
 
 void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {

@@ -5,8 +5,6 @@
 #include <string>
 
 #include <nlohmann/json.hpp>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
 
 namespace websocket {
 
@@ -16,6 +14,10 @@ using nlohmann::json;
  * @brief Defines a protocol which will be served at an endpoint of a server.
  * This protocol defines several message types, and processes messages of those types,
  * dispatching events to message handlers wherever necessary.
+ *
+ * JSON messages must define a "type" key, which controls how messages are handled.
+ * Additionally, JSON messages must (obviously) conform the expectations of the message
+ * handlers. This can be verified at runtime by using the optional validation functionality.
  */
 class WebSocketProtocol {
 public:
@@ -74,17 +76,34 @@ public:
 	 */
 	bool hasMessageHandler(const std::string& messageType) const;
 
+	void addConnectionHandler(const std::function<void()>& handler);
+
+	void addDisconnectionHandler(const std::function<void()>& handler);
+
 	/**
 	 * @brief Process the given JSON object that was sent to this protocol's endpoint.
-	 * Generally, this shouldn't be used by client code, but could be useful for testing/mocking.
-	 * 
-	 * @param obj The JSON object to be processed by this protocol.
+	 * Generally, this shouldn't be used by client code.
+	 *
+	 * @param obj The JSON object to be processed by this protocol. It is expected to have a
+	 * "type" key.
 	 */
 	void processMessage(const json& obj) const;
 
 	/**
+	 * @brief Invoke all connection handlers for this protocol.
+	 * Generally, this shouldn't be used by client code.
+	 */
+	void clientConnected();
+
+	/**
+	 * @brief Invoke all disconnection handlers for this protocol.
+	 * Generally, this shouldn't be used by client code.
+	 */
+	void clientDisconnected();
+
+	/**
 	 * @brief Get the protocol path of the endpoint this protocol is served on.
-	 * 
+	 *
 	 * @return The protocol path, of the form "/foo/bar".
 	 */
 	std::string getProtocolPath() const;
@@ -93,6 +112,8 @@ private:
 	std::string protocolPath;
 	std::map<std::string, std::function<void(json)>> handlerMap;
 	std::map<std::string, std::function<bool(json)>> validatorMap;
+	std::vector<std::function<void()>> connectionHandlers;
+	std::vector<std::function<void()>> disconnectionHandlers;
 };
 
 } // namespace websocket
