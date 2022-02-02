@@ -96,15 +96,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7892ad318af8fd69b7dc4e3062be3a2f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwebsocket_1_1WebSocketProtocol.html#a7892ad318af8fd69b7dc4e3062be3a2f">hasMessageHandler</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;messageType) const</td></tr>
 <tr class="memdesc:a7892ad318af8fd69b7dc4e3062be3a2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the given message type has an associated message handler.  <a href="classwebsocket_1_1WebSocketProtocol.html#a7892ad318af8fd69b7dc4e3062be3a2f">More...</a><br /></td></tr>
 <tr class="separator:a7892ad318af8fd69b7dc4e3062be3a2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84e2332a25714bae72c926adfc8c45da"><td class="memItemLeft" align="right" valign="top"><a id="a84e2332a25714bae72c926adfc8c45da" name="a84e2332a25714bae72c926adfc8c45da"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addConnectionHandler</b> (const std::function&lt; void()&gt; &amp;handler)</td></tr>
+<tr class="separator:a84e2332a25714bae72c926adfc8c45da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9680abdc89365aa217635cccfca2518c"><td class="memItemLeft" align="right" valign="top"><a id="a9680abdc89365aa217635cccfca2518c" name="a9680abdc89365aa217635cccfca2518c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addDisconnectionHandler</b> (const std::function&lt; void()&gt; &amp;handler)</td></tr>
+<tr class="separator:a9680abdc89365aa217635cccfca2518c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebe103259d04d555c6e1e754a65fa669"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwebsocket_1_1WebSocketProtocol.html#aebe103259d04d555c6e1e754a65fa669">processMessage</a> (const <a class="elRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">json</a> &amp;obj) const</td></tr>
-<tr class="memdesc:aebe103259d04d555c6e1e754a65fa669"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the given JSON object that was sent to this protocol's endpoint. Generally, this shouldn't be used by client code, but could be useful for testing/mocking.  <a href="classwebsocket_1_1WebSocketProtocol.html#aebe103259d04d555c6e1e754a65fa669">More...</a><br /></td></tr>
+<tr class="memdesc:aebe103259d04d555c6e1e754a65fa669"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the given JSON object that was sent to this protocol's endpoint. Generally, this shouldn't be used by client code.  <a href="classwebsocket_1_1WebSocketProtocol.html#aebe103259d04d555c6e1e754a65fa669">More...</a><br /></td></tr>
 <tr class="separator:aebe103259d04d555c6e1e754a65fa669"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9eddefd7b71e535ba3df9f6cac5895d"><td class="memItemLeft" align="right" valign="top"><a id="af9eddefd7b71e535ba3df9f6cac5895d" name="af9eddefd7b71e535ba3df9f6cac5895d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clientConnected</b> ()</td></tr>
+<tr class="memdesc:af9eddefd7b71e535ba3df9f6cac5895d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke all connection handlers for this protocol. Generally, this shouldn't be used by client code. <br /></td></tr>
+<tr class="separator:af9eddefd7b71e535ba3df9f6cac5895d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73b1d0c8c640a5e7d861fa1ae27184b1"><td class="memItemLeft" align="right" valign="top"><a id="a73b1d0c8c640a5e7d861fa1ae27184b1" name="a73b1d0c8c640a5e7d861fa1ae27184b1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clientDisconnected</b> ()</td></tr>
+<tr class="memdesc:a73b1d0c8c640a5e7d861fa1ae27184b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke all disconnection handlers for this protocol. Generally, this shouldn't be used by client code. <br /></td></tr>
+<tr class="separator:a73b1d0c8c640a5e7d861fa1ae27184b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae72711f7095f3b5a0edb352d4c4a6a89"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwebsocket_1_1WebSocketProtocol.html#ae72711f7095f3b5a0edb352d4c4a6a89">getProtocolPath</a> () const</td></tr>
 <tr class="memdesc:ae72711f7095f3b5a0edb352d4c4a6a89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the protocol path of the endpoint this protocol is served on.  <a href="classwebsocket_1_1WebSocketProtocol.html#ae72711f7095f3b5a0edb352d4c4a6a89">More...</a><br /></td></tr>
 <tr class="separator:ae72711f7095f3b5a0edb352d4c4a6a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Defines a protocol which will be served at an endpoint of a server. This protocol defines several message types, and processes messages of those types, dispatching events to message handlers wherever necessary. </p>
+<p >JSON messages must define a "type" key, which controls how messages are handled. Additionally, JSON messages must (obviously) conform the expectations of the message handlers. This can be verified at runtime by using the optional validation functionality. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a49126d6de1f4566a511d36109ff6abf4" name="a49126d6de1f4566a511d36109ff6abf4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a49126d6de1f4566a511d36109ff6abf4">&#9670;&nbsp;</a></span>WebSocketProtocol()</h2>
@@ -279,10 +294,10 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Process the given JSON object that was sent to this protocol's endpoint. Generally, this shouldn't be used by client code, but could be useful for testing/mocking. </p>
+<p>Process the given JSON object that was sent to this protocol's endpoint. Generally, this shouldn't be used by client code. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">obj</td><td>The JSON object to be processed by this protocol. </td></tr>
+    <tr><td class="paramname">obj</td><td>The JSON object to be processed by this protocol. It is expected to have a "type" key. </td></tr>
   </table>
   </dd>
 </dl>
