@@ -121,7 +121,6 @@ bool SingleClientWSServer::validate(connection_hdl hdl) {
 				serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str());
 			return false;
 		}
-		return !entry->second.client.has_value();
 	} else {
 		log(LOG_INFO, "Server=%s : Rejected connection to unrecognized endpoint %s from %s\n",
 			serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str());
