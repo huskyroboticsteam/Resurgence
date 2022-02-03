@@ -37,6 +37,26 @@ bool WebSocketProtocol::removeMessageHandler(const std::string& messageType) {
 	return false;
 }
 
+void WebSocketProtocol::addConnectionHandler(const std::function<void()>& handler) {
+	connectionHandlers.push_back(handler);
+}
+
+void WebSocketProtocol::addDisconnectionHandler(const std::function<void()>& handler) {
+	disconnectionHandlers.push_back(handler);
+}
+
+void WebSocketProtocol::clientConnected() {
+	for (const auto& f : connectionHandlers) {
+		f();
+	}
+}
+
+void WebSocketProtocol::clientDisconnected() {
+	for (const auto& f : disconnectionHandlers) {
+		f();
+	}
+}
+
 void WebSocketProtocol::processMessage(const json& obj) const {
 	if (obj.contains(TYPE_KEY)) {
 		std::string messageType = obj[TYPE_KEY];

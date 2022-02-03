@@ -23,11 +23,11 @@ typedef std::shared_ptr<websocketpp::config::core::message_type> message_t;
  * to each endpoint served by this server.
  * Users of this class will create endpoints by adding websocket protocols using addProtocol().
  * This server processes messages from the client and invokes message handlers,
- * which are defined by a websocket::WebSocketProtocol object,
- * depending on the "type" field of the JSON-encoded message.
+ * which are defined by a websocket::WebSocketProtocol object.
  *
- * Messages recieved by this server are expected to be JSON-encoded, and need to have
- * a "type" field. The entire json object will be passed to message handlers.
+ * Messages recieved by this server are expected to be JSON-encoded.
+ * Further requirements are dictated by the websocket::WebSocketProtocol documentation.
+ * The entire json object will be passed to message handlers.
  */
 class SingleClientWSServer {
 public:
