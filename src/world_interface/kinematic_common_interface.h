@@ -16,6 +16,7 @@ void setCmdVelToIntegrate(const wheelvel_t& wheelVels);
  * This is required, and will allow odometry methods to work correctly.
  * This also keeps track of the velocity to return for getCmdVel().
  *
- * @param wheelVels The heading velocity (rad/s) and forward velocity (m/s).
+ * @param dtheta The heading velocity, in rad/s.
+ * @param dx The forward velocity, in m/s.
  */
 void setCmdVelToIntegrate(double dtheta, double dx);
