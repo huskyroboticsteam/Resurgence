@@ -10,13 +10,13 @@ WebSocketProtocol::WebSocketProtocol(const std::string& protocolPath)
 	: protocolPath(protocolPath), handlerMap(), validatorMap() {}
 
 bool WebSocketProtocol::addMessageHandler(const std::string& messageType,
-										  const std::function<void(json)>& callback) {
-	return this->addMessageHandler(messageType, callback, [](json) { return true; });
+										  const std::function<void(const json&)>& callback) {
+	return this->addMessageHandler(messageType, callback, [](const json&) { return true; });
 }
 
 bool WebSocketProtocol::addMessageHandler(const std::string& messageType,
-										  const std::function<void(json)>& callback,
-										  const std::function<bool(json)>& validator) {
+										  const std::function<void(const json&)>& callback,
+										  const std::function<bool(const json&)>& validator) {
 	if (!hasMessageHandler(messageType)) {
 		handlerMap[messageType] = callback;
 		validatorMap[messageType] = validator;

@@ -41,7 +41,7 @@ public:
 	 * @return true if no handler already existed. false if a handler already exists.
 	 */
 	bool addMessageHandler(const std::string& messageType,
-						   const std::function<void(json)>& callback);
+						   const std::function<void(const json&)>& callback);
 
 	/**
 	 * @brief Add a message handler for the given message type, if no handler already exists.
@@ -56,8 +56,8 @@ public:
 	 * @return true if no handler already existed. false if a handler already exists.
 	 */
 	bool addMessageHandler(const std::string& messageType,
-						   const std::function<void(json)>& callback,
-						   const std::function<bool(json)>& validator);
+						   const std::function<void(const json&)>& callback,
+						   const std::function<bool(const json&)>& validator);
 
 	/**
 	 * @brief Remove the message handler for the given message type, if it exists.
@@ -110,8 +110,8 @@ public:
 
 private:
 	std::string protocolPath;
-	std::map<std::string, std::function<void(json)>> handlerMap;
-	std::map<std::string, std::function<bool(json)>> validatorMap;
+	std::map<std::string, std::function<void(const json&)>> handlerMap;
+	std::map<std::string, std::function<bool(const json&)>> validatorMap;
 	std::vector<std::function<void()>> connectionHandlers;
 	std::vector<std::function<void()>> disconnectionHandlers;
 };
