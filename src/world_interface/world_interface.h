@@ -16,9 +16,15 @@ class CameraParams;
 void world_interface_init();
 
 // If the requested dtheta/dx is too fast for the robot to execute, it will
-// scale them down and return the corresponding scale factor.
+// scale them down and return the corresponding scale divisor.
 double setCmdVel(double dtheta, double dx);
 
+/**
+ * @brief Get the velocity commanded to the robot. Depending on scaling,
+ * may not be the same numbers passed to setCmdVel().
+ *
+ * @return std::pair<double, double> Pair of thetaVel, xVel.
+ */
 std::pair<double, double> getCmdVel();
 
 // read measurement from the lidar

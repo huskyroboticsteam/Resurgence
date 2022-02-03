@@ -10,6 +10,7 @@
 #include "../log.h"
 #include "../simulator/utils.h"
 #include "world_interface.h"
+#include "kinematic_common_interface.h"
 
 #include <future>
 #include <iostream>
@@ -26,12 +27,8 @@ extern "C" {
 
 using nlohmann::json;
 
-struct timeval last_odom_reading_;
-transform_t last_odom_tf_;
-double odom_dtheta_, odom_dx_;
-
 // map that associates camera id to the camera object
-std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+static std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 
 void setupCameras() {
 	try {
@@ -51,11 +48,6 @@ void world_interface_init() {
 	bool gps_success = gps::usb::startGPSThread();
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
-
-	gettimeofday(&last_odom_reading_, NULL);
-	last_odom_tf_ = toTransform({0., 0., 0.});
-	odom_dtheta_ = 0.0;
-	odom_dx_ = 0.0;
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
@@ -108,33 +100,6 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
 		return {};
 	}
-}
-
-transform_t getOdomAt(const struct timeval& time) {
-	double elapsed = getElapsedUsecs(last_odom_reading_, time) / 1000000.0;
-	double delta_theta = odom_dtheta_ * elapsed;
-	double rel_x, rel_y, rel_th;
-	rel_th = odom_dtheta_ * elapsed;
-	if (fabs(odom_dtheta_) < 0.000001) {
-		rel_x = odom_dx_ * elapsed;
-		rel_y = 0.0;
-	} else {
-		double turn_radius = odom_dx_ / odom_dtheta_;
-		rel_x = turn_radius * sin(rel_th);
-		rel_y = turn_radius * (1 - cos(rel_th));
-	}
-	transform_t rel_tf = toTransform({rel_x, rel_y, rel_th});
-	return rel_tf * last_odom_tf_;
-}
-
-void setCmdVelToIntegrate(double dtheta, double dx) {
-	struct timeval now;
-	gettimeofday(&now, NULL);
-	transform_t new_tf = getOdomAt(now);
-	last_odom_reading_ = now;
-	last_odom_tf_ = new_tf;
-	odom_dtheta_ = dtheta;
-	odom_dx_ = dx;
 }
 
 // Distance between left and right wheels.
@@ -198,22 +163,12 @@ double setCmdVel(double dtheta, double dx) {
 	return scale_down_factor;
 }
 
-std::pair<double, double> getCmdVel() {
-	return {odom_dtheta_, odom_dx_};
-}
-
 landmarks_t readLandmarks() {
 	return AR::readLandmarks();
 }
 
 DataPoint<points_t> readLidarScan() {
 	return lidar::readLidar();
-}
-
-DataPoint<transform_t> readOdom() {
-	struct timeval now;
-	gettimeofday(&now, NULL);
-	return getOdomAt(now);
 }
 
 DataPoint<pose_t> readVisualOdomVel() {

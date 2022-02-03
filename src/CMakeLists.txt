@@ -58,7 +58,7 @@ Windows systems.")
 set(WITH_LIDAR ON CACHE BOOL "Enable/Disable the USB LiDAR interface.")
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
-set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
+set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP" "SIMULATOR3D")
 set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
 
 if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
@@ -183,8 +183,19 @@ add_library(real_world_interface STATIC
   ar/read_landmarks.cpp
   gps/usb_gps/read_usb_gps.cpp
   )
+add_library(sim3d_interface STATIC
+  world_interface/sim_3d_interface.cpp
+  camera/Camera.cpp
+  camera/CameraParams.cpp
+  ar/Detector.cpp
+  ar/MarkerSet.cpp
+  ar/MarkerPattern.cpp
+  ar/Tag.cpp
+  ar/read_landmarks.cpp)
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
+target_include_directories(sim3d_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(sim3d_interface ${vision_libs})
 
 add_library(hr_slam SHARED
   simulator/graph.cpp
@@ -192,12 +203,18 @@ add_library(hr_slam SHARED
   simulator/factors.cpp
   )
 
-add_subdirectory(lidar)
+if(WITH_LIDAR)
+  add_subdirectory(lidar)
+endif()
+
 list(APPEND real_world_libs
   real_world_interface
   ${libgps_LIBRARIES}
   lidar_interface
   URGLidar::urg_c)
+
+list(APPEND sim3d_libs
+  sim3d_interface)
 
 add_executable(Rover rover_main.cpp)
 add_library(rover_common SHARED
@@ -216,6 +233,7 @@ add_library(rover_common SHARED
   Util.cpp
   gps/gps_util.cpp
   world_interface/gps_common_interface.cpp
+  world_interface/kinematic_common_interface.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
@@ -235,9 +253,17 @@ list(APPEND rover_libs
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
   nlohmann_json::nlohmann_json)
-target_link_libraries(Rover ${rover_libs})
+# target_link_libraries(Rover ${rover_libs})
 target_link_libraries(Rover
-  ${rover_libs} real_base_station ${real_world_libs})
+  ${rover_libs} real_base_station)
+
+if(WORLD_INTERFACE STREQUAL "REAL")
+  target_link_libraries(Rover ${real_world_libs})
+elseif(WORLD_INTERFACE STREQUAL "SIMULATOR3D")
+  target_link_libraries(Rover ${sim3d_libs})
+else()
+  target_link_libraries(Rover ${real_world_libs}) # TODO: support other interfaces
+endif()
 
 list(APPEND vision_libs
   ${OpenCV_LIBS}

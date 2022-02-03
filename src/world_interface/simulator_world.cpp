@@ -1,6 +1,8 @@
 #include "../simulator/world.h"
 #include "world_interface.h"
 
+#include "kinematic_common_interface.h"
+
 #include <iostream>
 #include <unistd.h>
 
@@ -23,11 +25,8 @@ void world_interface_init() {
 double setCmdVel(double dtheta, double dx) {
 	world.setCmdVel(dtheta, dx);
 	cmdVel = {dtheta, dx};
+	setCmdVelToIntegrate(dtheta, dx);
 	return 1.0;
-}
-
-std::pair<double, double> getCmdVel() {
-	return cmdVel;
 }
 
 DataPoint<points_t> readLidarScan() {
@@ -56,10 +55,6 @@ DataPoint<gpscoords_t> gps::readGPSCoords() {
 
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
-}
-
-DataPoint<transform_t> readOdom() {
-	return world.readOdom();
 }
 
 URCLeg getLeg(int index) {
