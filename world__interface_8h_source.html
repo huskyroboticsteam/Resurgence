@@ -114,23 +114,25 @@ $(function() {
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;point_t&gt;</a> readGPS();</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>std::optional&lt;point_t&gt; gpsToMeters(<span class="keyword">const</span> <a class="code hl_struct" href="structgpscoords__t.html">gpscoords_t</a> &amp;coord);</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment">// Calculates the current transform in the global frame based purely on forward kinematics</span></div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;transform_t&gt;</a> readOdom();</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment">// Calculate the current pose velocity (in the robot&#39;s reference frame) using visual odometry.</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;pose_t&gt;</a> readVisualOdomVel();</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment">// `index` must be in the range 0-6 (the URC competition will have 7 legs)</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><a class="code hl_struct" href="structURCLeg.html">URCLeg</a> getLeg(<span class="keywordtype">int</span> <a class="code hl_variableRef" href="https://docs.opencv.org/4.2.0/d9/db7/group__datasets__gr.html#gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c">index</a>);</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="comment">// set the indicator to indicate the given signal. May no-op if indicator is not supported.</span></div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="keywordtype">void</span> setIndicator(indication_t signal);</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="keywordtype">void</span> setMotorPWM(<span class="keyword">const</span> <a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&amp; motor, <span class="keywordtype">double</span> normalizedPWM);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;double&gt;</a> readIMUHeading();</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>std::optional&lt;point_t&gt; gpsToMeters(<span class="keyword">const</span> <a class="code hl_struct" href="structgpscoords__t.html">gpscoords_t</a> &amp;coord);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment">// Calculates the current transform in the global frame based purely on forward kinematics</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;transform_t&gt;</a> readOdom();</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment">// Calculate the current pose velocity (in the robot&#39;s reference frame) using visual odometry.</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><a class="code hl_class" href="classDataPoint.html">DataPoint&lt;pose_t&gt;</a> readVisualOdomVel();</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment">// `index` must be in the range 0-6 (the URC competition will have 7 legs)</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><a class="code hl_struct" href="structURCLeg.html">URCLeg</a> getLeg(<span class="keywordtype">int</span> <a class="code hl_variableRef" href="https://docs.opencv.org/4.2.0/d9/db7/group__datasets__gr.html#gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c">index</a>);</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment">// set the indicator to indicate the given signal. May no-op if indicator is not supported.</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="keywordtype">void</span> setIndicator(indication_t signal);</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="keywordtype">void</span> setMotorPos(<span class="keyword">const</span> <a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&amp; motor, <a class="code hl_typedefRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos);</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="keywordtype">void</span> setMotorPWM(<span class="keyword">const</span> <a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&amp; motor, <span class="keywordtype">double</span> normalizedPWM);</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span> </div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="keywordtype">void</span> setMotorPos(<span class="keyword">const</span> <a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&amp; motor, <a class="code hl_typedefRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos);</div>
 <div class="ttc" id="aa01016_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01016.html">optional</a></div></div>
 <div class="ttc" id="aa01516_html_gaa5dbcd13c2fb305025ac6784482d05a5"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a></div><div class="ttdeci">_GLIBCXX_END_NAMESPACE_CXX11 typedef basic_string&lt; char &gt; string</div></div>
 <div class="ttc" id="aa07803_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a></div></div>
