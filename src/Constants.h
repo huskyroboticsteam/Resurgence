@@ -35,6 +35,10 @@ const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera nam
 constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
 constexpr uint16_t WS_SERVER_PORT = 3001;
 
+const std::string MC_PROTOCOL_NAME = "/mission-control";
+const std::string SIM_PROTOCOL_NAME = "/simulator";
+const std::string DGPS_PROTOCOL_NAME = "/dgps";
+  
 namespace Nav {
 const double RADIAN_COST = EFF_WHEEL_BASE / 2.0; // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
 const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3; // Planner stays this far away from obstacles (m)
