@@ -103,6 +103,14 @@ bool gpsHasFix();
 DataPoint<point_t> readGPS();
 
 /**
+ * @brief Read the current heading in the global map frame based on an IMU measurement.
+ * Note that the heading is in radians, CCW, and 0=North.
+ *
+ * @return DataPoint<double> The last heading reading, or none if measurement not available.
+ */
+DataPoint<double> readIMUHeading();
+
+/**
  * @brief Convert GPS coordinates into a coordinate on the map frame.
  *
  * @param coord The coord to transform into map space.

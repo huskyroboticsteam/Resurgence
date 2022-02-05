@@ -171,6 +171,10 @@ DataPoint<points_t> readLidarScan() {
 	return lidar::readLidar();
 }
 
+DataPoint<double> readIMUHeading() {
+	return {}; // TODO: interface with IMU
+}
+
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
