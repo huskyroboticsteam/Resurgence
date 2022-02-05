@@ -210,6 +210,10 @@ DataPoint<points_t> readLidarScan() {
 	return lidar::readLidar();
 }
 
+DataPoint<double> readIMUHeading() {
+	return {}; // TODO: interface with IMU
+}
+
 DataPoint<transform_t> readOdom() {
 	struct timeval now;
 	gettimeofday(&now, NULL);

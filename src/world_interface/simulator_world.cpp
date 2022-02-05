@@ -54,6 +54,10 @@ DataPoint<gpscoords_t> gps::readGPSCoords() {
 	return coords;
 }
 
+DataPoint<double> readIMUHeading() {
+	return {};
+}
+
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
