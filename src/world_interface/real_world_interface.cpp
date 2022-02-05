@@ -210,7 +210,7 @@ DataPoint<points_t> readLidarScan() {
 	return lidar::readLidar();
 }
 
-DataPoint<double> readHeading() {
+DataPoint<double> readIMUHeading() {
 	return {}; // TODO: interface with IMU
 }
 

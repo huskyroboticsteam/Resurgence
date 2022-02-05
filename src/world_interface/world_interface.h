@@ -102,7 +102,7 @@ DataPoint<point_t> readGPS();
  *
  * @return DataPoint<double> The last heading reading, or none if measurement not available.
  */
-DataPoint<double> readHeading();
+DataPoint<double> readIMUHeading();
 
 /**
  * @brief Convert GPS coordinates into a coordinate on the map frame.

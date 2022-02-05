@@ -24,7 +24,7 @@ DataPoint<gpscoords_t> gps::readGPSCoords() {
 	return {};
 }
 
-DataPoint<double> readHeading() {
+DataPoint<double> readIMUHeading() {
 	return {};
 }
 
