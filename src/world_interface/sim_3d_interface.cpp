@@ -25,6 +25,8 @@ constexpr double MAX_WHEEL_VEL =
 	Constants::WHEEL_RADIUS * Constants::MAX_DRIVE_PWM / Constants::PWM_PER_RAD_PER_SEC;
 const std::string PROTOCOL_PATH("/simulator");
 
+std::map<std::string, std::mutex> mutexMap;
+
 DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
 DataPoint<double> lastHeading;
 DataPoint<gpscoords_t> lastGPS;
@@ -51,6 +53,7 @@ void initCameras() {
 
 void handleGPS(json msg) {
 	gpscoords_t coords{msg["latitude"], msg["longitude"]};
+	std::lock_guard<std::mutex> guard(mutexMap["gps"]);
 	lastGPS = {coords};
 }
 
@@ -63,6 +66,7 @@ void handleLidar(json msg) {
 		double theta = point["theta"];
 		lidar.push_back({r * std::cos(theta), r * std::sin(theta), 1});
 	}
+	std::lock_guard<std::mutex> guard(mutexMap["lidar"]);
 	lastLidar = {now, lidar};
 }
 
@@ -81,11 +85,16 @@ void handleIMU(json msg) {
 	transformedX(2) = 0;
 	// recover heading
 	double heading = std::atan2(transformedX(1), transformedX(0));
+	std::lock_guard<std::mutex> guard(mutexMap["imu"]);
 	lastHeading = {heading};
 }
 
 void handleCamFrame(json msg) {
 	// TODO: deserialize b64 -> cv::Mat
+}
+
+void handleMotorStatus(json msg) {
+	// TODO: forward to mission control
 }
 
 void clientConnected() {
@@ -107,8 +116,7 @@ void initSimServer() {
 	protocol.addMessageHandler("simLidarReport", handleLidar);
 	protocol.addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol.addMessageHandler("simCameraStreamReport", handleCamFrame);
-	protocol.addMessageHandler("simMotorStatusReport",
-							   [](json o) { log(LOG_INFO, "%s\n", o.dump().c_str()); });
+	protocol.addMessageHandler("simMotorStatusReport", handleMotorStatus);
 	protocol.addConnectionHandler(clientConnected);
 	protocol.addDisconnectionHandler(clientDisconnected);
 
@@ -124,9 +132,16 @@ void initSimServer() {
 	initCameras();
 }
 
+void initMutexMap() {
+	mutexMap["imu"];
+	mutexMap["gps"];
+	mutexMap["lidar"];
+}
+
 } // namespace
 
 void world_interface_init() {
+	initMutexMap();
 	initSimServer();
 	initCameras();
 
@@ -164,7 +179,6 @@ double setCmdVel(double dtheta, double dx) {
 		lPWM /= maxAbsPWM;
 		rPWM /= maxAbsPWM;
 	}
-	log(LOG_INFO, "l=%.2f, r=%.2f\n", lPWM, rPWM);
 
 	setCmdVelToIntegrate(wheelVels);
 	setMotorPWM("frontLeftWheel", lPWM);
@@ -180,6 +194,7 @@ landmarks_t readLandmarks() {
 }
 
 DataPoint<points_t> readLidarScan() {
+	std::lock_guard<std::mutex> guard(mutexMap["lidar"]);
 	return lastLidar;
 }
 
@@ -188,7 +203,13 @@ DataPoint<pose_t> readVisualOdomVel() {
 }
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {
+	std::lock_guard<std::mutex> guard(mutexMap["gps"]);
 	return lastGPS;
+}
+
+DataPoint<double> readIMUHeading() {
+	std::lock_guard<std::mutex> guard(mutexMap["imu"]);
+	return lastHeading;
 }
 
 URCLeg getLeg(int index) {
