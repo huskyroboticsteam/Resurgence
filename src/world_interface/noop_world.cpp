@@ -24,6 +24,10 @@ DataPoint<gpscoords_t> gps::readGPSCoords() {
 	return {};
 }
 
+DataPoint<double> readHeading() {
+	return {};
+}
+
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
