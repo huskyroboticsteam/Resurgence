@@ -182,6 +182,7 @@ add_library(real_world_interface STATIC
   ar/Tag.cpp
   ar/read_landmarks.cpp
   gps/usb_gps/read_usb_gps.cpp
+  base64/base64_img.cpp
   )
 add_library(sim3d_interface STATIC
   world_interface/sim_3d_interface.cpp
@@ -224,6 +225,7 @@ add_library(rover_common SHARED
   Globals.cpp
   log.cpp
   rospub.cpp
+  base64/base64.cpp
   Networking/ParseBaseStation.cpp
   Networking/IK.cpp
   Networking/ParseCAN.cpp
