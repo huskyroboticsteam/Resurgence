@@ -192,7 +192,8 @@ add_library(sim3d_interface STATIC
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
   ar/Tag.cpp
-  ar/read_landmarks.cpp)
+  ar/read_landmarks.cpp
+  base64/base64_img.cpp)
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
 target_include_directories(sim3d_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})

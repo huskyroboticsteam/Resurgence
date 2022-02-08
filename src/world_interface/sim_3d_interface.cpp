@@ -2,6 +2,7 @@
 #include "../Globals.h"
 #include "../Networking/websocket/WebSocketProtocol.h"
 #include "../ar/read_landmarks.h"
+#include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
@@ -31,8 +32,13 @@ DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
 DataPoint<double> lastHeading;
 DataPoint<gpscoords_t> lastGPS;
 DataPoint<points_t> lastLidar;
+// stores the last camera frame for each camera
 std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
-std::shared_mutex cameraFrameMapMutex;
+// stores the index of the last camera frame for each camera
+// cameraFrameMap is not guaranteed to have valid data points,
+// but this one is guaranteed to have indices, if there are any
+std::map<CameraID, uint32_t> cameraLastFrameIdxMap;
+std::shared_mutex cameraFrameMapMutex; // protects both of the above maps
 
 std::condition_variable connectionCV;
 std::mutex connectionMutex;
@@ -90,7 +96,22 @@ void handleIMU(json msg) {
 }
 
 void handleCamFrame(json msg) {
-	// TODO: deserialize b64 -> cv::Mat
+	std::string cam = msg["camera"];
+	std::string b64 = msg["data"];
+	cv::Mat mat = base64::decodeMat(b64);
+
+	// acquire exclusive lock
+	std::lock_guard<std::shared_mutex> lock(cameraFrameMapMutex);
+	auto entry = cameraLastFrameIdxMap.find(cam);
+	uint32_t idx = 0;
+	if (entry != cameraLastFrameIdxMap.end()) {
+		idx = entry->second + 1;
+	}
+
+	CameraFrame cf = {mat, idx};
+	DataPoint<CameraFrame> df(cf);
+	cameraFrameMap[cam] = df;
+	cameraLastFrameIdxMap[cam] = idx;
 }
 
 void handleMotorStatus(json msg) {
@@ -148,15 +169,28 @@ void world_interface_init() {
 	AR::initializeLandmarkDetection();
 }
 
-// TODO: implement camera methods
-
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
-	return {};
+	// acquire shared lock
+	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
+	auto cfEntry = cameraFrameMap.find(cameraID);
+	if (cfEntry == cameraFrameMap.end() || !cfEntry->second.isValid()) {
+		return false;
+	}
+	return cfEntry->second.getData().second != oldFrameNum;
 }
 
 DataPoint<CameraFrame> readCamera(CameraID cameraID) {
-	return {};
+	// acquire shared lock
+	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
+	auto cfEntry = cameraFrameMap.find(cameraID);
+	if (cfEntry != cameraFrameMap.end()) {
+		return cfEntry->second;
+	} else {
+		return {};
+	}
 }
+
+// TODO: load camera config and report intrinsic/extrinsic parameters
 
 std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 	return {};
