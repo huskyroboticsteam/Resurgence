@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include "CameraConfig.h"
+
 #include <iostream>
 
 using cv::Mat;
@@ -11,8 +13,7 @@ Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _capture(std::make_shared<cv::VideoCapture>()),
 	  _frame_lock(std::make_shared<std::mutex>()),
-	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {
-}
+	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
 bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_params) {
 	if (*_running) {
@@ -82,57 +83,27 @@ Camera::Camera(const Camera& other)
 	  _name(other._name), _description(other._description), _frame_lock(other._frame_lock),
 	  _capture_lock(other._capture_lock), _thread(other._thread),
 	  _intrinsic_params(other._intrinsic_params), _extrinsic_params(other._extrinsic_params),
-	  _running(other._running) {
-}
-
-invalid_camera_config::invalid_camera_config() : _msg("Invalid camera configuration") {
-}
-
-invalid_camera_config::invalid_camera_config(const string& msg)
-	: _msg("Invalid camera configuration: " + msg) {
-}
-
-const char* invalid_camera_config::what() const noexcept {
-	return _msg.c_str();
-}
+	  _running(other._running) {}
 
 bool Camera::openFromConfigFile(std::string filename) {
-	cv::FileStorage fs(filename, cv::FileStorage::READ);
-	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file " + filename + " does not exist");
-	}
+	CameraConfig cfg = readConfigFromFile(filename);
 
-	// read intrinsic parameters
-	CameraParams intrinsics;
-	if (!fs[KEY_INTRINSIC_PARAMS].empty()) {
-		fs[KEY_INTRINSIC_PARAMS] >> intrinsics;
-	}
-
-	// read extrinsic parameters
 	cv::Mat extrinsics;
-	if (!fs[KEY_EXTRINSIC_PARAMS].empty()) {
-		fs[KEY_EXTRINSIC_PARAMS] >> extrinsics;
+	if (cfg.extrinsicParams) {
+		extrinsics = cfg.extrinsicParams.value();
 	}
 
-	// read name
-	if (fs[KEY_NAME].empty()) {
-		throw invalid_camera_config(KEY_NAME + " must be present");
-	}
-	_name = (string)fs[KEY_NAME];
-
-	// read description
-	if (!fs[KEY_DESCRIPTION].empty()) {
-		_description = (string)fs[KEY_DESCRIPTION];
+	CameraParams intrinsics;
+	if (cfg.intrinsicParams) {
+		intrinsics = cfg.intrinsicParams.value();
 	}
 
-	// read filename or camera ID, and open camera.
-	if (!fs[KEY_FILENAME].empty()) {
-		string cam_file = (string)fs[KEY_FILENAME];
-		return this->open(cam_file, intrinsics, extrinsics);
-	} else if (!fs[KEY_CAMERA_ID].empty()) {
-		int cam_id = (int)fs[KEY_CAMERA_ID];
-		return this->open(cam_id, intrinsics, extrinsics);
+	if (cfg.filename) {
+		return this->open(cfg.filename.value(), intrinsics, extrinsics);
+	} else if (cfg.cameraID) {
+		return this->open(cfg.cameraID.value(), intrinsics, extrinsics);
 	} else {
+		// this should never happen
 		throw invalid_camera_config("One of " + KEY_FILENAME + " or " + KEY_CAMERA_ID +
 									" must be present");
 	}
