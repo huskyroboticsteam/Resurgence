@@ -176,6 +176,7 @@ add_library(real_world_interface STATIC
   lidar/read_hokuyo_lidar.cpp
   camera/Camera.cpp
   camera/CameraParams.cpp
+  camera/CameraConfig.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
