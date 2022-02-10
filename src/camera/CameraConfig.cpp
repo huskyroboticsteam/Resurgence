@@ -42,7 +42,7 @@ const char* invalid_camera_config::what() const noexcept {
 	return _msg.c_str();
 }
 
-CameraConfig readConfigFromFile(std::string filename) {
+CameraConfig readConfigFromFile(const std::string& filename) {
 	cv::FileStorage fs(filename, cv::FileStorage::READ);
 	if (!fs.isOpened()) {
 		throw std::invalid_argument("Configuration file " + filename + " does not exist");

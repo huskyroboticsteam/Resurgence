@@ -34,15 +34,48 @@ private:
 	std::string _msg;
 };
 
+/**
+ * @brief A struct that represents the information outlined in @ref cameraparams.
+ */
 struct CameraConfig {
+	/**
+	 * @brief The name of the camera.
+	 */
 	std::string name;
+	/**
+	 * @brief If specified, gives the intrinsic parameter matrix.
+	 */
 	std::optional<CameraParams> intrinsicParams;
+	/**
+	 * @brief If specified, gives the extrinsic parameter matrix.
+	 */
 	std::optional<cv::Mat> extrinsicParams;
+	/**
+	 * @brief If specified, gives the file to which the camera should be streamed.
+	 */
 	std::optional<std::string> filename;
+	/**
+	 * @brief If specified, gives the id of the camera.
+	 */
 	std::optional<int> cameraID;
+	/**
+	 * @brief If specified, gives the text description of the camera.
+	 */
 	std::optional<std::string> description;
 };
 
-CameraConfig readConfigFromFile(std::string filename);
+/**
+ * @brief Read the camera config from the specified file.
+ *
+ * @param filename The path to the configuration file to open and read. Configuration file
+ * should be formatted as described in @ref cameraconfig.
+ *
+ * @return CameraConfig The parsed camera config object.
+ *
+ * @throws invalid_camera_config If the configuration is invalid for any reason.
+ *
+ * @throws invalid_argument If the file does not exist.
+ */
+CameraConfig readConfigFromFile(const std::string& filename);
 
 } // namespace cam
