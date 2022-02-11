@@ -9,6 +9,37 @@
 
 namespace cam {
 
+/**@{*/
+/**
+   Config file key for camera filename.
+ */
+const std::string KEY_FILENAME = "filename";
+/**
+   Config file key for camera id.
+ */
+const std::string KEY_CAMERA_ID = "camera_id";
+/**
+   Config file key for intrinsic parameters.
+ */
+const std::string KEY_INTRINSIC_PARAMS = "intrinsic_params";
+/**
+   Config file key for extrinsic parameters.
+ */
+const std::string KEY_EXTRINSIC_PARAMS = "extrinsic_params";
+/**
+   Config file key for calibration information.
+ */
+const std::string KEY_CALIB_INFO = "calib_info";
+/**
+   Config file key for camera name.
+ */
+const std::string KEY_NAME = "name";
+/**
+   Config file key for camera description.
+ */
+const std::string KEY_DESCRIPTION = "description";
+/**@}*/
+
 /**
 Exception for errors in the camera configuration.
 */
