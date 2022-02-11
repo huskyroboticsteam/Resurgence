@@ -82,7 +82,7 @@ struct CameraConfig {
 	 */
 	std::optional<cv::Mat> extrinsicParams;
 	/**
-	 * @brief If specified, gives the file to which the camera should be streamed.
+	 * @brief If specified, gives the file from which the camera should be streamed.
 	 */
 	std::optional<std::string> filename;
 	/**
