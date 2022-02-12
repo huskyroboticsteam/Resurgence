@@ -10,6 +10,17 @@
 
 namespace cam {
 
+/**
+   @addtogroup camera
+   @{
+ */
+
+/**
+	@name Configuration File Keys
+
+	The following are constants for the keys used in the camera configuration
+	files. See @ref cameraconfig for more details.
+*/
 /**@{*/
 /**
    Config file key for camera filename.
@@ -67,7 +78,7 @@ private:
 };
 
 /**
- * @brief A struct that represents the information outlined in @ref cameraparams.
+ * @brief A struct that represents the information outlined in @ref cameraconfig.
  */
 struct CameraConfig {
 	/**
@@ -112,5 +123,7 @@ struct CameraConfig {
  * @throws invalid_argument If the file does not exist.
  */
 CameraConfig readConfigFromFile(const std::string& filename);
+
+/** @} */
 
 } // namespace cam
