@@ -17,7 +17,7 @@ class CameraParams;
  *
  * @see WORLD_INTERFACE
  */
-enum class WorldInterface {real, sim2d, sim3d, noop};
+enum class WorldInterface { real, sim2d, sim3d, noop };
 
 /**
  * @brief The current world interface being used.
@@ -136,7 +136,7 @@ DataPoint<pose_t> getTruePose();
  * @return std::optional<point_t> The transformed point, or an empty datapoint
  * if the GPS does not have a fix.
  */
-std::optional<point_t> gpsToMeters(const gpscoords_t &coord);
+std::optional<point_t> gpsToMeters(const gpscoords_t& coord);
 
 // Calculates the current transform in the global frame based purely on forward kinematics
 DataPoint<transform_t> readOdom();
@@ -162,6 +162,7 @@ void setMotorPWM(const std::string& motor, double normalizedPWM);
  * @brief Set the target position of the motor.
  *
  * @param motor The name of the motor. Must be a valid motor name.
- * @param targetPos The target position. Refer to the specific motor for more information.
+ * @param targetPos The target position, in millidegrees. Refer to the specific motor for more
+ * information.
  */
 void setMotorPos(const std::string& motor, int32_t targetPos);
