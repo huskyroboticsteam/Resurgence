@@ -27,6 +27,8 @@ extern "C" {
 
 using nlohmann::json;
 
+const WorldInterface WORLD_INTERFACE = WorldInterface::real;
+
 // map that associates camera id to the camera object
 static std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 

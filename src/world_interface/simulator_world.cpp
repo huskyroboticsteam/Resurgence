@@ -6,6 +6,8 @@
 #include <iostream>
 #include <unistd.h>
 
+const WorldInterface WORLD_INTERFACE = WorldInterface::sim2d;
+
 World world;
 std::pair<double, double> cmdVel(0, 0);
 

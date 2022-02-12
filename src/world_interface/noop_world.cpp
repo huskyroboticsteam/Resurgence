@@ -2,6 +2,8 @@
 
 #include <unistd.h>
 
+const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
+
 void world_interface_init() {}
 
 DataPoint<points_t> readLidarScan() {

@@ -175,6 +175,8 @@ void initSimServer() {
 
 } // namespace
 
+const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
+
 void world_interface_init() {
 	initSimServer();
 	initCameras();

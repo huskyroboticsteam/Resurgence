@@ -12,6 +12,18 @@ namespace cam {
 class CameraParams;
 }
 
+/**
+ * @brief An enum which defines the possible types of world interfaces.
+ *
+ * @see WORLD_INTERFACE
+ */
+enum class WorldInterface {real, sim2d, sim3d, noop};
+
+/**
+ * @brief The current world interface being used.
+ */
+extern const WorldInterface WORLD_INTERFACE;
+
 // Call this before trying to do anything else
 void world_interface_init();
 
