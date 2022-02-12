@@ -67,10 +67,7 @@ bool validateMotorPositionRequest(const json& j) {
 void handleMotorPositionRequest(const json& j) {}
 
 bool validateCameraStreamOpenRequest(const json& j) {
-	return validateKey(j, "camera", val_t::string) &&
-		   validateKey(j, "fps", val_t::number_unsigned) &&
-		   validateKey(j, "width", val_t::number_unsigned) &&
-		   validateKey(j, "height", val_t::number_unsigned);
+	return validateKey(j, "camera", val_t::string);
 }
 
 void handleCameraStreamOpenRequest(const json& j) {}
@@ -122,4 +119,4 @@ static constexpr bool validateRange(const json& j, const std::string& key, doubl
 		   static_cast<double>(j) <= max;
 }
 
-} // namespace proto
+} // namespace mc
