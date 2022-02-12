@@ -111,6 +111,13 @@ DataPoint<point_t> readGPS();
 DataPoint<double> readIMUHeading();
 
 /**
+ * @brief Get the ground truth pose, if available. This is only available in simulation.
+ *
+ * @return DataPoint<pose_t> The ground truth pose, or an empty datapoint if unavailable.
+ */
+DataPoint<pose_t> getTruePose();
+
+/**
  * @brief Convert GPS coordinates into a coordinate on the map frame.
  *
  * @param coord The coord to transform into map space.

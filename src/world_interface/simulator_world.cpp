@@ -57,6 +57,10 @@ DataPoint<double> readIMUHeading() {
 	return {};
 }
 
+DataPoint<pose_t> getTruePose() {
+	return {};
+}
+
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }

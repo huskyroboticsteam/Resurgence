@@ -163,6 +163,10 @@ double setCmdVel(double dtheta, double dx) {
 	return scale_down_factor;
 }
 
+DataPoint<pose_t> getTruePose() {
+	return {};
+}
+
 landmarks_t readLandmarks() {
 	return AR::readLandmarks();
 }

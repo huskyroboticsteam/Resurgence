@@ -37,6 +37,9 @@ std::mutex gpsMutex;
 DataPoint<points_t> lastLidar;
 std::mutex lidarMutex;
 
+DataPoint<pose_t> lastTruePose;
+std::mutex truePoseMutex;
+
 // stores the last camera frame for each camera
 std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // stores the index of the last camera frame for each camera
@@ -121,7 +124,17 @@ void handleMotorStatus(json msg) {
 }
 
 void handleTruePose(json msg) {
-	// TODO: implement getter for this
+	auto pos = msg["position"];
+	auto rot = msg["rotation"];
+	double qw = rot["w"];
+	double qx = rot["x"];
+	double qy = rot["y"];
+	double qz = rot["z"];
+	double heading = util::quatToHeading(qw, qx, qy, qz);
+
+	pose_t pose = {pos["x"], pos["y"], heading};
+	std::lock_guard<std::mutex> lock(truePoseMutex);
+	lastTruePose = {pose};
 }
 
 void clientConnected() {
@@ -262,6 +275,11 @@ DataPoint<gpscoords_t> gps::readGPSCoords() {
 DataPoint<double> readIMUHeading() {
 	std::lock_guard<std::mutex> guard(headingMutex);
 	return lastHeading;
+}
+
+DataPoint<pose_t> getTruePose() {
+	std::lock_guard<std::mutex> guard(truePoseMutex);
+	return lastTruePose;
 }
 
 URCLeg getLeg(int index) {
