@@ -279,3 +279,38 @@ To build all of our executables (requires having all optional dependencies insta
 Otherwise you can specify just the specific executable you would like to run, e.g. `make RoverSim`. (You can still use the `-j` flag to parallelize the build.)
 
 To run our unit tests, run `make tests` and then execute `./tests`.
+
+## Running the Simulator
+
+### Building the rover code to work with the simulator
+
+The simulator does not have its own executable. Instead, you must configure the CMake variables and build the `Rover` target:
+
+```bash
+cd build
+cmake ../src -DWITH_CAN=OFF -DWITH_GPS=OFF -DWITH_LIDAR=OFF -DWITH_TESTS=OFF -DWORLD_INTERFACE=SIMULATOR3D
+make -j Rover
+```
+
+Note that (for now) unit tests cannot be run when configured to build the simulator rover code.
+
+### Running the simulator
+
+Launch the appropriate simulator executable for your platform. Then, run the rover code:
+
+```bash
+./Rover
+```
+
+The programs can be started in any order, it doesn't matter.
+
+### Switching back to building the real rover code
+
+Since the `Rover` target now builds the simulator rover code instead of the real rover code, we need to reconfigure CMake to build the real rover code again:
+
+```bash
+cd build
+rm -rf *
+cmake ../src
+make -j Rover
+```
