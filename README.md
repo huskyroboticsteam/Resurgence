@@ -282,6 +282,8 @@ To run our unit tests, run `make tests` and then execute `./tests`.
 
 ## Running the Simulator
 
+You can download the latest simulator build from the [simulator releases tab](https://github.com/huskyroboticsteam/Simulator/releases/latest).
+
 ### Building the rover code to work with the simulator
 
 The simulator does not have its own executable. Instead, you must configure the CMake variables and build the `Rover` target:
