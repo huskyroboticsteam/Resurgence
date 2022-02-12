@@ -79,6 +79,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcam_1_1Camera.html">Camera</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a camera on the rover, from which a video feed can be retrieved.  <a href="classcam_1_1Camera.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcam_1_1CameraConfig.html">CameraConfig</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A struct that represents the information outlined in cameraparams.  <a href="structcam_1_1CameraConfig.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcam_1_1CameraParams.html">CameraParams</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a set of intrinsic camera parameters.  <a href="classcam_1_1CameraParams.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -87,6 +90,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ab162965d19471ba55dd8126141ed702f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcam_1_1CameraConfig.html">CameraConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#ab162965d19471ba55dd8126141ed702f">readConfigFromFile</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;filename)</td></tr>
+<tr class="memdesc:ab162965d19471ba55dd8126141ed702f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the camera config from the specified file.  <a href="namespacecam.html#ab162965d19471ba55dd8126141ed702f">More...</a><br /></td></tr>
+<tr class="separator:ab162965d19471ba55dd8126141ed702f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga385fcc3b2e88c3692d7be7fb713a809a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga385fcc3b2e88c3692d7be7fb713a809a">read</a> (const <a class="elRef" href="https://docs.opencv.org/4.2.0/de/dd9/classcv_1_1FileNode.html">cv::FileNode</a> &amp;node, <a class="el" href="classcam_1_1CameraParams.html">CameraParams</a> &amp;params, const <a class="el" href="classcam_1_1CameraParams.html">CameraParams</a> &amp;default_value=<a class="el" href="classcam_1_1CameraParams.html">CameraParams</a>())</td></tr>
 <tr class="memdesc:ga385fcc3b2e88c3692d7be7fb713a809a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a <a class="el" href="classcam_1_1CameraParams.html" title="Represents a set of intrinsic camera parameters.">CameraParams</a> object from the given <a class="elRef" href="https://docs.opencv.org/4.2.0/de/dd9/classcv_1_1FileNode.html">cv::FileNode</a> object.  <a href="group__camera.html#ga385fcc3b2e88c3692d7be7fb713a809a">More...</a><br /></td></tr>
 <tr class="separator:ga385fcc3b2e88c3692d7be7fb713a809a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -105,23 +111,24 @@ Variables</h2></td></tr>
 <tr class="memitem:af457c9c8308904e74b727f1b51b59dcf"><td class="memItemLeft" align="right" valign="top"><a id="af457c9c8308904e74b727f1b51b59dcf" name="af457c9c8308904e74b727f1b51b59dcf"></a>
 const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b> = &quot;test_camera_params.yml&quot;</td></tr>
 <tr class="separator:af457c9c8308904e74b727f1b51b59dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
+<tr class="memitem:a213b10a1d4a1728106ee3d23fb05014b"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#a213b10a1d4a1728106ee3d23fb05014b">KEY_FILENAME</a> = &quot;filename&quot;</td></tr>
+<tr class="separator:a213b10a1d4a1728106ee3d23fb05014b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b1c0fd8767ce4e0a902baf28df55bbc"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#a9b1c0fd8767ce4e0a902baf28df55bbc">KEY_CAMERA_ID</a> = &quot;camera_id&quot;</td></tr>
+<tr class="separator:a9b1c0fd8767ce4e0a902baf28df55bbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fcd0c676f15d81994b2f589a56e32ca"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#a5fcd0c676f15d81994b2f589a56e32ca">KEY_INTRINSIC_PARAMS</a> = &quot;intrinsic_params&quot;</td></tr>
+<tr class="separator:a5fcd0c676f15d81994b2f589a56e32ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a233e5a5a576a5753e9669a017b63db58"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#a233e5a5a576a5753e9669a017b63db58">KEY_EXTRINSIC_PARAMS</a> = &quot;extrinsic_params&quot;</td></tr>
+<tr class="separator:a233e5a5a576a5753e9669a017b63db58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeda38d4f30aa43bca4c7b5959763fe9c"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#aeda38d4f30aa43bca4c7b5959763fe9c">KEY_CALIB_INFO</a> = &quot;calib_info&quot;</td></tr>
+<tr class="separator:aeda38d4f30aa43bca4c7b5959763fe9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a012c301e176ca2bd34d100a198675a5e"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#a012c301e176ca2bd34d100a198675a5e">KEY_NAME</a> = &quot;name&quot;</td></tr>
+<tr class="separator:a012c301e176ca2bd34d100a198675a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44d309a39b63e5e95e78003c43a0b075"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecam.html#a44d309a39b63e5e95e78003c43a0b075">KEY_DESCRIPTION</a> = &quot;description&quot;</td></tr>
+<tr class="separator:a44d309a39b63e5e95e78003c43a0b075"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Configuration File Keys</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p >The following are constants for the keys used in the camera configuration files. See <a class="el" href="cameraconfig.html">Camera Configuration</a> for more details. </p>
 </div></td></tr>
-<tr class="memitem:ga213b10a1d4a1728106ee3d23fb05014b"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga213b10a1d4a1728106ee3d23fb05014b">KEY_FILENAME</a> = &quot;filename&quot;</td></tr>
-<tr class="separator:ga213b10a1d4a1728106ee3d23fb05014b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9b1c0fd8767ce4e0a902baf28df55bbc"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga9b1c0fd8767ce4e0a902baf28df55bbc">KEY_CAMERA_ID</a> = &quot;camera_id&quot;</td></tr>
-<tr class="separator:ga9b1c0fd8767ce4e0a902baf28df55bbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5fcd0c676f15d81994b2f589a56e32ca"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga5fcd0c676f15d81994b2f589a56e32ca">KEY_INTRINSIC_PARAMS</a> = &quot;intrinsic_params&quot;</td></tr>
-<tr class="separator:ga5fcd0c676f15d81994b2f589a56e32ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga233e5a5a576a5753e9669a017b63db58"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga233e5a5a576a5753e9669a017b63db58">KEY_EXTRINSIC_PARAMS</a> = &quot;extrinsic_params&quot;</td></tr>
-<tr class="separator:ga233e5a5a576a5753e9669a017b63db58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaeda38d4f30aa43bca4c7b5959763fe9c"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaeda38d4f30aa43bca4c7b5959763fe9c">KEY_CALIB_INFO</a> = &quot;calib_info&quot;</td></tr>
-<tr class="separator:gaeda38d4f30aa43bca4c7b5959763fe9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga012c301e176ca2bd34d100a198675a5e"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga012c301e176ca2bd34d100a198675a5e">KEY_NAME</a> = &quot;name&quot;</td></tr>
-<tr class="separator:ga012c301e176ca2bd34d100a198675a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga44d309a39b63e5e95e78003c43a0b075"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga44d309a39b63e5e95e78003c43a0b075">KEY_DESCRIPTION</a> = &quot;description&quot;</td></tr>
-<tr class="separator:ga44d309a39b63e5e95e78003c43a0b075"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab7bc23b140e20ddc826d0c7aec467e79"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gab7bc23b140e20ddc826d0c7aec467e79">KEY_IMAGE_WIDTH</a> = &quot;image_width&quot;</td></tr>
 <tr class="separator:gab7bc23b140e20ddc826d0c7aec467e79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf2fa19088a3b13e980600b2c72f35fbc"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaf2fa19088a3b13e980600b2c72f35fbc">KEY_IMAGE_HEIGHT</a> = &quot;image_height&quot;</td></tr>
@@ -133,7 +140,148 @@ const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Namespace for camera access system. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="ab162965d19471ba55dd8126141ed702f" name="ab162965d19471ba55dd8126141ed702f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab162965d19471ba55dd8126141ed702f">&#9670;&nbsp;</a></span>readConfigFromFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structcam_1_1CameraConfig.html">CameraConfig</a> cam::readConfigFromFile </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read the camera config from the specified file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>The path to the configuration file to open and read. Configuration file should be formatted as described in <a class="el" href="cameraconfig.html">Camera Configuration</a>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structcam_1_1CameraConfig.html" title="A struct that represents the information outlined in cameraparams.">CameraConfig</a> The parsed camera config object.</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classcam_1_1invalid__camera__config.html">invalid_camera_config</a></td><td>If the configuration is invalid for any reason.</td></tr>
+    <tr><td class="paramname">invalid_argument</td><td>If the file does not exist. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aeda38d4f30aa43bca4c7b5959763fe9c" name="aeda38d4f30aa43bca4c7b5959763fe9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeda38d4f30aa43bca4c7b5959763fe9c">&#9670;&nbsp;</a></span>KEY_CALIB_INFO</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> cam::KEY_CALIB_INFO = &quot;calib_info&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Config file key for calibration information. </p>
+
+</div>
+</div>
+<a id="a9b1c0fd8767ce4e0a902baf28df55bbc" name="a9b1c0fd8767ce4e0a902baf28df55bbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b1c0fd8767ce4e0a902baf28df55bbc">&#9670;&nbsp;</a></span>KEY_CAMERA_ID</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> cam::KEY_CAMERA_ID = &quot;camera_id&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Config file key for camera id. </p>
+
+</div>
+</div>
+<a id="a44d309a39b63e5e95e78003c43a0b075" name="a44d309a39b63e5e95e78003c43a0b075"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44d309a39b63e5e95e78003c43a0b075">&#9670;&nbsp;</a></span>KEY_DESCRIPTION</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> cam::KEY_DESCRIPTION = &quot;description&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Config file key for camera description. </p>
+
+</div>
+</div>
+<a id="a233e5a5a576a5753e9669a017b63db58" name="a233e5a5a576a5753e9669a017b63db58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a233e5a5a576a5753e9669a017b63db58">&#9670;&nbsp;</a></span>KEY_EXTRINSIC_PARAMS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> cam::KEY_EXTRINSIC_PARAMS = &quot;extrinsic_params&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Config file key for extrinsic parameters. </p>
+
+</div>
+</div>
+<a id="a213b10a1d4a1728106ee3d23fb05014b" name="a213b10a1d4a1728106ee3d23fb05014b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a213b10a1d4a1728106ee3d23fb05014b">&#9670;&nbsp;</a></span>KEY_FILENAME</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> cam::KEY_FILENAME = &quot;filename&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Config file key for camera filename. </p>
+
+</div>
+</div>
+<a id="a5fcd0c676f15d81994b2f589a56e32ca" name="a5fcd0c676f15d81994b2f589a56e32ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fcd0c676f15d81994b2f589a56e32ca">&#9670;&nbsp;</a></span>KEY_INTRINSIC_PARAMS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> cam::KEY_INTRINSIC_PARAMS = &quot;intrinsic_params&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Config file key for intrinsic parameters. </p>
+
+</div>
+</div>
+<a id="a012c301e176ca2bd34d100a198675a5e" name="a012c301e176ca2bd34d100a198675a5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a012c301e176ca2bd34d100a198675a5e">&#9670;&nbsp;</a></span>KEY_NAME</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> cam::KEY_NAME = &quot;name&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Config file key for camera name. </p>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3

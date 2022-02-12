@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['r_0',['R',['https://docs.opencv.org/4.2.0/d0/ded/structcv_1_1face_1_1FacemarkAAM_1_1Config.html#a523237291402f020dd17d37e15321c40',1,'cv::face::FacemarkAAM::Config']]],
-  ['r_1',['r',['https://docs.opencv.org/4.2.0/d9/da0/structcv_1_1datasets_1_1MSM__middleburyObj.html#ac6e479e646f3e3b0babffa0e9225be70',1,'cv::datasets::MSM_middleburyObj::r()'],['https://docs.opencv.org/4.2.0/d3/d73/structcv_1_1detail_1_1tracked__cv__mat.html#a65576ef7daf7c86e056b42b34a80520f',1,'cv::detail::tracked_cv_mat::r()'],['https://docs.opencv.org/4.2.0/d1/df4/structcv_1_1detail_1_1tracked__cv__umat.html#a6a9a4f76fd04649d4d5fa85f56b3cfae',1,'cv::detail::tracked_cv_umat::r()']]],
-  ['r_2',['R',['https://docs.opencv.org/4.2.0/d4/d0a/structcv_1_1detail_1_1CameraParams.html#ab1fe6908cde4a9662e20f03e7dfcc272',1,'cv::detail::CameraParams']]],
+  ['r_0',['r',['https://docs.opencv.org/4.2.0/d3/d73/structcv_1_1detail_1_1tracked__cv__mat.html#a65576ef7daf7c86e056b42b34a80520f',1,'cv::detail::tracked_cv_mat::r()'],['https://docs.opencv.org/4.2.0/d1/df4/structcv_1_1detail_1_1tracked__cv__umat.html#a6a9a4f76fd04649d4d5fa85f56b3cfae',1,'cv::detail::tracked_cv_umat::r()']]],
+  ['r_1',['R',['https://docs.opencv.org/4.2.0/d4/d0a/structcv_1_1detail_1_1CameraParams.html#ab1fe6908cde4a9662e20f03e7dfcc272',1,'cv::detail::CameraParams::R()'],['https://docs.opencv.org/4.2.0/d0/ded/structcv_1_1face_1_1FacemarkAAM_1_1Config.html#a523237291402f020dd17d37e15321c40',1,'cv::face::FacemarkAAM::Config::R()']]],
+  ['r_2',['r',['https://docs.opencv.org/4.2.0/d9/da0/structcv_1_1datasets_1_1MSM__middleburyObj.html#ac6e479e646f3e3b0babffa0e9225be70',1,'cv::datasets::MSM_middleburyObj']]],
   ['r_5fkinv_3',['r_kinv',['https://docs.opencv.org/4.2.0/dc/d2c/structcv_1_1detail_1_1ProjectorBase.html#a2f30b2a02c9fddf1bacb47a805b00c82',1,'cv::detail::ProjectorBase']]],
   ['radius_4',['radius',['https://docs.opencv.org/4.2.0/d8/d07/structcv_1_1gapi_1_1wip_1_1draw_1_1Circle.html#acd0e72c915d2099cadcf27a76f041632',1,'cv::gapi::wip::draw::Circle']]],
   ['radius_5f_5',['radius_',['https://docs.opencv.org/4.2.0/dd/d05/classcv_1_1videostab_1_1DeblurerBase.html#a0af57e0803cb6bc72610185bb837fb58',1,'cv::videostab::DeblurerBase::radius_()'],['https://docs.opencv.org/4.2.0/d5/d00/classcv_1_1videostab_1_1InpainterBase.html#a2300c582c556d8e74329abe28f6d08ea',1,'cv::videostab::InpainterBase::radius_()'],['https://docs.opencv.org/4.2.0/d2/d6c/classcv_1_1videostab_1_1StabilizerBase.html#a9fceea8c4e22b8bbca30561d1a309e2e',1,'cv::videostab::StabilizerBase::radius_()']]],
@@ -78,8 +78,8 @@ var searchData=
   ['retr_5flist_75',['RETR_LIST',['https://docs.opencv.org/4.2.0/d3/dc0/group__imgproc__shape.html#gga819779b9857cc2f8601e6526a3a5bc71a48b9c2cb1056f775ae50bb68288b875e',1,]]],
   ['retr_5ftree_76',['RETR_TREE',['https://docs.opencv.org/4.2.0/d3/dc0/group__imgproc__shape.html#gga819779b9857cc2f8601e6526a3a5bc71ab10df56aed56c89a026580adc9431f58',1,]]],
   ['reverse_5fiteration_77',['reverse_iteration',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a11351.html#ace925c8be06b3640abb7b6f486290dabad65704fae44294b3e727d6704fd61ab6',1,'__gnu_pbds::container_traits']]],
-  ['rgb_78',['RGB',['https://docs.opencv.org/4.2.0/d5/ddf/classcv_1_1ogl_1_1Texture2D.html#a1838399ee67c0957c0ae42cabfa99033a1c819f641291e88d67ab432f67023a17',1,'cv::ogl::Texture2D']]],
-  ['rgb_79',['rgb',['https://docs.opencv.org/4.2.0/d6/d4b/structcv_1_1datasets_1_1GR__skigObj.html#aa3729704cbd03b83b2e9247b16e28ad1',1,'cv::datasets::GR_skigObj']]],
+  ['rgb_78',['rgb',['https://docs.opencv.org/4.2.0/d6/d4b/structcv_1_1datasets_1_1GR__skigObj.html#aa3729704cbd03b83b2e9247b16e28ad1',1,'cv::datasets::GR_skigObj']]],
+  ['rgb_79',['RGB',['https://docs.opencv.org/4.2.0/d5/ddf/classcv_1_1ogl_1_1Texture2D.html#a1838399ee67c0957c0ae42cabfa99033a1c819f641291e88d67ab432f67023a17',1,'cv::ogl::Texture2D']]],
   ['rgba_80',['RGBA',['https://docs.opencv.org/4.2.0/d5/ddf/classcv_1_1ogl_1_1Texture2D.html#a1838399ee67c0957c0ae42cabfa99033ab30fb919ec618eaa81c28235e568ef20',1,'cv::ogl::Texture2D']]],
   ['rgbd_5fnormals_5fimpl_5f_81',['rgbd_normals_impl_',['https://docs.opencv.org/4.2.0/d1/d5b/classcv_1_1rgbd_1_1RgbdNormals.html#a039c4c8dac9bdff17ddfaec856dae005',1,'cv::rgbd::RgbdNormals']]],
   ['rgbd_5fnormals_5fmethod_5ffals_82',['RGBD_NORMALS_METHOD_FALS',['https://docs.opencv.org/4.2.0/d1/d5b/classcv_1_1rgbd_1_1RgbdNormals.html#a47b8e2bd020dac1811e6af967ab882d9ac1f9aed92b2aade8fef82b1ed4d8af17',1,'cv::rgbd::RgbdNormals']]],
