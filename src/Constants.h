@@ -29,15 +29,16 @@ constexpr double SHOULDER_MAX = M_PI * 5. / 6.; // Can't quite lie flat
 constexpr double ELBOW_MIN = 0.0;
 constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent self-collisions
 
-const std::string AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
+constexpr const char* AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
 const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
 
 constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
 constexpr uint16_t WS_SERVER_PORT = 3001;
 
-const std::string MC_PROTOCOL_NAME = "/mission-control";
-const std::string SIM_PROTOCOL_NAME = "/simulator";
-const std::string DGPS_PROTOCOL_NAME = "/dgps";
+// TODO(evan): document these constants
+constexpr const char* MC_PROTOCOL_NAME = "/mission-control";
+constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
+constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
   
 namespace Nav {
 const double RADIAN_COST = EFF_WHEEL_BASE / 2.0; // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
