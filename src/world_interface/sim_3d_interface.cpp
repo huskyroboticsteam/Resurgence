@@ -26,13 +26,17 @@ namespace {
 constexpr double MAX_WHEEL_VEL =
 	Constants::WHEEL_RADIUS * Constants::MAX_DRIVE_PWM / Constants::PWM_PER_RAD_PER_SEC;
 const std::string PROTOCOL_PATH("/simulator");
+const DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
 
-std::map<std::string, std::mutex> mutexMap;
-
-DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
 DataPoint<double> lastHeading;
+std::mutex headingMutex;
+
 DataPoint<gpscoords_t> lastGPS;
+std::mutex gpsMutex;
+
 DataPoint<points_t> lastLidar;
+std::mutex lidarMutex;
+
 // stores the last camera frame for each camera
 std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // stores the index of the last camera frame for each camera
@@ -65,7 +69,7 @@ void initCameras() {
 
 void handleGPS(json msg) {
 	gpscoords_t coords{msg["latitude"], msg["longitude"]};
-	std::lock_guard<std::mutex> guard(mutexMap["gps"]);
+	std::lock_guard<std::mutex> guard(gpsMutex);
 	lastGPS = {coords};
 }
 
@@ -78,7 +82,7 @@ void handleLidar(json msg) {
 		double theta = point["theta"];
 		lidar.push_back({r * std::cos(theta), r * std::sin(theta), 1});
 	}
-	std::lock_guard<std::mutex> guard(mutexMap["lidar"]);
+	std::lock_guard<std::mutex> guard(lidarMutex);
 	lastLidar = {now, lidar};
 }
 
@@ -89,7 +93,7 @@ void handleIMU(json msg) {
 	double qw = msg["w"];
 
 	double heading = util::quatToHeading(qw, qx, qy, qz);
-	std::lock_guard<std::mutex> guard(mutexMap["imu"]);
+	std::lock_guard<std::mutex> guard(headingMutex);
 	lastHeading = {heading};
 }
 
@@ -156,16 +160,9 @@ void initSimServer() {
 	initCameras();
 }
 
-void initMutexMap() {
-	mutexMap["imu"];
-	mutexMap["gps"];
-	mutexMap["lidar"];
-}
-
 } // namespace
 
 void world_interface_init() {
-	initMutexMap();
 	initSimServer();
 	initCameras();
 
@@ -249,7 +246,7 @@ landmarks_t readLandmarks() {
 }
 
 DataPoint<points_t> readLidarScan() {
-	std::lock_guard<std::mutex> guard(mutexMap["lidar"]);
+	std::lock_guard<std::mutex> guard(lidarMutex);
 	return lastLidar;
 }
 
@@ -258,12 +255,12 @@ DataPoint<pose_t> readVisualOdomVel() {
 }
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {
-	std::lock_guard<std::mutex> guard(mutexMap["gps"]);
+	std::lock_guard<std::mutex> guard(gpsMutex);
 	return lastGPS;
 }
 
 DataPoint<double> readIMUHeading() {
-	std::lock_guard<std::mutex> guard(mutexMap["imu"]);
+	std::lock_guard<std::mutex> guard(headingMutex);
 	return lastHeading;
 }
 
