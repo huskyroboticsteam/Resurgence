@@ -46,14 +46,10 @@ CameraConfig readConfigFromFile(const std::string& filename) {
 
 	// read filename or camera ID, and open camera.
 	if (!fs[KEY_FILENAME].empty()) {
-		cfg.filename = static_cast<std::string>(fs[KEY_FILENAME]);
-	}
-
-	if (!fs[KEY_CAMERA_ID].empty()) {
-		cfg.cameraID = static_cast<int>(fs[KEY_CAMERA_ID]);
-	}
-
-	if (!cfg.filename && !cfg.cameraID) {
+		cfg.filenameOrID = static_cast<std::string>(fs[KEY_FILENAME]);
+	} else if (!fs[KEY_CAMERA_ID].empty()) {
+		cfg.filenameOrID = static_cast<int>(fs[KEY_CAMERA_ID]);
+	} else {
 		throw invalid_camera_config("One of " + KEY_FILENAME + " or " + KEY_CAMERA_ID +
 									" must be present");
 	}

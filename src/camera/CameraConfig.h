@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <string>
+#include <variant>
 
 #include <opencv2/core.hpp>
 
@@ -73,22 +74,25 @@ struct CameraConfig {
 	 * @brief The name of the camera.
 	 */
 	std::string name;
+
 	/**
 	 * @brief If specified, gives the intrinsic parameter matrix.
 	 */
 	std::optional<CameraParams> intrinsicParams;
+
 	/**
 	 * @brief If specified, gives the extrinsic parameter matrix.
 	 */
 	std::optional<cv::Mat> extrinsicParams;
+
 	/**
-	 * @brief If specified, gives the file to which the camera should be streamed.
+	 * @brief Either the camera ID or the filename to stream from.
+	 *
+	 * The camera ID specifies the ID of the camera device to use.
+	 * If the filename is specified, this camera will stream from a video file.
 	 */
-	std::optional<std::string> filename;
-	/**
-	 * @brief If specified, gives the id of the camera.
-	 */
-	std::optional<int> cameraID;
+	std::variant<std::string, int> filenameOrID;
+
 	/**
 	 * @brief If specified, gives the text description of the camera.
 	 */

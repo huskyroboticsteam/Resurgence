@@ -98,10 +98,10 @@ bool Camera::openFromConfigFile(std::string filename) {
 		intrinsics = cfg.intrinsicParams.value();
 	}
 
-	if (cfg.filename) {
-		return this->open(cfg.filename.value(), intrinsics, extrinsics);
-	} else if (cfg.cameraID) {
-		return this->open(cfg.cameraID.value(), intrinsics, extrinsics);
+	if (std::holds_alternative<std::string>(cfg.filenameOrID)) {
+		return this->open(std::get<std::string>(cfg.filenameOrID), intrinsics, extrinsics);
+	} else if (std::holds_alternative<int>(cfg.filenameOrID)) {
+		return this->open(std::get<int>(cfg.filenameOrID), intrinsics, extrinsics);
 	} else {
 		// this should never happen
 		throw invalid_camera_config("One of " + KEY_FILENAME + " or " + KEY_CAMERA_ID +
