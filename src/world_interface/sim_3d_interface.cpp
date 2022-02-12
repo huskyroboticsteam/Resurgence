@@ -4,6 +4,7 @@
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
+#include "../camera/CameraConfig.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
 #include "kinematic_common_interface.h"
@@ -39,6 +40,8 @@ std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // but this one is guaranteed to have indices, if there are any
 std::map<CameraID, uint32_t> cameraLastFrameIdxMap;
 std::shared_mutex cameraFrameMapMutex; // protects both of the above maps
+// not modified after startup, no need to synchronize
+std::map<CameraID, cam::CameraConfig> cameraConfigMap;
 
 std::condition_variable connectionCV;
 std::mutex connectionMutex;
@@ -49,6 +52,9 @@ void sendJSON(const json& obj) {
 }
 
 void initCameras() {
+	auto cfg = cam::readConfigFromFile(Constants::AR_CAMERA_CONFIG_PATH);
+	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
+
 	json msg = {{"type", "simCameraStreamOpenRequest"},
 				{"camera", Constants::AR_CAMERA_ID},
 				{"fps", 20},
@@ -190,14 +196,32 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 	}
 }
 
-// TODO: load camera config and report intrinsic/extrinsic parameters
-
 std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
-	return {};
+	auto entry = cameraConfigMap.find(cameraID);
+	if (entry != cameraConfigMap.end()) {
+		auto cfg = entry->second;
+		if (cfg.intrinsicParams) {
+			return cfg.intrinsicParams;
+		} else {
+			return {};
+		}
+	} else {
+		return {};
+	}
 }
 
 std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
-	return {};
+	auto entry = cameraConfigMap.find(cameraID);
+	if (entry != cameraConfigMap.end()) {
+		auto cfg = entry->second;
+		if (cfg.extrinsicParams) {
+			return cfg.extrinsicParams;
+		} else {
+			return {};
+		}
+	} else {
+		return {};
+	}
 }
 
 double setCmdVel(double dtheta, double dx) {
