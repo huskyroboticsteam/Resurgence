@@ -1,6 +1,7 @@
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../Networking/websocket/WebSocketProtocol.h"
+#include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
@@ -16,7 +17,6 @@
 #include <shared_mutex>
 #include <string>
 
-#include <Eigen/Geometry>
 #include <nlohmann/json.hpp>
 #include <opencv2/core.hpp>
 
@@ -88,15 +88,7 @@ void handleIMU(json msg) {
 	double qz = msg["z"];
 	double qw = msg["w"];
 
-	// see what +x gets transformed to by this rotation
-	Eigen::Quaterniond quat(qw, qx, qy, qz);
-	quat.normalize();
-	Eigen::Matrix3d rotMat = quat.toRotationMatrix();
-	Eigen::Vector3d transformedX = rotMat * Eigen::Vector3d::UnitX();
-	// flatten to xy-plane
-	transformedX(2) = 0;
-	// recover heading
-	double heading = std::atan2(transformedX(1), transformedX(0));
+	double heading = util::quatToHeading(qw, qx, qy, qz);
 	std::lock_guard<std::mutex> guard(mutexMap["imu"]);
 	lastHeading = {heading};
 }
@@ -124,6 +116,10 @@ void handleMotorStatus(json msg) {
 	// TODO: forward to mission control
 }
 
+void handleTruePose(json msg) {
+	// TODO: implement getter for this
+}
+
 void clientConnected() {
 	log(LOG_INFO, "Simulator connected!\n");
 	{
@@ -144,6 +140,7 @@ void initSimServer() {
 	protocol.addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol.addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol.addMessageHandler("simMotorStatusReport", handleMotorStatus);
+	protocol.addMessageHandler("simRoverTruePoseReport", handleTruePose);
 	protocol.addConnectionHandler(clientConnected);
 	protocol.addDisconnectionHandler(clientDisconnected);
 

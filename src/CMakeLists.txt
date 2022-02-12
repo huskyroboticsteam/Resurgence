@@ -146,6 +146,12 @@ if(WITH_TESTS)
   enable_testing()
 endif()
 
+list(APPEND camera_src
+  camera/Camera.cpp
+  camera/CameraParams.cpp
+  camera/CameraConfig.cpp
+  )
+
 # The CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
 add_library(hindsight_can SHARED
@@ -174,9 +180,6 @@ add_library(stub_world_interface STATIC
 add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
-  camera/Camera.cpp
-  camera/CameraParams.cpp
-  camera/CameraConfig.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
@@ -184,17 +187,18 @@ add_library(real_world_interface STATIC
   ar/read_landmarks.cpp
   gps/usb_gps/read_usb_gps.cpp
   base64/base64_img.cpp
+  ${camera_src}
   )
 add_library(sim3d_interface STATIC
   world_interface/sim_3d_interface.cpp
-  camera/Camera.cpp
-  camera/CameraParams.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  base64/base64_img.cpp)
+  base64/base64_img.cpp
+  ${camera_src}
+  )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
 target_include_directories(sim3d_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
