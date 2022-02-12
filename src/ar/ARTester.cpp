@@ -1,5 +1,6 @@
 #include "../camera/Camera.h"
 #include "../camera/CameraParams.h"
+#include "../camera/CameraConfig.h"
 #include "Detector.h"
 
 #include <chrono>

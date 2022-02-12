@@ -37,36 +37,6 @@ namespace cam {
 	The following are constants for the keys used in the camera configuration
 	files. See @ref cameraconfig for more details.
 */
-/**@{*/
-/**
-   Config file key for camera filename.
- */
-const std::string KEY_FILENAME = "filename";
-/**
-   Config file key for camera id.
- */
-const std::string KEY_CAMERA_ID = "camera_id";
-/**
-   Config file key for intrinsic parameters.
- */
-const std::string KEY_INTRINSIC_PARAMS = "intrinsic_params";
-/**
-   Config file key for extrinsic parameters.
- */
-const std::string KEY_EXTRINSIC_PARAMS = "extrinsic_params";
-/**
-   Config file key for calibration information.
- */
-const std::string KEY_CALIB_INFO = "calib_info";
-/**
-   Config file key for camera name.
- */
-const std::string KEY_NAME = "name";
-/**
-   Config file key for camera description.
- */
-const std::string KEY_DESCRIPTION = "description";
-/**@}*/
 
 /**
 	@brief Represents a camera on the rover, from which a video feed can be
@@ -278,31 +248,6 @@ public:
 	   @param new_description The new description for the camera.
 	 */
 	void setDescription(std::string new_description);
-};
-
-/**
-   Exception for errors in the camera configuration.
- */
-class invalid_camera_config : public std::exception {
-public:
-	/**
-	   Constructs an invalid_camera_config exception with the default message "Invalid camera
-	   configuration".
-	 */
-	invalid_camera_config();
-	/**
-	   Constructs an invalid_camera_config exception with the given message appended to
-	   "Invalid camera configuration:".
-	   @param msg The message to use for the exception.
-	 */
-	invalid_camera_config(const std::string& msg);
-	/**
-	   Returns the exception message as a C string.
-	 */
-	virtual const char* what() const noexcept;
-
-private:
-	std::string _msg;
 };
 
 /** @} */
