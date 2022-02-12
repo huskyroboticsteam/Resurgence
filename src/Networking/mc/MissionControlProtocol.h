@@ -1,11 +1,14 @@
 #pragma once
 
 #include "../websocket/WebSocketProtocol.h"
+#include "../../world_interface/world_interface.h"
+#include <unordered_set>
 
-namespace proto {
+namespace mc {
 using json = nlohmann::json;
 
 websocket::WebSocketProtocol initMissionControlProtocol();
+std::unordered_set<CameraID> getOpenCameraStreams();
 
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
