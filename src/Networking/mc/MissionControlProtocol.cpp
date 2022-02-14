@@ -1,6 +1,7 @@
 #include "MissionControlProtocol.h"
 
 #include "../../Constants.h"
+#include "../../Globals.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -8,6 +9,18 @@
 namespace mc {
 
 using val_t = json::value_t;
+// request keys
+constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
+constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
+constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
+constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
+constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
+constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
+
+// report keys
+constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
+constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
+constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 
 /**
    Check if the given json object has the given key.
@@ -44,7 +57,10 @@ bool validateOperationModeRequest(const json& j) {
 		   validateOneOf(j, "mode", {"teleoperation", "autonomous"});
 }
 
-void handleOperationModeRequest(const json& j) {}
+void handleOperationModeRequest(const json& j) {
+	std::string mode = j["mode"];
+	Globals::AUTONOMOUS = (mode == "autonomous");
+}
 
 bool validateDriveRequest(const json& j) {
 	return hasKey(j, "straight") && validateRange(j, "straight", -1, 1) &&
@@ -57,26 +73,41 @@ bool validateMotorPowerRequest(const json& j) {
 	return validateKey(j, "motor", val_t::string) && validateRange(j, "power", -1, 1);
 }
 
-void handleMotorPowerRequest(const json& j) {}
+void handleMotorPowerRequest(const json& j) {
+	std::string motor = j["motor"];
+	double power = j["power"];
+	setMotorPWM(motor, power);
+}
 
 bool validateMotorPositionRequest(const json& j) {
 	return validateKey(j, "motor", val_t::string) &&
-		   validateKey(j, "position", val_t::number_float);
+		   validateKey(j, "position", val_t::number_integer);
 }
 
-void handleMotorPositionRequest(const json& j) {}
+void handleMotorPositionRequest(const json& j) {
+	std::string motor = j["motor"];
+	double position_deg = j["position"];
+	int32_t position_mdeg = std::round(position_deg * 1000);
+	setMotorPos(motor, position_mdeg);
+}
 
 bool validateCameraStreamOpenRequest(const json& j) {
 	return validateKey(j, "camera", val_t::string);
 }
 
-void handleCameraStreamOpenRequest(const json& j) {}
+void handleCameraStreamOpenRequest(const json& j) {
+	CameraID cam = j["camera"];
+	open_camera_streams.insert(cam);
+}
 
 bool validateCameraStreamCloseRequest(const json& j) {
 	return validateKey(j, "camera", val_t::string);
 }
 
-void handleCameraStreamCloseRequest(const json& j) {}
+void handleCameraStreamCloseRequest(const json& j) {
+	CameraID cam = j["camera"];
+	open_camera_streams.erase(cam);
+}
 
 websocket::WebSocketProtocol initMissionControlProtocol() {
 	if (!proto) {
