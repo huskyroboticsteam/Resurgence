@@ -162,17 +162,12 @@ namespace Markers {
    Enum of marker names for URC.
  */
 enum URCMarkerName {
-	LEG1,
-	LEG2,
-	LEG3,
-	LEG4_L,
-	LEG4_R,
-	LEG5_L,
-	LEG5_R,
-	LEG6_L,
-	LEG6_R,
-	LEG7_L,
-	LEG7_R
+	START,
+	POST1,
+	POST2,
+	POST3,
+	GATEL,
+	GATER
 };
 
 /**
