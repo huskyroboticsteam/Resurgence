@@ -32,13 +32,6 @@ namespace cam {
  */
 
 /**
-	@name Configuration File Keys
-
-	The following are constants for the keys used in the camera configuration
-	files. See @ref cameraconfig for more details.
-*/
-
-/**
 	@brief Represents a camera on the rover, from which a video feed can be
 	retrieved.
 
