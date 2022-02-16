@@ -2,15 +2,9 @@
 
 #include <unistd.h>
 
+const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
+
 void world_interface_init() {}
-
-double setCmdVel(double /*dtheta*/, double /*dx*/) {
-	return 1.0;
-}
-
-std::pair<double, double> getCmdVel() {
-	return {0, 0};
-}
 
 DataPoint<points_t> readLidarScan() {
 	return points_t{};
@@ -28,12 +22,12 @@ DataPoint<double> readIMUHeading() {
 	return {};
 }
 
-DataPoint<pose_t> readVisualOdomVel() {
-	return DataPoint<pose_t>{};
+DataPoint<pose_t> getTruePose() {
+	return {};
 }
 
-DataPoint<transform_t> readOdom() {
-	return toTransform({0, 0, 0});
+DataPoint<pose_t> readVisualOdomVel() {
+	return DataPoint<pose_t>{};
 }
 
 URCLeg getLeg(int /*id*/) {

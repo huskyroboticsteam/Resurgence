@@ -4,10 +4,34 @@
 #include <string>
 #include <time.h>
 
+#include <Eigen/Geometry>
 #include <sys/time.h>
 
 namespace util {
 bool almostEqual(double a, double b, double threshold = 1e-6);
+
+/**
+ * @brief Extract the heading from a quaternion.
+ *
+ * Given a quaternion defined by out coordinate system, extract the CCW heading, in radians.
+ *
+ * @param qw The w component of the quaternion.
+ * @param qx The x component of the quaternion.
+ * @param qy The y component of the quaternion.
+ * @param qz The z component of the quaternion.
+ * @return double The CCW heading, in radians.
+ */
+double quatToHeading(double qw, double qx, double qy, double qz);
+
+/**
+ * @brief Extract the heading from a quaternion.
+ *
+ * Given a quaternion defined by out coordinate system, extract the CCW heading, in radians.
+ *
+ * @param quat The quaternion to extract the heading from. This does not need to be normalized.
+ * @return double The CCW heading, in radians.
+ */
+double quatToHeading(Eigen::Quaterniond quat);
 
 /**
  * A utility class that helps with timing. Measures the elapsed time from the moment

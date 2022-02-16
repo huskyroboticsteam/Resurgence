@@ -12,13 +12,31 @@ namespace cam {
 class CameraParams;
 }
 
+/**
+ * @brief An enum which defines the possible types of world interfaces.
+ *
+ * @see WORLD_INTERFACE
+ */
+enum class WorldInterface { real, sim2d, sim3d, noop };
+
+/**
+ * @brief The current world interface being used.
+ */
+extern const WorldInterface WORLD_INTERFACE;
+
 // Call this before trying to do anything else
 void world_interface_init();
 
 // If the requested dtheta/dx is too fast for the robot to execute, it will
-// scale them down and return the corresponding scale factor.
+// scale them down and return the corresponding scale divisor.
 double setCmdVel(double dtheta, double dx);
 
+/**
+ * @brief Get the velocity commanded to the robot. Depending on scaling,
+ * may not be the same numbers passed to setCmdVel().
+ *
+ * @return std::pair<double, double> Pair of thetaVel, xVel.
+ */
 std::pair<double, double> getCmdVel();
 
 // read measurement from the lidar
@@ -105,13 +123,20 @@ DataPoint<point_t> readGPS();
 DataPoint<double> readIMUHeading();
 
 /**
+ * @brief Get the ground truth pose, if available. This is only available in simulation.
+ *
+ * @return DataPoint<pose_t> The ground truth pose, or an empty datapoint if unavailable.
+ */
+DataPoint<pose_t> getTruePose();
+
+/**
  * @brief Convert GPS coordinates into a coordinate on the map frame.
  *
  * @param coord The coord to transform into map space.
  * @return std::optional<point_t> The transformed point, or an empty datapoint
  * if the GPS does not have a fix.
  */
-std::optional<point_t> gpsToMeters(const gpscoords_t &coord);
+std::optional<point_t> gpsToMeters(const gpscoords_t& coord);
 
 // Calculates the current transform in the global frame based purely on forward kinematics
 DataPoint<transform_t> readOdom();
@@ -137,6 +162,7 @@ void setMotorPWM(const std::string& motor, double normalizedPWM);
  * @brief Set the target position of the motor.
  *
  * @param motor The name of the motor. Must be a valid motor name.
- * @param targetPos The target position. Refer to the specific motor for more information.
+ * @param targetPos The target position, in millidegrees. Refer to the specific motor for more
+ * information.
  */
 void setMotorPos(const std::string& motor, int32_t targetPos);
