@@ -23,8 +23,6 @@
 using nlohmann::json;
 
 namespace {
-constexpr double MAX_WHEEL_VEL =
-	Constants::WHEEL_RADIUS * Constants::MAX_DRIVE_PWM / Constants::PWM_PER_RAD_PER_SEC;
 const std::string PROTOCOL_PATH("/simulator");
 const DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
 
@@ -239,8 +237,8 @@ double setCmdVel(double dtheta, double dx) {
 	}
 
 	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(dx, dtheta);
-	double lPWM = wheelVels.lVel / MAX_WHEEL_VEL;
-	double rPWM = wheelVels.rVel / MAX_WHEEL_VEL;
+	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
 	if (maxAbsPWM > 1) {
 		lPWM /= maxAbsPWM;
@@ -253,7 +251,7 @@ double setCmdVel(double dtheta, double dx) {
 	setMotorPWM("frontRightWheel", rPWM);
 	setMotorPWM("rearRightWheel", rPWM);
 
-	return maxAbsPWM > MAX_WHEEL_VEL ? maxAbsPWM : 1.0;
+	return maxAbsPWM > Constants::MAX_WHEEL_VEL ? maxAbsPWM : 1.0;
 }
 
 landmarks_t readLandmarks() {
