@@ -1,8 +1,12 @@
 #include "../simulator/world.h"
 #include "world_interface.h"
 
+#include "kinematic_common_interface.h"
+
 #include <iostream>
 #include <unistd.h>
+
+const WorldInterface WORLD_INTERFACE = WorldInterface::sim2d;
 
 World world;
 std::pair<double, double> cmdVel(0, 0);
@@ -23,11 +27,8 @@ void world_interface_init() {
 double setCmdVel(double dtheta, double dx) {
 	world.setCmdVel(dtheta, dx);
 	cmdVel = {dtheta, dx};
+	setCmdVelToIntegrate(dtheta, dx);
 	return 1.0;
-}
-
-std::pair<double, double> getCmdVel() {
-	return cmdVel;
 }
 
 DataPoint<points_t> readLidarScan() {
@@ -58,12 +59,12 @@ DataPoint<double> readIMUHeading() {
 	return {};
 }
 
-DataPoint<pose_t> readVisualOdomVel() {
-	return DataPoint<pose_t>{};
+DataPoint<pose_t> getTruePose() {
+	return {};
 }
 
-DataPoint<transform_t> readOdom() {
-	return world.readOdom();
+DataPoint<pose_t> readVisualOdomVel() {
+	return DataPoint<pose_t>{};
 }
 
 URCLeg getLeg(int index) {

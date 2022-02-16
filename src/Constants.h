@@ -10,7 +10,13 @@ constexpr size_t PACKET_PAYLOAD_SIZE = 8;
 constexpr double SHOULDER_LENGTH = 0.6; // placeholder(m)
 constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
 
+// TODO: tune these drive constants
 constexpr double WHEEL_BASE = 2. / 3.;
+constexpr double EFF_WHEEL_BASE = 1.40; // tweaked to match 2-wheel kinematic model
+constexpr double WHEEL_RADIUS = 0.15; // eyeballed
+constexpr double PWM_PER_RAD_PER_SEC = 5000; // eyeballed
+constexpr double MAX_DRIVE_PWM = 20000;
+constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
 
 // Joint limits
 constexpr double ARM_BASE_MIN = -M_PI / 2;

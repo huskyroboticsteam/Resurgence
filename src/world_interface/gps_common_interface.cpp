@@ -30,5 +30,8 @@ std::optional<point_t> gpsToMeters(const gpscoords_t &coord) {
 }
 
 bool gpsHasFix() {
+	if (!converter.has_value()) {
+		readGPS();
+	}
 	return converter.has_value();
 }
