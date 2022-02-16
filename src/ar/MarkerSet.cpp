@@ -110,7 +110,7 @@ constexpr size_t ARUCO_BIT_SIZE = 4;
 /** The border size in pixels of one side of an ARUco marker. */
 constexpr size_t ARUCO_BORDER_SIZE = 1;
 /** The physical size (in mm) of an ARUco marker. */
-constexpr float ARUCO_PHYS_SIZE = 0.1; // we don't know this yet, change later
+constexpr float ARUCO_PHYS_SIZE = 0.15; // we don't know this yet, change later
 
 
 /**
