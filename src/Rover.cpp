@@ -32,6 +32,10 @@ extern "C" {
 #include "HindsightCAN/CANSerialNumbers.h"
 }
 
+using std::chrono::duration_cast;
+using std::chrono::microseconds;
+using std::chrono::steady_clock;
+
 constexpr std::array<uint32_t, 6> arm_PPJRs = {
 	17 * 1000, // base, estimate
 
@@ -188,11 +192,12 @@ int rover_loop(int argc, char** argv) {
 	std::vector<URCLeg> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
 	Autonomous autonomous(urc_legs, CONTROL_HZ);
 	char buffer[MAXLINE];
-	struct timeval tp_rover_start;
+	auto roverStart = steady_clock::now();
 	int num_can_packets = 0;
-	gettimeofday(&tp_rover_start, NULL);
 	for (int iter = 0; /*no termination condition*/; iter++) {
-		long loopStartElapsedUsecs = getElapsedUsecs(tp_rover_start);
+		auto loopStart = steady_clock::now();
+		long loopStartElapsedUsecs =
+			duration_cast<microseconds>(loopStart - roverStart).count();
 		num_can_packets = 0;
 		while (recvCANPacket(&packet) != 0) {
 			num_can_packets += 1;
@@ -225,7 +230,8 @@ int rover_loop(int argc, char** argv) {
 
 		autonomous.autonomyIter();
 
-		long elapsedUsecs = getElapsedUsecs(tp_rover_start) - loopStartElapsedUsecs;
+		long elapsedUsecs =
+			duration_cast<microseconds>(steady_clock::now() - loopStart).count();
 		long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
 		if (desiredUsecs - elapsedUsecs > 0) {
 			// We drift by approximately 1ms per second unless we

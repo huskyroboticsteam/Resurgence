@@ -45,15 +45,3 @@ std::chrono::microseconds ScopedTimer::elapsedTime() const {
 	return elapsed;
 }
 } // namespace util
-
-long getElapsedUsecs(const struct timeval& tp_start, const struct timeval& tp_end) {
-	long elapsed =
-		(tp_end.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp_end.tv_usec - tp_start.tv_usec);
-	return elapsed;
-}
-
-long getElapsedUsecs(const struct timeval& tp_start) {
-	struct timeval tp_end;
-	gettimeofday(&tp_end, NULL);
-	return getElapsedUsecs(tp_start, tp_end);
-}

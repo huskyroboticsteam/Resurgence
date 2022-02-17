@@ -63,6 +63,3 @@ private:
 	std::string name;
 };
 } // namespace util
-
-long getElapsedUsecs(const struct timeval& tp_start, const struct timeval& tp_end);
-long getElapsedUsecs(const struct timeval& tp_start);
