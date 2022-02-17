@@ -6,14 +6,14 @@
 #include "filters/RollingAvgFilter.h"
 #include "lidar/PointCloudProcessing.h"
 #include "planning/plan.h"
-#include "simulator/friendly_graph.h"
-#include "simulator/graphics.h"
+#include "filters/pose_graph/friendly_graph.h"
 #include "simulator/utils.h"
 #include "worldmap/GlobalMap.h"
 #include "world_interface/data.h"
 
 #include <cmath>
 #include <future>
+#include <map>
 #include <memory>
 #include <vector>
 #include <optional>
@@ -79,7 +79,7 @@ private:
 	std::map<int, datatime_t> lastLandmarkTimes; // maps landmark idx -> last datapoint time
 
 	/* Variables for pose graph localization */
-	FriendlyGraph pose_graph;
+	filters::pose_graph::FriendlyGraph pose_graph;
 	int pose_id;			 // counter for how many poses we've added to the graph
 	transform_t prev_odom; // odom measurement at the time of the most recent pose in the graph
 	trajectory_t

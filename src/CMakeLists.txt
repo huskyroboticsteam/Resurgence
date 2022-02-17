@@ -205,9 +205,9 @@ target_include_directories(sim3d_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(sim3d_interface ${vision_libs})
 
 add_library(hr_slam SHARED
-  simulator/graph.cpp
-  simulator/friendly_graph.cpp
-  simulator/factors.cpp
+  filters/pose_graph/graph.cpp
+  filters/pose_graph/friendly_graph.cpp
+  filters/pose_graph/factors.cpp
   )
 
 if(WITH_LIDAR)
