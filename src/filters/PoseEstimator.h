@@ -6,6 +6,8 @@
 
 #include <Eigen/Core>
 
+namespace filters {
+
 constexpr int numStates = 3;
 using statevec_t = Eigen::Matrix<double, numStates, 1>;
 
@@ -94,3 +96,5 @@ private:
 	DiffDriveKinematics kinematics;
 	double dt;
 };
+
+} // namespace filters

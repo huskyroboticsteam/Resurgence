@@ -1,5 +1,7 @@
 #include "PoseEstimatorLinear.h"
 
+namespace filters {
+
 namespace {
 typedef Eigen::Matrix3d matrix;
 typedef Eigen::Vector3d vector;
@@ -19,8 +21,7 @@ PoseEstimatorLinear::PoseEstimatorLinear(const Eigen::Vector3d& stateStdDevs,
 	: kf(KalmanFilter<3, 3, 3>::createDiscrete(matrix::Identity(), matrix::Identity(),
 											   matrix::Identity(), stateStdDevs,
 											   measurementStdDevs, dt)),
-	  dt(dt) {
-}
+	  dt(dt) {}
 
 void PoseEstimatorLinear::predict(double thetaVel, double xVel) {
 	vector u = getPoseDiff(kf.getState(), dt, thetaVel, xVel);
@@ -39,3 +40,5 @@ void PoseEstimatorLinear::reset(const Eigen::Vector3d& pose) {
 void PoseEstimatorLinear::reset(const pose_t& pose, const pose_t& stdDevs) {
 	kf.reset(pose, stdDevs);
 }
+
+} // namespace filters

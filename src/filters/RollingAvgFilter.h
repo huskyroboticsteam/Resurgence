@@ -2,6 +2,8 @@
 
 #include <Eigen/Core>
 
+namespace filters {
+
 /**
  * Implements a rolling average filter of the specified type. Can only use double vectors.
  */
@@ -82,3 +84,5 @@ private:
 	int size = 0;
 	int index = 0;
 };
+
+} // namespace filters

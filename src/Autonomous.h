@@ -54,7 +54,7 @@ private:
 	// landmark measurements
 	std::pair<pose_t, pose_t> gate_targets;
 	bool gate_direction; // `true` if we go through the gate with left_post_id on our left
-	PoseEstimator poseEstimator;
+	filters::PoseEstimator poseEstimator;
 	GlobalMap map;
 	bool calibrated = false;
 	std::vector<pose_t> calibrationPoses{};

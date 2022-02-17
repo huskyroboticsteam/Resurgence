@@ -1,5 +1,7 @@
 #include "PoseEstimator.h"
 
+namespace filters {
+
 // Note: The state vector is defined as [x, y, theta].
 // The input vector is defined as [lVel, rVel].
 
@@ -28,7 +30,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d& inputNoiseGains,
 			  [inputNoiseGains](const statevec_t& x, const Eigen::Vector2d& u) {
 				  // TODO: verify this noise model on an actual robot
 				  Eigen::Vector2d stds = inputNoiseGains.array() * u.array().abs().sqrt();
-				  Eigen::Matrix<double, 2, 2> Q = StateSpace::createCovarianceMatrix(stds);
+				  Eigen::Matrix<double, 2, 2> Q = statespace::createCovarianceMatrix(stds);
 				  return Q;
 			  }),
 		  NoiseCovMat<numStates, numStates, numStates>(measurementStdDevs), dt),
@@ -78,3 +80,5 @@ Eigen::Matrix<double, 3, 3> PoseEstimator::getEstimateCovarianceMat() const {
 pose_t PoseEstimator::getPose() const {
 	return ekf.getState();
 }
+
+} // namespace filters

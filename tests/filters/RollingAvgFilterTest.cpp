@@ -3,6 +3,7 @@
 #include <catch2/catch.hpp>
 
 using namespace Catch::literals;
+using filters::RollingAvgFilter;
 
 namespace
 {

@@ -5,6 +5,8 @@
 
 #include <Eigen/Core>
 
+namespace filters {
+
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
  * The tracked states are x, y, and heading. All of these states are in map space.
@@ -81,3 +83,5 @@ private:
 	KalmanFilter<3, 3, 3> kf;
 	double dt;
 };
+
+} // namespace filters

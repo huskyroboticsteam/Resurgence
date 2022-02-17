@@ -4,12 +4,13 @@
 
 #include <Eigen/Core>
 
+namespace filters {
+
 template <int stateDim, int inputDim, int outputDim> class KalmanFilterBase {
 public:
 	KalmanFilterBase()
 		: P(Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5),
-		  xHat(Eigen::Matrix<double, stateDim, 1>::Zero()) {
-	}
+		  xHat(Eigen::Matrix<double, stateDim, 1>::Zero()) {}
 
 	/**
 	 * Correct the state estimate with measurement data.
@@ -56,7 +57,7 @@ public:
 	 */
 	void reset(const Eigen::Matrix<double, stateDim, 1>& state,
 			   const Eigen::Matrix<double, stateDim, 1>& stdDevs) {
-		reset(state, StateSpace::createCovarianceMatrix(stdDevs));
+		reset(state, statespace::createCovarianceMatrix(stdDevs));
 	}
 
 	/**
@@ -97,3 +98,5 @@ protected:
 	Eigen::Matrix<double, stateDim, stateDim> P;
 	Eigen::Matrix<double, stateDim, 1> xHat;
 };
+
+} // namespace filters

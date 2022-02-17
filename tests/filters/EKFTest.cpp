@@ -4,6 +4,7 @@
 #include "../../src/kinematics/DiffDriveKinematics.h"
 
 using namespace Catch::literals;
+using namespace filters;
 
 namespace
 {
