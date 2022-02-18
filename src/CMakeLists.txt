@@ -119,11 +119,11 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   # Find the libgps USB GPS library.
   # TODO: Remove this when interface with Electronics' IMU board is implemented.
   pkg_check_modules(libgps REQUIRED libgps)
-  if(WITH_LIDAR)
-	  # Find the URGLidar library.
-	  # TODO: Decide if we want to use those RPLidars we found
-	  find_package(URGLidar REQUIRED)
-  endif()
+endif()
+if(WITH_LIDAR)
+  # Find the URGLidar library.
+  # TODO: Decide if we want to use those RPLidars we found
+  find_package(URGLidar REQUIRED)
 endif()
 
 # Preprocessor flag required for the CAN library; see
