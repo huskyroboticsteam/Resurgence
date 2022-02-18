@@ -50,7 +50,10 @@ bool validateEmergencyStopRequest(const json& j) {
 	return validateKey(j, "stop", val_t::boolean);
 }
 
-void handleEmergencyStopRequest(const json& j) {}
+void handleEmergencyStopRequest(const json& j) {
+	bool stop = j["stop"];
+	Globals::E_STOP = stop;
+}
 
 bool validateOperationModeRequest(const json& j) {
 	return validateKey(j, "mode", val_t::string) &&
@@ -67,7 +70,16 @@ bool validateDriveRequest(const json& j) {
 		   hasKey(j, "steer") && validateRange(j, "steer", -1, 1);
 }
 
-void handleDriveRequest(const json& j) {}
+void handleDriveRequest(const json& j) {
+	// fit straight and steer to unit circle; i.e. scale each such that <straight, steer> is a
+	// unit vector
+	double straight = j["straight"];
+	double steer = j["straight"];
+	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
+	double dx = Constants::MAX_WHEEL_VEL * straight / norm;
+	double dtheta = Constants::MAX_DTHETA * steer / norm;
+	setCmdVel(dtheta, dx);
+}
 
 bool validateMotorPowerRequest(const json& j) {
 	return validateKey(j, "motor", val_t::string) && validateRange(j, "power", -1, 1);

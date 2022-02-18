@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 #include "world_interface/data.h"
+#include "kinematics/DiffDriveKinematics.h"
 
 namespace Constants {
 constexpr size_t PACKET_PAYLOAD_SIZE = 8;
@@ -18,6 +19,8 @@ constexpr double WHEEL_RADIUS = 0.15; // eyeballed
 constexpr double PWM_PER_RAD_PER_SEC = 5000; // eyeballed
 constexpr double MAX_DRIVE_PWM = 20000;
 constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
+const DiffDriveKinematics kinematics(EFF_WHEEL_BASE);
+const double MAX_DTHETA = kinematics.wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
 // Joint limits
 constexpr double ARM_BASE_MIN = -M_PI / 2;
