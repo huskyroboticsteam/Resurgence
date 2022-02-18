@@ -46,6 +46,14 @@ static constexpr bool validateRange(const json& j, const std::string& key, doubl
 static std::unordered_set<CameraID> open_camera_streams;
 std::optional<websocket::WebSocketProtocol> proto;
 
+/*///////////////// VALIDATORS/HANDLERS ////////////////////
+
+  For each protocol message type, there is a pair of functions in this section: a validator and
+  a handler. The validator will return a boolean depending on whether or not a message is valid
+  for this type, and the handler will perform the required actions for dealing with a message
+  of the type. NOTE: handlers expect valid messages, so call validator first
+*/
+
 bool validateEmergencyStopRequest(const json& j) {
 	return validateKey(j, "stop", val_t::boolean);
 }
@@ -120,6 +128,8 @@ void handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
 	open_camera_streams.erase(cam);
 }
+
+///////////////////////////////////////////////////////////////////
 
 websocket::WebSocketProtocol initMissionControlProtocol() {
 	if (!proto) {
