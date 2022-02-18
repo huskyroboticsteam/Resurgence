@@ -7,7 +7,11 @@
 #include "kinematics/DiffDriveKinematics.h"
 
 namespace Constants {
+/**
+   @deprecated No need for this constant once we fully switch to the new network protocol
+ */
 constexpr size_t PACKET_PAYLOAD_SIZE = 8;
+// TODO: make sure these are still accurate with the new arm.
 constexpr double SHOULDER_LENGTH = 0.6; // placeholder(m)
 constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
 
@@ -18,11 +22,27 @@ constexpr double EFF_WHEEL_BASE = 1.40; // tweaked to match 2-wheel kinematic mo
 constexpr double WHEEL_RADIUS = 0.15; // eyeballed
 constexpr double PWM_PER_RAD_PER_SEC = 5000; // eyeballed
 constexpr double MAX_DRIVE_PWM = 20000;
+/**
+   @brief Maximum tangential velocity for the rover's wheels.
+
+   If the rover is driving straight and not turning, this is the maximum forward velocity
+   (i.e. `dx` in setCmdVel()) of the rover.
+ */
 constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
+/**
+   Kinematic model for the rover, based on the wheel base width Constants::EFF_WHEEL_BASE
+ */
 const DiffDriveKinematics kinematics(EFF_WHEEL_BASE);
+/**
+   @brief Maximum angular velocity (i.e. `dtheta` in setCmdVel()) of the rover.
+
+   Computed assuming that the left wheel is going at full speed backwards while the right wheel
+   is going at full speed forwards.
+ */
 const double MAX_DTHETA = kinematics.wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
 // Joint limits
+// TODO: make sure these are still accurate with the new arm.
 constexpr double ARM_BASE_MIN = -M_PI / 2;
 constexpr double ARM_BASE_MAX = M_PI / 2;
 // constexpr double SHOULDER_MIN = M_PI / 2; // TODO mechanical problem with the moon gear.
@@ -35,12 +55,23 @@ constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent se
 constexpr const char* AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
 const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
 
+/**
+   @deprecated No need for this constant once we fully switch over the Mission Control PlanViz
+ */
 constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
 constexpr uint16_t WS_SERVER_PORT = 3001;
 
-// TODO(evan): document these constants
+/**
+   WebSocket server endpoint for the mission control protocol.
+ */
 constexpr const char* MC_PROTOCOL_NAME = "/mission-control";
+/**
+   WebSocket server endpoint for the simulator protocol.
+ */
 constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
+/**
+   WebSocket server endpoint for the DGPS protocol.
+ */
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
   
 namespace Nav {
