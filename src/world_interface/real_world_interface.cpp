@@ -105,17 +105,6 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 	}
 }
 
-// Distance between left and right wheels.
-constexpr double WHEEL_BASE = 0.66;
-// Effective distance between wheels. Tweaked so that actual rover angular rate
-// roughly matches the commanded angular rate.
-constexpr double EFF_WHEEL_BASE = 1.40;
-
-constexpr double WHEEL_RADIUS = 0.15;		  // Eyeballed
-constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
-// This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
-constexpr double MAX_PWM = 20000;
-
 double setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0))
 		return 0;
@@ -124,22 +113,22 @@ double setCmdVel(double dtheta, double dx) {
 	 *		dx = (right_ground_vel + left_ground_vel) / 2
 	 *		dtheta = (right_ground_vel - left_ground_vel) / EFF_WHEEL_BASE
 	 */
-	double right_ground_vel = dx + EFF_WHEEL_BASE / 2 * dtheta;
-	double left_ground_vel = dx - EFF_WHEEL_BASE / 2 * dtheta;
-	double right_angular_vel = right_ground_vel / WHEEL_RADIUS;
-	double left_angular_vel = left_ground_vel / WHEEL_RADIUS;
-	int16_t right_pwm = (int16_t)(right_angular_vel * PWM_FOR_1RAD_PER_SEC);
-	int16_t left_pwm = (int16_t)(left_angular_vel * PWM_FOR_1RAD_PER_SEC);
+	double right_ground_vel = dx + Constants::EFF_WHEEL_BASE / 2 * dtheta;
+	double left_ground_vel = dx - Constants::EFF_WHEEL_BASE / 2 * dtheta;
+	double right_angular_vel = right_ground_vel / Constants::WHEEL_RADIUS;
+	double left_angular_vel = left_ground_vel / Constants::WHEEL_RADIUS;
+	int16_t right_pwm = (int16_t)(right_angular_vel * Constants::PWM_PER_RAD_PER_SEC);
+	int16_t left_pwm = (int16_t)(left_angular_vel * Constants::PWM_PER_RAD_PER_SEC);
 	log(LOG_TRACE, "dtheta %f dx %f right ground %f right angular %f right pwm %d\n", dtheta,
 		dx, right_ground_vel, right_angular_vel, right_pwm);
 	double scale_down_factor = 1.0;
-	if (abs(right_pwm) > MAX_PWM) {
+	if (abs(right_pwm) > Constants::MAX_DRIVE_PWM) {
 		log(LOG_WARN, "WARNING: requested too-large right PWM %d\n", right_pwm);
-		scale_down_factor = abs(right_pwm) / MAX_PWM;
+		scale_down_factor = abs(right_pwm) / Constants::MAX_DRIVE_PWM;
 	}
-	if (abs(left_pwm) > MAX_PWM) {
+	if (abs(left_pwm) > Constants::MAX_DRIVE_PWM) {
 		log(LOG_WARN, "WARNING: requested too-large left PWM %d\n", left_pwm);
-		double scale_down_factor_left = abs(left_pwm) / MAX_PWM;
+		double scale_down_factor_left = abs(left_pwm) / Constants::MAX_DRIVE_PWM;
 		if (scale_down_factor_left > scale_down_factor)
 			scale_down_factor = scale_down_factor_left;
 	}

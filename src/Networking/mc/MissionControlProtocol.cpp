@@ -2,6 +2,7 @@
 
 #include "../../Constants.h"
 #include "../../Globals.h"
+#include "../../log.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -31,17 +32,21 @@ static bool hasKey(const json& j, const std::string& key);
  */
 static bool validateKey(const json& j, const std::string& key, const val_t& type);
 /**
+   Check if the given json object has the given key, with a type in the given set of types.
+ */
+static bool validateKey(const json& j, const std::string& key,
+						const std::unordered_set<val_t>& types);
+/**
    Check if the value in the given json object at the given key is a string in the given set of
    allowed values.
  */
 static bool validateOneOf(const json& j, const std::string& key,
-									const std::unordered_set<std::string>& vals);
+						  const std::unordered_set<std::string>& vals);
 /**
    Check if the value in the given json object at the given key is a floating-point number
    between min and max, inclusive.
  */
-static bool validateRange(const json& j, const std::string& key, double min,
-									double max);
+static bool validateRange(const json& j, const std::string& key, double min, double max);
 
 static std::unordered_set<CameraID> open_camera_streams;
 std::optional<websocket::WebSocketProtocol> proto;
@@ -74,6 +79,7 @@ void handleOperationModeRequest(const json& j) {
 }
 
 bool validateDriveRequest(const json& j) {
+	std::string msg = j.dump();
 	return hasKey(j, "straight") && validateRange(j, "straight", -1, 1) &&
 		   hasKey(j, "steer") && validateRange(j, "steer", -1, 1);
 }
@@ -82,10 +88,11 @@ void handleDriveRequest(const json& j) {
 	// fit straight and steer to unit circle; i.e. scale each such that <straight, steer> is a
 	// unit vector
 	double straight = j["straight"];
-	double steer = j["straight"];
+	double steer = j["steer"];
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
-	double dx = Constants::MAX_WHEEL_VEL * straight / norm;
-	double dtheta = Constants::MAX_DTHETA * steer / norm;
+	double dx = Constants::MAX_WHEEL_VEL * (norm > 1e-6 ? straight / norm : straight);
+	double dtheta = Constants::MAX_DTHETA * (norm > 1e-6 ? -steer / norm : steer);
+	log(LOG_INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer, dtheta, dx);
 	setCmdVel(dtheta, dx);
 }
 
@@ -160,16 +167,24 @@ static bool validateKey(const json& j, const std::string& key, const val_t& type
 	return hasKey(j, key) && j.at(key).type() == type;
 }
 
-static bool validateOneOf(const json& j, const std::string& key,
-									const std::unordered_set<std::string>& vals) {
-	return validateKey(j, key, val_t::string) &&
-		   vals.find(static_cast<std::string>(j)) != vals.end();
+static bool validateKey(const json& j, const std::string& key,
+						const std::unordered_set<val_t>& types) {
+	return hasKey(j, key) && types.find(j.at(key).type()) != types.end();
 }
 
-static bool validateRange(const json& j, const std::string& key, double min,
-									double max) {
-	return j.type() == val_t::number_float && min <= static_cast<double>(j) &&
-		   static_cast<double>(j) <= max;
+static bool validateOneOf(const json& j, const std::string& key,
+						  const std::unordered_set<std::string>& vals) {
+	return validateKey(j, key, val_t::string) &&
+		   vals.find(static_cast<std::string>(j[key])) != vals.end();
+}
+
+static bool validateRange(const json& j, const std::string& key, double min, double max) {
+	if (validateKey(j, key,
+					{val_t::number_float, val_t::number_unsigned, val_t::number_integer})) {
+		double d = j[key];
+		return min <= d && d <= max;
+	}
+	return false;
 }
 
 } // namespace mc

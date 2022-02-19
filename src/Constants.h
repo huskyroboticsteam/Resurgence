@@ -36,7 +36,14 @@ constexpr std::array<uint8_t, 6> arm_encoder_signs = {0, 0, 1, 0, 0, 0};
 
 // TODO: tune these drive constants
 constexpr double ROBOT_LENGTH = 1.0;
+/**
+   Distance between left and right wheels.
+*/
 constexpr double WHEEL_BASE = 2. / 3.;
+/**
+  Effective distance between wheels. Tweaked so that actual rover angular rate roughly matches
+  the commanded angular rate.
+ */
 constexpr double EFF_WHEEL_BASE = 1.40; // tweaked to match 2-wheel kinematic model
 constexpr double WHEEL_RADIUS = 0.15; // eyeballed
 constexpr double PWM_PER_RAD_PER_SEC = 5000; // eyeballed

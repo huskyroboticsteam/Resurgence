@@ -1,6 +1,7 @@
 #include "WebSocketServer.h"
 
 #include "../../log.h"
+#include "../../Constants.h"
 
 #include <string>
 
@@ -159,6 +160,7 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	assert(protocolMap.find(path) != protocolMap.end());
 
 	std::string jsonStr = message->get_payload();
+	log(LOG_TRACE, "Message on %s: %s\n", path.c_str(), jsonStr.c_str());
 	json obj = json::parse(jsonStr);
 	protocolMap.at(path).protocol.processMessage(obj);
 }
