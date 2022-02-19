@@ -156,9 +156,6 @@ add_library(hindsight_can SHARED
   HindsightCAN/CANScience.c
   HindsightCAN/PortFiles/PortTemplate.c)
 
-add_library(real_base_station SHARED
-  Networking/Network.cpp)
-
 add_library(stub_world_interface STATIC
   world_interface/noop_world.cpp)
 add_library(real_world_interface STATIC
@@ -216,12 +213,14 @@ add_library(rover_common SHARED
   log.cpp
   rospub.cpp
   base64/base64.cpp
-  Networking/ParseBaseStation.cpp
-  Networking/IK.cpp
+  #Networking/ParseBaseStation.cpp
+  # TODO Make these not depend on the old protocol
+  #Networking/IK.cpp
+  #Networking/motor_interface.cpp
   Networking/ParseCAN.cpp
-  Networking/motor_interface.cpp
   Networking/websocket/WebSocketServer.cpp
   Networking/websocket/WebSocketProtocol.cpp
+  Networking/mc/MissionControlProtocol.cpp
   Util.cpp
   gps/gps_util.cpp
   world_interface/gps_common_interface.cpp
@@ -243,9 +242,7 @@ list(APPEND rover_libs
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
   nlohmann_json::nlohmann_json)
-# target_link_libraries(Rover ${rover_libs})
-target_link_libraries(Rover
-  ${rover_libs} real_base_station)
+target_link_libraries(Rover ${rover_libs})
 
 if(WORLD_INTERFACE STREQUAL "REAL")
   target_link_libraries(Rover ${real_world_libs})
@@ -284,7 +281,6 @@ endif()
 if(WITH_CAN)
   add_executable(TunePID TunePID.cpp)
   target_link_libraries(TunePID ${rover_libs}
-	real_base_station
 	real_can_interface
 	${real_world_libs}
 	)
