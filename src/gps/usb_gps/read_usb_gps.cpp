@@ -22,7 +22,7 @@ datatime_t gps_time;
 DataPoint<gpscoords_t> readGPSCoords() {
 	DataPoint<gpscoords_t> data;
 	gps_mutex.lock();
-	if (gpsHasFix()) {
+	if (has_fix) {
 		data = DataPoint<gpscoords_t>(gps_time, most_recent_coords);
 	}
 	gps_mutex.unlock();
