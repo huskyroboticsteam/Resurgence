@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../gps/gps_util.h"
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 #include "data.h"
 
 #include <optional>
@@ -40,7 +40,7 @@ double setCmdVel(double dtheta, double dx);
 std::pair<double, double> getCmdVel();
 
 // read measurement from the lidar
-DataPoint<points_t> readLidarScan();
+DataPoint<navtypes::points_t> readLidarScan();
 
 /**
  * @brief Check if a new camera frame from the specified camera is available.
@@ -112,7 +112,7 @@ bool gpsHasFix();
  *
  * @return DataPoint<point_t> The last GPS reading, in the map space.
  */
-DataPoint<point_t> readGPS();
+DataPoint<navtypes::point_t> readGPS();
 
 /**
  * @brief Read the current heading in the global map frame based on an IMU measurement.
@@ -127,7 +127,7 @@ DataPoint<double> readIMUHeading();
  *
  * @return DataPoint<pose_t> The ground truth pose, or an empty datapoint if unavailable.
  */
-DataPoint<pose_t> getTruePose();
+DataPoint<navtypes::pose_t> getTruePose();
 
 /**
  * @brief Convert GPS coordinates into a coordinate on the map frame.
@@ -136,16 +136,16 @@ DataPoint<pose_t> getTruePose();
  * @return std::optional<point_t> The transformed point, or an empty datapoint
  * if the GPS does not have a fix.
  */
-std::optional<point_t> gpsToMeters(const gpscoords_t& coord);
+std::optional<navtypes::point_t> gpsToMeters(const gpscoords_t& coord);
 
 // Calculates the current transform in the global frame based purely on forward kinematics
-DataPoint<transform_t> readOdom();
+DataPoint<navtypes::transform_t> readOdom();
 
 // Calculate the current pose velocity (in the robot's reference frame) using visual odometry.
-DataPoint<pose_t> readVisualOdomVel();
+DataPoint<navtypes::pose_t> readVisualOdomVel();
 
 // `index` must be in the range 0-6 (the URC competition will have 7 legs)
-URCLeg getLeg(int index);
+navtypes::URCLeg getLeg(int index);
 
 // set the indicator to indicate the given signal. May no-op if indicator is not supported.
 void setIndicator(indication_t signal);

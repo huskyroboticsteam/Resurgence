@@ -1,5 +1,10 @@
 #include "PoseEstimator.h"
 
+#include "../Util.h"
+#include "../navtypes.h"
+
+using namespace navtypes;
+
 namespace filters {
 
 // Note: The state vector is defined as [x, y, theta].
@@ -57,7 +62,7 @@ void PoseEstimator::predict(double thetaVel, double xVel) {
 }
 
 void PoseEstimator::correct(const transform_t& measurement) {
-	pose_t pose = toPose(measurement, getPose()(2));
+	pose_t pose = util::toPose(measurement, getPose()(2));
 	ekf.correct(pose);
 }
 

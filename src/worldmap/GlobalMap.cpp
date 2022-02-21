@@ -1,12 +1,15 @@
 #include "GlobalMap.h"
 
+#include "../navtypes.h"
+
 #include <Eigen/LU>
+
+using namespace navtypes;
 
 GlobalMap::GlobalMap(double areaSize, int scanStride, int maxIter, double relErrChangeThresh)
 	: tree(areaSize), icp(maxIter, relErrChangeThresh,
 						  std::bind(&GlobalMap::getClosest, this, std::placeholders::_1)),
-	  scanStride(scanStride) {
-}
+	  scanStride(scanStride) {}
 
 points_t GlobalMap::getPoints() const {
 	return tree.getAllPoints();

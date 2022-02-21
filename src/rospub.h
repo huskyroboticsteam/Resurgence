@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "simulator/utils.h"
+#include "navtypes.h"
 
 #include <nlohmann/json.hpp>
 
@@ -24,7 +24,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(ArrayPub, {{AP_INVALID, nullptr},
 
 void init();
 void shutdown();
-void publish(const pose_t& pose, PointPub topic); // Also can be used for point_t
-void publish_array(const points_t& points, ArrayPub topic);
+void publish(const navtypes::pose_t& pose, PointPub topic); // Also can be used for point_t
+void publish_array(const navtypes::points_t& points, ArrayPub topic);
 
 } // namespace rospub

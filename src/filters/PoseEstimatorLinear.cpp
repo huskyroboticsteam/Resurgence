@@ -1,5 +1,12 @@
 #include "PoseEstimatorLinear.h"
 
+#include "../Util.h"
+
+using util::toPose;
+using util::toTransform;
+using util::toTransformRotateFirst;
+using namespace navtypes;
+
 namespace filters {
 
 namespace {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 
 struct wheelvel_t {
 	double lVel;
@@ -30,7 +30,7 @@ public:
 	 * @return The robot velocity in the form [xVel, yVel, thetaVel] in the robot's local
 	 * reference frame. thetaVel will be in units rad/sec.
 	 */
-	pose_t wheelVelToRobotVel(double lVel, double rVel) const;
+	navtypes::pose_t wheelVelToRobotVel(double lVel, double rVel) const;
 
 	/**
 	 * Given the robot velocity in the robot's local reference frame, find the left and right
@@ -51,7 +51,7 @@ public:
 	 * has been moving at the specified velocity for this much time.
 	 * @return The pose update in the robot's local reference frame.
 	 */
-	pose_t getLocalPoseUpdate(const wheelvel_t& wheelVel, double dt) const;
+	navtypes::pose_t getLocalPoseUpdate(const wheelvel_t& wheelVel, double dt) const;
 
 	/**
 	 * Calculate the pose update in the global reference frame (map space) assuming the left
@@ -62,7 +62,7 @@ public:
 	 * has been moving at the specified velocity for this much time.
 	 * @return The pose update in the global reference frame.
 	 */
-	pose_t getPoseUpdate(const wheelvel_t& wheelVel, double heading, double dt) const;
+	navtypes::pose_t getPoseUpdate(const wheelvel_t& wheelVel, double heading, double dt) const;
 
 	/**
 	 * Calculate the next pose of the robot in the global reference frame. (map space)
@@ -74,7 +74,7 @@ public:
 	 * @return The next pose of the robot in the global reference frame after having moved at
 	 * the specified velocity for the specified time.
 	 */
-	pose_t getNextPose(const wheelvel_t& wheelVel, const pose_t& pose, double dt) const;
+	navtypes::pose_t getNextPose(const wheelvel_t& wheelVel, const navtypes::pose_t& pose, double dt) const;
 
 private:
 	double wheelBaseWidth;

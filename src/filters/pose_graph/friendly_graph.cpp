@@ -2,13 +2,19 @@
 #include "friendly_graph.h"
 
 #include "../../Constants.h"
-#include "../../simulator/utils.h"
+#include "../../navtypes.h"
+#include "../../Util.h"
 
 #include <iostream>
 #include <vector>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
+
+using namespace navtypes;
+using util::toPose;
+using util::toTransform;
+using util::toTransformRotateFirst;
 
 namespace filters::pose_graph {
 

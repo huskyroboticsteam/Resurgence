@@ -2,7 +2,7 @@
 #ifndef _PLAN_H_
 #define _PLAN_H_
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 
 #include <Eigen/Core>
 
@@ -22,7 +22,7 @@ using action_t = Eigen::Vector2d;
  * @return A plan that takes the robot from its current position to the goal point.
  */
 plan_t getPlan(const std::function<bool(double x, double y, double radius)>& collides,
-			   const point_t& goal, double goal_radius);
+			   const navtypes::point_t& goal, double goal_radius);
 
 /**
  * Finds a path to the given goal point, stopping when at most goal_radius distance away.
@@ -36,7 +36,7 @@ plan_t getPlan(const std::function<bool(double x, double y, double radius)>& col
  * @param goal_radius The maximum allowable distance to the goal.
  * @return A plan that takes the robot from its current position to the goal point.
  */
-plan_t getPlan(const points_t& lidar_scan, const point_t& goal, double goal_radius);
+plan_t getPlan(const navtypes::points_t& lidar_scan, const navtypes::point_t& goal, double goal_radius);
 double planCostFromIndex(plan_t& plan, int idx);
 
 #endif

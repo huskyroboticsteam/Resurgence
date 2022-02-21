@@ -1,9 +1,7 @@
 #include "Autonomous.h"
 
 #include "Globals.h"
-#include "commands/DriveToGateNoCompass.h"
-#include "commands/nogps/DriveThroughGate.h"
-#include "commands/nogps/DriveToGate.h"
+#include "Util.h"
 #include "log.h"
 #include "rospub.h"
 #include "world_interface/world_interface.h"
@@ -12,6 +10,10 @@
 #include <iostream>
 
 #include <Eigen/LU>
+
+using namespace navtypes;
+using util::toTransform;
+using util::toPose;
 
 namespace pose_graph = filters::pose_graph;
 
@@ -392,7 +394,7 @@ plan_t computePlan(transform_t invTransform, point_t goal) {
 			transform_t coll_tf = toTransform(relPoint);
 			// TODO implement thread-safe access to `map` if `USE_MAP` is true
 			// if (USE_MAP) return map.hasPointWithin(p, radius);
-			return collides(coll_tf, lidar_scan, radius);
+			return util::collides(coll_tf, lidar_scan, radius);
 		};
 	} else {
 		if (!lidarData) {
@@ -504,7 +506,7 @@ void Autonomous::autonomyIter() {
 	transform_t invTransform = toTransform(pose).inverse();
 
 	const points_t landmarks_transformed =
-		transformReadings(smoothed_landmarks, invTransform * VIZ_BASE_TF);
+		util::transformReadings(smoothed_landmarks, invTransform * VIZ_BASE_TF);
 	rospub::publish_array(landmarks_transformed, rospub::ArrayPub::LANDMARKS);
 
 	if (nav_state == NavState::DONE && Globals::AUTONOMOUS) {
@@ -569,7 +571,7 @@ void Autonomous::autonomyIter() {
 	}
 
 	// Send lidar points to visualization
-	const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
+	const points_t lidar_scan_transformed = util::transformReadings(lidar_scan, VIZ_BASE_TF);
 	log(LOG_DEBUG, "Publishing %d lidar points\n", lidar_scan_transformed.size());
 	rospub::publish_array(lidar_scan_transformed, rospub::ArrayPub::LIDAR_SCAN);
 
@@ -636,7 +638,7 @@ pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan
 		if (USE_MAP) {
 			plan_pose_collides &= map.hasPointWithin(plan_pose, PLAN_COLLISION_DIST);
 		} else {
-			plan_pose_collides &= collides(tf_plan_pose, lidar_scan, PLAN_COLLISION_DIST);
+			plan_pose_collides &= util::collides(tf_plan_pose, lidar_scan, PLAN_COLLISION_DIST);
 		}
 		if (plan_pose_collides) {
 			// We'll replan next timestep

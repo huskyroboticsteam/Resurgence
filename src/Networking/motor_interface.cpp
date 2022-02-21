@@ -12,7 +12,6 @@ extern "C" {
 #include "../HindsightCAN/CANMotorUnit.h"
 }
 #include "../Globals.h"
-#include "../simulator/utils.h"
 #include "../world_interface/world_interface.h"
 #include "ParseBaseStation.h"
 #include "motor_interface.h"

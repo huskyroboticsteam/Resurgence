@@ -11,6 +11,7 @@ constexpr double SHOULDER_LENGTH = 0.6; // placeholder(m)
 constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
 
 // TODO: tune these drive constants
+constexpr double ROBOT_LENGTH = 1.0;
 constexpr double WHEEL_BASE = 2. / 3.;
 constexpr double EFF_WHEEL_BASE = 1.40; // tweaked to match 2-wheel kinematic model
 constexpr double WHEEL_RADIUS = 0.15; // eyeballed
@@ -33,4 +34,15 @@ const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera nam
 
 constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
 constexpr uint16_t WS_SERVER_PORT = 3001;
+
+namespace Nav {
+const double RADIAN_COST = EFF_WHEEL_BASE / 2.0; // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
+const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3; // Planner stays this far away from obstacles (m)
+const int MAX_ITERS = 3000; // Max number of nodes expanded during A* search
+const double PLAN_RESOLUTION = Constants::ROBOT_LENGTH; // m
+const double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH*3;
+const double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
+const double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
+const double EPS = 2.0; // heuristic weight for weighted A*
+}
 } // namespace Constants

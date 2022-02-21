@@ -10,6 +10,7 @@
 #include "Networking/ParseCAN.h"
 #include "Networking/motor_interface.h"
 #include "Util.h"
+#include "navtypes.h"
 #include "log.h"
 #include "rospub.h"
 #include "world_interface/world_interface.h"
@@ -35,6 +36,7 @@ extern "C" {
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 using std::chrono::steady_clock;
+using namespace navtypes;
 
 constexpr std::array<uint32_t, 6> arm_PPJRs = {
 	17 * 1000, // base, estimate

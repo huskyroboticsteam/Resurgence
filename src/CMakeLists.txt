@@ -248,9 +248,7 @@ add_library(rover_common SHARED
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
-  commands/nogps/DriveToGate.cpp
-  commands/nogps/DriveThroughGate.cpp
-  commands/DriveToGateNoCompass.cpp)
+  )
 
 list(APPEND rover_libs
   rover_common
@@ -308,10 +306,6 @@ if(WITH_CAN)
 	)
   target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
 endif()
-
-add_executable(PlanViz
-  PlanViz.cpp)
-target_link_libraries(PlanViz simulator_base ${sfml_libs})
 
 if(WITH_TESTS)
   add_executable(tests

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../simulator/utils.h"
+#include "../../navtypes.h"
 #include "factors.h"
 #include "graph.h"
 
@@ -49,21 +49,21 @@ public:
 	FriendlyGraph(int num_landmarks, int max_num_poses, float camera_std, float gps_xy_std,
 				  float wheel_noise_rate);
 
-	void addGPSMeasurement(int pose_id, const transform_t& gps_tf);
-	void addOdomMeasurement(int pose2_id, int pose1_id, const transform_t& pose2_tf,
-							const transform_t& pose1_tf);
-	void addLandmarkMeasurement(int pose_id, int lm_id, const point_t& bearing,
+	void addGPSMeasurement(int pose_id, const navtypes::transform_t& gps_tf);
+	void addOdomMeasurement(int pose2_id, int pose1_id, const navtypes::transform_t& pose2_tf,
+							const navtypes::transform_t& pose1_tf);
+	void addLandmarkMeasurement(int pose_id, int lm_id, const navtypes::point_t& bearing,
 								bool overwrite = false);
-	void addLandmarkPrior(int lm_id, point_t location, double xy_std);
-	void addPosePrior(int pose_id, const transform_t& pose_tf, covariance<3>& cov);
+	void addLandmarkPrior(int lm_id, navtypes::point_t location, double xy_std);
+	void addPosePrior(int pose_id, const navtypes::transform_t& pose_tf, covariance<3>& cov);
 
-	pose_t getPoseEstimate(int pose_id);
+	navtypes::pose_t getPoseEstimate(int pose_id);
 	void solve();
-	points_t getLandmarkLocations();
+	navtypes::points_t getLandmarkLocations();
 	/* This method will return the smoothed trajectory (assuming you've already called
 	 * `solve()`). Note that the length of this trajectory will be at most `max_num_poses`
 	 * (the oldest poses are discarded). */
-	trajectory_t getSmoothedTrajectory();
+	navtypes::trajectory_t getSmoothedTrajectory();
 	int getMaxNumPoses() const;
 };
 

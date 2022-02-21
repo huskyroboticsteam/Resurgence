@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <stack>
 
+using namespace navtypes;
+
 // checks if the given point is contained in the specified square axis-aligned bounding box
 bool inBounds(const point_t& center, double size, const point_t& point) {
 	point_t diff = (point - center).array().abs();

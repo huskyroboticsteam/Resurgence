@@ -1,11 +1,14 @@
 #include "PointCloudProcessing.h"
 
 #include "URGLidar.h"
+#include "../navtypes.h"
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <limits>
+
+using namespace navtypes;
 
 namespace lidar {
 
