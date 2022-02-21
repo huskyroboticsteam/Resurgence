@@ -2,6 +2,7 @@
 #include "../Globals.h"
 #include "../Networking/websocket/WebSocketProtocol.h"
 #include "../Util.h"
+#include "../navtypes.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
@@ -21,6 +22,7 @@
 #include <opencv2/core.hpp>
 
 using nlohmann::json;
+using namespace navtypes;
 
 namespace {
 const std::string PROTOCOL_PATH("/simulator");

@@ -58,7 +58,7 @@ Windows systems.")
 set(WITH_LIDAR ON CACHE BOOL "Enable/Disable the USB LiDAR interface.")
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
-set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP" "SIMULATOR3D")
+set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
 set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
 
 if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
@@ -111,11 +111,6 @@ if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()
 
-# Find the SFML graphics library, used for the planar simulator
-find_package(SFML REQUIRED COMPONENTS graphics window system)
-list(APPEND sfml_libs
-  sfml-graphics sfml-window sfml-system Threads::Threads)
-
 # Libraries needed to interface with real-life sensors. If we aren't using the real world
 # interface, these aren't needed.
 if(WORLD_INTERFACE STREQUAL "REAL")
@@ -125,9 +120,9 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   # TODO: Remove this when interface with Electronics' IMU board is implemented.
   pkg_check_modules(libgps REQUIRED libgps)
   if(WITH_LIDAR)
-	# Find the URGLidar library.
-	# TODO: Decide if we want to use those RPLidars we found
-	find_package(URGLidar REQUIRED)
+	  # Find the URGLidar library.
+	  # TODO: Decide if we want to use those RPLidars we found
+	  find_package(URGLidar REQUIRED)
   endif()
 endif()
 
@@ -161,20 +156,9 @@ add_library(hindsight_can SHARED
   HindsightCAN/CANScience.c
   HindsightCAN/PortFiles/PortTemplate.c)
 
-add_library(simulator_base SHARED
-  simulator/utils.cpp
-  simulator/world.cpp
-  simulator/graphics.cpp)
-target_link_libraries(simulator_base ${sfml_libs})
-
-add_library(simulator_nav SHARED
-  planning/plan.cpp)
-
 add_library(real_base_station SHARED
   Networking/Network.cpp)
 
-add_library(simulator_world_interface STATIC
-  world_interface/simulator_world.cpp)
 add_library(stub_world_interface STATIC
   world_interface/noop_world.cpp)
 add_library(real_world_interface STATIC
@@ -189,8 +173,8 @@ add_library(real_world_interface STATIC
   base64/base64_img.cpp
   ${camera_src}
   )
-add_library(sim3d_interface STATIC
-  world_interface/sim_3d_interface.cpp
+add_library(simulator_interface STATIC
+  world_interface/simulator_interface.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
@@ -201,8 +185,8 @@ add_library(sim3d_interface STATIC
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
-target_include_directories(sim3d_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(sim3d_interface ${vision_libs})
+target_include_directories(simulator_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(simulator_interface ${vision_libs})
 
 add_library(hr_slam SHARED
   filters/pose_graph/graph.cpp
@@ -220,8 +204,8 @@ list(APPEND real_world_libs
   lidar_interface
   URGLidar::urg_c)
 
-list(APPEND sim3d_libs
-  sim3d_interface)
+list(APPEND simulator_libs
+  simulator_interface)
 
 add_executable(Rover rover_main.cpp)
 add_library(rover_common SHARED
@@ -248,13 +232,13 @@ add_library(rover_common SHARED
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
+  planning/plan.cpp
   )
 
 list(APPEND rover_libs
   rover_common
   hindsight_can
-  simulator_base
-  simulator_nav
+  Threads::Threads
   hr_slam
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
@@ -265,8 +249,8 @@ target_link_libraries(Rover
 
 if(WORLD_INTERFACE STREQUAL "REAL")
   target_link_libraries(Rover ${real_world_libs})
-elseif(WORLD_INTERFACE STREQUAL "SIMULATOR3D")
-  target_link_libraries(Rover ${sim3d_libs})
+elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
+  target_link_libraries(Rover ${simulator_libs})
 else()
   target_link_libraries(Rover ${real_world_libs}) # TODO: support other interfaces
 endif()

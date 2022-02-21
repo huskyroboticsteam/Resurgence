@@ -4,6 +4,8 @@
 
 #include <catch2/catch.hpp>
 
+using namespace navtypes;
+
 namespace
 {
 double randNum(double low, double high)
