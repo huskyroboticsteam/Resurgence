@@ -81,7 +81,7 @@ git clone https://github.com/huskyroboticsteam/Resurgence/
 cd Resurgence
 ```
 
-4. Clone the 2D simulator and CAN library submodules (we use git submodules, unfortunately)
+4. Clone the CAN library submodule (we use git submodules, unfortunately)
 ```bash
 git submodule init
 git submodule update
