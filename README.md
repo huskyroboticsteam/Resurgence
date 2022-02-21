@@ -172,16 +172,12 @@ sudo cp src/lidar/50-usb-hokuyo-lidar.rules /etc/udev/rules.d
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-## Install SFML and Eigen (navigation simulator)
+## Install [Eigen](http://eigen.tuxfamily.org)
 
- * [Eigen](http://eigen.tuxfamily.org)
- * [SFML](https://www.sfml-dev.org/tutorials/2.5/)
-
-On Ubuntu, you might be able to install these via
+On Ubuntu, you might be able to install via
 
 ```
 sudo apt-get install libeigen3-dev
-sudo apt-get install libsfml-dev
 ```
 
 ## Install JSON library
@@ -276,7 +272,7 @@ To build all of our executables (requires having all optional dependencies insta
 
 `make -j$(nproc)`
 
-Otherwise you can specify just the specific executable you would like to run, e.g. `make RoverSim`. (You can still use the `-j` flag to parallelize the build.)
+Otherwise you can specify just the specific executable you would like to run, e.g. `make Rover`. (You can still use the `-j` flag to parallelize the build.)
 
 To run our unit tests, run `make tests` and then execute `./tests`.
 
@@ -290,7 +286,7 @@ The simulator does not have its own executable. Instead, you must configure the 
 
 ```bash
 cd build
-cmake ../src -DWITH_CAN=OFF -DWITH_GPS=OFF -DWITH_LIDAR=OFF -DWITH_TESTS=OFF -DWORLD_INTERFACE=SIMULATOR3D
+cmake ../src -DWITH_CAN=OFF -DWITH_GPS=OFF -DWITH_LIDAR=OFF -DWITH_TESTS=OFF -DWORLD_INTERFACE=SIMULATOR
 make -j Rover
 ```
 
