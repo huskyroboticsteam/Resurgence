@@ -2,6 +2,8 @@
 
 #include "../kinematics/DiffDriveKinematics.h"
 
+namespace robot {
+
 /**
  * @brief Call this method from all implementations of setCmdVel().
  * This is required, and will allow odometry methods to work correctly.
@@ -20,3 +22,5 @@ void setCmdVelToIntegrate(const wheelvel_t& wheelVels);
  * @param dx The forward velocity, in m/s.
  */
 void setCmdVelToIntegrate(double dtheta, double dx);
+
+} // namespace robot

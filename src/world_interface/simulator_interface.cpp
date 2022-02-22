@@ -2,13 +2,13 @@
 #include "../Globals.h"
 #include "../Networking/websocket/WebSocketProtocol.h"
 #include "../Util.h"
-#include "../navtypes.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
+#include "../navtypes.h"
 #include "kinematic_common_interface.h"
 #include "world_interface.h"
 
@@ -23,6 +23,7 @@
 
 using nlohmann::json;
 using namespace navtypes;
+using namespace robot::types;
 
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
@@ -175,6 +176,8 @@ void initSimServer() {
 
 } // namespace
 
+namespace robot {
+
 const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 
 void world_interface_init() {
@@ -269,11 +272,6 @@ DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
 
-DataPoint<gpscoords_t> gps::readGPSCoords() {
-	std::lock_guard<std::mutex> guard(gpsMutex);
-	return lastGPS;
-}
-
 DataPoint<double> readIMUHeading() {
 	std::lock_guard<std::mutex> guard(headingMutex);
 	return lastHeading;
@@ -303,4 +301,11 @@ void setIndicator(indication_t signal) {
 	if (signal == indication_t::arrivedAtDest) {
 		log(LOG_INFO, "Robot arrived at destination!\n");
 	}
+}
+
+} // namespace robot
+
+DataPoint<gpscoords_t> gps::readGPSCoords() {
+	std::lock_guard<std::mutex> guard(gpsMutex);
+	return lastGPS;
 }

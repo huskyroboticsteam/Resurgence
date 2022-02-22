@@ -1,11 +1,14 @@
-#include "world_interface.h"
 #include "../navtypes.h"
+#include "world_interface.h"
 
 #include <optional>
 
 using namespace navtypes;
+using namespace robot::types;
 
 static std::optional<GPSToMetersConverter> converter;
+
+namespace robot {
 
 DataPoint<point_t> readGPS() {
 	DataPoint<gpscoords_t> coords = gps::readGPSCoords();
@@ -24,7 +27,7 @@ DataPoint<point_t> readGPS() {
 	return {time, pos};
 }
 
-std::optional<point_t> gpsToMeters(const gpscoords_t &coord) {
+std::optional<point_t> gpsToMeters(const gpscoords_t& coord) {
 	if (converter) {
 		return converter->gpsToMeters(coord);
 	} else {
@@ -38,3 +41,5 @@ bool gpsHasFix() {
 	}
 	return converter.has_value();
 }
+
+} // namespace robot

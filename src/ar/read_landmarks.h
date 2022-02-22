@@ -5,5 +5,5 @@
 namespace AR {
 bool initializeLandmarkDetection();
 bool isLandmarkDetectionInitialized();
-landmarks_t readLandmarks();
+robot::types::landmarks_t readLandmarks();
 } // namespace AR

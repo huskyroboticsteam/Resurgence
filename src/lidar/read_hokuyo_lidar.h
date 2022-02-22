@@ -24,5 +24,5 @@ bool isLidarInitialized();
  *
  * @return The data from the lidar sensor, or an empty data point if the lidar wasn't initialized.
  */
-DataPoint<navtypes::points_t> readLidar();
+robot::types::DataPoint<navtypes::points_t> readLidar();
 } // namespace lidar

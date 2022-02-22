@@ -3,23 +3,22 @@
 #include "../Networking/ParseCAN.h"
 #include "../Networking/motor_interface.h"
 #include "../Util.h"
-#include "../navtypes.h"
 #include "../ar/read_landmarks.h"
 #include "../camera/Camera.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
-#include "world_interface.h"
+#include "../navtypes.h"
 #include "kinematic_common_interface.h"
+#include "world_interface.h"
 
 #include <future>
 #include <iostream>
 #include <map>
 #include <set>
 
-#include <opencv2/calib3d.hpp>
-
 #include <nlohmann/json.hpp>
+#include <opencv2/calib3d.hpp>
 
 extern "C" {
 #include "../HindsightCAN/CANMotorUnit.h"
@@ -27,6 +26,9 @@ extern "C" {
 
 using nlohmann::json;
 using namespace navtypes;
+using namespace robot::types;
+
+namespace robot {
 
 const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
@@ -38,8 +40,9 @@ void setupCameras() {
 		auto arCam = std::make_shared<cam::Camera>();
 		arCam->openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
 		cameraMap[Constants::AR_CAMERA_ID] = arCam;
-	} catch (const std::exception &e) {
-		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n", Constants::AR_CAMERA_ID, e.what());
+	} catch (const std::exception& e) {
+		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n", Constants::AR_CAMERA_ID,
+			e.what());
 	}
 
 	// Set up the rest of the cameras here
@@ -228,3 +231,5 @@ void setMotorPos(const std::string& motor, int32_t targetPos) {
 
 // TODO: implement
 void setIndicator(indication_t signal) {}
+
+} // namespace robot

@@ -33,7 +33,7 @@ void cleanup(int signum) {
 
 int main(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
-	world_interface_init();
+	robot::world_interface_init();
 	InitializeRover(MOTOR_UNIT_MODE_PID, false);
 	struct timeval tp0, tp_start;
 

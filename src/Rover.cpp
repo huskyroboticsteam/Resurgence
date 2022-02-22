@@ -171,7 +171,7 @@ int rover_loop(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
-	world_interface_init();
+	robot::world_interface_init();
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);

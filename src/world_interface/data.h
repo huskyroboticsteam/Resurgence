@@ -12,6 +12,12 @@ namespace cv {
 class Mat;
 }
 
+/**
+ * @namespace robot::types
+ * @brief Types for use in the world interface.
+ */
+namespace robot::types {
+
 // the clock used for time measurements for data
 using dataclock = std::chrono::steady_clock;
 // a point in time as measured by dataclock
@@ -95,3 +101,5 @@ private:
 	// the time and measurement data
 	std::optional<std::pair<datatime_t, T>> datapoint;
 };
+
+} // namespace robot::types

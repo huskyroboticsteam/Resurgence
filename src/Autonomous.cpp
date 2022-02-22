@@ -12,6 +12,7 @@
 #include <Eigen/LU>
 
 using namespace navtypes;
+using namespace robot::types;
 using util::toTransform;
 using util::toPose;
 
@@ -88,13 +89,13 @@ Autonomous::Autonomous(const std::vector<URCLegGPS>& gpsTargets, double controlH
 }
 
 void Autonomous::init() {
-	if (!gpsHasFix()) {
+	if (!robot::gpsHasFix()) {
 		return;
 	}
 	this->urc_targets.clear();
 	// convert gps targets to map space
 	for (const auto& gpsTarget : urc_targets_gps) {
-		point_t p = gpsToMeters(gpsTarget.gps).value();
+		point_t p = robot::gpsToMeters(gpsTarget.gps).value();
 		urc_targets.push_back({gpsTarget.left_post_id, gpsTarget.right_post_id, p});
 	}
 	search_target = {urc_targets[0].approx_GPS(0), urc_targets[0].approx_GPS(1), -M_PI / 2};
@@ -107,7 +108,7 @@ void Autonomous::init() {
 	// that leads to smoother changes in the pose estimate (at least in the simulator),
 	// which are easier for the controller to work with.
 	pose_graph = pose_graph::FriendlyGraph(num_landmarks, 10, 0.3, 5.0, 0.05);
-	prev_odom = readOdom();
+	prev_odom = robot::readOdom();
 	// TODO how to make this start pose configurable?
 	transform_t start_pose_guess = toTransform({0, 0, 0});
 	double pose_prior_xy_std = 3.0;
@@ -143,7 +144,7 @@ double dist(const pose_t& p1, const pose_t& p2, double theta_weight) {
 
 void Autonomous::endCurrentLeg() {
 	log(LOG_INFO, "Leg complete, exiting autonomous mode\n");
-	setCmdVel(0, 0);
+	robot::setCmdVel(0, 0);
 	Globals::AUTONOMOUS = false;
 	leg_idx += 1;
 	// clear the cached data points
@@ -389,7 +390,7 @@ void Autonomous::updateSearchTarget() {
 
 plan_t computePlan(transform_t invTransform, point_t goal) {
 	// We need to readLidar again from within the planning thread, for thread safety
-	auto lidarData = readLidarScan();
+	auto lidarData = robot::readLidarScan();
 	points_t lidar_scan;
 	std::function<bool(double, double, double)> collide_func;
 	if (lidarData.isFresh(LIDAR_FRESH_PERIOD)) {
@@ -415,13 +416,13 @@ plan_t computePlan(transform_t invTransform, point_t goal) {
 }
 
 transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
-	DataPoint<point_t> gpsData = readGPS();
+	DataPoint<point_t> gpsData = robot::readGPS();
 	bool new_gps_data = gpsData.isFresh(GPS_FRESH_PERIOD) && lastGPSTime != gpsData.getTime();
 	if (new_gps_data) {
 		lastGPSTime = gpsData.getTime();
 	}
 
-	landmarks_t landmarks = readLandmarks();
+	landmarks_t landmarks = robot::readLandmarks();
 	printLandmarks(landmarks, LOG_DEBUG);
 	// check if any of the landmark data is new
 	bool new_landmark_data = false;
@@ -480,14 +481,14 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 }
 
 void Autonomous::autonomyIter() {
-	if (gpsHasFix() && !initialized) {
+	if (robot::gpsHasFix() && !initialized) {
 		init();
-	} else if (!gpsHasFix()) {
+	} else if (!robot::gpsHasFix()) {
 		log(LOG_WARN, "Waiting for GPS fix...\n");
 		return;
 	}
 
-	transform_t odom = readOdom();
+	transform_t odom = robot::readOdom();
 	pose_t pose{0, 0, 0};
 
 	if (!pending_solve.valid()) {
@@ -532,7 +533,7 @@ void Autonomous::autonomyIter() {
 	log(LOG_DEBUG, "plan_target %f %f %f\n", plan_target(0), plan_target(1), plan_target(2));
 	update_nav_state(pose, plan_target);
 
-	auto lidarData = readLidarScan();
+	auto lidarData = robot::readLidarScan();
 	points_t lidar_scan;
 	if (lidarData.isFresh(LIDAR_FRESH_PERIOD)) {
 		if (lastLidarTime != lidarData.getTime()) {
@@ -624,7 +625,7 @@ void Autonomous::autonomyIter() {
 	double driveSpeed = getLinearVel(driveTarget, pose, thetaErr);
 
 	if (!Globals::E_STOP && Globals::AUTONOMOUS) {
-		double scale_factor = setCmdVel(thetaVel, driveSpeed);
+		double scale_factor = robot::setCmdVel(thetaVel, driveSpeed);
 	}
 }
 

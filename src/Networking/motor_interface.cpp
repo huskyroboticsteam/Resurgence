@@ -124,11 +124,11 @@ bool setOperationMode(const std::string& motor, int ik_axis, const std::string& 
 }
 
 void sendPWMPacket(const std::string& motor, double normalized_pwm) {
-    setMotorPWM(motor, normalized_pwm);
+    robot::setMotorPWM(motor, normalized_pwm);
 }
 
 void sendPIDPacket(const std::string& motor, int32_t pid_target) {
-	setMotorPos(motor, pid_target);
+	robot::setMotorPos(motor, pid_target);
 }
 
 // TODO: if this sends the motor packet, should probably be called
