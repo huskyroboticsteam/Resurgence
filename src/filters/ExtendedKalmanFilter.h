@@ -6,6 +6,8 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
+namespace filters {
+
 /**
  * Represents a square noise covariance matrix. Returning the zero matrix can sometimes be
  * dangerous depending on your model, as it may cause numerical instability or incorrect
@@ -29,8 +31,7 @@ public:
 	 * @param stdDevs The standard deviations of each element.
 	 */
 	explicit NoiseCovMat(const Eigen::Matrix<double, size, 1>& stdDevs)
-		: NoiseCovMat(StateSpace::createCovarianceMatrix(stdDevs)) {
-	}
+		: NoiseCovMat(statespace::createCovarianceMatrix(stdDevs)) {}
 
 	/**
 	 * Create a time-invariant noise covariance matrix equal to the given matrix.
@@ -38,8 +39,7 @@ public:
 	 * @param mat The noise covariance matrix.
 	 */
 	NoiseCovMat(const Eigen::Matrix<double, size, size>& mat)
-		: func([mat](const state_t& x, const param_t& param) { return mat; }) {
-	}
+		: func([mat](const state_t& x, const param_t& param) { return mat; }) {}
 
 	/**
 	 * Create a time-varying noise covariance matrix. At runtime, the matrix will be calculated
@@ -51,8 +51,7 @@ public:
 	 */
 	NoiseCovMat(const std::function<Eigen::Matrix<double, size, size>(const state_t&,
 																	  const param_t&)>& func)
-		: func(func) {
-	}
+		: func(func) {}
 
 	/**
 	 * Gets the noise covariance matrix, given the current state and additonal parameter.
@@ -114,8 +113,7 @@ public:
 						 const NoiseCovMat<stateDim, outputNoiseDim, outputDim>& outputNoise,
 						 double dt)
 		: stateFunc(stateFunc), outputFunc(outputFunc), Q(processNoise), R(outputNoise),
-		  dt(dt) {
-	}
+		  dt(dt) {}
 
 	void predict(const Eigen::Matrix<double, inputDim, 1>& input) override {
 		Eigen::Matrix<double, stateDim, stateDim> F =
@@ -261,3 +259,5 @@ private:
 		}
 	}
 };
+
+} // namespace filters

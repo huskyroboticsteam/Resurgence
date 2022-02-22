@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 #include "../world_interface/data.h"
 
 namespace lidar {
@@ -24,5 +24,5 @@ bool isLidarInitialized();
  *
  * @return The data from the lidar sensor, or an empty data point if the lidar wasn't initialized.
  */
-DataPoint<points_t> readLidar();
+DataPoint<navtypes::points_t> readLidar();
 } // namespace lidar

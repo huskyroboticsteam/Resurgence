@@ -1,6 +1,9 @@
 #include "world_interface.h"
+#include "../navtypes.h"
 
 #include <optional>
+
+using namespace navtypes;
 
 static std::optional<GPSToMetersConverter> converter;
 

@@ -1,6 +1,9 @@
 #include "world_interface.h"
+#include "../navtypes.h"
 
 #include <unistd.h>
+
+using namespace navtypes;
 
 const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
 

@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "../../simulator/utils.h"
-
 namespace gps::usb {
 /**
  * @brief Check if the USB GPS has acquired a fix.

@@ -1,6 +1,7 @@
 #include "rospub.h"
 
 #include "Constants.h"
+#include "navtypes.h"
 
 #include <array>
 #include <map>
@@ -12,6 +13,7 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
+using namespace navtypes;
 
 namespace rospub {
 namespace ws = websocketpp;

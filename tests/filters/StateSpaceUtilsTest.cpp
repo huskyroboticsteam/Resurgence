@@ -2,13 +2,15 @@
 
 #include "../../src/filters/StateSpaceUtil.h"
 
+using namespace filters;
+
 TEST_CASE("StateSpace - Continuous to Discrete System Model") {
 	// examples pulled from appendix of https://doi.org/10.1016/0307-904X(80)90177-8
 	Eigen::Matrix2d A, B;
 	A << 1, 2, 3, -4;
 	B << 2, 0, 1, 1;
 
-	StateSpace::continuousToDiscrete(A, B, 0.25);
+	statespace::continuousToDiscrete(A, B, 0.25);
 
 	Eigen::Matrix2d discA, discB; // these are called G and H in the paper
 	discA << 1.45412, 0.38920, 0.58381, 0.48111;
@@ -23,7 +25,7 @@ TEST_CASE("StateSpace - Discrete to Continuous System Model") {
 	A << 1.45412, 0.38920, 0.58381, 0.48111;
 	B << 0.64872, 0.05190, 0.32437, 0.16865;
 
-	StateSpace::discreteToContinuous(A, B, 0.25);
+	statespace::discreteToContinuous(A, B, 0.25);
 
 	Eigen::Matrix2d contA, contB;
 	contA << 1, 2, 3, -4;

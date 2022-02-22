@@ -1,6 +1,10 @@
 #include "gps_util.h"
 
+#include "../navtypes.h"
+
 #include <cmath>
+
+using namespace navtypes;
 
 constexpr double PI = M_PI;
 

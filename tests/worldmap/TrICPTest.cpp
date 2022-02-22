@@ -1,4 +1,5 @@
 #include "../../src/worldmap/TrICP.h"
+#include "../../src/Util.h"
 
 #include <Eigen/LU>
 #include <iostream>
@@ -6,6 +7,9 @@
 #include <catch2/catch.hpp>
 
 #include "../../src/worldmap/GlobalMap.h"
+
+using namespace navtypes;
+using namespace util;
 
 namespace
 {

@@ -2,10 +2,14 @@
 
 #include "../Constants.h"
 #include "../Util.h"
+#include "../navtypes.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "world_interface.h"
 
 #include <chrono>
+
+using namespace navtypes;
+using util::toTransform;
 
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;

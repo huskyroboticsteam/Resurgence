@@ -1,18 +1,21 @@
 #include "Autonomous.h"
 
 #include "Globals.h"
-#include "commands/DriveToGateNoCompass.h"
-#include "commands/nogps/DriveThroughGate.h"
-#include "commands/nogps/DriveToGate.h"
+#include "Util.h"
 #include "log.h"
 #include "rospub.h"
-#include "simulator/constants.h"
 #include "world_interface/world_interface.h"
 
 #include <cmath>
 #include <iostream>
 
 #include <Eigen/LU>
+
+using namespace navtypes;
+using util::toTransform;
+using util::toPose;
+
+namespace pose_graph = filters::pose_graph;
 
 constexpr float PI = M_PI;
 constexpr double KP_ANGLE = 2.0;
@@ -40,8 +43,7 @@ constexpr auto ZERO_DURATION = std::chrono::microseconds(0);
 constexpr std::chrono::milliseconds LIDAR_FRESH_PERIOD(200);
 constexpr std::chrono::milliseconds GPS_FRESH_PERIOD(2000); // update to match gps specs
 
-const transform_t VIZ_BASE_TF =
-	toTransform({NavSim::DEFAULT_WINDOW_CENTER_X, NavSim::DEFAULT_WINDOW_CENTER_Y, M_PI / 2});
+const transform_t VIZ_BASE_TF = toTransform({0, 0, M_PI / 2}); // TODO: remove this
 
 /**
 	 @brief Prints a list of landmarks using the logging mechanism.
@@ -71,18 +73,18 @@ static bool printLandmarks(const landmarks_t& landmarks, int log_level = LOG_DEB
 
 Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	: urc_targets(_targets), leg_idx(0),
-		search_target({_targets[0].approx_GPS(0) - PI, _targets[0].approx_GPS(1), -PI / 2}),
-		gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}), gate_direction(true),
-		poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
-		map(10000), // TODO: the stride should be set higher when using the real lidar
-		calibrated(false), calibrationPoses({}), nav_state(NavState::GPS),
-		control_state(ControlState::FAR_FROM_TARGET_POSE), time_since_plan(0), plan(0, 2),
-		pending_plan(), pending_solve(), plan_cost(INFINITE_COST), plan_base({0, 0, 0}),
-		plan_idx(0), search_theta_increment(PI / 4), mapLoopCounter(0), mapBlindPeriod(15),
-		mapDoesOverlap(false), mapOverlapSampleThreshold(15),
-		pose_graph(0, 0, 0, 0, 0), // We'll re-initialize this in the function body
-		pose_id(0), prev_odom(toTransform({0, 0, 0})), smoothed_traj({}),
-		smoothed_landmarks({}) {
+	  search_target({_targets[0].approx_GPS(0) - PI, _targets[0].approx_GPS(1), -PI / 2}),
+	  gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}), gate_direction(true),
+	  poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
+	  map(10000), // TODO: the stride should be set higher when using the real lidar
+	  calibrated(false), calibrationPoses({}), nav_state(NavState::GPS),
+	  control_state(ControlState::FAR_FROM_TARGET_POSE), time_since_plan(0), plan(0, 2),
+	  pending_plan(), pending_solve(), plan_cost(INFINITE_COST), plan_base({0, 0, 0}),
+	  plan_idx(0), search_theta_increment(PI / 4), mapLoopCounter(0), mapBlindPeriod(15),
+	  mapDoesOverlap(false), mapOverlapSampleThreshold(15),
+	  pose_graph(0, 0, 0, 0, 0), // We'll re-initialize this in the function body
+	  pose_id(0), prev_odom(toTransform({0, 0, 0})), smoothed_traj({}),
+	  smoothed_landmarks({}) {
 
 	int num_landmarks = 0;
 	for (auto target : _targets) {
@@ -92,13 +94,13 @@ Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	// We use a gps_xy_std that's larger than the true std because empirically
 	// that leads to smoother changes in the pose estimate (at least in the simulator),
 	// which are easier for the controller to work with.
-	pose_graph = FriendlyGraph(num_landmarks, 10, 0.3, 5.0, 0.05);
+	pose_graph = pose_graph::FriendlyGraph(num_landmarks, 10, 0.3, 5.0, 0.05);
 	prev_odom = readOdom();
 	// TODO how to make this start pose configurable?
 	transform_t start_pose_guess = toTransform({0, 0, 0});
 	double pose_prior_xy_std = 3.0;
 	double pose_prior_th_std = 1.0;
-	covariance<3> pose_prior_cov = covariance<3>::Zero();
+	pose_graph::covariance<3> pose_prior_cov = pose_graph::covariance<3>::Zero();
 	pose_prior_cov << pose_prior_xy_std * pose_prior_xy_std, 0, 0, 0,
 		pose_prior_xy_std * pose_prior_xy_std, 0, 0, 0, pose_prior_th_std * pose_prior_th_std;
 	pose_graph.addPosePrior(0, start_pose_guess, pose_prior_cov);
@@ -115,7 +117,7 @@ Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 }
 
 Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz,
-						 const pose_t& startPose)
+					   const pose_t& startPose)
 	: Autonomous(_targets, controlHz) {
 	poseEstimator.reset(startPose);
 	calibrated = true;
@@ -154,8 +156,8 @@ void Autonomous::setNavState(NavState s) {
 	NavState old_state = nav_state;
 	nav_state = s;
 	if (old_state != s) {
-		log(LOG_INFO, "Changing navigation state %s -> %s\n",
-		NAV_STATE_NAMES[old_state], NAV_STATE_NAMES[nav_state]);
+		log(LOG_INFO, "Changing navigation state %s -> %s\n", NAV_STATE_NAMES[old_state],
+			NAV_STATE_NAMES[nav_state]);
 		plan_cost = INFINITE_COST;
 	}
 }
@@ -176,7 +178,7 @@ void Autonomous::update_nav_state(const pose_t& pose, const pose_t& plan_target)
 		if (foundLeftPost && foundRightPost) {
 			setNavState(NavState::GATE_ALIGN);
 		} else if ((foundLeftPost || foundRightPost) &&
-					 (nav_state != SEARCH_PATTERN_SECOND_POST)) {
+				   (nav_state != SEARCH_PATTERN_SECOND_POST)) {
 			setNavState(NavState::POST_VISIBLE);
 		}
 	}
@@ -199,7 +201,7 @@ void Autonomous::update_nav_state(const pose_t& pose, const pose_t& plan_target)
 			log(LOG_INFO, "Arrived at gate\n");
 			setNavState(NavState::DONE);
 		} else if (nav_state == NavState::SEARCH_PATTERN ||
-					 nav_state == NavState::SEARCH_PATTERN_SECOND_POST) {
+				   nav_state == NavState::SEARCH_PATTERN_SECOND_POST) {
 			// Current search point has been reached
 			updateSearchTarget();
 		}
@@ -247,7 +249,7 @@ double Autonomous::getLinearVel(const pose_t& drive_target, const pose_t& pose,
 }
 
 double Autonomous::getThetaVel(const pose_t& drive_target, const pose_t& pose,
-								 double& thetaErr) const {
+							   double& thetaErr) const {
 	// If we're within 20cm of the target location, we want to turn the rover until
 	// we reach the target orientation. Otherwise, we want to turn the rover to
 	// aim it at the target location.
@@ -275,7 +277,7 @@ point_t Autonomous::getPostLocation(bool left, bool verbose) {
 		if (verbose) {
 			log(LOG_ERROR, "Invalid post_id %d\n", urc_targets[leg_idx].left_post_id);
 		}
-		return {0,0,0};
+		return {0, 0, 0};
 	}
 	return smoothed_landmarks[post_id];
 }
@@ -293,8 +295,7 @@ bool Autonomous::getPostVisibility(bool left) {
 	bool visible = different_from_prior && (location(2) != 0);
 	log(LOG_DEBUG,
 		"Visibility %s is %d: diff %.3f loc (%.3f %.3f %.3f) prior (%.3f %.3f %.3f)\n",
-		left ? "LEFT " : "RIGHT", visible, diff,
-		location(0), location(1), location(2),
+		left ? "LEFT " : "RIGHT", visible, diff, location(0), location(1), location(2),
 		prior_location(0), prior_location(1), prior_location(2));
 	return visible;
 }
@@ -306,7 +307,7 @@ pose_t Autonomous::choose_plan_target(const pose_t& pose) {
 	if (nav_state == NavState::GPS) {
 		return getGPSTargetPose();
 	} else if (nav_state == NavState::SEARCH_PATTERN ||
-				 nav_state == NavState::SEARCH_PATTERN_SECOND_POST) {
+			   nav_state == NavState::SEARCH_PATTERN_SECOND_POST) {
 		return search_target;
 	} else if (nav_state == NavState::POST_VISIBLE) {
 		bool post_to_get = getPostVisibility(LEFT) ? LEFT : RIGHT;
@@ -349,7 +350,7 @@ void Autonomous::computeGateTargets(const pose_t& pose, bool choose_direction) {
 
 	// Angle between targets
 	double angle = std::atan2(gate_targets.second(1) - gate_targets.first(1),
-								gate_targets.second(0) - gate_targets.first(0));
+							  gate_targets.second(0) - gate_targets.first(0));
 	gate_targets.first(2) = angle;
 	gate_targets.second(2) = angle;
 }
@@ -393,7 +394,7 @@ plan_t computePlan(transform_t invTransform, point_t goal) {
 			transform_t coll_tf = toTransform(relPoint);
 			// TODO implement thread-safe access to `map` if `USE_MAP` is true
 			// if (USE_MAP) return map.hasPointWithin(p, radius);
-			return collides(coll_tf, lidar_scan, radius);
+			return util::collides(coll_tf, lidar_scan, radius);
 		};
 	} else {
 		if (!lidarData) {
@@ -418,16 +419,19 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 	// check if any of the landmark data is new
 	bool new_landmark_data = false;
 	for (int i = 0; i < landmarks.size(); i++) {
-		const auto &lm = landmarks[i];
+		const auto& lm = landmarks[i];
 		// we don't check isFresh() because that's handled in the AR code
 		if (lm) {
 			auto lastTimeItr = lastLandmarkTimes.find(i);
-			// if we haven't gotten any data before, or if the current data is more recent, mark as new
-			if (lastTimeItr == lastLandmarkTimes.end() || lastTimeItr->second != lm.getTime()) {
+			// if we haven't gotten any data before, or if the current data is more recent,
+			// mark as new
+			if (lastTimeItr == lastLandmarkTimes.end() ||
+				lastTimeItr->second != lm.getTime()) {
 				new_landmark_data = true;
 				lastLandmarkTimes[i] = lm.getTime();
 			} else {
-				// we've seen this data point before, so mark as empty (so it won't be used later)
+				// we've seen this data point before, so mark as empty (so it won't be used
+				// later)
 				landmarks[i] = {};
 			}
 		}
@@ -435,7 +439,8 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 
 	double odom_diff = toPose(current_odom * prev_odom.inverse(), 0.0).norm();
 	bool overwrite_landmark = (current_odom == prev_odom) && new_landmark_data;
-	bool new_data = new_gps_data || (odom_diff > 0.5 && new_landmark_data) || overwrite_landmark;
+	bool new_data =
+		new_gps_data || (odom_diff > 0.5 && new_landmark_data) || overwrite_landmark;
 
 	if (new_data) {
 		if (current_odom != prev_odom) { // Don't add poses to pose graph if we haven't moved
@@ -452,13 +457,15 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 			}
 		}
 		// TODO: change addGPSMeasurement() to accept a point_t instead of transform_t
-		if (new_gps_data) pose_graph.addGPSMeasurement(pose_id, toTransform(gpsData.getData()));
+		if (new_gps_data)
+			pose_graph.addGPSMeasurement(pose_id, toTransform(gpsData.getData()));
 
 		pose_graph.solve();
 		int log_level = LOG_DEBUG;
 		log(log_level, "Found pose graph solution: ");
 		bool found_one = printLandmarks(pose_graph.getLandmarkLocations(), log_level);
-		if (!found_one) log(log_level, "No landmarks found.\n");
+		if (!found_one)
+			log(log_level, "No landmarks found.\n");
 		return current_odom;
 	} else {
 		return prev_odom;
@@ -467,7 +474,7 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 
 void Autonomous::autonomyIter() {
 	transform_t odom = readOdom();
-	pose_t pose {0,0,0};
+	pose_t pose{0, 0, 0};
 
 	if (!pending_solve.valid()) {
 		// TODO even if we already have a pose graph optimization running, we should still
@@ -499,7 +506,7 @@ void Autonomous::autonomyIter() {
 	transform_t invTransform = toTransform(pose).inverse();
 
 	const points_t landmarks_transformed =
-		transformReadings(smoothed_landmarks, invTransform * VIZ_BASE_TF);
+		util::transformReadings(smoothed_landmarks, invTransform * VIZ_BASE_TF);
 	rospub::publish_array(landmarks_transformed, rospub::ArrayPub::LANDMARKS);
 
 	if (nav_state == NavState::DONE && Globals::AUTONOMOUS) {
@@ -539,7 +546,8 @@ void Autonomous::autonomyIter() {
 		point_t_goal.topRows(2) = plan_target.topRows(2);
 		point_t_goal(2) = 1.0;
 		point_t_goal = toTransform(pose) * point_t_goal;
-		log(LOG_DEBUG, "point_t_goal %f %f %f\n", point_t_goal(0), point_t_goal(1), point_t_goal(2));
+		log(LOG_DEBUG, "point_t_goal %f %f %f\n", point_t_goal(0), point_t_goal(1),
+			point_t_goal(2));
 		pending_plan =
 			std::async(std::launch::async, &computePlan, invTransform, point_t_goal);
 	}
@@ -553,7 +561,7 @@ void Autonomous::autonomyIter() {
 		// we want a significant improvement to avoid thrash
 		if (new_plan_cost < plan_cost * 0.8) {
 			log(LOG_INFO, "Got new plan: %ld steps, %f cost (previous: %ld steps, %f cost)\n",
-					new_plan.size(), new_plan_cost, plan.size(), plan_cost);
+				new_plan.size(), new_plan_cost, plan.size(), plan_cost);
 			plan_idx = 0;
 			plan_base = pose;
 			plan_cost = new_plan_cost;
@@ -563,7 +571,7 @@ void Autonomous::autonomyIter() {
 	}
 
 	// Send lidar points to visualization
-	const points_t lidar_scan_transformed = transformReadings(lidar_scan, VIZ_BASE_TF);
+	const points_t lidar_scan_transformed = util::transformReadings(lidar_scan, VIZ_BASE_TF);
 	log(LOG_DEBUG, "Publishing %d lidar points\n", lidar_scan_transformed.size());
 	rospub::publish_array(lidar_scan_transformed, rospub::ArrayPub::LIDAR_SCAN);
 
@@ -607,7 +615,7 @@ void Autonomous::autonomyIter() {
 }
 
 pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan_target,
-		const points_t& lidar_scan) {
+										  const points_t& lidar_scan) {
 	// Roll out the plan until we find a target pose a certain distance in front
 	// of the robot position `pose`.
 	//
@@ -630,7 +638,7 @@ pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan
 		if (USE_MAP) {
 			plan_pose_collides &= map.hasPointWithin(plan_pose, PLAN_COLLISION_DIST);
 		} else {
-			plan_pose_collides &= collides(tf_plan_pose, lidar_scan, PLAN_COLLISION_DIST);
+			plan_pose_collides &= util::collides(tf_plan_pose, lidar_scan, PLAN_COLLISION_DIST);
 		}
 		if (plan_pose_collides) {
 			// We'll replan next timestep
@@ -649,7 +657,8 @@ pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan
 			accumulated_cost += planCostFromIndex(plan, i);
 			driveTarget = plan_pose;
 			if (dist(plan_pose, pose, 1.0) > 2 * FOLLOW_DIST) {
-				log(LOG_WARN, "Drifted too far from plan. Stopping the rover and replanning.\n");
+				log(LOG_WARN,
+					"Drifted too far from plan. Stopping the rover and replanning.\n");
 				driveTarget = pose; // Don't move
 				accumulated_cost += INFINITE_COST;
 			}
@@ -675,15 +684,14 @@ pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan
 
 	if (dist(final_plan_pose, plan_target, 0.0) > 2 * PLANNING_GOAL_REGION_RADIUS) {
 		log(LOG_WARN, "Plan target moved (%f %f %f -> %f %f %f). Replanning.\n",
-				final_plan_pose(0), final_plan_pose(1), final_plan_pose(2),
-				plan_target(0), plan_target(1), plan_target(2));
+			final_plan_pose(0), final_plan_pose(1), final_plan_pose(2), plan_target(0),
+			plan_target(1), plan_target(2));
 		accumulated_cost += INFINITE_COST;
 	}
 	plan_cost = accumulated_cost;
 
 	return driveTarget;
 }
-
 
 pose_t Autonomous::getGPSTargetPose() const {
 	pose_t ret{urc_targets[leg_idx].approx_GPS(0), urc_targets[leg_idx].approx_GPS(1), 0.0};
@@ -697,11 +705,11 @@ static bool printLandmarks(const points_t& landmarks, int log_level) {
 		point_t lm = landmarks[i];
 		if (lm[2] != 0 && lm.topRows(2).norm() != 0) {
 			found_one = true;
-			stream << "Landmark " << i
-				<< " at {" << lm[0] << ", " << lm[1] << "} ";
+			stream << "Landmark " << i << " at {" << lm[0] << ", " << lm[1] << "} ";
 		}
 	}
-	if (found_one) stream << std::endl;
+	if (found_one)
+		stream << std::endl;
 	log(log_level, stream.str().c_str());
 	return found_one;
 }
@@ -714,11 +722,11 @@ static bool printLandmarks(const landmarks_t& landmarks, int log_level) {
 		if (lmData && lmData.getData().topRows(2).norm() != 0) {
 			point_t lm = lmData.getData();
 			found_one = true;
-			stream << "Landmark " << i
-				<< " at {" << lm[0] << ", " << lm[1] << "} ";
+			stream << "Landmark " << i << " at {" << lm[0] << ", " << lm[1] << "} ";
 		}
 	}
-	if (found_one) stream << std::endl;
+	if (found_one)
+		stream << std::endl;
 	log(log_level, stream.str().c_str());
 	return found_one;
 }

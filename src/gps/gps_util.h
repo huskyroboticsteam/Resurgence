@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 
 /** Represents a GPS coordinate in degrees. Positive is north/east. */
 struct gpscoords_t {
@@ -59,10 +59,10 @@ public:
 	GPSToMetersConverter(const GPSDatum& datum, const gpscoords_t& origin);
 
 	/** convert the given gps coordinates to a coordinate on the xy plane, in meters */
-	point_t gpsToMeters(const gpscoords_t& coords) const;
+	navtypes::point_t gpsToMeters(const gpscoords_t& coords) const;
 
 	/** convert a coordinate on the xy-plane to a gps coordinate */
-	gpscoords_t metersToGPS(const point_t& pos) const;
+	gpscoords_t metersToGPS(const navtypes::point_t& pos) const;
 
 	/**
 	 * Get the number of meters per degree of latitude.

@@ -7,7 +7,7 @@
 /**
  * Collection of utility methods for use with state space applications.
  */
-namespace StateSpace {
+namespace filters::statespace {
 
 constexpr double epsilon = 1e-5;
 

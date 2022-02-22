@@ -1,8 +1,11 @@
 #include "../../src/gps/gps_util.h"
+#include "../../src/navtypes.h"
 
 #include <random>
 
 #include <catch2/catch.hpp>
+
+using namespace navtypes;
 
 namespace {
 gpscoords_t seattle{47.608013, -122.335167};

@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 #include "KalmanFilter.h"
 
 #include <Eigen/Core>
+
+namespace filters {
 
 /**
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
@@ -31,7 +33,7 @@ public:
 	 *
 	 * @param measurement The measurement to use to correct the filter, as a transform.
 	 */
-	void correct(const transform_t& measurement);
+	void correct(const navtypes::transform_t& measurement);
 
 	/**
 	 * Use the model to predict the next system state, given the current inputs.
@@ -64,16 +66,16 @@ public:
 	 *
 	 * @param pose The pose to which the state estimate will be set.
 	 */
-	void reset(const pose_t& pose);
+	void reset(const navtypes::pose_t& pose);
 
-	void reset(const pose_t& pose, const pose_t& stdDevs);
+	void reset(const navtypes::pose_t& pose, const navtypes::pose_t& stdDevs);
 
 	/**
 	 * Gets the current state estimate.
 	 *
 	 * @return The state estimate.
 	 */
-	pose_t getPose() const {
+	navtypes::pose_t getPose() const {
 		return kf.getState();
 	}
 
@@ -81,3 +83,5 @@ private:
 	KalmanFilter<3, 3, 3> kf;
 	double dt;
 };
+
+} // namespace filters

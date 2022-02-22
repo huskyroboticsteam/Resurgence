@@ -3,12 +3,12 @@
 #include "../Networking/ParseCAN.h"
 #include "../Networking/motor_interface.h"
 #include "../Util.h"
+#include "../navtypes.h"
 #include "../ar/read_landmarks.h"
 #include "../camera/Camera.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
-#include "../simulator/utils.h"
 #include "world_interface.h"
 #include "kinematic_common_interface.h"
 
@@ -26,6 +26,7 @@ extern "C" {
 }
 
 using nlohmann::json;
+using namespace navtypes;
 
 const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 

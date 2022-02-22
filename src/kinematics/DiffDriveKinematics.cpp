@@ -1,5 +1,10 @@
 #include "DiffDriveKinematics.h"
 
+#include "../Util.h"
+
+using namespace navtypes;
+using util::toTransformRotateFirst;
+
 DiffDriveKinematics::DiffDriveKinematics(double wheelBaseWidth)
 	: wheelBaseWidth(wheelBaseWidth) {
 }

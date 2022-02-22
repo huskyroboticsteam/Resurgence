@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 #include "QuadTree.h"
 #include "TrICP.h"
 
@@ -38,7 +38,8 @@ public:
 	 * then no meaningful features can be matched. Set to 0 to add points directly
 	 * with no feature matching.
 	 */
-	void addPoints(const transform_t& robotTrf, const points_t& points, double overlap);
+	void addPoints(const navtypes::transform_t& robotTrf, const navtypes::points_t& points,
+				   double overlap);
 
 	/**
 	 * Get the points in the global map. This vector is a copy, so modifying it will not
@@ -46,7 +47,7 @@ public:
 	 *
 	 * @return A vector of points in the 2D point map.
 	 */
-	points_t getPoints() const;
+	navtypes::points_t getPoints() const;
 
 	/**
 	 * Gets the number of points stored in this map.
@@ -61,7 +62,7 @@ public:
 	 * @param point The point for which the closest point will be found.
 	 * @return The closest point, or [0,0,0] if no points are in this map.
 	 */
-	point_t getClosest(const point_t& point) const;
+	navtypes::point_t getClosest(const navtypes::point_t& point) const;
 
 	/**
 	 * Gets all points in the map within the given distance (inclusive) from the given point.
@@ -70,7 +71,7 @@ public:
 	 * @param dist The distance within which to search.
 	 * @return A vector of points that are within the given distance from the given point.
 	 */
-	points_t getPointsWithin(const point_t& point, double dist) const;
+	navtypes::points_t getPointsWithin(const navtypes::point_t& point, double dist) const;
 
 	/**
 	 * Checks if the given point has at least one point within the given distance from it.
@@ -82,7 +83,7 @@ public:
 	 * @return True iff there exists a point in the map, which may be the given point, within
 	 * the given distance from the given point. False otherwise.
 	 */
-	bool hasPointWithin(const point_t& point, double dist) const;
+	bool hasPointWithin(const navtypes::point_t& point, double dist) const;
 
 private:
 	QuadTree tree;

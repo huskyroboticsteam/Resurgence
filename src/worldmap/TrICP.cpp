@@ -3,6 +3,8 @@
 #include <Eigen/LU>
 #include <Eigen/SVD>
 
+using namespace navtypes;
+
 struct PointPair // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
 	point_t mapPoint;

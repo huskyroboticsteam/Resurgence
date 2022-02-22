@@ -1,8 +1,11 @@
 #include "../../src/kinematics/DiffDriveKinematics.h"
+#include "../../src/navtypes.h"
 
 #include <iostream>
 
 #include <catch2/catch.hpp>
+
+using namespace navtypes;
 
 namespace
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 
 /**
  * Implements the Trimmed Iterative Closest Point algorithm for 2D point cloud registration.
@@ -21,7 +21,7 @@ public:
 	 * collection of points that the new point cloud sample is being registered to.
 	 */
 	explicit TrICP(int maxIter, double relErrChangeThresh,
-				   std::function<point_t(const point_t&)> getClosest);
+				   std::function<navtypes::point_t(const navtypes::point_t&)> getClosest);
 	/**
 	 * Finds a rigid transformation that transforms the given sample to match the map.
 	 *
@@ -33,7 +33,7 @@ public:
 	 * @return A rigid transformation that transforms the given sample to match the map,
 	 * or the identity matrix if the sample is empty or overlap is 0.
 	 */
-	transform_t correct(const points_t& sample, double overlap);
+	navtypes::transform_t correct(const navtypes::points_t& sample, double overlap);
 
 private:
 	// maximum number of iterations to use
@@ -41,11 +41,11 @@ private:
 	// if the relative error change drops below this threshold, stop iterating
 	double relErrChangeThresh;
 	// find the closest point in the reference to the given point
-	std::function<point_t(const point_t&)> getClosest;
+	std::function<navtypes::point_t(const navtypes::point_t&)> getClosest;
 
 	// performs a single iteration of point cloud registration, returning the computed
 	// transform
-	transform_t iterate(points_t& sample, int N, double& mse) const;
+	navtypes::transform_t iterate(navtypes::points_t& sample, int N, double& mse) const;
 
 	// returns true iff any of the stopping conditions are met
 	bool isDone(int numIter, double S, double oldMSE) const;

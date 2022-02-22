@@ -1,10 +1,15 @@
 #include "../../src/worldmap/GlobalMap.h"
+#include "../../src/navtypes.h"
+#include "../../src/Util.h"
 
 #include <iostream>
 #include <cmath>
 #include <cfloat>
 
 #include <catch2/catch.hpp>
+
+using namespace navtypes;
+using namespace util;
 
 namespace
 {

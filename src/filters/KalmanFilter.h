@@ -6,6 +6,8 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
+namespace filters {
+
 template <int stateDim, int inputDim, int outputDim>
 class KalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim> {
 public:
@@ -32,21 +34,21 @@ public:
 					 const Eigen::Matrix<double, outputDim, 1>& measurementStdDevs,
 					 double dt) {
 		Eigen::Matrix<double, stateDim, stateDim> stateCovarianceCont =
-			StateSpace::createCovarianceMatrix(stateStdDevs);
+			statespace::createCovarianceMatrix(stateStdDevs);
 		Eigen::Matrix<double, outputDim, outputDim> measurementCovarianceCont =
-			StateSpace::createCovarianceMatrix(measurementStdDevs);
+			statespace::createCovarianceMatrix(measurementStdDevs);
 
 		Eigen::Matrix<double, stateDim, stateDim> discA = systemMat;
 		Eigen::Matrix<double, stateDim, inputDim> discB = inputMat;
-		StateSpace::continuousToDiscrete(discA, discB, dt);
+		statespace::continuousToDiscrete(discA, discB, dt);
 
 		Eigen::Matrix<double, stateDim, stateDim> stateCovariance =
-			StateSpace::discretizeQ(systemMat, stateCovarianceCont, dt);
+			statespace::discretizeQ(systemMat, stateCovarianceCont, dt);
 		Eigen::Matrix<double, outputDim, outputDim> measurementCovariance =
-			StateSpace::discretizeR(measurementCovarianceCont, dt);
+			statespace::discretizeR(measurementCovarianceCont, dt);
 
 		// solve DARE for asymptotic state error covariance matrix
-		Eigen::Matrix<double, stateDim, stateDim> P = StateSpace::DARE(
+		Eigen::Matrix<double, stateDim, stateDim> P = statespace::DARE(
 			discA.transpose(), outputMat.transpose(), stateCovariance, measurementCovariance);
 
 		Eigen::Matrix<double, outputDim, outputDim> S =
@@ -81,22 +83,22 @@ public:
 				   const Eigen::Matrix<double, stateDim, 1>& stateStdDevs,
 				   const Eigen::Matrix<double, outputDim, 1>& measurementStdDevs, double dt) {
 		Eigen::Matrix<double, stateDim, stateDim> stateCovarianceCont =
-			StateSpace::createCovarianceMatrix(stateStdDevs);
+			statespace::createCovarianceMatrix(stateStdDevs);
 		Eigen::Matrix<double, outputDim, outputDim> measurementCovarianceCont =
-			StateSpace::createCovarianceMatrix(measurementStdDevs);
+			statespace::createCovarianceMatrix(measurementStdDevs);
 
 		Eigen::Matrix<double, stateDim, stateDim> contA = systemMat;
 		Eigen::Matrix<double, stateDim, inputDim> contB = inputMat;
-		StateSpace::discreteToContinuous(contA, contB, dt);
+		statespace::discreteToContinuous(contA, contB, dt);
 
 		Eigen::Matrix<double, stateDim, stateDim> stateCovariance =
-			StateSpace::discretizeQ(contA, stateCovarianceCont, dt);
+			statespace::discretizeQ(contA, stateCovarianceCont, dt);
 		Eigen::Matrix<double, outputDim, outputDim> measurementCovariance =
-			StateSpace::discretizeR(measurementCovarianceCont, dt);
+			statespace::discretizeR(measurementCovarianceCont, dt);
 
 		// solve DARE for asymptotic state error covariance matrix
 		Eigen::Matrix<double, stateDim, stateDim> P =
-			StateSpace::DARE(systemMat.transpose().eval(), outputMat.transpose().eval(),
+			statespace::DARE(systemMat.transpose().eval(), outputMat.transpose().eval(),
 							 stateCovariance, measurementCovariance);
 
 		// The following math is derived from the asymptotic form:
@@ -136,6 +138,7 @@ private:
 				 const Eigen::Matrix<double, stateDim, stateDim>& Q,
 				 const Eigen::Matrix<double, outputDim, outputDim>& R,
 				 const Eigen::Matrix<double, stateDim, outputDim>& K)
-		: A(A), B(B), C(C), Q(Q), R(R), K(K) {
-	}
+		: A(A), B(B), C(C), Q(Q), R(R), K(K) {}
 };
+
+} // namespace filters

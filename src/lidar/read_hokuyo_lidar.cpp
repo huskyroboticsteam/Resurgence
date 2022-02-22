@@ -1,7 +1,7 @@
 
 #include "read_hokuyo_lidar.h"
 
-#include "../simulator/utils.h"
+#include "../navtypes.h"
 #include "../world_interface/world_interface.h"
 #include "PointCloudProcessing.h"
 #include "PointGenerator.h"
@@ -10,6 +10,8 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
+
+using namespace navtypes;
 
 // This website may be helpful
 // https://sourceforge.net/p/urgnetwork/wiki/top_en/

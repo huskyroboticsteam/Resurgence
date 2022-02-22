@@ -1,10 +1,9 @@
 
 #include "plan.h"
 
+#include "../Constants.h"
 #include "../Util.h"
 #include "../log.h"
-#include "../simulator/constants.h"
-#include "../simulator/graphics.h"
 
 #include <iostream>
 #include <queue>
@@ -14,7 +13,9 @@
 
 constexpr double EPSILON = 1.2; // heuristic weight for weighted A*
 
-using namespace NavSim;
+using namespace Constants::Nav;
+using util::toTransform;
+using namespace navtypes;
 
 // TODO implement goal orientations?
 double heuristic(int x, int y, const point_t& goal) {
@@ -168,7 +169,7 @@ plan_t getPlan(const points_t& lidar_hits, const point_t& goal, double goal_radi
 	collides_predicate_t collidesPredicate = [&](double x, double y, double radius) {
 		pose_t p = {x, y, 0};
 		transform_t trf = toTransform(p);
-		return collides(trf, lidar_hits, SAFE_RADIUS);
+		return util::collides(trf, lidar_hits, SAFE_RADIUS);
 	};
 	return getPlan(collidesPredicate, goal, goal_radius);
 }
