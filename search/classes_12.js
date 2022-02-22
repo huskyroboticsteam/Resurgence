@@ -178,7 +178,7 @@ var searchData=
   ['rng_175',['RNG',['https://docs.opencv.org/4.2.0/d1/dd6/classcv_1_1RNG.html',1,'cv']]],
   ['rng_5fmt19937_176',['RNG_MT19937',['https://docs.opencv.org/4.2.0/db/d3e/classcv_1_1RNG__MT19937.html',1,'cv']]],
   ['rnnlayer_177',['RNNLayer',['https://docs.opencv.org/4.2.0/dd/dfd/classcv_1_1dnn_1_1RNNLayer.html',1,'cv::dnn']]],
-  ['rollingavgfilter_178',['RollingAvgFilter',['../classRollingAvgFilter.html',1,'']]],
+  ['rollingavgfilter_178',['RollingAvgFilter',['../classfilters_1_1RollingAvgFilter.html',1,'filters']]],
   ['rope_179',['rope',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09243.html',1,'__gnu_cxx']]],
   ['rotatedrect_180',['RotatedRect',['https://docs.opencv.org/4.2.0/db/dd6/classcv_1_1RotatedRect.html',1,'cv']]],
   ['rotation2d_181',['Rotation2D',['https://eigen.tuxfamily.org/dox/classEigen_1_1Rotation2D.html',1,'Eigen']]],

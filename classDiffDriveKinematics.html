@@ -76,16 +76,16 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa3624e7f47090d299fab9591b25b63b9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aa3624e7f47090d299fab9591b25b63b9">DiffDriveKinematics</a> (double wheelBaseWidth)</td></tr>
 <tr class="separator:aa3624e7f47090d299fab9591b25b63b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="memItemLeft" align="right" valign="top">pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#af4f04aecd5ab5c7361f0958c9c3b0138">wheelVelToRobotVel</a> (double lVel, double rVel) const</td></tr>
+<tr class="memitem:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#af4f04aecd5ab5c7361f0958c9c3b0138">wheelVelToRobotVel</a> (double lVel, double rVel) const</td></tr>
 <tr class="separator:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22f42429446747e810e4d85c671f10ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structwheelvel__t.html">wheelvel_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#a22f42429446747e810e4d85c671f10ca">robotVelToWheelVel</a> (double xVel, double thetaVel) const</td></tr>
 <tr class="separator:a22f42429446747e810e4d85c671f10ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec54118f4bab8a82f40cf4a21c417500"><td class="memItemLeft" align="right" valign="top">pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aec54118f4bab8a82f40cf4a21c417500">getLocalPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double dt) const</td></tr>
+<tr class="memitem:aec54118f4bab8a82f40cf4a21c417500"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aec54118f4bab8a82f40cf4a21c417500">getLocalPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double dt) const</td></tr>
 <tr class="separator:aec54118f4bab8a82f40cf4a21c417500"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="memItemLeft" align="right" valign="top">pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aa0d0f3830ee9cc483a110f8e42c43e72">getPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double heading, double dt) const</td></tr>
+<tr class="memitem:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aa0d0f3830ee9cc483a110f8e42c43e72">getPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double heading, double dt) const</td></tr>
 <tr class="separator:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1edebe22228462fd5e14612591976da7"><td class="memItemLeft" align="right" valign="top">pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#a1edebe22228462fd5e14612591976da7">getNextPose</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, const pose_t &amp;pose, double dt) const</td></tr>
-<tr class="separator:a1edebe22228462fd5e14612591976da7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab55546370d415616eb4478dfd98f7a77"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#ab55546370d415616eb4478dfd98f7a77">getNextPose</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, const navtypes::pose_t &amp;pose, double dt) const</td></tr>
+<tr class="separator:ab55546370d415616eb4478dfd98f7a77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Represents the kinematics of a differential drive. This class can be used to calculate various velocities and pose updates using the mathematical representation of the drivebase. </p>
@@ -161,8 +161,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a1edebe22228462fd5e14612591976da7" name="a1edebe22228462fd5e14612591976da7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1edebe22228462fd5e14612591976da7">&#9670;&nbsp;</a></span>getNextPose()</h2>
+<a id="ab55546370d415616eb4478dfd98f7a77" name="ab55546370d415616eb4478dfd98f7a77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab55546370d415616eb4478dfd98f7a77">&#9670;&nbsp;</a></span>getNextPose()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -176,7 +176,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const pose_t &amp;&#160;</td>
+          <td class="paramtype">const navtypes::pose_t &amp;&#160;</td>
           <td class="paramname"><em>pose</em>, </td>
         </tr>
         <tr>

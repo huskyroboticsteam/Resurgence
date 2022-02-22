@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['k_0',['K',['https://docs.opencv.org/4.2.0/d4/d0a/structcv_1_1detail_1_1CameraParams.html#aa9171df82e517480b06d135ed1387dc3',1,'cv::detail::CameraParams']]],
-  ['k_1',['k',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06451.html#af928f60c8659aada87d333e379afcd1d',1,'std::negative_binomial_distribution']]],
+  ['k_0',['k',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06451.html#af928f60c8659aada87d333e379afcd1d',1,'std::negative_binomial_distribution']]],
+  ['k_1',['K',['https://docs.opencv.org/4.2.0/d4/d0a/structcv_1_1detail_1_1CameraParams.html#aa9171df82e517480b06d135ed1387dc3',1,'cv::detail::CameraParams']]],
   ['kalmanfilter_2',['KalmanFilter',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html#abac82ecfa530611a163255bc7d91c088',1,'cv::KalmanFilter::KalmanFilter(int dynamParams, int measureParams, int controlParams=0, int type=CV_32F)'],['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html#ac0799f0611baee9e7e558f016e4a7b40',1,'cv::KalmanFilter::KalmanFilter()']]],
   ['keep_5fall_3',['keep_all',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1QoS.html#a58be89f44939d2a6ac3a679e8c3097cf',1,'rclcpp::QoS']]],
   ['keep_5flast_4',['keep_last',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1QoS.html#a21f3d3a262f23011ef9fbd05a22f1c1c',1,'rclcpp::QoS']]],

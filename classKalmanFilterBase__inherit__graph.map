@@ -1,7 +1,0 @@
-<map id="KalmanFilterBase&lt; stateDim, inputDim, outputDim &gt;" name="KalmanFilterBase&lt; stateDim, inputDim, outputDim &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="5,101,197,143"/>
-<area shape="rect" id="node2" href="$classExtendedKalmanFilter.html" title=" " alt="" coords="263,5,426,47"/>
-<area shape="rect" id="node3" href="$classKalmanFilter.html" title=" " alt="" coords="269,71,421,98"/>
-<area shape="rect" id="node4" href="$classExtendedKalmanFilter.html" title=" " alt="" coords="245,123,444,193"/>
-<area shape="rect" id="node5" href="$classKalmanFilter.html" title=" " alt="" coords="263,217,426,259"/>
-</map>

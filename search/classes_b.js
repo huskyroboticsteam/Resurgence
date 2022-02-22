@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['kalmanfilter_0',['KalmanFilter',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html',1,'cv::KalmanFilter'],['../classKalmanFilter.html',1,'KalmanFilter&lt; stateDim, inputDim, outputDim &gt;']]],
-  ['kalmanfilter_3c_203_2c_203_2c_203_20_3e_1',['KalmanFilter&lt; 3, 3, 3 &gt;',['../classKalmanFilter.html',1,'']]],
-  ['kalmanfilterbase_2',['KalmanFilterBase',['../classKalmanFilterBase.html',1,'']]],
+  ['kalmanfilter_0',['KalmanFilter',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html',1,'cv::KalmanFilter'],['../classfilters_1_1KalmanFilter.html',1,'filters::KalmanFilter&lt; stateDim, inputDim, outputDim &gt;']]],
+  ['kalmanfilter_3c_203_2c_203_2c_203_20_3e_1',['KalmanFilter&lt; 3, 3, 3 &gt;',['../classfilters_1_1KalmanFilter.html',1,'filters']]],
+  ['kalmanfilterbase_2',['KalmanFilterBase',['../classfilters_1_1KalmanFilterBase.html',1,'filters']]],
   ['kaze_3',['KAZE',['https://docs.opencv.org/4.2.0/d3/d61/classcv_1_1KAZE.html',1,'cv']]],
   ['keep_5fdiag_4',['keep_diag',['https://eigen.tuxfamily.org/dox/structEigen_1_1IncompleteLUT_1_1keep__diag.html',1,'Eigen::IncompleteLUT&lt; class, class &gt;::keep_diag'],['https://eigen.tuxfamily.org/dox/structEigen_1_1SimplicialCholeskyBase_1_1keep__diag.html',1,'Eigen::SimplicialCholeskyBase::keep_diag']]],
   ['keepall_5',['KeepAll',['https://docs.ros2.org/foxy/api/rclcpp/structrclcpp_1_1KeepAll.html',1,'rclcpp']]],

@@ -72,74 +72,75 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a>&gt;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01016.html">optional</a>&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a>&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;../simulator/utils.h&quot;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// forward declare cv::Mat instead of importing OpenCV</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// we do this to avoid unnecessarily including OpenCV in all build targets</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">namespace </span>cv {</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">class </span>Mat;</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>}</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">// the clock used for time measurements for data</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">using</span> dataclock = std::chrono::steady_clock;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// a point in time as measured by dataclock</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">using</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> = <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">std::chrono::time_point&lt;dataclock&gt;</a>;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code hl_class" href="classDataPoint.html">DataPoint</a>;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">using</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">landmarks_t</a> = <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt;DataPoint&lt;point_t&gt;</a>&gt;;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment">// A pair of a camera frame and its corresponding frame number</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">using</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">CameraFrame</a> = <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair&lt;cv::Mat, uint32_t&gt;</a>;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment">// The type of a camera id</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">using</span> CameraID = <a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment">// An indication enum, used to command the LED to flash different signals</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">enum class</span> indication_t { off, autonomous, teleop, arrivedAtDest };</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classDataPoint.html">   35</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code hl_class" href="classDataPoint.html">DataPoint</a> {</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">   40</a></span>    <a class="code hl_function" href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">DataPoint</a>() : datapoint() {}</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">   47</a></span>    <a class="code hl_function" href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">DataPoint</a>(T data) : <a class="code hl_class" href="classDataPoint.html">DataPoint</a>(dataclock::now(), data) {}</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">   55</a></span>    <a class="code hl_function" href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">DataPoint</a>(<a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> time, T data) : datapoint({time, data}) {}</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="comment">// provide an implicit conversion to the data type. Helps with backwards compatability.</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">operator</span> T()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="keywordflow">return</span> getData();</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    }</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="comment">// Check if this measurement is valid</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">operator</span> bool()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        <span class="keywordflow">return</span> isValid();</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    }</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">   74</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">isFresh</a>(<a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::milliseconds</a> duration)<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keywordflow">return</span> isValid() &amp;&amp; dataclock::now() - duration &lt;= getTime();</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    }</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="comment">// Check if this measurement is valid</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordtype">bool</span> isValid()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="keywordflow">return</span> datapoint.has_value();</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    }</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="comment">// The time at which the data was measured. Use only if data is valid.</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> getTime()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        <span class="keywordflow">return</span> datapoint.value().first;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    }</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="comment">// The measurement data. Use only if data is valid.</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    T getData()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        <span class="keywordflow">return</span> datapoint.value().second;</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    }</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="comment">// the time and measurement data</span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    std::optional&lt;std::pair&lt;datatime_t, T&gt;&gt; datapoint;</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>};</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;../navtypes.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a>&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01016.html">optional</a>&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// forward declare cv::Mat instead of importing OpenCV</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">// we do this to avoid unnecessarily including OpenCV in all build targets</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">namespace </span>cv {</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">class </span>Mat;</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>}</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">// the clock used for time measurements for data</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">using</span> dataclock = std::chrono::steady_clock;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">// a point in time as measured by dataclock</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">using</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> = <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">std::chrono::time_point&lt;dataclock&gt;</a>;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code hl_class" href="classDataPoint.html">DataPoint</a>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">using</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">landmarks_t</a> = <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt;DataPoint&lt;navtypes::point_t&gt;</a>&gt;;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment">// A pair of a camera frame and its corresponding frame number</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">using</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">CameraFrame</a> = <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair&lt;cv::Mat, uint32_t&gt;</a>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">// The type of a camera id</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keyword">using</span> CameraID = <a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment">// An indication enum, used to command the LED to flash different signals</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">enum class</span> indication_t { off, autonomous, teleop, arrivedAtDest };</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classDataPoint.html">   36</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code hl_class" href="classDataPoint.html">DataPoint</a> {</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">   41</a></span>    <a class="code hl_function" href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">DataPoint</a>() : datapoint() {}</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">   48</a></span>    <a class="code hl_function" href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">DataPoint</a>(T data) : <a class="code hl_class" href="classDataPoint.html">DataPoint</a>(dataclock::now(), data) {}</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">   56</a></span>    <a class="code hl_function" href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">DataPoint</a>(<a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> time, T data) : datapoint({time, data}) {}</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="comment">// provide an implicit conversion to the data type. Helps with backwards compatability.</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keyword">operator</span> T()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <span class="keywordflow">return</span> getData();</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    }</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="comment">// Check if this measurement is valid</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keyword">operator</span> bool()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        <span class="keywordflow">return</span> isValid();</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    }</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">   75</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">isFresh</a>(<a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::milliseconds</a> duration)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="keywordflow">return</span> isValid() &amp;&amp; dataclock::now() - duration &lt;= getTime();</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    }</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="comment">// Check if this measurement is valid</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keywordtype">bool</span> isValid()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordflow">return</span> datapoint.has_value();</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="comment">// The time at which the data was measured. Use only if data is valid.</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">datatime_t</a> getTime()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <span class="keywordflow">return</span> datapoint.value().first;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    }</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="comment">// The measurement data. Use only if data is valid.</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    T getData()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        <span class="keywordflow">return</span> datapoint.value().second;</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    }</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="comment">// the time and measurement data</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    std::optional&lt;std::pair&lt;datatime_t, T&gt;&gt; datapoint;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>};</div>
 <div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
 <div class="ttc" id="aa00182_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a></div></div>
 <div class="ttc" id="aa01016_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01016.html">optional</a></div></div>
@@ -148,11 +149,11 @@ $(function() {
 <div class="ttc" id="aa01843_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01843.html">std::chrono::time_point</a></div></div>
 <div class="ttc" id="aa07803_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a></div></div>
 <div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector</a></div></div>
-<div class="ttc" id="aclassDataPoint_html"><div class="ttname"><a href="classDataPoint.html">DataPoint</a></div><div class="ttdoc">Represents data measured using a sensor at a given time.</div><div class="ttdef"><b>Definition:</b> data.h:35</div></div>
-<div class="ttc" id="aclassDataPoint_html_a05b3f45801385657196aafb10b7f44fe"><div class="ttname"><a href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">DataPoint::isFresh</a></div><div class="ttdeci">bool isFresh(std::chrono::milliseconds duration) const</div><div class="ttdoc">Check if this measurement was taken recently.</div><div class="ttdef"><b>Definition:</b> data.h:74</div></div>
-<div class="ttc" id="aclassDataPoint_html_a0db55d9ee2768d0c34660be3587085b0"><div class="ttname"><a href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(datatime_t time, T data)</div><div class="ttdoc">Construct a new DataPoint object, measured at the given time.</div><div class="ttdef"><b>Definition:</b> data.h:55</div></div>
-<div class="ttc" id="aclassDataPoint_html_a56fa702e3dd61a1b51656b9a064b074e"><div class="ttname"><a href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint()</div><div class="ttdoc">Construct an invalid DataPoint, holding no data.</div><div class="ttdef"><b>Definition:</b> data.h:40</div></div>
-<div class="ttc" id="aclassDataPoint_html_a5b55a21f5a944caad3e3e7cbf45152ed"><div class="ttname"><a href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(T data)</div><div class="ttdoc">Construct a new DataPoint object, measured now.</div><div class="ttdef"><b>Definition:</b> data.h:47</div></div>
+<div class="ttc" id="aclassDataPoint_html"><div class="ttname"><a href="classDataPoint.html">DataPoint</a></div><div class="ttdoc">Represents data measured using a sensor at a given time.</div><div class="ttdef"><b>Definition:</b> data.h:36</div></div>
+<div class="ttc" id="aclassDataPoint_html_a05b3f45801385657196aafb10b7f44fe"><div class="ttname"><a href="classDataPoint.html#a05b3f45801385657196aafb10b7f44fe">DataPoint::isFresh</a></div><div class="ttdeci">bool isFresh(std::chrono::milliseconds duration) const</div><div class="ttdoc">Check if this measurement was taken recently.</div><div class="ttdef"><b>Definition:</b> data.h:75</div></div>
+<div class="ttc" id="aclassDataPoint_html_a0db55d9ee2768d0c34660be3587085b0"><div class="ttname"><a href="classDataPoint.html#a0db55d9ee2768d0c34660be3587085b0">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(datatime_t time, T data)</div><div class="ttdoc">Construct a new DataPoint object, measured at the given time.</div><div class="ttdef"><b>Definition:</b> data.h:56</div></div>
+<div class="ttc" id="aclassDataPoint_html_a56fa702e3dd61a1b51656b9a064b074e"><div class="ttname"><a href="classDataPoint.html#a56fa702e3dd61a1b51656b9a064b074e">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint()</div><div class="ttdoc">Construct an invalid DataPoint, holding no data.</div><div class="ttdef"><b>Definition:</b> data.h:41</div></div>
+<div class="ttc" id="aclassDataPoint_html_a5b55a21f5a944caad3e3e7cbf45152ed"><div class="ttname"><a href="classDataPoint.html#a5b55a21f5a944caad3e3e7cbf45152ed">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(T data)</div><div class="ttdoc">Construct a new DataPoint object, measured now.</div><div class="ttdef"><b>Definition:</b> data.h:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

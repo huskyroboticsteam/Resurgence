@@ -289,6 +289,5 @@ var searchData=
   ['mutex_286',['mutex',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07191.html',1,'std']]],
   ['mutextwopriorities_287',['MutexTwoPriorities',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1detail_1_1MutexTwoPriorities.html',1,'rclcpp::detail']]],
   ['mvkernel_288',['MVKernel',['https://docs.opencv.org/4.2.0/dd/dbc/structcv_1_1stereo_1_1MVKernel.html',1,'cv::stereo']]],
-  ['mvnlayer_289',['MVNLayer',['https://docs.opencv.org/4.2.0/d4/db5/classcv_1_1dnn_1_1MVNLayer.html',1,'cv::dnn']]],
-  ['mywindow_290',['MyWindow',['../classMyWindow.html',1,'']]]
+  ['mvnlayer_289',['MVNLayer',['https://docs.opencv.org/4.2.0/d4/db5/classcv_1_1dnn_1_1MVNLayer.html',1,'cv::dnn']]]
 ];

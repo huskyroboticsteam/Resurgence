@@ -83,7 +83,7 @@ var searchData=
   ['unscentedkalmanfilter_80',['UnscentedKalmanFilter',['https://docs.opencv.org/4.2.0/de/d72/classcv_1_1tracking_1_1UnscentedKalmanFilter.html',1,'cv::tracking']]],
   ['unscentedkalmanfilterparams_81',['UnscentedKalmanFilterParams',['https://docs.opencv.org/4.2.0/da/d73/classcv_1_1tracking_1_1UnscentedKalmanFilterParams.html',1,'cv::tracking']]],
   ['unsupportedeventtypeexception_82',['UnsupportedEventTypeException',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1UnsupportedEventTypeException.html',1,'rclcpp']]],
-  ['urcleg_83',['URCLeg',['../structURCLeg.html',1,'']]],
+  ['urcleg_83',['URCLeg',['../structnavtypes_1_1URCLeg.html',1,'navtypes']]],
   ['urglidar_84',['URGLidar',['../classURGLidar.html',1,'']]],
   ['use_5fonly_85',['use_only',['https://docs.opencv.org/4.2.0/d6/d25/structcv_1_1gapi_1_1use__only.html',1,'cv::gapi']]],
   ['uses_5fallocator_86',['uses_allocator',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06047.html',1,'std']]],

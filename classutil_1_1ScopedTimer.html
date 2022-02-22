@@ -63,7 +63,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>util</b></li><li class="navelem"><a class="el" href="classutil_1_1ScopedTimer.html">ScopedTimer</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespaceutil.html">util</a></li><li class="navelem"><a class="el" href="classutil_1_1ScopedTimer.html">ScopedTimer</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -74,19 +74,26 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A utility class that helps with timing.  
+ <a href="classutil_1_1ScopedTimer.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Util_8h_source.html">Util.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a8a81591c83834cbb2e676172dd12d122"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1ScopedTimer.html#a8a81591c83834cbb2e676172dd12d122">ScopedTimer</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> name)</td></tr>
+<tr class="memdesc:a8a81591c83834cbb2e676172dd12d122"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a scoped timer with the specified name.  <a href="classutil_1_1ScopedTimer.html#a8a81591c83834cbb2e676172dd12d122">More...</a><br /></td></tr>
 <tr class="separator:a8a81591c83834cbb2e676172dd12d122"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74471e10bbfdba342fe8e94131915349"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">ScopedTimer</a> ()</td></tr>
+<tr class="memdesc:a74471e10bbfdba342fe8e94131915349"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an unnamed scoped timer.  <a href="classutil_1_1ScopedTimer.html#a74471e10bbfdba342fe8e94131915349">More...</a><br /></td></tr>
 <tr class="separator:a74471e10bbfdba342fe8e94131915349"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b5106706ff6007114bf545852b2b5cc"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a4b023048c2f5e3644ccc58a80ae381ad">std::chrono::microseconds</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1ScopedTimer.html#a8b5106706ff6007114bf545852b2b5cc">elapsedTime</a> () const</td></tr>
+<tr class="memdesc:a8b5106706ff6007114bf545852b2b5cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the elapsed time measured by this timer.  <a href="classutil_1_1ScopedTimer.html#a8b5106706ff6007114bf545852b2b5cc">More...</a><br /></td></tr>
 <tr class="separator:a8b5106706ff6007114bf545852b2b5cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >A utility class that helps with timing. Measures the elapsed time from the moment this class is instantiated to the moment that the scope ends. </p>
+<div class="textblock"><p >A utility class that helps with timing. </p>
+<p >Measures the elapsed time from the moment this class is instantiated to the moment that it's destructed. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8a81591c83834cbb2e676172dd12d122" name="a8a81591c83834cbb2e676172dd12d122"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8a81591c83834cbb2e676172dd12d122">&#9670;&nbsp;</a></span>ScopedTimer() <span class="overload">[1/2]</span></h2>
@@ -103,7 +110,10 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Create a scoped timer with the specified name. The elapsed time will be printed to stdout at the end of the scope. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Create a scoped timer with the specified name. </p>
+<p >The elapsed time will be printed to stdout when destructed.</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>The name of this timer. </td></tr>
   </table>
@@ -126,7 +136,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Create an unnamed scoped timer. Nothing will be printed by this timer. </p>
+
+<p>Create an unnamed scoped timer. </p>
+<p >Nothing will be printed by this timer. </p>
 
 </div>
 </div>
@@ -145,7 +157,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets the elapsed time measured by this scoped timer. </p><dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Gets the elapsed time measured by this timer. </p>
+<dl class="section return"><dt>Returns</dt><dd>The elapsed time, in microseconds. </dd></dl>
 
 </div>
 </div>
