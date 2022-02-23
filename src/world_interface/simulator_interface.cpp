@@ -253,7 +253,7 @@ double setCmdVel(double dtheta, double dx) {
 	setMotorPWM("frontRightWheel", rPWM);
 	setMotorPWM("rearRightWheel", rPWM);
 
-	return maxAbsPWM > Constants::MAX_WHEEL_VEL ? maxAbsPWM : 1.0;
+	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
 
 landmarks_t readLandmarks() {
