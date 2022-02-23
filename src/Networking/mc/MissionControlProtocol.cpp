@@ -65,6 +65,9 @@ bool validateEmergencyStopRequest(const json& j) {
 
 void handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
+	if (stop) {
+		setCmdVel(0, 0);
+	}
 	Globals::E_STOP = stop;
 }
 
