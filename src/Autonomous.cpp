@@ -71,9 +71,9 @@ static bool printLandmarks(const points_t& landmarks, int log_level = LOG_DEBUG)
  */
 static bool printLandmarks(const landmarks_t& landmarks, int log_level = LOG_DEBUG);
 
-Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
-	: urc_targets(_targets), leg_idx(0),
-	  search_target({_targets[0].approx_GPS(0) - PI, _targets[0].approx_GPS(1), -PI / 2}),
+Autonomous::Autonomous(const std::vector<URCLegGPS>& gpsTargets, double controlHz)
+	: initialized(false), urc_targets({}), urc_targets_gps(gpsTargets), leg_idx(0),
+	  search_target({}),
 	  gate_targets({NAN, NAN, NAN}, {NAN, NAN, NAN}), gate_direction(true),
 	  poseEstimator({0.2, 0.2}, gpsStdDev, Constants::WHEEL_BASE, 1.0 / controlHz),
 	  map(10000), // TODO: the stride should be set higher when using the real lidar
@@ -85,9 +85,21 @@ Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	  pose_graph(0, 0, 0, 0, 0), // We'll re-initialize this in the function body
 	  pose_id(0), prev_odom(toTransform({0, 0, 0})), smoothed_traj({}),
 	  smoothed_landmarks({}) {
+}
 
+void Autonomous::init() {
+	if (!gpsHasFix()) {
+		return;
+	}
+	this->urc_targets.clear();
+	// convert gps targets to map space
+	for (const auto& gpsTarget : urc_targets_gps) {
+		point_t p = gpsToMeters(gpsTarget.gps).value();
+		urc_targets.push_back({gpsTarget.left_post_id, gpsTarget.right_post_id, p});
+	}
+	search_target = {urc_targets[0].approx_GPS(0), urc_targets[0].approx_GPS(1), -M_PI / 2};
 	int num_landmarks = 0;
-	for (auto target : _targets) {
+	for (auto target : urc_targets) {
 		int num_landmarks_for_target = (target.right_post_id == -1) ? 1 : 2;
 		num_landmarks += num_landmarks_for_target;
 	}
@@ -105,7 +117,7 @@ Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 		pose_prior_xy_std * pose_prior_xy_std, 0, 0, 0, pose_prior_th_std * pose_prior_th_std;
 	pose_graph.addPosePrior(0, start_pose_guess, pose_prior_cov);
 	double lm_std = 100.0;
-	for (auto target : _targets) {
+	for (auto target : urc_targets) {
 		pose_graph.addLandmarkPrior(target.left_post_id, target.approx_GPS, lm_std);
 		if (target.right_post_id != -1) {
 			pose_graph.addLandmarkPrior(target.right_post_id, target.approx_GPS, lm_std);
@@ -114,13 +126,7 @@ Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz)
 	pose_graph.solve();
 	smoothed_traj = pose_graph.getSmoothedTrajectory();
 	smoothed_landmarks = pose_graph.getLandmarkLocations();
-}
-
-Autonomous::Autonomous(const std::vector<URCLeg>& _targets, double controlHz,
-					   const pose_t& startPose)
-	: Autonomous(_targets, controlHz) {
-	poseEstimator.reset(startPose);
-	calibrated = true;
+	initialized = true;
 }
 
 double dist(const pose_t& p1, const pose_t& p2, double theta_weight) {
@@ -308,7 +314,7 @@ pose_t Autonomous::choose_plan_target(const pose_t& pose) {
 		return getGPSTargetPose();
 	} else if (nav_state == NavState::SEARCH_PATTERN ||
 			   nav_state == NavState::SEARCH_PATTERN_SECOND_POST) {
-		return search_target;
+		return search_target.value();
 	} else if (nav_state == NavState::POST_VISIBLE) {
 		bool post_to_get = getPostVisibility(LEFT) ? LEFT : RIGHT;
 		point_t post = getPostLocation(post_to_get);
@@ -359,6 +365,7 @@ void Autonomous::updateSearchTarget() {
 	// Replan to avoid waiting at current search point
 	plan_cost = INFINITE_COST;
 	// Set the search target to the next point in the search pattern
+	pose_t& search_target = this->search_target.value();
 	search_target -= urc_targets[leg_idx].approx_GPS;
 	double radius = hypot(search_target(0), search_target(1));
 	double scale = (radius + search_theta_increment) / radius;
@@ -473,6 +480,13 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 }
 
 void Autonomous::autonomyIter() {
+	if (gpsHasFix() && !initialized) {
+		init();
+	} else if (!gpsHasFix()) {
+		log(LOG_WARN, "Waiting for GPS fix...\n");
+		return;
+	}
+
 	transform_t odom = readOdom();
 	pose_t pose{0, 0, 0};
 

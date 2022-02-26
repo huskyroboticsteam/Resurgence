@@ -34,9 +34,9 @@ constexpr std::array<const char*, 7> NAV_STATE_NAMES({"GPS", "POST_VISIBLE", "SE
 
 class Autonomous {
 public:
-	explicit Autonomous(const std::vector<navtypes::URCLeg>& urc_targets, double controlHz);
-	Autonomous(const std::vector<navtypes::URCLeg>& urc_targets, double controlHz,
-			   const navtypes::pose_t& startPose);
+	explicit Autonomous(const std::vector<navtypes::URCLegGPS>& gpsTargets, double controlHz);
+	Autonomous(double controlHz, const navtypes::pose_t& startPose);
+	void init();
 	// Returns a pair of floats, in heading, speed
 	// Accepts current heading of the robot as parameter
 	// Gets the target's coordinate
@@ -44,9 +44,11 @@ public:
 	void autonomyIter();
 
 private:
+	bool initialized;
 	std::vector<navtypes::URCLeg> urc_targets;
+	std::vector<navtypes::URCLegGPS> urc_targets_gps;
 	size_t leg_idx; // which of the urc_targets we're currently navigating toward
-	navtypes::pose_t search_target;
+	std::optional<navtypes::pose_t> search_target;
 	// Gate targets are {NAN, NAN, NAN} if unset and {INF, INF, INF} if reached
 	// gate_targets.second(2) is NAN if targets have not been refined with more accurate
 	// landmark measurements

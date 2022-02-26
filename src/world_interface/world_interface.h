@@ -96,7 +96,7 @@ namespace gps {
  * @return DataPoint<gpscoords_t> The last GPS coordinates measured by the sensor, or empty if
  * no fix.
  */
-DataPoint<gpscoords_t> readGPSCoords();
+DataPoint<navtypes::gpscoords_t> readGPSCoords();
 } // namespace gps
 
 /**
@@ -136,7 +136,7 @@ DataPoint<navtypes::pose_t> getTruePose();
  * @return std::optional<point_t> The transformed point, or an empty datapoint
  * if the GPS does not have a fix.
  */
-std::optional<navtypes::point_t> gpsToMeters(const gpscoords_t& coord);
+std::optional<navtypes::point_t> gpsToMeters(const navtypes::gpscoords_t& coord);
 
 // Calculates the current transform in the global frame based purely on forward kinematics
 DataPoint<navtypes::transform_t> readOdom();
