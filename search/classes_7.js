@@ -106,7 +106,7 @@ var searchData=
   ['gplaidmlcontext_103',['GPlaidMLContext',['https://docs.opencv.org/4.2.0/de/d5f/structcv_1_1GPlaidMLContext.html',1,'cv']]],
   ['gplaidmlkernel_104',['GPlaidMLKernel',['https://docs.opencv.org/4.2.0/df/db7/classcv_1_1GPlaidMLKernel.html',1,'cv']]],
   ['gplaidmlkernelimpl_105',['GPlaidMLKernelImpl',['https://docs.opencv.org/4.2.0/d1/d8a/classcv_1_1GPlaidMLKernelImpl.html',1,'cv']]],
-  ['gpscoords_5ft_106',['gpscoords_t',['../structgpscoords__t.html',1,'']]],
+  ['gpscoords_5ft_106',['gpscoords_t',['../structnavtypes_1_1gpscoords__t.html',1,'navtypes']]],
   ['gpsdatum_107',['GPSDatum',['../classGPSDatum.html',1,'']]],
   ['gpsfactor_108',['GPSFactor',['../classfilters_1_1pose__graph_1_1GPSFactor.html',1,'filters::pose_graph']]],
   ['gpstometersconverter_109',['GPSToMetersConverter',['../classGPSToMetersConverter.html',1,'']]],

@@ -84,8 +84,9 @@ var searchData=
   ['unscentedkalmanfilterparams_81',['UnscentedKalmanFilterParams',['https://docs.opencv.org/4.2.0/da/d73/classcv_1_1tracking_1_1UnscentedKalmanFilterParams.html',1,'cv::tracking']]],
   ['unsupportedeventtypeexception_82',['UnsupportedEventTypeException',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1UnsupportedEventTypeException.html',1,'rclcpp']]],
   ['urcleg_83',['URCLeg',['../structnavtypes_1_1URCLeg.html',1,'navtypes']]],
-  ['urglidar_84',['URGLidar',['../classURGLidar.html',1,'']]],
-  ['use_5fonly_85',['use_only',['https://docs.opencv.org/4.2.0/d6/d25/structcv_1_1gapi_1_1use__only.html',1,'cv::gapi']]],
-  ['uses_5fallocator_86',['uses_allocator',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06047.html',1,'std']]],
-  ['uses_5fallocator_3c_20tuple_3c_20_5ftypes_2e_2e_2e_20_3e_2c_20_5falloc_20_3e_87',['uses_allocator&lt; tuple&lt; _Types... &gt;, _Alloc &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a03043.html',1,'std']]]
+  ['urcleggps_84',['URCLegGPS',['../structnavtypes_1_1URCLegGPS.html',1,'navtypes']]],
+  ['urglidar_85',['URGLidar',['../classURGLidar.html',1,'']]],
+  ['use_5fonly_86',['use_only',['https://docs.opencv.org/4.2.0/d6/d25/structcv_1_1gapi_1_1use__only.html',1,'cv::gapi']]],
+  ['uses_5fallocator_87',['uses_allocator',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06047.html',1,'std']]],
+  ['uses_5fallocator_3c_20tuple_3c_20_5ftypes_2e_2e_2e_20_3e_2c_20_5falloc_20_3e_88',['uses_allocator&lt; tuple&lt; _Types... &gt;, _Alloc &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a03043.html',1,'std']]]
 ];
