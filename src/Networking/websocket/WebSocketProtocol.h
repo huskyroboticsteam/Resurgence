@@ -10,6 +10,10 @@ namespace websocket {
 
 using nlohmann::json;
 
+typedef std::function<void(const json&)> msghandler_t;
+typedef std::function<bool(const json&)> validator_t;
+typedef std::function<void()> connhandler_t;
+
 /**
  * @brief Defines a protocol which will be served at an endpoint of a server.
  * This protocol defines several message types, and processes messages of those types,
@@ -40,8 +44,7 @@ public:
 	 * @param callback The callback function that will accept the json object.
 	 * @return true if no handler already existed. false if a handler already exists.
 	 */
-	bool addMessageHandler(const std::string& messageType,
-						   const std::function<void(const json&)>& callback);
+	bool addMessageHandler(const std::string& messageType, const msghandler_t& callback);
 
 	/**
 	 * @brief Add a message handler for the given message type, if no handler already exists.
@@ -55,9 +58,8 @@ public:
 	 * the message is valid.
 	 * @return true if no handler already existed. false if a handler already exists.
 	 */
-	bool addMessageHandler(const std::string& messageType,
-						   const std::function<void(const json&)>& callback,
-						   const std::function<bool(const json&)>& validator);
+	bool addMessageHandler(const std::string& messageType, const msghandler_t& callback,
+						   const validator_t& validator);
 
 	/**
 	 * @brief Remove the message handler for the given message type, if it exists.
@@ -76,9 +78,9 @@ public:
 	 */
 	bool hasMessageHandler(const std::string& messageType) const;
 
-	void addConnectionHandler(const std::function<void()>& handler);
+	void addConnectionHandler(const connhandler_t& handler);
 
-	void addDisconnectionHandler(const std::function<void()>& handler);
+	void addDisconnectionHandler(const connhandler_t& handler);
 
 	/**
 	 * @brief Process the given JSON object that was sent to this protocol's endpoint.
@@ -110,10 +112,10 @@ public:
 
 private:
 	std::string protocolPath;
-	std::map<std::string, std::function<void(const json&)>> handlerMap;
-	std::map<std::string, std::function<bool(const json&)>> validatorMap;
-	std::vector<std::function<void()>> connectionHandlers;
-	std::vector<std::function<void()>> disconnectionHandlers;
+	std::map<std::string, msghandler_t> handlerMap;
+	std::map<std::string, validator_t> validatorMap;
+	std::vector<connhandler_t> connectionHandlers;
+	std::vector<connhandler_t> disconnectionHandlers;
 };
 
 } // namespace websocket

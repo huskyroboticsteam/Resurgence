@@ -10,13 +10,13 @@ WebSocketProtocol::WebSocketProtocol(const std::string& protocolPath)
 	: protocolPath(protocolPath), handlerMap(), validatorMap() {}
 
 bool WebSocketProtocol::addMessageHandler(const std::string& messageType,
-										  const std::function<void(const json&)>& callback) {
+										  const msghandler_t& callback) {
 	return this->addMessageHandler(messageType, callback, [](const json&) { return true; });
 }
 
 bool WebSocketProtocol::addMessageHandler(const std::string& messageType,
-										  const std::function<void(const json&)>& callback,
-										  const std::function<bool(const json&)>& validator) {
+										  const msghandler_t& callback,
+										  const validator_t& validator) {
 	if (!hasMessageHandler(messageType)) {
 		handlerMap[messageType] = callback;
 		validatorMap[messageType] = validator;
@@ -37,11 +37,11 @@ bool WebSocketProtocol::removeMessageHandler(const std::string& messageType) {
 	return false;
 }
 
-void WebSocketProtocol::addConnectionHandler(const std::function<void()>& handler) {
+void WebSocketProtocol::addConnectionHandler(const connhandler_t& handler) {
 	connectionHandlers.push_back(handler);
 }
 
-void WebSocketProtocol::addDisconnectionHandler(const std::function<void()>& handler) {
+void WebSocketProtocol::addDisconnectionHandler(const connhandler_t& handler) {
 	disconnectionHandlers.push_back(handler);
 }
 
