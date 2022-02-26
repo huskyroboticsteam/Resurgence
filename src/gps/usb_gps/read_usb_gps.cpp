@@ -1,6 +1,7 @@
 #include "read_usb_gps.h"
 
 #include "../../log.h"
+#include "../../navtypes.h"
 #include "../../world_interface/world_interface.h"
 #include "../gps_util.h"
 
@@ -15,15 +16,15 @@ gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 std::thread gps_thread;
 std::mutex gps_mutex;
 bool has_fix;
-gpscoords_t most_recent_coords;
+navtypes::gpscoords_t most_recent_coords;
 datatime_t gps_time;
 
 // implements method from world_interface.h
-DataPoint<gpscoords_t> readGPSCoords() {
-	DataPoint<gpscoords_t> data;
+DataPoint<navtypes::gpscoords_t> readGPSCoords() {
+	DataPoint<navtypes::gpscoords_t> data;
 	gps_mutex.lock();
 	if (has_fix) {
-		data = DataPoint<gpscoords_t>(gps_time, most_recent_coords);
+	  data = DataPoint<navtypes::gpscoords_t>(gps_time, most_recent_coords);
 	}
 	gps_mutex.unlock();
 	return data;

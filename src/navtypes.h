@@ -6,6 +6,14 @@
 
 namespace navtypes {
 
+/** Represents a GPS coordinate in degrees. Positive is north/east. */
+struct gpscoords_t {
+	/** the latitude of the gps coordinate, in degrees */
+	double lat;
+	/** the longitude of the gps coordinate, in degrees */
+	double lon;
+};
+
 /* Obstacles are specifed as a list of 2D vertices. Must be convex.
  * Do not repeat the starting vertex at the end. */
 using obstacle_t = Eigen::ArrayX2d;
@@ -25,6 +33,12 @@ struct URCLeg {
 	int left_post_id;
 	int right_post_id; // This will be -1 for legs that are just single posts
 	point_t approx_GPS;
+};
+
+struct URCLegGPS {
+	int left_post_id;
+	int right_post_id;
+	gpscoords_t gps;
 };
 
 } // namespace navtypes
