@@ -34,6 +34,20 @@ using CameraID = std::string;
 // An indication enum, used to command the LED to flash different signals
 enum class indication_t { off, autonomous, teleop, arrivedAtDest };
 
+enum class motorid_t {
+	frontLeftWheel,
+	frontRightWheel,
+	rearLeftwheel,
+	rearRightWheel,
+	armBase,
+	shoulder,
+	elbow,
+	forearm,
+	differentialRight,
+	differentialLeft,
+	hand
+};
+
 /**
  * @brief Represents data measured using a sensor at a given time.
  *

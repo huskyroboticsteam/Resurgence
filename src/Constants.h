@@ -1,9 +1,11 @@
 #pragma once
 
+#include "world_interface/data.h"
+
 #include <cmath>
 #include <cstddef>
+#include <map>
 #include <string>
-#include "world_interface/data.h"
 
 namespace Constants {
 constexpr size_t PACKET_PAYLOAD_SIZE = 8;
@@ -13,8 +15,8 @@ constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
 // TODO: tune these drive constants
 constexpr double ROBOT_LENGTH = 1.0;
 constexpr double WHEEL_BASE = 2. / 3.;
-constexpr double EFF_WHEEL_BASE = 1.40; // tweaked to match 2-wheel kinematic model
-constexpr double WHEEL_RADIUS = 0.15; // eyeballed
+constexpr double EFF_WHEEL_BASE = 1.40;		 // tweaked to match 2-wheel kinematic model
+constexpr double WHEEL_RADIUS = 0.15;		 // eyeballed
 constexpr double PWM_PER_RAD_PER_SEC = 5000; // eyeballed
 constexpr double MAX_DRIVE_PWM = 20000;
 constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
@@ -35,14 +37,30 @@ const robot::types::CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with r
 constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
 constexpr uint16_t WS_SERVER_PORT = 3001;
 
+const std::map<robot::types::motorid_t, std::string> motorNameMap = {
+	{robot::types::motorid_t::frontLeftWheel, "frontLeftWheel"},
+	{robot::types::motorid_t::frontRightWheel, "frontRightWheel"},
+	{robot::types::motorid_t::rearLeftwheel, "rearLeftwheel"},
+	{robot::types::motorid_t::rearRightWheel, "rearRightWheel"},
+	{robot::types::motorid_t::armBase, "armBase"},
+	{robot::types::motorid_t::shoulder, "shoulder"},
+	{robot::types::motorid_t::elbow, "elbow"},
+	{robot::types::motorid_t::forearm, "forearm"},
+	{robot::types::motorid_t::differentialRight, "differentialRight"},
+	{robot::types::motorid_t::differentialLeft, "differentialLeft"},
+	{robot::types::motorid_t::hand, "hand"}
+};
+
 namespace Nav {
-const double RADIAN_COST = EFF_WHEEL_BASE / 2.0; // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
-const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3; // Planner stays this far away from obstacles (m)
+// Distance (m) we could have traveled forward in the time it takes to turn 1 radian
+const double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
+// Planner stays this far away from obstacles (m)
+const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3;
 const int MAX_ITERS = 3000; // Max number of nodes expanded during A* search
 const double PLAN_RESOLUTION = Constants::ROBOT_LENGTH; // m
-const double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH*3;
+const double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH * 3;
 const double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
 const double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
 const double EPS = 2.0; // heuristic weight for weighted A*
-}
+} // namespace Nav
 } // namespace Constants
