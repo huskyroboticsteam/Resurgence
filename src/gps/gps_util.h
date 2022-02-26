@@ -2,14 +2,6 @@
 
 #include "../navtypes.h"
 
-/** Represents a GPS coordinate in degrees. Positive is north/east. */
-struct gpscoords_t {
-	/** the latitude of the gps coordinate, in degrees */
-	double lat;
-	/** the longitude of the gps coordinate, in degrees */
-	double lon;
-};
-
 /**
  * @brief A GPS datum that specifies the reference ellipsoid for use in GPS calculations.
  * This is important to resolve what exact location a gps coordinate specifies.
@@ -56,13 +48,13 @@ public:
 	 * @param datum The datum to use for the GPS calculations.
 	 * @param origin The gps coordinates of the origin of the xy-plane.
 	 */
-	GPSToMetersConverter(const GPSDatum& datum, const gpscoords_t& origin);
+	GPSToMetersConverter(const GPSDatum& datum, const navtypes::gpscoords_t& origin);
 
 	/** convert the given gps coordinates to a coordinate on the xy plane, in meters */
-	navtypes::point_t gpsToMeters(const gpscoords_t& coords) const;
+	navtypes::point_t gpsToMeters(const navtypes::gpscoords_t& coords) const;
 
 	/** convert a coordinate on the xy-plane to a gps coordinate */
-	gpscoords_t metersToGPS(const navtypes::point_t& pos) const;
+	navtypes::gpscoords_t metersToGPS(const navtypes::point_t& pos) const;
 
 	/**
 	 * Get the number of meters per degree of latitude.
@@ -78,7 +70,7 @@ public:
 
 private:
 	const GPSDatum datum;
-	const gpscoords_t origin;
+	const navtypes::gpscoords_t origin;
 	double metersPerDegLat;
 	double metersPerDegLon;
 };
