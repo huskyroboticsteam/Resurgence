@@ -1,0 +1,38 @@
+%YAML:1.0
+---
+# Name and description for the camera.
+# You should replace these.
+name: "TODO: Replace this"
+description: "TODO: Replace this"
+# Additionally, you should choose one of the below
+# and replace it with the proper value.
+# Camera ID: given ID N, will attempt to use /dev/videoN.
+camera_id: 0
+# Filename: will attempt to open the video device/stream
+# at the given path.
+filename: /path/to/camera/device
+# Information about the calibration process, such as the
+# reprojection error and board size.
+calib_info:
+   calibration_time: "Sat 26 Feb 2022 05:48:16 PM PST"
+   board_width: 11
+   board_height: 8
+   square_size: 1.9999999552965164e-02
+   avg_reprojection_error: 9.0924531389499644e-02
+   flags: 0
+# The actual intrinsic parameters of the camera.
+intrinsic_params:
+   camera_matrix: !!opencv-matrix
+      rows: 3
+      cols: 3
+      dt: d
+      data: [ 8.2342295124138286e+02, 0., 3.0932599345522056e+02, 0.,
+          8.2343518498999936e+02, 2.5535163960018482e+02, 0., 0., 1. ]
+   distortion_coefficients: !!opencv-matrix
+      rows: 5
+      cols: 1
+      dt: d
+      data: [ -4.1403211038112020e-01, 2.3294645126543093e-01,
+          2.6390433411918726e-04, -2.9625819516459952e-04, 0. ]
+   image_width: 640
+   image_height: 480
