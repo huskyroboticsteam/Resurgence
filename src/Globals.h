@@ -8,6 +8,9 @@
 
 #include <nlohmann/json.hpp>
 
+/**
+   @deprecated
+ */
 enum class RoverState {
 	RemoteControl,
 	DrivingToWaypoint,
@@ -18,10 +21,20 @@ enum class RoverState {
 //              provide variable definition in Globals.cpp
 namespace Globals {
 extern CommandLineOptions opts;
+/**
+   @deprecated
+ */
 extern RoverState curr_state;
+/**
+   @deprecated
+ */
 extern nlohmann::json status_data;
+/**
+   @deprecated
+ */
 extern nlohmann::json motor_status;
 extern websocket::SingleClientWSServer websocketServer;
+// TODO(evan): make these atomic
 extern bool E_STOP;
 extern bool AUTONOMOUS;
 } // namespace Globals
