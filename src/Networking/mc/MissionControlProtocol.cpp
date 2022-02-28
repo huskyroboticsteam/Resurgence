@@ -4,12 +4,18 @@
 #include "../../Globals.h"
 #include "../../log.h"
 
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 
 namespace mc {
 
 using val_t = json::value_t;
+using std::placeholders::_1;
+using websocket::connhandler_t;
+using websocket::msghandler_t;
+using websocket::validator_t;
+
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
@@ -47,9 +53,6 @@ static bool validateOneOf(const json& j, const std::string& key,
    between min and max, inclusive.
  */
 static bool validateRange(const json& j, const std::string& key, double min, double max);
-
-static std::unordered_set<CameraID> open_camera_streams;
-std::optional<websocket::WebSocketProtocol> proto;
 
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
 
@@ -95,7 +98,8 @@ void handleDriveRequest(const json& j) {
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1e-6 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1e-6 ? -steer / norm : steer);
-	log(LOG_INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer, dtheta, dx);
+	log(LOG_INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
+		dtheta, dx);
 	setCmdVel(dtheta, dx);
 }
 
@@ -125,39 +129,46 @@ bool validateCameraStreamOpenRequest(const json& j) {
 	return validateKey(j, "camera", val_t::string);
 }
 
-void handleCameraStreamOpenRequest(const json& j) {
+void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
-	open_camera_streams.insert(cam);
+	this->_open_streams.insert(cam);
 }
 
 bool validateCameraStreamCloseRequest(const json& j) {
 	return validateKey(j, "camera", val_t::string);
 }
 
-void handleCameraStreamCloseRequest(const json& j) {
+void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
-	open_camera_streams.erase(cam);
+	this->_open_streams.erase(cam);
 }
 
-///////////////////////////////////////////////////////////////////
-
-websocket::WebSocketProtocol initMissionControlProtocol() {
-	if (!proto) {
-		proto = websocket::WebSocketProtocol(Constants::MC_PROTOCOL_NAME);
-		proto->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
-								 validateEmergencyStopRequest);
-		proto->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
-								 validateOperationModeRequest);
-		proto->addMessageHandler(DRIVE_REQ_TYPE, handleDriveRequest, validateDriveRequest);
-		proto->addMessageHandler(MOTOR_POWER_REQ_TYPE, handleMotorPowerRequest,
-								 validateMotorPowerRequest);
-		proto->addMessageHandler(CAMERA_STREAM_OPEN_REQ_TYPE, handleCameraStreamOpenRequest,
-								 validateCameraStreamOpenRequest);
-		proto->addMessageHandler(CAMERA_STREAM_CLOSE_REQ_TYPE, handleCameraStreamCloseRequest,
-								 validateCameraStreamCloseRequest);
+void MissionControlProtocol::videoStreamTask() {
+	_streaming_running = true;
+	while (_streaming_running) {
+		for (const CameraID& cam : _open_streams) {
+		}
 	}
+}
 
-	return *proto;
+MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server) {
+	this->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
+							validateEmergencyStopRequest);
+	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
+							validateOperationModeRequest);
+	this->addMessageHandler(DRIVE_REQ_TYPE, handleDriveRequest, validateDriveRequest);
+	this->addMessageHandler(MOTOR_POWER_REQ_TYPE, handleMotorPowerRequest,
+							validateMotorPowerRequest);
+	// camera stream handlers need the class for context since they must modify _open_streams
+	this->addMessageHandler(
+		CAMERA_STREAM_OPEN_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleCameraStreamOpenRequest, this, _1),
+		validateCameraStreamOpenRequest);
+	this->addMessageHandler(
+		CAMERA_STREAM_CLOSE_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
+		validateCameraStreamCloseRequest);
 }
 
 ///// UTILITY FUNCTIONS //////

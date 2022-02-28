@@ -24,20 +24,6 @@ private:
 	std::atomic<bool> _streaming_running;
 	SingleClientWSServer& _server;
 	std::unordered_set<CameraID> _open_streams;
-	////// VALIDATORS //////
-	bool validateEmergencyStopRequest(const json& j);
-	bool validateOperationModeRequest(const json& j);
-	bool validateDriveRequest(const json& j);
-	bool validateMotorPowerRequest(const json& j);
-	bool validateMotorPositionRequest(const json& j);
-	bool validateCameraStreamOpenRequest(const json& j);
-	bool validateCameraStreamCloseRequest(const json& j);
-	////// HANDLERS //////
-	void handleEmergencyStopRequest(const json& j);
-	void handleOperationModeRequest(const json& j);
-	void handleDriveRequest(const json& j);
-	void handleMotorPowerRequest(const json& j);
-	void handleMotorPositionRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 };
