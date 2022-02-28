@@ -28,8 +28,7 @@ namespace can {
 namespace {
 int can_fd;
 sockaddr_can can_addr;
-can_frame can_frame_;
-ifreq can_ifr;
+std::mutex socketMutex; // protects both can_fd and can_addr
 
 std::map<deviceid_t, std::pair<std::shared_mutex, std::map<telemtype_t, int32_t>>> telemMap;
 std::shared_mutex telemMapMutex;
@@ -42,17 +41,24 @@ void error(const std::string& err) {
 void recievePacket(CANPacket& packet) {
 	socklen_t len = sizeof(can_addr);
 
-	if (recvfrom(can_fd, &can_frame_, sizeof(struct can_frame), 0, (struct sockaddr*)&can_addr,
-				 &len) < 0) {
-		// not marked as nonblocking, so we shouldn't see EGAIN or EWOULDBLOCK errors
-		std::perror("Failed to receive CAN packet!");
-	} else {
+	bool success;
+	can_frame frame;
+	{
+		// lock the socket only while we're using it
+		std::lock_guard lock(socketMutex);
+		// no need to check for EAGAIN or EWOULDBLOCK since we're blocking
+		success = recvfrom(can_fd, &frame, sizeof(struct can_frame), 0,
+						   (struct sockaddr*)&can_addr, &len) >= 0;
+	}
+	if (success) {
 		log(LOG_TRACE, "Got CAN packet\n");
-		packet.id = can_frame_.can_id;
-		packet.dlc = can_frame_.can_dlc;
-		for (int i = 0; i < can_frame_.can_dlc; i++) {
-			packet.data[i] = can_frame_.data[i];
+		packet.id = frame.can_id;
+		packet.dlc = frame.can_dlc;
+		for (int i = 0; i < frame.can_dlc; i++) {
+			packet.data[i] = frame.data[i];
 		}
+	} else {
+		std::perror("Failed to receive CAN packet!");
 	}
 }
 
@@ -97,10 +103,12 @@ void recieveThreadFn() {
 } // namespace
 
 void initCAN() {
+	std::lock_guard lock(socketMutex);
 	if ((can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
 		error("Failed to initialize CAN bus!");
 	}
 
+	ifreq can_ifr;
 	std::strcpy(can_ifr.ifr_name, "can0");
 	if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0) {
 		std::perror("Failed to get hardware CAN interface index\n"
@@ -130,18 +138,24 @@ void initCAN() {
 
 // TODO: add resend period argument, allowing for periodic resends of packets
 void sendCANPacket(const CANPacket& packet) {
-	can_frame_.can_id = packet.id;
-	can_frame_.can_dlc = packet.dlc;
+	can_frame frame;
+	frame.can_id = packet.id;
+	frame.can_dlc = packet.dlc;
 	for (int i = 0; i < packet.dlc; i++) {
-		can_frame_.data[i] = packet.data[i];
+		frame.data[i] = packet.data[i];
 	}
 
-	if (sendto(can_fd, &can_frame_, sizeof(struct can_frame), 0, (struct sockaddr*)&can_addr,
-			   sizeof(can_addr)) < 0) {
+	bool success;
+	{
+		std::lock_guard lock(socketMutex);
 		// not marked as nonblocking, so we shouldn't see EAGAIN or EWOULDBLOCK
-		std::perror("Failed to send CAN packet");
-	} else {
+		success = sendto(can_fd, &frame, sizeof(struct can_frame), 0,
+						 (struct sockaddr*)&can_addr, sizeof(can_addr)) >= 0;
+	}
+	if (success) {
 		log(LOG_TRACE, "CAN packet sent.\n");
+	} else {
+		std::perror("Failed to send CAN packet");
 	}
 }
 
