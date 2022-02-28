@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <optional>
 
-class CANPacket;
+extern "C" {
+	#include "../HindsightCAN/CANPacket.h"
+}
 
 namespace can {
 

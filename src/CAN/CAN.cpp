@@ -20,7 +20,6 @@
 
 extern "C" {
 #include "../HindsightCAN/CANCommon.h"
-#include "../HindsightCAN/CANPacket.h"
 }
 
 namespace can {
@@ -30,7 +29,11 @@ int can_fd;
 sockaddr_can can_addr;
 std::mutex socketMutex; // protects both can_fd and can_addr
 
-std::map<deviceid_t, std::pair<std::shared_mutex, std::map<telemtype_t, int32_t>>> telemMap;
+// TODO: should the map instead be a shared pointer to a map?
+using protectedmap_t =
+	std::pair<std::shared_ptr<std::shared_mutex>, std::map<telemtype_t, int32_t>>;
+
+std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
 
 void error(const std::string& err) {
@@ -84,7 +87,7 @@ void recieveThreadFn() {
 			// acquire read lock of entire map
 			std::shared_lock mapLock(telemMapMutex);
 			auto& pair = telemMap.at(id);
-			std::shared_mutex& deviceMutex = pair.first;
+			std::shared_mutex& deviceMutex = *pair.first;
 			auto& deviceMap = pair.second;
 			// acquire write lock of the map for this device
 			std::unique_lock deviceLock(deviceMutex);
@@ -92,11 +95,11 @@ void recieveThreadFn() {
 			deviceMap.insert(std::make_pair(telemType, telemData));
 		} else {
 			// this device has no existing data, so insert a new device map
-			std::shared_mutex mutex;
+			auto mutexPtr = std::make_shared<std::shared_mutex>();
 			std::map<telemtype_t, int32_t> deviceMap = {{telemType, telemData}};
 			// acquire write lock of the entire map to insert a new device map
 			std::unique_lock mapLock(telemMapMutex);
-			telemMap.emplace(id, std::make_pair(mutex, deviceMap));
+			telemMap.emplace(id, std::make_pair(mutexPtr, deviceMap));
 		}
 	}
 }
