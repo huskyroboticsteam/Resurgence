@@ -2,6 +2,7 @@
 
 #include "navtypes.h"
 
+#include <algorithm>
 #include <iostream>
 #include <random>
 #include <time.h>
@@ -127,6 +128,14 @@ long getNormalSeed() {
 
 double stdn(int thread_id) {
 	return stdn_dist(thread_id == 0 ? main_generator : spin_generator);
+}
+
+template <typename K, typename V>
+std::unordered_set<K> keySet(const std::unordered_map<K, V>& input) {
+	std::unordered_set<K> output;
+	std::transform(input.begin(), input.end(), std::inserter(output, output.end()),
+				   [](auto pair) { return pair.first; });
+	return output;
 }
 
 } // namespace util
