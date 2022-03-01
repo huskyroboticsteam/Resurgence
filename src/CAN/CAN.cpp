@@ -10,6 +10,7 @@
 #include <string>
 #include <thread>
 #include <unistd.h>
+#include <utility>
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -23,15 +24,13 @@ extern "C" {
 }
 
 namespace can {
-
 namespace {
 int can_fd;
 sockaddr_can can_addr;
 std::mutex socketMutex; // protects both can_fd and can_addr
 
-// TODO: should the map instead be a shared pointer to a map?
 using protectedmap_t =
-	std::pair<std::shared_ptr<std::shared_mutex>, std::map<telemtype_t, int32_t>>;
+	std::pair<std::shared_ptr<std::shared_mutex>, std::shared_ptr<std::map<telemtype_t, int32_t>>>;
 
 std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
@@ -88,7 +87,7 @@ void recieveThreadFn() {
 			std::shared_lock mapLock(telemMapMutex);
 			auto& pair = telemMap.at(id);
 			std::shared_mutex& deviceMutex = *pair.first;
-			auto& deviceMap = pair.second;
+			auto& deviceMap = *pair.second;
 			// acquire write lock of the map for this device
 			std::unique_lock deviceLock(deviceMutex);
 			// insert telemetry data
@@ -96,10 +95,11 @@ void recieveThreadFn() {
 		} else {
 			// this device has no existing data, so insert a new device map
 			auto mutexPtr = std::make_shared<std::shared_mutex>();
-			std::map<telemtype_t, int32_t> deviceMap = {{telemType, telemData}};
+			auto deviceMapPtr = std::make_shared<std::map<telemtype_t, int32_t>>();
+			deviceMapPtr->emplace(telemType, telemData);
 			// acquire write lock of the entire map to insert a new device map
 			std::unique_lock mapLock(telemMapMutex);
-			telemMap.emplace(id, std::make_pair(mutexPtr, deviceMap));
+			telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
 		}
 	}
 }
@@ -139,7 +139,6 @@ void initCAN() {
 	recieveThread.detach();
 }
 
-// TODO: add resend period argument, allowing for periodic resends of packets
 void sendCANPacket(const CANPacket& packet) {
 	can_frame frame;
 	frame.can_id = packet.id;
