@@ -29,8 +29,8 @@ int can_fd;
 sockaddr_can can_addr;
 std::mutex socketMutex; // protects both can_fd and can_addr
 
-using protectedmap_t =
-	std::pair<std::shared_ptr<std::shared_mutex>, std::shared_ptr<std::map<telemtype_t, int32_t>>>;
+using protectedmap_t = std::pair<std::shared_ptr<std::shared_mutex>,
+								 std::shared_ptr<std::map<telemtype_t, int32_t>>>;
 
 std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
@@ -158,6 +158,24 @@ void sendCANPacket(const CANPacket& packet) {
 		log(LOG_TRACE, "CAN packet sent.\n");
 	} else {
 		std::perror("Failed to send CAN packet");
+	}
+}
+
+std::optional<int32_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
+	std::shared_lock mapLock(telemMapMutex);
+	auto entry = telemMap.find(id);
+	if (entry != telemMap.end()) {
+		auto& devMutex = *entry->second.first;
+		auto& devMap = *entry->second.second;
+		std::shared_lock deviceLock(devMutex);
+		auto telemEntry = devMap.find(telemType);
+		if (telemEntry != devMap.end()) {
+			return telemEntry->second;
+		} else {
+			return {};
+		}
+	} else {
+		return {};
 	}
 }
 
