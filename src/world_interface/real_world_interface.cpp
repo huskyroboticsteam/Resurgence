@@ -3,23 +3,22 @@
 #include "../Networking/ParseCAN.h"
 #include "../Networking/motor_interface.h"
 #include "../Util.h"
-#include "../navtypes.h"
 #include "../ar/read_landmarks.h"
 #include "../camera/Camera.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
-#include "world_interface.h"
+#include "../navtypes.h"
 #include "kinematic_common_interface.h"
+#include "world_interface.h"
 
 #include <future>
 #include <iostream>
 #include <map>
 #include <set>
 
-#include <opencv2/calib3d.hpp>
-
 #include <nlohmann/json.hpp>
+#include <opencv2/calib3d.hpp>
 
 extern "C" {
 #include "../HindsightCAN/CANMotorUnit.h"
@@ -38,8 +37,9 @@ void setupCameras() {
 		auto arCam = std::make_shared<cam::Camera>();
 		arCam->openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
 		cameraMap[Constants::AR_CAMERA_ID] = arCam;
-	} catch (const std::exception &e) {
-		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n", Constants::AR_CAMERA_ID.c_str(), e.what());
+	} catch (const std::exception& e) {
+		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n",
+			Constants::AR_CAMERA_ID.c_str(), e.what());
 	}
 
 	// Set up the rest of the cameras here
@@ -180,18 +180,20 @@ URCLeg getLeg(int index) {
 }
 
 const std::map<std::string, double> positive_arm_pwm_scales = {
-	{"arm_base", 12000}, {"shoulder", -20000}, {"elbow", -32768}, {"forearm", -6000},
-	{"diffleft", 5000},	 {"diffright", -5000}, {"hand", 15000}};
+	{"armBase", 12000}, {"shoulder", -20000},		{"elbow", -32768},
+	{"forearm", -6000}, {"differentialLeft", 5000}, {"differentialRight", -5000},
+	{"hand", 15000}};
 const std::map<std::string, double> negative_arm_pwm_scales = {
-	{"arm_base", 12000}, {"shoulder", -14000},	{"elbow", -18000}, {"forearm", -6000},
-	{"diffleft", 5000},	 {"diffright", -10000}, {"hand", 15000}};
+	{"armBase", 12000}, {"shoulder", -14000},		{"elbow", -18000},
+	{"forearm", -6000}, {"differentialLeft", 5000}, {"differentialRight", -10000},
+	{"hand", 15000}};
 const std::map<std::string, double> incremental_pid_scales = {
-	{"arm_base", M_PI / 8}, // TODO: Check signs
+	{"armBase", M_PI / 8}, // TODO: Check signs
 	{"shoulder", -M_PI / 8},
 	{"elbow", -M_PI / 8},
 	{"forearm", 0}, // We haven't implemented PID on these motors yet
-	{"diffleft", 0},
-	{"diffright", 0},
+	{"differentialLeft", 0},
+	{"differentialRight", 0},
 	{"hand", 0}};
 
 template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {

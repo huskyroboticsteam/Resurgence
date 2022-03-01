@@ -19,28 +19,6 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
-enum JointName {
-	INVALID_JOINT,
-	ARM_BASE,
-	SHOULDER,
-	ELBOW,
-	FOREARM,
-	DIFFERENTIAL_ROLL,
-	DIFFERENTIAL_PITCH,
-	HAND,
-	DRILL_ARM
-};
-
-NLOHMANN_JSON_SERIALIZE_ENUM(JointName, {{INVALID_JOINT, nullptr},
-										 {ARM_BASE, "armBase"},
-										 {SHOULDER, "shoulder"},
-										 {ELBOW, "elbow"},
-										 {FOREARM, "forearm"},
-										 {DIFFERENTIAL_ROLL, "differentialRoll"},
-										 {DIFFERENTIAL_PITCH, "differentialPitch"},
-										 {HAND, "hand"},
-										 {DRILL_ARM, "drillArm"}});
-
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
@@ -132,54 +110,34 @@ static void handleDriveRequest(const json& j) {
 	setCmdVel(dtheta, dx);
 }
 
-static bool validateJointPowerRequest(const json& j) {
-	JointName joint;
-	return validateKey(j, "joint", val_t::string) && ((joint = j["joint"]) != INVALID_JOINT) &&
-		   validateRange(j, "power", -1, 1);
+static bool validateJoint(const json& j) {
+	return validateKey(j, "joint", val_t::string) &&
+		   validateOneOf(j, "joint",
+						 {"armBase", "shoulder", "elbow", "forearm", "differentialRoll",
+						  "differentialPitch", "hand"});
 }
 
-static constexpr std::optional<const char*> getMotorName(JointName joint) {
-	switch (joint) {
-		case ARM_BASE:
-			return {"arm_base"};
-		case SHOULDER:
-			return {"shoulder"};
-		case ELBOW:
-			return {"elbow"};
-		case FOREARM:
-			return {"forearm"};
-		// TODO: implement differential (going to take some different logic)
-		case HAND:
-			return {"hand"};
-		// TODO: implement drill arm when electronics adds it in CAN protocol
-		default:
-			return {};
-	}
+static bool validateJointPowerRequest(const json& j) {
+	return validateJoint(j) && validateRange(j, "power", -1, 1);
 }
 
 static void handleJointPowerRequest(const json& j) {
-	JointName joint = j["joint"];
-	auto motor = getMotorName(joint);
-	if (motor) {
-		double power = j["power"];
-		setMotorPWM(*motor, power);
-	}
+	std::string motor = j["joint"];
+	double power = j["power"];
+	// TODO adapt this when we have the new CAN/motor interface
+	setMotorPWM(motor, power);
 }
 
 static bool validateJointPositionRequest(const json& j) {
-	JointName joint;
-	return validateKey(j, "joint", val_t::string) && ((joint = j["joint"]) != INVALID_JOINT) &&
-		   validateKey(j, "position", val_t::number_integer);
+	return validateJoint(j) && validateKey(j, "position", val_t::number_integer);
 }
 
 static void handleJointPositionRequest(const json& j) {
-	JointName joint = j["joint"];
-	auto motor = getMotorName(joint);
-	if (motor) {
-		double position_deg = j["position"];
-		int32_t position_mdeg = std::round(position_deg * 1000);
-		setMotorPos(*motor, position_mdeg);
-	}
+	std::string motor = j["joint"];
+	double position_deg = j["position"];
+	int32_t position_mdeg = std::round(position_deg * 1000);
+	// TODO adapt this when we have the new CAN/motor interface;
+	setMotorPos(motor, position_mdeg);
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
@@ -239,9 +197,8 @@ void MissionControlProtocol::videoStreamTask() {
 	}
 }
 
-void MissionControlProtocol::handleConnection(){
-	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE},
-			  {"peripheral", "arm"}};
+void MissionControlProtocol::handleConnection() {
+	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", "arm"}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 }
 
