@@ -9,7 +9,7 @@ extern "C" {
 
 namespace can {
 
-enum class devicegroup_t { broadcast, reserved, master, power, motor, telemetry, gpio };
+enum class devicegroup_t { broadcast, reserved, master, power, motor, telemetry, gpio, science };
 
 using deviceserial_t = uint8_t;
 using telemtype_t = uint8_t;

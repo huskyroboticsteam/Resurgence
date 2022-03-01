@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../world_interface/data.h"
 #include "CAN.h"
 
 extern "C" {
@@ -12,9 +11,9 @@ devicegroup_t getDeviceGroup(const CANPacket& packet);
 
 devicegroup_t getDeviceGroup(uint8_t groupCode);
 
+uint8_t getDeviceGroupCode(devicegroup_t group);
+
 deviceserial_t getDeviceSerial(const CANPacket& packet);
 
 deviceid_t getDeviceGroupAndSerial(const CANPacket& packet);
-
-deviceserial_t getMotorSerial(robot::types::motorid_t motor);
 } // namespace can
