@@ -20,6 +20,8 @@ class MissionControlProtocol : public WebSocketProtocol {
 public:
 	MissionControlProtocol(SingleClientWSServer& server);
 	~MissionControlProtocol();
+	MissionControlProtocol(const MissionControlProtocol& other) = delete;
+	MissionControlProtocol& operator=(const MissionControlProtocol& other) = delete;
 	std::unordered_set<CameraID> getOpenCameraStreams();
 
 private:

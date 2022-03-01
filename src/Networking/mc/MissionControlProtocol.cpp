@@ -8,6 +8,7 @@
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
+
 #include <opencv2/core.hpp>
 
 namespace mc {
@@ -18,12 +19,36 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
+enum JointName {
+	INVALID_JOINT,
+	ARM_BASE,
+	SHOULDER,
+	ELBOW,
+	FOREARM,
+	DIFFERENTIAL_ROLL,
+	DIFFERENTIAL_PITCH,
+	HAND,
+	DRILL_ARM
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(JointName, {{INVALID_JOINT, nullptr},
+										 {ARM_BASE, "armBase"},
+										 {SHOULDER, "shoulder"},
+										 {ELBOW, "elbow"},
+										 {FOREARM, "forearm"},
+										 {DIFFERENTIAL_ROLL, "differentialRoll"},
+										 {DIFFERENTIAL_PITCH, "differentialPitch"},
+										 {HAND, "hand"},
+										 {DRILL_ARM, "drillArm"}});
+
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
 constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
 constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
+constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
 constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
+constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
 constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
 
@@ -106,26 +131,54 @@ static void handleDriveRequest(const json& j) {
 	setCmdVel(dtheta, dx);
 }
 
-static bool validateMotorPowerRequest(const json& j) {
-	return validateKey(j, "motor", val_t::string) && validateRange(j, "power", -1, 1);
+static bool validateJointPowerRequest(const json& j) {
+	JointName joint;
+	return validateKey(j, "joint", val_t::string) && ((joint = j["joint"]) != INVALID_JOINT) &&
+		   validateRange(j, "power", -1, 1);
 }
 
-static void handleMotorPowerRequest(const json& j) {
-	std::string motor = j["motor"];
-	double power = j["power"];
-	setMotorPWM(motor, power);
+static constexpr std::optional<const char*> getMotorName(JointName joint) {
+	switch (joint) {
+		case ARM_BASE:
+			return {"arm_base"};
+		case SHOULDER:
+			return {"shoulder"};
+		case ELBOW:
+			return {"elbow"};
+		case FOREARM:
+			return {"forearm"};
+		// TODO: implement differential (going to take some different logic)
+		case HAND:
+			return {"hand"};
+		// TODO: implement drill arm when electronics adds it in CAN protocol
+		default:
+			return {};
+	}
 }
 
-static bool validateMotorPositionRequest(const json& j) {
-	return validateKey(j, "motor", val_t::string) &&
+static void handleJointPowerRequest(const json& j) {
+	JointName joint = j["joint"];
+	auto motor = getMotorName(joint);
+	if (motor) {
+		double power = j["power"];
+		setMotorPWM(*motor, power);
+	}
+}
+
+static bool validateJointPositionRequest(const json& j) {
+	JointName joint;
+	return validateKey(j, "joint", val_t::string) && ((joint = j["joint"]) != INVALID_JOINT) &&
 		   validateKey(j, "position", val_t::number_integer);
 }
 
-static void handleMotorPositionRequest(const json& j) {
-	std::string motor = j["motor"];
-	double position_deg = j["position"];
-	int32_t position_mdeg = std::round(position_deg * 1000);
-	setMotorPos(motor, position_mdeg);
+static void handleJointPositionRequest(const json& j) {
+	JointName joint = j["joint"];
+	auto motor = getMotorName(joint);
+	if (motor) {
+		double position_deg = j["position"];
+		int32_t position_mdeg = std::round(position_deg * 1000);
+		setMotorPos(*motor, position_mdeg);
+	}
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
@@ -187,10 +240,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
 							validateOperationModeRequest);
 	this->addMessageHandler(DRIVE_REQ_TYPE, handleDriveRequest, validateDriveRequest);
-	this->addMessageHandler(MOTOR_POWER_REQ_TYPE, handleMotorPowerRequest,
-							validateMotorPowerRequest);
-	this->addMessageHandler(MOTOR_POSITION_REQ_TYPE, handleMotorPositionRequest,
-							validateMotorPositionRequest);
+	this->addMessageHandler(JOINT_POWER_REQ_TYPE, handleJointPowerRequest,
+							validateJointPowerRequest);
+	this->addMessageHandler(JOINT_POSITION_REQ_TYPE, handleJointPositionRequest,
+							validateJointPositionRequest);
 	// camera stream handlers need the class for context since they must modify _open_streams
 	this->addMessageHandler(
 		CAMERA_STREAM_OPEN_REQ_TYPE,
@@ -207,7 +260,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 
 MissionControlProtocol::~MissionControlProtocol() {
 	this->_streaming_running = false;
-	if(this->_streaming_thread.joinable()){
+	if (this->_streaming_thread.joinable()) {
 		this->_streaming_thread.join();
 	}
 }
