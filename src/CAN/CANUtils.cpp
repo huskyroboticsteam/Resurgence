@@ -18,7 +18,7 @@ namespace can {
 namespace {
 template <typename K, typename V> std::map<V, K> reverseMap(const std::map<K, V>& map) {
 	std::map<V, K> reversed;
-	for (const auto& [k, v] : reversed) {
+	for (const auto& [k, v] : map) {
 		reversed.emplace(v, k);
 	}
 	return reversed;
