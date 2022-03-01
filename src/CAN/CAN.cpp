@@ -161,7 +161,7 @@ void sendCANPacket(const CANPacket& packet) {
 	}
 }
 
-std::optional<int32_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
+std::optional<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
 	std::shared_lock mapLock(telemMapMutex);
 	auto entry = telemMap.find(id);
 	if (entry != telemMap.end()) {
