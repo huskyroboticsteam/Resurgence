@@ -2,6 +2,7 @@
 
 extern "C" {
 #include "../HindsightCAN/CANPacket.h"
+#include "../HindsightCAN/CANMotorUnit.h"
 }
 
 #include <chrono>
@@ -9,14 +10,19 @@ extern "C" {
 
 namespace can {
 enum class devicegroup_t {
-	broadcast,
-	reserved,
-	master,
-	power,
-	motor,
-	telemetry,
-	gpio,
-	science
+	broadcast = DEVICE_GROUP_BROADCAST,
+	reserved = DEVICE_GROUP_RESERVED,
+	master = DEVICE_GROUP_MASTER,
+	power = DEVICE_GROUP_POWER,
+	motor = DEVICE_GROUP_MOTOR_CONTROL,
+	telemetry = DEVICE_GROUP_TELEMETRY,
+	gpio = DEVICE_GROUP_GPIO_BOARDS,
+	science = DEVICE_GROUP_SCIENCE
+};
+
+enum class motormode_t {
+	pwm = MOTOR_UNIT_MODE_PWM,
+	pid = MOTOR_UNIT_MODE_PID
 };
 
 using deviceserial_t = uint8_t;
@@ -26,10 +32,6 @@ using telemetry_t = int32_t;
 using deviceid_t = std::pair<devicegroup_t, deviceserial_t>;
 
 devicegroup_t getDeviceGroup(const CANPacket& packet);
-
-devicegroup_t getDeviceGroup(uint8_t groupCode);
-
-uint8_t getDeviceGroupCode(devicegroup_t group);
 
 deviceserial_t getDeviceSerial(const CANPacket& packet);
 
@@ -45,4 +47,6 @@ void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod,
 			   int32_t kP, int32_t kI, int32_t kD);
+
+void setMotorMode(deviceserial_t serial, motormode_t mode);
 } // namespace can
