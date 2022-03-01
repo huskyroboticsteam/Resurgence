@@ -180,6 +180,10 @@ add_library(simulator_interface STATIC
   base64/base64_img.cpp
   ${camera_src}
   )
+
+list(APPEND vision_libs
+  ${OpenCV_LIBS}
+  opencv_aruco)
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
 target_include_directories(simulator_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -233,6 +237,8 @@ add_library(rover_common SHARED
   worldmap/QuadTree.cpp
   planning/plan.cpp
   )
+target_include_directories(rover_common SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(rover_common ${vision_libs})
 
 list(APPEND rover_libs
   rover_common
@@ -251,10 +257,6 @@ elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
 else()
   target_link_libraries(Rover ${real_world_libs}) # TODO: support other interfaces
 endif()
-
-list(APPEND vision_libs
-  ${OpenCV_LIBS}
-  opencv_aruco)
 
 target_link_libraries(Rover ${vision_libs})
 
