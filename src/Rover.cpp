@@ -152,7 +152,8 @@ int rover_loop(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
-	Globals::websocketServer.addProtocol(mc::MissionControlProtocol(Globals::websocketServer));
+	mc::MissionControlProtocol mcProto(Globals::websocketServer);
+	Globals::websocketServer.addProtocol(mcProto);
 	world_interface_init();
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line

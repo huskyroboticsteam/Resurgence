@@ -187,7 +187,9 @@ static bool validateCameraStreamOpenRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
+	this->_stream_lock.lock();
 	this->_open_streams[cam] = 0;
+	this->_stream_lock.unlock();
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
@@ -196,7 +198,9 @@ static bool validateCameraStreamCloseRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
+	this->_stream_lock.lock();
 	this->_open_streams.erase(cam);
+	this->_stream_lock.unlock();
 }
 
 void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
@@ -206,9 +210,9 @@ void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 }
 
 void MissionControlProtocol::videoStreamTask() {
-	_streaming_running = true;
-	while (_streaming_running) {
+	while (this->_streaming_running) {
 		// for all open streams, check if there is a new frame
+		this->_stream_lock.lock();
 		for (const auto& stream : _open_streams) {
 			const CameraID& cam = stream.first;
 			const uint32_t& frame_num = stream.second;
@@ -226,15 +230,16 @@ void MissionControlProtocol::videoStreamTask() {
 			}
 
 			// break out of the loop if we should stop streaming
-			if (!_streaming_running) {
+			if (!this->_streaming_running) {
 				break;
 			}
 		}
+		this->_stream_lock.unlock();
 	}
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server) {
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams() {
 	this->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
 							validateEmergencyStopRequest);
 	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
