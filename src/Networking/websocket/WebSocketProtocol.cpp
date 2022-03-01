@@ -1,6 +1,7 @@
 #include "WebSocketProtocol.h"
 
 #include "../../log.h"
+#include "../../Constants.h"
 
 namespace websocket {
 
@@ -63,6 +64,9 @@ void WebSocketProtocol::processMessage(const json& obj) const {
 		auto validatorEntry = validatorMap.find(messageType);
 		if (validatorEntry != validatorMap.end()) {
 			if (validatorEntry->second(obj)) {
+				if(protocolPath == Constants::MC_PROTOCOL_NAME){
+					log(LOG_INFO, "MC->R: %s\n", obj.dump().c_str());
+				}
 				handlerMap.at(messageType)(obj);
 			} else {
 				log(LOG_WARN, "Endpoint=%s : Invalid message received of type=%s: %s\n",

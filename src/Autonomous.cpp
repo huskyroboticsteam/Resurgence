@@ -539,12 +539,12 @@ void Autonomous::autonomyIter() {
 			lidar_scan = lidarData.getData();
 			lastLidarTime = lidarData.getTime();
 		} else {
-			log(LOG_WARN, "No new lidar data available!\n");
+			log(LOG_DEBUG, "No new lidar data available!\n");
 		}
 	} else if (!lidarData) {
 		log(LOG_ERROR, "Tried to read from the lidar before it was initialized!\n");
 	} else {
-		log(LOG_WARN, "Data is older than %dms!\n", LIDAR_FRESH_PERIOD);
+		log(LOG_DEBUG, "Data is older than %dms!\n", LIDAR_FRESH_PERIOD);
 	}
 
 	if (USE_MAP) {
@@ -574,7 +574,7 @@ void Autonomous::autonomyIter() {
 		double new_plan_cost = planCostFromIndex(new_plan, 0);
 		// we want a significant improvement to avoid thrash
 		if (new_plan_cost < plan_cost * 0.8) {
-			log(LOG_INFO, "Got new plan: %ld steps, %f cost (previous: %ld steps, %f cost)\n",
+			log(LOG_DEBUG, "Got new plan: %ld steps, %f cost (previous: %ld steps, %f cost)\n",
 				new_plan.size(), new_plan_cost, plan.size(), plan_cost);
 			plan_idx = 0;
 			plan_base = pose;
@@ -697,7 +697,7 @@ pose_t Autonomous::getDriveTargetFromPlan(const pose_t& pose, const pose_t& plan
 	}
 
 	if (dist(final_plan_pose, plan_target, 0.0) > 2 * PLANNING_GOAL_REGION_RADIUS) {
-		log(LOG_WARN, "Plan target moved (%f %f %f -> %f %f %f). Replanning.\n",
+		log(LOG_DEBUG, "Plan target moved (%f %f %f -> %f %f %f). Replanning.\n",
 			final_plan_pose(0), final_plan_pose(1), final_plan_pose(2), plan_target(0),
 			plan_target(1), plan_target(2));
 		accumulated_cost += INFINITE_COST;
