@@ -200,6 +200,9 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		CAMERA_STREAM_CLOSE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
+
+	this->_streaming_running = true;
+	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
