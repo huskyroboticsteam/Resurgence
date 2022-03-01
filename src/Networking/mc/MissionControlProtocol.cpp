@@ -23,6 +23,7 @@ constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
 constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
 constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
+constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
 constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
 
@@ -64,11 +65,11 @@ static bool validateRange(const json& j, const std::string& key, double min, dou
   of the type. NOTE: handlers expect valid messages, so call validator first
 */
 
-bool validateEmergencyStopRequest(const json& j) {
+static bool validateEmergencyStopRequest(const json& j) {
 	return validateKey(j, "stop", val_t::boolean);
 }
 
-void handleEmergencyStopRequest(const json& j) {
+static void handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
 		setCmdVel(0, 0);
@@ -76,23 +77,23 @@ void handleEmergencyStopRequest(const json& j) {
 	Globals::E_STOP = stop;
 }
 
-bool validateOperationModeRequest(const json& j) {
+static bool validateOperationModeRequest(const json& j) {
 	return validateKey(j, "mode", val_t::string) &&
 		   validateOneOf(j, "mode", {"teleoperation", "autonomous"});
 }
 
-void handleOperationModeRequest(const json& j) {
+static void handleOperationModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	Globals::AUTONOMOUS = (mode == "autonomous");
 }
 
-bool validateDriveRequest(const json& j) {
+static bool validateDriveRequest(const json& j) {
 	std::string msg = j.dump();
 	return hasKey(j, "straight") && validateRange(j, "straight", -1, 1) &&
 		   hasKey(j, "steer") && validateRange(j, "steer", -1, 1);
 }
 
-void handleDriveRequest(const json& j) {
+static void handleDriveRequest(const json& j) {
 	// fit straight and steer to unit circle; i.e. scale each such that <straight, steer> is a
 	// unit vector
 	double straight = j["straight"];
@@ -105,29 +106,29 @@ void handleDriveRequest(const json& j) {
 	setCmdVel(dtheta, dx);
 }
 
-bool validateMotorPowerRequest(const json& j) {
+static bool validateMotorPowerRequest(const json& j) {
 	return validateKey(j, "motor", val_t::string) && validateRange(j, "power", -1, 1);
 }
 
-void handleMotorPowerRequest(const json& j) {
+static void handleMotorPowerRequest(const json& j) {
 	std::string motor = j["motor"];
 	double power = j["power"];
 	setMotorPWM(motor, power);
 }
 
-bool validateMotorPositionRequest(const json& j) {
+static bool validateMotorPositionRequest(const json& j) {
 	return validateKey(j, "motor", val_t::string) &&
 		   validateKey(j, "position", val_t::number_integer);
 }
 
-void handleMotorPositionRequest(const json& j) {
+static void handleMotorPositionRequest(const json& j) {
 	std::string motor = j["motor"];
 	double position_deg = j["position"];
 	int32_t position_mdeg = std::round(position_deg * 1000);
 	setMotorPos(motor, position_mdeg);
 }
 
-bool validateCameraStreamOpenRequest(const json& j) {
+static bool validateCameraStreamOpenRequest(const json& j) {
 	return validateKey(j, "camera", val_t::string);
 }
 
@@ -136,7 +137,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	this->_open_streams[cam] = 0;
 }
 
-bool validateCameraStreamCloseRequest(const json& j) {
+static bool validateCameraStreamCloseRequest(const json& j) {
 	return validateKey(j, "camera", val_t::string);
 }
 
@@ -188,6 +189,8 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addMessageHandler(DRIVE_REQ_TYPE, handleDriveRequest, validateDriveRequest);
 	this->addMessageHandler(MOTOR_POWER_REQ_TYPE, handleMotorPowerRequest,
 							validateMotorPowerRequest);
+	this->addMessageHandler(MOTOR_POSITION_REQ_TYPE, handleMotorPositionRequest,
+							validateMotorPositionRequest);
 	// camera stream handlers need the class for context since they must modify _open_streams
 	this->addMessageHandler(
 		CAMERA_STREAM_OPEN_REQ_TYPE,
