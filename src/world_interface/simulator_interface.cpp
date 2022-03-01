@@ -2,13 +2,13 @@
 #include "../Globals.h"
 #include "../Networking/websocket/WebSocketProtocol.h"
 #include "../Util.h"
-#include "../navtypes.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
+#include "../navtypes.h"
 #include "kinematic_common_interface.h"
 #include "world_interface.h"
 
@@ -58,16 +58,23 @@ void sendJSON(const json& obj) {
 	Globals::websocketServer.sendJSON(PROTOCOL_PATH, obj);
 }
 
+static void openCamera(CameraID cam, uint8_t fps = 20, uint16_t width = 640,
+					   uint16_t height = 480) {
+	json msg = {{"type", "simCameraStreamOpenRequest"},
+				{"camera", cam},
+				{"fps", fps},
+				{"width", width},
+				{"height", height}};
+	sendJSON(msg);
+}
+
 void initCameras() {
 	auto cfg = cam::readConfigFromFile(Constants::AR_CAMERA_CONFIG_PATH);
 	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
-
-	json msg = {{"type", "simCameraStreamOpenRequest"},
-				{"camera", Constants::AR_CAMERA_ID},
-				{"fps", 20},
-				{"width", 640},
-				{"height", 480}};
-	sendJSON(msg);
+	openCamera(Constants::AR_CAMERA_ID);
+	openCamera("front");
+	openCamera("rear");
+	openCamera("upperArm");
 }
 
 void handleGPS(json msg) {
