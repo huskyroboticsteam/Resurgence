@@ -3,6 +3,7 @@
 #include "../../Constants.h"
 #include "../../Globals.h"
 #include "../../log.h"
+#include "../../base64/base64_img.h"
 
 #include <functional>
 #include <unordered_map>
@@ -131,7 +132,7 @@ bool validateCameraStreamOpenRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
-	this->_open_streams.insert(cam);
+	this->_open_streams[cam] = 0;
 }
 
 bool validateCameraStreamCloseRequest(const json& j) {
@@ -143,10 +144,36 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	this->_open_streams.erase(cam);
 }
 
+void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam, const std::string& b64_data) {
+	json msg = {{"type", CAMERA_STREAM_REP_TYPE},
+				{"camera", cam},
+				{"data", b64_data}};
+	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+}
+
 void MissionControlProtocol::videoStreamTask() {
 	_streaming_running = true;
 	while (_streaming_running) {
-		for (const CameraID& cam : _open_streams) {
+		// for all open streams, check if there is a new frame
+		for (const auto& stream : _open_streams) {
+			const CameraID& cam = stream.first;
+			const uint32_t& frame_num = stream.second;
+			if (hasNewCameraFrame(cam, frame_num)) {
+				// if there is a new frame, grab it
+				auto data = readCamera(cam).getData();
+				uint32_t& new_frame_num = data.second;
+				cv::Mat& frame = data.first;
+				// update the previous frame number
+				this->_open_streams[cam] = new_frame_num;
+
+				// convert frame to base64 and send it
+				std::string b64_data = base64::encodeMat(frame, "jpg");
+				sendCameraStreamReport(cam, b64_data);
+			}
+
+			if(!_streaming_running) {
+				break;
+			}
 		}
 	}
 }

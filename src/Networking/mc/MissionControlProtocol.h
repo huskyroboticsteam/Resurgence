@@ -7,8 +7,10 @@
 #include <atomic>
 #include <memory>
 #include <unordered_set>
+#include <unordered_map>
 
 namespace mc {
+
 using json = nlohmann::json;
 using websocket::SingleClientWSServer;
 using websocket::WebSocketProtocol;
@@ -23,9 +25,10 @@ private:
 	void videoStreamTask();
 	std::atomic<bool> _streaming_running;
 	SingleClientWSServer& _server;
-	std::unordered_set<CameraID> _open_streams;
+	std::unordered_map<CameraID, uint32_t> _open_streams;
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
+	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
 };
 
 }; // namespace mc
