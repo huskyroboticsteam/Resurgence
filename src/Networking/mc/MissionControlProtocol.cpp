@@ -56,6 +56,7 @@ constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
 constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
 constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
+constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 
 /**
    Check if the given json object has the given key.
@@ -238,6 +239,12 @@ void MissionControlProtocol::videoStreamTask() {
 	}
 }
 
+void MissionControlProtocol::handleConnection(){
+	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE},
+			  {"peripheral", "arm"}};
+	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
+}
+
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams() {
 	this->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
@@ -258,6 +265,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		CAMERA_STREAM_CLOSE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
+	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);

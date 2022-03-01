@@ -35,6 +35,7 @@ private:
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
+	void handleConnection();
 };
 
 }; // namespace mc
