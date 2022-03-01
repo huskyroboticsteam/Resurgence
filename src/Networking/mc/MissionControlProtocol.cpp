@@ -2,12 +2,13 @@
 
 #include "../../Constants.h"
 #include "../../Globals.h"
-#include "../../log.h"
 #include "../../base64/base64_img.h"
+#include "../../log.h"
 
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
+#include <opencv2/core.hpp>
 
 namespace mc {
 
@@ -144,10 +145,9 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	this->_open_streams.erase(cam);
 }
 
-void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam, const std::string& b64_data) {
-	json msg = {{"type", CAMERA_STREAM_REP_TYPE},
-				{"camera", cam},
-				{"data", b64_data}};
+void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
+													const std::string& b64_data) {
+	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
@@ -162,7 +162,7 @@ void MissionControlProtocol::videoStreamTask() {
 				// if there is a new frame, grab it
 				auto data = readCamera(cam).getData();
 				uint32_t& new_frame_num = data.second;
-				cv::Mat& frame = data.first;
+				cv::Mat frame = data.first;
 				// update the previous frame number
 				this->_open_streams[cam] = new_frame_num;
 
@@ -171,7 +171,8 @@ void MissionControlProtocol::videoStreamTask() {
 				sendCameraStreamReport(cam, b64_data);
 			}
 
-			if(!_streaming_running) {
+			// break out of the loop if we should stop streaming
+			if (!_streaming_running) {
 				break;
 			}
 		}
@@ -196,6 +197,13 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		CAMERA_STREAM_CLOSE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
+}
+
+MissionControlProtocol::~MissionControlProtocol() {
+	this->_streaming_running = false;
+	if(this->_streaming_thread.joinable()){
+		this->_streaming_thread.join();
+	}
 }
 
 ///// UTILITY FUNCTIONS //////
