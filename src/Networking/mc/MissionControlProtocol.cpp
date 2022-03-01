@@ -225,7 +225,7 @@ void MissionControlProtocol::videoStreamTask() {
 				this->_open_streams[cam] = new_frame_num;
 
 				// convert frame to base64 and send it
-				std::string b64_data = base64::encodeMat(frame, "jpg");
+				std::string b64_data = base64::encodeMat(frame, ".jpg");
 				sendCameraStreamReport(cam, b64_data);
 			}
 
