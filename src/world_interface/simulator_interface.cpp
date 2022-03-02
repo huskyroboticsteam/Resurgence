@@ -28,6 +28,18 @@ using namespace robot::types;
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
 const DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
+const std::map<motorid_t, std::string> motorNameMap = {
+	{motorid_t::frontLeftWheel, "frontLeftWheel"},
+	{motorid_t::frontRightWheel, "frontRightWheel"},
+	{motorid_t::rearLeftwheel, "rearLeftwheel"},
+	{motorid_t::rearRightWheel, "rearRightWheel"},
+	{motorid_t::armBase, "armBase"},
+	{motorid_t::shoulder, "shoulder"},
+	{motorid_t::elbow, "elbow"},
+	{motorid_t::forearm, "forearm"},
+	{motorid_t::differentialRight, "differentialRight"},
+	{motorid_t::differentialLeft, "differentialLeft"},
+	{motorid_t::hand, "hand"}};
 
 DataPoint<double> lastHeading;
 std::mutex headingMutex;
@@ -251,10 +263,10 @@ double setCmdVel(double dtheta, double dx) {
 	}
 
 	setCmdVelToIntegrate(wheelVels);
-	setMotorPWM("frontLeftWheel", lPWM);
-	setMotorPWM("rearLeftWheel", lPWM);
-	setMotorPWM("frontRightWheel", rPWM);
-	setMotorPWM("rearRightWheel", rPWM);
+	setMotorPower(motorid_t::frontLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
@@ -286,14 +298,15 @@ URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
 
-void setMotorPWM(const std::string& motor, double normalizedPWM) {
-	json msg = {{"type", "simMotorPowerRequest"}, {"motor", motor}, {"power", normalizedPWM}};
+void setMotorPower(motorid_t motor, double normalizedPWM) {
+	std::string name = motorNameMap.at(motor);
+	json msg = {{"type", "simMotorPowerRequest"}, {"motor", name}, {"power", normalizedPWM}};
 	sendJSON(msg);
 }
 
-void setMotorPos(const std::string& motor, int32_t targetPos) {
-	json msg = {
-		{"type", "simMotorPositionRequest"}, {"motor", motor}, {"position", targetPos}};
+void setMotorPos(motorid_t motor, int32_t targetPos) {
+	std::string name = motorNameMap.at(motor);
+	json msg = {{"type", "simMotorPositionRequest"}, {"motor", name}, {"position", targetPos}};
 	sendJSON(msg);
 }
 

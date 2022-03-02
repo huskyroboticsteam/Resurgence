@@ -148,19 +148,20 @@ void setIndicator(types::indication_t signal);
 /**
  * @brief Set the PWM command of the given motor.
  *
- * @param motor The name of the motor. Must be a valid motor name.
- * @param normalizedPWM The PWM command, in the range [-1, 1]
+ * @param motor The motor to set the PWM of.
+ * @param power The power command, in the range [-1, 1]
  */
-void setMotorPWM(const std::string& motor, double normalizedPWM);
+void setMotorPower(robot::types::motorid_t motor, double power);
 
 /**
- * @brief Set the target position of the motor.
+ * @brief Set the target position of the motor. This will have no effect if the motor
+ * does not support PID.
  *
- * @param motor The name of the motor. Must be a valid motor name.
+ * @param motor The motor to set the target position of.
  * @param targetPos The target position, in millidegrees. Refer to the specific motor for more
  * information.
  */
-void setMotorPos(const std::string& motor, int32_t targetPos);
+void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
 
 } // namespace robot
 

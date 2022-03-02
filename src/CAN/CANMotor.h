@@ -19,6 +19,8 @@ void setMotorMode(deviceserial_t serial, motormode_t mode);
 
 void setMotorPower(deviceserial_t serial, double power);
 
+void setMotorPower(deviceserial_t serial, int16_t power);
+
 void setMotorPIDTarget(deviceserial_t serial, int32_t target);
 
 int32_t getMotorPosition(deviceserial_t serial);

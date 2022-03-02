@@ -99,7 +99,7 @@ void recieveThreadFn() {
 		} else {
 			// this device has no existing data, so insert a new device map
 			auto mutexPtr = std::make_shared<std::shared_mutex>();
-			auto deviceMapPtr = std::make_shared<std::map<telemtype_t, int32_t>>();
+			auto deviceMapPtr = std::make_shared<std::map<telemetrycode_t, int32_t>>();
 			deviceMapPtr->emplace(telemCode, telemData);
 			// acquire write lock of the entire map to insert a new device map
 			std::unique_lock mapLock(telemMapMutex);

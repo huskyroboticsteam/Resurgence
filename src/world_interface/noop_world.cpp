@@ -36,7 +36,7 @@ URCLeg getLeg(int /*id*/) {
 	return URCLeg{-1, -1, {0., 0., 0.}};
 }
 
-void setMotorPWM(const std::string& motor, double normalizedPWM) {}
+void setMotorPower(const std::string& motor, double normalizedPWM) {}
 
 void setMotorPos(const std::string& motor, int32_t targetPos) {}
 

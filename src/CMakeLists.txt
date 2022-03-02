@@ -149,7 +149,7 @@ list(APPEND camera_src
 
 # The CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
-add_library(hindsight_can SHARED
+list(APPEND hindsight_can_src
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/CANMotorUnit.c
@@ -161,27 +161,29 @@ add_library(real_base_station SHARED
 
 add_library(stub_world_interface STATIC
   world_interface/noop_world.cpp)
-add_library(real_world_interface STATIC
-  world_interface/real_world_interface.cpp
-  lidar/read_hokuyo_lidar.cpp
+
+list(APPEND common_world_interface_src
+  world_interface/gps_common_interface.cpp
+  world_interface/kinematic_common_interface.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  gps/usb_gps/read_usb_gps.cpp
   base64/base64_img.cpp
   ${camera_src}
+)
+
+add_library(real_world_interface STATIC
+  world_interface/real_world_constants.cpp
+  world_interface/real_world_interface.cpp
+  lidar/read_hokuyo_lidar.cpp
+  gps/usb_gps/read_usb_gps.cpp
+  ${common_world_interface_src}
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
-  ar/Detector.cpp
-  ar/MarkerSet.cpp
-  ar/MarkerPattern.cpp
-  ar/Tag.cpp
-  ar/read_landmarks.cpp
-  base64/base64_img.cpp
-  ${camera_src}
+  ${common_world_interface_src}
   )
 target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(real_world_interface ${vision_libs})
@@ -216,16 +218,10 @@ add_library(rover_common SHARED
   log.cpp
   rospub.cpp
   base64/base64.cpp
-  Networking/ParseBaseStation.cpp
-  Networking/IK.cpp
-  Networking/ParseCAN.cpp
-  Networking/motor_interface.cpp
   Networking/websocket/WebSocketServer.cpp
   Networking/websocket/WebSocketProtocol.cpp
   Util.cpp
   gps/gps_util.cpp
-  world_interface/gps_common_interface.cpp
-  world_interface/kinematic_common_interface.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
@@ -237,13 +233,11 @@ add_library(rover_common SHARED
 
 list(APPEND rover_libs
   rover_common
-  hindsight_can
   Threads::Threads
   hr_slam
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
   nlohmann_json::nlohmann_json)
-# target_link_libraries(Rover ${rover_libs})
 target_link_libraries(Rover
   ${rover_libs} real_base_station)
 
@@ -265,28 +259,37 @@ target_link_libraries(Rover ${vision_libs})
 # Stub CAN interface is used for the tests (and for the Rover if
 # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
 # enabled.
-if(WITH_CAN)
-  add_library(real_can_interface STATIC
-	log.cpp
-	Networking/CANUtils.cpp)
-endif()
-add_library(stub_can_interface STATIC
-  log.cpp
-  Networking/CANStubs.cpp)
 
-# Link the appropriate CAN interface to the Rover executable.
+# Common CAN source files
+list(APPEND can_interface_src
+  log.cpp
+  CAN/CANMotor_PSOC.cpp
+  CAN/CANMotor.cpp
+  CAN/CANUtils.cpp
+  ${hindsight_can_src}
+)
+
+# Hardware specific source files
 if(WITH_CAN)
-  target_link_libraries(Rover real_can_interface)
+  list(APPEND can_interface_src
+  CAN/CAN.cpp)
 else()
-  target_link_libraries(Rover stub_can_interface)
+  list(APPEND can_interface_src
+  CAN/CANStubs.cpp)
 endif()
+
+# Link the CAN interface to the Rover executable.
+add_library(can_interface SHARED
+  ${can_interface_src})
+target_link_libraries(Rover can_interface)
 
 if(WITH_CAN)
   add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID ${rover_libs}
-	real_base_station
-	real_can_interface
-	${real_world_libs}
+  target_link_libraries(TunePID 
+    ${rover_libs}
+    can_interface
+	  real_base_station
+	  ${real_world_libs}
 	)
   target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
 endif()
@@ -314,8 +317,8 @@ if(WITH_TESTS)
     ../tests/worldmap/QuadTreeTest.cpp)
 
   target_link_libraries(tests
+    can_interface
     ${rover_libs}
-    stub_can_interface
     ${real_world_libs}
     ${OpenCV_LIBS})
   include(CTest)
@@ -330,4 +333,4 @@ target_link_libraries(gpsd_test gps)
 
 add_subdirectory(ar)
 add_subdirectory(camera)
-add_subdirectory(Networking)
+add_subdirectory(CAN)

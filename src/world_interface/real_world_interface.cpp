@@ -1,3 +1,6 @@
+#include "../CAN/CAN.h"
+#include "../CAN/CANMotor.h"
+#include "../CAN/CANUtils.h"
 #include "../Globals.h"
 #include "../Networking/CANUtils.h"
 #include "../Networking/ParseCAN.h"
@@ -10,19 +13,17 @@
 #include "../log.h"
 #include "../navtypes.h"
 #include "kinematic_common_interface.h"
+#include "real_world_constants.h"
 #include "world_interface.h"
 
 #include <future>
 #include <iostream>
 #include <map>
 #include <set>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 #include <opencv2/calib3d.hpp>
-
-extern "C" {
-#include "../HindsightCAN/CANMotorUnit.h"
-}
 
 using nlohmann::json;
 using namespace navtypes;
@@ -32,8 +33,39 @@ namespace robot {
 
 const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
+namespace {
 // map that associates camera id to the camera object
-static std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+
+std::map<motorid_t, can::motormode_t> motorModeMap;
+
+void ensureMotorMode(motorid_t motor, can::motormode_t mode) {
+	auto entry = motorModeMap.find(motor);
+	if (entry == motorModeMap.end()) {
+		motorModeMap.insert(std::make_pair(motor, mode));
+	} else if (entry->second != mode) {
+		entry->second = mode;
+		can::motor::setMotorMode(motorSerialIDMap.at(motor), mode);
+	}
+}
+
+void initMotors() {
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontLeftWheel));
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontRightWheel));
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftwheel));
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
+
+	for (motorid_t motor : pidMotors) {
+		can::deviceserial_t serial = motorSerialIDMap.at(motor);
+		bool invEnc = motorEncInvMap.at(motor);
+		pidcoef_t pid = motorPIDMap.at(motor);
+		uint32_t ppjr = motorPulsesPerJointRevMap.at(motor);
+		can::motor::initMotor(serial, invEnc, true, ppjr, TELEM_PERIOD, pid.kP, pid.kI,
+							  pid.kD);
+	}
+
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
+}
 
 void setupCameras() {
 	try {
@@ -47,6 +79,7 @@ void setupCameras() {
 
 	// Set up the rest of the cameras here
 }
+} // namespace
 
 void world_interface_init() {
 	setupCameras();
@@ -54,6 +87,9 @@ void world_interface_init() {
 	bool gps_success = gps::usb::startGPSThread();
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
+
+	can::initCAN();
+	initMotors();
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
@@ -158,13 +194,13 @@ double setCmdVel(double dtheta, double dx) {
 	CANPacket p;
 	uint8_t motor_group = 0x04;
 	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_FL, left_pwm);
-	sendCANPacket(p);
+	can::sendCANPacket(p);
 	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_FR, right_pwm);
-	sendCANPacket(p);
+	can::sendCANPacket(p);
 	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_BL, left_pwm);
-	sendCANPacket(p);
+	can::sendCANPacket(p);
 	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_BR, right_pwm);
-	sendCANPacket(p);
+	can::sendCANPacket(p);
 
 	return scale_down_factor;
 }
@@ -193,40 +229,43 @@ URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
 
-const std::map<std::string, double> positive_arm_pwm_scales = {
-	{"arm_base", 12000}, {"shoulder", -20000}, {"elbow", -32768}, {"forearm", -6000},
-	{"diffleft", 5000},	 {"diffright", -5000}, {"hand", 15000}};
-const std::map<std::string, double> negative_arm_pwm_scales = {
-	{"arm_base", 12000}, {"shoulder", -14000},	{"elbow", -18000}, {"forearm", -6000},
-	{"diffleft", 5000},	 {"diffright", -10000}, {"hand", 15000}};
-const std::map<std::string, double> incremental_pid_scales = {
-	{"arm_base", M_PI / 8}, // TODO: Check signs
-	{"shoulder", -M_PI / 8},
-	{"elbow", -M_PI / 8},
-	{"forearm", 0}, // We haven't implemented PID on these motors yet
-	{"diffleft", 0},
-	{"diffright", 0},
-	{"hand", 0}};
+const std::map<motorid_t, double> positive_arm_pwm_scales = {
+	{motorid_t::armBase, 0.1831},
+	{motorid_t::shoulder, -0.3052},
+	{motorid_t::elbow, -0.5},
+	{motorid_t::forearm, -0.0916},
+	{motorid_t::differentialLeft, 0.0763},
+	{motorid_t::differentialRight, -0.0763},
+	{motorid_t::hand, 0.2289}};
+const std::map<motorid_t, double> negative_arm_pwm_scales = {
+	{motorid_t::armBase, 0.1831},
+	{motorid_t::shoulder, -0.2136},
+	{motorid_t::elbow, -0.2747},
+	{motorid_t::forearm, -0.0916},
+	{motorid_t::differentialLeft, 0.0763},
+	{motorid_t::differentialRight, -0.1526},
+	{motorid_t::hand, 0.2289}};
 
 template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 	auto itr = std::find(vec.begin(), vec.end(), val);
 	return itr == vec.end() ? -1 : itr - vec.begin();
 }
 
-void setMotorPWM(const std::string& motor, double normalizedPWM) {
-	CANPacket p;
-	auto& scale_map = (normalizedPWM > 0 ? positive_arm_pwm_scales : negative_arm_pwm_scales);
-	double pwm = normalizedPWM * scale_map.at(motor);
-	int motor_serial = getIndex(motor_group, motor);
-	AssemblePWMDirSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, pwm);
-	sendCANPacket(p);
+void setMotorPower(robot::types::motorid_t motor, double power) {
+	can::deviceserial_t serial = motorSerialIDMap.at(motor);
+	auto& scaleMap = power < 0 ? negative_arm_pwm_scales : positive_arm_pwm_scales;
+	auto entry = scaleMap.find(motor);
+	if (entry != scaleMap.end()) {
+		power *= entry->second;
+	}
+	ensureMotorMode(motor, can::motormode_t::pwm);
+	can::motor::setMotorPower(serial, power);
 }
 
-void setMotorPos(const std::string& motor, int32_t targetPos) {
-	CANPacket p;
-	int motor_serial = getIndex(motor_group, motor);
-	AssemblePIDTargetSetPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, motor_serial, targetPos);
-	sendCANPacket(p);
+void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
+	can::deviceserial_t serial = motorSerialIDMap.at(motor);
+	ensureMotorMode(motor, can::motormode_t::pid);
+	can::motor::setMotorPIDTarget(serial, targetPos);
 }
 
 // TODO: implement

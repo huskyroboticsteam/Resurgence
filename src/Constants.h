@@ -37,20 +37,6 @@ const robot::types::CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with r
 constexpr uint16_t PLANVIZ_SERVER_PORT = 9002;
 constexpr uint16_t WS_SERVER_PORT = 3001;
 
-const std::map<robot::types::motorid_t, std::string> motorNameMap = {
-	{robot::types::motorid_t::frontLeftWheel, "frontLeftWheel"},
-	{robot::types::motorid_t::frontRightWheel, "frontRightWheel"},
-	{robot::types::motorid_t::rearLeftwheel, "rearLeftwheel"},
-	{robot::types::motorid_t::rearRightWheel, "rearRightWheel"},
-	{robot::types::motorid_t::armBase, "armBase"},
-	{robot::types::motorid_t::shoulder, "shoulder"},
-	{robot::types::motorid_t::elbow, "elbow"},
-	{robot::types::motorid_t::forearm, "forearm"},
-	{robot::types::motorid_t::differentialRight, "differentialRight"},
-	{robot::types::motorid_t::differentialLeft, "differentialLeft"},
-	{robot::types::motorid_t::hand, "hand"}
-};
-
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
 const double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
