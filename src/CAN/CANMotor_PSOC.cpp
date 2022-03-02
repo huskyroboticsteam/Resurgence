@@ -4,7 +4,9 @@
 
 #include <chrono>
 #include <cmath>
+#include <condition_variable>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <vector>
 
@@ -15,36 +17,64 @@ extern "C" {
 }
 
 using namespace std::chrono_literals;
+using std::chrono::milliseconds;
 
 namespace can::motor {
 
 namespace {
-constexpr std::chrono::milliseconds TELEMETRY_PERIOD = 100ms;
+using clock = std::chrono::steady_clock;
+using timepoint_t = std::chrono::time_point<clock>;
 
-std::vector<deviceserial_t> telemetryMotors;
+struct telemschedule_t {
+	timepoint_t nextSendTime;
+	milliseconds telemPeriod;
+	deviceserial_t serial;
+};
+
+bool operator<(const telemschedule_t& t1, const telemschedule_t& t2) {
+	return t1.nextSendTime < t2.nextSendTime;
+}
+
+std::priority_queue<telemschedule_t> telemetrySchedule;
 bool startedMotorThread = false;
+bool newMotorAdded = false;
+std::condition_variable motorsCV;
 std::mutex motorsMutex; // protects both motor list and motor flag
 
 void motorThreadFn() {
 	while (true) {
-		{
-			std::lock_guard lock(motorsMutex);
-			for (deviceserial_t serial : telemetryMotors) {
-				pullMotorPosition(serial);
+		std::unique_lock lock(motorsMutex);
+		if (telemetrySchedule.empty()) {
+			motorsCV.wait(lock, [] { return newMotorAdded; });
+			newMotorAdded = false;
+		} else {
+			auto now = clock::now();
+			auto ts = telemetrySchedule.top();
+			if (ts.nextSendTime <= now) {
+				telemetrySchedule.pop();
+				pullMotorPosition(ts.serial);
+				telemetrySchedule.push(
+					{ts.nextSendTime + ts.telemPeriod, ts.telemPeriod, ts.serial});
+			} else {
+				motorsCV.wait_until(lock, ts.nextSendTime, [] { return newMotorAdded; });
+				newMotorAdded = false;
 			}
 		}
-		std::this_thread::sleep_for(TELEMETRY_PERIOD);
 	}
 }
 
-void startMonitoringMotor(deviceserial_t motor) {
-	std::lock_guard lock(motorsMutex);
-	if (!startedMotorThread) {
-		startedMotorThread = true;
-		std::thread motorThread(motorThreadFn);
-		motorThread.detach();
+void startMonitoringMotor(deviceserial_t motor, std::chrono::milliseconds period) {
+	{
+		std::unique_lock lock(motorsMutex);
+		if (!startedMotorThread) {
+			startedMotorThread = true;
+			std::thread motorThread(motorThreadFn);
+			motorThread.detach();
+		}
+		telemetrySchedule.push({clock::now(), period, motor});
+		newMotorAdded = true;
 	}
-	telemetryMotors.push_back(motor);
+	motorsCV.notify_one();
 }
 } // namespace
 
@@ -64,9 +94,8 @@ void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 	AssembleEncoderPPJRSetPacket(&p, motorGroupCode, serial, pulsesPerJointRev);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
-	// TODO: change the setup to allow for different periods for each motor
 	if (telemetryPeriod != 0ms) {
-		startMonitoringMotor(serial);
+		startMonitoringMotor(serial, telemetryPeriod);
 	}
 }
 
