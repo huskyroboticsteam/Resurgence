@@ -1,0 +1,122 @@
+#include "CAN.h"
+#include "CANMotor.h"
+#include "CANUtils.h"
+
+#include <chrono>
+#include <cmath>
+#include <mutex>
+#include <thread>
+#include <vector>
+
+extern "C" {
+#include "../HindsightCAN/CANCommon.h"
+#include "../HindsightCAN/CANMotorUnit.h"
+#include "../HindsightCAN/CANPacket.h"
+}
+
+using namespace std::chrono_literals;
+
+namespace can::motor {
+
+namespace {
+constexpr std::chrono::milliseconds TELEMETRY_PERIOD = 100ms;
+
+std::vector<deviceserial_t> telemetryMotors;
+bool startedMotorThread = false;
+std::mutex motorsMutex; // protects both motor list and motor flag
+
+void motorThreadFn() {
+	while (true) {
+		{
+			std::lock_guard lock(motorsMutex);
+			for (deviceserial_t serial : telemetryMotors) {
+				pullMotorPosition(serial);
+			}
+		}
+		std::this_thread::sleep_for(TELEMETRY_PERIOD);
+	}
+}
+
+void startMonitoringMotor(deviceserial_t motor) {
+	std::lock_guard lock(motorsMutex);
+	if (!startedMotorThread) {
+		startedMotorThread = true;
+		std::thread motorThread(motorThreadFn);
+		motorThread.detach();
+	}
+	telemetryMotors.push_back(motor);
+}
+} // namespace
+
+void initMotor(deviceserial_t serial) {
+	setMotorMode(serial, motormode_t::pwm);
+	std::this_thread::sleep_for(1000us);
+}
+
+void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
+			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod) {
+	initMotor(serial);
+	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);
+	CANPacket p;
+	AssembleEncoderInitializePacket(&p, motorGroupCode, serial, 0, invertEncoder, zeroEncoder);
+	sendCANPacket(p);
+	std::this_thread::sleep_for(1000us);
+	AssembleEncoderPPJRSetPacket(&p, motorGroupCode, serial, pulsesPerJointRev);
+	sendCANPacket(p);
+	std::this_thread::sleep_for(1000us);
+	// TODO: change the setup to allow for different periods for each motor
+	if (telemetryPeriod != 0ms) {
+		startMonitoringMotor(serial);
+	}
+}
+
+void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
+			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod,
+			   int32_t kP, int32_t kI, int32_t kD) {
+	initMotor(serial, invertEncoder, zeroEncoder, pulsesPerJointRev, telemetryPeriod);
+	CANPacket p;
+	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);
+	AssemblePSetPacket(&p, motorGroupCode, serial, kP);
+	sendCANPacket(p);
+	AssembleISetPacket(&p, motorGroupCode, serial, kI);
+	sendCANPacket(p);
+	AssembleDSetPacket(&p, motorGroupCode, serial, kD);
+	sendCANPacket(p);
+	std::this_thread::sleep_for(1000us);
+}
+
+void setMotorMode(deviceserial_t serial, motormode_t mode) {
+	CANPacket p;
+	AssembleModeSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial,
+						  static_cast<uint8_t>(mode));
+	sendCANPacket(p);
+}
+
+void setMotorPower(deviceserial_t serial, double power) {
+	power = std::min(std::max(power, -1.0), 1.0);
+	int powerInt = std::round(power * ((1 << 16) - 1));
+	int16_t dutyCycle = static_cast<int16_t>(powerInt);
+
+	CANPacket p;
+	AssemblePWMDirSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, dutyCycle);
+	sendCANPacket(p);
+}
+
+void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
+	CANPacket p;
+	AssemblePIDTargetSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, target);
+	sendCANPacket(p);
+}
+
+int32_t getMotorPosition(deviceserial_t serial) {
+	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle)
+		.value_or(0);
+}
+
+void pullMotorPosition(deviceserial_t serial) {
+	CANPacket p;
+	AssembleTelemetryPullPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial,
+								static_cast<uint8_t>(telemtype_t::angle));
+	sendCANPacket(p);
+}
+} // namespace can::motor
