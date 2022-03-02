@@ -3,6 +3,7 @@
 #include "CAN.h"
 
 #include <chrono>
+#include <cmath>
 #include <map>
 #include <thread>
 
@@ -30,6 +31,7 @@ deviceid_t getDeviceGroupAndSerial(const CANPacket& packet) {
 
 void initMotor(deviceserial_t serial) {
 	setMotorMode(serial, motormode_t::pwm);
+	std::this_thread::sleep_for(1000us);
 }
 
 void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
@@ -69,6 +71,21 @@ void setMotorMode(deviceserial_t serial, motormode_t mode) {
 	AssembleModeSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial,
 						  static_cast<uint8_t>(mode));
 	sendCANPacket(p);
-	std::this_thread::sleep_for(1000us);
+}
+
+void setMotorPower(deviceserial_t serial, double power) {
+	power = std::min(std::max(power, -1.0), 1.0);
+	int powerInt = std::round(power * ((1 << 16) - 1));
+	int16_t dutyCycle = static_cast<int16_t>(powerInt);
+
+	CANPacket p;
+	AssemblePWMDirSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, dutyCycle);
+	sendCANPacket(p);
+}
+
+void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
+	CANPacket p;
+	AssemblePIDTargetSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, target);
+	sendCANPacket(p);
 }
 } // namespace can

@@ -49,4 +49,8 @@ void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 			   int32_t kP, int32_t kI, int32_t kD);
 
 void setMotorMode(deviceserial_t serial, motormode_t mode);
+
+void setMotorPower(deviceserial_t serial, double power);
+
+void setMotorPIDTarget(deviceserial_t serial, int32_t target);
 } // namespace can
