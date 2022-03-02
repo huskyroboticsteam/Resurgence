@@ -98,13 +98,13 @@ static bool validateDriveRequest(const json& j) {
 }
 
 static void handleDriveRequest(const json& j) {
-	// fit straight and steer to unit circle; i.e. scale each such that <straight, steer> is a
-	// unit vector
+	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
+	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
 	double steer = j["steer"];
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
-	double dx = Constants::MAX_WHEEL_VEL * (norm > 1e-6 ? straight / norm : straight);
-	double dtheta = Constants::MAX_DTHETA * (norm > 1e-6 ? -steer / norm : steer);
+	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
+	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? -steer / norm : steer);
 	log(LOG_INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
 		dtheta, dx);
 	setCmdVel(dtheta, dx);
