@@ -3,6 +3,7 @@
 extern "C" {
 #include "../HindsightCAN/CANPacket.h"
 #include "../HindsightCAN/CANMotorUnit.h"
+#include "../HindsightCAN/CANCommon.h"
 }
 
 #include <chrono>
@@ -25,8 +26,26 @@ enum class motormode_t {
 	pid = MOTOR_UNIT_MODE_PID
 };
 
+enum class telemtype_t {
+	voltage = PACKET_TELEMETRY_VOLTAGE,
+	current = PACKET_TELEMETRY_CURRENT,
+	pwr_rail = PACKET_TELEMETRY_PWR_RAIL_STATE,
+	temp = PACKET_TELEMETRY_TEMPERATURE,
+	angle = PACKET_TELEMETRY_ANG_POSITION,
+	gps_lat = PACKET_TELEMETRY_GPS_LAT,
+	gps_lon = PACKET_TELEMETRY_GPS_LON,
+	mag_dir = PACKET_TELEMETRY_MAG_DIR,
+	accel_x = PACKET_TELEMETRY_ACCEL_X,
+	accel_y = PACKET_TELEMETRY_ACCEL_Y,
+	accel_z = PACKET_TELEMETRY_ACCEL_Z,
+	gyro_x = PACKET_TELEMETRY_GYRO_X,
+	gyro_y = PACKET_TELEMETRY_GYRO_Y,
+	gyro_z = PACKET_TELEMETRY_GYRO_Z,
+	limit_switch = PACKET_TELEMETRY_LIM_SW_STATE
+	// TODO: add further telemetry types if required
+};
+
 using deviceserial_t = uint8_t;
-using telemtype_t = uint8_t; // TODO: convert to enum
 using telemetry_t = int32_t;
 
 using deviceid_t = std::pair<devicegroup_t, deviceserial_t>;
@@ -53,4 +72,6 @@ void setMotorMode(deviceserial_t serial, motormode_t mode);
 void setMotorPower(deviceserial_t serial, double power);
 
 void setMotorPIDTarget(deviceserial_t serial, int32_t target);
+
+int32_t getMotorPosition(deviceserial_t serial);
 } // namespace can

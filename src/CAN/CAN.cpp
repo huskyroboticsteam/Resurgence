@@ -29,8 +29,12 @@ int can_fd;
 sockaddr_can can_addr;
 std::mutex socketMutex; // protects both can_fd and can_addr
 
+using telemetrycode_t = uint8_t;
+
+// the telemetry map will store telemetry code instead of telem enum
+// this means unrecognized telemetry types won't cause UB
 using protectedmap_t = std::pair<std::shared_ptr<std::shared_mutex>,
-								 std::shared_ptr<std::map<telemtype_t, int32_t>>>;
+								 std::shared_ptr<std::map<telemetrycode_t, int32_t>>>;
 
 std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
@@ -78,7 +82,7 @@ void recieveThreadFn() {
 
 		// extract necessary information
 		deviceid_t id = getDeviceGroupAndSerial(packet);
-		telemtype_t telemType = DecodeTelemetryType(&packet);
+		telemetrycode_t telemCode = DecodeTelemetryType(&packet);
 		int32_t telemData = DecodeTelemetryDataSigned(&packet);
 
 		// check if telemetry data is alread in map
@@ -91,12 +95,12 @@ void recieveThreadFn() {
 			// acquire write lock of the map for this device
 			std::unique_lock deviceLock(deviceMutex);
 			// insert telemetry data
-			deviceMap.insert(std::make_pair(telemType, telemData));
+			deviceMap.insert(std::make_pair(telemCode, telemData));
 		} else {
 			// this device has no existing data, so insert a new device map
 			auto mutexPtr = std::make_shared<std::shared_mutex>();
 			auto deviceMapPtr = std::make_shared<std::map<telemtype_t, int32_t>>();
-			deviceMapPtr->emplace(telemType, telemData);
+			deviceMapPtr->emplace(telemCode, telemData);
 			// acquire write lock of the entire map to insert a new device map
 			std::unique_lock mapLock(telemMapMutex);
 			telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
@@ -168,7 +172,7 @@ std::optional<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemTy
 		auto& devMutex = *entry->second.first;
 		auto& devMap = *entry->second.second;
 		std::shared_lock deviceLock(devMutex);
-		auto telemEntry = devMap.find(telemType);
+		auto telemEntry = devMap.find(static_cast<telemetrycode_t>(telemType));
 		if (telemEntry != devMap.end()) {
 			return telemEntry->second;
 		} else {

@@ -45,6 +45,8 @@ void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 	AssembleEncoderPPJRSetPacket(&p, motorGroupCode, serial, pulsesPerJointRev);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
+	// TODO: are timing packets supported? If not we'll need to constantly poll them with
+	// telemetry pull packets
 	AssembleTelemetryTimingPacket(&p, motorGroupCode, serial, PACKET_TELEMETRY_ANG_POSITION,
 								  telemetryPeriod.count());
 	sendCANPacket(p);
@@ -87,5 +89,10 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 	CANPacket p;
 	AssemblePIDTargetSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, target);
 	sendCANPacket(p);
+}
+
+int32_t getMotorPosition(deviceserial_t serial) {
+	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle)
+		.value_or(0);
 }
 } // namespace can
