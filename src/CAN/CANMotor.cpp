@@ -62,8 +62,7 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 	sendCANPacket(p);
 }
 
-int32_t getMotorPosition(deviceserial_t serial) {
-	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle)
-		.value_or(0);
+robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
+	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle);
 }
 } // namespace can::motor

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CANUtils.h"
+#include "../world_interface/data.h"
 
 #include <optional>
 
@@ -14,6 +15,6 @@ void initCAN();
 
 void sendCANPacket(const CANPacket& packet);
 
-std::optional<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType);
+robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType);
 
 } // namespace can

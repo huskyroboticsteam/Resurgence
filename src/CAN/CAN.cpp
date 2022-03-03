@@ -23,6 +23,8 @@ extern "C" {
 #include "../HindsightCAN/CANCommon.h"
 }
 
+using robot::types::DataPoint;
+
 namespace can {
 namespace {
 int can_fd;
@@ -34,7 +36,7 @@ using telemetrycode_t = uint8_t;
 // the telemetry map will store telemetry code instead of telem enum
 // this means unrecognized telemetry types won't cause UB
 using protectedmap_t = std::pair<std::shared_ptr<std::shared_mutex>,
-								 std::shared_ptr<std::map<telemetrycode_t, int32_t>>>;
+								 std::shared_ptr<std::map<telemetrycode_t, DataPoint<telemetry_t>>>>;
 
 std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
@@ -83,7 +85,8 @@ void recieveThreadFn() {
 		// extract necessary information
 		deviceid_t id = getDeviceGroupAndSerial(packet);
 		telemetrycode_t telemCode = DecodeTelemetryType(&packet);
-		int32_t telemData = DecodeTelemetryDataSigned(&packet);
+		telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
+		DataPoint<telemetry_t> data(telemData);
 
 		// check if telemetry data is alread in map
 		if (mapHasKey(telemMapMutex, telemMap, id)) {
@@ -95,12 +98,12 @@ void recieveThreadFn() {
 			// acquire write lock of the map for this device
 			std::unique_lock deviceLock(deviceMutex);
 			// insert telemetry data
-			deviceMap.insert(std::make_pair(telemCode, telemData));
+			deviceMap.insert(std::make_pair(telemCode, data));
 		} else {
 			// this device has no existing data, so insert a new device map
 			auto mutexPtr = std::make_shared<std::shared_mutex>();
-			auto deviceMapPtr = std::make_shared<std::map<telemetrycode_t, int32_t>>();
-			deviceMapPtr->emplace(telemCode, telemData);
+			auto deviceMapPtr = std::make_shared<std::map<telemetrycode_t, DataPoint<telemetry_t>>>();
+			deviceMapPtr->emplace(telemCode, data);
 			// acquire write lock of the entire map to insert a new device map
 			std::unique_lock mapLock(telemMapMutex);
 			telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
@@ -165,7 +168,7 @@ void sendCANPacket(const CANPacket& packet) {
 	}
 }
 
-std::optional<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
+robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
 	std::shared_lock mapLock(telemMapMutex);
 	auto entry = telemMap.find(id);
 	if (entry != telemMap.end()) {

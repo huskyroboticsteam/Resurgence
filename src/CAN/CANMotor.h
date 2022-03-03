@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CANUtils.h"
+#include "../world_interface/data.h"
 
 #include <chrono>
 
@@ -23,7 +24,7 @@ void setMotorPower(deviceserial_t serial, int16_t power);
 
 void setMotorPIDTarget(deviceserial_t serial, int32_t target);
 
-int32_t getMotorPosition(deviceserial_t serial);
+robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial);
 
 void pullMotorPosition(deviceserial_t serial);
 } // namespace can::motor
