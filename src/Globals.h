@@ -5,6 +5,7 @@
 #include "Networking/websocket/WebSocketServer.h"
 
 #include <vector>
+#include <atomic>
 
 #include <nlohmann/json.hpp>
 
@@ -35,6 +36,6 @@ extern nlohmann::json status_data;
 extern nlohmann::json motor_status;
 extern websocket::SingleClientWSServer websocketServer;
 // TODO(evan): make these atomic
-extern bool E_STOP;
-extern bool AUTONOMOUS;
+extern std::atomic<bool> E_STOP;
+extern std::atomic<bool> AUTONOMOUS;
 } // namespace Globals
