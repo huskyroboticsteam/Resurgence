@@ -149,12 +149,13 @@ list(APPEND camera_src
 
 # The CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
-list(APPEND hindsight_can_src
+add_library(hindsight_can STATIC
   HindsightCAN/CANPacket.c
   HindsightCAN/CANCommon.c
   HindsightCAN/CANMotorUnit.c
   HindsightCAN/CANScience.c
-  HindsightCAN/PortFiles/PortTemplate.c)
+  HindsightCAN/PortFiles/PortTemplate.c
+)
 
 add_library(real_base_station SHARED
   Networking/Network.cpp)
@@ -261,26 +262,25 @@ target_link_libraries(Rover ${vision_libs})
 # enabled.
 
 # Common CAN source files
-list(APPEND can_interface_src
+add_library(can_interface SHARED)
+target_sources(can_interface PRIVATE
   log.cpp
   CAN/CANMotor_PSOC.cpp
   CAN/CANMotor.cpp
   CAN/CANUtils.cpp
-  ${hindsight_can_src}
 )
 
 # Hardware specific source files
 if(WITH_CAN)
-  list(APPEND can_interface_src
-  CAN/CAN.cpp)
+  target_sources(can_interface PRIVATE
+    CAN/CAN.cpp)
 else()
-  list(APPEND can_interface_src
-  CAN/CANStubs.cpp)
+  target_sources(can_interface PRIVATE
+    CAN/CANStubs.cpp)
 endif()
+target_link_libraries(can_interface PUBLIC hindsight_can)
 
 # Link the CAN interface to the Rover executable.
-add_library(can_interface SHARED
-  ${can_interface_src})
 target_link_libraries(Rover can_interface)
 
 if(WITH_CAN)
@@ -331,6 +331,10 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
-add_subdirectory(ar)
-add_subdirectory(camera)
-add_subdirectory(CAN)
+if(WITH_CV)
+  add_subdirectory(ar)
+  add_subdirectory(camera)
+endif()
+if(WITH_CAN)
+  add_subdirectory(CAN)
+endif()
