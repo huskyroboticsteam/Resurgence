@@ -14,8 +14,8 @@
 
 #include <future>
 #include <iostream>
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <nlohmann/json.hpp>
 #include <opencv2/calib3d.hpp>
@@ -30,7 +30,7 @@ using namespace navtypes;
 const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
 // map that associates camera id to the camera object
-static std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+static std::unordered_map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 
 void setupCameras() {
 	try {
@@ -51,6 +51,10 @@ void world_interface_init() {
 	bool gps_success = gps::usb::startGPSThread();
 	bool lidar_success = lidar::initializeLidar();
 	bool landmark_success = AR::initializeLandmarkDetection();
+}
+
+std::unordered_set<CameraID> getCameras() {
+	return util::keySet(cameraMap);
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {

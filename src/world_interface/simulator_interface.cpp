@@ -17,6 +17,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include <unordered_map>
 
 #include <nlohmann/json.hpp>
 #include <opencv2/core.hpp>
@@ -41,14 +42,14 @@ DataPoint<pose_t> lastTruePose;
 std::mutex truePoseMutex;
 
 // stores the last camera frame for each camera
-std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
+std::unordered_map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // stores the index of the last camera frame for each camera
 // cameraFrameMap is not guaranteed to have valid data points,
 // but this one is guaranteed to have indices, if there are any
-std::map<CameraID, uint32_t> cameraLastFrameIdxMap;
+std::unordered_map<CameraID, uint32_t> cameraLastFrameIdxMap;
 std::shared_mutex cameraFrameMapMutex; // protects both of the above maps
 // not modified after startup, no need to synchronize
-std::map<CameraID, cam::CameraConfig> cameraConfigMap;
+std::unordered_map<CameraID, cam::CameraConfig> cameraConfigMap;
 
 std::condition_variable connectionCV;
 std::mutex connectionMutex;
@@ -189,6 +190,11 @@ void world_interface_init() {
 	initCameras();
 
 	AR::initializeLandmarkDetection();
+}
+
+std::unordered_set<CameraID> getCameras(){
+	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
+	return util::keySet(cameraLastFrameIdxMap);
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {

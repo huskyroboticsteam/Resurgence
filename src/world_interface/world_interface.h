@@ -5,6 +5,7 @@
 #include "data.h"
 
 #include <optional>
+#include <unordered_set>
 
 // forward declare cam::CameraParams instead of including it
 // we do this to avoid unnecessarily including OpenCV in all build targets
@@ -41,6 +42,14 @@ std::pair<double, double> getCmdVel();
 
 // read measurement from the lidar
 DataPoint<navtypes::points_t> readLidarScan();
+
+/**
+ * @brief Get the IDs of the currently supported cameras.
+ *
+ * @return The IDs of all cameras currently supported by the world interface, as a @ref
+ * std::unordered_set.
+ */
+std::unordered_set<CameraID> getCameras();
 
 /**
  * @brief Check if a new camera frame from the specified camera is available.
