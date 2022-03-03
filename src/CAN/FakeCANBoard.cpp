@@ -1,12 +1,11 @@
 
-#include "CANUtils.h"
 #include "CAN.h"
 #include "CANMotor.h"
+#include "CANUtils.h"
 #include "TestPackets.h"
 
 #include <iostream>
 extern "C" {
-#include "../HindsightCAN/CANMotorUnit.h"
 #include "../HindsightCAN/CANScience.h"
 }
 
@@ -50,7 +49,8 @@ int main() {
 			serial = prompt("Enter motor serial");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
 			std::cout << "got " << serial << " and " << mode << std::endl;
-			can::motor::setMotorMode(serial, static_cast<can::motormode_t>(mode));
+			can::motor::setMotorMode(serial, mode == 0 ? can::motormode_t::pwm
+													   : can::motormode_t::pid);
 		}
 
 		if (test_type == TEST_PWM) {
@@ -74,12 +74,7 @@ int main() {
 			int i_coeff = prompt("I");
 			int d_coeff = prompt("D");
 
-			AssemblePSetPacket(&p, motor_group, (uint8_t)serial, p_coeff);
-			can::sendCANPacket(p);
-			AssembleISetPacket(&p, motor_group, (uint8_t)serial, i_coeff);
-			can::sendCANPacket(p);
-			AssembleDSetPacket(&p, motor_group, (uint8_t)serial, d_coeff);
-			can::sendCANPacket(p);
+			can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
 
 			int angle_target = prompt("Enter PID target (in 1000ths of degrees)");
 			can::motor::setMotorPIDTarget(serial, angle_target);
