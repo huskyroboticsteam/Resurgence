@@ -6,6 +6,8 @@
 #include "../../log.h"
 
 #include <functional>
+#include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -146,9 +148,11 @@ static bool validateCameraStreamOpenRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
-	this->_stream_lock.lock();
-	this->_open_streams[cam] = 0;
-	this->_stream_lock.unlock();
+	std::unordered_set<CameraID> supported_cams = getCameras();
+	if (supported_cams.find(cam) != supported_cams.end()) {
+		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
+		this->_open_streams[cam] = 0;
+	}
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
@@ -157,9 +161,8 @@ static bool validateCameraStreamCloseRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
-	this->_stream_lock.lock();
+	std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 	this->_open_streams.erase(cam);
-	this->_stream_lock.unlock();
 }
 
 void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
@@ -170,8 +173,8 @@ void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 
 void MissionControlProtocol::videoStreamTask() {
 	while (this->_streaming_running) {
+		std::shared_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		// for all open streams, check if there is a new frame
-		this->_stream_lock.lock();
 		for (const auto& stream : _open_streams) {
 			const CameraID& cam = stream.first;
 			const uint32_t& frame_num = stream.second;
@@ -193,7 +196,6 @@ void MissionControlProtocol::videoStreamTask() {
 				break;
 			}
 		}
-		this->_stream_lock.unlock();
 	}
 }
 

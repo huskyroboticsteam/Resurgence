@@ -9,7 +9,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <thread>
-#include <mutex>
+#include <shared_mutex>
 
 namespace mc {
 
@@ -28,7 +28,7 @@ public:
 private:
 	void videoStreamTask();
 	SingleClientWSServer& _server;
-	std::mutex _stream_lock;
+	std::shared_mutex _stream_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
 	std::atomic<bool> _streaming_running;
 	std::thread _streaming_thread;
