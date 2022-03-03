@@ -156,9 +156,9 @@ add_library(hindsight_can SHARED
   HindsightCAN/CANScience.c
   HindsightCAN/PortFiles/PortTemplate.c)
 
-add_library(stub_world_interface STATIC
+add_library(stub_world_interface SHARED
   world_interface/noop_world.cpp)
-add_library(real_world_interface STATIC
+add_library(real_world_interface SHARED
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
   ar/Detector.cpp
@@ -168,9 +168,10 @@ add_library(real_world_interface STATIC
   ar/read_landmarks.cpp
   gps/usb_gps/read_usb_gps.cpp
   base64/base64_img.cpp
+  Util.cpp
   ${camera_src}
   )
-add_library(simulator_interface STATIC
+add_library(simulator_interface SHARED
   world_interface/simulator_interface.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
@@ -178,6 +179,7 @@ add_library(simulator_interface STATIC
   ar/Tag.cpp
   ar/read_landmarks.cpp
   base64/base64_img.cpp
+  Util.cpp
   ${camera_src}
   )
 
