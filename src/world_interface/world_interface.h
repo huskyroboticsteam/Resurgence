@@ -163,6 +163,8 @@ void setMotorPower(robot::types::motorid_t motor, double power);
  */
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
 
+types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
+
 } // namespace robot
 
 namespace gps {

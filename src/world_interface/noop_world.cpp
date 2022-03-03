@@ -36,9 +36,13 @@ URCLeg getLeg(int /*id*/) {
 	return URCLeg{-1, -1, {0., 0., 0.}};
 }
 
-void setMotorPower(const std::string& motor, double normalizedPWM) {}
+void setMotorPower(motorid_t motor, double normalizedPWM) {}
 
-void setMotorPos(const std::string& motor, int32_t targetPos) {}
+void setMotorPos(motorid_t motor, int32_t targetPos) {}
+
+types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+	return {};
+}
 
 void setIndicator(indication_t signal) {}
 

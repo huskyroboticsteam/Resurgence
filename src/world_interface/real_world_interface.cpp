@@ -268,4 +268,8 @@ void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
 // TODO: implement
 void setIndicator(indication_t signal) {}
 
+types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+	return can::motor::getMotorPosition(motorSerialIDMap.at(motor));
+}
+
 } // namespace robot

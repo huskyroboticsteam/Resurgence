@@ -310,6 +310,10 @@ void setMotorPos(motorid_t motor, int32_t targetPos) {
 	sendJSON(msg);
 }
 
+types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+	// TODO: return motor position
+}
+
 void setIndicator(indication_t signal) {
 	if (signal == indication_t::arrivedAtDest) {
 		log(LOG_INFO, "Robot arrived at destination!\n");

@@ -25,6 +25,7 @@ using std::chrono::duration_cast;
 using std::chrono::microseconds;
 using std::chrono::steady_clock;
 using namespace navtypes;
+using namespace robot::types;
 
 void closeRover(int signum) {
 	rospub::shutdown();
@@ -86,15 +87,9 @@ int rover_loop(int argc, char** argv) {
 		long loopStartElapsedUsecs =
 			duration_cast<microseconds>(loopStart - roverStart).count();
 
-		int arm_base_pos = -1;
-		int shoulder_pos = -1;
-		int elbow_pos = -1;
-		if (!Globals::status_data["arm_base"]["angular_position"].is_null())
-			arm_base_pos = Globals::status_data["arm_base"]["angular_position"];
-		if (!Globals::status_data["shoulder"]["angular_position"].is_null())
-			shoulder_pos = Globals::status_data["shoulder"]["angular_position"];
-		if (!Globals::status_data["elbow"]["angular_position"].is_null())
-			elbow_pos = Globals::status_data["elbow"]["angular_position"];
+		int arm_base_pos = robot::getMotorPos(motorid_t::armBase).getDataOrElse(-1);
+		int shoulder_pos = robot::getMotorPos(motorid_t::shoulder).getDataOrElse(-1);
+		int elbow_pos = robot::getMotorPos(motorid_t::elbow).getDataOrElse(-1);
 		log(LOG_DEBUG, "Time\t %d arm_base\t %d\t shoulder\t %d\t elbow\t %d \r",
 			loopStartElapsedUsecs / 1000, arm_base_pos, shoulder_pos, elbow_pos);
 

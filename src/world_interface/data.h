@@ -75,12 +75,21 @@ public:
 	 */
 	DataPoint(datatime_t time, T data) : datapoint({time, data}) {}
 
-	// provide an implicit conversion to the data type. Helps with backwards compatability.
+	/**
+	 * @brief Implicitly convert to the required data type. UB if datapoint is invalid.
+	 * Equivalent to getData().
+	 *
+	 * @return T The value of this datapoint.
+	 */
 	operator T() const {
 		return getData();
 	}
 
-	// Check if this measurement is valid
+	/**
+	 * @brief Check if this measurement is valid. Equivalent to isValid().
+	 *
+	 * @return bool True iff this datapoint has a value.
+	 */
 	operator bool() const {
 		return isValid();
 	}
@@ -96,23 +105,50 @@ public:
 		return isValid() && dataclock::now() - duration <= getTime();
 	}
 
-	// Check if this measurement is valid
+	/**
+	 * @brief Check if this measurement is valid.
+	 *
+	 * @return bool True iff this data point has a value.
+	 */
 	bool isValid() const {
 		return datapoint.has_value();
 	}
 
-	// The time at which the data was measured. Use only if data is valid.
+	/**
+	 * @brief Get the time at which the measurement was taken.
+	 * UB if data point is not valid.
+	 *
+	 * @return datatime_t The time at which the measurement was taken.
+	 */
 	datatime_t getTime() const {
 		return datapoint.value().first;
 	}
 
-	// The measurement data. Use only if data is valid.
+	/**
+	 * @brief Get the value of this data point.
+	 * UB if data point is not valid.
+	 *
+	 * @return T The value of this data point.
+	 */
 	T getData() const {
 		return datapoint.value().second;
 	}
 
+	/**
+	 * @brief Get the value of this data point, defaulting to a given value
+	 * if this data point is invalid.
+	 *
+	 * @param defaultData The value to return if this data point is not valid.
+	 * @return T The value of this data point, or @p defaultData.
+	 */
+	T getDataOrElse(T defaultData) {
+		return isValid() ? getData() : defaultData;
+	}
+
 private:
-	// the time and measurement data
+	/**
+	 * @brief The time and measurement data.
+	 */
 	std::optional<std::pair<datatime_t, T>> datapoint;
 };
 
