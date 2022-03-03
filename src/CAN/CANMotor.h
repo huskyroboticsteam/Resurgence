@@ -1,11 +1,13 @@
 #pragma once
 
-#include "CANUtils.h"
 #include "../world_interface/data.h"
+#include "CANUtils.h"
 
 #include <chrono>
 
 namespace can::motor {
+
+void emergencyStopMotors();
 
 void initMotor(deviceserial_t serial);
 
@@ -15,6 +17,8 @@ void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod,
 			   int32_t kP, int32_t kI, int32_t kD);
+
+void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t kD);
 
 void setMotorMode(deviceserial_t serial, motormode_t mode);
 

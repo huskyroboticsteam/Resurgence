@@ -1,5 +1,6 @@
-#include "CAN.h"
 #include "CANMotor.h"
+
+#include "CAN.h"
 #include "CANUtils.h"
 
 #include <chrono>
@@ -15,6 +16,15 @@ extern "C" {
 using namespace std::chrono_literals;
 
 namespace can::motor {
+
+void emergencyStopMotors() {
+	CANPacket p;
+	AssembleGroupBroadcastingEmergencyStopPacket(
+		&p, static_cast<uint8_t>(devicegroup_t::motor), ESTOP_ERR_GENERAL);
+	can::sendCANPacket(p);
+	std::this_thread::sleep_for(1000us);
+}
+
 void initMotor(deviceserial_t serial) {
 	setMotorMode(serial, motormode_t::pwm);
 	std::this_thread::sleep_for(1000us);
@@ -24,6 +34,10 @@ void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod,
 			   int32_t kP, int32_t kI, int32_t kD) {
 	initMotor(serial, invertEncoder, zeroEncoder, pulsesPerJointRev, telemetryPeriod);
+	setMotorPIDConstants(serial, kP, kI, kD);
+}
+
+void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t kD) {
 	CANPacket p;
 	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);
 	AssemblePSetPacket(&p, motorGroupCode, serial, kP);
@@ -63,6 +77,7 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 }
 
 robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
-	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle);
+	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial),
+							  telemtype_t::angle);
 }
 } // namespace can::motor

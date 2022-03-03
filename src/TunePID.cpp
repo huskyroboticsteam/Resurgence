@@ -1,16 +1,16 @@
-#include "Rover.h"
-#include "log.h"
-#include "world_interface/world_interface.h"
-#include "world_interface/real_world_constants.h"
 #include "CAN/CAN.h"
 #include "CAN/CANMotor.h"
+#include "Rover.h"
+#include "log.h"
+#include "world_interface/real_world_constants.h"
+#include "world_interface/world_interface.h"
 
 #include <csignal>
 #include <ctime>
 #include <iostream>
+#include <map>
 #include <time.h>
 #include <unistd.h>
-#include <map>
 
 #include <sys/time.h>
 
@@ -20,8 +20,7 @@ extern "C" {
 
 using namespace robot::types;
 
-template <typename K, typename V>
-std::map<V, K> reverseMap(const std::map<K, V>& map) {
+template <typename K, typename V> std::map<V, K> reverseMap(const std::map<K, V>& map) {
 	std::map<V, K> reversed;
 	for (const auto& [k, v] : map) {
 		reversed.emplace(v, k);
@@ -40,8 +39,7 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::forearm, "forearm"},
 	{motorid_t::differentialRight, "differentialRight"},
 	{motorid_t::differentialLeft, "differentialLeft"},
-	{motorid_t::hand, "hand"}
-};
+	{motorid_t::hand, "hand"}};
 
 const std::map<std::string, motorid_t> nameToMotorMap = reverseMap(motorNameMap);
 
@@ -49,10 +47,7 @@ const uint8_t motor_group_id = DEVICE_GROUP_MOTOR_CONTROL;
 
 void cleanup(int signum) {
 	std::cout << "Interrupted\n";
-	CANPacket p;
-	AssembleGroupBroadcastingEmergencyStopPacket(&p, motor_group_id, ESTOP_ERR_GENERAL);
-	can::sendCANPacket(p);
-	usleep(1000); // Give the packet time to be sent
+	can::motor::emergencyStopMotors();
 	exit(0);
 }
 
@@ -76,7 +71,7 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, motor_name);
 	motorid_t motor = nameToMotorMap.at(motor_name);
 	uint8_t serial = robot::motorSerialIDMap.at(motor);
-	
+
 	printf("Enter coefficients for motor [%s] (serial %d):\n", motor_name.c_str(), serial);
 	std::string str;
 	std::cout << "P > ";
@@ -89,13 +84,7 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, str);
 	int d_coeff = std::stoi(str);
 
-	CANPacket p;
-	AssemblePSetPacket(&p, motor_group_id, serial, p_coeff);
-	can::sendCANPacket(p);
-	AssembleISetPacket(&p, motor_group_id, serial, i_coeff);
-	can::sendCANPacket(p);
-	AssembleDSetPacket(&p, motor_group_id, serial, d_coeff);
-	can::sendCANPacket(p);
+	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
 
 	double timestep = 0.0;
 	double period = 2.0;
