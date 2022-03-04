@@ -6,6 +6,7 @@ void initCAN() {}
 
 void sendCANPacket(const CANPacket& packet) {}
 
-std::optional<int32_t> getDeviceTelemetry(devicegroup_t group, deviceserial_t serial,
-										  telemtype_t telemType) {}
+robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
+	return {};
+}
 } // namespace can

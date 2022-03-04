@@ -4,17 +4,35 @@
 #include "CANUtils.h"
 #include "TestPackets.h"
 
+#include <algorithm>
+#include <chrono>
 #include <iostream>
+#include <thread>
+#include <vector>
+
 extern "C" {
 #include "../HindsightCAN/CANScience.h"
 }
 
-constexpr int TEST_MODE_SET = 0;
-constexpr int TEST_PWM = 1;
-constexpr int TEST_PID = 2;
-constexpr int TEST_SCIENCE_TELEMETRY = 3;
-constexpr int TEST_SCIENCE_MOTORS = 4;
-constexpr int TEST_SCIENCE_SERVOS = 5;
+using namespace std::chrono_literals;
+
+enum class TestMode {
+	ModeSet,
+	PWM,
+	PID,
+	Encoder,
+	ScienceTelemetry,
+	ScienceMotors,
+	ScienceServos
+};
+
+std::vector<int> modes = {static_cast<int>(TestMode::ModeSet),
+						  static_cast<int>(TestMode::PWM),
+						  static_cast<int>(TestMode::PID),
+						  static_cast<int>(TestMode::Encoder),
+						  static_cast<int>(TestMode::ScienceTelemetry),
+						  static_cast<int>(TestMode::ScienceMotors),
+						  static_cast<int>(TestMode::ScienceServos)};
 
 int prompt(const char* msg) {
 	std::string str;
@@ -28,38 +46,41 @@ int main() {
 	can::initCAN();
 
 	CANPacket p;
-	uint8_t motor_group = 0x04;
-	uint8_t science_group = 0x07;
-	int test_type = prompt("What are you testing?\n\
-          0 for MODE SET\n\
-          1 for PWM\n\
-          2 for PID\n\
-          3 for SCIENCE TELEMETRY\n\
-          4 for SCIENCE MOTORS\n\
-          5 for SCIENCE SERVOS\n");
+	uint8_t science_group = static_cast<int>(can::devicegroup_t::science);
+	std::stringstream ss("What are you testing?\n");
+	ss << static_cast<int>(TestMode::ModeSet) << " for MODE SET\n";
+	ss << static_cast<int>(TestMode::PWM) << " for PWM\n";
+	ss << static_cast<int>(TestMode::PID) << " for PID\n";
+	ss << static_cast<int>(TestMode::Encoder) << " for ENCODER\n";
+	ss << static_cast<int>(TestMode::ScienceTelemetry) << " for SCIENCE TELEMETRY\n";
+	ss << static_cast<int>(TestMode::ScienceMotors) << " for SCIENCE MOTORS\n";
+	ss << static_cast<int>(TestMode::ScienceTelemetry) << " for SCIENCE SERVOS\n";
+	int test_type = prompt(ss.str().c_str());
+	if (std::find(modes.begin(), modes.end(), test_type) == modes.end()) {
+		std::cout << "Unrecognized response: " << test_type << std::endl;
+		std::exit(1);
+	}
+	TestMode testMode = static_cast<TestMode>(test_type);
 	int serial = 0;
-	if (test_type == TEST_PWM || test_type == TEST_PID) {
+	if (testMode == TestMode::PWM || testMode == TestMode::PID ||
+		testMode == TestMode::Encoder) {
 		serial = prompt("Enter motor serial");
 	}
 	bool mode_has_been_set = false;
 
 	while (1) {
 
-		if (test_type == TEST_MODE_SET) {
+		if (testMode == TestMode::ModeSet) {
 			serial = prompt("Enter motor serial");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
 			std::cout << "got " << serial << " and " << mode << std::endl;
 			can::motor::setMotorMode(serial, mode == 0 ? can::motormode_t::pwm
 													   : can::motormode_t::pid);
-		}
-
-		if (test_type == TEST_PWM) {
+		} else if (testMode == TestMode::PWM) {
 			int pwm = prompt("Enter PWM");
 			can::motor::setMotorMode(serial, can::motormode_t::pwm);
 			can::motor::setMotorPower(serial, static_cast<int16_t>(pwm));
-		}
-
-		if (test_type == TEST_PID) {
+		} else if (testMode == TestMode::PID) {
 			// Don't send all five packets at once. On some motor boards, the CAN buffer
 			// only fits four packets.
 
@@ -78,17 +99,28 @@ int main() {
 
 			int angle_target = prompt("Enter PID target (in 1000ths of degrees)");
 			can::motor::setMotorPIDTarget(serial, angle_target);
-		}
-
-		if (test_type == TEST_SCIENCE_TELEMETRY) {
+		} else if (testMode == TestMode::Encoder) {
+			if (!mode_has_been_set) {
+				int ppjr = prompt("Pulses per joint revolution");
+				int encPeriod = prompt("Telemetry period (ms)");
+				can::motor::initMotor(serial, false, true, ppjr,
+									  std::chrono::milliseconds(encPeriod));
+				mode_has_been_set = true;
+			}
+			auto encoderData = can::motor::getMotorPosition(serial);
+			std::string encoderStr =
+				encoderData ? std::to_string(encoderData.getData()) : "null";
+			// \33[2k is the ANSI escape sequence for erasing the current console line
+			// so the output is a single changing line instead of flooding the console with text
+			std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
+			std::this_thread::sleep_for(20ms);
+		} else if (testMode == TestMode::ScienceTelemetry) {
 			// Serial 0 seems to work. Nothing else (up to 17, the largest I tried)
 			serial = prompt("Enter serial");
 			uint8_t sensor_code = 42; // Nonsense for now, just testing CAN connection
 			AssembleScienceSensorPullPacket(&p, science_group, (uint8_t)serial, sensor_code);
 			can::sendCANPacket(p);
-		}
-
-		if (test_type == TEST_SCIENCE_MOTORS) {
+		} else if (testMode == TestMode::ScienceMotors) {
 			// CAREFUL, there are no safety checks / limit switches
 			// 0: drill up/down (down is positive, ~500 PWM)
 			// 1: drawer open/close (open is positive, ~100 PWM)
@@ -98,9 +130,7 @@ int main() {
 			AssembleScienceMotorControlPacket(&p, science_group, 0x0, (uint8_t)motor_no,
 											  (int16_t)pwm);
 			can::sendCANPacket(p);
-		}
-
-		if (test_type == TEST_SCIENCE_SERVOS) {
+		} else if (testMode == TestMode::ScienceServos) {
 			int servo_no = prompt("Enter servo no");
 			int degrees = prompt("Enter degrees");
 			AssembleScienceServoPacket(&p, science_group, 0x0, (uint8_t)servo_no,
