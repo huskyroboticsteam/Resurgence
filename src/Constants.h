@@ -47,7 +47,11 @@ constexpr double WHEEL_BASE = 2. / 3.;
 constexpr double EFF_WHEEL_BASE = 1.40; // tweaked to match 2-wheel kinematic model
 constexpr double WHEEL_RADIUS = 0.15; // eyeballed
 constexpr double PWM_PER_RAD_PER_SEC = 5000; // eyeballed
-constexpr double MAX_DRIVE_PWM = 32767;
+constexpr double MAX_DRIVE_PWM = 25000; // can be up to 2^15 - 1 (32767) but we have limited it
+										// because driving at full speed draws a massive amount
+										// of current that's too much for our power supply (and
+										// the rover's full speed is somewhat hard to control
+										// while it's driving)
 /**
    @brief Maximum tangential velocity for the rover's wheels.
 
