@@ -18,22 +18,29 @@ class Mat;
  */
 namespace robot::types {
 
-// the clock used for time measurements for data
+/** @brief The clock used for time measurements for data */
 using dataclock = std::chrono::steady_clock;
-// a point in time as measured by dataclock
+/** @brief A point in time as measured by dataclock */
 using datatime_t = std::chrono::time_point<dataclock>;
 
 template <typename T> class DataPoint;
+
+/**
+ * @brief A data structure that represents when each landmark was seen.
+ *
+ * @see AR::readLandmarks()
+ */
 using landmarks_t = std::vector<DataPoint<navtypes::point_t>>;
 
-// A pair of a camera frame and its corresponding frame number
+/** @brief A pair of a camera frame and its corresponding frame number */
 using CameraFrame = std::pair<cv::Mat, uint32_t>;
-// The type of a camera id
+/** @brief The type of a camera id */
 using CameraID = std::string;
 
-// An indication enum, used to command the LED to flash different signals
+/** @brief An indication enum, used to command the LED to flash different signals */
 enum class indication_t { off, autonomous, teleop, arrivedAtDest };
 
+/** @brief The motors on the robot. */
 enum class motorid_t {
 	frontLeftWheel,
 	frontRightWheel,

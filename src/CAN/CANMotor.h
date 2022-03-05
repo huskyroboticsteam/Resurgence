@@ -5,6 +5,12 @@
 
 #include <chrono>
 
+/**
+ * @namespace can::motor
+ * @brief Utilities for interacting with motor boards over a CAN interface.
+ *
+ * These motor boards can either be AVR or PSoC boards.
+ */
 namespace can::motor {
 
 void emergencyStopMotors();

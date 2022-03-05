@@ -1,15 +1,21 @@
 #pragma once
 
 extern "C" {
-#include "../HindsightCAN/CANPacket.h"
-#include "../HindsightCAN/CANMotorUnit.h"
 #include "../HindsightCAN/CANCommon.h"
+#include "../HindsightCAN/CANMotorUnit.h"
+#include "../HindsightCAN/CANPacket.h"
 }
 
 #include <chrono>
 #include <utility>
 
 namespace can {
+
+/**
+ * @brief The possible device group codes.
+ *
+ * Every can device is in a group. These are the possible groups.
+ */
 enum class devicegroup_t {
 	broadcast = DEVICE_GROUP_BROADCAST,
 	reserved = DEVICE_GROUP_RESERVED,
@@ -21,11 +27,14 @@ enum class devicegroup_t {
 	science = DEVICE_GROUP_SCIENCE
 };
 
-enum class motormode_t {
-	pwm = MOTOR_UNIT_MODE_PWM,
-	pid = MOTOR_UNIT_MODE_PID
-};
+/** @brief The possible motor modes. */
+enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
 
+/**
+ * @brief The type of telemetries that devices can report.
+ *
+ * A device may offer some or none of these telemetry types.
+ */
 enum class telemtype_t {
 	voltage = PACKET_TELEMETRY_VOLTAGE,
 	current = PACKET_TELEMETRY_CURRENT,
@@ -45,15 +54,41 @@ enum class telemtype_t {
 	// TODO: add further telemetry types if required
 };
 
+/** @brief The type of the device serial number. */
 using deviceserial_t = uint8_t;
+
+/** @brief The type of telemetry data. */
 using telemetry_t = int32_t;
 
+/**
+ * @brief A unique identifier for a CAN device.
+ *
+ * A CAN device is uniquely identified by its group code and its serial number.
+ */
 using deviceid_t = std::pair<devicegroup_t, deviceserial_t>;
 
+/**
+ * @brief Get the device group from the id of the given packet.
+ *
+ * @param packet The packet to extract the group from.
+ * @return devicegroup_t The extracted device group.
+ */
 devicegroup_t getDeviceGroup(const CANPacket& packet);
 
+/**
+ * @brief Get the serial number from the id of the given packet.
+ *
+ * @param packet The packet to extract the serial number from.
+ * @return deviceserial_t The extracted serial number.
+ */
 deviceserial_t getDeviceSerial(const CANPacket& packet);
 
+/**
+ * @brief Get the unique identifier from the id of the given packet.
+ *
+ * @param packet The packet ot extract the identifier from.
+ * @return deviceid_t The extracted device identifier.
+ */
 deviceid_t getDeviceGroupAndSerial(const CANPacket& packet);
 
 } // namespace can

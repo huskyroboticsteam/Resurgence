@@ -25,16 +25,25 @@ namespace robot {
  */
 enum class WorldInterface { real, sim2d, sim3d, noop };
 
-/**
- * @brief The current world interface being used.
- */
+/** @brief The current world interface being used. */
 extern const WorldInterface WORLD_INTERFACE;
 
-// Call this before trying to do anything else
+/**
+ * @brief Initialize the world interface.
+ *
+ * This method should only be called once, and must be called
+ * before any other world interface methods.
+ */
 void world_interface_init();
 
-// If the requested dtheta/dx is too fast for the robot to execute, it will
-// scale them down and return the corresponding scale divisor.
+/**
+ * @brief Request the robot to drive at the given velocities.
+ *
+ * @param dtheta The heading velocity.
+ * @param dx The forward velocity.
+ * @return double If the requested velocities are too high, they will be scaled down.
+ * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
+ */
 double setCmdVel(double dtheta, double dx);
 
 /**
@@ -45,7 +54,13 @@ double setCmdVel(double dtheta, double dx);
  */
 std::pair<double, double> getCmdVel();
 
-// read measurement from the lidar
+/**
+ * @brief Get the last measurement from the lidar.
+ *
+ * The returned points are in the robot's reference frame.
+ *
+ * @return types::DataPoint<navtypes::points_t> The lidar scan, if available.
+ */
 types::DataPoint<navtypes::points_t> readLidarScan();
 
 /**
@@ -133,16 +148,39 @@ types::DataPoint<navtypes::pose_t> getTruePose();
  */
 std::optional<navtypes::point_t> gpsToMeters(const navtypes::gpscoords_t& coord);
 
-// Calculates the current transform in the global frame based purely on forward kinematics
+/**
+ * @brief Calculates the current transform in the frame of the starting pose based purely on
+ * forward kinematics
+ *
+ * @return types::DataPoint<navtypes::transform_t> The current transform in the frame of the
+ * starting pose. Generally, this datapoint should always be valid.
+ */
 types::DataPoint<navtypes::transform_t> readOdom();
 
-// Calculate the current pose velocity (in the robot's reference frame) using visual odometry.
+/**
+ * @brief Calculate the current pose velocity (in the robot's reference frame) using visual
+ * odometry.
+ *
+ * @return types::DataPoint<navtypes::pose_t> The current velocity in each axis of the pose
+ * vector, or an empty data point if no data is available.
+ */
 types::DataPoint<navtypes::pose_t> readVisualOdomVel();
 
-// `index` must be in the range 0-6 (the URC competition will have 7 legs)
+/**
+ * @brief Get the URC leg of the given index.
+ *
+ * @param index The index of the URC leg, in the range [0, 6]
+ * @return navtypes::URCLeg Information for the URC leg of the given index.
+ *
+ * @deprecated This function is probably deprecated, and will be replaced in the future.
+ */
 navtypes::URCLeg getLeg(int index);
 
-// set the indicator to indicate the given signal. May no-op if indicator is not supported.
+/**
+ * @brief Set the robot indicator to indicate the given signal.
+ *
+ * @param signal The signal to display on the indicator.
+ */
 void setIndicator(types::indication_t signal);
 
 /**
@@ -163,6 +201,14 @@ void setMotorPower(robot::types::motorid_t motor, double power);
  */
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
 
+/**
+ * @brief Get the last reported position of the specified motor.
+ *
+ * @param motor The motor to get the position from.
+ * @return types::DataPoint<int32_t> The last reported position of the motor, if it exists.
+ * If the motor has not reported a position (because it hasn't been received yet or if it
+ * doesn't have an encoder) then an empty data point is returned.
+ */
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
 
 } // namespace robot
