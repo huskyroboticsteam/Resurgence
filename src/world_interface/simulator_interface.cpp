@@ -9,7 +9,6 @@
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
 #include "../navtypes.h"
-#include "kinematic_common_interface.h"
 #include "world_interface.h"
 
 #include <atomic>
@@ -246,29 +245,6 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 	} else {
 		return {};
 	}
-}
-
-double setCmdVel(double dtheta, double dx) {
-	if (Globals::E_STOP && (dtheta != 0 || dx != 0)) {
-		return 0;
-	}
-
-	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(dx, dtheta);
-	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
-	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
-	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
-	if (maxAbsPWM > 1) {
-		lPWM /= maxAbsPWM;
-		rPWM /= maxAbsPWM;
-	}
-
-	setCmdVelToIntegrate(wheelVels);
-	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, rPWM);
-	setMotorPower(motorid_t::rearRightWheel, rPWM);
-
-	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
 
 landmarks_t readLandmarks() {

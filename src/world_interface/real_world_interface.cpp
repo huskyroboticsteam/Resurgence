@@ -9,7 +9,6 @@
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../navtypes.h"
-#include "kinematic_common_interface.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
 
@@ -152,56 +151,6 @@ constexpr double WHEEL_RADIUS = 0.15;		  // Eyeballed
 constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
 // This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
 constexpr double MAX_PWM = 20000;
-
-double setCmdVel(double dtheta, double dx) {
-	if (Globals::E_STOP && (dtheta != 0 || dx != 0))
-		return 0;
-
-	/* This is the inverse of the formula:
-	 *		dx = (right_ground_vel + left_ground_vel) / 2
-	 *		dtheta = (right_ground_vel - left_ground_vel) / EFF_WHEEL_BASE
-	 */
-	double right_ground_vel = dx + EFF_WHEEL_BASE / 2 * dtheta;
-	double left_ground_vel = dx - EFF_WHEEL_BASE / 2 * dtheta;
-	double right_angular_vel = right_ground_vel / WHEEL_RADIUS;
-	double left_angular_vel = left_ground_vel / WHEEL_RADIUS;
-	int16_t right_pwm = (int16_t)(right_angular_vel * PWM_FOR_1RAD_PER_SEC);
-	int16_t left_pwm = (int16_t)(left_angular_vel * PWM_FOR_1RAD_PER_SEC);
-	log(LOG_TRACE, "dtheta %f dx %f right ground %f right angular %f right pwm %d\n", dtheta,
-		dx, right_ground_vel, right_angular_vel, right_pwm);
-	double scale_down_factor = 1.0;
-	if (abs(right_pwm) > MAX_PWM) {
-		log(LOG_WARN, "WARNING: requested too-large right PWM %d\n", right_pwm);
-		scale_down_factor = abs(right_pwm) / MAX_PWM;
-	}
-	if (abs(left_pwm) > MAX_PWM) {
-		log(LOG_WARN, "WARNING: requested too-large left PWM %d\n", left_pwm);
-		double scale_down_factor_left = abs(left_pwm) / MAX_PWM;
-		if (scale_down_factor_left > scale_down_factor)
-			scale_down_factor = scale_down_factor_left;
-	}
-	right_pwm = (int16_t)(right_pwm / scale_down_factor);
-	left_pwm = (int16_t)(left_pwm / scale_down_factor);
-	if (scale_down_factor < 1.0) {
-		log(LOG_WARN, "Scaling down cmd_vel by %f to %f %f\n", scale_down_factor,
-			dtheta / scale_down_factor, dx / scale_down_factor);
-	}
-
-	setCmdVelToIntegrate(dtheta / scale_down_factor, dx / scale_down_factor);
-
-	CANPacket p;
-	uint8_t motor_group = 0x04;
-	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_FL, left_pwm);
-	can::sendCANPacket(p);
-	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_FR, right_pwm);
-	can::sendCANPacket(p);
-	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_BL, left_pwm);
-	can::sendCANPacket(p);
-	AssemblePWMDirSetPacket(&p, motor_group, DEVICE_SERIAL_MOTOR_CHASSIS_BR, right_pwm);
-	can::sendCANPacket(p);
-
-	return scale_down_factor;
-}
 
 DataPoint<pose_t> getTruePose() {
 	return {};
