@@ -46,7 +46,7 @@ void error(const std::string& err) {
 	std::exit(1);
 }
 
-void recievePacket(CANPacket& packet) {
+void receivePacket(CANPacket& packet) {
 	socklen_t len = sizeof(can_addr);
 
 	bool success;
@@ -76,11 +76,11 @@ bool mapHasKey(std::shared_mutex& mutex, const std::map<K, V>& map, const K& key
 	return map.find(key) != map.end();
 }
 
-void recieveThreadFn() {
+void receiveThreadFn() {
 	CANPacket packet;
 
 	while (true) {
-		recievePacket(packet);
+		receivePacket(packet);
 
 		// extract necessary information
 		deviceid_t id = getDeviceGroupAndSerial(packet);
@@ -142,8 +142,8 @@ void initCAN() {
 	}
 
 	// start thread for recieving CAN packets
-	std::thread recieveThread(recieveThreadFn);
-	recieveThread.detach();
+	std::thread receiveThread(receiveThreadFn);
+	receiveThread.detach();
 }
 
 void sendCANPacket(const CANPacket& packet) {

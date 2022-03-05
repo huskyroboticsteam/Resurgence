@@ -87,6 +87,7 @@ int main() {
 			if (!mode_has_been_set) {
 				// AVR board firmware resets the angle target every time it receives a
 				// mode set packet, so we only want to send this once.
+				// TODO: do we need to set the PPJR?
 				can::motor::setMotorMode(serial, can::motormode_t::pid);
 				mode_has_been_set = true;
 			}
