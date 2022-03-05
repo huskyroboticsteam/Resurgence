@@ -51,6 +51,10 @@ enum class telemtype_t {
 	// TODO: add further telemetry types if required
 };
 
+struct packettype_t {
+	enum {telemetry=ID_TELEMETRY_REPORT};
+};
+
 /** @brief The type of the device serial number. */
 using deviceserial_t = uint8_t;
 
@@ -87,5 +91,11 @@ deviceserial_t getDeviceSerial(const CANPacket& packet);
  * @return deviceid_t The extracted device identifier.
  */
 deviceid_t getDeviceGroupAndSerial(const CANPacket& packet);
+
+deviceserial_t getSenderDeviceSerial(const CANPacket& packet);
+
+devicegroup_t getSenderDeviceGroup(const CANPacket& packet);
+
+deviceid_t getSenderDeviceGroupAndSerial(const CANPacket& packet);
 
 } // namespace can
