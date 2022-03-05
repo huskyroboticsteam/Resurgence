@@ -25,6 +25,7 @@
 using nlohmann::json;
 using namespace navtypes;
 using namespace robot::types;
+using can::motor::motormode_t;
 
 namespace robot {
 
@@ -34,9 +35,9 @@ namespace {
 // map that associates camera id to the camera object
 std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 
-std::map<motorid_t, can::motormode_t> motorModeMap;
+std::map<motorid_t, motormode_t> motorModeMap;
 
-void ensureMotorMode(motorid_t motor, can::motormode_t mode) {
+void ensureMotorMode(motorid_t motor, motormode_t mode) {
 	auto entry = motorModeMap.find(motor);
 	if (entry == motorModeMap.end()) {
 		motorModeMap.insert(std::make_pair(motor, mode));
@@ -255,13 +256,13 @@ void setMotorPower(robot::types::motorid_t motor, double power) {
 	if (entry != scaleMap.end()) {
 		power *= entry->second;
 	}
-	ensureMotorMode(motor, can::motormode_t::pwm);
+	ensureMotorMode(motor, motormode_t::pwm);
 	can::motor::setMotorPower(serial, power);
 }
 
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
 	can::deviceserial_t serial = motorSerialIDMap.at(motor);
-	ensureMotorMode(motor, can::motormode_t::pid);
+	ensureMotorMode(motor, motormode_t::pid);
 	can::motor::setMotorPIDTarget(serial, targetPos);
 }
 

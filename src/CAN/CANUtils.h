@@ -27,9 +27,6 @@ enum class devicegroup_t {
 	science = DEVICE_GROUP_SCIENCE
 };
 
-/** @brief The possible motor modes. */
-enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
-
 /**
  * @brief The type of telemetries that devices can report.
  *

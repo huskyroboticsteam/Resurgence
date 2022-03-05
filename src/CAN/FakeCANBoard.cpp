@@ -16,6 +16,8 @@ extern "C" {
 
 using namespace std::chrono_literals;
 
+using can::motor::motormode_t;
+
 enum class TestMode {
 	ModeSet,
 	PWM,
@@ -74,11 +76,11 @@ int main() {
 			serial = prompt("Enter motor serial");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
 			std::cout << "got " << serial << " and " << mode << std::endl;
-			can::motor::setMotorMode(serial, mode == 0 ? can::motormode_t::pwm
-													   : can::motormode_t::pid);
+			can::motor::setMotorMode(serial, mode == 0 ? motormode_t::pwm
+													   : motormode_t::pid);
 		} else if (testMode == TestMode::PWM) {
 			int pwm = prompt("Enter PWM");
-			can::motor::setMotorMode(serial, can::motormode_t::pwm);
+			can::motor::setMotorMode(serial, motormode_t::pwm);
 			can::motor::setMotorPower(serial, static_cast<int16_t>(pwm));
 		} else if (testMode == TestMode::PID) {
 			// Don't send all five packets at once. On some motor boards, the CAN buffer
@@ -88,7 +90,7 @@ int main() {
 				// AVR board firmware resets the angle target every time it receives a
 				// mode set packet, so we only want to send this once.
 				// TODO: do we need to set the PPJR?
-				can::motor::setMotorMode(serial, can::motormode_t::pid);
+				can::motor::setMotorMode(serial, motormode_t::pid);
 				mode_has_been_set = true;
 			}
 

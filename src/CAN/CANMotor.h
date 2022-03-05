@@ -12,6 +12,9 @@
  * These motor boards can either be AVR or PSoC boards.
  */
 namespace can::motor {
+	
+/** @brief The possible motor modes. */
+enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
 
 void emergencyStopMotors();
 
