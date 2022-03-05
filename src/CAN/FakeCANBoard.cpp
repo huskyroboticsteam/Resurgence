@@ -40,7 +40,7 @@ int prompt(const char* msg) {
 	std::string str;
 	std::cout << msg << " > ";
 	std::getline(std::cin, str);
-	int val = std::stoi(str);
+	int val = std::stoi(str, nullptr, 0);
 	return val;
 }
 
