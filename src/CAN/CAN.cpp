@@ -4,6 +4,7 @@
 #include "CANUtils.h"
 
 #include <cstring>
+#include <chrono>
 #include <map>
 #include <mutex>
 #include <shared_mutex>
@@ -24,6 +25,8 @@ extern "C" {
 }
 
 using robot::types::DataPoint;
+
+constexpr std::chrono::milliseconds READ_PERIOD(10);
 
 namespace can {
 namespace {
@@ -47,27 +50,31 @@ void error(const std::string& err) {
 	std::exit(1);
 }
 
-void receivePacket(CANPacket& packet) {
+bool receivePacket(CANPacket& packet) {
 	socklen_t len = sizeof(can_addr);
 
-	bool success;
+	int ret;
 	can_frame frame;
 	{
 		// lock the socket only while we're using it
 		std::lock_guard lock(socketMutex);
-		// no need to check for EAGAIN or EWOULDBLOCK since we're blocking
-		success = recvfrom(can_fd, &frame, sizeof(struct can_frame), 0,
-						   (struct sockaddr*)&can_addr, &len) >= 0;
+		// we won't loop if we get EAGAIN or EWOULDBLOCK
+		ret = recvfrom(can_fd, &frame, sizeof(can_frame), MSG_DONTWAIT,
+						   reinterpret_cast<sockaddr*>(&can_addr), &len);
 	}
-	if (success) {
+	if (ret >= 0) {
 		log(LOG_TRACE, "Got CAN packet\n");
 		packet.id = frame.can_id;
 		packet.dlc = frame.can_dlc;
 		for (int i = 0; i < frame.can_dlc; i++) {
 			packet.data[i] = frame.data[i];
 		}
-	} else {
+		return true;
+	} else if (ret != EAGAIN && ret != EWOULDBLOCK) {
 		std::perror("Failed to receive CAN packet!");
+		return false;
+	} else {
+		return false;
 	}
 }
 
@@ -111,17 +118,20 @@ void receiveThreadFn() {
 	CANPacket packet;
 
 	while (true) {
-		receivePacket(packet);
+		bool received = receivePacket(packet);
+		if (received) {
+			uint8_t packetType = packet.data[0];
+			switch (packetType) {
+				case packettype_t::telemetry:
+					handleTelemetryPacket(packet);
+					break;
 
-		uint8_t packetType = packet.data[0];
-		switch (packetType) {
-			case packettype_t::telemetry:
-				handleTelemetryPacket(packet);
-				break;
-
-			default:
-				log(LOG_WARN, "Unrecognized CAN packet type: %x\n", packetType);
-				break;
+				default:
+					log(LOG_WARN, "Unrecognized CAN packet type: %x\n", packetType);
+					break;
+			}
+		} else {
+			std::this_thread::sleep_for(READ_PERIOD);
 		}
 	}
 }
