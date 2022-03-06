@@ -8,19 +8,18 @@ extern const std::set<motorid_t> pidMotors = {
 	motorid_t::armBase, motorid_t::shoulder,		 motorid_t::elbow,
 	motorid_t::forearm, motorid_t::differentialLeft, motorid_t::differentialRight};
 
-// TODO: replace with real serial numbers
 extern const std::map<motorid_t, can::deviceserial_t> motorSerialIDMap = {
-	{motorid_t::frontLeftWheel, 0},
-	{motorid_t::frontRightWheel, 1},
-	{motorid_t::rearLeftwheel, 2},
-	{motorid_t::rearRightWheel, 3},
-	{motorid_t::armBase, 4},
-	{motorid_t::shoulder, 5},
-	{motorid_t::elbow, 6},
-	{motorid_t::forearm, 7},
-	{motorid_t::differentialRight, 8},
-	{motorid_t::differentialLeft, 9},
-	{motorid_t::hand, 10}};
+	{motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},
+	{motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},
+	{motorid_t::rearLeftwheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},
+	{motorid_t::rearRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BR},
+	{motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
+	{motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
+	{motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
+	{motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
+	{motorid_t::differentialRight, DEVICE_SERIAL_MOTOR_DIFF_WRIST_R},
+	{motorid_t::differentialLeft, DEVICE_SERIAL_MOTOR_DIFF_WRIST_L},
+	{motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}};
 
 // TODO: tune pid
 extern const std::map<motorid_t, pidcoef_t> motorPIDMap = {
