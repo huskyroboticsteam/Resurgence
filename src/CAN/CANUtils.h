@@ -8,6 +8,7 @@ extern "C" {
 
 #include <chrono>
 #include <utility>
+#include <string>
 
 namespace can {
 
@@ -97,5 +98,7 @@ deviceserial_t getSenderDeviceSerial(const CANPacket& packet);
 devicegroup_t getSenderDeviceGroup(const CANPacket& packet);
 
 deviceid_t getSenderDeviceGroupAndSerial(const CANPacket& packet);
+
+std::string packetToString(const CANPacket& packet);
 
 } // namespace can

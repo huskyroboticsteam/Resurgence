@@ -1,5 +1,8 @@
 #include "CANUtils.h"
 
+#include <ios>
+#include <sstream>
+
 extern "C" {
 #include "../HindsightCAN/CANPacket.h"
 }
@@ -31,6 +34,18 @@ devicegroup_t getSenderDeviceGroup(const CANPacket& packet) {
 
 deviceid_t getSenderDeviceGroupAndSerial(const CANPacket& packet) {
 	return std::make_pair(getSenderDeviceGroup(packet), getSenderDeviceSerial(packet));
+}
+
+std::string packetToString(const CANPacket& packet) {
+	std::stringstream ss;
+	ss << std::hex << packet.id << "#";
+	for (int i = 0; i < packet.dlc; i++) {
+		ss << std::hex << static_cast<int>(packet.data[i]);
+		if (i < packet.dlc - 1) {
+			ss << ".";
+		}
+	}
+	return ss.str();
 }
 
 } // namespace can
