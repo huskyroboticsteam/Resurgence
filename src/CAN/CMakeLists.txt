@@ -5,6 +5,9 @@ add_executable(FakeCANBoard
   TestPackets.cpp)
 target_link_libraries(FakeCANBoard can_interface Threads::Threads)
 
+add_executable(CANTest CANTest.cpp)
+target_link_libraries(CANTest can_interface Threads::Threads)
+
 if(WITH_TESTS)
   # Networking Tests
   target_sources(tests PUBLIC
