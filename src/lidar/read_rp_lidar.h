@@ -1,5 +1,5 @@
 #pragma once
-#include <rplidar.h>
+#include <RPLidar/rplidar.h>
 
 #include "../navtypes.h"
 #include "../world_interface/data.h"
@@ -13,5 +13,4 @@ bool isInitialized();
 void readLidarLoop();
 
 DataPoint<points_t> readLidar();
-}
 }

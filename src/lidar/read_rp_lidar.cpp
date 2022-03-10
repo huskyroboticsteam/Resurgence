@@ -30,7 +30,9 @@ void readLidarLoop() {
 }
 
 DataPoint<points_t> readLidar() {
-
+    if (isInitialized()) {
+        
+    }
 }
-}
+} // namespace lidar
 
