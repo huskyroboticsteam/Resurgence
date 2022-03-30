@@ -1,4 +1,5 @@
 #pragma once
+
 #include <RPLidar/rplidar.h>
 
 #include "../navtypes.h"
@@ -7,8 +8,6 @@
 namespace lidar {
 
 bool initializeLidar();
-
-bool isInitialized();
 
 void readLidarLoop();
 

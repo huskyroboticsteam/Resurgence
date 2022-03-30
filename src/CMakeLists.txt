@@ -122,6 +122,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   if(WITH_LIDAR)
 	  # Find the URGLidar library.
 	  # TODO: Decide if we want to use those RPLidars we found
+    find_package(RPLidar REQUIRED)
 	  find_package(URGLidar REQUIRED)
   endif()
 endif()
@@ -202,7 +203,8 @@ list(APPEND real_world_libs
   real_world_interface
   ${libgps_LIBRARIES}
   lidar_interface
-  URGLidar::urg_c)
+  URGLidar::urg_c
+  RPLidar::RPLidar)
 
 list(APPEND simulator_libs
   simulator_interface)
