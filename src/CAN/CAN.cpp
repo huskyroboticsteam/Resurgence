@@ -9,6 +9,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include <termios.h>
 #include <thread>
 #include <unistd.h>
 #include <utility>
@@ -29,7 +30,7 @@ using robot::types::DataPoint;
 constexpr std::chrono::milliseconds READ_PERIOD(10);
 
 namespace can {
-namespace {
+// namespace {
 int can_fd;
 sockaddr_can can_addr;
 std::mutex socketMutex; // protects both can_fd and can_addr
@@ -135,62 +136,90 @@ void receiveThreadFn() {
 		}
 	}
 }
-} // namespace
+// } // namespace
 
 void initCAN() {
-	std::lock_guard lock(socketMutex);
+	// int s;
+
 	if ((can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		error("Failed to initialize CAN bus!");
+		perror("Socket");
+		return;
 	}
 
-	ifreq can_ifr;
-	std::strcpy(can_ifr.ifr_name, "can0");
-	if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0) {
-		std::perror("Failed to get hardware CAN interface index\n"
-					"You can enable CAN with\n\n"
-					"  ~/Resurgence/enable_CAN_and_GPS.sh\n\n");
-		std::strcpy(can_ifr.ifr_name, "vcan0");
-		if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0) {
-			error("Failed to get virtual CAN interface index\n"
-				  "You can enable CAN with\n\n"
-				  "  ~/Resurgence/enable_CAN_and_GPS.sh\n\n");
-		}
-		log(LOG_INFO, "Found virtual CAN interface index.\n");
+	struct ifreq ifr;
+	strcpy(ifr.ifr_name, "can0");
+	ioctl(can_fd, SIOCGIFINDEX, &ifr);
+
+	struct sockaddr_can addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.can_family = AF_CAN;
+	addr.can_ifindex = ifr.ifr_ifindex;
+
+	if (bind(can_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+		perror("Bind");
+		return;
 	}
 
-	can_addr.can_family = AF_CAN;
-	log(LOG_DEBUG, "Index: %d\n", can_ifr.ifr_ifindex);
-	can_addr.can_ifindex = can_ifr.ifr_ifindex;
+	// std::lock_guard lock(socketMutex);
+	// if ((can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+	// 	error("Failed to initialize CAN bus!");
+	// }
 
-	if (bind(can_fd, (struct sockaddr*)&can_addr, sizeof(can_addr)) < 0) {
-		error("Failed to bind CAN socket");
-	}
+	// ifreq can_ifr;
+	// std::strcpy(can_ifr.ifr_name, "can0");
+	// if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0) {
+	// 	std::perror("Failed to get hardware CAN interface index\n"
+	// 				"You can enable CAN with\n\n"
+	// 				"  ~/Resurgence/enable_CAN_and_GPS.sh\n\n");
+	// 	std::strcpy(can_ifr.ifr_name, "vcan0");
+	// 	if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0) {
+	// 		error("Failed to get virtual CAN interface index\n"
+	// 			  "You can enable CAN with\n\n"
+	// 			  "  ~/Resurgence/enable_CAN_and_GPS.sh\n\n");
+	// 	}
+	// 	log(LOG_INFO, "Found virtual CAN interface index.\n");
+	// }
+
+	// std::memset(&can_addr, 0, sizeof(can_addr));
+	// can_addr.can_family = AF_CAN;
+	// log(LOG_DEBUG, "Index: %d\n", can_ifr.ifr_ifindex);
+	// can_addr.can_ifindex = can_ifr.ifr_ifindex;
+
+	// if (bind(can_fd, (struct sockaddr*)&can_addr, sizeof(can_addr)) < 0) {
+	// 	error("Failed to bind CAN socket");
+	// }
 
 	// start thread for recieving CAN packets
-	std::thread receiveThread(receiveThreadFn);
-	receiveThread.detach();
+	// std::thread receiveThread(receiveThreadFn);
+	// receiveThread.detach();
 }
 
 void sendCANPacket(const CANPacket& packet) {
 	can_frame frame;
 	frame.can_id = packet.id;
 	frame.can_dlc = packet.dlc;
-	for (int i = 0; i < packet.dlc; i++) {
-		frame.data[i] = packet.data[i];
+	std::memcpy(frame.data, packet.data, packet.dlc);
+
+	if (write(can_fd, &frame, sizeof(struct can_frame)) != sizeof(struct can_frame)) {
+		std::perror("Failed to send CAN packet");
+	} else {
+		log(LOG_TRACE, "CAN packet sent.\n");
 	}
 
-	bool success;
-	{
-		std::lock_guard lock(socketMutex);
-		// not marked as nonblocking, so we shouldn't see EAGAIN or EWOULDBLOCK
-		success = sendto(can_fd, &frame, sizeof(struct can_frame), 0,
-						 (struct sockaddr*)&can_addr, sizeof(can_addr)) >= 0;
-	}
-	if (success) {
-		log(LOG_TRACE, "CAN packet sent.\n");
-	} else {
-		std::perror("Failed to send CAN packet");
-	}
+	tcdrain(can_fd);
+
+	// bool success;
+	// {
+	// 	std::lock_guard lock(socketMutex);
+	// 	// not marked as nonblocking, so we shouldn't see EAGAIN or EWOULDBLOCK
+	// 	success = sendto(can_fd, &frame, sizeof(struct can_frame), 0,
+	// 					 (struct sockaddr*)&can_addr, sizeof(can_addr)) >= 0;
+	// }
+	// if (success) {
+	// 	log(LOG_TRACE, "CAN packet sent.\n");
+	// } else {
+	// 	std::perror("Failed to send CAN packet");
+	// }
 }
 
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
