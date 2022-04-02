@@ -262,7 +262,12 @@ target_link_libraries(Rover ${vision_libs})
 # enabled.
 
 # Common CAN source files
-add_library(can_interface SHARED)
+
+# **DON'T MAKE THIS SHARED**
+# If this library is shared then CAN shits itself and nothing fucking works
+# literally don't ask me why because I got no fucking clue
+# Somehow it will crash the bus even though the kernel will report it's fine. Fuck this.
+add_library(can_interface STATIC)
 target_sources(can_interface PRIVATE
   log.cpp
   CAN/CANMotor_PSOC.cpp

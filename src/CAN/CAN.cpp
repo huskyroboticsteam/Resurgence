@@ -3,8 +3,8 @@
 #include "../log.h"
 #include "CANUtils.h"
 
-#include <cstring>
 #include <chrono>
+#include <cstring>
 #include <map>
 #include <mutex>
 #include <shared_mutex>
@@ -30,7 +30,7 @@ using robot::types::DataPoint;
 constexpr std::chrono::milliseconds READ_PERIOD(10);
 
 namespace can {
-// namespace {
+namespace {
 int can_fd;
 sockaddr_can can_addr;
 std::mutex socketMutex; // protects both can_fd and can_addr
@@ -61,7 +61,7 @@ bool receivePacket(CANPacket& packet) {
 		std::lock_guard lock(socketMutex);
 		// we won't loop if we get EAGAIN or EWOULDBLOCK
 		ret = recvfrom(can_fd, &frame, sizeof(can_frame), MSG_DONTWAIT,
-						   reinterpret_cast<sockaddr*>(&can_addr), &len);
+					   reinterpret_cast<sockaddr*>(&can_addr), &len);
 	}
 	if (ret >= 0) {
 		log(LOG_TRACE, "Got CAN packet\n");
@@ -136,58 +136,36 @@ void receiveThreadFn() {
 		}
 	}
 }
-// } // namespace
+} // namespace
 
 void initCAN() {
-	// int s;
-
+	std::lock_guard lock(socketMutex);
 	if ((can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		perror("Socket");
+		std::perror("Failed to initialize CAN bus!");
 		return;
 	}
 
 	struct ifreq ifr;
-	strcpy(ifr.ifr_name, "can0");
-	ioctl(can_fd, SIOCGIFINDEX, &ifr);
+	std::strcpy(ifr.ifr_name, "can0");
+	if (ioctl(can_fd, SIOCGIFINDEX, &ifr) < 0) {
+		std::perror("Failed to get hardware CAN interface index");
+		std::strcpy(ifr.ifr_name, "vcan0");
+		if (ioctl(can_fd, SIOCGIFINDEX, &ifr) < 0) {
+			std::perror("Failed to get virual CAN interface index");
+			return;
+		}
+		log(LOG_INFO, "Found virtual CAN interface index.\n");
+	}
 
 	struct sockaddr_can addr;
-	memset(&addr, 0, sizeof(addr));
+	std::memset(&addr, 0, sizeof(addr));
 	addr.can_family = AF_CAN;
 	addr.can_ifindex = ifr.ifr_ifindex;
 
 	if (bind(can_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		perror("Bind");
+		std::perror("Bind");
 		return;
 	}
-
-	// std::lock_guard lock(socketMutex);
-	// if ((can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-	// 	error("Failed to initialize CAN bus!");
-	// }
-
-	// ifreq can_ifr;
-	// std::strcpy(can_ifr.ifr_name, "can0");
-	// if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0) {
-	// 	std::perror("Failed to get hardware CAN interface index\n"
-	// 				"You can enable CAN with\n\n"
-	// 				"  ~/Resurgence/enable_CAN_and_GPS.sh\n\n");
-	// 	std::strcpy(can_ifr.ifr_name, "vcan0");
-	// 	if (ioctl(can_fd, SIOCGIFINDEX, &can_ifr) < 0) {
-	// 		error("Failed to get virtual CAN interface index\n"
-	// 			  "You can enable CAN with\n\n"
-	// 			  "  ~/Resurgence/enable_CAN_and_GPS.sh\n\n");
-	// 	}
-	// 	log(LOG_INFO, "Found virtual CAN interface index.\n");
-	// }
-
-	// std::memset(&can_addr, 0, sizeof(can_addr));
-	// can_addr.can_family = AF_CAN;
-	// log(LOG_DEBUG, "Index: %d\n", can_ifr.ifr_ifindex);
-	// can_addr.can_ifindex = can_ifr.ifr_ifindex;
-
-	// if (bind(can_fd, (struct sockaddr*)&can_addr, sizeof(can_addr)) < 0) {
-	// 	error("Failed to bind CAN socket");
-	// }
 
 	// start thread for recieving CAN packets
 	// std::thread receiveThread(receiveThreadFn);
@@ -199,27 +177,18 @@ void sendCANPacket(const CANPacket& packet) {
 	frame.can_id = packet.id;
 	frame.can_dlc = packet.dlc;
 	std::memcpy(frame.data, packet.data, packet.dlc);
+	bool success;
+	{
+		std::lock_guard lock(socketMutex);
+		success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
+		tcdrain(can_fd);
+	}
 
-	if (write(can_fd, &frame, sizeof(struct can_frame)) != sizeof(struct can_frame)) {
+	if (!success) {
 		std::perror("Failed to send CAN packet");
 	} else {
 		log(LOG_TRACE, "CAN packet sent.\n");
 	}
-
-	tcdrain(can_fd);
-
-	// bool success;
-	// {
-	// 	std::lock_guard lock(socketMutex);
-	// 	// not marked as nonblocking, so we shouldn't see EAGAIN or EWOULDBLOCK
-	// 	success = sendto(can_fd, &frame, sizeof(struct can_frame), 0,
-	// 					 (struct sockaddr*)&can_addr, sizeof(can_addr)) >= 0;
-	// }
-	// if (success) {
-	// 	log(LOG_TRACE, "CAN packet sent.\n");
-	// } else {
-	// 	std::perror("Failed to send CAN packet");
-	// }
 }
 
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
