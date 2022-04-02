@@ -52,6 +52,9 @@ std::mutex lidarMutex;
 DataPoint<pose_t> lastTruePose;
 std::mutex truePoseMutex;
 
+std::map<std::string, DataPoint<int32_t>> motorPosMap;
+std::shared_mutex motorPosMapMutex;
+
 // stores the last camera frame for each camera
 std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // stores the index of the last camera frame for each camera
@@ -132,7 +135,12 @@ void handleCamFrame(json msg) {
 }
 
 void handleMotorStatus(json msg) {
-	// TODO: forward to mission control
+	int32_t pos = msg["position"];
+	std::string motorName = msg["motor"];
+	DataPoint<int32_t> posData(pos);
+
+	std::unique_lock lock(motorPosMapMutex);
+	motorPosMap.insert_or_assign(motorName, posData);
 }
 
 void handleTruePose(json msg) {
@@ -286,8 +294,15 @@ void setMotorPos(motorid_t motor, int32_t targetPos) {
 	sendJSON(msg);
 }
 
-types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
-	// TODO: return motor position
+DataPoint<int32_t> getMotorPos(motorid_t motor) {
+	std::string motorName = motorNameMap.at(motor);
+	std::shared_lock lock(motorPosMapMutex);
+	auto entry = motorPosMap.find(motorName);
+	if (entry != motorPosMap.end()) {
+		return entry->second;
+	} else {
+		return {};
+	}
 }
 
 void setIndicator(indication_t signal) {
