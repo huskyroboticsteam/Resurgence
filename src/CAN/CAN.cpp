@@ -47,6 +47,7 @@ using protectedmap_t =
 std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
 
+// not thread-safe wrt file descriptor
 bool receivePacket(int fd, CANPacket& packet) {
 	int ret;
 	can_frame frame;
@@ -99,6 +100,7 @@ void handleTelemetryPacket(CANPacket& packet) {
 	}
 }
 
+// returns a file descriptor, or -1 on failure
 int createCANSocket(std::optional<can::deviceid_t> id) {
 	int fd;
 	if ((fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
@@ -148,8 +150,13 @@ void receiveThreadFn() {
 	CANPacket packet;
 	// create dedicated CAN socket for reading
 	int recvFD = createCANSocket({{devicegroup_t::master, DEVICE_SERIAL_JETSON}});
+	if (recvFD < 0) {
+		log(LOG_ERROR, "Unable to open CAN connection!\n");
+		return;
+	}
 
 	while (true) {
+		// no sychronization necessary, since this thread owns the FD
 		bool received = receivePacket(recvFD, packet);
 		if (received) {
 			uint8_t packetType = packet.data[0];
@@ -173,6 +180,9 @@ void receiveThreadFn() {
 void initCAN() {
 	std::lock_guard lock(socketMutex);
 	can_fd = createCANSocket({});
+	if (can_fd < 0) {
+		log(LOG_ERROR, "Unable to open CAN connection!\n");
+	}
 
 	// start thread for recieving CAN packets
 	std::thread receiveThread(receiveThreadFn);
@@ -199,12 +209,15 @@ void sendCANPacket(const CANPacket& packet) {
 }
 
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
-	std::shared_lock mapLock(telemMapMutex);
+	std::shared_lock mapLock(telemMapMutex); // acquire read lock
+	// find entry for device in map
 	auto entry = telemMap.find(id);
 	if (entry != telemMap.end()) {
 		auto& devMutex = *entry->second.first;
 		auto& devMap = *entry->second.second;
+		// acquire read lock of device map
 		std::shared_lock deviceLock(devMutex);
+		// find entry for telemetry
 		auto telemEntry = devMap.find(static_cast<telemetrycode_t>(telemType));
 		if (telemEntry != devMap.end()) {
 			return telemEntry->second;
