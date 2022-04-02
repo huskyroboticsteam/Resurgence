@@ -27,13 +27,14 @@ extern "C" {
 
 using robot::types::DataPoint;
 
-constexpr std::chrono::milliseconds READ_PERIOD(10);
-
 namespace can {
 namespace {
+constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
+// receive all messages on the given group
+constexpr int CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
+
 int can_fd;
-sockaddr_can can_addr;
-std::mutex socketMutex; // protects both can_fd and can_addr
+std::mutex socketMutex; // protects can_fd
 
 using telemetrycode_t = uint8_t;
 
@@ -46,35 +47,18 @@ using protectedmap_t =
 std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
 
-void error(const std::string& err) {
-	std::perror(err.c_str());
-	std::exit(1);
-}
-
-bool receivePacket(CANPacket& packet) {
-	socklen_t len = sizeof(can_addr);
-
+bool receivePacket(int fd, CANPacket& packet) {
 	int ret;
 	can_frame frame;
-	{
-		// lock the socket only while we're using it
-		std::lock_guard lock(socketMutex);
-		// we won't loop if we get EAGAIN or EWOULDBLOCK
-		ret = recvfrom(can_fd, &frame, sizeof(can_frame), MSG_DONTWAIT,
-					   reinterpret_cast<sockaddr*>(&can_addr), &len);
-	}
+	ret = read(fd, &frame, sizeof(can_frame));
 	if (ret >= 0) {
 		log(LOG_TRACE, "Got CAN packet\n");
 		packet.id = frame.can_id;
 		packet.dlc = frame.can_dlc;
-		for (int i = 0; i < frame.can_dlc; i++) {
-			packet.data[i] = frame.data[i];
-		}
+		std::memcpy(packet.data, frame.data, frame.can_dlc);
 		return true;
-	} else if (ret != EAGAIN && ret != EWOULDBLOCK) {
-		std::perror("Failed to receive CAN packet!");
-		return false;
 	} else {
+		std::perror("Failed to receive CAN packet!");
 		return false;
 	}
 }
@@ -115,11 +99,58 @@ void handleTelemetryPacket(CANPacket& packet) {
 	}
 }
 
+int createCANSocket(std::optional<can::deviceid_t> id) {
+	int fd;
+	if ((fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+		std::perror("Failed to initialize CAN bus!");
+		return -1;
+	}
+
+	struct ifreq ifr;
+	std::strcpy(ifr.ifr_name, "can0");
+	if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
+		std::perror("Failed to get hardware CAN interface index");
+		std::strcpy(ifr.ifr_name, "vcan0");
+		if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
+			std::perror("Failed to get virtual CAN interface index");
+			return -1;
+		}
+		log(LOG_INFO, "Found virtual CAN interface index.\n");
+	}
+
+	struct sockaddr_can addr;
+	std::memset(&addr, 0, sizeof(addr));
+	addr.can_family = AF_CAN;
+	addr.can_ifindex = ifr.ifr_ifindex;
+
+	if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+		std::perror("Bind");
+		return -1;
+	}
+
+	// enable reception at the given id, if provided
+	if (id) {
+		int canID = ConstructCANID(0, static_cast<uint8_t>(id->first), id->second);
+		can_filter filters[1];
+		filters[0].can_id = canID;
+		filters[0].can_mask = CAN_MASK;
+
+		setsockopt(fd, SOL_CAN_RAW, CAN_RAW_FILTER, &filters, sizeof(filters));
+	} else {
+		// disable reception on this socket.
+		setsockopt(fd, SOL_CAN_RAW, CAN_RAW_FILTER, nullptr, 0);
+	}
+
+	return fd;
+}
+
 void receiveThreadFn() {
 	CANPacket packet;
+	// create dedicated CAN socket for reading
+	int recvFD = createCANSocket({{devicegroup_t::master, DEVICE_SERIAL_JETSON}});
 
 	while (true) {
-		bool received = receivePacket(packet);
+		bool received = receivePacket(recvFD, packet);
 		if (received) {
 			uint8_t packetType = packet.data[0];
 			switch (packetType) {
@@ -132,7 +163,8 @@ void receiveThreadFn() {
 					break;
 			}
 		} else {
-			std::this_thread::sleep_for(READ_PERIOD);
+			// we had a bus error, so sleep for a bit
+			std::this_thread::sleep_for(READ_ERR_SLEEP);
 		}
 	}
 }
@@ -140,36 +172,11 @@ void receiveThreadFn() {
 
 void initCAN() {
 	std::lock_guard lock(socketMutex);
-	if ((can_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		std::perror("Failed to initialize CAN bus!");
-		return;
-	}
-
-	struct ifreq ifr;
-	std::strcpy(ifr.ifr_name, "can0");
-	if (ioctl(can_fd, SIOCGIFINDEX, &ifr) < 0) {
-		std::perror("Failed to get hardware CAN interface index");
-		std::strcpy(ifr.ifr_name, "vcan0");
-		if (ioctl(can_fd, SIOCGIFINDEX, &ifr) < 0) {
-			std::perror("Failed to get virual CAN interface index");
-			return;
-		}
-		log(LOG_INFO, "Found virtual CAN interface index.\n");
-	}
-
-	struct sockaddr_can addr;
-	std::memset(&addr, 0, sizeof(addr));
-	addr.can_family = AF_CAN;
-	addr.can_ifindex = ifr.ifr_ifindex;
-
-	if (bind(can_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		std::perror("Bind");
-		return;
-	}
+	can_fd = createCANSocket({});
 
 	// start thread for recieving CAN packets
-	// std::thread receiveThread(receiveThreadFn);
-	// receiveThread.detach();
+	std::thread receiveThread(receiveThreadFn);
+	receiveThread.detach();
 }
 
 void sendCANPacket(const CANPacket& packet) {
