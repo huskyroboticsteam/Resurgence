@@ -157,9 +157,39 @@ add_library(hindsight_can STATIC
   HindsightCAN/PortFiles/PortTemplate.c
 )
 
+## ====== CAN Interfaces =======
+# Stub CAN interface is used for the tests (and for the Rover if
+# CAN is disabled) and the real CAN interface is used for the Rover if CAN is
+# enabled.
+
+# Common CAN source files
+
+# **DON'T MAKE THIS SHARED**
+# If this library is shared then CAN shits itself and nothing fucking works
+# literally don't ask me why because I got no fucking clue
+# Somehow it will crash the bus even though the kernel will report it's fine. Fuck this.
+add_library(can_interface STATIC)
+target_sources(can_interface PRIVATE
+  log.cpp
+  CAN/CANMotor_PSOC.cpp
+  CAN/CANMotor.cpp
+  CAN/CANUtils.cpp
+)
+
+# Hardware specific source files
+if(WITH_CAN)
+  target_sources(can_interface PRIVATE
+    CAN/CAN.cpp)
+else()
+  target_sources(can_interface PRIVATE
+    CAN/CANStubs.cpp)
+endif()
+target_link_libraries(can_interface PUBLIC hindsight_can)
+
 add_library(real_base_station SHARED
   Networking/Network.cpp)
 
+## ====== World Interfaces =======
 add_library(stub_world_interface STATIC
   world_interface/noop_world.cpp)
 
@@ -190,6 +220,8 @@ target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_D
 target_link_libraries(real_world_interface ${vision_libs})
 target_include_directories(simulator_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(simulator_interface ${vision_libs})
+
+target_link_libraries(real_world_interface can_interface)
 
 add_library(hr_slam SHARED
   filters/pose_graph/graph.cpp
@@ -256,38 +288,6 @@ list(APPEND vision_libs
 
 target_link_libraries(Rover ${vision_libs})
 
-## ====== CAN Interfaces =======
-# Stub CAN interface is used for the tests (and for the Rover if
-# CAN is disabled) and the real CAN interface is used for the Rover if CAN is
-# enabled.
-
-# Common CAN source files
-
-# **DON'T MAKE THIS SHARED**
-# If this library is shared then CAN shits itself and nothing fucking works
-# literally don't ask me why because I got no fucking clue
-# Somehow it will crash the bus even though the kernel will report it's fine. Fuck this.
-add_library(can_interface STATIC)
-target_sources(can_interface PRIVATE
-  log.cpp
-  CAN/CANMotor_PSOC.cpp
-  CAN/CANMotor.cpp
-  CAN/CANUtils.cpp
-)
-
-# Hardware specific source files
-if(WITH_CAN)
-  target_sources(can_interface PRIVATE
-    CAN/CAN.cpp)
-else()
-  target_sources(can_interface PRIVATE
-    CAN/CANStubs.cpp)
-endif()
-target_link_libraries(can_interface PUBLIC hindsight_can)
-
-# Link the CAN interface to the Rover executable.
-target_link_libraries(Rover can_interface)
-
 if(WITH_CAN)
   add_executable(TunePID TunePID.cpp)
   target_link_libraries(TunePID 
@@ -322,7 +322,6 @@ if(WITH_TESTS)
     ../tests/worldmap/QuadTreeTest.cpp)
 
   target_link_libraries(tests
-    can_interface
     ${rover_libs}
     ${real_world_libs}
     ${OpenCV_LIBS})
