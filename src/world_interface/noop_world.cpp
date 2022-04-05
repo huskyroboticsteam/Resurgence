@@ -46,6 +46,14 @@ types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
 
 void setIndicator(indication_t signal) {}
 
+callbackid_t addLimitSwitchCallback(
+	robot::types::motorid_t motor,
+	const std::function<void(robot::types::motorid_t motor,
+					   robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback) {}
+
+void removeLimitSwitchCallback(callbackid_t id) {}
+
 } // namespace robot
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {

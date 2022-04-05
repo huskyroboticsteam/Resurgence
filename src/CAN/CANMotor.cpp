@@ -15,30 +15,9 @@ extern "C" {
 
 using namespace std::chrono_literals;
 using robot::types::DataPoint;
+using robot::types::LimitSwitchData;
 
 namespace can::motor {
-
-LimitSwitchData::LimitSwitchData(unsigned long long data) : data(data) {}
-
-bool LimitSwitchData::isOpen(size_t idx) {
-	return !data.test(idx);
-}
-
-bool LimitSwitchData::isClosed(size_t idx) {
-	return data.test(idx);
-}
-
-bool LimitSwitchData::isAnyClosed() {
-	return data.any();
-}
-
-bool LimitSwitchData::isAnyOpen() {
-	return !data.all();
-}
-
-std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) {
-	return data ^ other.data;
-}
 
 void emergencyStopMotors() {
 	CANPacket p;

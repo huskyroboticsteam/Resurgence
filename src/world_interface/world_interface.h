@@ -211,6 +211,16 @@ void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
  */
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
 
+using callbackid_t = unsigned long long;
+
+callbackid_t addLimitSwitchCallback(
+	robot::types::motorid_t motor,
+	const std::function<void(robot::types::motorid_t motor,
+					   robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback);
+
+void removeLimitSwitchCallback(callbackid_t id);
+
 } // namespace robot
 
 namespace gps {

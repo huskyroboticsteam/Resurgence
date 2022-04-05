@@ -55,6 +55,13 @@ std::mutex truePoseMutex;
 std::map<std::string, DataPoint<int32_t>> motorPosMap;
 std::shared_mutex motorPosMapMutex;
 
+using lscallback_t =
+	std::function<void(robot::types::DataPoint<LimitSwitchData> limitSwitchData)>;
+std::map<std::string, std::map<robot::callbackid_t, lscallback_t>> limitSwitchCallbackMap;
+robot::callbackid_t nextCallbackID = 0;
+std::map<robot::callbackid_t, motorid_t> lsCallbackToMotorMap;
+std::mutex limitSwitchCallbackMapMutex; // protects both maps and nextCallbackID
+
 // stores the last camera frame for each camera
 std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // stores the index of the last camera frame for each camera
@@ -143,6 +150,23 @@ void handleMotorStatus(json msg) {
 	motorPosMap.insert_or_assign(motorName, posData);
 }
 
+void handleLimitSwitch(json msg) {
+	std::string motorName = msg["motor"];
+	uint8_t data;
+	std::string limit = msg["limit"];
+	if (limit == "maximum") {
+		data = 1 << LIMIT_SWITCH_LIM_MAX_IDX;
+	} else if (limit == "minimum") {
+		data = 1 << LIMIT_SWITCH_LIM_MIN_IDX;
+	}
+	DataPoint<LimitSwitchData> lsData(data);
+
+	std::lock_guard lock(limitSwitchCallbackMapMutex);
+	for (const auto& entry : limitSwitchCallbackMap.at(motorName)) {
+		entry.second(lsData);
+	}
+}
+
 void handleTruePose(json msg) {
 	auto pos = msg["position"];
 	auto rot = msg["rotation"];
@@ -177,6 +201,7 @@ void initSimServer() {
 	protocol.addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol.addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol.addMessageHandler("simMotorStatusReport", handleMotorStatus);
+	protocol.addMessageHandler("simLimitSwitchAlert", handleLimitSwitch);
 	protocol.addMessageHandler("simRoverTruePoseReport", handleTruePose);
 	protocol.addConnectionHandler(clientConnected);
 	protocol.addDisconnectionHandler(clientDisconnected);
@@ -302,6 +327,31 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 		return entry->second;
 	} else {
 		return {};
+	}
+}
+
+callbackid_t addLimitSwitchCallback(
+	robot::types::motorid_t motor,
+	const std::function<void(robot::types::motorid_t motor,
+							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback) {
+	auto func = std::bind(callback, motor, std::placeholders::_1);
+	std::string motorName = motorNameMap.at(motor);
+
+	std::lock_guard lock(limitSwitchCallbackMapMutex);
+	limitSwitchCallbackMap.insert({motorName, {}});
+	callbackid_t nextID = nextCallbackID++;
+	limitSwitchCallbackMap.at(motorName).insert({nextID, func});
+	lsCallbackToMotorMap.insert({nextID, motor});
+	return nextID;
+}
+
+void removeLimitSwitchCallback(callbackid_t id) {
+	std::lock_guard lock(limitSwitchCallbackMapMutex);
+	std::string motorName = motorNameMap.at(lsCallbackToMotorMap.at(id));
+	limitSwitchCallbackMap.at(motorName).erase(id);
+	if (limitSwitchCallbackMap.at(motorName).empty()) {
+		limitSwitchCallbackMap.erase(motorName);
 	}
 }
 

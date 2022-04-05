@@ -196,6 +196,7 @@ add_library(stub_world_interface STATIC
 list(APPEND common_world_interface_src
   world_interface/gps_common_interface.cpp
   world_interface/kinematic_common_interface.cpp
+  world_interface/data.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp

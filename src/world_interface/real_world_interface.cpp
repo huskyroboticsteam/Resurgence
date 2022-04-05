@@ -36,6 +36,9 @@ std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 
 std::map<motorid_t, motormode_t> motorModeMap;
 
+callbackid_t nextCallbackID = 0;
+std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
+
 void ensureMotorMode(motorid_t motor, motormode_t mode) {
 	auto entry = motorModeMap.find(motor);
 	if (entry == motorModeMap.end()) {
@@ -220,6 +223,24 @@ void setIndicator(indication_t signal) {}
 
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
 	return can::motor::getMotorPosition(motorSerialIDMap.at(motor));
+}
+
+callbackid_t addLimitSwitchCallback(
+	robot::types::motorid_t motor,
+	const std::function<void(robot::types::motorid_t motor,
+							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback) {
+	auto func = [=](can::deviceserial_t serial, DataPoint<LimitSwitchData> data) {
+		callback(motor, data);
+	};
+	auto id = can::motor::addLimitSwitchCallback(motorSerialIDMap.at(motor), func);
+	auto nextID = nextCallbackID++;
+	callbackIDMap.insert({nextID, id});
+	return nextID;
+}
+
+void removeLimitSwitchCallback(callbackid_t id) {
+	return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
 }
 
 } // namespace robot
