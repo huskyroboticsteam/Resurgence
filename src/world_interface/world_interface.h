@@ -216,7 +216,7 @@ using callbackid_t = unsigned long long;
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
 	const std::function<void(robot::types::motorid_t motor,
-					   robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+					   robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>&
 		callback);
 
 void removeLimitSwitchCallback(callbackid_t id);

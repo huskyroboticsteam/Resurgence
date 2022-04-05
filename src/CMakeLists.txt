@@ -190,10 +190,8 @@ add_library(real_base_station SHARED
   Networking/Network.cpp)
 
 ## ====== World Interfaces =======
-add_library(stub_world_interface STATIC
-  world_interface/noop_world.cpp)
-
-list(APPEND common_world_interface_src
+# hardware-agnostic utilities and common code for world interface
+add_library(world_interface_core STATIC
   world_interface/gps_common_interface.cpp
   world_interface/kinematic_common_interface.cpp
   world_interface/data.cpp
@@ -204,25 +202,29 @@ list(APPEND common_world_interface_src
   ar/read_landmarks.cpp
   base64/base64_img.cpp
   ${camera_src}
-)
+  )
+target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco)
+
+# CAN library (above) requires some utilities from this
+target_link_libraries(can_interface PUBLIC world_interface_core)
+
+add_library(stub_world_interface STATIC
+  world_interface/noop_world.cpp)
 
 add_library(real_world_interface STATIC
   world_interface/real_world_constants.cpp
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
   gps/usb_gps/read_usb_gps.cpp
-  ${common_world_interface_src}
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
-  ${common_world_interface_src}
   )
-target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(real_world_interface ${vision_libs})
-target_include_directories(simulator_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(simulator_interface ${vision_libs})
 
-target_link_libraries(real_world_interface can_interface)
+target_link_libraries(real_world_interface can_interface world_interface_core)
+target_link_libraries(simulator_interface world_interface_core)
+target_link_libraries(stub_world_interface world_interface_core)
 
 add_library(hr_slam SHARED
   filters/pose_graph/graph.cpp

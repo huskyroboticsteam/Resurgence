@@ -49,8 +49,10 @@ void setIndicator(indication_t signal) {}
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
 	const std::function<void(robot::types::motorid_t motor,
-					   robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
-		callback) {}
+							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback) {
+	return 0;
+}
 
 void removeLimitSwitchCallback(callbackid_t id) {}
 
