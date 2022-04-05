@@ -14,8 +14,31 @@ extern "C" {
 }
 
 using namespace std::chrono_literals;
+using robot::types::DataPoint;
 
 namespace can::motor {
+
+LimitSwitchData::LimitSwitchData(unsigned long long data) : data(data) {}
+
+bool LimitSwitchData::isOpen(size_t idx) {
+	return !data.test(idx);
+}
+
+bool LimitSwitchData::isClosed(size_t idx) {
+	return data.test(idx);
+}
+
+bool LimitSwitchData::isAnyClosed() {
+	return data.any();
+}
+
+bool LimitSwitchData::isAnyOpen() {
+	return !data.all();
+}
+
+std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) {
+	return data ^ other.data;
+}
 
 void emergencyStopMotors() {
 	CANPacket p;
@@ -76,8 +99,30 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 	sendCANPacket(p);
 }
 
-robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
+DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial),
 							  telemtype_t::angle);
+}
+
+callbackid_t addLimitSwitchCallback(
+	deviceserial_t serial,
+	const std::function<void(deviceserial_t serial,
+							 DataPoint<LimitSwitchData> limitSwitchData)>& callback) {
+	auto id = std::make_pair(devicegroup_t::motor, serial);
+	// wrap callback in lambda to change signature
+	auto func = [callback](deviceid_t deviceID, telemtype_t,
+						   DataPoint<telemetry_t> telemData) {
+		if (telemData) {
+			LimitSwitchData data = telemData.getData();
+			callback(deviceID.second, {telemData.getTime(), data});
+		} else {
+			callback(deviceID.second, {});
+		}
+	};
+	return addDeviceTelemetryCallback(id, telemtype_t::limit_switch, func);
+}
+
+void removeLimitSwitchCallback(callbackid_t id) {
+	removeDeviceTelemetryCallback(id);
 }
 } // namespace can::motor

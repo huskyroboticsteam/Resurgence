@@ -3,6 +3,7 @@
 #include "../world_interface/data.h"
 #include "CANUtils.h"
 
+#include <functional>
 #include <optional>
 
 extern "C" {
@@ -14,6 +15,13 @@ extern "C" {
  * @brief Utilities for interacting with CAN devices.
  */
 namespace can {
+
+/**
+ * @brief An ID for a telemetry callback.
+ *
+ * Users should not construct these themselves.
+ */
+using callbackid_t = std::tuple<deviceid_t, telemtype_t, uint32_t>;
 
 /**
  * @brief Initialize the CAN interface.
@@ -44,5 +52,32 @@ void sendCANPacket(const CANPacket& packet);
  * is returned.
  */
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType);
+
+/**
+ * @brief Add a callback which is invoked when data is recieved.
+ *
+ * The callback is invoked when telemetry data of the given type is received
+ * from the given device.
+ *
+ * @param id The ID of the device the callback is listening for.
+ * @param telemType The type of telemetry the callback is listening for.
+ * @param callback The callback that will be invoked with the device ID, telemetry type, and
+ * the telemetry data.
+ * @return callbackid_t A callback ID, which can be used with removeDeviceTelemetryCallback()
+ * to remove a callback.
+ */
+callbackid_t addDeviceTelemetryCallback(
+	deviceid_t id, telemtype_t telemType,
+	const std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
+		callback);
+
+/**
+ * @brief Remove a previously registered telemetry callback.
+ *
+ * The callback associated with the given callback ID is removed.
+ *
+ * @param id A callback ID which was previously returned by addDeviceTelemetryCallback().
+ */
+void removeDeviceTelemetryCallback(callbackid_t id);
 
 } // namespace can

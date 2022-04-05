@@ -39,7 +39,7 @@ std::priority_queue<telemschedule_t> telemetrySchedule;
 bool startedMotorThread = false;
 bool newMotorAdded = false;
 std::condition_variable motorsCV;
-std::mutex motorsMutex; // protects both motor list and motor flag
+std::mutex motorsMutex; // protects telemetrySchedule, startedMotorThread, newMotorAdded
 
 void motorThreadFn() {
 	while (true) {

@@ -29,14 +29,32 @@ using robot::types::DataPoint;
 
 namespace can {
 namespace {
+// time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 // receive all messages on the given group
 constexpr int CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
 
-int can_fd;
+int can_fd;	// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
 
 using telemetrycode_t = uint8_t;
+
+const std::map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
+	{PACKET_TELEMETRY_VOLTAGE, telemtype_t::voltage},
+	{PACKET_TELEMETRY_CURRENT, telemtype_t::current},
+	{PACKET_TELEMETRY_PWR_RAIL_STATE, telemtype_t::pwr_rail},
+	{PACKET_TELEMETRY_TEMPERATURE, telemtype_t::temp},
+	{PACKET_TELEMETRY_ANG_POSITION, telemtype_t::angle},
+	{PACKET_TELEMETRY_GPS_LAT, telemtype_t::gps_lat},
+	{PACKET_TELEMETRY_GPS_LON, telemtype_t::gps_lon},
+	{PACKET_TELEMETRY_MAG_DIR, telemtype_t::mag_dir},
+	{PACKET_TELEMETRY_ACCEL_X, telemtype_t::accel_x},
+	{PACKET_TELEMETRY_ACCEL_Y, telemtype_t::accel_y},
+	{PACKET_TELEMETRY_ACCEL_Z, telemtype_t::accel_z},
+	{PACKET_TELEMETRY_GYRO_X, telemtype_t::gyro_x},
+	{PACKET_TELEMETRY_GYRO_Y, telemtype_t::gyro_y},
+	{PACKET_TELEMETRY_GYRO_Z, telemtype_t::gyro_z},
+	{PACKET_TELEMETRY_LIM_SW_STATE, telemtype_t::limit_switch}};
 
 // the telemetry map will store telemetry code instead of telem enum
 // this means unrecognized telemetry types won't cause UB
@@ -44,8 +62,15 @@ using protectedmap_t =
 	std::pair<std::shared_ptr<std::shared_mutex>,
 			  std::shared_ptr<std::map<telemetrycode_t, DataPoint<telemetry_t>>>>;
 
+// holds telemetry data for each device
 std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
+
+std::map<std::pair<deviceid_t, telemetrycode_t>,
+		 std::map<uint32_t, std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>>>
+	telemetryCallbackMap;
+uint32_t nextCallbackID = 0;
+std::mutex telemetryCallbackMapMutex; // protects callbackMap and callbackID
 
 // not thread-safe wrt file descriptor
 bool receivePacket(int fd, CANPacket& packet) {
@@ -97,6 +122,22 @@ void handleTelemetryPacket(CANPacket& packet) {
 		// acquire write lock of the entire map to insert a new device map
 		std::unique_lock mapLock(telemMapMutex);
 		telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
+	}
+
+	// now fire off callback, if it exists
+	// first convert the telemetry code into a telemetry type
+	auto telemTypeEntry = telemCodeToTypeMap.find(telemCode);
+	if (telemTypeEntry != telemCodeToTypeMap.end()) {
+		telemtype_t telemType = telemTypeEntry->second;
+		std::lock_guard lock(telemetryCallbackMapMutex);
+		// get callback (checking if it exists)
+		auto entry = telemetryCallbackMap.find(std::make_pair(id, telemCode));
+		if (entry != telemetryCallbackMap.end()) {
+			// invoke all callbacks
+			for (auto callbackEntry : entry->second) {
+				callbackEntry.second(id, telemType, data);
+			}
+		}
 	}
 }
 
@@ -226,6 +267,41 @@ robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype
 		}
 	} else {
 		return {};
+	}
+}
+
+callbackid_t addDeviceTelemetryCallback(
+	deviceid_t id, telemtype_t telemType,
+	const std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
+		callback) {
+	telemetrycode_t code = static_cast<telemetrycode_t>(telemType);
+	auto key = std::make_pair(id, code);
+
+	std::lock_guard lock(telemetryCallbackMapMutex);
+	uint32_t callbackIDCode = nextCallbackID++;
+	callbackid_t callbackID = {id, telemType, callbackIDCode};
+
+	telemetryCallbackMap.insert({key, {}});
+	telemetryCallbackMap.at(key).insert({callbackIDCode, callback});
+
+	return callbackID;
+}
+
+void removeDeviceTelemetryCallback(callbackid_t id) {
+	deviceid_t deviceID = std::get<0>(id);
+	telemetrycode_t telemCode = static_cast<telemetrycode_t>(std::get<1>(id));
+	uint32_t code = std::get<2>(id);
+	auto key = std::make_pair(deviceID, telemCode);
+
+	std::lock_guard lock(telemetryCallbackMapMutex);
+	auto entry = telemetryCallbackMap.find(key);
+	if (entry != telemetryCallbackMap.end()) {
+		// remove the callback
+		entry->second.erase(code);
+		// if there are no callbacks left for this telemetry type + device, remove the map
+		if (entry->second.empty()) {
+			telemetryCallbackMap.erase(entry);
+		}
 	}
 }
 

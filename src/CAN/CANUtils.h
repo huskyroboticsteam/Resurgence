@@ -93,12 +93,42 @@ deviceserial_t getDeviceSerial(const CANPacket& packet);
  */
 deviceid_t getDeviceGroupAndSerial(const CANPacket& packet);
 
+/**
+ * @brief Get the device serial code of the sender of the given packet.
+ *
+ * @param packet The packet to extract the sender code from.
+ * @return deviceserial_t The serial code of the sender.
+ */
 deviceserial_t getSenderDeviceSerial(const CANPacket& packet);
 
+/**
+ * @brief Get the device group of the sender of the given packet.
+ *
+ * @param packet The packet to extract the device group from.
+ * @return devicegroup_t The device group of the sender.
+ */
 devicegroup_t getSenderDeviceGroup(const CANPacket& packet);
 
+/**
+ * @brief Get the device group and serial code of the sender
+ * of the given packet.
+ *
+ * @param packet The packet to extract the information from.
+ * @return deviceid_t The device group and serial code of the sender.
+ */
 deviceid_t getSenderDeviceGroupAndSerial(const CANPacket& packet);
 
+/**
+ * @brief Get a string representation of the given CAN packet.
+ *
+ * The returned string representation is in the format specified by cansend,
+ * which allows easy copy-pasting.
+ *
+ * @see http://manpages.ubuntu.com/manpages/focal/man1/cansend.1.html
+ * 
+ * @param packet The packet to convert to a string.
+ * @return std::string The string representation of the given packet.
+ */
 std::string packetToString(const CANPacket& packet);
 
 } // namespace can
