@@ -147,6 +147,9 @@ list(APPEND camera_src
   camera/CameraConfig.cpp
   )
 
+# shared library for logging code
+add_library(logging SHARED log.cpp)
+
 # The CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
 add_library(hindsight_can STATIC
@@ -170,7 +173,6 @@ add_library(hindsight_can STATIC
 # Somehow it will crash the bus even though the kernel will report it's fine. Fuck this.
 add_library(can_interface STATIC)
 target_sources(can_interface PRIVATE
-  log.cpp
   CAN/CANMotor_PSOC.cpp
   CAN/CANMotor.cpp
   CAN/CANUtils.cpp
@@ -184,7 +186,11 @@ else()
   target_sources(can_interface PRIVATE
     CAN/CANStubs.cpp)
 endif()
-target_link_libraries(can_interface PUBLIC hindsight_can)
+target_link_libraries(can_interface PUBLIC
+  hindsight_can
+  Threads::Threads
+  logging
+)
 
 add_library(real_base_station SHARED
   Networking/Network.cpp)
@@ -201,6 +207,7 @@ add_library(world_interface_core STATIC
   ar/Tag.cpp
   ar/read_landmarks.cpp
   base64/base64_img.cpp
+  gps/gps_util.cpp
   ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -251,13 +258,10 @@ add_library(rover_common SHARED
   Autonomous.cpp
   CommandLineOptions.cpp
   Globals.cpp
-  log.cpp
   rospub.cpp
-  base64/base64.cpp
   Networking/websocket/WebSocketServer.cpp
   Networking/websocket/WebSocketProtocol.cpp
   Util.cpp
-  gps/gps_util.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   kinematics/DiffDriveKinematics.cpp
@@ -266,6 +270,7 @@ add_library(rover_common SHARED
   worldmap/QuadTree.cpp
   planning/plan.cpp
   )
+target_link_libraries(rover_common logging)
 
 list(APPEND rover_libs
   rover_common
@@ -273,7 +278,9 @@ list(APPEND rover_libs
   hr_slam
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
-  nlohmann_json::nlohmann_json)
+  nlohmann_json::nlohmann_json
+  logging
+)
 target_link_libraries(Rover
   ${rover_libs} real_base_station)
 
