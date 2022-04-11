@@ -165,6 +165,7 @@ add_library(stub_world_interface STATIC
 add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
+  lidar/read_rp_lidar.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp

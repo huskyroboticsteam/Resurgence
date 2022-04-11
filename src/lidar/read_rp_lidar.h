@@ -11,5 +11,14 @@ bool initializeLidar();
 
 void readLidarLoop();
 
-DataPoint<points_t> readLidar();
+typedef struct Polar2D {
+	double r, theta;
+	double asCartesianX() {
+		return r * cos(theta);
+	}
+	double asCartesianY() {
+		return r * sin(theta);
+	}
+} Polar2D;
+
 }
