@@ -4,7 +4,7 @@
 #include <chrono>
 #include <fstream>
 #include <thread>
-// TO DO: MAKE CHANGES IN MAIN VIS FOR RPLIDAR
+
 int runHokuyo() {
 	using namespace lidar;
 	URGLidar lidar;
@@ -61,12 +61,12 @@ int runRPLidar() {
         if (auto scan = rp_lidar.poll()) {
 			// Converts data into Polar Coord
 			std::vector<Polar2D> currFrames;
+			double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
 			for (int i = 0; i < scan.value().ranges.size(); i++) {
-				double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
 				double rad = dtheta*i;
-				double dist = scan.value().ranges[i];
+				double dist = scan.value().ranges[i] * 1000;
 
-				Polar2D frame{dist, dtheta};
+				Polar2D frame{dist, rad};
 				currFrames.push_back(frame);
 			}
 
