@@ -24,7 +24,7 @@ deviceid_t getDeviceGroupAndSerial(const CANPacket& packet) {
 }
 
 deviceserial_t getSenderDeviceSerial(const CANPacket& packet) {
-	return GetDeviceSerialNumber(const_cast<CANPacket*>(&packet));
+	return GetSenderDeviceSerialNumber(const_cast<CANPacket*>(&packet));
 }
 
 devicegroup_t getSenderDeviceGroup(const CANPacket& packet) {
