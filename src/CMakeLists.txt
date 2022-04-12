@@ -197,7 +197,8 @@ add_library(real_base_station SHARED
 
 ## ====== World Interfaces =======
 # hardware-agnostic utilities and common code for world interface
-add_library(world_interface_core STATIC
+# For some reason the tests executable breaks if it's static. Fucking hell.
+add_library(world_interface_core SHARED
   world_interface/gps_common_interface.cpp
   world_interface/kinematic_common_interface.cpp
   world_interface/data.cpp
@@ -206,6 +207,7 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
+  base64/base64.cpp
   base64/base64_img.cpp
   gps/gps_util.cpp
   ${camera_src}
