@@ -38,32 +38,32 @@ void readLidarLoop() {
     std::vector<Polar2D> polarPts;    
     while (true) {
         auto scan = rp_lidar.poll();
-        if (!scan) {
+        if (auto scan = rp_lidar.poll()) {
+            // Converts data into Polar Coord
+            std::vector<Polar2D> currFrames;
+            double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
+            for (unsigned long i = 0; i < scan.value().ranges.size(); i++) {
+                double rad = dtheta*i;
+                double dist = scan.value().ranges[i] * 1000;
+
+                Polar2D frame{dist, rad};
+                currFrames.push_back(frame);
+            }
+        
+            // Converts to regular points
+            std::vector<point_t> pts(currFrames.size());
+            point_t origin({0, 0, 1});
+            for (unsigned long i = 0; i < currFrames.size(); i++) {
+                pts[i] = lidar::polarToCartesian2(currFrames[i]);
+            }
+            points_lock.lock();
+            last_points = pts;
+            points_lock.unlock();
+            lidar_initialized = true;
+        } else {
             perror("failed to get frame");
             continue;
         }
-
-        // Converts data into Polar Coord
-        std::vector<Polar2D> currFrames;
-        for (int i = 0; i < scan.value().ranges.size(); i++) {
-            double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
-            double rad = dtheta*i;
-            double dist = scan.value().ranges[i];
-
-            Polar2D frame{dist, dtheta};
-            currFrames.push_back(frame);
-        }
-    
-        // Converts to regular points
-        std::vector<point_t> pts(currFrames.size());
-        point_t origin({0, 0, 1});
-        for (int i = 0; i < currFrames.size(); i++) {
-            pts[i] = lidar::polarToCartesian2(currFrames[i]);
-        }
-        points_lock.lock();
-        last_points = pts;
-        points_lock.unlock();
-        lidar_initialized = true;
     } 
 }
 

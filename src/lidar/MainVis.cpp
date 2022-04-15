@@ -59,7 +59,7 @@ int runRPLidar() {
 	while (true) {
 		vis.clear();
         if (auto scan = rp_lidar.poll()) {
-			// Converts data into Polar Coord
+			// Converts Scanned data into Polar Coord
 			std::vector<Polar2D> currFrames;
 			double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
 			for (int i = 0; i < scan.value().ranges.size(); i++) {
@@ -70,11 +70,13 @@ int runRPLidar() {
 				currFrames.push_back(frame);
 			}
 
+			// Converts Polar Coords to points to plot in visualizer
 			std::vector<PointXY> pts(currFrames.size());
 			for (Polar2D polar : currFrames) {
 				pts.push_back(lidar::polarToCartesian(polar));
 			}
 
+			// Plot points into visualizer
 			vis.setGrid(vis_grid_color, vis_grid_dist);
 			vis.drawPoints(pts, vis_pt_color, vis_pt_radius);
 			std::vector<std::vector<PointXY>> clusters = clusterPoints(pts, cluster_sep_threshold);
