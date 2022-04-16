@@ -52,6 +52,9 @@ enum class telemtype_t {
 	// TODO: add further telemetry types if required
 };
 
+/**
+ * @brief The types of CAN packets that we recognize.
+ */
 struct packettype_t {
 	enum { telemetry = ID_TELEMETRY_REPORT, limit_alert = ID_MOTOR_UNIT_LIM_ALERT };
 };

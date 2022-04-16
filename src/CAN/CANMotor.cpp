@@ -54,7 +54,7 @@ void setMotorMode(deviceserial_t serial, motormode_t mode) {
 
 void setMotorPower(deviceserial_t serial, double power) {
 	power = std::min(std::max(power, -1.0), 1.0);
-	int powerInt = std::round(power * ((1 << 16) - 1));
+	int powerInt = std::round(power * std::numeric_limits<int16_t>::max());
 	int16_t dutyCycle = static_cast<int16_t>(powerInt);
 	setMotorPower(serial, dutyCycle);
 }
