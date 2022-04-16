@@ -78,19 +78,19 @@ void startMonitoringMotor(deviceserial_t motor, std::chrono::milliseconds period
 }
 } // namespace
 
-void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod) {
-	initMotor(serial);
+void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
+				 int32_t pulsesPerJointRev, std::optional<std::chrono::milliseconds> telemetryPeriod) {
 	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);
 	CANPacket p;
-	AssembleEncoderInitializePacket(&p, motorGroupCode, serial, 0, invertEncoder, zeroEncoder);
+	AssembleEncoderInitializePacket(&p, motorGroupCode, serial, sensor_t::encoder,
+									invertEncoder, zeroEncoder);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 	AssembleEncoderPPJRSetPacket(&p, motorGroupCode, serial, pulsesPerJointRev);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
-	if (telemetryPeriod != 0ms) {
-		startMonitoringMotor(serial, telemetryPeriod);
+	if (telemetryPeriod) {
+		startMonitoringMotor(serial, telemetryPeriod.value());
 	}
 }
 

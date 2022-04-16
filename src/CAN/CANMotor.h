@@ -18,18 +18,22 @@ namespace can::motor {
 /** @brief The possible motor modes. */
 enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
 
+/** @brief The supported motor position sensors. */
+struct sensor_t {
+	enum { encoder = 0, potentiometer = 1 };
+};
+
 // TODO: write documentation for the following methods
 
 void emergencyStopMotors();
 
 void initMotor(deviceserial_t serial);
 
-void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod);
+void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
+				 int32_t pulsesPerJointRev, std::optional<std::chrono::milliseconds> telemetryPeriod);
 
-void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod,
-			   int32_t kP, int32_t kI, int32_t kD);
+void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi,
+					   std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t kD);
 
@@ -47,9 +51,9 @@ void pullMotorPosition(deviceserial_t serial);
 
 callbackid_t addLimitSwitchCallback(
 	deviceserial_t serial,
-	const std::function<void(deviceserial_t serial,
-					   robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>&
-		callback);
+	const std::function<void(
+		deviceserial_t serial,
+		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
 void removeLimitSwitchCallback(callbackid_t id);
 } // namespace can::motor

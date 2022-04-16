@@ -60,8 +60,9 @@ void initMotors() {
 		bool invEnc = motorEncInvMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
 		uint32_t ppjr = motorPulsesPerJointRevMap.at(motor);
-		can::motor::initMotor(serial, invEnc, true, ppjr, TELEM_PERIOD, pid.kP, pid.kI,
-							  pid.kD);
+		can::motor::initMotor(serial);
+		can::motor::initEncoder(serial, invEnc, true, ppjr, TELEM_PERIOD);
+		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
 	}
 
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));

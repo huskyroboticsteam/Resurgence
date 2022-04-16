@@ -32,13 +32,6 @@ void initMotor(deviceserial_t serial) {
 	std::this_thread::sleep_for(1000us);
 }
 
-void initMotor(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-			   int32_t pulsesPerJointRev, std::chrono::milliseconds telemetryPeriod,
-			   int32_t kP, int32_t kI, int32_t kD) {
-	initMotor(serial, invertEncoder, zeroEncoder, pulsesPerJointRev, telemetryPeriod);
-	setMotorPIDConstants(serial, kP, kI, kD);
-}
-
 void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t kD) {
 	CANPacket p;
 	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);

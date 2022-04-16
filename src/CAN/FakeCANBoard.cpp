@@ -106,7 +106,8 @@ int main() {
 			if (!mode_has_been_set) {
 				int ppjr = prompt("Pulses per joint revolution");
 				int encPeriod = prompt("Telemetry period (ms)");
-				can::motor::initMotor(serial, false, true, ppjr,
+				can::motor::initMotor(serial);
+				can::motor::initEncoder(serial, false, true, ppjr,
 									  std::chrono::milliseconds(encPeriod));
 				mode_has_been_set = true;
 			}
