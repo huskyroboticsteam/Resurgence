@@ -147,8 +147,14 @@ list(APPEND camera_src
   camera/CameraConfig.cpp
   )
 
-# shared library for logging code
-add_library(logging SHARED log.cpp)
+# shared library for utility code
+add_library(utils SHARED 
+  log.cpp
+  Util.cpp
+  gps/gps_util.cpp
+  base64/base64.cpp
+  kinematics/DiffDriveKinematics.cpp
+  world_interface/data.cpp)
 
 # The CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
@@ -189,7 +195,7 @@ endif()
 target_link_libraries(can_interface PUBLIC
   hindsight_can
   Threads::Threads
-  logging
+  utils
 )
 
 add_library(real_base_station SHARED
@@ -200,21 +206,19 @@ add_library(real_base_station SHARED
 add_library(world_interface_core STATIC
   world_interface/gps_common_interface.cpp
   world_interface/kinematic_common_interface.cpp
-  world_interface/data.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
   base64/base64_img.cpp
-  gps/gps_util.cpp
   ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco)
+target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils)
 
 # CAN library (above) requires some utilities from this
-target_link_libraries(can_interface PUBLIC world_interface_core)
+target_link_libraries(can_interface PUBLIC utils)
 
 add_library(stub_world_interface STATIC
   world_interface/noop_world.cpp)
@@ -261,16 +265,14 @@ add_library(rover_common SHARED
   rospub.cpp
   Networking/websocket/WebSocketServer.cpp
   Networking/websocket/WebSocketProtocol.cpp
-  Util.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
-  kinematics/DiffDriveKinematics.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
   planning/plan.cpp
   )
-target_link_libraries(rover_common logging)
+target_link_libraries(rover_common utils)
 
 list(APPEND rover_libs
   rover_common
@@ -279,7 +281,7 @@ list(APPEND rover_libs
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
   nlohmann_json::nlohmann_json
-  logging
+  utils
 )
 target_link_libraries(Rover
   ${rover_libs} real_base_station)
