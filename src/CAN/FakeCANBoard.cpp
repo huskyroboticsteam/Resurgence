@@ -17,12 +17,14 @@ extern "C" {
 using namespace std::chrono_literals;
 
 using can::motor::motormode_t;
+using namespace robot::types;
 
 enum class TestMode {
 	ModeSet,
 	PWM,
 	PID,
 	Encoder,
+	LimitSwitch,
 	ScienceTelemetry,
 	ScienceMotors,
 	ScienceServos
@@ -32,6 +34,7 @@ std::vector<int> modes = {static_cast<int>(TestMode::ModeSet),
 						  static_cast<int>(TestMode::PWM),
 						  static_cast<int>(TestMode::PID),
 						  static_cast<int>(TestMode::Encoder),
+						  static_cast<int>(TestMode::LimitSwitch),
 						  static_cast<int>(TestMode::ScienceTelemetry),
 						  static_cast<int>(TestMode::ScienceMotors),
 						  static_cast<int>(TestMode::ScienceServos)};
@@ -54,6 +57,7 @@ int main() {
 	ss << static_cast<int>(TestMode::PWM) << " for PWM\n";
 	ss << static_cast<int>(TestMode::PID) << " for PID\n";
 	ss << static_cast<int>(TestMode::Encoder) << " for ENCODER\n";
+	ss << static_cast<int>(TestMode::LimitSwitch) << " for LIMIT SWITCH\n";
 	ss << static_cast<int>(TestMode::ScienceTelemetry) << " for SCIENCE TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceMotors) << " for SCIENCE MOTORS\n";
 	ss << static_cast<int>(TestMode::ScienceTelemetry) << " for SCIENCE SERVOS\n";
@@ -65,7 +69,7 @@ int main() {
 	TestMode testMode = static_cast<TestMode>(test_type);
 	int serial = 0;
 	if (testMode == TestMode::PWM || testMode == TestMode::PID ||
-		testMode == TestMode::Encoder) {
+		testMode == TestMode::Encoder || testMode == TestMode::LimitSwitch) {
 		serial = prompt("Enter motor serial");
 	}
 	bool mode_has_been_set = false;
@@ -117,6 +121,15 @@ int main() {
 			// so the output is a single changing line instead of flooding the console with text
 			std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
 			std::this_thread::sleep_for(20ms);
+		} else if (testMode == TestMode::LimitSwitch) {
+			if (!mode_has_been_set) {
+				can::deviceid_t id = std::make_pair(can::devicegroup_t::motor, serial);
+				can::addDeviceTelemetryCallback(id, can::telemtype_t::limit_switch,
+					[](can::deviceid_t id, can::telemtype_t telemType, DataPoint<can::telemetry_t> data) {
+						std::cout << "Motor Limit: serial=" << std::hex << id.second << ", data=" << std::bitset<8>(data.getDataOrElse(0)) << std::endl;
+					});
+				mode_has_been_set = true;
+			}
 		} else if (testMode == TestMode::ScienceTelemetry) {
 			// Serial 0 seems to work. Nothing else (up to 17, the largest I tried)
 			serial = prompt("Enter serial");
