@@ -30,14 +30,11 @@ enum class TestMode {
 	ScienceServos
 };
 
-std::vector<int> modes = {static_cast<int>(TestMode::ModeSet),
-						  static_cast<int>(TestMode::PWM),
-						  static_cast<int>(TestMode::PID),
-						  static_cast<int>(TestMode::Encoder),
-						  static_cast<int>(TestMode::LimitSwitch),
-						  static_cast<int>(TestMode::ScienceTelemetry),
-						  static_cast<int>(TestMode::ScienceMotors),
-						  static_cast<int>(TestMode::ScienceServos)};
+std::vector<int> modes = {
+	static_cast<int>(TestMode::ModeSet),	   static_cast<int>(TestMode::PWM),
+	static_cast<int>(TestMode::PID),		   static_cast<int>(TestMode::Encoder),
+	static_cast<int>(TestMode::LimitSwitch),   static_cast<int>(TestMode::ScienceTelemetry),
+	static_cast<int>(TestMode::ScienceMotors), static_cast<int>(TestMode::ScienceServos)};
 
 int prompt(const char* msg) {
 	std::string str;
@@ -80,8 +77,7 @@ int main() {
 			serial = prompt("Enter motor serial");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
 			std::cout << "got " << serial << " and " << mode << std::endl;
-			can::motor::setMotorMode(serial, mode == 0 ? motormode_t::pwm
-													   : motormode_t::pid);
+			can::motor::setMotorMode(serial, mode == 0 ? motormode_t::pwm : motormode_t::pid);
 		} else if (testMode == TestMode::PWM) {
 			int pwm = prompt("Enter PWM");
 			can::motor::setMotorMode(serial, motormode_t::pwm);
@@ -118,15 +114,20 @@ int main() {
 			std::string encoderStr =
 				encoderData ? std::to_string(encoderData.getData()) : "null";
 			// \33[2k is the ANSI escape sequence for erasing the current console line
-			// so the output is a single changing line instead of flooding the console with text
+			// the output is a single changing line instead of flooding the console with text
 			std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
 			std::this_thread::sleep_for(20ms);
 		} else if (testMode == TestMode::LimitSwitch) {
 			if (!mode_has_been_set) {
 				can::deviceid_t id = std::make_pair(can::devicegroup_t::motor, serial);
-				can::addDeviceTelemetryCallback(id, can::telemtype_t::limit_switch,
-					[](can::deviceid_t id, can::telemtype_t telemType, DataPoint<can::telemetry_t> data) {
-						std::cout << "Motor Limit: serial=" << std::hex << id.second << ", data=" << std::bitset<8>(data.getDataOrElse(0)) << std::endl;
+				can::addDeviceTelemetryCallback(
+					id, can::telemtype_t::limit_switch,
+					[](can::deviceid_t id, can::telemtype_t telemType,
+					   DataPoint<can::telemetry_t> data) {
+						std::cout << "Motor Limit: serial=" << std::hex
+								  << static_cast<int>(id.second)
+								  << ", data=" << std::bitset<8>(data.getDataOrElse(0))
+								  << std::endl;
 					});
 				mode_has_been_set = true;
 			}
