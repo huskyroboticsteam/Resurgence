@@ -7,8 +7,8 @@ extern "C" {
 }
 
 #include <chrono>
-#include <utility>
 #include <string>
+#include <utility>
 
 namespace can {
 
@@ -53,7 +53,7 @@ enum class telemtype_t {
 };
 
 struct packettype_t {
-	enum {telemetry=ID_TELEMETRY_REPORT};
+	enum { telemetry = ID_TELEMETRY_REPORT, limit_alert = ID_MOTOR_UNIT_LIM_ALERT };
 };
 
 /** @brief The type of the device serial number. */
@@ -125,7 +125,7 @@ deviceid_t getSenderDeviceGroupAndSerial(const CANPacket& packet);
  * which allows easy copy-pasting.
  *
  * @see http://manpages.ubuntu.com/manpages/focal/man1/cansend.1.html
- * 
+ *
  * @param packet The packet to convert to a string.
  * @return std::string The string representation of the given packet.
  */

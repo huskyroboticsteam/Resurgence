@@ -34,7 +34,7 @@ constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 // receive all messages on the given group
 constexpr int CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
 
-int can_fd;	// file descriptor of outbound can connection
+int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
 
 using telemetrycode_t = uint8_t;
@@ -67,7 +67,8 @@ std::map<deviceid_t, protectedmap_t> telemMap;
 std::shared_mutex telemMapMutex;
 
 std::map<std::pair<deviceid_t, telemetrycode_t>,
-		 std::map<uint32_t, std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>>>
+		 std::map<uint32_t, std::function<void(deviceid_t, telemtype_t,
+											   robot::types::DataPoint<telemetry_t>)>>>
 	telemetryCallbackMap;
 uint32_t nextCallbackID = 0;
 std::mutex telemetryCallbackMapMutex; // protects callbackMap and callbackID
@@ -78,7 +79,6 @@ bool receivePacket(int fd, CANPacket& packet) {
 	can_frame frame;
 	ret = read(fd, &frame, sizeof(can_frame));
 	if (ret >= 0) {
-		log(LOG_TRACE, "Got CAN packet\n");
 		packet.id = frame.can_id;
 		packet.dlc = frame.can_dlc;
 		std::memcpy(packet.data, frame.data, frame.can_dlc);
@@ -95,36 +95,8 @@ bool mapHasKey(std::shared_mutex& mutex, const std::map<K, V>& map, const K& key
 	return map.find(key) != map.end();
 }
 
-void handleTelemetryPacket(CANPacket& packet) {
-	// extract necessary information
-	deviceid_t id = getSenderDeviceGroupAndSerial(packet);
-	telemetrycode_t telemCode = DecodeTelemetryType(&packet);
-	telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
-	DataPoint<telemetry_t> data(telemData);
-
-	// check if telemetry data is alread in map
-	if (mapHasKey(telemMapMutex, telemMap, id)) {
-		// acquire read lock of entire map
-		std::shared_lock mapLock(telemMapMutex);
-		auto& pair = telemMap.at(id);
-		std::shared_mutex& deviceMutex = *pair.first;
-		auto& deviceMap = *pair.second;
-		// acquire write lock of the map for this device
-		std::unique_lock deviceLock(deviceMutex);
-		// insert telemetry data
-		deviceMap.insert(std::make_pair(telemCode, data));
-	} else {
-		// this device has no existing data, so insert a new device map
-		auto mutexPtr = std::make_shared<std::shared_mutex>();
-		auto deviceMapPtr =
-			std::make_shared<std::map<telemetrycode_t, DataPoint<telemetry_t>>>();
-		deviceMapPtr->emplace(telemCode, data);
-		// acquire write lock of the entire map to insert a new device map
-		std::unique_lock mapLock(telemMapMutex);
-		telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
-	}
-
-	// now fire off callback, if it exists
+void invokeTelemCallback(deviceid_t id, telemetrycode_t telemCode,
+						 DataPoint<telemetry_t> data) {
 	// first convert the telemetry code into a telemetry type
 	auto telemTypeEntry = telemCodeToTypeMap.find(telemCode);
 	if (telemTypeEntry != telemCodeToTypeMap.end()) {
@@ -139,6 +111,39 @@ void handleTelemetryPacket(CANPacket& packet) {
 			}
 		}
 	}
+}
+
+void handleTelemetryPacket(CANPacket& packet) {
+	// extract necessary information
+	deviceid_t id = getSenderDeviceGroupAndSerial(packet);
+	telemetrycode_t telemCode = DecodeTelemetryType(&packet);
+	telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
+	DataPoint<telemetry_t> data(telemData);
+
+	// check if telemetry data is already in map
+	if (mapHasKey(telemMapMutex, telemMap, id)) {
+		// acquire read lock of entire map
+		std::shared_lock mapLock(telemMapMutex);
+		auto& pair = telemMap.at(id);
+		std::shared_mutex& deviceMutex = *pair.first;
+		auto& deviceMap = *pair.second;
+		// acquire write lock of the map for this device
+		std::unique_lock deviceLock(deviceMutex);
+		// insert telemetry data
+		deviceMap.insert_or_assign(telemCode, data);
+	} else {
+		// this device has no existing data, so insert a new device map
+		auto mutexPtr = std::make_shared<std::shared_mutex>();
+		auto deviceMapPtr =
+			std::make_shared<std::map<telemetrycode_t, DataPoint<telemetry_t>>>();
+		deviceMapPtr->emplace(telemCode, data);
+		// acquire write lock of the entire map to insert a new device map
+		std::unique_lock mapLock(telemMapMutex);
+		telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
+	}
+
+	// now fire off callback, if it exists
+	invokeTelemCallback(id, telemCode, data);
 }
 
 // returns a file descriptor, or -1 on failure
@@ -206,6 +211,13 @@ void receiveThreadFn() {
 					handleTelemetryPacket(packet);
 					break;
 
+				case packettype_t::limit_alert:
+					invokeTelemCallback(
+						getSenderDeviceGroupAndSerial(packet),
+						static_cast<telemetrycode_t>(telemtype_t::limit_switch),
+						{packet.data[3]});
+					break;
+
 				default:
 					log(LOG_WARN, "Unrecognized CAN packet type: %x\n", packetType);
 					break;
@@ -244,8 +256,6 @@ void sendCANPacket(const CANPacket& packet) {
 
 	if (!success) {
 		std::perror("Failed to send CAN packet");
-	} else {
-		log(LOG_TRACE, "CAN packet sent.\n");
 	}
 }
 
