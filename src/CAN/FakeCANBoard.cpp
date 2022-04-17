@@ -71,8 +71,7 @@ int main() {
 	}
 	bool mode_has_been_set = false;
 
-	while (1) {
-
+	while (true) {
 		if (testMode == TestMode::ModeSet) {
 			serial = prompt("Enter motor serial");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
@@ -104,11 +103,21 @@ int main() {
 			can::motor::setMotorPIDTarget(serial, angle_target);
 		} else if (testMode == TestMode::Encoder) {
 			if (!mode_has_been_set) {
-				int ppjr = prompt("Pulses per joint revolution");
-				int encPeriod = prompt("Telemetry period (ms)");
+				int sensorType;
+				do {
+					sensorType =
+						prompt("What type of sensor?\n0 for encoder\n1 for potentiometer\n");
+				} while (sensorType != 0 && sensorType != 1);
+
+				std::chrono::milliseconds telemPeriod(prompt("Telemetry period (ms)"));
+
 				can::motor::initMotor(serial);
-				can::motor::initEncoder(serial, false, true, ppjr,
-									  std::chrono::milliseconds(encPeriod));
+				if (sensorType == 0) {
+					int ppjr = prompt("Pulses per joint revolution");
+					can::motor::initEncoder(serial, false, true, ppjr, telemPeriod);
+				} else if (sensorType == 1) {
+					// TODO: initialize potentiometer
+				}
 				mode_has_been_set = true;
 			}
 			auto encoderData = can::motor::getMotorPosition(serial);

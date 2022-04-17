@@ -4,8 +4,8 @@
 #include "CAN.h"
 #include "CANUtils.h"
 
-#include <bitset>
 #include <chrono>
+#include <optional>
 
 /**
  * @namespace can::motor
@@ -22,8 +22,6 @@ enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
 struct sensor_t {
 	enum { encoder = 0, potentiometer = 1 };
 };
-
-// TODO: write documentation for the following methods
 
 /**
  * @brief Emergency stop all motors on the CAN bus.
