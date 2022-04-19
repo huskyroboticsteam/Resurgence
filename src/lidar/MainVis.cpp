@@ -59,8 +59,7 @@ int runHokuyo() {
  */
 int runRPLidar() {
 	using namespace lidar;
-	RPLidar rp_lidar("/dev/ttyUSB0");
-	rp_lidar.setBaudrate(115200);
+	RPLidar rp_lidar("/dev/ttyUSB0", 256000UL);
 
 	LidarVis vis(vis_win_width, vis_win_height, vis_bg_color, lidar_max_range);
 	cv::namedWindow(vis_win_name);
