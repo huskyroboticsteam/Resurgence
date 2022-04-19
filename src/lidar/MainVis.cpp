@@ -62,7 +62,7 @@ int runRPLidar() {
 			// Converts Scanned data into Polar Coord
 			std::vector<Polar2D> currFrames;
 			double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
-			for (int i = 0; i < scan.value().ranges.size(); i++) {
+			for (long unsigned i = 0; i < scan.value().ranges.size(); i++) {
 				double rad = dtheta*i;
 				double dist = scan.value().ranges[i] * 1000;
 
@@ -113,5 +113,5 @@ int main(int argc, char** argv) {
 		case 2: errorCode = runRPLidar();
 	}
 	
-	return 0;
+	return errorCode;
 }
