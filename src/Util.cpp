@@ -130,4 +130,10 @@ double stdn(int thread_id) {
 	return stdn_dist(thread_id == 0 ? main_generator : spin_generator);
 }
 
+uint64_t getUnixTime() {
+	return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
+									 std::chrono::system_clock::now().time_since_epoch())
+									 .count());
+}
+
 } // namespace util

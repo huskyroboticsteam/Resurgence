@@ -213,4 +213,6 @@ std::unordered_set<K> keySet(const std::unordered_map<K, V>& input) {
 	return output;
 }
 
+uint64_t getUnixTime();
+
 } // namespace util
