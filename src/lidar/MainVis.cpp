@@ -5,6 +5,10 @@
 #include <fstream>
 #include <thread>
 
+/**
+ * @brief Hokuyo Lidar
+ * Runs Main Visualizer with a plugged in Hokuyo Lidar
+ */
 int runHokuyo() {
 	using namespace lidar;
 	URGLidar lidar;
@@ -49,6 +53,10 @@ int runHokuyo() {
 	return 0;
 }
 
+/**
+ * @brief RP Lidar
+ * Runs Main Visualizer on any RP Lidar that uses the RP LIdar SDK
+ */
 int runRPLidar() {
 	using namespace lidar;
 	RPLidar rp_lidar("/dev/ttyUSB0");
@@ -99,6 +107,11 @@ int runRPLidar() {
 	return 0;
 }
 
+/**
+ * @brief Main Visualizer
+ * Visualizes scanned data from inputted lidar by plotting objects
+ * on a graph
+ */
 int main(int argc, char** argv) {
 	if (argc != 2) {
 		perror("not enough args");
