@@ -72,7 +72,7 @@ static void openCamera(CameraID cam, uint8_t fps = 20, uint16_t width = 640,
 void initCameras() {
 	auto cfg = cam::readConfigFromFile(Constants::AR_CAMERA_CONFIG_PATH);
 	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
-	openCamera(Constants::AR_CAMERA_ID);
+	//openCamera(Constants::AR_CAMERA_ID);
 	openCamera("front");
 	openCamera("rear");
 	openCamera("upperArm");
