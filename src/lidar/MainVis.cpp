@@ -57,9 +57,9 @@ int runHokuyo() {
  * @brief RP Lidar
  * Runs Main Visualizer on any RP Lidar that uses the RP LIdar SDK
  */
-int runRPLidar() {
+int runRPLidar(unsigned long baudrate) {
 	using namespace lidar;
-	RPLidar rp_lidar("/dev/ttyUSB0", 256000UL);
+	RPLidar rp_lidar("/dev/ttyUSB0", baudrate);
 
 	LidarVis vis(vis_win_width, vis_win_height, vis_bg_color, lidar_max_range);
 	cv::namedWindow(vis_win_name);
@@ -106,23 +106,38 @@ int runRPLidar() {
 	return 0;
 }
 
+static void help() {
+	printf("Lidar Visualizer. \n"
+		"Usage: \n"
+		"     -l=<lidar_num>         # 1=hokyuo, 2=rplidar"
+		"     -b=<baudrate>          # set baudrate, defaults to 115200"
+		);
+}
+
 /**
  * @brief Main Visualizer
  * Visualizes scanned data from inputted lidar by plotting objects
  * on a graph
  */
 int main(int argc, char** argv) {
-	if (argc != 2) {
-		perror("not enough args");
+	unsigned long baudrate;
+	int lidarType;
+	int errorCode = 0;
+	if (argc == 2) {
+		baudrate = 112500;
+		lidarType = atoi(argv[1]);
+	} else if (argc == 3) {
+		baudrate = (unsigned long) atol(argv[2]);
+		lidarType = atoi(argv[1]);
+	} else {
+		help();
 		return -1;
 	}
-	
-	int lidarType = atoi(argv[1]);
-	int errorCode = 0;
+
 
 	switch(lidarType) {
 		case 1: errorCode = runHokuyo();
-		case 2: errorCode = runRPLidar();
+		case 2: errorCode = runRPLidar(baudrate);
 	}
 	
 	return errorCode;
