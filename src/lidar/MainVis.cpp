@@ -13,7 +13,7 @@ int runHokuyo() {
 	using namespace lidar;
 	URGLidar lidar;
 	if (!lidar.open()) {
-		std::cout << "failed to open hokuyo idar" << std::endl;
+		std::cout << "failed to open hokuyo lidar" << std::endl;
 		return lidar.getError();
 	}
 
