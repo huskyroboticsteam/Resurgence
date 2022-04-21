@@ -13,7 +13,8 @@
 using namespace navtypes;
 
 std::atomic<bool> lidar_initialized(false);
-RPLidar rp_lidar("/dev/ttyUSB0");
+constexpr uint32_t RPLIDAR_BAUDRATE = 115200;
+RPLidar rp_lidar("/dev/ttyUSB0", RPLIDAR_BAUDRATE);
 std::thread lidar_thread;
 points_t last_points = {};
 std::mutex points_lock;
@@ -25,8 +26,6 @@ bool initializeLidar() {
         if (!rp_lidar.checkHealth()) {
             perror("failed to connect to rp lidar");
         }
-
-        rp_lidar.setBaudrate(115200);
         rp_lidar.setMaxDistance(16.0);
         lidar_thread = std::thread(&readLidarLoop);
     }
