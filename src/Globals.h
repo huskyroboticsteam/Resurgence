@@ -35,7 +35,6 @@ extern nlohmann::json status_data;
  */
 extern nlohmann::json motor_status;
 extern websocket::SingleClientWSServer websocketServer;
-// TODO(evan): make these atomic
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 } // namespace Globals

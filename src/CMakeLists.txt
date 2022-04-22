@@ -122,7 +122,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 endif()
 if(WITH_LIDAR)
   # Find the URGLidar library.
-  # TODO: Decide if we want to use those RPLidars we found
   find_package(URGLidar REQUIRED)
 endif()
 

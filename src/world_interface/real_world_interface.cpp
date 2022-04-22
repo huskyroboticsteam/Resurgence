@@ -192,7 +192,7 @@ const std::map<std::string, double> negative_arm_pwm_scales = {
 	{"forearm", -6000}, {"differentialLeft", 5000}, {"differentialRight", -10000},
 	{"hand", 15000}};
 const std::map<std::string, double> incremental_pid_scales = {
-	{"armBase", M_PI / 8}, // TODO: Check signs
+	{"armBase", M_PI / 8},
 	{"shoulder", -M_PI / 8},
 	{"elbow", -M_PI / 8},
 	{"forearm", 0}, // We haven't implemented PID on these motors yet
