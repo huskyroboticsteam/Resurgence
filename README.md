@@ -81,29 +81,40 @@ process shouldn't take too long.
 
 ## Setup Project Repository
 
-1. Enter the home directory (or wherever you would like to put the project files).
-`cd ~` (If you would like to put the project somewhere else, replace `~` with
-the folder path.)
-
-2. Clone the repository.
 ```bash
+# Enter the home directory (or wherever you would like to put the project files).
+# If you would like to put the project somewhere else, replace '~' with the folder path.
+cd ~
+# Clone the repository.
 git clone https://github.com/huskyroboticsteam/Resurgence/
+``` 
+
+## Install HindsightCAN
+This is a library developed by Electronics for interfacing with their
+motors and sensors over the
+[CAN](https://en.wikipedia.org/wiki/CAN_bus) bus; it is needed for packet definitions and utility functions and doesn't actually require support for a physical CAN bus.
+
+### Linux
+Assuming the Ubuntu repository has been set up:
+```bash
+sudo apt install hindsight-can
 ```
 
-3. Navigate into the repository.
+### Mac
+You will unfortunately need to build from source:
 ```bash
-cd Resurgence
-```
-
-4. Clone the CAN library submodule (we use git submodules, unfortunately)
-```bash
-git submodule init
-git submodule update
-```
-
-5. Finally, navigate back to the parent directory:
-```bash
-cd ..
+# Clone the repository
+git clone https://github.com/huskyroboticsteam/HindsightCAN
+# Navigate inside the cloned repository
+cd HindsightCAN
+# Set up a build folder and enter it
+mkdir -p build && cd build
+# Run CMake configuration
+cmake ..
+# Build project and install
+sudo cmake --build . --target install
+# Navigate back to previous directory
+cd ../..
 ```
 
 ## Install OpenCV
