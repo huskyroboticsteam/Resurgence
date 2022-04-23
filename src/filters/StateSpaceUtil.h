@@ -5,14 +5,15 @@
 #include <unsupported/Eigen/MatrixFunctions>
 
 /**
- * Collection of utility methods for use with state space applications.
+ * @namespace filters::statespace
+ * @brief Collection of utility methods for use with state space applications.
  */
 namespace filters::statespace {
 
 constexpr double epsilon = 1e-5;
 
 /**
- * Create a covariance matrix modelling independent variables with the given standard
+ * @brief Create a covariance matrix modelling independent variables with the given standard
  * deviations.
  *
  * @tparam size The dimension of the noise.
@@ -28,7 +29,7 @@ createCovarianceMatrix(const Eigen::Matrix<double, size, 1>& stdDevs) {
 }
 
 /**
- * Convert a discrete time system matrix to continuous time.
+ * @brief Convert a discrete time system matrix to continuous time.
  *
  * @tparam numStates The number of states in the system.
  * @param A The discrete time system matrix.
@@ -42,7 +43,7 @@ discreteToContinuous(const Eigen::Matrix<double, numStates, numStates>& A, doubl
 }
 
 /**
- * Convert discrete time system and input matrices to continuous time.
+ * @brief Convert discrete time system and input matrices to continuous time.
  *
  * @tparam numStates The number of states in the system.
  * @param A A reference to the discrete time system matrix. It will be replaced with the
@@ -63,7 +64,7 @@ void discreteToContinuous(Eigen::Matrix<double, numStates, numStates>& A,
 }
 
 /**
- * Convert continuous time system and input matrices to discrete time.
+ * @brief Convert continuous time system and input matrices to discrete time.
  *
  * @tparam numStates The number of states in the system.
  * @param A A reference to the continuous time system matrix. It will be replaced with the
@@ -90,7 +91,7 @@ void continuousToDiscrete(Eigen::Matrix<double, numStates, numStates>& A,
 }
 
 /**
- * Convert a continuous time system matrix to discrete time.
+ * @brief Convert a continuous time system matrix to discrete time.
  *
  * @tparam numStates The number of states in the system.
  * @param contA The continuous time system matrix.
@@ -105,7 +106,7 @@ discretizeA(const Eigen::Matrix<double, numStates, numStates>& contA, double dt)
 }
 
 /**
- * Convert a continuous time system matrix and additive process noise matrix to discrete time.
+ * @brief Convert a continuous time system matrix and additive process noise matrix to discrete time.
  *
  * @tparam numStates The number of states in the system.
  * @param contA A reference to the continuous time system matrix.
@@ -141,7 +142,7 @@ void discretizeAQ(const Eigen::Matrix<double, numStates, numStates>& contA,
 }
 
 /**
- * Discretizes a continuous time additive process noise covariance matrix.
+ * @brief Discretizes a continuous time additive process noise covariance matrix.
  *
  * @tparam numStates The number of states in the system.
  * @param contA The continuous time system matrix.
@@ -160,7 +161,7 @@ discretizeQ(const Eigen::Matrix<double, numStates, numStates>& contA,
 }
 
 /**
- * Discretizes a continuous time additive output noise covariance matrix.
+ * @brief Discretizes a continuous time additive output noise covariance matrix.
  *
  * @tparam numStates The number of states in the system.
  * @param contR The continuous time output noise covariance matrix.
@@ -173,10 +174,10 @@ discretizeR(const Eigen::Matrix<double, numStates, numStates>& contR, double dt)
 	return contR / dt;
 }
 
-// Solves Discrete-time Algebraic Riccati Equation to calculate asymptotic error covariance
-// matrix This can be used to calculate the optimal Kalman gain matrix
 /**
- * Solves the Discrete-time Algebraic Riccati Equation to calculate the asymptotic
+ * @brief Solves the Discrete-time Algebraic Riccati Equation.
+ *
+ * This can be used to calculate the asymptotic
  * estimate error covariance matrix. (P_inf) This can be used to calculate the optimal
  * Kalman gain matrix.
  *

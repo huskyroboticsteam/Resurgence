@@ -8,17 +8,26 @@
 
 namespace filters {
 
-constexpr int numStates = 3;
-using statevec_t = Eigen::Matrix<double, numStates, 1>;
-
 /**
+ * @brief Uses an Extended Kalman Filter to estimate the robot pose.
+ *
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
  * The tracked states are x, y, and heading. All of these states are in map space.
  */
 class PoseEstimator {
 public:
 	/**
-	 * Create a new Pose Estimator.
+	 * @brief The dimension of the state vector.
+	 */
+	static constexpr int numStates = 3;
+
+	/**
+	 * @brief The type of the state vector.
+	 */
+	using statevec_t = Eigen::Matrix<double, numStates, 1>;
+
+	/**
+	 * @brief Create a new Pose Estimator.
 	 *
 	 * @param inputNoiseGains The gain for the noise in each dimension of the input space.
 	 * This pose estimator models process noise as noise applied to the wheel velocities
@@ -34,7 +43,8 @@ public:
 				  const Eigen::Vector3d& measurementStdDevs, double wheelBase, double dt);
 
 	/**
-	 * Correct the pose estimation with measurement data.
+	 * @brief Correct the pose estimation with measurement data.
+	 *
 	 * The measurement should be in the same space as the state.
 	 *
 	 * @param measurement The measurement to use to correct the filter, as a transform.
@@ -42,7 +52,7 @@ public:
 	void correct(const navtypes::transform_t& measurement);
 
 	/**
-	 * Use the model to predict the next system state, given the current inputs.
+	 * @brief Use the model to predict the next system state, given the current inputs.
 	 *
 	 * @param thetaVel Commanded rotational velocity.
 	 * @param xVel Commanded x velocity.
@@ -50,7 +60,8 @@ public:
 	void predict(double thetaVel, double xVel);
 
 	/**
-	 * Get the current estimate covariance matrix.
+	 * @brief Get the current estimate covariance matrix.
+	 *
 	 * This is an indication of the uncertainty of the pose estimate.
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
@@ -58,6 +69,8 @@ public:
 	Eigen::Matrix<double, numStates, numStates> getEstimateCovarianceMat() const;
 
 	/**
+	 * @brief Reset the pose estimator.
+	 *
 	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix
 	 * to a diagonal matrix with large values to reflect complete uncertainty in the current
 	 * pose. If you have any information about the current pose, use reset(const pose_t &,
@@ -66,6 +79,8 @@ public:
 	void reset();
 
 	/**
+	 * @brief Reset the pose estimator.
+	 *
 	 * Sets the state estimate to the supplied vector and resets the estimate covariance matrix
 	 * to a diagonal matrix with large values to reflect complete uncertainty in the current
 	 * pose. If you have any information about the current pose, use reset(const pose_t &,
@@ -76,6 +91,8 @@ public:
 	void reset(const navtypes::pose_t& pose);
 
 	/**
+	 * @brief Reset the pose estimator.
+	 *
 	 * Sets the state estimate to the supplied vector and sets the estimate covariance matrix
 	 * to reflect the given uncertainty.
 	 *
@@ -85,7 +102,7 @@ public:
 	void reset(const navtypes::pose_t& pose, const navtypes::pose_t& stdDevs);
 
 	/**
-	 * Gets the current state estimate.
+	 * @brief Gets the current state estimate.
 	 *
 	 * @return The state estimate.
 	 */

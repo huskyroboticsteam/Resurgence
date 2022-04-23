@@ -8,11 +8,21 @@
 
 namespace filters {
 
+/**
+ * @brief Implements a Kalman Filter.
+ *
+ * Unlike the "standard" Kalman Filter this uses the asymptotic Kalman gain.
+ *
+ * @tparam stateDim The dimension of the state vector.
+ * @tparam inputDim The dimension of the system input vector.
+ * @tparam outputDim The dimension of the system output vector, or the sensor measurement.
+ */
 template <int stateDim, int inputDim, int outputDim>
 class KalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim> {
 public:
 	/**
-	 * Create a new Kalman Filter from a continuous-time state space model.
+	 * @brief Create a new Kalman Filter from a continuous-time state space model.
+	 *
 	 * The only matrices that change between this and createDisc() are the system matrix and
 	 * input matrix. All other parameters would be the same.
 	 *
@@ -62,7 +72,8 @@ public:
 	}
 
 	/**
-	 * Create a new Kalman Filter from a discrete-time state space model.
+	 * @brief Create a new Kalman Filter from a discrete-time state space model.
+	 *
 	 * The only matrices that change between this and createCont() are the system matrix and
 	 * input matrix. All other parameters would be the same.
 	 *

@@ -9,7 +9,9 @@
 namespace filters {
 
 /**
- * Represents a square noise covariance matrix. Returning the zero matrix can sometimes be
+ * @brief Represents a square noise covariance matrix.
+ *
+ * Returning the zero matrix can sometimes be
  * dangerous depending on your model, as it may cause numerical instability or incorrect
  * computations.
  *
@@ -25,7 +27,7 @@ public:
 	using param_t = Eigen::Matrix<double, paramSize, 1>;
 
 	/**
-	 * Create a time-invariant noise covariance matrix modelling independent noise with the
+	 * @brief Create a time-invariant noise covariance matrix modelling independent noise with the
 	 * given standard deviations.
 	 *
 	 * @param stdDevs The standard deviations of each element.
@@ -34,7 +36,7 @@ public:
 		: NoiseCovMat(statespace::createCovarianceMatrix(stdDevs)) {}
 
 	/**
-	 * Create a time-invariant noise covariance matrix equal to the given matrix.
+	 * @brief Create a time-invariant noise covariance matrix equal to the given matrix.
 	 *
 	 * @param mat The noise covariance matrix.
 	 */
@@ -42,7 +44,9 @@ public:
 		: func([mat](const state_t& x, const param_t& param) { return mat; }) {}
 
 	/**
-	 * Create a time-varying noise covariance matrix. At runtime, the matrix will be calculated
+	 * @brief Create a time-varying noise covariance matrix.
+	 *
+	 * At runtime, the matrix will be calculated
 	 * when needed using the supplied function.
 	 *
 	 * @param func The function that supplies the noise covariance matrix,
@@ -54,7 +58,8 @@ public:
 		: func(func) {}
 
 	/**
-	 * Gets the noise covariance matrix, given the current state and additonal parameter.
+	 * @brief Gets the noise covariance matrix, given the current state and additonal parameter.
+	 *
 	 * The matrix may be time-invariant, which case the values of x and param do not matter.
 	 *
 	 * @param x The current state vector.
@@ -72,7 +77,9 @@ private:
 };
 
 /**
- * Implements a discrete-time EKF. This implements the more general system form described here:
+ * @brief Implements a discrete-time EKF.
+ *
+ * This implements the more general system form described here:
  * https://en.wikipedia.org/wiki/Extended_Kalman_filter#Non-additive_noise_formulation_and_equations
  *
  * @tparam stateDim The dimension of the state space for this system. This is the number of
@@ -100,7 +107,7 @@ public:
 	using outputnoise_t = Eigen::Matrix<double, outputNoiseDim, 1>;
 
 	/**
-	 * Create a new discrete-time EKF.
+	 * @brief Create a new discrete-time EKF.
 	 *
 	 * @param stateFunc Discrete-time state transition function. x_t+1 = f(x_t, u)
 	 * @param outputFunc Output function of the system. Also known as h(x)
@@ -150,28 +157,32 @@ public:
 	}
 
 	/**
-	 * Set this to provide an analytic solution to df/dx.
+	 * @brief Set this to provide an analytic solution to df/dx.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, stateDim, stateDim>(const state_t&, const input_t&,
 															const processnoise_t&)>
 		stateFuncJacobianX;
 	/**
-	 * Set this to provide an analytic solution to df/dw.
+	 * @brief Set this to provide an analytic solution to df/dw.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, stateDim, processNoiseDim>(
 		const state_t&, const input_t&, const processnoise_t&)>
 		stateFuncJacobianW;
 	/**
-	 * Set this to provide an analytic solution to dh/dx.
+	 * @brief Set this to provide an analytic solution to dh/dx.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, outputDim, stateDim>(const state_t&,
 															 const outputnoise_t&)>
 		outputFuncJacobianX;
 	/**
-	 * Set this to provide an analytic solution to dh/dv.
+	 * @brief Set this to provide an analytic solution to dh/dv.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, outputDim, outputNoiseDim>(const state_t&,

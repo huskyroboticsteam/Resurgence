@@ -11,6 +11,9 @@ namespace filters {
 // The input vector is defined as [lVel, rVel].
 
 namespace {
+
+using statevec_t = PoseEstimator::statevec_t;
+
 statevec_t stateFunc(const DiffDriveKinematics& kinematics, double dt, const statevec_t& x,
 					 const Eigen::Vector2d& u, const Eigen::Vector2d& w) {
 	Eigen::Vector2d input = u + w; // noise is applied to the input vector

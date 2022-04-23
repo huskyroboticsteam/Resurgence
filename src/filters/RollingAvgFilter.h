@@ -5,12 +5,12 @@
 namespace filters {
 
 /**
- * Implements a rolling average filter of the specified type. Can only use double vectors.
+ * @brief Implements a rolling average filter of the specified type. Can only use double vectors.
  */
 template <int numPoints, int numDims> class RollingAvgFilter {
 public:
 	/**
-	 * Get the output of the filter.
+	 * @brief Get the output of the filter.
 	 *
 	 * @return The output of the filter. If no data has been entered, returns the default
 	 * value.
@@ -28,7 +28,7 @@ public:
 	}
 
 	/**
-	 * Adds data to the filter and gets the new output.
+	 * @brief Adds data to the filter and gets the new output.
 	 *
 	 * @param val The data to add to the filter.
 	 * @return The new output of the filter after adding this data.
@@ -44,7 +44,7 @@ public:
 	}
 
 	/**
-	 * Clears all data in the buffer.
+	 * @brief Clears all data in the buffer.
 	 */
 	void reset() {
 		size = 0;
@@ -52,7 +52,7 @@ public:
 	}
 
 	/**
-	 * Returns the number of points stored in the buffer.
+	 * @brief Returns the number of points stored in the buffer.
 	 *
 	 * @return The number of points stored in the buffer, in the range [0, numPoints]
 	 */
@@ -61,7 +61,7 @@ public:
 	}
 
 	/**
-	 * Returns the maximum number of points that can be stored in the buffer.
+	 * @brief Get the maximum number of points that can be stored in the buffer.
 	 *
 	 * @return The maximum number of points that can be stored in the buffer.
 	 */
@@ -70,7 +70,7 @@ public:
 	}
 
 	/**
-	 * Get the underlying buffer of the filter.
+	 * @brief Get the underlying buffer of the filter.
 	 *
 	 * @return The Matrix representing the buffer of the filter. Data points are stored in each
 	 * column.
