@@ -174,9 +174,8 @@ add_library(hindsight_can STATIC
 # Common CAN source files
 
 # **DON'T MAKE THIS SHARED**
-# If this library is shared then CAN shits itself and nothing fucking works
-# literally don't ask me why because I got no fucking clue
-# Somehow it will crash the bus even though the kernel will report it's fine. Fuck this.
+# Making this library shared causes some memory fuckery
+# No clue why but CAN I/O goes to shit. Don't do it.
 add_library(can_interface STATIC)
 target_sources(can_interface PRIVATE
   CAN/CANMotor_PSOC.cpp
