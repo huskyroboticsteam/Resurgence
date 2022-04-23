@@ -7,7 +7,7 @@
 #include <optional>
 
 extern "C" {
-#include "../HindsightCAN/CANPacket.h"
+#include <HindsightCAN/CANPacket.h>
 }
 
 /**

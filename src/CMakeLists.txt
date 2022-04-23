@@ -130,10 +130,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   endif()
 endif()
 
-# Preprocessor flag required for the CAN library; see
-# https://github.com/huskyroboticsteam/HindsightCAN#how-to-port-to-a-new-chip
-add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
-
 # Enable all warnings except a few (unused variable/parameter/result)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-variable \
