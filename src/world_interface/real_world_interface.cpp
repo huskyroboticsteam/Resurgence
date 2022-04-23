@@ -18,7 +18,6 @@
 #include <set>
 #include <vector>
 
-#include <nlohmann/json.hpp>
 #include <opencv2/calib3d.hpp>
 
 using nlohmann::json;

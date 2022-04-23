@@ -6,8 +6,6 @@
 
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
 enum class RoverState {
 	RemoteControl,
 	DrivingToWaypoint,

@@ -5,8 +5,6 @@
 
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
 namespace Globals {
 CommandLineOptions opts;
 RoverState curr_state;

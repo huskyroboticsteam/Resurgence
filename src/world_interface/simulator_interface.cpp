@@ -142,9 +142,13 @@ void handleCamFrame(json msg) {
 }
 
 void handleMotorStatus(json msg) {
-	int32_t pos = msg["position"];
 	std::string motorName = msg["motor"];
-	DataPoint<int32_t> posData(pos);
+	auto posJson = msg["position"];
+	DataPoint<int32_t> posData;
+	if (!posJson.is_null()) {
+		int32_t pos = posJson;
+		posData = {pos};
+	}
 
 	std::unique_lock lock(motorPosMapMutex);
 	motorPosMap.insert_or_assign(motorName, posData);
@@ -214,8 +218,6 @@ void initSimServer() {
 		std::unique_lock<std::mutex> lock(connectionMutex);
 		connectionCV.wait(lock, [] { return simConnected; });
 	}
-
-	initCameras();
 }
 
 } // namespace
