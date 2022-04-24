@@ -1,24 +1,26 @@
 #pragma once
 
-#include <numeric>
+#include <iterator>
 #include <list>
+#include <numeric>
 
 namespace filters {
 
 /**
  * @brief Implements a rolling average filter of the specified type.
  *
- * @tparam T The data type to filter. Must support commutative addition as well as scalar division.
+ * @tparam T The data type to filter. Must support commutative addition as well as scalar
+ * division.
  */
 template <typename T> class RollingAvgFilter {
 public:
-
 	/**
 	 * @brief Construct a new rolling average filter.
 	 *
 	 * @param numPoints The maximum number of points that can be stored in the buffer.
 	 */
-	RollingAvgFilter(int numPoints) : numPoints(numPoints), data(), dataIter(data.begin()) {}
+	explicit RollingAvgFilter(int numPoints)
+		: numPoints(numPoints), data(), dataIter(data.begin()) {}
 
 	/**
 	 * @brief Get the output of the filter.
@@ -30,7 +32,7 @@ public:
 	 * @warning If no data is in the filter the behavior is undefined.
 	 */
 	T get() const {
-		return std::reduce(data.begin() + 1, data.end(), data.front()) / data.size();
+		return std::reduce(std::next(data.begin()), data.end(), data.front()) / data.size();
 	}
 
 	/**
