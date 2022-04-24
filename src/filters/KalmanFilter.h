@@ -63,9 +63,15 @@ public:
 
 		Eigen::Matrix<double, outputDim, outputDim> S =
 			outputMat * P * outputMat.transpose() + measurementCovariance;
-		// This is the Kalman gain matrix, used to weight the GPS data against the model data
+		// from wikipedia: K = P * H^T * S^-1
+		// so:
+		// K * S = P * H^T
+		// (K * S)^T = (P * H^T)^T
+		// S^T * K^T = H * P^T
+		// K^T = solve(S^T, H * P^T)
+		// K = solve(S^T, H * P^T)^T
 		Eigen::Matrix<double, stateDim, outputDim> gainMatrix =
-			S.transpose().colPivHouseholderQr().solve((outputMat * P.transpose()).transpose());
+			S.transpose().colPivHouseholderQr().solve(outputMat * P.transpose()).transpose();
 
 		return KalmanFilter(discA, discB, outputMat, stateCovariance, measurementCovariance,
 							gainMatrix);
@@ -109,14 +115,20 @@ public:
 
 		// solve DARE for asymptotic state error covariance matrix
 		Eigen::Matrix<double, stateDim, stateDim> P =
-			statespace::DARE(systemMat.transpose().eval(), outputMat.transpose().eval(),
+			statespace::DARE(systemMat.transpose(), outputMat.transpose(),
 							 stateCovariance, measurementCovariance);
 
 		// The following math is derived from the asymptotic form:
 		// https://en.wikipedia.org/wiki/Kalman_filter#Asymptotic_form
 		Eigen::Matrix<double, outputDim, outputDim> S =
 			outputMat * P * outputMat.transpose() + measurementCovariance;
-		// This is the Kalman gain matrix, used to weight the GPS data against the model data
+		// from wikipedia:
+		// K = P * H^T * S^-1
+		// K * S = P * H^T
+		// (K * S)^T = (P * H^T)^T
+		// S^T * K^T = H * P^T
+		// K^T = solve(S^T, H * P^T)
+		// K = solve(S^T, H * P^T)^T
 		Eigen::Matrix<double, stateDim, outputDim> gainMatrix =
 			S.transpose().colPivHouseholderQr().solve(outputMat * P.transpose()).transpose();
 
@@ -135,12 +147,12 @@ public:
 	}
 
 private:
-	Eigen::Matrix<double, stateDim, stateDim> A;
-	Eigen::Matrix<double, stateDim, inputDim> B;
-	Eigen::Matrix<double, inputDim, stateDim> C;
-	Eigen::Matrix<double, stateDim, stateDim> Q;
-	Eigen::Matrix<double, outputDim, outputDim> R;
-	Eigen::Matrix<double, stateDim, outputDim> K;
+	Eigen::Matrix<double, stateDim, stateDim> A; // system matrix
+	Eigen::Matrix<double, stateDim, inputDim> B; // input matrix
+	Eigen::Matrix<double, inputDim, stateDim> C; // output matrix
+	Eigen::Matrix<double, stateDim, stateDim> Q; // system noise covariance matrix
+	Eigen::Matrix<double, outputDim, outputDim> R; // output noise covariance matrix
+	Eigen::Matrix<double, stateDim, outputDim> K; // asymptotic kalman gain
 
 	// Assumes all discrete matrices
 	KalmanFilter(const Eigen::Matrix<double, stateDim, stateDim>& A,

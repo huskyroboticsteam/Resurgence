@@ -106,7 +106,8 @@ discretizeA(const Eigen::Matrix<double, numStates, numStates>& contA, double dt)
 }
 
 /**
- * @brief Convert a continuous time system matrix and additive process noise matrix to discrete time.
+ * @brief Convert a continuous time system matrix and additive process noise matrix to discrete
+ * time.
  *
  * @tparam numStates The number of states in the system.
  * @param contA A reference to the continuous time system matrix.
@@ -175,49 +176,63 @@ discretizeR(const Eigen::Matrix<double, numStates, numStates>& contR, double dt)
 }
 
 /**
- * @brief Solves the Discrete-time Algebraic Riccati Equation.
+ * @brief Solve a discrete-time Algebraic Riccati equation.
  *
- * This can be used to calculate the asymptotic
- * estimate error covariance matrix. (P_inf) This can be used to calculate the optimal
- * Kalman gain matrix.
+ * The matrix names used are the same convention as the linked wikipedia article.
+ * Note that these matrices do not have specific names since DARE is simply a type
+ * of equation.
  *
- * @tparam numStates The number of states in the system.
- * @param A0 The discrete time system matrix.
- * @param Ctrans The transpose of the discrete time output matrix.
- * @param Q The discrete time additive process noise covariance matrix.
- * @param R The discrete time additive output noise covariance matrix.
- * @return The asymptotic estimate error covariance matrix.
+ * @tparam numStates The dimension of the matrices.
+ * @param A The A matrix.
+ * @param B The B matrix.
+ * @param R The R matrix.
+ * @param Q The Q matrix.
+ * @param tolerance The algorithm is stopped when the relative error of the calculation is at
+ * most this value.
+ * @param maxIter If nonnegative, the algorithm will stop after these many iterations if it has
+ * not converged by then.
+ * @return Eigen::Matrix<double, numStates, numStates> The approximate solution to the DARE.
+ *
+ * @see https://en.wikipedia.org/wiki/Algebraic_Riccati_equation#Solution
  */
 template <int numStates>
 static Eigen::Matrix<double, numStates, numStates>
-DARE(const Eigen::Matrix<double, numStates, numStates>& A0,
-	 const Eigen::Matrix<double, numStates, numStates>& Ctrans,
+DARE(const Eigen::Matrix<double, numStates, numStates>& A,
+	 const Eigen::Matrix<double, numStates, numStates>& B,
 	 const Eigen::Matrix<double, numStates, numStates>& Q,
-	 const Eigen::Matrix<double, numStates, numStates>& R) {
-	// reference:
+	 const Eigen::Matrix<double, numStates, numStates>& R, double tolerance = 1e-4,
+	 int maxIter = -1) {
+	using mat_t = Eigen::Matrix<double, numStates, numStates>;
+	// see:
 	// https://scicomp.stackexchange.com/questions/30757/discrete-time-algebraic-riccati-equation-dare-solver-in-c
-	Eigen::Matrix<double, numStates, numStates> A = A0;
-	Eigen::Matrix<double, numStates, numStates> G = Ctrans * R.inverse() * Ctrans.transpose();
-	Eigen::Matrix<double, numStates, numStates> H = Q;
-	const Eigen::Matrix<double, numStates, numStates> I =
-		Eigen::Matrix<double, numStates, numStates>::Identity();
+	// to conform to the wikipedia article conventions, we replace H with P
 
-	Eigen::Matrix<double, numStates, numStates> lastA;
-	Eigen::Matrix<double, numStates, numStates> lastG;
-	Eigen::Matrix<double, numStates, numStates> lastH;
-	// converges quadratically
-	do {
-		lastA = A;
-		lastG = G;
-		lastH = H;
+	mat_t currA = A;
+	mat_t currG = B * R.inverse() * B.transpose();
+	mat_t currP = Q;
 
-		const Eigen::Matrix<double, numStates, numStates> AIGH =
-			lastA * (I + lastG * lastH).inverse();
-		A = lastA * AIGH * lastA;
-		G = lastG + lastA * AIGH * lastG * lastA.transpose();
-		H = lastH + lastA.transpose() * lastH * (I + lastG * lastH).transpose() * lastA;
-	} while ((H - lastH).norm() / H.norm() >= 1e-4);
+	mat_t I = mat_t::Identity();
 
-	return H;
+	double error;
+
+	for (int i = 0; maxIter < 0 || i < maxIter; i++) {
+		mat_t lastA = currA;
+		mat_t lastG = currG;
+		mat_t lastP = currP;
+
+		mat_t AIGHinv = lastA * (I + lastG * lastP).inverse();
+
+		currA = AIGHinv * lastA;
+		currG = lastG + AIGHinv * lastG * lastA.transpose();
+		currP = lastP + lastA.transpose() * lastP * (I + lastG * lastP).inverse() * lastA;
+
+		double error = (currP - lastP).norm() / currP.norm();
+		if (error > tolerance){
+			break;
+		}
+	}
+
+	return currP;
 }
-} // namespace StateSpace
+
+} // namespace filters::statespace
