@@ -11,7 +11,7 @@ bool initializeLidar();
 
 void readLidarLoop();
 
-typedef struct Polar2D {
+struct Polar2D {
 	double r, theta;
 	double asCartesianX() {
 		return r * cos(theta);
@@ -19,6 +19,6 @@ typedef struct Polar2D {
 	double asCartesianY() {
 		return r * sin(theta);
 	}
-} Polar2D;
+};
 
 }
