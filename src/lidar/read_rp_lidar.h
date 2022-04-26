@@ -9,7 +9,7 @@ namespace lidar {
 
 bool initializeLidar();
 
-DataPoint<points_t> readLidar();
+DataPoint<navtypes::points_t> readLidar();
 
 struct Polar2D {
 	double r, theta;
