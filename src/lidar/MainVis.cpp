@@ -102,8 +102,8 @@ int runRPLidar(unsigned long baudrate) {
 static void help() {
 	printf("Lidar Visualizer. \n"
 		"Usage: \n"
-		"     -l=<lidar_num>         # 1=hokyuo, 2=rplidar"
-		"     -b=<baudrate>          # set baudrate, defaults to 115200"
+		"     -l=<lidar_num>         # 1=hokyuo, 2=rplidar \n"
+		"     -b=<baudrate>          # set baudrate, defaults to 115200 \n"
 		);
 }
 
