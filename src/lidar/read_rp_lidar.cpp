@@ -25,24 +25,6 @@ std::mutex points_lock;
 namespace lidar {
 
 /**
- * @brief Startsup RPLidar with default settings
- */
-bool initializeLidar() {
-    if (!lidar_initialized) {
-        if (!rp_lidar.checkHealth()) {
-            perror("failed to connect to rp lidar");
-        } else {
-            rp_lidar.setMaxDistance(16.0);
-            points_lock.lock();
-            lidar_thread = std::thread(&readLidarLoop);
-            lidar_initialized = true;
-            points_lock.unlock();
-        }
-    }
-    return lidar_initialized;
-}
-
-/**
  * @brief RP Lidar continuously scans environment, updates current timeframe with lidar data
  */
 void readLidarLoop() {
@@ -74,6 +56,24 @@ void readLidarLoop() {
             continue;
         }
     } 
+}
+
+/**
+ * @brief Startsup RPLidar with default settings
+ */
+bool initializeLidar() {
+    if (!lidar_initialized) {
+        if (!rp_lidar.checkHealth()) {
+            perror("failed to connect to rp lidar");
+        } else {
+            rp_lidar.setMaxDistance(16.0);
+            points_lock.lock();
+            lidar_thread = std::thread(&readLidarLoop);
+            lidar_initialized = true;
+            points_lock.unlock();
+        }
+    }
+    return lidar_initialized;
 }
 
 /**
