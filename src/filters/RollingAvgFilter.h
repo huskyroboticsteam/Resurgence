@@ -19,7 +19,7 @@ public:
 	 *
 	 * @param numPoints The maximum number of points that can be stored in the buffer.
 	 */
-	explicit RollingAvgFilter(int numPoints)
+	explicit RollingAvgFilter(size_t numPoints)
 		: numPoints(numPoints), data(), dataIter(data.begin()) {}
 
 	/**
@@ -91,7 +91,7 @@ public:
 	}
 
 private:
-	int numPoints;
+	size_t numPoints;
 	std::list<T> data;
 	typename std::list<T>::iterator dataIter;
 };

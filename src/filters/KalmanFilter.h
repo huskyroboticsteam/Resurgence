@@ -115,7 +115,7 @@ public:
 
 		// solve DARE for asymptotic state error covariance matrix
 		Eigen::Matrix<double, stateDim, stateDim> P =
-			statespace::DARE(systemMat.transpose(), outputMat.transpose(),
+			statespace::DARE(systemMat.transpose().eval(), outputMat.transpose().eval(),
 							 stateCovariance, measurementCovariance);
 
 		// The following math is derived from the asymptotic form:
