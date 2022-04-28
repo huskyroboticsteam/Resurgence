@@ -5,13 +5,13 @@
 
 #include <chrono>
 #include <cstring>
-#include <map>
 #include <mutex>
 #include <shared_mutex>
 #include <string>
 #include <termios.h>
 #include <thread>
 #include <unistd.h>
+#include <unordered_map>
 #include <utility>
 
 #include <linux/can.h>
@@ -27,19 +27,31 @@ extern "C" {
 
 using robot::types::DataPoint;
 
+// template specialization for hashing pairs
+template <typename T1, typename T2> struct std::hash<std::pair<T1, T2>> {
+	std::size_t operator()(const std::pair<T1, T2>& pair) const {
+		auto h1 = std::hash<T1>()(pair.first);
+		auto h2 = std::hash<T2>()(pair.second);
+		// stolen from:
+		// https://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
+		return (h1 << 6) + (h1 >> 2) + h2 + 0x9e3779b9;
+	}
+};
+
+
 namespace can {
 namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 // receive all messages on the given group
-constexpr int CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
+constexpr uint32_t CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
 
 int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
 
 using telemetrycode_t = uint8_t;
 
-const std::map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
+const std::unordered_map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
 	{PACKET_TELEMETRY_VOLTAGE, telemtype_t::voltage},
 	{PACKET_TELEMETRY_CURRENT, telemtype_t::current},
 	{PACKET_TELEMETRY_PWR_RAIL_STATE, telemtype_t::pwr_rail},
@@ -58,16 +70,16 @@ const std::map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
 
 // the telemetry map will store telemetry code instead of telem enum
 // this means unrecognized telemetry types won't cause UB
-using protectedmap_t =
+using devicemap_t =
 	std::pair<std::shared_ptr<std::shared_mutex>,
-			  std::shared_ptr<std::map<telemetrycode_t, DataPoint<telemetry_t>>>>;
+			  std::shared_ptr<std::unordered_map<telemetrycode_t, DataPoint<telemetry_t>>>>;
 
 // holds telemetry data for each device
-std::map<deviceid_t, protectedmap_t> telemMap;
+std::unordered_map<deviceid_t, devicemap_t> telemMap;
 std::shared_mutex telemMapMutex;
 
-std::map<std::pair<deviceid_t, telemetrycode_t>,
-		 std::map<uint32_t, std::function<void(deviceid_t, telemtype_t,
+std::unordered_map<std::pair<deviceid_t, telemetrycode_t>,
+		 std::unordered_map<uint32_t, std::function<void(deviceid_t, telemtype_t,
 											   robot::types::DataPoint<telemetry_t>)>>>
 	telemetryCallbackMap;
 uint32_t nextCallbackID = 0;
@@ -90,7 +102,7 @@ bool receivePacket(int fd, CANPacket& packet) {
 }
 
 template <typename K, typename V>
-bool mapHasKey(std::shared_mutex& mutex, const std::map<K, V>& map, const K& key) {
+bool mapHasKey(std::shared_mutex& mutex, const std::unordered_map<K, V>& map, const K& key) {
 	std::shared_lock lock(mutex);
 	return map.find(key) != map.end();
 }
@@ -135,7 +147,7 @@ void handleTelemetryPacket(CANPacket& packet) {
 		// this device has no existing data, so insert a new device map
 		auto mutexPtr = std::make_shared<std::shared_mutex>();
 		auto deviceMapPtr =
-			std::make_shared<std::map<telemetrycode_t, DataPoint<telemetry_t>>>();
+			std::make_shared<std::unordered_map<telemetrycode_t, DataPoint<telemetry_t>>>();
 		deviceMapPtr->emplace(telemCode, data);
 		// acquire write lock of the entire map to insert a new device map
 		std::unique_lock mapLock(telemMapMutex);

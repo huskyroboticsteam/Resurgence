@@ -4,11 +4,11 @@ using robot::types::motorid_t;
 
 namespace robot {
 
-extern const std::set<motorid_t> pidMotors = {
+extern const std::unordered_set<motorid_t> pidMotors = {
 	motorid_t::armBase, motorid_t::shoulder,		 motorid_t::elbow,
 	motorid_t::forearm, motorid_t::differentialLeft, motorid_t::differentialRight};
 
-extern const std::map<motorid_t, can::deviceserial_t> motorSerialIDMap = {
+extern const std::unordered_map<motorid_t, can::deviceserial_t> motorSerialIDMap = {
 	{motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},
 	{motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},
 	{motorid_t::rearLeftwheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},
@@ -22,13 +22,13 @@ extern const std::map<motorid_t, can::deviceserial_t> motorSerialIDMap = {
 	{motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}};
 
 // TODO: tune pid
-extern const std::map<motorid_t, pidcoef_t> motorPIDMap = {
+extern const std::unordered_map<motorid_t, pidcoef_t> motorPIDMap = {
 	{motorid_t::armBase, {1000, 50, 10000}},	 {motorid_t::shoulder, {100, 0, 1000}},
 	{motorid_t::elbow, {500, 50, 10000}},		 {motorid_t::forearm, {1000, 0, 0}},
 	{motorid_t::differentialLeft, {1000, 0, 0}}, {motorid_t::differentialRight, {1000, 0, 0}}};
 
 // TODO: verify encoder inversions
-extern const std::map<motorid_t, bool> motorEncInvMap = {
+extern const std::unordered_map<motorid_t, bool> motorEncInvMap = {
 	{motorid_t::armBase, false},
 	{motorid_t::shoulder, false},
 	{motorid_t::elbow, true},
@@ -37,7 +37,7 @@ extern const std::map<motorid_t, bool> motorEncInvMap = {
 	{motorid_t::differentialRight, false}};
 
 // TODO: measure/verify this
-extern const std::map<robot::types::motorid_t, uint32_t> motorPulsesPerJointRevMap = {
+extern const std::unordered_map<robot::types::motorid_t, uint32_t> motorPulsesPerJointRevMap = {
 	{motorid_t::armBase, 17 * 1000},  {motorid_t::armBase, 20 * 1000},
 	{motorid_t::armBase, 36 * 1000},  {motorid_t::armBase, 360 * 1000},
 	{motorid_t::armBase, 360 * 1000}, {motorid_t::armBase, 360 * 1000}};

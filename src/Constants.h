@@ -3,8 +3,6 @@
 #include "world_interface/data.h"
 
 #include <cmath>
-#include <cstddef>
-#include <map>
 #include <string>
 
 namespace Constants {

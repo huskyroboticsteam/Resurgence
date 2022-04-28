@@ -14,8 +14,7 @@
 
 #include <future>
 #include <iostream>
-#include <map>
-#include <set>
+#include <unordered_map>
 #include <vector>
 
 #include <opencv2/calib3d.hpp>
@@ -31,9 +30,9 @@ const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
 namespace {
 // map that associates camera id to the camera object
-std::map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+std::unordered_map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 
-std::map<motorid_t, motormode_t> motorModeMap;
+std::unordered_map<motorid_t, motormode_t> motorModeMap;
 
 callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
@@ -179,7 +178,7 @@ URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
 
-const std::map<motorid_t, double> positive_arm_pwm_scales = {
+const std::unordered_map<motorid_t, double> positive_arm_pwm_scales = {
 	{motorid_t::armBase, 0.1831},
 	{motorid_t::shoulder, -0.3052},
 	{motorid_t::elbow, -0.5},
@@ -187,7 +186,7 @@ const std::map<motorid_t, double> positive_arm_pwm_scales = {
 	{motorid_t::differentialLeft, 0.0763},
 	{motorid_t::differentialRight, -0.0763},
 	{motorid_t::hand, 0.2289}};
-const std::map<motorid_t, double> negative_arm_pwm_scales = {
+const std::unordered_map<motorid_t, double> negative_arm_pwm_scales = {
 	{motorid_t::armBase, 0.1831},
 	{motorid_t::shoulder, -0.2136},
 	{motorid_t::elbow, -0.2747},

@@ -7,6 +7,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <unordered_set>
 #include <vector>
 
 extern "C" {
@@ -29,7 +30,7 @@ enum class TestMode {
 	ScienceServos
 };
 
-std::vector<int> modes = {
+std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::ModeSet),	   static_cast<int>(TestMode::PWM),
 	static_cast<int>(TestMode::PID),		   static_cast<int>(TestMode::Encoder),
 	static_cast<int>(TestMode::LimitSwitch),   static_cast<int>(TestMode::ScienceTelemetry),
@@ -58,7 +59,7 @@ int main() {
 	ss << static_cast<int>(TestMode::ScienceMotors) << " for SCIENCE MOTORS\n";
 	ss << static_cast<int>(TestMode::ScienceTelemetry) << " for SCIENCE SERVOS\n";
 	int test_type = prompt(ss.str().c_str());
-	if (std::find(modes.begin(), modes.end(), test_type) == modes.end()) {
+	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
 		std::exit(1);
 	}

@@ -7,8 +7,6 @@ extern "C" {
 #include "../HindsightCAN/CANPacket.h"
 }
 
-using namespace std::chrono_literals;
-
 namespace can {
 devicegroup_t getDeviceGroup(const CANPacket& packet) {
 	uint8_t groupCode = GetDeviceGroupCode(const_cast<CANPacket*>(&packet));
