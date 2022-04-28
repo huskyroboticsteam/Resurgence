@@ -103,6 +103,10 @@ find_package(Boost REQUIRED COMPONENTS system)
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
+# Find the CAN library; contains packet and protocol definitions and does not
+# actually require physical CAN to be present.
+find_package(HindsightCAN REQUIRED)
+
 find_package(Threads REQUIRED)
 if(WITH_CV)
   find_package(OpenCV REQUIRED)
@@ -125,10 +129,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 	  find_package(URGLidar REQUIRED)
   endif()
 endif()
-
-# Preprocessor flag required for the CAN library; see
-# https://github.com/huskyroboticsteam/HindsightCAN#how-to-port-to-a-new-chip
-add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
 
 # Enable all warnings except a few (unused variable/parameter/result)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
@@ -156,16 +156,6 @@ add_library(utils SHARED
   kinematics/DiffDriveKinematics.cpp
   world_interface/data.cpp)
 
-# The CAN library; contains packet and protocol definitions and does not
-# actually require physical CAN to be present.
-add_library(hindsight_can STATIC
-  HindsightCAN/CANPacket.c
-  HindsightCAN/CANCommon.c
-  HindsightCAN/CANMotorUnit.c
-  HindsightCAN/CANScience.c
-  HindsightCAN/PortFiles/PortTemplate.c
-)
-
 ## ====== CAN Interfaces =======
 # Stub CAN interface is used for the tests (and for the Rover if
 # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
@@ -192,7 +182,7 @@ else()
     CAN/CANStubs.cpp)
 endif()
 target_link_libraries(can_interface PUBLIC
-  hindsight_can
+  HindsightCAN::HindsightCAN
   Threads::Threads
   utils
 )

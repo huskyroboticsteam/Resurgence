@@ -1,9 +1,9 @@
 #pragma once
 
 extern "C" {
-#include "../HindsightCAN/CANCommon.h"
-#include "../HindsightCAN/CANMotorUnit.h"
-#include "../HindsightCAN/CANPacket.h"
+#include <HindsightCAN/CANCommon.h>
+#include <HindsightCAN/CANMotorUnit.h>
+#include <HindsightCAN/CANPacket.h>
 }
 
 #include <chrono>
