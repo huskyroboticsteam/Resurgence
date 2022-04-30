@@ -11,6 +11,8 @@ enum Lidars {
 	NONE
 };
 
+constexpr double MM_PER_M = 1000;
+
 /**
  * @brief Hokuyo Lidar
  * Runs Main Visualizer with a plugged in Hokuyo Lidar
@@ -76,7 +78,6 @@ int runRPLidar(unsigned long baudrate) {
 			double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
 			for (long unsigned i = 0; i < scan.value().ranges.size(); i++) {
 				double rad = dtheta*i;
-				double MM_PER_M = 1000;
 				double dist = scan.value().ranges[i] * MM_PER_M;
 
 				Polar2D frame{dist, rad};
