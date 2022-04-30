@@ -14,7 +14,7 @@
 using namespace navtypes;
 
 bool lidar_initialized = false;
-RPLidar rp_lidar(Constants::Lidar::RP_PATH, Constants::Lidar::RPLIDAR_A1_BAUDRATE);
+RPLidar rp_lidar(Constants::Lidar::RP_PATH, Constants::Lidar::RPLIDAR_S1_BAUDRATE);
 std::thread lidar_thread;
 DataPoint<points_t> last_points = {};
 std::mutex points_lock;
