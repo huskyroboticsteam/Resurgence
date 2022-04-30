@@ -1,10 +1,9 @@
 #pragma once
 
-#include <cmath>
-#include <cstddef>
-#include <string>
 #include "world_interface/data.h"
-#include "kinematics/DiffDriveKinematics.h"
+
+#include <cmath>
+#include <string>
 
 namespace Constants {
 /**
@@ -83,7 +82,7 @@ constexpr double ELBOW_MIN = 0.0;
 constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent self-collisions
 
 constexpr const char* AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
-const CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
+const robot::types::CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
 
 /**
    @deprecated No need for this constant once we fully switch over the Mission Control PlanViz
@@ -105,13 +104,15 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
   
 namespace Nav {
-const double RADIAN_COST = EFF_WHEEL_BASE / 2.0; // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
-const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3; // Planner stays this far away from obstacles (m)
+// Distance (m) we could have traveled forward in the time it takes to turn 1 radian
+const double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
+// Planner stays this far away from obstacles (m)
+const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3;
 const int MAX_ITERS = 3000; // Max number of nodes expanded during A* search
 const double PLAN_RESOLUTION = Constants::ROBOT_LENGTH; // m
-const double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH*3;
+const double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH * 3;
 const double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
 const double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
 const double EPS = 2.0; // heuristic weight for weighted A*
-}
+} // namespace Nav
 } // namespace Constants

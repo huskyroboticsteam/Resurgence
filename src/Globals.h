@@ -26,14 +26,6 @@ extern CommandLineOptions opts;
    @deprecated
  */
 extern RoverState curr_state;
-/**
-   @deprecated
- */
-extern nlohmann::json status_data;
-/**
-   @deprecated
- */
-extern nlohmann::json motor_status;
 extern websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;

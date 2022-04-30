@@ -69,7 +69,7 @@ bool ParseBaseStationPacket(char const* buffer) {
 		success = ParseMotorPacket(parsed_message);
 	} else if (type == "autonomous") {
 		Globals::AUTONOMOUS = !Globals::AUTONOMOUS;
-		success = (setCmdVel(0, 0) == 1.0);
+		success = (robot::setCmdVel(0, 0) == 1.0);
 		log(LOG_INFO, "Set autonomous to %d\n", Globals::AUTONOMOUS);
 	} else if (type != "estop") {
 		return sendError("Unrecognized message type '" + type + "'");
@@ -95,7 +95,7 @@ bool ParseEmergencyStop(json& message) {
 		AssembleEmergencyStopPacket(&p, DEVICE_GROUP_MOTOR_CONTROL, serial, ESTOP_ERR_GENERAL);
 		sendCANPacket(p);
 	}
-	bool success = (setCmdVel(0, 0) == 1.0);
+	bool success = (robot::setCmdVel(0, 0) == 1.0);
 	Globals::E_STOP = true;
 	bool release;
 	try {
@@ -123,7 +123,7 @@ bool ParseDrivePacket(json& message) {
 	if (fb > 1.0 || fb < -1.0 || lr > 1.0 || lr < -1.0) {
 		return sendError("Drive targets not within bounds +/- 1.0");
 	}
-	double scale_factor = setCmdVel(lr * DEFAULT_TH_VEL, fb * DEFAULT_X_VEL);
+	double scale_factor = robot::setCmdVel(lr * DEFAULT_TH_VEL, fb * DEFAULT_X_VEL);
 	if (scale_factor < 1.0) {
 		return sendError("Infeasible drive targets. I scaled them down by " +
 						 std::to_string(scale_factor));

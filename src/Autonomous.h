@@ -74,9 +74,10 @@ private:
 	unsigned int
 		mapOverlapSampleThreshold; // at least these many points required to overlap map
 
-	std::optional<datatime_t> lastLidarTime;	 // last timestamp of lidar data
-	std::optional<datatime_t> lastGPSTime;		 // last timestamp of gps data
-	std::map<int, datatime_t> lastLandmarkTimes; // maps landmark idx -> last datapoint time
+	std::optional<robot::types::datatime_t> lastLidarTime; // last timestamp of lidar data
+	std::optional<robot::types::datatime_t> lastGPSTime;   // last timestamp of gps data
+	std::map<int, robot::types::datatime_t>
+		lastLandmarkTimes; // maps landmark idx -> last datapoint time
 
 	/* Variables for pose graph localization */
 	filters::pose_graph::FriendlyGraph pose_graph;

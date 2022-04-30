@@ -8,6 +8,8 @@ using cv::Mat;
 using cv::Size;
 using std::string;
 
+using namespace robot::types;
+
 namespace cam {
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),

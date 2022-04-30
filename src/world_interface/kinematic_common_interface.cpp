@@ -1,14 +1,14 @@
-#include "kinematic_common_interface.h"
-
 #include "../Constants.h"
+#include "../Globals.h"
 #include "../Util.h"
-#include "../navtypes.h"
 #include "../kinematics/DiffDriveKinematics.h"
+#include "../navtypes.h"
 #include "world_interface.h"
 
 #include <chrono>
 
 using namespace navtypes;
+using namespace robot::types;
 using util::toTransform;
 
 using std::chrono::duration_cast;
@@ -17,6 +17,15 @@ using std::chrono::milliseconds;
 static DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
 static DataPoint<transform_t> lastOdom;
 static wheelvel_t commandedWheelVel{0, 0};
+
+namespace robot {
+namespace {
+void setCmdVelToIntegrate(const wheelvel_t& wheelVels) {
+	auto odom = robot::readOdom();
+	lastOdom = odom;
+	commandedWheelVel = wheelVels;
+}
+} // namespace
 
 DataPoint<transform_t> readOdom() {
 	if (!lastOdom) {
@@ -33,6 +42,29 @@ DataPoint<transform_t> readOdom() {
 	}
 }
 
+double setCmdVel(double dtheta, double dx) {
+	if (Globals::E_STOP && (dtheta != 0 || dx != 0)) {
+		return 0;
+	}
+
+	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(dx, dtheta);
+	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
+	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
+	if (maxAbsPWM > 1) {
+		lPWM /= maxAbsPWM;
+		rPWM /= maxAbsPWM;
+	}
+
+	setCmdVelToIntegrate(wheelVels);
+	setMotorPower(motorid_t::frontLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, rPWM);
+
+	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
+}
+
 std::pair<double, double> getCmdVel() {
 	double l = commandedWheelVel.lVel;
 	double r = commandedWheelVel.rVel;
@@ -40,12 +72,4 @@ std::pair<double, double> getCmdVel() {
 	return {robotVel(2), robotVel(0)};
 }
 
-void setCmdVelToIntegrate(const wheelvel_t& wheelVels) {
-	auto odom = readOdom();
-	lastOdom = odom;
-	commandedWheelVel = wheelVels;
-}
-
-void setCmdVelToIntegrate(double dtheta, double dx) {
-	setCmdVelToIntegrate(kinematics.robotVelToWheelVel(dx, dtheta));
-}
+} // namespace robot

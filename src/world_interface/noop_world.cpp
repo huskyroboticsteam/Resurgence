@@ -1,9 +1,12 @@
-#include "world_interface.h"
 #include "../navtypes.h"
+#include "world_interface.h"
 
 #include <unistd.h>
 
 using namespace navtypes;
+using namespace robot::types;
+
+namespace robot {
 
 const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
 
@@ -15,10 +18,6 @@ DataPoint<points_t> readLidarScan() {
 
 landmarks_t readLandmarks() {
 	return landmarks_t{};
-}
-
-DataPoint<gpscoords_t> gps::readGPSCoords() {
-	return {};
 }
 
 DataPoint<double> readIMUHeading() {
@@ -37,8 +36,28 @@ URCLeg getLeg(int /*id*/) {
 	return URCLeg{-1, -1, {0., 0., 0.}};
 }
 
-void setMotorPWM(const std::string& motor, double normalizedPWM) {}
+void setMotorPower(motorid_t motor, double normalizedPWM) {}
 
-void setMotorPos(const std::string& motor, int32_t targetPos) {}
+void setMotorPos(motorid_t motor, int32_t targetPos) {}
+
+types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+	return {};
+}
 
 void setIndicator(indication_t signal) {}
+
+callbackid_t addLimitSwitchCallback(
+	robot::types::motorid_t motor,
+	const std::function<void(robot::types::motorid_t motor,
+							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback) {
+	return 0;
+}
+
+void removeLimitSwitchCallback(callbackid_t id) {}
+
+} // namespace robot
+
+DataPoint<gpscoords_t> gps::readGPSCoords() {
+	return {};
+}

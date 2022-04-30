@@ -5,8 +5,6 @@
 
 #include <string>
 
-#include <nlohmann/json.hpp>
-
 namespace websocket {
 
 using nlohmann::json;

@@ -103,6 +103,10 @@ find_package(Boost REQUIRED COMPONENTS system)
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
+# Find the CAN library; contains packet and protocol definitions and does not
+# actually require physical CAN to be present.
+find_package(HindsightCAN REQUIRED)
+
 find_package(Threads REQUIRED)
 if(WITH_CV)
   find_package(OpenCV REQUIRED)
@@ -125,10 +129,6 @@ if(WITH_LIDAR)
   find_package(URGLidar REQUIRED)
 endif()
 
-# Preprocessor flag required for the CAN library; see
-# https://github.com/huskyroboticsteam/HindsightCAN#how-to-port-to-a-new-chip
-add_definitions(-DCHIP_TYPE=CHIP_TYPE_TEMPLATE)
-
 # Enable all warnings except a few (unused variable/parameter/result)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-variable \
@@ -146,49 +146,85 @@ list(APPEND camera_src
   camera/CameraConfig.cpp
   )
 
-# The CAN library; contains packet and protocol definitions and does not
-# actually require physical CAN to be present.
-add_library(hindsight_can SHARED
-  HindsightCAN/CANPacket.c
-  HindsightCAN/CANCommon.c
-  HindsightCAN/CANMotorUnit.c
-  HindsightCAN/CANScience.c
-  HindsightCAN/PortFiles/PortTemplate.c)
+# shared library for utility code
+add_library(utils SHARED 
+  log.cpp
+  Util.cpp
+  gps/gps_util.cpp
+  base64/base64.cpp
+  kinematics/DiffDriveKinematics.cpp
+  world_interface/data.cpp)
 
-add_library(stub_world_interface SHARED
+## ====== CAN Interfaces =======
+# Stub CAN interface is used for the tests (and for the Rover if
+# CAN is disabled) and the real CAN interface is used for the Rover if CAN is
+# enabled.
+
+# Common CAN source files
+
+# **DON'T MAKE THIS SHARED**
+# Making this library shared causes some memory fuckery
+# No clue why but CAN I/O goes to shit. Don't do it.
+add_library(can_interface STATIC)
+target_sources(can_interface PRIVATE
+  CAN/CANMotor_PSOC.cpp
+  CAN/CANMotor.cpp
+  CAN/CANUtils.cpp
+)
+
+# Hardware specific source files
+if(WITH_CAN)
+  target_sources(can_interface PRIVATE
+    CAN/CAN.cpp)
+else()
+  target_sources(can_interface PRIVATE
+    CAN/CANStubs.cpp)
+endif()
+target_link_libraries(can_interface PUBLIC
+  HindsightCAN::HindsightCAN
+  Threads::Threads
+  utils
+)
+
+add_library(real_base_station SHARED
+  Networking/Network.cpp)
+
+## ====== World Interfaces =======
+# hardware-agnostic utilities and common code for world interface
+add_library(world_interface_core STATIC
+  world_interface/gps_common_interface.cpp
+  world_interface/kinematic_common_interface.cpp
+  ar/Detector.cpp
+  ar/MarkerSet.cpp
+  ar/MarkerPattern.cpp
+  ar/Tag.cpp
+  ar/read_landmarks.cpp
+  base64/base64_img.cpp
+  Util.cpp
+  ${camera_src}
+  )
+target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils)
+
+# CAN library (above) requires some utilities from this
+target_link_libraries(can_interface PUBLIC utils)
+
+add_library(stub_world_interface STATIC
   world_interface/noop_world.cpp)
-add_library(real_world_interface SHARED
+
+add_library(real_world_interface STATIC
+  world_interface/real_world_constants.cpp
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
-  ar/Detector.cpp
-  ar/MarkerSet.cpp
-  ar/MarkerPattern.cpp
-  ar/Tag.cpp
-  ar/read_landmarks.cpp
   gps/usb_gps/read_usb_gps.cpp
-  base64/base64_img.cpp
-  Util.cpp
-  ${camera_src}
   )
-add_library(simulator_interface SHARED
+add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
-  ar/Detector.cpp
-  ar/MarkerSet.cpp
-  ar/MarkerPattern.cpp
-  ar/Tag.cpp
-  ar/read_landmarks.cpp
-  base64/base64_img.cpp
-  Util.cpp
-  ${camera_src}
   )
 
-list(APPEND vision_libs
-  ${OpenCV_LIBS}
-  opencv_aruco)
-target_include_directories(real_world_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(real_world_interface ${vision_libs})
-target_include_directories(simulator_interface SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(simulator_interface ${vision_libs})
+target_link_libraries(real_world_interface can_interface world_interface_core)
+target_link_libraries(simulator_interface world_interface_core)
+target_link_libraries(stub_world_interface world_interface_core)
 
 add_library(hr_slam SHARED
   filters/pose_graph/graph.cpp
@@ -215,41 +251,29 @@ add_library(rover_common SHARED
   Autonomous.cpp
   CommandLineOptions.cpp
   Globals.cpp
-  log.cpp
   rospub.cpp
-  base64/base64.cpp
-  #Networking/ParseBaseStation.cpp
-  # TODO Make these not depend on the old protocol
-  #Networking/IK.cpp
-  #Networking/motor_interface.cpp
-  Networking/ParseCAN.cpp
   Networking/websocket/WebSocketServer.cpp
   Networking/websocket/WebSocketProtocol.cpp
-  Networking/mc/MissionControlProtocol.cpp
-  Util.cpp
-  gps/gps_util.cpp
-  world_interface/gps_common_interface.cpp
-  world_interface/kinematic_common_interface.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
-  kinematics/DiffDriveKinematics.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
   planning/plan.cpp
   )
-target_include_directories(rover_common SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(rover_common ${vision_libs})
+target_link_libraries(rover_common utils)
 
 list(APPEND rover_libs
   rover_common
-  hindsight_can
   Threads::Threads
   hr_slam
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
-  nlohmann_json::nlohmann_json)
-target_link_libraries(Rover ${rover_libs})
+  nlohmann_json::nlohmann_json
+  utils
+)
+target_link_libraries(Rover
+  ${rover_libs} real_base_station)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
   target_link_libraries(Rover ${real_world_libs})
@@ -261,31 +285,13 @@ endif()
 
 target_link_libraries(Rover ${vision_libs})
 
-## ====== CAN Interfaces =======
-# Stub CAN interface is used for the tests (and for the Rover if
-# CAN is disabled) and the real CAN interface is used for the Rover if CAN is
-# enabled.
-if(WITH_CAN)
-  add_library(real_can_interface STATIC
-	log.cpp
-	Networking/CANUtils.cpp)
-endif()
-add_library(stub_can_interface STATIC
-  log.cpp
-  Networking/CANStubs.cpp)
-
-# Link the appropriate CAN interface to the Rover executable.
-if(WITH_CAN)
-  target_link_libraries(Rover real_can_interface)
-else()
-  target_link_libraries(Rover stub_can_interface)
-endif()
-
 if(WITH_CAN)
   add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID ${rover_libs}
-	real_can_interface
-	${real_world_libs}
+  target_link_libraries(TunePID 
+    ${rover_libs}
+    can_interface
+	  real_base_station
+	  ${real_world_libs}
 	)
   target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
 endif()
@@ -314,7 +320,6 @@ if(WITH_TESTS)
 
   target_link_libraries(tests
     ${rover_libs}
-    stub_can_interface
     ${real_world_libs}
     ${OpenCV_LIBS})
   include(CTest)
@@ -327,6 +332,8 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
-add_subdirectory(ar)
-add_subdirectory(camera)
-add_subdirectory(Networking)
+if(WITH_CV)
+  add_subdirectory(ar)
+  add_subdirectory(camera)
+endif()
+add_subdirectory(CAN)

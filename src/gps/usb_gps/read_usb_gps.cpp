@@ -11,6 +11,8 @@
 #include <thread>
 #include <unistd.h>
 
+using namespace robot::types;
+
 namespace gps {
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 std::thread gps_thread;
@@ -23,8 +25,8 @@ datatime_t gps_time;
 DataPoint<navtypes::gpscoords_t> readGPSCoords() {
 	DataPoint<navtypes::gpscoords_t> data;
 	gps_mutex.lock();
-	if (has_fix) {
-	  data = DataPoint<navtypes::gpscoords_t>(gps_time, most_recent_coords);
+	if (robot::gpsHasFix()) {
+		data = DataPoint<navtypes::gpscoords_t>(gps_time, most_recent_coords);
 	}
 	gps_mutex.unlock();
 	return data;
