@@ -45,4 +45,9 @@ const double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
 const double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
 const double EPS = 2.0; // heuristic weight for weighted A*
 }
+
+// Lidar
+namespace Lidar {
+const std::string RP_PATH = "/dev/ttyUSB0";
+}
 } // namespace Constants

@@ -5,6 +5,12 @@
 #include <fstream>
 #include <thread>
 
+enum Lidars {
+	Hokuyo,
+	RP,
+	NONE
+};
+
 /**
  * @brief Hokuyo Lidar
  * Runs Main Visualizer with a plugged in Hokuyo Lidar
@@ -70,8 +76,8 @@ int runRPLidar(unsigned long baudrate) {
 			double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
 			for (long unsigned i = 0; i < scan.value().ranges.size(); i++) {
 				double rad = dtheta*i;
-				double MM_TO_M = 1000;
-				double dist = scan.value().ranges[i] * MM_TO_M;
+				double MM_PER_M = 1000;
+				double dist = scan.value().ranges[i] * MM_PER_M;
 
 				Polar2D frame{dist, rad};
 				pts.push_back(lidar::polarToCartesian(frame));
@@ -101,10 +107,16 @@ int runRPLidar(unsigned long baudrate) {
 
 static void help() {
 	printf("Lidar Visualizer. \n"
-		"Usage: \n"
-		"     -l=<lidar_num>         # 1=hokyuo, 2=rplidar \n"
-		"     -b=<baudrate>          # set baudrate, defaults to 115200 \n"
+		"Usage: lidar_vis <lidar_type> <baud_rate>\n"
+		"        <lidar_type>   # \"hokuyo\" \"rp\"\n"
+		"        <baud_rate>    # default=115200\n"
 		);
+}
+
+Lidars hash(std::string lidar) {
+	if (lidar == "hokuyo") return Hokuyo;
+	if (lidar == "rp") return RP;
+	return NONE;
 }
 
 /**
@@ -114,23 +126,26 @@ static void help() {
  */
 int main(int argc, char** argv) {
 	unsigned long baudrate;
-	int lidarType;
 	int errorCode = 0;
 	if (argc == 2) {
 		baudrate = 112500;
-		lidarType = atoi(argv[1]);
 	} else if (argc == 3) {
 		baudrate = (unsigned long) atol(argv[2]);
-		lidarType = atoi(argv[1]);
 	} else {
 		help();
 		return -1;
 	}
 
-
-	switch(lidarType) {
-		case 1: errorCode = runHokuyo();
-		case 2: errorCode = runRPLidar(baudrate);
+	switch(hash(std::string(argv[1]))) {
+		case Hokuyo:
+			errorCode = runHokuyo();
+			break;
+		case RP:
+			errorCode = runRPLidar(baudrate);
+			break;
+		case NONE:
+			help();
+			return -1;
 	}
 	
 	return errorCode;

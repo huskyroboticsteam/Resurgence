@@ -7,10 +7,19 @@
 
 namespace lidar {
 
+/**
+ * @brief Startsup RPLidar with default settings
+ */
 bool initializeLidar();
 
+/**
+ * @brief Provides RP Lidar data at current timeframe
+ */
 DataPoint<navtypes::points_t> readLidar();
 
+/**
+ * @brief Polar struct that holds radians, and theta
+ */
 struct Polar2D {
 	double r, theta;
 	double asCartesianX() {
