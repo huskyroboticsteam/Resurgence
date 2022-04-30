@@ -13,11 +13,8 @@
 
 using namespace navtypes;
 
-constexpr uint32_t RPLIDAR_BAUDRATE = 115200;
-constexpr double MM_PER_M = 1000;
-
 bool lidar_initialized = false;
-RPLidar rp_lidar(Constants::Lidar::RP_PATH, RPLIDAR_BAUDRATE);
+RPLidar rp_lidar(Constants::Lidar::RP_PATH, Constants::Lidar::RPLIDAR_A1_BAUDRATE);
 std::thread lidar_thread;
 DataPoint<points_t> last_points = {};
 std::mutex points_lock;
@@ -34,7 +31,7 @@ void readLidarLoop() {
             double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
             for (unsigned long i = 0; i < scan.value().ranges.size(); i++) {
                 double rad = dtheta*i;
-                double dist_m = scan.value().ranges[i] * MM_PER_M;
+                double dist_m = scan.value().ranges[i] * Constants::Lidar::MM_PER_M;
 
                 Polar2D frame{dist_m, rad};
                 pts.push_back(lidar::polarToCartesian2(frame));
@@ -53,12 +50,12 @@ void readLidarLoop() {
 /**
  * @brief Startsup RPLidar with default settings
  */
-bool initializeLidar(double MAX_DIST = 16) {
+bool initializeLidar(double max_dist = 16) {
     if (!lidar_initialized) {
         if (!rp_lidar.checkHealth()) {
             perror("failed to connect to rp lidar");
         } else {
-            rp_lidar.setMaxDistance(MAX_DIST);
+            rp_lidar.setMaxDistance(max_dist);
             std::lock_guard<std::mutex> lk(points_lock);
             lidar_thread = std::thread(&readLidarLoop);
             lidar_initialized = true;

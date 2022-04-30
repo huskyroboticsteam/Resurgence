@@ -1,4 +1,5 @@
 #include "LidarVis.h"
+#include "../Constants.h"
 
 #include <iostream>
 #include <chrono>
@@ -10,8 +11,6 @@ enum Lidars {
 	RP,
 	NONE
 };
-
-constexpr double MM_PER_M = 1000;
 
 /**
  * @brief Hokuyo Lidar
@@ -67,7 +66,7 @@ int runHokuyo() {
  */
 int runRPLidar(unsigned long baudrate) {
 	using namespace lidar;
-	RPLidar rp_lidar("/dev/ttyUSB0", baudrate);
+	RPLidar rp_lidar(Constants::Lidar::RP_PATH, baudrate);
 
 	LidarVis vis(vis_win_width, vis_win_height, vis_bg_color, lidar_max_range);
 	cv::namedWindow(vis_win_name);
@@ -78,7 +77,7 @@ int runRPLidar(unsigned long baudrate) {
 			double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
 			for (long unsigned i = 0; i < scan.value().ranges.size(); i++) {
 				double rad = dtheta*i;
-				double dist = scan.value().ranges[i] * MM_PER_M;
+				double dist = scan.value().ranges[i] * Constants::Lidar::MM_PER_M;
 
 				Polar2D frame{dist, rad};
 				pts.push_back(lidar::polarToCartesian(frame));
@@ -129,7 +128,7 @@ int main(int argc, char** argv) {
 	unsigned long baudrate;
 	int errorCode = 0;
 	if (argc == 2) {
-		baudrate = 112500;
+		baudrate = Constants::Lidar::RPLIDAR_A1_BAUDRATE;
 	} else if (argc == 3) {
 		baudrate = (unsigned long) atol(argv[2]);
 	} else {
