@@ -2,14 +2,13 @@
 #include "../Globals.h"
 #include "../Networking/websocket/WebSocketProtocol.h"
 #include "../Util.h"
-#include "../navtypes.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
-#include "kinematic_common_interface.h"
+#include "../navtypes.h"
 #include "world_interface.h"
 
 #include <atomic>
@@ -23,10 +22,23 @@
 
 using nlohmann::json;
 using namespace navtypes;
+using namespace robot::types;
 
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
 const DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
+const std::map<motorid_t, std::string> motorNameMap = {
+	{motorid_t::frontLeftWheel, "frontLeftWheel"},
+	{motorid_t::frontRightWheel, "frontRightWheel"},
+	{motorid_t::rearLeftwheel, "rearLeftwheel"},
+	{motorid_t::rearRightWheel, "rearRightWheel"},
+	{motorid_t::armBase, "armBase"},
+	{motorid_t::shoulder, "shoulder"},
+	{motorid_t::elbow, "elbow"},
+	{motorid_t::forearm, "forearm"},
+	{motorid_t::differentialRight, "differentialRight"},
+	{motorid_t::differentialLeft, "differentialLeft"},
+	{motorid_t::hand, "hand"}};
 
 DataPoint<double> lastHeading;
 std::mutex headingMutex;
@@ -39,6 +51,16 @@ std::mutex lidarMutex;
 
 DataPoint<pose_t> lastTruePose;
 std::mutex truePoseMutex;
+
+std::map<std::string, DataPoint<int32_t>> motorPosMap;
+std::shared_mutex motorPosMapMutex;
+
+using lscallback_t =
+	std::function<void(robot::types::DataPoint<LimitSwitchData> limitSwitchData)>;
+std::map<std::string, std::map<robot::callbackid_t, lscallback_t>> limitSwitchCallbackMap;
+robot::callbackid_t nextCallbackID = 0;
+std::map<robot::callbackid_t, motorid_t> lsCallbackToMotorMap;
+std::mutex limitSwitchCallbackMapMutex; // protects both maps and nextCallbackID
 
 // stores the last camera frame for each camera
 std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
@@ -120,7 +142,33 @@ void handleCamFrame(json msg) {
 }
 
 void handleMotorStatus(json msg) {
-	// TODO: forward to mission control
+	std::string motorName = msg["motor"];
+	auto posJson = msg["position"];
+	DataPoint<int32_t> posData;
+	if (!posJson.is_null()) {
+		int32_t pos = posJson;
+		posData = {pos};
+	}
+
+	std::unique_lock lock(motorPosMapMutex);
+	motorPosMap.insert_or_assign(motorName, posData);
+}
+
+void handleLimitSwitch(json msg) {
+	std::string motorName = msg["motor"];
+	uint8_t data;
+	std::string limit = msg["limit"];
+	if (limit == "maximum") {
+		data = 1 << LIMIT_SWITCH_LIM_MAX_IDX;
+	} else if (limit == "minimum") {
+		data = 1 << LIMIT_SWITCH_LIM_MIN_IDX;
+	}
+	DataPoint<LimitSwitchData> lsData(data);
+
+	std::lock_guard lock(limitSwitchCallbackMapMutex);
+	for (const auto& entry : limitSwitchCallbackMap.at(motorName)) {
+		entry.second(lsData);
+	}
 }
 
 void handleTruePose(json msg) {
@@ -157,6 +205,7 @@ void initSimServer() {
 	protocol.addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol.addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol.addMessageHandler("simMotorStatusReport", handleMotorStatus);
+	protocol.addMessageHandler("simLimitSwitchAlert", handleLimitSwitch);
 	protocol.addMessageHandler("simRoverTruePoseReport", handleTruePose);
 	protocol.addConnectionHandler(clientConnected);
 	protocol.addDisconnectionHandler(clientDisconnected);
@@ -169,11 +218,11 @@ void initSimServer() {
 		std::unique_lock<std::mutex> lock(connectionMutex);
 		connectionCV.wait(lock, [] { return simConnected; });
 	}
-
-	initCameras();
 }
 
 } // namespace
+
+namespace robot {
 
 const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 
@@ -233,29 +282,6 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 	}
 }
 
-double setCmdVel(double dtheta, double dx) {
-	if (Globals::E_STOP && (dtheta != 0 || dx != 0)) {
-		return 0;
-	}
-
-	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(dx, dtheta);
-	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
-	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
-	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
-	if (maxAbsPWM > 1) {
-		lPWM /= maxAbsPWM;
-		rPWM /= maxAbsPWM;
-	}
-
-	setCmdVelToIntegrate(wheelVels);
-	setMotorPWM("frontLeftWheel", lPWM);
-	setMotorPWM("rearLeftWheel", lPWM);
-	setMotorPWM("frontRightWheel", rPWM);
-	setMotorPWM("rearRightWheel", rPWM);
-
-	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
-}
-
 landmarks_t readLandmarks() {
 	return AR::readLandmarks();
 }
@@ -267,11 +293,6 @@ DataPoint<points_t> readLidarScan() {
 
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
-}
-
-DataPoint<gpscoords_t> gps::readGPSCoords() {
-	std::lock_guard<std::mutex> guard(gpsMutex);
-	return lastGPS;
 }
 
 DataPoint<double> readIMUHeading() {
@@ -288,19 +309,63 @@ URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
 
-void setMotorPWM(const std::string& motor, double normalizedPWM) {
-	json msg = {{"type", "simMotorPowerRequest"}, {"motor", motor}, {"power", normalizedPWM}};
+void setMotorPower(motorid_t motor, double normalizedPWM) {
+	std::string name = motorNameMap.at(motor);
+	json msg = {{"type", "simMotorPowerRequest"}, {"motor", name}, {"power", normalizedPWM}};
 	sendJSON(msg);
 }
 
-void setMotorPos(const std::string& motor, int32_t targetPos) {
-	json msg = {
-		{"type", "simMotorPositionRequest"}, {"motor", motor}, {"position", targetPos}};
+void setMotorPos(motorid_t motor, int32_t targetPos) {
+	std::string name = motorNameMap.at(motor);
+	json msg = {{"type", "simMotorPositionRequest"}, {"motor", name}, {"position", targetPos}};
 	sendJSON(msg);
+}
+
+DataPoint<int32_t> getMotorPos(motorid_t motor) {
+	std::string motorName = motorNameMap.at(motor);
+	std::shared_lock lock(motorPosMapMutex);
+	auto entry = motorPosMap.find(motorName);
+	if (entry != motorPosMap.end()) {
+		return entry->second;
+	} else {
+		return {};
+	}
+}
+
+callbackid_t addLimitSwitchCallback(
+	robot::types::motorid_t motor,
+	const std::function<void(robot::types::motorid_t motor,
+							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback) {
+	auto func = std::bind(callback, motor, std::placeholders::_1);
+	std::string motorName = motorNameMap.at(motor);
+
+	std::lock_guard lock(limitSwitchCallbackMapMutex);
+	limitSwitchCallbackMap.insert({motorName, {}});
+	callbackid_t nextID = nextCallbackID++;
+	limitSwitchCallbackMap.at(motorName).insert({nextID, func});
+	lsCallbackToMotorMap.insert({nextID, motor});
+	return nextID;
+}
+
+void removeLimitSwitchCallback(callbackid_t id) {
+	std::lock_guard lock(limitSwitchCallbackMapMutex);
+	std::string motorName = motorNameMap.at(lsCallbackToMotorMap.at(id));
+	limitSwitchCallbackMap.at(motorName).erase(id);
+	if (limitSwitchCallbackMap.at(motorName).empty()) {
+		limitSwitchCallbackMap.erase(motorName);
+	}
 }
 
 void setIndicator(indication_t signal) {
 	if (signal == indication_t::arrivedAtDest) {
 		log(LOG_INFO, "Robot arrived at destination!\n");
 	}
+}
+
+} // namespace robot
+
+DataPoint<gpscoords_t> gps::readGPSCoords() {
+	std::lock_guard<std::mutex> guard(gpsMutex);
+	return lastGPS;
 }

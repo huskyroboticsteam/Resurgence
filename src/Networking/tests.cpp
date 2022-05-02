@@ -15,6 +15,7 @@ extern "C" {
 #include <catch2/catch.hpp>
 
 using nlohmann::json;
+using namespace robot;
 
 void setupEncoders() {
 	int32_t start_angle = 1337;

@@ -12,6 +12,7 @@
 #include <thread>
 
 using namespace navtypes;
+using namespace robot::types;
 
 // This website may be helpful
 // https://sourceforge.net/p/urgnetwork/wiki/top_en/

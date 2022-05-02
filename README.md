@@ -64,32 +64,57 @@ Then, to install the tools, run
 ```bash
 brew install cmake
 ```
-	
+
+## (*Linux users only*) Setup Ubuntu repository
+The project depends on many third-party libraries (mostly for sensors,
+distributed by the sensor manufacturers) that we have packaged in a third-party
+Ubuntu package repository. *Before continuing*, you should follow the
+instructions at <https://huskyroboticsteam.github.io/ubuntu-repo> to set it
+up. Afterwards, it should be fairly trivial to install the dependencies. 
+
+If you are on another Linux distribution, you may still have to build these
+dependencies from source (especially if your system does not use the APT package
+manager).
+
+Mac users will unfortunately still have to build them from source, but the
+process shouldn't take too long.
+
 ## Setup Project Repository
 
-1. Enter the home directory (or wherever you would like to put the project files).
-`cd ~` (If you would like to put the project somewhere else, replace `~` with
-the folder path.)
-
-2. Clone the repository.
 ```bash
+# Enter the home directory (or wherever you would like to put the project files).
+# If you would like to put the project somewhere else, replace '~' with the folder path.
+cd ~
+# Clone the repository.
 git clone https://github.com/huskyroboticsteam/Resurgence/
+``` 
+
+## Install HindsightCAN
+This is a library developed by Electronics for interfacing with their
+motors and sensors over the
+[CAN](https://en.wikipedia.org/wiki/CAN_bus) bus; it is needed for packet definitions and utility functions and doesn't actually require support for a physical CAN bus.
+
+### Linux
+Assuming the Ubuntu repository has been set up:
+```bash
+sudo apt install hindsight-can
 ```
 
-3. Navigate into the repository.
+### Mac
+You will unfortunately need to build from source:
 ```bash
-cd Resurgence
-```
-
-4. Clone the CAN library submodule (we use git submodules, unfortunately)
-```bash
-git submodule init
-git submodule update
-```
-
-5. Finally, navigate back to the parent directory:
-```bash
-cd ..
+# Clone the repository
+git clone https://github.com/huskyroboticsteam/HindsightCAN
+# Navigate inside the cloned repository
+cd HindsightCAN
+# Set up a build folder and enter it
+mkdir -p build && cd build
+# Run CMake configuration
+cmake ..
+# Build project and install
+sudo cmake --build . --target install
+# Navigate back to previous directory
+cd ../..
 ```
 
 ## Install OpenCV
@@ -122,27 +147,36 @@ brew install opencv@4
 
 ## Install Catch2 (for unit testing)
 ### Linux
-1. Navigate to a directory where you would like to put Catch2: `cd ~` (Again, we're using
-the home directory `~` here but you can use whatever you'd like.)
-1. Clone Catch2: `git clone https://github.com/catchorg/Catch2.git`
-2. Enter the cloned directory: `cd Catch2`
-3. Check out the correct version: `git checkout v2.13.7`
-4. Create and enter a directory to put the compiled code into: `mkdir build && cd build`
-6. Configure CMake: `cmake -DBUILD_TESTING=OFF ..`
-7. Build/install Catch2: `sudo cmake --build . --target install`
-8. Navigate back to the directory from Step 1: `cd ../..`
-9. You can delete the Catch2 directory after you're finished
+If you are on Ubuntu, you can use our Ubuntu package repository.
+Follow the instructions on <https://huskyroboticsteam.github.io/ubuntu-repo> first, and 
+then once you're finished, you can run
+```bash
+sudo apt install catch2
+```
 
 ### On Mac
 There is a Homebrew package for Catch2 as well. Open the Terminal and run this
 command:
-`brew install catch2`
+```bash
+brew install catch2
+```
 
 ## Install URG library (Hokuyo lidar)
 
 ~~This is **optional** unless you are connecting to our hardware lidar
 sensor.~~ (not yet!)
-The same instructions will work for Linux and Mac. These instructions
+
+### Linux
+On Ubuntu, make sure you have followed the
+[instructions to install our Ubuntu
+repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
+```bash
+sudo apt install urg-lidar
+```
+
+
+### Mac
+Unfortunately on Mac, you will have to build the library from source. These instructions
 can also be found in the
 [huskyrobotics/urg-lidar](https://github.com/huskyroboticsteam/urg-lidar)
 repository's README.
@@ -164,9 +198,9 @@ cd ../..
 ```
 
 
-(TODO: actually include udev rules) ~~By default on Ubuntu, the USB
-lidar device will only be accessible to the root user (e.g. via
-sudo). To make it accessible to everyone:~~
+(TODO: actually include udev rules) ~~By default on Ubuntu, the USB lidar device
+will only be accessible to the root user (e.g. via sudo). To make it accessible
+to everyone:~~
 
 ```
 sudo cp src/lidar/50-usb-hokuyo-lidar.rules /etc/udev/rules.d
@@ -175,10 +209,17 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 
 ## Install [Eigen](http://eigen.tuxfamily.org)
 
-On Ubuntu, you might be able to install via
+### Linux
+On Ubuntu, you will be able to install via
 
-```
+```bash
 sudo apt-get install libeigen3-dev
+```
+
+### Mac
+On Mac, you will be able to install via
+```bash
+brew install eigen
 ```
 
 ## Install JSON library
@@ -204,12 +245,48 @@ sudo apt install libwebsocketpp-dev libboost-system-dev
 ## Install GPS libraries
 
 ~~This is **optional** unless you are connecting to our hardware GPS
-sensor.~~ (not yet!) This is required to build for now.
+sensor.~~ (not yet!** This is required to build for now.
 
-On Ubuntu, just run:
+### Linux
+
+On Ubuntu, make sure you have followed the
+[instructions to install our Ubuntu
+repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
 
 ```bash
-sudo apt-get install gpsd gpsd-clients libgps-dev
+sudo apt-get install ublox-linux gpsd gpsd-clients libgps-dev
+```
+(**NOTE**: `gpsd` is still required for legacy purposes, but will likely be
+phased out when we completely switch to the new Ublox GPS hardware, so this
+command installs `ublox-linux` as well to interact with that. Even `ublox-linux`
+is a temporary solution; Electronics plans to integrate the GPS into a board
+which we will query over CAN.)
+
+### Mac
+
+On Mac, you are able to install `gpsd` via
+```bash
+brew install gpsd
+```
+but you will have to build `ublox-linux` from source. These instructions
+can also be found in the
+[huskyrobotics/ublox-linux](https://github.com/huskyroboticsteam/ublox-linux)
+repository's README.
+```bash
+# Clone repository (--recursive is important! Build won't work without submodules)
+git clone --recursive https://github.com/huskyroboticsteam/ublox-linux.git
+# Enter cloned directory
+cd ublox-linux
+# Make a build directory to hold compiled code
+mkdir -p build
+# Enter build directory
+cd build
+# Configure CMake
+cmake ..
+# Build/Install Ublox Linux library
+sudo make install
+# Navigate back to working directory
+cd ../..
 ```
 
 ## Set up the build directory
@@ -248,7 +325,7 @@ make -j Rover
 
 Note that (for now) unit tests cannot be run when configured to build the simulator rover code.
 
-### Running the simulator
+### Launching the simulator
 
 Launch the appropriate simulator executable for your platform. Then, run the rover code:
 

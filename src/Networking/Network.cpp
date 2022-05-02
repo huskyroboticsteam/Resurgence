@@ -3,7 +3,6 @@
 #include "../Globals.h"
 #include "../log.h"
 #include "NetworkConstants.h"
-#include "ParseCAN.h"
 
 #include <cassert>
 #include <cstdlib>
