@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kinematics/DiffDriveKinematics.h"
 #include "world_interface/data.h"
 
 #include <cmath>
@@ -43,8 +44,8 @@ constexpr double WHEEL_BASE = 2. / 3.;
   Effective distance between wheels. Tweaked so that actual rover angular rate roughly matches
   the commanded angular rate.
  */
-constexpr double EFF_WHEEL_BASE = 1.40; // tweaked to match 2-wheel kinematic model
-constexpr double WHEEL_RADIUS = 0.15; // eyeballed
+constexpr double EFF_WHEEL_BASE = 1.40;		 // tweaked to match 2-wheel kinematic model
+constexpr double WHEEL_RADIUS = 0.15;		 // eyeballed
 constexpr double PWM_PER_RAD_PER_SEC = 5000; // eyeballed
 constexpr double MAX_DRIVE_PWM = 25000; // can be up to 2^15 - 1 (32767) but we have limited it
 										// because driving at full speed draws a massive amount
@@ -59,16 +60,13 @@ constexpr double MAX_DRIVE_PWM = 25000; // can be up to 2^15 - 1 (32767) but we 
  */
 constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
 /**
-   Kinematic model for the rover, based on the wheel base width Constants::EFF_WHEEL_BASE
- */
-const DiffDriveKinematics kinematics(EFF_WHEEL_BASE);
-/**
    @brief Maximum angular velocity (i.e. `dtheta` in setCmdVel()) of the rover.
 
    Computed assuming that the left wheel is going at full speed backwards while the right wheel
    is going at full speed forwards.
  */
-const double MAX_DTHETA = kinematics.wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
+const double MAX_DTHETA =
+	DiffDriveKinematics(EFF_WHEEL_BASE).wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
 // Joint limits
 // TODO: make sure these are still accurate with the new arm.
@@ -102,7 +100,7 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
    WebSocket server endpoint for the DGPS protocol.
  */
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
-  
+
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
 const double RADIAN_COST = EFF_WHEEL_BASE / 2.0;

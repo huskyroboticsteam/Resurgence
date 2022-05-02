@@ -1,10 +1,10 @@
 #include "WebSocketServer.h"
 
-#include "../../log.h"
 #include "../../Constants.h"
+#include "../../log.h"
 
 #include <string>
-
+namespace net {
 namespace websocket {
 
 using nlohmann::json;
@@ -145,7 +145,7 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 	std::string path = conn->get_resource();
 	log(LOG_INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s\n",
 		serverName.c_str(), path.c_str(), client.c_str());
-	
+
 	auto& protocolData = protocolMap.at(path);
 	protocolData.client.reset();
 	protocolData.protocol.clientDisconnected();
@@ -163,3 +163,4 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	protocolMap.at(path).protocol.processMessage(obj);
 }
 } // namespace websocket
+} // namespace net

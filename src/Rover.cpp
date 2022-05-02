@@ -3,6 +3,7 @@
 #include "Autonomous.h"
 #include "CommandLineOptions.h"
 #include "Globals.h"
+#include "network/MissionControlProtocol.h"
 #include "Util.h"
 #include "navtypes.h"
 #include "log.h"
@@ -70,14 +71,13 @@ int rover_loop(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
-	mc::MissionControlProtocol mcProto(Globals::websocketServer);
+	net::mc::MissionControlProtocol mcProto(Globals::websocketServer);
 	Globals::websocketServer.addProtocol(mcProto);
 	robot::world_interface_init();
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
 	Globals::opts = ParseCommandLineOptions(argc, argv);
-	CANPacket packet;
 
 	// Target locations for autonomous navigation
 	// Eventually this will be set by communication from the base station

@@ -6,6 +6,7 @@
 
 #include <nlohmann/json.hpp>
 
+namespace net{
 namespace websocket {
 
 using nlohmann::json;
@@ -119,3 +120,4 @@ private:
 };
 
 } // namespace websocket
+} // namespace net

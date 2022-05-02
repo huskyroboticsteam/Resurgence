@@ -1,6 +1,6 @@
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../Networking/websocket/WebSocketProtocol.h"
+#include "../network/websocket/WebSocketProtocol.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
@@ -207,7 +207,7 @@ void clientDisconnected() {
 }
 
 void initSimServer() {
-	websocket::WebSocketProtocol protocol(PROTOCOL_PATH);
+	net::websocket::WebSocketProtocol protocol(PROTOCOL_PATH);
 	protocol.addMessageHandler("simImuOrientationReport", handleIMU);
 	protocol.addMessageHandler("simLidarReport", handleLidar);
 	protocol.addMessageHandler("simGpsPositionReport", handleGPS);

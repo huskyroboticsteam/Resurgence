@@ -182,9 +182,6 @@ target_link_libraries(can_interface PUBLIC
   utils
 )
 
-add_library(real_base_station SHARED
-  Networking/Network.cpp)
-
 ## ====== World Interfaces =======
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
@@ -248,8 +245,6 @@ add_library(rover_common SHARED
   CommandLineOptions.cpp
   Globals.cpp
   rospub.cpp
-  Networking/websocket/WebSocketServer.cpp
-  Networking/websocket/WebSocketProtocol.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   worldmap/GlobalMap.cpp
@@ -257,19 +252,19 @@ add_library(rover_common SHARED
   worldmap/QuadTree.cpp
   planning/plan.cpp
   )
-target_link_libraries(rover_common utils)
+target_link_libraries(rover_common
+  utils
+  mission_control_interface)
 
 list(APPEND rover_libs
   rover_common
   Threads::Threads
+  websocket_utils
   hr_slam
-  ${Boost_LIBRARIES}
-  websocketpp::websocketpp
-  nlohmann_json::nlohmann_json
   utils
 )
 target_link_libraries(Rover
-  ${rover_libs} real_base_station)
+  ${rover_libs})
 
 if(WORLD_INTERFACE STREQUAL "REAL")
   target_link_libraries(Rover ${real_world_libs})
@@ -286,8 +281,7 @@ if(WITH_CAN)
   target_link_libraries(TunePID 
     ${rover_libs}
     can_interface
-	  real_base_station
-	  ${real_world_libs}
+	${real_world_libs}
 	)
   target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
 endif()
@@ -333,3 +327,4 @@ if(WITH_CV)
   add_subdirectory(camera)
 endif()
 add_subdirectory(CAN)
+add_subdirectory(network)

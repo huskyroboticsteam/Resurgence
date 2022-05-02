@@ -11,6 +11,7 @@
 #include "../navtypes.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
+#include "../Constants.h"
 
 #include <future>
 #include <iostream>

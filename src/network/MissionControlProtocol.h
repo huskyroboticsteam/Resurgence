@@ -1,19 +1,21 @@
 #pragma once
 
-#include "../../world_interface/world_interface.h"
-#include "../websocket/WebSocketProtocol.h"
-#include "../websocket/WebSocketServer.h"
+#include "websocket/WebSocketProtocol.h"
+#include "websocket/WebSocketServer.h"
+#include "../world_interface/world_interface.h"
 
 #include <atomic>
 #include <memory>
-#include <unordered_set>
-#include <unordered_map>
-#include <thread>
 #include <shared_mutex>
+#include <thread>
+#include <unordered_map>
+#include <unordered_set>
 
+namespace net {
 namespace mc {
 
 using json = nlohmann::json;
+using robot::types::CameraID;
 using websocket::SingleClientWSServer;
 using websocket::WebSocketProtocol;
 
@@ -39,3 +41,4 @@ private:
 };
 
 }; // namespace mc
+} // namespace net

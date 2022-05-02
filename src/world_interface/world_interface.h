@@ -70,7 +70,7 @@ types::DataPoint<navtypes::points_t> readLidarScan();
  * @return The IDs of all cameras currently supported by the world interface, as a @ref
  * std::unordered_set.
  */
-std::unordered_set<CameraID> getCameras();
+std::unordered_set<types::CameraID> getCameras();
 
 /**
  * @brief Check if a new camera frame from the specified camera is available.

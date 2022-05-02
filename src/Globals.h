@@ -1,8 +1,7 @@
 #pragma once
 
 #include "CommandLineOptions.h"
-#include "Networking/Network.h"
-#include "Networking/websocket/WebSocketServer.h"
+#include "network/websocket/WebSocketServer.h"
 
 #include <vector>
 #include <atomic>
@@ -24,7 +23,7 @@ extern CommandLineOptions opts;
    @deprecated
  */
 extern RoverState curr_state;
-extern websocket::SingleClientWSServer websocketServer;
+extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 } // namespace Globals

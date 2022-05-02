@@ -1,9 +1,9 @@
 #include "MissionControlProtocol.h"
 
-#include "../../Constants.h"
-#include "../../Globals.h"
-#include "../../base64/base64_img.h"
-#include "../../log.h"
+#include "../Constants.h"
+#include "../Globals.h"
+#include "../base64/base64_img.h"
+#include "../log.h"
 
 #include <functional>
 #include <mutex>
@@ -13,6 +13,7 @@
 
 #include <opencv2/core.hpp>
 
+namespace net {
 namespace mc {
 
 using val_t = json::value_t;
@@ -78,7 +79,7 @@ static bool validateEmergencyStopRequest(const json& j) {
 static void handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
-		setCmdVel(0, 0);
+		robot::setCmdVel(0, 0);
 	}
 	Globals::E_STOP = stop;
 }
@@ -109,7 +110,7 @@ static void handleDriveRequest(const json& j) {
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? -steer / norm : steer);
 	log(LOG_INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
 		dtheta, dx);
-	setCmdVel(dtheta, dx);
+	robot::setCmdVel(dtheta, dx);
 }
 
 static bool validateJoint(const json& j) {
@@ -127,7 +128,7 @@ static void handleJointPowerRequest(const json& j) {
 	std::string motor = j["joint"];
 	double power = j["power"];
 	// TODO adapt this when we have the new CAN/motor interface
-	setMotorPWM(motor, power);
+	//setMotorPWM(motor, power);
 }
 
 static bool validateJointPositionRequest(const json& j) {
@@ -139,7 +140,7 @@ static void handleJointPositionRequest(const json& j) {
 	double position_deg = j["position"];
 	int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO adapt this when we have the new CAN/motor interface;
-	setMotorPos(motor, position_mdeg);
+	//setMotorPos(motor, position_mdeg);
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
@@ -148,7 +149,7 @@ static bool validateCameraStreamOpenRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
-	std::unordered_set<CameraID> supported_cams = getCameras();
+	std::unordered_set<CameraID> supported_cams = robot::getCameras();
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		this->_open_streams[cam] = 0;
@@ -169,34 +170,6 @@ void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 													const std::string& b64_data) {
 	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-}
-
-void MissionControlProtocol::videoStreamTask() {
-	while (this->_streaming_running) {
-		std::shared_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
-		// for all open streams, check if there is a new frame
-		for (const auto& stream : _open_streams) {
-			const CameraID& cam = stream.first;
-			const uint32_t& frame_num = stream.second;
-			if (hasNewCameraFrame(cam, frame_num)) {
-				// if there is a new frame, grab it
-				auto data = readCamera(cam).getData();
-				uint32_t& new_frame_num = data.second;
-				cv::Mat frame = data.first;
-				// update the previous frame number
-				this->_open_streams[cam] = new_frame_num;
-
-				// convert frame to base64 and send it
-				std::string b64_data = base64::encodeMat(frame, ".jpg");
-				sendCameraStreamReport(cam, b64_data);
-			}
-
-			// break out of the loop if we should stop streaming
-			if (!this->_streaming_running) {
-				break;
-			}
-		}
-	}
 }
 
 void MissionControlProtocol::handleConnection() {
@@ -268,3 +241,4 @@ static bool validateRange(const json& j, const std::string& key, double min, dou
 }
 
 } // namespace mc
+} // namespace net
