@@ -20,11 +20,13 @@ var searchData=
   ['mutextwopriorities_17',['MutexTwoPriorities',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1detail_1_1MutexTwoPriorities_1_1HighPriorityLockable.html',1,'rclcpp::detail']]],
   ['node_5finterfaces_18',['node_interfaces',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1node__interfaces.html',1,'rclcpp']]],
   ['rclcpp_19',['rclcpp',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html',1,'']]],
-  ['serialization_5ftraits_20',['serialization_traits',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1serialization__traits.html',1,'rclcpp']]],
-  ['strategies_21',['strategies',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1strategies.html',1,'rclcpp']]],
-  ['subscription_5ftraits_22',['subscription_traits',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1subscription__traits.html',1,'rclcpp']]],
-  ['topic_5fstatistics_23',['topic_statistics',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1topic__statistics.html',1,'rclcpp']]],
-  ['type_5fsupport_24',['type_support',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1type__support.html',1,'rclcpp']]],
-  ['wait_5fset_5fpolicies_25',['wait_set_policies',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1wait__set__policies.html',1,'rclcpp']]],
-  ['writepreferringreadwritelock_26',['WritePreferringReadWriteLock',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1wait__set__policies_1_1detail_1_1WritePreferringReadWriteLock_1_1ReadMutex.html',1,'rclcpp::wait_set_policies::detail']]]
+  ['robot_20',['robot',['../namespacerobot.html',1,'']]],
+  ['serialization_5ftraits_21',['serialization_traits',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1serialization__traits.html',1,'rclcpp']]],
+  ['strategies_22',['strategies',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1strategies.html',1,'rclcpp']]],
+  ['subscription_5ftraits_23',['subscription_traits',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1subscription__traits.html',1,'rclcpp']]],
+  ['topic_5fstatistics_24',['topic_statistics',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1topic__statistics.html',1,'rclcpp']]],
+  ['type_5fsupport_25',['type_support',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1type__support.html',1,'rclcpp']]],
+  ['types_26',['types',['../namespacerobot_1_1types.html',1,'robot']]],
+  ['wait_5fset_5fpolicies_27',['wait_set_policies',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp_1_1wait__set__policies.html',1,'rclcpp']]],
+  ['writepreferringreadwritelock_28',['WritePreferringReadWriteLock',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1wait__set__policies_1_1detail_1_1WritePreferringReadWriteLock_1_1ReadMutex.html',1,'rclcpp::wait_set_policies::detail']]]
 ];

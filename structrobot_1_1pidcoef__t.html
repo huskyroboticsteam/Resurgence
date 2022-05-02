@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.3"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): src/world_interface/kinematic_common_interface.h Source File</title>
+<title>Resurgence (PY2022): robot::pidcoef_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,22 +63,40 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_1e1245ae52d485cb7d8112a201289c20.html">world_interface</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacerobot.html">robot</a></li><li class="navelem"><a class="el" href="structrobot_1_1pidcoef__t.html">pidcoef_t</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="headertitle"><div class="title">kinematic_common_interface.h</div></div>
+  <div class="summary">
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structrobot_1_1pidcoef__t-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">robot::pidcoef_t Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;../kinematics/DiffDriveKinematics.h&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keywordtype">void</span> setCmdVelToIntegrate(<span class="keyword">const</span> <a class="code hl_struct" href="structwheelvel__t.html">wheelvel_t</a>&amp; wheelVels);</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keywordtype">void</span> setCmdVelToIntegrate(<span class="keywordtype">double</span> dtheta, <span class="keywordtype">double</span> dx);</div>
-<div class="ttc" id="astructwheelvel__t_html"><div class="ttname"><a href="structwheelvel__t.html">wheelvel_t</a></div><div class="ttdef"><b>Definition:</b> DiffDriveKinematics.h:5</div></div>
-</div><!-- fragment --></div><!-- contents -->
+
+<p>A struct containing a set of PID coefficients.  
+ <a href="structrobot_1_1pidcoef__t.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="real__world__constants_8h_source.html">real_world_constants.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a5741113a2d92eabc99e67eb7d7aac7bd"><td class="memItemLeft" align="right" valign="top"><a id="a5741113a2d92eabc99e67eb7d7aac7bd" name="a5741113a2d92eabc99e67eb7d7aac7bd"></a>
+<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>kP</b></td></tr>
+<tr class="separator:a5741113a2d92eabc99e67eb7d7aac7bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68a87ce0b34cf15b583bd77e6ecc5501"><td class="memItemLeft" align="right" valign="top"><a id="a68a87ce0b34cf15b583bd77e6ecc5501" name="a68a87ce0b34cf15b583bd77e6ecc5501"></a>
+<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>kI</b></td></tr>
+<tr class="separator:a68a87ce0b34cf15b583bd77e6ecc5501"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a684794597424974ab7610f0ddf5ea8df"><td class="memItemLeft" align="right" valign="top"><a id="a684794597424974ab7610f0ddf5ea8df" name="a684794597424974ab7610f0ddf5ea8df"></a>
+<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>kD</b></td></tr>
+<tr class="separator:a684794597424974ab7610f0ddf5ea8df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p >A struct containing a set of PID coefficients. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>src/world_interface/<a class="el" href="real__world__constants_8h_source.html">real_world_constants.h</a></li>
+</ul>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3

@@ -3,7 +3,7 @@ var searchData=
   ['daisy_0',['DAISY',['https://docs.opencv.org/4.2.0/d9/d37/classcv_1_1xfeatures2d_1_1DAISY.html',1,'cv::xfeatures2d']]],
   ['data_1',['Data',['https://docs.opencv.org/4.2.0/de/d4f/structcv_1_1face_1_1FacemarkAAM_1_1Data.html',1,'cv::face::FacemarkAAM::Data'],['https://docs.opencv.org/4.2.0/d7/d84/structcv_1_1gapi_1_1wip_1_1Data.html',1,'cv::gapi::wip::Data']]],
   ['datadepth_2',['DataDepth',['https://docs.opencv.org/4.2.0/d7/d0e/classcv_1_1DataDepth.html',1,'cv']]],
-  ['datapoint_3',['DataPoint',['../classDataPoint.html',1,'']]],
+  ['datapoint_3',['DataPoint',['../classrobot_1_1types_1_1DataPoint.html',1,'robot::types']]],
   ['dataset_4',['Dataset',['https://docs.opencv.org/4.2.0/d9/d2e/classcv_1_1datasets_1_1Dataset.html',1,'cv::datasets']]],
   ['datatype_5',['DataType',['https://docs.opencv.org/4.2.0/d0/d3a/classcv_1_1DataType.html',1,'cv']]],
   ['dct2d_6',['DCT2D',['https://docs.opencv.org/4.2.0/d5/d57/structcv_1_1hal_1_1DCT2D.html',1,'cv::hal']]],

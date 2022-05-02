@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.3"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): src/Networking/CANUtils.h Source File</title>
+<title>Resurgence (PY2022): src/CAN/CANUtils.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,30 +63,103 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_bd51a612c92e41a52efc1573706495c8.html">Networking</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_004e800ee3ba15138b2f73b7599c3c7a.html">CAN</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="headertitle"><div class="title">CANUtils.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#ifndef __CAN_UTILS_H__</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#define __CAN_UTILS_H__</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;../HindsightCAN/CANPacket.h&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;HindsightCAN/CANCommon.h&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;HindsightCAN/CANMotorUnit.h&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;HindsightCAN/CANPacket.h&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>}</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keywordtype">void</span> InitializeCANSocket();</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keywordtype">void</span> sendCANPacket(<span class="keyword">const</span> <a class="code hl_struct" href="structCANPacket.html">CANPacket</a>&amp; packet);</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// Returns 1 if a packet was received, 0 otherwise</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// If a packet was received, stores it at *packet.</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keywordtype">int</span> recvCANPacket(<a class="code hl_struct" href="structCANPacket.html">CANPacket</a>* packet);</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="astructCANPacket_html"><div class="ttname"><a href="structCANPacket.html">CANPacket</a></div><div class="ttdef"><b>Definition:</b> CANPacket.h:16</div></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00152.html">string</a>&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00176.html">utility</a>&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecan.html">can</a> {</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">   20</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">devicegroup_t</a> {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    broadcast = DEVICE_GROUP_BROADCAST,</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    reserved = DEVICE_GROUP_RESERVED,</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    master = DEVICE_GROUP_MASTER,</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_functionRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a> = DEVICE_GROUP_POWER,</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    motor = DEVICE_GROUP_MOTOR_CONTROL,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    telemetry = DEVICE_GROUP_TELEMETRY,</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    gpio = DEVICE_GROUP_GPIO_BOARDS,</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    science = DEVICE_GROUP_SCIENCE</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>};</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">   36</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a> {</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    voltage = PACKET_TELEMETRY_VOLTAGE,</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    current = PACKET_TELEMETRY_CURRENT,</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    pwr_rail = PACKET_TELEMETRY_PWR_RAIL_STATE,</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    temp = PACKET_TELEMETRY_TEMPERATURE,</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    angle = PACKET_TELEMETRY_ANG_POSITION,</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    gps_lat = PACKET_TELEMETRY_GPS_LAT,</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    gps_lon = PACKET_TELEMETRY_GPS_LON,</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    mag_dir = PACKET_TELEMETRY_MAG_DIR,</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    accel_x = PACKET_TELEMETRY_ACCEL_X,</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    accel_y = PACKET_TELEMETRY_ACCEL_Y,</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    accel_z = PACKET_TELEMETRY_ACCEL_Z,</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    gyro_x = PACKET_TELEMETRY_GYRO_X,</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    gyro_y = PACKET_TELEMETRY_GYRO_Y,</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    gyro_z = PACKET_TELEMETRY_GYRO_Z,</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    limit_switch = PACKET_TELEMETRY_LIM_SW_STATE</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="comment">// TODO: add further telemetry types if required</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>};</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="structcan_1_1packettype__t.html">   58</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structcan_1_1packettype__t.html">packettype_t</a> {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keyword">enum</span> { telemetry = ID_TELEMETRY_REPORT, limit_alert = ID_MOTOR_UNIT_LIM_ALERT };</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>};</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">   63</a></span><span class="keyword">using</span> <a class="code hl_typedef" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> = <a class="code hl_typedefRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a>;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="namespacecan.html#a83ed0f0f4b4503bc12119eb6fb95eb58">   66</a></span><span class="keyword">using</span> <a class="code hl_typedef" href="namespacecan.html#a83ed0f0f4b4503bc12119eb6fb95eb58">telemetry_t</a> = <a class="code hl_typedefRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">   73</a></span><span class="keyword">using</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">deviceid_t</a> = <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair&lt;devicegroup_t, deviceserial_t&gt;</a>;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><a class="code hl_enumeration" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">devicegroup_t</a> <a class="code hl_function" href="namespacecan.html#a68993ba52b501e31599eb5b62bd2a532">getDeviceGroup</a>(<span class="keyword">const</span> CANPacket&amp; packet);</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><a class="code hl_typedef" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> <a class="code hl_function" href="namespacecan.html#ac51d9cc1db83099b51cc3201913f518d">getDeviceSerial</a>(<span class="keyword">const</span> CANPacket&amp; packet);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">deviceid_t</a> <a class="code hl_function" href="namespacecan.html#abd4c04ddf8d27abcd6a9956e8174f64f">getDeviceGroupAndSerial</a>(<span class="keyword">const</span> CANPacket&amp; packet);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><a class="code hl_typedef" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> <a class="code hl_function" href="namespacecan.html#ae89b165257be741a7da9858b7269f85e">getSenderDeviceSerial</a>(<span class="keyword">const</span> CANPacket&amp; packet);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><a class="code hl_enumeration" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">devicegroup_t</a> <a class="code hl_function" href="namespacecan.html#aa96abb3cfe25f46c65296c39052ac600">getSenderDeviceGroup</a>(<span class="keyword">const</span> CANPacket&amp; packet);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">deviceid_t</a> <a class="code hl_function" href="namespacecan.html#a77899582aaaeaa583286127b8761a245">getSenderDeviceGroupAndSerial</a>(<span class="keyword">const</span> CANPacket&amp; packet);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> <a class="code hl_function" href="namespacecan.html#a9ab72b2781e78dee8d1fd8738dbe1367">packetToString</a>(<span class="keyword">const</span> CANPacket&amp; packet);</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>} <span class="comment">// namespace can</span></div>
+<div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
+<div class="ttc" id="aa00152_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00152.html">string</a></div></div>
+<div class="ttc" id="aa00176_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00176.html">utility</a></div></div>
+<div class="ttc" id="aa01468_html_ga52a0d4d0aad4e35cbcc82c8be1dfcebe"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a></div><div class="ttdeci">_Tp power(_Tp __x, _Integer __n, _MonoidOperation __monoid_op)</div></div>
+<div class="ttc" id="aa01516_html_gaa5dbcd13c2fb305025ac6784482d05a5"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a></div><div class="ttdeci">_GLIBCXX_END_NAMESPACE_CXX11 typedef basic_string&lt; char &gt; string</div></div>
+<div class="ttc" id="aa07803_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a></div></div>
+<div class="ttc" id="anamespacecan_html"><div class="ttname"><a href="namespacecan.html">can</a></div><div class="ttdoc">Utilities for interacting with CAN devices.</div><div class="ttdef"><b>Definition:</b> CAN.cpp:42</div></div>
+<div class="ttc" id="anamespacecan_html_a1b499367fdbe137b795e3bde15a57e86"><div class="ttname"><a href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">can::devicegroup_t</a></div><div class="ttdeci">devicegroup_t</div><div class="ttdoc">The possible device group codes.</div><div class="ttdef"><b>Definition:</b> CANUtils.h:20</div></div>
+<div class="ttc" id="anamespacecan_html_a2c998f360a5233d716a05edfc26800a5"><div class="ttname"><a href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">can::deviceserial_t</a></div><div class="ttdeci">uint8_t deviceserial_t</div><div class="ttdoc">The type of the device serial number.</div><div class="ttdef"><b>Definition:</b> CANUtils.h:63</div></div>
+<div class="ttc" id="anamespacecan_html_a68993ba52b501e31599eb5b62bd2a532"><div class="ttname"><a href="namespacecan.html#a68993ba52b501e31599eb5b62bd2a532">can::getDeviceGroup</a></div><div class="ttdeci">devicegroup_t getDeviceGroup(const CANPacket &amp;packet)</div><div class="ttdoc">Get the device group from the id of the given packet.</div><div class="ttdef"><b>Definition:</b> CANUtils.cpp:11</div></div>
+<div class="ttc" id="anamespacecan_html_a77899582aaaeaa583286127b8761a245"><div class="ttname"><a href="namespacecan.html#a77899582aaaeaa583286127b8761a245">can::getSenderDeviceGroupAndSerial</a></div><div class="ttdeci">deviceid_t getSenderDeviceGroupAndSerial(const CANPacket &amp;packet)</div><div class="ttdoc">Get the device group and serial code of the sender of the given packet.</div><div class="ttdef"><b>Definition:</b> CANUtils.cpp:33</div></div>
+<div class="ttc" id="anamespacecan_html_a83ed0f0f4b4503bc12119eb6fb95eb58"><div class="ttname"><a href="namespacecan.html#a83ed0f0f4b4503bc12119eb6fb95eb58">can::telemetry_t</a></div><div class="ttdeci">int32_t telemetry_t</div><div class="ttdoc">The type of telemetry data.</div><div class="ttdef"><b>Definition:</b> CANUtils.h:66</div></div>
+<div class="ttc" id="anamespacecan_html_a9ab72b2781e78dee8d1fd8738dbe1367"><div class="ttname"><a href="namespacecan.html#a9ab72b2781e78dee8d1fd8738dbe1367">can::packetToString</a></div><div class="ttdeci">std::string packetToString(const CANPacket &amp;packet)</div><div class="ttdoc">Get a string representation of the given CAN packet.</div><div class="ttdef"><b>Definition:</b> CANUtils.cpp:37</div></div>
+<div class="ttc" id="anamespacecan_html_aa96abb3cfe25f46c65296c39052ac600"><div class="ttname"><a href="namespacecan.html#aa96abb3cfe25f46c65296c39052ac600">can::getSenderDeviceGroup</a></div><div class="ttdeci">devicegroup_t getSenderDeviceGroup(const CANPacket &amp;packet)</div><div class="ttdoc">Get the device group of the sender of the given packet.</div><div class="ttdef"><b>Definition:</b> CANUtils.cpp:28</div></div>
+<div class="ttc" id="anamespacecan_html_abd4c04ddf8d27abcd6a9956e8174f64f"><div class="ttname"><a href="namespacecan.html#abd4c04ddf8d27abcd6a9956e8174f64f">can::getDeviceGroupAndSerial</a></div><div class="ttdeci">deviceid_t getDeviceGroupAndSerial(const CANPacket &amp;packet)</div><div class="ttdoc">Get the unique identifier from the id of the given packet.</div><div class="ttdef"><b>Definition:</b> CANUtils.cpp:20</div></div>
+<div class="ttc" id="anamespacecan_html_ac51d9cc1db83099b51cc3201913f518d"><div class="ttname"><a href="namespacecan.html#ac51d9cc1db83099b51cc3201913f518d">can::getDeviceSerial</a></div><div class="ttdeci">deviceserial_t getDeviceSerial(const CANPacket &amp;packet)</div><div class="ttdoc">Get the serial number from the id of the given packet.</div><div class="ttdef"><b>Definition:</b> CANUtils.cpp:16</div></div>
+<div class="ttc" id="anamespacecan_html_ae89b165257be741a7da9858b7269f85e"><div class="ttname"><a href="namespacecan.html#ae89b165257be741a7da9858b7269f85e">can::getSenderDeviceSerial</a></div><div class="ttdeci">deviceserial_t getSenderDeviceSerial(const CANPacket &amp;packet)</div><div class="ttdoc">Get the device serial code of the sender of the given packet.</div><div class="ttdef"><b>Definition:</b> CANUtils.cpp:24</div></div>
+<div class="ttc" id="anamespacecan_html_af98139e403f1d81f1d91b55695b90ad4"><div class="ttname"><a href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">can::telemtype_t</a></div><div class="ttdeci">telemtype_t</div><div class="ttdoc">The type of telemetries that devices can report.</div><div class="ttdef"><b>Definition:</b> CANUtils.h:36</div></div>
+<div class="ttc" id="anamespacecv_html_a5637fae091197126a031b7594cccc9fe"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a></div><div class="ttdeci">::uint8_t uint8_t</div></div>
+<div class="ttc" id="anamespacecv_html_ad5ed0491058a71efd30a0f28ad1d3f05"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a></div><div class="ttdeci">::int32_t int32_t</div></div>
+<div class="ttc" id="astructcan_1_1packettype__t_html"><div class="ttname"><a href="structcan_1_1packettype__t.html">can::packettype_t</a></div><div class="ttdoc">The types of CAN packets that we recognize.</div><div class="ttdef"><b>Definition:</b> CANUtils.h:58</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
