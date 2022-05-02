@@ -6,8 +6,6 @@
 
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
 enum class RoverState {
 	RemoteControl,
 	DrivingToWaypoint,
@@ -19,8 +17,6 @@ enum class RoverState {
 namespace Globals {
 extern CommandLineOptions opts;
 extern RoverState curr_state;
-extern nlohmann::json status_data;
-extern nlohmann::json motor_status;
 extern websocket::SingleClientWSServer websocketServer;
 extern bool E_STOP;
 extern bool AUTONOMOUS;

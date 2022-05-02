@@ -64,7 +64,7 @@ class Camera {
 private:
 	std::shared_ptr<cv::Mat> _frame;
 	std::shared_ptr<uint32_t> _frame_num;
-	std::shared_ptr<datatime_t> _frame_time;
+	std::shared_ptr<robot::types::datatime_t> _frame_time;
 	std::shared_ptr<cv::VideoCapture> _capture;
 	std::string _name;
 	std::string _description;
@@ -202,7 +202,7 @@ public:
 	 * Note that this is not the same as the current time.
 	 * @returns true on success, false if some error occurs.
 	 */
-	bool next(cv::Mat& frame, uint32_t& frame_num, datatime_t& frame_time) const;
+	bool next(cv::Mat& frame, uint32_t& frame_num, robot::types::datatime_t& frame_time) const;
 	/**
 	   @brief Returns true if this camera has associated intrinsic parameters.
 	 */

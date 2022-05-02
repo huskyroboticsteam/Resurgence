@@ -2,7 +2,7 @@
 #pragma once
 
 extern "C" {
-#include "../HindsightCAN/CANPacket.h"
+#include <HindsightCAN/CANPacket.h>
 }
 #include <string>
 
