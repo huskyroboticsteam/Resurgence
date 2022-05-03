@@ -94,7 +94,7 @@ private:
  * In systems with additive output noise, this is the same as outputDim.
  */
 template <int stateDim, int inputDim, int outputDim, int processNoiseDim, int outputNoiseDim>
-class ExtendedKalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim> {
+class ExtendedKalmanFilter : public KalmanFilterBase<stateDim, inputDim> {
 public:
 	using state_t = Eigen::Matrix<double, stateDim, 1>;
 	using output_t = Eigen::Matrix<double, outputDim, 1>;
@@ -135,7 +135,14 @@ public:
 		this->P = F * this->P * F.transpose() + L * processNoise * L.transpose();
 	}
 
-	void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) override {
+	/**
+	 * @brief Correct the state estimate with measurement data.
+	 *
+	 * The measurement should be in the same space as the state.
+	 *
+	 * @param measurement The measurement to use to correct the filter.
+	 */
+	void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) {
 		Eigen::Matrix<double, outputDim, stateDim> H =
 			getOutputFuncJacobianX(outputFunc, this->xHat); // output matrix
 

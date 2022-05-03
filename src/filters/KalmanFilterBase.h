@@ -11,22 +11,12 @@ namespace filters {
  *
  * @tparam stateDim The dimension of the state vector.
  * @tparam inputDim The dimension of the input vector, or system actions.
- * @tparam outputDim The dimension of the output vector, or sensor measurements.
  */
-template <int stateDim, int inputDim, int outputDim> class KalmanFilterBase {
+template <int stateDim, int inputDim> class KalmanFilterBase {
 public:
 	KalmanFilterBase()
 		: P(Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5),
 		  xHat(Eigen::Matrix<double, stateDim, 1>::Zero()) {}
-
-	/**
-	 * @brief Correct the state estimate with measurement data.
-	 *
-	 * The measurement should be in the same space as the state.
-	 *
-	 * @param measurement The measurement to use to correct the filter.
-	 */
-	virtual void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) = 0;
 
 	/**
 	 * @brief Use the model to predict the next system state, given the current inputs.
