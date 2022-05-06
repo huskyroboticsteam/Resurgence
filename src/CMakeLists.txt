@@ -123,6 +123,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   # Find the libgps USB GPS library.
   # TODO: Remove this when interface with Electronics' IMU board is implemented.
   pkg_check_modules(libgps REQUIRED libgps)
+  find_package(URGLidar REQUIRED)
 endif()
 
 # Enable all warnings except a few (unused variable/parameter/result)
