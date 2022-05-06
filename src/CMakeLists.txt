@@ -124,10 +124,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   # TODO: Remove this when interface with Electronics' IMU board is implemented.
   pkg_check_modules(libgps REQUIRED libgps)
 endif()
-if(WITH_LIDAR)
-  # Find the URGLidar library.
-  find_package(URGLidar REQUIRED)
-endif()
 
 # Enable all warnings except a few (unused variable/parameter/result)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \

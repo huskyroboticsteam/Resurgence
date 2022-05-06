@@ -7,8 +7,6 @@
 #include <vector>
 #include <atomic>
 
-#include <nlohmann/json.hpp>
-
 /**
    @deprecated
  */

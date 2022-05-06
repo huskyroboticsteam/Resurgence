@@ -15,6 +15,7 @@
 #include <future>
 #include <iostream>
 #include <unordered_map>
+#include <vector>
 
 #include <opencv2/calib3d.hpp>
 
