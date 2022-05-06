@@ -108,9 +108,9 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(HindsightCAN REQUIRED)
 
 find_package(Threads REQUIRED)
-if(WITH_CV)
-  find_package(OpenCV REQUIRED)
-endif()
+# Even if CV code is disabled, we still need OpenCV unfortunately (world interface, cameras
+# depend on it)
+find_package(OpenCV REQUIRED)
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()

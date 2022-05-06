@@ -2,7 +2,6 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../base64/base64_img.h"
 #include "../log.h"
 
 #include <functional>
@@ -10,8 +9,6 @@
 #include <shared_mutex>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <opencv2/core.hpp>
 
 namespace net {
 namespace mc {
