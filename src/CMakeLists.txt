@@ -226,7 +226,10 @@ target_link_libraries(real_world_interface can_interface world_interface_core)
 target_link_libraries(simulator_interface world_interface_core)
 target_link_libraries(stub_world_interface world_interface_core)
 
-add_library(hr_slam SHARED
+add_library(filters SHARED
+  filters/PoseEstimator.cpp
+  filters/PoseEstimatorLinear.cpp
+  filters/StateSpaceUtil.cpp
   filters/pose_graph/graph.cpp
   filters/pose_graph/friendly_graph.cpp
   filters/pose_graph/factors.cpp
@@ -254,8 +257,6 @@ add_library(rover_common SHARED
   rospub.cpp
   Networking/websocket/WebSocketServer.cpp
   Networking/websocket/WebSocketProtocol.cpp
-  filters/PoseEstimator.cpp
-  filters/PoseEstimatorLinear.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
@@ -266,7 +267,7 @@ target_link_libraries(rover_common utils)
 list(APPEND rover_libs
   rover_common
   Threads::Threads
-  hr_slam
+  filters
   ${Boost_LIBRARIES}
   websocketpp::websocketpp
   nlohmann_json::nlohmann_json
@@ -317,6 +318,7 @@ if(WITH_TESTS)
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
+    ../tests/filters/OutputTest.cpp
     ../tests/filters/StateSpaceUtilsTest.cpp
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp

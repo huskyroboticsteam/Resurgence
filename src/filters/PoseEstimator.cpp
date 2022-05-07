@@ -13,6 +13,7 @@ namespace filters {
 namespace {
 
 using statevec_t = PoseEstimator::statevec_t;
+using statespace::NoiseCovMat;
 
 statevec_t stateFunc(const DiffDriveKinematics& kinematics, double dt, const statevec_t& x,
 					 const Eigen::Vector2d& u, const Eigen::Vector2d& w) {

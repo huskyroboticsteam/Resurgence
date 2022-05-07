@@ -12,6 +12,10 @@ namespace filters::statespace {
 
 constexpr double epsilon = 1e-5;
 
+Eigen::MatrixXd
+numericalJacobian(const std::function<Eigen::VectorXd(const Eigen::VectorXd&)>& func,
+				  const Eigen::VectorXd& x, int outputDim);
+
 /**
  * @brief Create a covariance matrix modelling independent variables with the given standard
  * deviations.
@@ -234,5 +238,144 @@ DARE(const Eigen::Matrix<double, numStates, numStates>& A,
 
 	return currP;
 }
+
+/**
+ * @brief Represents a square noise covariance matrix.
+ *
+ * Returning the zero matrix can sometimes be
+ * dangerous depending on your model, as it may cause numerical instability or incorrect
+ * computations.
+ */
+class NoiseCovMatX {
+public:
+	const int stateDim, size, paramDim;
+
+	/**
+	 * @brief Create a time-invariant noise covariance matrix modelling independent noise with
+	 * the given standard deviations.
+	 *
+	 * @param stdDevs The standard deviations of each element.
+	 */
+	explicit NoiseCovMatX(const Eigen::VectorXd& stdDevs, int stateDim, int paramSize)
+		: stateDim(stateDim), size(stdDevs.size()), paramDim(paramSize) {
+		Eigen::MatrixXd covMat = Eigen::MatrixXd::Zero(stdDevs.size(), stdDevs.size());
+		covMat.diagonal() = stdDevs;
+		func = [=](const Eigen::VectorXd& x, const Eigen::VectorXd& param) { return covMat; };
+	}
+
+	/**
+	 * @brief Create a time-invariant noise covariance matrix equal to the given matrix.
+	 *
+	 * @param mat The noise covariance matrix.
+	 */
+	NoiseCovMatX(const Eigen::MatrixXd& mat, int stateDim, int paramSize)
+		: stateDim(stateDim), size(mat.rows()), paramDim(paramSize) {
+		assert(mat.rows() == mat.cols());
+		func = [=](const Eigen::VectorXd& x, const Eigen::VectorXd& param) { return mat; };
+	}
+
+	/**
+	 * @brief Create a time-varying noise covariance matrix.
+	 *
+	 * At runtime, the matrix will be calculated
+	 * when needed using the supplied function.
+	 *
+	 * @param func The function that supplies the noise covariance matrix,
+	 * given the state vector and one additional vector. For process noise, this is usually the
+	 * input vector. For output noise, this is usually the output vector.
+	 */
+	NoiseCovMatX(const std::function<Eigen::MatrixXd(const Eigen::VectorXd&,
+													const Eigen::VectorXd&)>& func,
+				int stateDim, int size, int paramSize)
+		: stateDim(stateDim), size(size), paramDim(paramSize), func(func) {}
+
+	/**
+	 * @brief Gets the noise covariance matrix, given the current state and additonal
+	 * parameter.
+	 *
+	 * The matrix may be time-invariant, which case the values of x and param do not matter.
+	 *
+	 * @param x The current state vector.
+	 * @param param The parameter vector, as defined by the use of this matrix. For process
+	 * noise, this is usually the input vector. For output noise this is usually the output
+	 * vector.
+	 * @return The noise covariance matrix.
+	 */
+	Eigen::MatrixXd get(const Eigen::VectorXd& x, const Eigen::VectorXd& param) {
+		assert(x.size() == stateDim && param.size() == paramDim);
+		return func(x, param);
+	}
+
+private:
+	std::function<Eigen::MatrixXd(const Eigen::VectorXd&, const Eigen::VectorXd&)> func;
+};
+
+/**
+ * @brief Represents a square noise covariance matrix.
+ *
+ * Returning the zero matrix can sometimes be
+ * dangerous depending on your model, as it may cause numerical instability or incorrect
+ * computations.
+ *
+ * @tparam stateDim The dimension of the state space for this system. This is the number of
+ * elements in the state vector.
+ * @tparam size The size of this matrix.
+ * @tparam paramSize The dimension of the vector accepted by get() in addition to a state
+ * vector.
+ */
+template <int stateDim, int size, int paramSize> class NoiseCovMat {
+public:
+	using state_t = Eigen::Matrix<double, stateDim, 1>;
+	using param_t = Eigen::Matrix<double, paramSize, 1>;
+
+	/**
+	 * @brief Create a time-invariant noise covariance matrix modelling independent noise with the
+	 * given standard deviations.
+	 *
+	 * @param stdDevs The standard deviations of each element.
+	 */
+	explicit NoiseCovMat(const Eigen::Matrix<double, size, 1>& stdDevs)
+		: NoiseCovMat(createCovarianceMatrix(stdDevs)) {}
+
+	/**
+	 * @brief Create a time-invariant noise covariance matrix equal to the given matrix.
+	 *
+	 * @param mat The noise covariance matrix.
+	 */
+	NoiseCovMat(const Eigen::Matrix<double, size, size>& mat)
+		: func([mat](const state_t& x, const param_t& param) { return mat; }) {}
+
+	/**
+	 * @brief Create a time-varying noise covariance matrix.
+	 *
+	 * At runtime, the matrix will be calculated
+	 * when needed using the supplied function.
+	 *
+	 * @param func The function that supplies the noise covariance matrix,
+	 * given the state vector and one additional vector. For process noise, this is usually the
+	 * input vector. For output noise, this is usually the output vector.
+	 */
+	NoiseCovMat(const std::function<Eigen::Matrix<double, size, size>(const state_t&,
+																	  const param_t&)>& func)
+		: func(func) {}
+
+	/**
+	 * @brief Gets the noise covariance matrix, given the current state and additonal parameter.
+	 *
+	 * The matrix may be time-invariant, which case the values of x and param do not matter.
+	 *
+	 * @param x The current state vector.
+	 * @param param The parameter vector, as defined by the use of this matrix. For process
+	 * noise, this is usually the input vector. For output noise this is usually the output
+	 * vector.
+	 * @return The noise covariance matrix.
+	 */
+	Eigen::Matrix<double, size, size> get(const state_t& x, const param_t& param) {
+		return func(x, param);
+	}
+
+private:
+	std::function<Eigen::Matrix<double, size, size>(const state_t&, const param_t&)> func;
+};
 
 } // namespace filters::statespace
