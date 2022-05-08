@@ -1,7 +1,7 @@
 #pragma once
 
-#include "StateSpaceUtil.h"
 #include "KalmanFilterBase.h"
+#include "StateSpaceUtil.h"
 
 #include <array>
 #include <functional>
@@ -34,14 +34,14 @@ public:
 	 * @param outputNoiseDim The dimension of the noise applied to the output.
 	 * @param outputFunc The output function that takes a state vector and output noise vector
 	 * and produces an output vector.
-	 * @param covMat The covariance matrix of the output vector. The dimensions of this object
-	 * must match that of this.
+	 * @param covMat The covariance matrix of the output noise vector. The state dimension must be @p statedim,
+	 * the parameter size must @p outputDim and the size must be @p outputnoiseDim
 	 */
 	Output(int stateDim, int outputDim, int outputNoiseDim, const outputfunc_t& outputFunc,
 		   const statespace::NoiseCovMatX& covMat)
 		: stateDim(stateDim), outputDim(outputDim), outputNoiseDim(outputNoiseDim),
 		  outputFunc(outputFunc), covMat(covMat) {
-		assert(covMat.stateDim == stateDim && covMat.size == outputDim &&
+		assert(covMat.stateDim == stateDim && covMat.size == outputNoiseDim &&
 			   covMat.paramDim == outputDim);
 	}
 
@@ -83,7 +83,8 @@ public:
 			auto func = [&](const Eigen::VectorXd& outputNoise) {
 				return outputFunc(state, outputNoise);
 			};
-			return statespace::numericalJacobian(func, state, outputDim);
+			Eigen::VectorXd v = Eigen::VectorXd::Zero(outputNoiseDim);
+			return statespace::numericalJacobian(func, v, outputDim);
 		}
 	}
 
@@ -102,9 +103,15 @@ public:
 	/**
 	 * @brief Set an analytic solution to dh/dx.
 	 *
+	 * Behavior is undefined if the supplied functions
+	 * do not accept or return vectors/matrices of the correct dimensions.
+	 *
 	 * @param jacobianV The analytic solution to dh/dx.
 	 * The jacobian function takes a state vector and an output
 	 * noise vector and returns a outputDim x stateDim jacobian matrix.
+	 * 
+	 * @warning Behavior is undefined if the supplied functions
+	 * do not accept or return vectors/matrices of the correct dimensions.
 	 */
 	void setOutputFuncJacobianX(
 		const std::function<Eigen::MatrixXd(const Eigen::VectorXd&, const Eigen::VectorXd&)>&
@@ -115,9 +122,15 @@ public:
 	/**
 	 * @brief Set an analytic solution to dh/dv.
 	 *
+	 * Behavior is undefined if the supplied functions
+	 * do not accept or return vectors/matrices of the correct dimensions.
+	 *
 	 * @param jacobianV The analytic solution to dh/dv. The jacobian function takes
 	 * a state vector and an output noise vector and returns a
 	 * outputDim x outputNoiseDim jacobian matrix.
+	 * 
+	 * @warning Behavior is undefined if the supplied functions
+	 * do not accept or return vectors/matrices of the correct dimensions.
 	 */
 	void setOutputFuncJacobianV(
 		const std::function<Eigen::MatrixXd(const Eigen::VectorXd&, const Eigen::VectorXd&)>&
@@ -136,26 +149,26 @@ private:
 template <int stateDim, int inputDim, int processNoiseDim, int numOutputs>
 class MultiSensorEKF : public KalmanFilterBase<stateDim, inputDim> {
 public:
-	using state_t = Eigen::Matrix<double, stateDim, 1>;
-	using input_t = Eigen::Matrix<double, inputDim, 1>;
-	using processnoise_t = Eigen::Matrix<double, processNoiseDim, 1>;
+	using state_t = statespace::Vectord<stateDim>;
+	using input_t = statespace::Vectord<inputDim>;
+	using processnoise_t = statespace::Vectord<processNoiseDim>;
 
 	using statefunc_t =
 		std::function<state_t(const state_t&, const input_t&, const processnoise_t&)>;
 
-	MultiSensorEKF(const statefunc_t& stateFunc,
-				   const statespace::NoiseCovMat<stateDim, processNoiseDim, inputDim>& processNoise,
-				   double dt, const std::array<Output, numOutputs>& outputs)
+	MultiSensorEKF(
+		const statefunc_t& stateFunc,
+		const statespace::NoiseCovMat<stateDim, processNoiseDim, inputDim>& processNoise,
+		double dt, const std::array<Output, numOutputs>& outputs)
 		: stateFunc(stateFunc), Q(processNoise), dt(dt), outputs(outputs) {}
 
-	void predict(const state_t& input) override {
-		Eigen::Matrix<double, stateDim, stateDim> F =
-			getStateFuncJacobianX(stateFunc, this->xHat, input);
-		Eigen::Matrix<double, processNoiseDim, processNoiseDim> processNoise =
+	void predict(const input_t& input) override {
+		statespace::Matrixd<stateDim, stateDim> F = stateFuncJacobianX(this->xHat, input);
+		statespace::Matrixd<processNoiseDim, processNoiseDim> processNoise =
 			Q.get(this->xHat, input);
 
-		Eigen::Matrix<double, stateDim, processNoiseDim> L =
-			getStateFuncJacobianW(stateFunc, this->xHat, input);
+		statespace::Matrixd<stateDim, processNoiseDim> L =
+			stateFuncJacobianW(this->xHat, input);
 
 		this->xHat = stateFunc(this->xHat, input, processnoise_t::Zero());
 		this->P = F * this->P * F.transpose() + L * processNoise * L.transpose();
@@ -167,23 +180,57 @@ public:
 		Eigen::MatrixXd H = output.outputFuncJacobianX(this->xHat);
 		Eigen::MatrixXd outputNoise = output.covMat.get(this->xHat, measurement);
 		Eigen::MatrixXd M = output.outputFuncJacobianV(this->xHat);
-		Eigen::MatrixXd S =
-			H * this->P * H.transpose() +
-			M * outputNoise * M.transpose(); // residual covariance
+		Eigen::MatrixXd S = H * this->P * H.transpose() +
+							M * outputNoise * M.transpose(); // residual covariance
 		// near-optimal kalman gain
 		Eigen::Matrix<double, stateDim, Eigen::Dynamic> K =
 			S.transpose().colPivHouseholderQr().solve(H * this->P.transpose()).transpose();
-		Eigen::VectorXd y = measurement -
-					output.outputFunc(this->xHat, Eigen::VectorXd::Zero(output.outputNoiseDim)); // measurement residual
+		Eigen::VectorXd y =
+			measurement -
+			output.outputFunc(this->xHat, Eigen::VectorXd::Zero(
+											  output.outputNoiseDim)); // measurement residual
 
 		this->xHat = this->xHat + K * y;
 		this->P = (Eigen::Matrix<double, stateDim, stateDim>::Identity() - K * H) * this->P;
 	}
-
-	template <int outputIdx>
-	void correct(const Eigen::VectorXd& measurement) {
+	
+	template <int outputIdx> void correct(const Eigen::VectorXd& measurement) {
 		static_assert(0 <= outputIdx && outputIdx < numOutputs);
 		correct(outputIdx, measurement);
+	}
+
+	void setStateFuncJacobianX(
+		const std::function<statespace::Matrixd<stateDim, stateDim>(
+			const state_t&, const input_t&, const processnoise_t&)>& stateFuncJacobianX) {
+		this->stateFuncJacobianXSol = stateFuncJacobianX;
+	}
+
+	void setStateFuncJacobianW(
+		const std::function<statespace::Matrixd<stateDim, processNoiseDim>(
+			const state_t&, const input_t&, const processnoise_t&)>& stateFuncJacobianW) {
+		this->stateFuncJacobianWSol = stateFuncJacobianW;
+	}
+
+	statespace::Matrixd<stateDim, stateDim> stateFuncJacobianX(const state_t& x,
+															   const input_t& u) {
+		processnoise_t w = processnoise_t::Zero();
+		if (stateFuncJacobianXSol) {
+			return stateFuncJacobianXSol(x, u, w);
+		} else {
+			auto func = [&](const state_t& state) { return stateFunc(state, u, w); };
+			return statespace::numericalJacobian(func, x, stateDim);
+		}
+	}
+
+	statespace::Matrixd<stateDim, processNoiseDim> stateFuncJacobianW(const state_t& x,
+																	  const input_t& u) {
+		processnoise_t w = processnoise_t::Zero();
+		if (stateFuncJacobianXSol) {
+			return stateFuncJacobianXSol(x, u, w);
+		} else {
+			auto func = [&](const processnoise_t& noise) { return stateFunc(x, u, noise); };
+			return statespace::numericalJacobian(func, w, stateDim);
+		}
 	}
 
 private:
@@ -191,6 +238,14 @@ private:
 	statespace::NoiseCovMat<stateDim, processNoiseDim, inputDim> Q;
 	double dt;
 	std::array<Output, numOutputs> outputs;
+
+	std::function<statespace::Matrixd<stateDim, stateDim>(const state_t&, const input_t&,
+														  const processnoise_t&)>
+		stateFuncJacobianXSol;
+
+	std::function<statespace::Matrixd<stateDim, processNoiseDim>(
+		const state_t&, const input_t&, const processnoise_t&)>
+		stateFuncJacobianWSol;
 };
 
 } // namespace filters

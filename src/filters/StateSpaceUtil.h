@@ -10,6 +10,12 @@
  */
 namespace filters::statespace {
 
+template <int rows, int cols>
+using Matrixd = Eigen::Matrix<double, rows, cols>;
+
+template <int dim>
+using Vectord = Eigen::Matrix<double, dim, 1>;
+
 constexpr double epsilon = 1e-5;
 
 Eigen::MatrixXd
@@ -256,9 +262,9 @@ public:
 	 *
 	 * @param stdDevs The standard deviations of each element.
 	 */
-	explicit NoiseCovMatX(const Eigen::VectorXd& stdDevs, int stateDim, int paramSize)
+	NoiseCovMatX(const Eigen::VectorXd& stdDevs, int stateDim, int paramSize)
 		: stateDim(stateDim), size(stdDevs.size()), paramDim(paramSize) {
-		Eigen::MatrixXd covMat = Eigen::MatrixXd::Zero(stdDevs.size(), stdDevs.size());
+		Eigen::MatrixXd covMat(Eigen::MatrixXd::Zero(stdDevs.size(), stdDevs.size()));
 		covMat.diagonal() = stdDevs;
 		func = [=](const Eigen::VectorXd& x, const Eigen::VectorXd& param) { return covMat; };
 	}
@@ -301,7 +307,7 @@ public:
 	 * vector.
 	 * @return The noise covariance matrix.
 	 */
-	Eigen::MatrixXd get(const Eigen::VectorXd& x, const Eigen::VectorXd& param) {
+	Eigen::MatrixXd get(const Eigen::VectorXd& x, const Eigen::VectorXd& param) const {
 		assert(x.size() == stateDim && param.size() == paramDim);
 		return func(x, param);
 	}

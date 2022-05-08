@@ -318,6 +318,7 @@ if(WITH_TESTS)
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
+    ../tests/filters/MultiSensorEKFTest.cpp
     ../tests/filters/OutputTest.cpp
     ../tests/filters/StateSpaceUtilsTest.cpp
     ../tests/worldmap/TrICPTest.cpp
