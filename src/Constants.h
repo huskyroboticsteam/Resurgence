@@ -51,6 +51,7 @@ const double EPS = 2.0; // heuristic weight for weighted A*
 // Lidar
 namespace Lidar {
 const std::string RP_PATH = "/dev/ttyUSB0";
+constexpr double MM_PER_M = 1000;
 constexpr uint32_t RPLIDAR_A1_BAUDRATE = 115200;
 constexpr uint32_t RPLIDAR_S1_BAUDRATE = 256000;
 }

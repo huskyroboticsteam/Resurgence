@@ -77,9 +77,9 @@ int runRPLidar(unsigned long baudrate) {
 			double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
 			for (long unsigned i = 0; i < scan.value().ranges.size(); i++) {
 				double rad = dtheta*i;
-				double dist_m = scan.value().ranges[i];
+				double dist_mm = scan.value().ranges[i] * Constants::Lidar::MM_PER_M;
 
-				Polar2D frame{dist_m, rad};
+				Polar2D frame{dist_mm, rad};
 				pts.push_back(lidar::polarToCartesian(frame));
 			}
 
