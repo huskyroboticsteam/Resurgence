@@ -10,15 +10,15 @@ namespace lidar {
 /**
  * @brief Startsup RPLidar with default settings
  */
-bool initializeLidar();
+bool initializeLidar(double max_dist=16);
 
 /**
  * @brief Provides RP Lidar data at current timeframe
  */
-DataPoint<navtypes::points_t> readLidar();
+robot::types::DataPoint<navtypes::points_t> readLidar();
 
 /**
- * @brief Polar struct that holds radians, and theta
+ * @brief Polar struct that holds radius, and theta (radians)
  */
 struct Polar2D {
 	double r, theta;

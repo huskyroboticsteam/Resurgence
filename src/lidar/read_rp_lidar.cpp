@@ -16,13 +16,12 @@ using namespace navtypes;
 bool lidar_initialized = false;
 RPLidar rp_lidar(Constants::Lidar::RP_PATH, Constants::Lidar::RPLIDAR_S1_BAUDRATE);
 std::thread lidar_thread;
-DataPoint<points_t> last_points = {};
+robot::types::DataPoint<points_t> last_points = {};
 std::mutex points_lock;
 
 namespace lidar {
 
 void readLidarLoop() {
-    using namespace std::chrono;
     std::vector<Polar2D> polarPts;    
     while (true) {
         auto scan = rp_lidar.poll();
@@ -31,7 +30,7 @@ void readLidarLoop() {
             double dtheta = (scan.value().angle_max-scan.value().angle_min)/(scan.value().ranges.size()-1);
             for (unsigned long i = 0; i < scan.value().ranges.size(); i++) {
                 double rad = dtheta*i;
-                double dist_m = scan.value().ranges[i] * Constants::Lidar::MM_PER_M;
+                double dist_m = scan.value().ranges[i];
 
                 Polar2D frame{dist_m, rad};
                 pts.push_back(lidar::polarToCartesian2(frame));
@@ -50,13 +49,13 @@ void readLidarLoop() {
 /**
  * @brief Startsup RPLidar with default settings
  */
-bool initializeLidar(double max_dist = 16) {
+bool initializeLidar(double max_dist) {
+    std::lock_guard<std::mutex> lk(points_lock);
     if (!lidar_initialized) {
         if (!rp_lidar.checkHealth()) {
             perror("failed to connect to rp lidar");
         } else {
             rp_lidar.setMaxDistance(max_dist);
-            std::lock_guard<std::mutex> lk(points_lock);
             lidar_thread = std::thread(&readLidarLoop);
             lidar_initialized = true;
         }
@@ -67,10 +66,10 @@ bool initializeLidar(double max_dist = 16) {
 /**
  * @brief Provides RP Lidar data at current timeframe
  */
-DataPoint<points_t> readLidar() {
+robot::types::DataPoint<points_t> readLidar() {
+    std::lock_guard<std::mutex> lk(points_lock);
     if (lidar_initialized) {
-        DataPoint<points_t> pts;
-        std::lock_guard<std::mutex> lk(points_lock);
+        robot::types::DataPoint<points_t> pts;
         pts = last_points;
         return pts;
     }
