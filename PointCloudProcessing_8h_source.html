@@ -90,8 +90,8 @@ $(function() {
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keywordtype">bool</span> approxEqual(<a class="code hl_struct" href="structPointXY.html">PointXY</a> p, <a class="code hl_struct" href="structPointXY.html">PointXY</a> q);</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keywordtype">float</span> <a class="code hl_functionRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#gade7ee057985825bd6d67e7a1a682dd89">distance</a>(<span class="keywordtype">float</span> x0, <span class="keywordtype">float</span> y0, <span class="keywordtype">float</span> x1, <span class="keywordtype">float</span> y1);</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><a class="code hl_struct" href="structPointXY.html">PointXY</a> polarToCartesian(<a class="code hl_struct" href="structPolar2D.html">Polar2D</a> p);</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>navtypes::point_t polarToCartesian2(<a class="code hl_struct" href="structPolar2D.html">Polar2D</a> p);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><a class="code hl_struct" href="structPointXY.html">PointXY</a> polarToCartesian(<a class="code hl_struct" href="structlidar_1_1Polar2D.html">Polar2D</a> p);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>navtypes::point_t polarToCartesian2(<a class="code hl_struct" href="structlidar_1_1Polar2D.html">Polar2D</a> p);</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keywordtype">void</span> localToGlobal(<a class="code hl_struct" href="structPointXY.html">PointXY</a>&amp; p, <span class="keywordtype">float</span> x_loc, <span class="keywordtype">float</span> y_loc, <span class="keywordtype">float</span> heading);</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt;std::vector&lt;PointXY&gt;</a>&gt; clusterPoints(<a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector&lt;PointXY&gt;</a>&amp; pts,</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                                                <span class="keywordtype">float</span> sep_threshold);</div>
@@ -108,6 +108,7 @@ $(function() {
 <div class="ttc" id="astructPointXY_html"><div class="ttname"><a href="structPointXY.html">PointXY</a></div><div class="ttdef"><b>Definition:</b> PointXY.h:6</div></div>
 <div class="ttc" id="astructPolar2D_html"><div class="ttname"><a href="structPolar2D.html">Polar2D</a></div><div class="ttdef"><b>Definition:</b> SyntheticLidar.h:10</div></div>
 <div class="ttc" id="astructlidar_1_1BoundingBox_html"><div class="ttname"><a href="structlidar_1_1BoundingBox.html">lidar::BoundingBox</a></div><div class="ttdef"><b>Definition:</b> PointCloudProcessing.h:12</div></div>
+<div class="ttc" id="astructlidar_1_1Polar2D_html"><div class="ttname"><a href="structlidar_1_1Polar2D.html">lidar::Polar2D</a></div><div class="ttdoc">Polar struct that holds radius, and theta (radians)</div><div class="ttdef"><b>Definition:</b> read_rp_lidar.h:23</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
