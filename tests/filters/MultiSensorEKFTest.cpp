@@ -48,9 +48,9 @@ TEST_CASE("MultiSensorEKF Test Runtime Errors", "[filters]") {
 	auto stateFunc = [](const Vectord<stateDim>& x, const Vectord<inputDim>& u,
 						const Vectord<stateDim>& noise) { return x + noise; };
 
-	NoiseCovMatX covMat1(Eigen::MatrixXd::Identity(4, 4).eval(), stateDim, 2);
+	NoiseCovMat<-1,-1,-1> covMat1(Eigen::MatrixXd::Identity(4, 4).eval(), stateDim, 2);
 	Output out1(stateDim, 2, 4, outputFunc1, covMat1);
-	NoiseCovMatX covMat2(Eigen::MatrixXd::Identity(3, 3).eval(), stateDim, 3);
+	NoiseCovMat<-1,-1,-1> covMat2(Eigen::MatrixXd::Identity(3, 3).eval(), stateDim, 3);
 	Output out2(stateDim, 3, 3, outputFunc2, covMat2);
 	NoiseCovMat<stateDim, stateDim, inputDim> processNoise(
 		Eigen::Matrix<double, stateDim, stateDim>::Identity().eval());
