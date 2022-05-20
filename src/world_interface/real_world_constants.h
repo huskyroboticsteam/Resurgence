@@ -39,4 +39,10 @@ extern const std::unordered_map<robot::types::motorid_t, bool> motorEncInvMap;
 /** @brief A mapping of motorids to the number of pulses per joint revolution. */
 extern const std::unordered_map<robot::types::motorid_t, uint32_t> motorPulsesPerJointRevMap;
 
+/** @brief A mapping of motorids to  */
+extern const std::unordered_map<robot::types::motorid_t, double> positive_arm_pwm_scales;
+extern const std::unordered_map<robot::types::motorid_t, double> negative_arm_pwm_scales;
+
+extern const std::unordered_map<robot::types::motorid_t, double> motorGearRatioMap;
+
 } // namespace robot

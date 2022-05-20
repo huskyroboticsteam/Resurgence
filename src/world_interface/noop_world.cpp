@@ -8,7 +8,9 @@ using namespace robot::types;
 
 namespace robot {
 
-const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
+extern const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
+extern const DiffDriveKinematics driveKinematics(1); //doesn't really matter what we set this to
+extern const DiffWristKinematics wristKinematics;
 
 void world_interface_init() {}
 
