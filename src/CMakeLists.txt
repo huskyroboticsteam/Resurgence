@@ -150,6 +150,7 @@ add_library(utils SHARED
   gps/gps_util.cpp
   base64/base64.cpp
   kinematics/DiffDriveKinematics.cpp
+  kinematics/DiffWristKinematics.cpp
   world_interface/data.cpp)
 
 ## ====== CAN Interfaces =======

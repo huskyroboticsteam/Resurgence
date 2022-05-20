@@ -15,6 +15,11 @@ constexpr size_t PACKET_PAYLOAD_SIZE = 8;
 constexpr double SHOULDER_LENGTH = 0.6; // placeholder(m)
 constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
 
+/**
+   Number of millidegrees per degree
+ */
+constexpr float MDEG_PER_DEG = 1000;
+
 constexpr std::array<uint32_t, 6> arm_PPJRs = {
 	17 * 1000, // base, estimate
 
