@@ -225,8 +225,8 @@ public:
 	statespace::Matrixd<stateDim, processNoiseDim> stateFuncJacobianW(const state_t& x,
 																	  const input_t& u) {
 		processnoise_t w = processnoise_t::Zero();
-		if (stateFuncJacobianXSol) {
-			return stateFuncJacobianXSol(x, u, w);
+		if (stateFuncJacobianWSol) {
+			return stateFuncJacobianWSol(x, u, w);
 		} else {
 			auto func = [&](const processnoise_t& noise) { return stateFunc(x, u, noise); };
 			return statespace::numericalJacobian(func, w, stateDim);
