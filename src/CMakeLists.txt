@@ -230,6 +230,7 @@ add_library(filters SHARED
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
   filters/StateSpaceUtil.cpp
+  filters/FullPoseEstimator.cpp
   filters/pose_graph/graph.cpp
   filters/pose_graph/friendly_graph.cpp
   filters/pose_graph/factors.cpp
