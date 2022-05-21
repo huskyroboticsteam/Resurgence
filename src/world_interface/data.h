@@ -267,25 +267,5 @@ private:
 } // namespace robot::types
 
 namespace std {
-std::string to_string(robot::types::jointid_t joint) {
-	using robot::types::jointid_t;
-	switch (joint) {
-		case jointid_t::armBase:
-			return "armBase";
-		case jointid_t::shoulder:
-			return "shoulder";
-		case jointid_t::elbow:
-			return "elbow";
-		case jointid_t::forearm:
-			return "forearm";
-		case jointid_t::hand:
-			return "hand";
-		case jointid_t::differentialPitch:
-			return "differentialPitch";
-		case jointid_t::differentialRoll:
-			return "differentialRoll";
-		case jointid_t::drill_arm:
-			return "drillArm";
-	}
-}
+std::string to_string(robot::types::jointid_t joint);
 } // namespace std

@@ -250,4 +250,10 @@ void removeLimitSwitchCallback(callbackid_t id) {
 	return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
 }
 
+const std::unordered_map<robot::types::jointid_t, robot::types::motorid_t> jointMotorMap{
+	{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
+	{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
+	{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
+	{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
+	{robot::types::jointid_t::hand, robot::types::motorid_t::hand}};
 } // namespace robot
