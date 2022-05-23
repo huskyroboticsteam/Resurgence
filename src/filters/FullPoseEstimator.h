@@ -11,6 +11,7 @@ namespace filters {
 class FullPoseEstimator {
 public:
 	static constexpr int numStates = 3;
+	static constexpr int numSensors = 2;
 	using state_t = statespace::Vectord<numStates>;
 
 	FullPoseEstimator(const Eigen::Vector2d& inputNoiseGains, double wheelBase, double dt,
@@ -80,7 +81,7 @@ public:
 private:
 	DiffDriveKinematics kinematics;
 	double dt;
-	MultiSensorEKF<numStates, 2, 2, 2> ekf;
+	MultiSensorEKF<numStates, 2, 2, numSensors> ekf;
 };
 
 } // namespace filters
