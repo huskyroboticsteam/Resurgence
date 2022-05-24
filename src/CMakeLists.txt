@@ -321,6 +321,7 @@ if(WITH_TESTS)
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp
     ../tests/filters/StateSpaceUtilsTest.cpp
+    ../tests/filters/FullPoseEstimatorTest.cpp
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
     ../tests/worldmap/QuadTreeTest.cpp)
