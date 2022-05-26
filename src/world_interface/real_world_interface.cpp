@@ -50,7 +50,7 @@ void ensureMotorMode(motorid_t motor, motormode_t mode) {
 void initMotors() {
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontLeftWheel));
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontRightWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftwheel));
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftWheel));
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
 
 	for (motorid_t motor : pidMotors) {
