@@ -3,6 +3,7 @@
 #include "PointCloudProcessing.h"
 #include "PointGenerator.h"
 #include "URGLidar.h"
+#include <RPLidar/rplidar.h>
 
 #include <vector>
 
@@ -11,7 +12,7 @@
 #include <opencv2/imgproc.hpp>
 
 namespace lidar {
-constexpr int lidar_max_range = 5000;
+constexpr int lidar_max_range = 10000;
 constexpr int vis_win_width = 600;
 constexpr int vis_win_height = 600;
 constexpr int vis_pt_radius = 3;

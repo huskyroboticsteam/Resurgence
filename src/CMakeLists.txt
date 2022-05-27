@@ -126,6 +126,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   if(WITH_LIDAR)
 	  # Find the URGLidar library.
 	  # TODO: Decide if we want to use those RPLidars we found
+    find_package(RPLidar REQUIRED)
 	  find_package(URGLidar REQUIRED)
   endif()
 endif()
@@ -216,6 +217,7 @@ add_library(real_world_interface STATIC
   world_interface/real_world_constants.cpp
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
+  lidar/read_rp_lidar.cpp
   gps/usb_gps/read_usb_gps.cpp
   )
 add_library(simulator_interface STATIC
@@ -244,7 +246,8 @@ list(APPEND real_world_libs
   real_world_interface
   ${libgps_LIBRARIES}
   lidar_interface
-  URGLidar::urg_c)
+  URGLidar::urg_c
+  RPLidar::RPLidar)
 
 list(APPEND simulator_libs
   simulator_interface)
