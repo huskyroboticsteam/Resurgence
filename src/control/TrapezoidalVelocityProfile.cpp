@@ -6,6 +6,10 @@ SingleDimTrapezoidalVelocityProfile::SingleDimTrapezoidalVelocityProfile(double 
 																		 double maxAccel)
 	: maxVel(maxVel), maxAccel(maxAccel) {}
 
+void SingleDimTrapezoidalVelocityProfile::reset() {
+	profile.reset();
+}
+
 void SingleDimTrapezoidalVelocityProfile::setTarget(double startPos, double endPos) {
 	profile_t profile{.startPos = startPos, .endPos = endPos};
 	double rampUpTime = maxVel / maxAccel;
@@ -22,6 +26,7 @@ void SingleDimTrapezoidalVelocityProfile::setTarget(double startPos, double endP
 		profile.stopAccelTime = profile.startDecelTime = totalTime / 2;
 		profile.totalTime = totalTime;
 	}
+	this->profile = profile;
 }
 
 double SingleDimTrapezoidalVelocityProfile::getCommand(double elapsedTime) const {

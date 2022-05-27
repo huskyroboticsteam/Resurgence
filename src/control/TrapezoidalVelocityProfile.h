@@ -24,6 +24,8 @@ public:
 	// returns target position
 	double getCommand(double elapsedTime) const;
 
+	void reset();
+
 private:
 	struct profile_t {
 		double stopAccelTime;
@@ -42,6 +44,12 @@ public:
 							   const std::array<double, dim>& maxAccels) {
 		for (int i = 0; i < dim; i++) {
 			profiles.emplace_back(maxVels[i], maxAccels[i]);
+		}
+	}
+
+	void reset() {
+		for (auto& profile : profiles) {
+			profile.reset();
 		}
 	}
 
