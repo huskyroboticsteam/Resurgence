@@ -324,7 +324,9 @@ if(WITH_TESTS)
     ../tests/filters/StateSpaceUtilsTest.cpp
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
-    ../tests/worldmap/QuadTreeTest.cpp)
+    ../tests/worldmap/QuadTreeTest.cpp
+	# Protocol/teleop tests
+	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
   target_link_libraries(tests
     ${rover_libs}
