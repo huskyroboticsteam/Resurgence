@@ -246,6 +246,10 @@ add_library(filters SHARED
   filters/pose_graph/factors.cpp
   )
 
+add_library(control SHARED
+  control/TrapezoidalVelocityProfile.cpp
+)
+
 if(WITH_LIDAR)
   add_subdirectory(lidar)
 endif()
@@ -283,6 +287,7 @@ list(APPEND rover_libs
   Threads::Threads
   websocket_utils
   filters
+  control
   utils
 )
 target_link_libraries(Rover
