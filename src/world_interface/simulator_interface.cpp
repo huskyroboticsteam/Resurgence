@@ -30,7 +30,7 @@ const std::string PROTOCOL_PATH("/simulator");
 const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::frontLeftWheel, "frontLeftWheel"},
 	{motorid_t::frontRightWheel, "frontRightWheel"},
-	{motorid_t::rearLeftwheel, "rearLeftwheel"},
+	{motorid_t::rearLeftWheel, "rearLeftWheel"},
 	{motorid_t::rearRightWheel, "rearRightWheel"},
 	{motorid_t::armBase, "armBase"},
 	{motorid_t::shoulder, "shoulder"},
@@ -231,8 +231,18 @@ void initSimServer() {
 
 namespace robot {
 
-extern const DiffDriveKinematics driveKinematics(Constants::EFF_WHEEL_BASE);
-extern const DiffWristKinematics wristKinematics;
+namespace {
+DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+DiffWristKinematics wrist_kinematics;
+}
+
+const DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
+
+const DiffWristKinematics& wristKinematics() {
+	return wrist_kinematics;
+}
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 

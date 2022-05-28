@@ -119,7 +119,12 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   # Find the libgps USB GPS library.
   # TODO: Remove this when interface with Electronics' IMU board is implemented.
   pkg_check_modules(libgps REQUIRED libgps)
-  find_package(URGLidar REQUIRED)
+  if(WITH_LIDAR)
+	  # Find the URGLidar library.
+	  # TODO: Decide if we want to use those RPLidars we found
+    find_package(RPLidar REQUIRED)
+	  find_package(URGLidar REQUIRED)
+  endif()
 endif()
 
 # Enable all warnings except a few (unused variable/parameter/result)
@@ -208,6 +213,7 @@ add_library(real_world_interface STATIC
   world_interface/real_world_constants.cpp
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
+  lidar/read_rp_lidar.cpp
   gps/usb_gps/read_usb_gps.cpp
   )
 add_library(simulator_interface STATIC
@@ -218,7 +224,11 @@ target_link_libraries(real_world_interface can_interface world_interface_core)
 target_link_libraries(simulator_interface world_interface_core)
 target_link_libraries(stub_world_interface world_interface_core)
 
-add_library(hr_slam SHARED
+add_library(filters SHARED
+  filters/PoseEstimator.cpp
+  filters/PoseEstimatorLinear.cpp
+  filters/StateSpaceUtil.cpp
+  filters/FullPoseEstimator.cpp
   filters/pose_graph/graph.cpp
   filters/pose_graph/friendly_graph.cpp
   filters/pose_graph/factors.cpp
@@ -232,7 +242,8 @@ list(APPEND real_world_libs
   real_world_interface
   ${libgps_LIBRARIES}
   lidar_interface
-  URGLidar::urg_c)
+  URGLidar::urg_c
+  RPLidar::RPLidar)
 
 list(APPEND simulator_libs
   simulator_interface)
@@ -246,6 +257,8 @@ add_library(rover_common SHARED
   rospub.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
+  Networking/websocket/WebSocketServer.cpp
+  Networking/websocket/WebSocketProtocol.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
@@ -260,6 +273,7 @@ list(APPEND rover_libs
   Threads::Threads
   websocket_utils
   hr_slam
+  filters
   utils
 )
 target_link_libraries(Rover
@@ -302,10 +316,14 @@ if(WITH_TESTS)
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
+    ../tests/filters/MultiSensorEKFTest.cpp
     ../tests/filters/StateSpaceUtilsTest.cpp
+    ../tests/filters/FullPoseEstimatorTest.cpp
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
-    ../tests/worldmap/QuadTreeTest.cpp)
+    ../tests/worldmap/QuadTreeTest.cpp
+	# Protocol/teleop tests
+	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
   target_link_libraries(tests
     ${rover_libs}
@@ -325,3 +343,4 @@ add_subdirectory(ar)
 add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)
+add_subdirectory(filters)

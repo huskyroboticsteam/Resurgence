@@ -45,7 +45,7 @@ enum class indication_t { off, autonomous, teleop, arrivedAtDest };
 enum class motorid_t {
 	frontLeftWheel,
 	frontRightWheel,
-	rearLeftwheel,
+	rearLeftWheel,
 	rearRightWheel,
 	armBase,
 	shoulder,

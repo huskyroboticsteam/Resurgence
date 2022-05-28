@@ -9,70 +9,9 @@
 namespace filters {
 
 /**
- * Represents a square noise covariance matrix. Returning the zero matrix can sometimes be
- * dangerous depending on your model, as it may cause numerical instability or incorrect
- * computations.
+ * @brief Implements a discrete-time EKF.
  *
- * @tparam stateDim The dimension of the state space for this system. This is the number of
- * elements in the state vector.
- * @tparam size The size of this matrix.
- * @tparam paramSize The dimension of the vector accepted by get() in addition to a state
- * vector.
- */
-template <int stateDim, int size, int paramSize> class NoiseCovMat {
-public:
-	using state_t = Eigen::Matrix<double, stateDim, 1>;
-	using param_t = Eigen::Matrix<double, paramSize, 1>;
-
-	/**
-	 * Create a time-invariant noise covariance matrix modelling independent noise with the
-	 * given standard deviations.
-	 *
-	 * @param stdDevs The standard deviations of each element.
-	 */
-	explicit NoiseCovMat(const Eigen::Matrix<double, size, 1>& stdDevs)
-		: NoiseCovMat(statespace::createCovarianceMatrix(stdDevs)) {}
-
-	/**
-	 * Create a time-invariant noise covariance matrix equal to the given matrix.
-	 *
-	 * @param mat The noise covariance matrix.
-	 */
-	NoiseCovMat(const Eigen::Matrix<double, size, size>& mat)
-		: func([mat](const state_t& x, const param_t& param) { return mat; }) {}
-
-	/**
-	 * Create a time-varying noise covariance matrix. At runtime, the matrix will be calculated
-	 * when needed using the supplied function.
-	 *
-	 * @param func The function that supplies the noise covariance matrix,
-	 * given the state vector and one additional vector. For process noise, this is usually the
-	 * input vector. For output noise, this is usually the output vector.
-	 */
-	NoiseCovMat(const std::function<Eigen::Matrix<double, size, size>(const state_t&,
-																	  const param_t&)>& func)
-		: func(func) {}
-
-	/**
-	 * Gets the noise covariance matrix, given the current state and additonal parameter.
-	 * The matrix may be time-invariant, which case the values of x and param do not matter.
-	 *
-	 * @param x The current state vector.
-	 * @param param The parameter vector, as defined by the use of this matrix. For process
-	 * noise, this is usually the input vector. For output noise this is usually the output
-	 * vector.
-	 * @return The noise covariance matrix.
-	 */
-	Eigen::Matrix<double, size, size> get(const state_t& x, const param_t& param) {
-		return func(x, param);
-	}
-
-private:
-	std::function<Eigen::Matrix<double, size, size>(const state_t&, const param_t&)> func;
-};
-
-/**
- * Implements a discrete-time EKF. This implements the more general system form described here:
+ * This implements the more general system form described here:
  * https://en.wikipedia.org/wiki/Extended_Kalman_filter#Non-additive_noise_formulation_and_equations
  *
  * @tparam stateDim The dimension of the state space for this system. This is the number of
@@ -87,7 +26,7 @@ private:
  * In systems with additive output noise, this is the same as outputDim.
  */
 template <int stateDim, int inputDim, int outputDim, int processNoiseDim, int outputNoiseDim>
-class ExtendedKalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim> {
+class ExtendedKalmanFilter : public KalmanFilterBase<stateDim, inputDim> {
 public:
 	using state_t = Eigen::Matrix<double, stateDim, 1>;
 	using output_t = Eigen::Matrix<double, outputDim, 1>;
@@ -100,7 +39,7 @@ public:
 	using outputnoise_t = Eigen::Matrix<double, outputNoiseDim, 1>;
 
 	/**
-	 * Create a new discrete-time EKF.
+	 * @brief Create a new discrete-time EKF.
 	 *
 	 * @param stateFunc Discrete-time state transition function. x_t+1 = f(x_t, u)
 	 * @param outputFunc Output function of the system. Also known as h(x)
@@ -109,8 +48,8 @@ public:
 	 * @param dt The time in seconds between updates.
 	 */
 	ExtendedKalmanFilter(const statefunc_t& stateFunc, const outputfunc_t& outputFunc,
-						 const NoiseCovMat<stateDim, processNoiseDim, inputDim>& processNoise,
-						 const NoiseCovMat<stateDim, outputNoiseDim, outputDim>& outputNoise,
+						 const statespace::NoiseCovMat<stateDim, processNoiseDim, inputDim>& processNoise,
+						 const statespace::NoiseCovMat<stateDim, outputNoiseDim, outputDim>& outputNoise,
 						 double dt)
 		: stateFunc(stateFunc), outputFunc(outputFunc), Q(processNoise), R(outputNoise),
 		  dt(dt) {}
@@ -128,7 +67,14 @@ public:
 		this->P = F * this->P * F.transpose() + L * processNoise * L.transpose();
 	}
 
-	void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) override {
+	/**
+	 * @brief Correct the state estimate with measurement data.
+	 *
+	 * The measurement should be in the same space as the state.
+	 *
+	 * @param measurement The measurement to use to correct the filter.
+	 */
+	void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) {
 		Eigen::Matrix<double, outputDim, stateDim> H =
 			getOutputFuncJacobianX(outputFunc, this->xHat); // output matrix
 
@@ -150,28 +96,32 @@ public:
 	}
 
 	/**
-	 * Set this to provide an analytic solution to df/dx.
+	 * @brief Set this to provide an analytic solution to df/dx.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, stateDim, stateDim>(const state_t&, const input_t&,
 															const processnoise_t&)>
 		stateFuncJacobianX;
 	/**
-	 * Set this to provide an analytic solution to df/dw.
+	 * @brief Set this to provide an analytic solution to df/dw.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, stateDim, processNoiseDim>(
 		const state_t&, const input_t&, const processnoise_t&)>
 		stateFuncJacobianW;
 	/**
-	 * Set this to provide an analytic solution to dh/dx.
+	 * @brief Set this to provide an analytic solution to dh/dx.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, outputDim, stateDim>(const state_t&,
 															 const outputnoise_t&)>
 		outputFuncJacobianX;
 	/**
-	 * Set this to provide an analytic solution to dh/dv.
+	 * @brief Set this to provide an analytic solution to dh/dv.
+	 *
 	 * If this is null, it will be numerically approximated.
 	 */
 	std::function<Eigen::Matrix<double, outputDim, outputNoiseDim>(const state_t&,
@@ -182,8 +132,8 @@ private:
 	statefunc_t stateFunc;
 	outputfunc_t outputFunc;
 	// process noise and measurement noise covariance matrices
-	NoiseCovMat<stateDim, processNoiseDim, inputDim> Q;
-	NoiseCovMat<stateDim, outputNoiseDim, outputDim> R;
+	statespace::NoiseCovMat<stateDim, processNoiseDim, inputDim> Q;
+	statespace::NoiseCovMat<stateDim, outputNoiseDim, outputDim> R;
 	double dt;
 	static constexpr double epsilon = 1e-5;
 

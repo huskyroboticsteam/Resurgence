@@ -1605,7 +1605,7 @@ FORMULA_MACROFILE      =
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-USE_MATHJAX            = NO
+USE_MATHJAX            = YES
 
 # When MathJax is enabled you can set the default output format to be used for
 # the MathJax output. See the MathJax site (see:
@@ -2242,7 +2242,6 @@ TAGFILES  =		"doxygen-tags/opencv.tag=https://docs.opencv.org/4.2.0"
 TAGFILES +=		"doxygen-tags/libstdc++.tag=https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api"
 TAGFILES +=		"doxygen-tags/Eigen.doxytags=https://eigen.tuxfamily.org/dox"
 TAGFILES +=		"doxygen-tags/nlohmann_json.tag=https://nlohmann.github.io/json/doxygen"
-TAGFILES +=		"doxygen-tags/rclcpp.tag=https://docs.ros2.org/foxy/api/rclcpp/"
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to

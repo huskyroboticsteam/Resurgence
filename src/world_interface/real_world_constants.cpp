@@ -11,7 +11,7 @@ extern const std::unordered_set<motorid_t> pidMotors = {
 extern const std::unordered_map<motorid_t, can::deviceserial_t> motorSerialIDMap = {
 	{motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},
 	{motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},
-	{motorid_t::rearLeftwheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},
+	{motorid_t::rearLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},
 	{motorid_t::rearRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BR},
 	{motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
 	{motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},

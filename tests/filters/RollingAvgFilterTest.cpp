@@ -1,5 +1,6 @@
 #include "../../src/filters/RollingAvgFilter.h"
 
+#include <Eigen/Core>
 #include <catch2/catch.hpp>
 
 using namespace Catch::literals;
@@ -24,7 +25,7 @@ Eigen::Matrix<double, 3, 1> create3D(double x1, double x2, double x3)
 
 TEST_CASE("RollingAvgFilter Test 1D")
 {
-	RollingAvgFilter<2, 1> filter;
+	RollingAvgFilter<Eigen::Matrix<double, 1, 1>> filter(2);
 
 	filter.get(create1D(1));
 	filter.get(create1D(9));
@@ -39,7 +40,7 @@ TEST_CASE("RollingAvgFilter Test 1D")
 
 TEST_CASE("RollingAvgFilter Test 3D")
 {
-	RollingAvgFilter<3, 3> filter;
+	RollingAvgFilter<Eigen::Vector3d> filter(3);
 
 	filter.get(create3D(1, 1, 1));
 	filter.get(create3D(2, 2, 2));

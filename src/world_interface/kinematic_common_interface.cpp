@@ -34,7 +34,7 @@ DataPoint<transform_t> readOdom() {
 		double elapsed =
 			duration_cast<milliseconds>(now - lastOdom.getTime()).count() / 1000.0;
 		transform_t update =
-			toTransform(driveKinematics.getLocalPoseUpdate(commandedWheelVel, elapsed));
+			toTransform(driveKinematics().getLocalPoseUpdate(commandedWheelVel, elapsed));
 		transform_t odom = lastOdom.getData() * update;
 		lastOdom = {now, odom};
 		return lastOdom;
@@ -46,7 +46,7 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	wheelvel_t wheelVels = driveKinematics.robotVelToWheelVel(dx, dtheta);
+	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
@@ -57,7 +57,7 @@ double setCmdVel(double dtheta, double dx) {
 
 	setCmdVelToIntegrate(wheelVels);
 	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, lPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
 	setMotorPower(motorid_t::frontRightWheel, rPWM);
 	setMotorPower(motorid_t::rearRightWheel, rPWM);
 
@@ -67,7 +67,7 @@ double setCmdVel(double dtheta, double dx) {
 std::pair<double, double> getCmdVel() {
 	double l = commandedWheelVel.lVel;
 	double r = commandedWheelVel.rVel;
-	pose_t robotVel = driveKinematics.wheelVelToRobotVel(l, r);
+	pose_t robotVel = driveKinematics().wheelVelToRobotVel(l, r);
 	return {robotVel(2), robotVel(0)};
 }
 

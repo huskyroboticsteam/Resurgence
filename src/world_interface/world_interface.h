@@ -31,8 +31,8 @@ enum class WorldInterface { real, sim2d, sim3d, noop };
 /** @brief The current world interface being used. */
 extern const WorldInterface WORLD_INTERFACE;
 
-extern const DiffDriveKinematics driveKinematics;
-extern const DiffWristKinematics wristKinematics;
+const DiffDriveKinematics& driveKinematics();
+const DiffWristKinematics& wristKinematics();
 
 /**
  * @brief Initialize the world interface.

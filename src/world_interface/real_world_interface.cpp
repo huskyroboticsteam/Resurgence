@@ -29,8 +29,18 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
-extern const DiffDriveKinematics driveKinematics(Constants::EFF_WHEEL_BASE);
-extern const DiffWristKinematics wristKinematics;
+namespace {
+DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+DiffWristKinematics wrist_kinematics;
+} // namespace
+
+const DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
+
+const DiffWristKinematics& wristKinematics() {
+	return wrist_kinematics;
+}
 
 namespace {
 // map that associates camera id to the camera object
@@ -54,7 +64,7 @@ void ensureMotorMode(motorid_t motor, motormode_t mode) {
 void initMotors() {
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontLeftWheel));
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontRightWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftwheel));
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftWheel));
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
 
 	for (motorid_t motor : pidMotors) {
