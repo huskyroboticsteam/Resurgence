@@ -328,6 +328,7 @@ if(WITH_TESTS)
     ../tests/gps/GPSConverterTest.cpp
     # Controller tests
     ../tests/control/TrapezoidalVelocityProfileTest.cpp
+    ../tests/control/JacobianControllerTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp

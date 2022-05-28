@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../filters/StateSpaceUtil.h"
 #include "../world_interface/data.h"
 #include "TrapezoidalVelocityProfile.h"
 
@@ -24,10 +25,13 @@ public:
 		const std::array<double, outputDim>& maxVels,
 		const std::array<double, outputDim>& maxAccels)
 		: kinematicsFunc(kinematicsFunc),
-		  jacobianFunc(jacobianFunc ? jacobianFunc : jacobianFunc),
+		  jacobianFunc(jacobianFunc
+						   ? jacobianFunc
+						   : std::bind(filters::statespace::numericalJacobian, kinematicsFunc,
+									   std::placeholders::_1, outputDim)),
 		  velocityProfile(maxVels, maxAccels) {
-		// TODO: numerically approximate with statespace::numericalJacobian
-		assert(kinematicsFunc && jacobianFunc);
+		assert(this->kinematicsFunc);
+		assert(this->jacobianFunc);
 	}
 
 	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos) const {
