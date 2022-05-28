@@ -10,13 +10,17 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
 
-const DiffDriveKinematics driveKinematics() {
-	//doesn't really matter what we set this to
-	return DiffDriveKinematics(1); 
+namespace{
+	DiffDriveKinematics drive_kinematics(1);  //doesn't really matter what we set this to
+	DiffWristKinematics wrist_kinematics;
 }
 
-const DiffWristKinematics wristKinematics() {
-	return DiffWristKinematics();
+const DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
+
+const DiffWristKinematics& wristKinematics() {
+	return wrist_kinematics;
 }
 
 void world_interface_init() {}

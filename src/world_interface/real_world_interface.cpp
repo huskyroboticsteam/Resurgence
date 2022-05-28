@@ -29,12 +29,17 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
-const DiffDriveKinematics driveKinematics() {
-	return DiffDriveKinematics(Constants::EFF_WHEEL_BASE);
+namespace {
+DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+DiffWristKinematics wrist_kinematics;
+} // namespace
+
+const DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
 }
 
-const DiffWristKinematics wristKinematics() {
-	return DiffWristKinematics();
+const DiffWristKinematics& wristKinematics() {
+	return wrist_kinematics;
 }
 
 namespace {

@@ -223,12 +223,17 @@ void initSimServer() {
 
 namespace robot {
 
-const DiffDriveKinematics driveKinematics() {
-	return DiffDriveKinematics(Constants::EFF_WHEEL_BASE);
+namespace {
+DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+DiffWristKinematics wrist_kinematics;
 }
 
-const DiffWristKinematics wristKinematics() {
-	return DiffWristKinematics();
+const DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
+
+const DiffWristKinematics& wristKinematics() {
+	return wrist_kinematics;
 }
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
