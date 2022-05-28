@@ -20,7 +20,7 @@ public:
 	 * @param numPoints The maximum number of points that can be stored in the buffer.
 	 */
 	explicit RollingAvgFilter(size_t numPoints)
-		: numPoints(numPoints), data(), dataIter(data.begin()) {}
+		: numPoints(numPoints), data() {}
 
 	/**
 	 * @brief Get the output of the filter.
@@ -42,14 +42,9 @@ public:
 	 * @return The new output of the filter after adding this data.
 	 */
 	T get(const T& val) {
-		if (data.size() < numPoints) {
-			data.push_back(val);
-			dataIter = data.begin();
-		} else {
-			*dataIter = val;
-			if (++dataIter == data.end()) {
-				dataIter = data.begin();
-			}
+		data.push_back(val);
+		if (data.size() > numPoints) {
+			data.pop_front();
 		}
 
 		return get();
@@ -60,7 +55,6 @@ public:
 	 */
 	void reset() {
 		data.clear();
-		dataIter = data.begin();
 	}
 
 	/**
@@ -93,7 +87,6 @@ public:
 private:
 	size_t numPoints;
 	std::list<T> data;
-	typename std::list<T>::iterator dataIter;
 };
 
 } // namespace filters

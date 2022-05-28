@@ -8,6 +8,15 @@
 
 namespace filters {
 
+/**
+ * @brief This class implements a pose estimator that can fuse multiple sensors
+ * with the kinematic model for accurate estimation.
+ *
+ * Internally, this uses an EKF. This differs from filters::PoseEstimator in that
+ * multiple sensors are supported.
+ *
+ * The tracked states are x, y, and heading, in map space.
+ */
 class FullPoseEstimator {
 public:
 	static constexpr int numStates = 3;
@@ -17,8 +26,22 @@ public:
 	FullPoseEstimator(const Eigen::Vector2d& inputNoiseGains, double wheelBase, double dt,
 					  const Eigen::Vector2d& gpsStdDev, double headingStdDev);
 
+	/**
+	 * @brief Use a gps measurement to correct the pose estimate.
+	 *
+	 * The sensor reading is assumed to be appropriately recent.
+	 *
+	 * @param gps The gps measurement, in map space.
+	 */
 	void correctGPS(const navtypes::point_t& gps);
 
+	/**
+	 * @brief Use a heading measurement to correct the pose estimate.
+	 *
+	 * The sensor reading is assumed to be appropriately recent.
+	 *
+	 * @param heading The heading sensor reading, in map space.
+	 */
 	void correctHeading(double heading);
 
 	/**

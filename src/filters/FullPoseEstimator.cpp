@@ -1,5 +1,7 @@
 #include "FullPoseEstimator.h"
 
+#include "../Util.h"
+
 #include <functional>
 
 namespace filters {
@@ -92,6 +94,8 @@ void FullPoseEstimator::correctGPS(const point_t& gps) {
 }
 
 void FullPoseEstimator::correctHeading(double heading) {
+	double currHeading = ekf.getState()(2);
+	heading = util::closestHeading(heading, currHeading);
 	Vectord<1> headingVec;
 	headingVec << heading;
 	ekf.correct<HEADING_IDX>(headingVec);
