@@ -46,11 +46,9 @@ endif()
 
 ##====== Module settings ======
 # These variables control whether various modules are enabled or disabled. The goal is to allow
-# a user to selectively exclude modules that they do not need; for example if we are just
-# trying to drive the rover for a demo, we don't need computer vision or autonomous navigation
-# code. We also need a way to disable CAN on non-Linux systems that don't support it, so this
-# is a way to do that.
-set(WITH_CV ON CACHE BOOL "Enable/Disable computer vision code.")
+# a user to selectively exclude modules that they do not need (and/or cannot compile on their
+# system); for example, we need a way to disable CAN on non-Linux systems that don't support
+# it, so this is a way to do that.
 set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
 systems.")
 set(WITH_GPS ${WITH_GPS_DEFAULT} CACHE BOOL "Enable/Disable the USB GPS interface. Disabled on
@@ -68,7 +66,6 @@ endif()
 
 message("========================================\n\
 Module settings:")
-message("  Computer Vision:\t${WITH_CV}")
 if(NOT WITH_CAN_DEFAULT)
   message("  CAN Networking:\t${WITH_CAN} (non-Linux system - disabled by default)")
 else()
@@ -108,9 +105,8 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(HindsightCAN REQUIRED)
 
 find_package(Threads REQUIRED)
-# Even if CV code is disabled, we still need OpenCV unfortunately (world interface, cameras
-# depend on it)
 find_package(OpenCV REQUIRED)
+
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()
@@ -149,9 +145,11 @@ add_library(utils SHARED
   Util.cpp
   gps/gps_util.cpp
   base64/base64.cpp
+  base64/base64_img.cpp
   kinematics/DiffDriveKinematics.cpp
   kinematics/DiffWristKinematics.cpp
   world_interface/data.cpp)
+target_link_libraries(utils ${OpenCV_LIBS})
 
 ## ====== CAN Interfaces =======
 # Stub CAN interface is used for the tests (and for the Rover if
@@ -194,7 +192,6 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  base64/base64_img.cpp
   Util.cpp
   ${camera_src}
   )
@@ -324,9 +321,7 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
-if(WITH_CV)
-  add_subdirectory(ar)
-  add_subdirectory(camera)
-endif()
+add_subdirectory(ar)
+add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)
