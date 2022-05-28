@@ -8,6 +8,8 @@
 namespace filters {
 
 /**
+ * @brief Uses a Kalman Filter to estimate the robot pose.
+ *
  * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
  * The tracked states are x, y, and heading. All of these states are in map space.
  * In most cases, you should probably use PoseEstimator instead. However, I don't think we
@@ -16,7 +18,7 @@ namespace filters {
 class [[deprecated]] PoseEstimatorLinear {
 public:
 	/**
-	 * Create a new Pose Estimator.
+	 * @brief Create a new Pose Estimator.
 	 *
 	 * @param stateStdDevs The standard deviations for each of the state elements.
 	 * 					   This represents noise in the system model.
@@ -28,7 +30,8 @@ public:
 						const Eigen::Vector3d& measurementStdDevs, double dt);
 
 	/**
-	 * Correct the pose estimation with measurement data.
+	 * @brief Correct the pose estimation with measurement data.
+	 *
 	 * The measurement should be in the same space as the state.
 	 *
 	 * @param measurement The measurement to use to correct the filter, as a transform.
@@ -36,7 +39,7 @@ public:
 	void correct(const navtypes::transform_t& measurement);
 
 	/**
-	 * Use the model to predict the next system state, given the current inputs.
+	 * @brief Use the model to predict the next system state, given the current inputs.
 	 *
 	 * @param thetaVel Commanded rotational velocity.
 	 * @param xVel Commanded x velocity.
@@ -44,7 +47,8 @@ public:
 	void predict(double thetaVel, double xVel);
 
 	/**
-	 * Get the current estimate covariance matrix.
+	 * @brief Get the current estimate covariance matrix.
+	 *
 	 * This is an indication of the uncertainty of the pose estimate.
 	 *
 	 * @return The estimate covariance matrix, AKA the P matrix.
@@ -54,6 +58,8 @@ public:
 	}
 
 	/**
+	 * @brief Reset the estimator.
+	 *
 	 * Sets the state estimate to the zero vector and resets the estimate covariance matrix.
 	 */
 	void reset() {
@@ -61,6 +67,8 @@ public:
 	}
 
 	/**
+	 * @brief Reset the estimator.
+	 *
 	 * Sets the state estimate to the supplied vector and resets the estimate covariance
 	 * matrix.
 	 *
@@ -68,10 +76,16 @@ public:
 	 */
 	void reset(const navtypes::pose_t& pose);
 
+	/**
+	 * @brief Reset the estimator.
+	 * 
+	 * @param pose The pose to set as the new estimate.
+	 * @param stdDevs The standard deviations in each axis of the state vector.
+	 */
 	void reset(const navtypes::pose_t& pose, const navtypes::pose_t& stdDevs);
 
 	/**
-	 * Gets the current state estimate.
+	 * @brief Gets the current state estimate.
 	 *
 	 * @return The state estimate.
 	 */

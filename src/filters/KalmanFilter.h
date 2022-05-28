@@ -8,11 +8,21 @@
 
 namespace filters {
 
+/**
+ * @brief Implements a Kalman Filter.
+ *
+ * Unlike the "standard" Kalman Filter this uses the asymptotic Kalman gain.
+ *
+ * @tparam stateDim The dimension of the state vector.
+ * @tparam inputDim The dimension of the system input vector.
+ * @tparam outputDim The dimension of the system output vector, or the sensor measurement.
+ */
 template <int stateDim, int inputDim, int outputDim>
-class KalmanFilter : public KalmanFilterBase<stateDim, inputDim, outputDim> {
+class KalmanFilter : public KalmanFilterBase<stateDim, inputDim> {
 public:
 	/**
-	 * Create a new Kalman Filter from a continuous-time state space model.
+	 * @brief Create a new Kalman Filter from a continuous-time state space model.
+	 *
 	 * The only matrices that change between this and createDisc() are the system matrix and
 	 * input matrix. All other parameters would be the same.
 	 *
@@ -53,16 +63,23 @@ public:
 
 		Eigen::Matrix<double, outputDim, outputDim> S =
 			outputMat * P * outputMat.transpose() + measurementCovariance;
-		// This is the Kalman gain matrix, used to weight the GPS data against the model data
+		// from wikipedia: K = P * H^T * S^-1
+		// so:
+		// K * S = P * H^T
+		// (K * S)^T = (P * H^T)^T
+		// S^T * K^T = H * P^T
+		// K^T = solve(S^T, H * P^T)
+		// K = solve(S^T, H * P^T)^T
 		Eigen::Matrix<double, stateDim, outputDim> gainMatrix =
-			S.transpose().colPivHouseholderQr().solve((outputMat * P.transpose()).transpose());
+			S.transpose().colPivHouseholderQr().solve(outputMat * P.transpose()).transpose();
 
 		return KalmanFilter(discA, discB, outputMat, stateCovariance, measurementCovariance,
 							gainMatrix);
 	}
 
 	/**
-	 * Create a new Kalman Filter from a discrete-time state space model.
+	 * @brief Create a new Kalman Filter from a discrete-time state space model.
+	 *
 	 * The only matrices that change between this and createCont() are the system matrix and
 	 * input matrix. All other parameters would be the same.
 	 *
@@ -105,7 +122,13 @@ public:
 		// https://en.wikipedia.org/wiki/Kalman_filter#Asymptotic_form
 		Eigen::Matrix<double, outputDim, outputDim> S =
 			outputMat * P * outputMat.transpose() + measurementCovariance;
-		// This is the Kalman gain matrix, used to weight the GPS data against the model data
+		// from wikipedia:
+		// K = P * H^T * S^-1
+		// K * S = P * H^T
+		// (K * S)^T = (P * H^T)^T
+		// S^T * K^T = H * P^T
+		// K^T = solve(S^T, H * P^T)
+		// K = solve(S^T, H * P^T)^T
 		Eigen::Matrix<double, stateDim, outputDim> gainMatrix =
 			S.transpose().colPivHouseholderQr().solve(outputMat * P.transpose()).transpose();
 
@@ -113,7 +136,14 @@ public:
 							measurementCovariance, gainMatrix);
 	}
 
-	void correct(const Eigen::Matrix<double, stateDim, 1>& measurement) override {
+	/**
+	 * @brief Correct the state estimate with measurement data.
+	 *
+	 * The measurement should be in the same space as the state.
+	 *
+	 * @param measurement The measurement to use to correct the filter.
+	 */
+	void correct(const Eigen::Matrix<double, outputDim, 1>& measurement) {
 		this->xHat = this->xHat + K * (measurement - C * this->xHat);
 		this->P = (Eigen::Matrix<double, stateDim, stateDim>::Identity() - K * C) * this->P;
 	}
@@ -124,17 +154,17 @@ public:
 	}
 
 private:
-	Eigen::Matrix<double, stateDim, stateDim> A;
-	Eigen::Matrix<double, stateDim, inputDim> B;
-	Eigen::Matrix<double, inputDim, stateDim> C;
-	Eigen::Matrix<double, stateDim, stateDim> Q;
-	Eigen::Matrix<double, outputDim, outputDim> R;
-	Eigen::Matrix<double, stateDim, outputDim> K;
+	Eigen::Matrix<double, stateDim, stateDim> A; // system matrix
+	Eigen::Matrix<double, stateDim, inputDim> B; // input matrix
+	Eigen::Matrix<double, outputDim, stateDim> C; // output matrix
+	Eigen::Matrix<double, stateDim, stateDim> Q; // system noise covariance matrix
+	Eigen::Matrix<double, outputDim, outputDim> R; // output noise covariance matrix
+	Eigen::Matrix<double, stateDim, outputDim> K; // asymptotic kalman gain
 
 	// Assumes all discrete matrices
 	KalmanFilter(const Eigen::Matrix<double, stateDim, stateDim>& A,
 				 const Eigen::Matrix<double, stateDim, inputDim>& B,
-				 const Eigen::Matrix<double, inputDim, stateDim>& C,
+				 const Eigen::Matrix<double, outputDim, stateDim>& C,
 				 const Eigen::Matrix<double, stateDim, stateDim>& Q,
 				 const Eigen::Matrix<double, outputDim, outputDim>& R,
 				 const Eigen::Matrix<double, stateDim, outputDim>& K)

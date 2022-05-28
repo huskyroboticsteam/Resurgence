@@ -1,67 +1,73 @@
 #pragma once
 
-#include <Eigen/Core>
+#include <iterator>
+#include <list>
+#include <numeric>
 
 namespace filters {
 
 /**
- * Implements a rolling average filter of the specified type. Can only use double vectors.
+ * @brief Implements a rolling average filter of the specified type.
+ *
+ * @tparam T The data type to filter. Must support commutative addition as well as scalar
+ * division.
  */
-template <int numPoints, int numDims> class RollingAvgFilter {
+template <typename T> class RollingAvgFilter {
 public:
 	/**
-	 * Get the output of the filter.
+	 * @brief Construct a new rolling average filter.
 	 *
-	 * @return The output of the filter. If no data has been entered, returns the default
-	 * value.
+	 * @param numPoints The maximum number of points that can be stored in the buffer.
 	 */
-	Eigen::Matrix<double, numDims, 1> get() const {
-		Eigen::Matrix<double, numDims, 1> ret = Eigen::Matrix<double, numDims, 1>::Zero();
-		if (size == 0) {
-			return ret;
-		}
-		int numData = std::min(numPoints, size);
-		for (int i = 0; i < numData; i++) {
-			ret += data.col(i);
-		}
-		return ret / numData;
+	explicit RollingAvgFilter(size_t numPoints)
+		: numPoints(numPoints), data() {}
+
+	/**
+	 * @brief Get the output of the filter.
+	 *
+	 * Behavior is undefined if no data is in the filter.
+	 *
+	 * @return The output of the filter.
+	 *
+	 * @warning If no data is in the filter the behavior is undefined.
+	 */
+	T get() const {
+		return std::reduce(std::next(data.begin()), data.end(), data.front()) / data.size();
 	}
 
 	/**
-	 * Adds data to the filter and gets the new output.
+	 * @brief Adds data to the filter and gets the new output.
 	 *
 	 * @param val The data to add to the filter.
 	 * @return The new output of the filter after adding this data.
 	 */
-	Eigen::Matrix<double, numDims, 1> get(const Eigen::Matrix<double, numDims, 1>& val) {
-		data.col(index) = val;
-		index = (index + 1) % numPoints;
-		if (size < numPoints) {
-			size++;
+	T get(const T& val) {
+		data.push_back(val);
+		if (data.size() > numPoints) {
+			data.pop_front();
 		}
 
 		return get();
 	}
 
 	/**
-	 * Clears all data in the buffer.
+	 * @brief Clears all data in the buffer.
 	 */
 	void reset() {
-		size = 0;
-		index = 0;
+		data.clear();
 	}
 
 	/**
-	 * Returns the number of points stored in the buffer.
+	 * @brief Returns the number of points stored in the buffer.
 	 *
 	 * @return The number of points stored in the buffer, in the range [0, numPoints]
 	 */
 	int getSize() const {
-		return size;
+		return data.size();
 	}
 
 	/**
-	 * Returns the maximum number of points that can be stored in the buffer.
+	 * @brief Get the maximum number of points that can be stored in the buffer.
 	 *
 	 * @return The maximum number of points that can be stored in the buffer.
 	 */
@@ -70,19 +76,17 @@ public:
 	}
 
 	/**
-	 * Get the underlying buffer of the filter.
+	 * @brief Get the underlying buffer of the filter.
 	 *
-	 * @return The Matrix representing the buffer of the filter. Data points are stored in each
-	 * column.
+	 * @return A copy of the underlying buffer.
 	 */
-	Eigen::Matrix<double, numDims, numPoints> getData() const {
+	std::list<T> getData() const {
 		return data;
 	}
 
 private:
-	Eigen::Matrix<double, numDims, numPoints> data; // ring buffer, starts with garbage data
-	int size = 0;
-	int index = 0;
+	size_t numPoints;
+	std::list<T> data;
 };
 
 } // namespace filters

@@ -5,6 +5,7 @@
 
 using namespace Catch::literals;
 using namespace filters;
+using namespace filters::statespace;
 using namespace navtypes;
 
 namespace

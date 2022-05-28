@@ -2,54 +2,47 @@
 
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
-#include "ExtendedKalmanFilter.h"
+#include "MultiSensorEKF.h"
 
-#include <Eigen/Core>
+#include <array>
 
 namespace filters {
 
 /**
- * @brief Uses an Extended Kalman Filter to estimate the robot pose.
+ * @brief This class implements a pose estimator that can fuse multiple sensors
+ * with the kinematic model for accurate estimation.
  *
- * This class uses a Kalman Filter to continuously estimate the pose of the robot in 2d space.
- * The tracked states are x, y, and heading. All of these states are in map space.
+ * Internally, this uses an EKF. This differs from filters::PoseEstimator in that
+ * multiple sensors are supported.
+ *
+ * The tracked states are x, y, and heading, in map space.
  */
-class PoseEstimator {
+class FullPoseEstimator {
 public:
-	/**
-	 * @brief The dimension of the state vector.
-	 */
 	static constexpr int numStates = 3;
+	static constexpr int numSensors = 2;
+	using state_t = statespace::Vectord<numStates>;
+
+	FullPoseEstimator(const Eigen::Vector2d& inputNoiseGains, double wheelBase, double dt,
+					  const Eigen::Vector2d& gpsStdDev, double headingStdDev);
 
 	/**
-	 * @brief The type of the state vector.
+	 * @brief Use a gps measurement to correct the pose estimate.
+	 *
+	 * The sensor reading is assumed to be appropriately recent.
+	 *
+	 * @param gps The gps measurement, in map space.
 	 */
-	using statevec_t = Eigen::Matrix<double, numStates, 1>;
+	void correctGPS(const navtypes::point_t& gps);
 
 	/**
-	 * @brief Create a new Pose Estimator.
+	 * @brief Use a heading measurement to correct the pose estimate.
 	 *
-	 * @param inputNoiseGains The gain for the noise in each dimension of the input space.
-	 * This pose estimator models process noise as noise applied to the wheel velocities
-	 * with standard deviation proportional to the wheel velocity. The standard deviation of
-	 * the noise is modelled as k * sqrt(abs(v)) where k is the input noise gain and v is the
-	 * wheel velocity.
-	 * @param measurementStdDevs The standard deviations for each of the measurement elements.
-	 * 							 This represents additive noise in the measurements.
-	 * @param wheelBase The distance between the left and right wheels.
-	 * @param dt The time in seconds between updates.
+	 * The sensor reading is assumed to be appropriately recent.
+	 *
+	 * @param heading The heading sensor reading, in map space.
 	 */
-	PoseEstimator(const Eigen::Vector2d& inputNoiseGains,
-				  const Eigen::Vector3d& measurementStdDevs, double wheelBase, double dt);
-
-	/**
-	 * @brief Correct the pose estimation with measurement data.
-	 *
-	 * The measurement should be in the same space as the state.
-	 *
-	 * @param measurement The measurement to use to correct the filter, as a transform.
-	 */
-	void correct(const navtypes::transform_t& measurement);
+	void correctHeading(double heading);
 
 	/**
 	 * @brief Use the model to predict the next system state, given the current inputs.
@@ -109,9 +102,9 @@ public:
 	navtypes::pose_t getPose() const;
 
 private:
-	ExtendedKalmanFilter<numStates, 2, 3, 2, 3> ekf;
 	DiffDriveKinematics kinematics;
 	double dt;
+	MultiSensorEKF<numStates, 2, 2, numSensors> ekf;
 };
 
 } // namespace filters
