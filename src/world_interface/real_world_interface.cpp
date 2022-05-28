@@ -1,6 +1,7 @@
 #include "../CAN/CAN.h"
 #include "../CAN/CANMotor.h"
 #include "../CAN/CANUtils.h"
+#include "../Constants.h"
 #include "../Globals.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
@@ -26,7 +27,20 @@ using can::motor::motormode_t;
 
 namespace robot {
 
-const WorldInterface WORLD_INTERFACE = WorldInterface::real;
+extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
+
+namespace {
+DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+DiffWristKinematics wrist_kinematics;
+} // namespace
+
+const DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
+
+const DiffWristKinematics& wristKinematics() {
+	return wrist_kinematics;
+}
 
 namespace {
 // map that associates camera id to the camera object

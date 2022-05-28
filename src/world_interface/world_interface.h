@@ -3,6 +3,8 @@
 #include "../gps/gps_util.h"
 #include "../navtypes.h"
 #include "data.h"
+#include "../kinematics/DiffDriveKinematics.h"
+#include "../kinematics/DiffWristKinematics.h"
 
 #include <optional>
 
@@ -27,6 +29,9 @@ enum class WorldInterface { real, sim2d, sim3d, noop };
 
 /** @brief The current world interface being used. */
 extern const WorldInterface WORLD_INTERFACE;
+
+const DiffDriveKinematics& driveKinematics();
+const DiffWristKinematics& wristKinematics();
 
 /**
  * @brief Initialize the world interface.

@@ -155,6 +155,7 @@ add_library(utils SHARED
   gps/gps_util.cpp
   base64/base64.cpp
   kinematics/DiffDriveKinematics.cpp
+  kinematics/DiffWristKinematics.cpp
   world_interface/data.cpp)
 
 ## ====== CAN Interfaces =======
@@ -327,7 +328,9 @@ if(WITH_TESTS)
     ../tests/filters/FullPoseEstimatorTest.cpp
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
-    ../tests/worldmap/QuadTreeTest.cpp)
+    ../tests/worldmap/QuadTreeTest.cpp
+	# Protocol/teleop tests
+	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
   target_link_libraries(tests
     ${rover_libs}

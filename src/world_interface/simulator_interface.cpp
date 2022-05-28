@@ -26,7 +26,6 @@ using namespace robot::types;
 
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
-const DiffDriveKinematics kinematics(Constants::EFF_WHEEL_BASE);
 const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::frontLeftWheel, "frontLeftWheel"},
 	{motorid_t::frontRightWheel, "frontRightWheel"},
@@ -224,7 +223,20 @@ void initSimServer() {
 
 namespace robot {
 
-const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
+namespace {
+DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+DiffWristKinematics wrist_kinematics;
+}
+
+const DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
+
+const DiffWristKinematics& wristKinematics() {
+	return wrist_kinematics;
+}
+
+extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 
 void world_interface_init() {
 	initSimServer();
