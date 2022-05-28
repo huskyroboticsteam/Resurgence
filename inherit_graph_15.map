@@ -1,9 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="5,172,168,213"/>
-<area shape="rect" id="node2" href="$classfilters_1_1ExtendedKalmanFilter.html" title=" " alt="" coords="243,5,428,47"/>
-<area shape="rect" id="node3" href="$classfilters_1_1KalmanFilter.html" title=" " alt="" coords="269,71,401,112"/>
-<area shape="rect" id="node4" href="$classfilters_1_1MultiSensorEKF.html" title=" " alt="" coords="228,136,443,177"/>
-<area shape="rect" id="node5" href="$classfilters_1_1ExtendedKalmanFilter.html" title="Implements a discrete&#45;time EKF." alt="" coords="216,201,455,257"/>
-<area shape="rect" id="node6" href="$classfilters_1_1KalmanFilter.html" title="Implements a Kalman Filter." alt="" coords="262,281,409,337"/>
-<area shape="rect" id="node7" href="$classfilters_1_1MultiSensorEKF.html" title=" " alt="" coords="227,361,444,417"/>
+<area shape="rect" id="node1" href="$classfilters_1_1FullPoseEstimator.html" title="This class implements a pose estimator that can fuse multiple sensors with the kinematic model for ac..." alt="" coords="5,5,171,32"/>
 </map>

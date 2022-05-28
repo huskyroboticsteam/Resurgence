@@ -20,7 +20,6 @@ var searchData=
   ['upscale_5fvideo_2emarkdown_17',['upscale_video.markdown',['https://docs.opencv.org/4.2.0/da/d2c/upscale__video_8markdown.html',1,'']]],
   ['util_2ehpp_18',['util.hpp',['https://docs.opencv.org/4.2.0/d5/d6b/contrib_2modules_2datasets_2include_2opencv2_2datasets_2util_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d1/d59/modules_2gapi_2include_2opencv2_2gapi_2util_2util_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d9/d06/modules_2stitching_2include_2opencv2_2stitching_2detail_2util_8hpp.html',1,'(Global Namespace)']]],
   ['util_5finl_2ehpp_19',['util_inl.hpp',['https://docs.opencv.org/4.2.0/d7/dab/util__inl_8hpp.html',1,'']]],
-  ['utilities_2ehpp_20',['utilities.hpp',['https://docs.ros2.org/foxy/api/rclcpp/detail_2utilities_8hpp.html',1,'(Global Namespace)'],['https://docs.ros2.org/foxy/api/rclcpp/utilities_8hpp.html',1,'(Global Namespace)']]],
-  ['utility_21',['utility',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00176.html',1,'']]],
-  ['utility_2ehpp_22',['utility.hpp',['https://docs.opencv.org/4.2.0/d1/d4e/utility_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/df/dc3/cuda_2utility_8hpp.html',1,'(Global Namespace)']]]
+  ['utility_20',['utility',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00176.html',1,'']]],
+  ['utility_2ehpp_21',['utility.hpp',['https://docs.opencv.org/4.2.0/d1/d4e/utility_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/df/dc3/cuda_2utility_8hpp.html',1,'(Global Namespace)']]]
 ];

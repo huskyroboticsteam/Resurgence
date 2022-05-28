@@ -12,6 +12,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -99,7 +106,12 @@ $(function() {
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="namespacerobot.html#a137af2b02d865426bf9c5f3d0a096121">   40</a></span><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map&lt;robot::types::motorid_t, uint32_t&gt;</a> <a class="code hl_variable" href="namespacerobot.html#a137af2b02d865426bf9c5f3d0a096121">motorPulsesPerJointRevMap</a>;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>} <span class="comment">// namespace robot</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map&lt;robot::types::motorid_t, double&gt;</a> <a class="code hl_variable" href="namespacerobot.html#a56b26c6a8799a43ecd957f83813df04d">positive_arm_pwm_scales</a>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map&lt;robot::types::motorid_t, double&gt;</a> negative_arm_pwm_scales;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map&lt;robot::types::motorid_t, double&gt;</a> motorGearRatioMap;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>} <span class="comment">// namespace robot</span></div>
 <div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
 <div class="ttc" id="aa00170_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00170.html">unordered_map</a></div></div>
 <div class="ttc" id="aa00173_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00173.html">unordered_set</a></div></div>
@@ -114,6 +126,7 @@ $(function() {
 <div class="ttc" id="anamespacerobot_html_a137af2b02d865426bf9c5f3d0a096121"><div class="ttname"><a href="namespacerobot.html#a137af2b02d865426bf9c5f3d0a096121">robot::motorPulsesPerJointRevMap</a></div><div class="ttdeci">const std::unordered_map&lt; robot::types::motorid_t, uint32_t &gt; motorPulsesPerJointRevMap</div><div class="ttdoc">A mapping of motorids to the number of pulses per joint revolution.</div><div class="ttdef"><b>Definition:</b> real_world_constants.h:40</div></div>
 <div class="ttc" id="anamespacerobot_html_a47d4f531c954b2b70cd871438dead04b"><div class="ttname"><a href="namespacerobot.html#a47d4f531c954b2b70cd871438dead04b">robot::pidMotors</a></div><div class="ttdeci">const std::unordered_set&lt; motorid_t &gt; pidMotors</div><div class="ttdoc">The set of motors that are PID controlled.</div><div class="ttdef"><b>Definition:</b> real_world_constants.h:23</div></div>
 <div class="ttc" id="anamespacerobot_html_a4ae4dc4491b3870eabf7bcde9e388251"><div class="ttname"><a href="namespacerobot.html#a4ae4dc4491b3870eabf7bcde9e388251">robot::motorPIDMap</a></div><div class="ttdeci">const std::unordered_map&lt; motorid_t, pidcoef_t &gt; motorPIDMap</div><div class="ttdoc">A mapping of PID controlled motors to their pid coefficients.</div><div class="ttdef"><b>Definition:</b> real_world_constants.h:29</div></div>
+<div class="ttc" id="anamespacerobot_html_a56b26c6a8799a43ecd957f83813df04d"><div class="ttname"><a href="namespacerobot.html#a56b26c6a8799a43ecd957f83813df04d">robot::positive_arm_pwm_scales</a></div><div class="ttdeci">const std::unordered_map&lt; robot::types::motorid_t, double &gt; positive_arm_pwm_scales</div><div class="ttdoc">A mapping of motorids to</div><div class="ttdef"><b>Definition:</b> real_world_interface.cpp:195</div></div>
 <div class="ttc" id="anamespacerobot_html_a90f0167f90350503b542f1a7098953ea"><div class="ttname"><a href="namespacerobot.html#a90f0167f90350503b542f1a7098953ea">robot::motorEncInvMap</a></div><div class="ttdeci">const std::unordered_map&lt; motorid_t, bool &gt; motorEncInvMap</div><div class="ttdoc">A map that represents whether a motor's encoder is inverted.</div><div class="ttdef"><b>Definition:</b> real_world_constants.h:37</div></div>
 <div class="ttc" id="astructrobot_1_1pidcoef__t_html"><div class="ttname"><a href="structrobot_1_1pidcoef__t.html">robot::pidcoef_t</a></div><div class="ttdoc">A struct containing a set of PID coefficients.</div><div class="ttdef"><b>Definition:</b> real_world_constants.h:14</div></div>
 </div><!-- fragment --></div><!-- contents -->

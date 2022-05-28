@@ -13,7 +13,5 @@ var searchData=
   ['interpolationflags_10',['InterpolationFlags',['https://docs.opencv.org/4.2.0/da/d54/group__imgproc__transform.html#ga5bb5a1fea74ea38e1a5445ca803ff121',1,]]],
   ['interpolationmasks_11',['InterpolationMasks',['https://docs.opencv.org/4.2.0/da/d54/group__imgproc__transform.html#ga628d8c499433359d67b1d830d46d8dae',1,]]],
   ['interpolationtype_12',['InterpolationType',['https://docs.opencv.org/4.2.0/d2/d84/group__optflow.html#gac80d2a88890a3d8a1e655c91a24f3225',1,'cv::optflow::InterpolationType()'],['https://docs.opencv.org/4.2.0/d2/d84/group__optflow.html#gac80d2a88890a3d8a1e655c91a24f3225',1,'InterpolationType()(Global Namespace)']]],
-  ['intraprocessbuffertype_13',['IntraProcessBufferType',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a53c5da68d5964c6bd7894afe4a76a92b',1,'rclcpp']]],
-  ['intraprocesssetting_14',['IntraProcessSetting',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a2ebc5fdfcb7e3f025f8ebc2fe1d10fe5',1,'rclcpp']]],
-  ['io_5ferrc_15',['io_errc',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a5a20cae60a4377da46121402c57322a2',1,'std']]]
+  ['io_5ferrc_13',['io_errc',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a5a20cae60a4377da46121402c57322a2',1,'std']]]
 ];

@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['enable_0',['Enable',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a2ebc5fdfcb7e3f025f8ebc2fe1d10fe5a2faec1f9f8cc7f8f40d521c4dd574f49',1,'rclcpp::Enable()'],['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a1faa0b05040d3cf0f74c231b6800bffca2faec1f9f8cc7f8f40d521c4dd574f49',1,'rclcpp::Enable()']]]
+  ['filter_0',['Filter',['https://docs.opencv.org/4.2.0/d0/dc4/classcv_1_1GFluidKernel.html#a8af159f1d2f0183faeb58620029f5196ad7778d0c64b6ba21494c97f77a66885a',1,'cv::GFluidKernel']]],
+  ['float_1',['FLOAT',['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aae738c26bf4ce1037fa81b039a915cbf6',1,'FLOAT()(Global Namespace)'],['https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga8af2ae1e077644d1dd232d29d988b79aae738c26bf4ce1037fa81b039a915cbf6',1,'FLOAT()(Global Namespace)']]],
+  ['future_5falready_5fretrieved_2',['future_already_retrieved',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga61938f7ac25df97b5362109e61bb46a6a829037befd349f04ff71ddea385bdb9a',1,'future_already_retrieved()(Global Namespace)'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga61938f7ac25df97b5362109e61bb46a6a829037befd349f04ff71ddea385bdb9a',1,'std::future_already_retrieved()'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga61938f7ac25df97b5362109e61bb46a6a829037befd349f04ff71ddea385bdb9a',1,'future_already_retrieved()(Global Namespace)']]]
 ];

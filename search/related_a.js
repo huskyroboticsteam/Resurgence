@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['streamaccessor_0',['StreamAccessor',['https://docs.opencv.org/4.2.0/d9/df3/classcv_1_1cuda_1_1Stream.html#a8362b5c9fdffe61e694647684353b090',1,'cv::cuda::Stream']]],
-  ['swap_1',['swap',['https://docs.opencv.org/4.2.0/d9/dc4/classcv_1_1util_1_1any.html#aefa0132aaa70b264555656fd48d7a3f5',1,'cv::util::any::swap()'],['https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aee0ae36cbfb0336832ebc0374c3c7679.html#aee0ae36cbfb0336832ebc0374c3c7679',1,'nlohmann::basic_json::swap()']]]
+  ['unsafe_5fany_5fcast_0',['unsafe_any_cast',['https://docs.opencv.org/4.2.0/d9/dc4/classcv_1_1util_1_1any.html#a755df8c6c75f565edf5872add33ad0ae',1,'cv::util::any::unsafe_any_cast()'],['https://docs.opencv.org/4.2.0/d9/dc4/classcv_1_1util_1_1any.html#a49c708f264edfbbf6657dc7d8b6fa47b',1,'cv::util::any::unsafe_any_cast()']]],
+  ['use_5ffacet_1',['use_facet',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a05879.html#ac42c07b39caa9133862dd851c3fa2c7d',1,'std::locale::use_facet()'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a05887.html#ac42c07b39caa9133862dd851c3fa2c7d',1,'std::locale::id::use_facet()']]]
 ];

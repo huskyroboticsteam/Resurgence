@@ -265,13 +265,12 @@ var searchData=
   ['brisk_262',['BRISK',['https://docs.opencv.org/4.2.0/de/dbf/classcv_1_1BRISK.html',1,'cv']]],
   ['broxopticalflow_263',['BroxOpticalFlow',['https://docs.opencv.org/4.2.0/d7/d18/classcv_1_1cuda_1_1BroxOpticalFlow.html',1,'cv::cuda::BroxOpticalFlow'],['https://docs.opencv.org/4.2.0/dc/dd1/classcv_1_1superres_1_1BroxOpticalFlow.html',1,'cv::superres::BroxOpticalFlow']]],
   ['buffer_264',['Buffer',['https://docs.opencv.org/4.2.0/dc/d92/classcv_1_1gapi_1_1fluid_1_1Buffer.html',1,'cv::gapi::fluid::Buffer'],['https://docs.opencv.org/4.2.0/d3/d68/classcv_1_1ogl_1_1Buffer.html',1,'cv::ogl::Buffer']]],
-  ['bufferimplementationbase_265',['BufferImplementationBase',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1experimental_1_1buffers_1_1BufferImplementationBase.html',1,'rclcpp::experimental::buffers']]],
-  ['bufferpool_266',['BufferPool',['https://docs.opencv.org/4.2.0/d5/d08/classcv_1_1cuda_1_1BufferPool.html',1,'cv::cuda']]],
-  ['bufferpoolcontroller_267',['BufferPoolController',['https://docs.opencv.org/4.2.0/d4/dad/classcv_1_1BufferPoolController.html',1,'cv']]],
-  ['bundleadjusteraffine_268',['BundleAdjusterAffine',['https://docs.opencv.org/4.2.0/d6/d8d/classcv_1_1detail_1_1BundleAdjusterAffine.html',1,'cv::detail']]],
-  ['bundleadjusteraffinepartial_269',['BundleAdjusterAffinePartial',['https://docs.opencv.org/4.2.0/d4/dbb/classcv_1_1detail_1_1BundleAdjusterAffinePartial.html',1,'cv::detail']]],
-  ['bundleadjusterbase_270',['BundleAdjusterBase',['https://docs.opencv.org/4.2.0/d5/d56/classcv_1_1detail_1_1BundleAdjusterBase.html',1,'cv::detail']]],
-  ['bundleadjusterray_271',['BundleAdjusterRay',['https://docs.opencv.org/4.2.0/da/d7c/classcv_1_1detail_1_1BundleAdjusterRay.html',1,'cv::detail']]],
-  ['bundleadjusterreproj_272',['BundleAdjusterReproj',['https://docs.opencv.org/4.2.0/dc/d54/classcv_1_1detail_1_1BundleAdjusterReproj.html',1,'cv::detail']]],
-  ['byte_5fcontainer_5fwith_5fsubtype_273',['byte_container_with_subtype',['https://nlohmann.github.io/json/doxygen/classnlohmann_1_1byte__container__with__subtype.html',1,'nlohmann']]]
+  ['bufferpool_265',['BufferPool',['https://docs.opencv.org/4.2.0/d5/d08/classcv_1_1cuda_1_1BufferPool.html',1,'cv::cuda']]],
+  ['bufferpoolcontroller_266',['BufferPoolController',['https://docs.opencv.org/4.2.0/d4/dad/classcv_1_1BufferPoolController.html',1,'cv']]],
+  ['bundleadjusteraffine_267',['BundleAdjusterAffine',['https://docs.opencv.org/4.2.0/d6/d8d/classcv_1_1detail_1_1BundleAdjusterAffine.html',1,'cv::detail']]],
+  ['bundleadjusteraffinepartial_268',['BundleAdjusterAffinePartial',['https://docs.opencv.org/4.2.0/d4/dbb/classcv_1_1detail_1_1BundleAdjusterAffinePartial.html',1,'cv::detail']]],
+  ['bundleadjusterbase_269',['BundleAdjusterBase',['https://docs.opencv.org/4.2.0/d5/d56/classcv_1_1detail_1_1BundleAdjusterBase.html',1,'cv::detail']]],
+  ['bundleadjusterray_270',['BundleAdjusterRay',['https://docs.opencv.org/4.2.0/da/d7c/classcv_1_1detail_1_1BundleAdjusterRay.html',1,'cv::detail']]],
+  ['bundleadjusterreproj_271',['BundleAdjusterReproj',['https://docs.opencv.org/4.2.0/dc/d54/classcv_1_1detail_1_1BundleAdjusterReproj.html',1,'cv::detail']]],
+  ['byte_5fcontainer_5fwith_5fsubtype_272',['byte_container_with_subtype',['https://nlohmann.github.io/json/doxygen/classnlohmann_1_1byte__container__with__subtype.html',1,'nlohmann']]]
 ];

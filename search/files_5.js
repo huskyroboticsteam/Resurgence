@@ -59,7 +59,7 @@ var searchData=
   ['binomial_5fheap_5fbase_5f_2ffind_5ffn_5fimps_2ehpp_56',['binomial_heap_base_/find_fn_imps.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a16868.html',1,'']]],
   ['binomial_5fheap_5fbase_5f_2finsert_5ffn_5fimps_2ehpp_57',['binomial_heap_base_/insert_fn_imps.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a16982.html',1,'']]],
   ['binomial_5fheap_5fbase_5f_2fsplit_5fjoin_5ffn_5fimps_2ehpp_58',['binomial_heap_base_/split_join_fn_imps.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a17237.html',1,'']]],
-  ['bioinspired_2ehpp_59',['bioinspired.hpp',['https://docs.opencv.org/4.2.0/d4/d64/bioinspired_2bioinspired_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d2/dfa/bioinspired_8hpp.html',1,'(Global Namespace)']]],
+  ['bioinspired_2ehpp_59',['bioinspired.hpp',['https://docs.opencv.org/4.2.0/d2/dfa/bioinspired_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d4/d64/bioinspired_2bioinspired_8hpp.html',1,'(Global Namespace)']]],
   ['bitmap_5fallocator_2eh_60',['bitmap_allocator.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01034.html',1,'']]],
   ['bits_2falgorithmfwd_2eh_61',['bits/algorithmfwd.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a16586.html',1,'']]],
   ['bits_2falloc_5ftraits_2eh_62',['bits/alloc_traits.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a16592.html',1,'']]],
@@ -85,7 +85,6 @@ var searchData=
   ['branch_5fpolicy_2ehpp_82',['branch_policy.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01235.html',1,'']]],
   ['branch_5fpolicy_2ftraits_2ehpp_83',['branch_policy/traits.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a17309.html',1,'']]],
   ['brightedges_2ehpp_84',['brightedges.hpp',['https://docs.opencv.org/4.2.0/d8/dc5/brightedges_8hpp.html',1,'']]],
-  ['buffer_5fimplementation_5fbase_2ehpp_85',['buffer_implementation_base.hpp',['https://docs.ros2.org/foxy/api/rclcpp/buffer__implementation__base_8hpp.html',1,'']]],
-  ['bufferpool_2ehpp_86',['bufferpool.hpp',['https://docs.opencv.org/4.2.0/df/d28/bufferpool_8hpp.html',1,'']]],
-  ['building_5ftegra_5fcuda_2emarkdown_87',['building_tegra_cuda.markdown',['https://docs.opencv.org/4.2.0/d7/d04/building__tegra__cuda_8markdown.html',1,'']]]
+  ['bufferpool_2ehpp_85',['bufferpool.hpp',['https://docs.opencv.org/4.2.0/df/d28/bufferpool_8hpp.html',1,'']]],
+  ['building_5ftegra_5fcuda_2emarkdown_86',['building_tegra_cuda.markdown',['https://docs.opencv.org/4.2.0/d7/d04/building__tegra__cuda_8markdown.html',1,'']]]
 ];

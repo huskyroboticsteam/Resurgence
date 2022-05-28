@@ -11,6 +11,5 @@ var searchData=
   ['format_8',['Format',['https://docs.opencv.org/4.2.0/d5/ddf/classcv_1_1ogl_1_1Texture2D.html#a1838399ee67c0957c0ae42cabfa99033',1,'cv::ogl::Texture2D']]],
   ['formattype_9',['FormatType',['https://docs.opencv.org/4.2.0/d3/da1/classcv_1_1Formatter.html#abf8cb6362d243c3b42fa7787504bc08e',1,'cv::Formatter']]],
   ['future_5ferrc_10',['future_errc',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga61938f7ac25df97b5362109e61bb46a6',1,'std::future_errc()'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga61938f7ac25df97b5362109e61bb46a6',1,'future_errc()(Global Namespace)']]],
-  ['future_5fstatus_11',['future_status',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga528eb8f3b350394c0406d4d58ab7dbf4',1,'std::future_status()'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga528eb8f3b350394c0406d4d58ab7dbf4',1,'future_status()(Global Namespace)']]],
-  ['futurereturncode_12',['FutureReturnCode',['https://docs.ros2.org/foxy/api/rclcpp/namespacerclcpp.html#a7b4ff5f1e516740d7e11ea97fe6f5532',1,'rclcpp']]]
+  ['future_5fstatus_11',['future_status',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga528eb8f3b350394c0406d4d58ab7dbf4',1,'std::future_status()'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01478.html#ga528eb8f3b350394c0406d4d58ab7dbf4',1,'future_status()(Global Namespace)']]]
 ];

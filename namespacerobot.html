@@ -12,6 +12,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -125,6 +132,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a2337a0214f903f0ba6174b3d8b9e025b"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a>&lt; double, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">getCmdVel</a> ()</td></tr>
 <tr class="memdesc:a2337a0214f903f0ba6174b3d8b9e025b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the velocity commanded to the robot. Depending on scaling, may not be the same numbers passed to <a class="el" href="namespacerobot.html#a8363ee6c4c4bd4b93c4188984dc77ad6" title="Request the robot to drive at the given velocities.">setCmdVel()</a>.  <a href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">More...</a><br /></td></tr>
 <tr class="separator:a2337a0214f903f0ba6174b3d8b9e025b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af156944ae2405af9ad492ab2ffe4ffec"><td class="memItemLeft" align="right" valign="top"><a id="af156944ae2405af9ad492ab2ffe4ffec" name="af156944ae2405af9ad492ab2ffe4ffec"></a>
+const <a class="el" href="classDiffDriveKinematics.html">DiffDriveKinematics</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>driveKinematics</b> ()</td></tr>
+<tr class="separator:af156944ae2405af9ad492ab2ffe4ffec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07219b1836d29e2ba587d1872d3ec3d9"><td class="memItemLeft" align="right" valign="top"><a id="a07219b1836d29e2ba587d1872d3ec3d9" name="a07219b1836d29e2ba587d1872d3ec3d9"></a>
+const <a class="el" href="classDiffWristKinematics.html">DiffWristKinematics</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>wristKinematics</b> ()</td></tr>
+<tr class="separator:a07219b1836d29e2ba587d1872d3ec3d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf752a16bcc35605b3f364901f949063"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aaf752a16bcc35605b3f364901f949063">world_interface_init</a> ()</td></tr>
 <tr class="memdesc:aaf752a16bcc35605b3f364901f949063"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the world interface.  <a href="namespacerobot.html#aaf752a16bcc35605b3f364901f949063">More...</a><br /></td></tr>
 <tr class="separator:aaf752a16bcc35605b3f364901f949063"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,6 +222,15 @@ const <a class="el" href="namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e"
 <tr class="memitem:a137af2b02d865426bf9c5f3d0a096121"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a2e2bf34f6d75c7c4bd05605e1c5e33e1">uint32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a137af2b02d865426bf9c5f3d0a096121">motorPulsesPerJointRevMap</a></td></tr>
 <tr class="memdesc:a137af2b02d865426bf9c5f3d0a096121"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to the number of pulses per joint revolution.  <a href="namespacerobot.html#a137af2b02d865426bf9c5f3d0a096121">More...</a><br /></td></tr>
 <tr class="separator:a137af2b02d865426bf9c5f3d0a096121"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56b26c6a8799a43ecd957f83813df04d"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a56b26c6a8799a43ecd957f83813df04d">positive_arm_pwm_scales</a></td></tr>
+<tr class="memdesc:a56b26c6a8799a43ecd957f83813df04d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to <br  />
+  <a href="namespacerobot.html#a56b26c6a8799a43ecd957f83813df04d">More...</a><br /></td></tr>
+<tr class="separator:a56b26c6a8799a43ecd957f83813df04d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b8a7285f3d9ea59377f010faa9aafd3"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a6b8a7285f3d9ea59377f010faa9aafd3">negative_arm_pwm_scales</a></td></tr>
+<tr class="separator:a6b8a7285f3d9ea59377f010faa9aafd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45b6bf094d15c6f5a91cc1bb25aad9e9"><td class="memItemLeft" align="right" valign="top"><a id="a45b6bf094d15c6f5a91cc1bb25aad9e9" name="a45b6bf094d15c6f5a91cc1bb25aad9e9"></a>
+const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>motorGearRatioMap</b></td></tr>
+<tr class="separator:a45b6bf094d15c6f5a91cc1bb25aad9e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae917757337e6e1a1b99392c7c1db4069"><td class="memItemLeft" align="right" valign="top"><a id="ae917757337e6e1a1b99392c7c1db4069" name="ae917757337e6e1a1b99392c7c1db4069"></a>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>WHEEL_BASE</b> = 0.66</td></tr>
 <tr class="separator:ae917757337e6e1a1b99392c7c1db4069"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,10 +246,6 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>PWM_FOR_1
 <tr class="memitem:a6d367fba7bd0a0da7029a57158141a9d"><td class="memItemLeft" align="right" valign="top"><a id="a6d367fba7bd0a0da7029a57158141a9d" name="a6d367fba7bd0a0da7029a57158141a9d"></a>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</b> = 20000</td></tr>
 <tr class="separator:a6d367fba7bd0a0da7029a57158141a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd328b517749a1cc9fccce4653235f8d"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#abd328b517749a1cc9fccce4653235f8d">positive_arm_pwm_scales</a></td></tr>
-<tr class="separator:abd328b517749a1cc9fccce4653235f8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83fb2df13115e2b02606b67dac471fb9"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a83fb2df13115e2b02606b67dac471fb9">negative_arm_pwm_scales</a></td></tr>
-<tr class="separator:a83fb2df13115e2b02606b67dac471fb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Collection of functions that allows interfacing with the hardware and the world. </p>
@@ -923,14 +941,14 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 
 </div>
 </div>
-<a id="a83fb2df13115e2b02606b67dac471fb9" name="a83fb2df13115e2b02606b67dac471fb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a83fb2df13115e2b02606b67dac471fb9">&#9670;&nbsp;</a></span>negative_arm_pwm_scales</h2>
+<a id="a6b8a7285f3d9ea59377f010faa9aafd3" name="a6b8a7285f3d9ea59377f010faa9aafd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b8a7285f3d9ea59377f010faa9aafd3">&#9670;&nbsp;</a></span>negative_arm_pwm_scales</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt;<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double&gt; robot::negative_arm_pwm_scales</td>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double &gt; robot::negative_arm_pwm_scales</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -972,14 +990,14 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 
 </div>
 </div>
-<a id="abd328b517749a1cc9fccce4653235f8d" name="abd328b517749a1cc9fccce4653235f8d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd328b517749a1cc9fccce4653235f8d">&#9670;&nbsp;</a></span>positive_arm_pwm_scales</h2>
+<a id="a56b26c6a8799a43ecd957f83813df04d" name="a56b26c6a8799a43ecd957f83813df04d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56b26c6a8799a43ecd957f83813df04d">&#9670;&nbsp;</a></span>positive_arm_pwm_scales</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt;<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double&gt; robot::positive_arm_pwm_scales</td>
+          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double &gt; robot::positive_arm_pwm_scales</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -992,6 +1010,9 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">    {motorid_t::differentialRight, -0.0763},</div>
 <div class="line">    {motorid_t::hand, 0.2289}}</div>
 </div><!-- fragment -->
+<p>A mapping of motorids to <br  />
+ </p>
+
 </div>
 </div>
 </div><!-- contents -->

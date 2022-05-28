@@ -1,9 +1,5 @@
 var searchData=
 [
-  ['get_5flogger_0',['get_logger',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1Logger.html#a065ae21b8b626fa98be4ad3ce03fb070',1,'rclcpp::Logger']]],
-  ['nodeservices_1',['NodeServices',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1CallbackGroup.html#a63f67ef2e5e2d8f593a64b883c8ea3df',1,'rclcpp::CallbackGroup']]],
-  ['nodetimers_2',['NodeTimers',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1CallbackGroup.html#aeeb1ac7e4e912bb8dc7aa1813535b0ed',1,'rclcpp::CallbackGroup']]],
-  ['nodetopics_3',['NodeTopics',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1CallbackGroup.html#ad0616a6ca4b2217d0dc1e94877547a77',1,'rclcpp::CallbackGroup']]],
-  ['nodetopicsinterface_4',['NodeTopicsInterface',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1Subscription.html#a872235940e232040a0e05d383f0d262a',1,'rclcpp::Subscription']]],
-  ['nodewaitables_5',['NodeWaitables',['https://docs.ros2.org/foxy/api/rclcpp/classrclcpp_1_1CallbackGroup.html#ab6d6e6e119688fe097e360f8cd3c6759',1,'rclcpp::CallbackGroup']]]
+  ['streamaccessor_0',['StreamAccessor',['https://docs.opencv.org/4.2.0/d9/df3/classcv_1_1cuda_1_1Stream.html#a8362b5c9fdffe61e694647684353b090',1,'cv::cuda::Stream']]],
+  ['swap_1',['swap',['https://docs.opencv.org/4.2.0/d9/dc4/classcv_1_1util_1_1any.html#aefa0132aaa70b264555656fd48d7a3f5',1,'cv::util::any::swap()'],['https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aee0ae36cbfb0336832ebc0374c3c7679.html#aee0ae36cbfb0336832ebc0374c3c7679',1,'nlohmann::basic_json::swap()']]]
 ];
