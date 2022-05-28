@@ -59,7 +59,7 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 // TODO: figure out the correct parameters needed and implement for both motor boards
-void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi,
+void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo, uint16_t adcHi,
 					   std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**
