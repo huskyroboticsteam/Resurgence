@@ -35,11 +35,20 @@ public:
 	}
 
 	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos) const {
+		double unused;
+		return getCommand(elapsedTime, currPos, unused);
+	}
+
+	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos, double& cosineSim) const {
 		Vectord<outputDim> currTarget = velocityProfile.getCommand(elapsedTime);
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
 		Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
 		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQR().solve(outputPosDiff);
+
+		Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
+		cosineSim = outputPosDiff.dot(trueOutputPosDiff) / (outputPosDiff.norm() * trueOutputPosDiff.norm());
+
 		return currPos + inputPosDiff;
 	}
 
