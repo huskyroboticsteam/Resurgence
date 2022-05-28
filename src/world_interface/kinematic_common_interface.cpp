@@ -57,7 +57,7 @@ double setCmdVel(double dtheta, double dx) {
 
 	setCmdVelToIntegrate(wheelVels);
 	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, lPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
 	setMotorPower(motorid_t::frontRightWheel, rPWM);
 	setMotorPower(motorid_t::rearRightWheel, rPWM);
 

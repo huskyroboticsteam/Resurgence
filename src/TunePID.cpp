@@ -31,7 +31,7 @@ template <typename K, typename V> std::map<V, K> reverseMap(const std::map<K, V>
 const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::frontLeftWheel, "frontLeftWheel"},
 	{motorid_t::frontRightWheel, "frontRightWheel"},
-	{motorid_t::rearLeftwheel, "rearLeftwheel"},
+	{motorid_t::rearLeftWheel, "rearLeftWheel"},
 	{motorid_t::rearRightWheel, "rearRightWheel"},
 	{motorid_t::armBase, "armBase"},
 	{motorid_t::shoulder, "shoulder"},
