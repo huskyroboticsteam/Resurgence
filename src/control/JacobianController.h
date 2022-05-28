@@ -14,8 +14,8 @@ namespace control {
 
 template <int outputDim, int inputDim> class JacobianController {
 private:
-	template <int d> using Vectord = Eigen::Matrix<double, d, 1>;
-	template <int r, int c> using Matrixd = Eigen::Matrix<double, r, c>;
+	template <int dim> using Vectord = filters::statespace::Vectord<dim>;
+	template <int rows, int cols> using Matrixd = filters::statespace::Matrixd<rows, cols>;
 
 public:
 	JacobianController(
@@ -39,7 +39,12 @@ public:
 		return getCommand(elapsedTime, currPos, unused);
 	}
 
-	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos, double& cosineSim) const {
+	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos,
+								 double& cosineSim) const {
+		if (!velocityProfile.hasTarget()) {
+			return currPos;
+		}
+
 		Vectord<outputDim> currTarget = velocityProfile.getCommand(elapsedTime);
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
@@ -47,7 +52,8 @@ public:
 		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQR().solve(outputPosDiff);
 
 		Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
-		cosineSim = outputPosDiff.dot(trueOutputPosDiff) / (outputPosDiff.norm() * trueOutputPosDiff.norm());
+		cosineSim = outputPosDiff.dot(trueOutputPosDiff) /
+					(outputPosDiff.norm() * trueOutputPosDiff.norm());
 
 		return currPos + inputPosDiff;
 	}
@@ -55,6 +61,14 @@ public:
 	void setTarget(const Vectord<inputDim>& currPos, const Vectord<outputDim>& target) {
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		velocityProfile.setTarget(currPosOutput, target);
+	}
+
+	bool hasTarget() {
+		return velocityProfile.hasTarget();
+	}
+
+	void reset() {
+		velocityProfile.reset();
 	}
 
 private:

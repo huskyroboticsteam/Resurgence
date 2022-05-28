@@ -29,6 +29,10 @@ void SingleDimTrapezoidalVelocityProfile::setTarget(double startPos, double endP
 	this->profile = profile;
 }
 
+bool SingleDimTrapezoidalVelocityProfile::hasTarget() const {
+	return this->profile.has_value();
+}
+
 double SingleDimTrapezoidalVelocityProfile::getCommand(double elapsedTime) const {
 	if (!profile) {
 		return 0;

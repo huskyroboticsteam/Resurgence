@@ -1,7 +1,5 @@
 #pragma once
 
-// define TRAP_PROF_NO_EIGEN to disable eigen
-
 #include "../world_interface/data.h"
 
 #include <array>
@@ -9,9 +7,7 @@
 #include <optional>
 #include <vector>
 
-#ifndef TRAP_PROF_NO_EIGEN
 #include <Eigen/Core>
-#endif
 
 namespace control {
 
@@ -20,6 +16,8 @@ public:
 	SingleDimTrapezoidalVelocityProfile(double maxVel, double maxAccel);
 
 	void setTarget(double startPos, double endPos);
+
+	bool hasTarget() const;
 
 	// returns target position
 	double getCommand(double elapsedTime) const;
@@ -53,6 +51,11 @@ public:
 		}
 	}
 
+	bool hasTarget() {
+		return std::any_of(profiles.begin(), profiles.end(),
+						   [](const auto& p) { return p.hasTarget(); });
+	}
+
 	void setTarget(const std::array<double, dim>& startPos,
 				   const std::array<double, dim>& endPos) {
 		for (int i = 0; i < dim; i++) {
@@ -60,7 +63,6 @@ public:
 		}
 	}
 
-#ifndef TRAP_PROF_NO_EIGEN
 	void setTarget(const Eigen::Matrix<double, dim, 1>& startPos,
 				   const Eigen::Matrix<double, dim, 1>& endPos) {
 		for (int i = 0; i < dim; i++) {
@@ -68,6 +70,7 @@ public:
 		}
 	}
 
+	// returns zero vector if no target
 	Eigen::Matrix<double, dim, 1> getCommand(double elapsedTime) const {
 		Eigen::Matrix<double, dim, 1> ret;
 		for (int i = 0; i < dim; i++) {
@@ -75,15 +78,6 @@ public:
 		}
 		return ret;
 	}
-#else
-	std::array<double, dim> getCommand(double elapsedTime) const {
-		std::array<double, dim> ret;
-		for (int i = 0; i < dim; i++) {
-			ret[i] = profiles[i].getCommand(elapsedTime);
-		}
-		return ret;
-	}
-#endif
 
 private:
 	std::vector<SingleDimTrapezoidalVelocityProfile> profiles;
