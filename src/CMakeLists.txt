@@ -248,11 +248,9 @@ list(APPEND real_world_libs
 list(APPEND simulator_libs
   simulator_interface)
 
-add_executable(Rover rover_main.cpp)
+add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
-  Rover.cpp
   Autonomous.cpp
-  CommandLineOptions.cpp
   Globals.cpp
   rospub.cpp
   filters/PoseEstimator.cpp

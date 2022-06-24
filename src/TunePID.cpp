@@ -1,6 +1,5 @@
 #include "CAN/CAN.h"
 #include "CAN/CANMotor.h"
-#include "Rover.h"
 #include "log.h"
 #include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"

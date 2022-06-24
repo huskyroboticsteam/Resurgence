@@ -1,7 +1,4 @@
-#include "Rover.h"
-
 #include "Autonomous.h"
-#include "CommandLineOptions.h"
 #include "Globals.h"
 #include "network/MissionControlProtocol.h"
 #include "Util.h"
@@ -61,13 +58,13 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 
 	if (urc_legs.size() == 0) {
 		log(LOG_ERROR, "could not get URC legs\n");
-		exit(0);
+		exit(EXIT_FAILURE);
 	}
 
 	return urc_legs;
 }
 
-int rover_loop(int argc, char** argv) {
+int main(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
@@ -77,7 +74,6 @@ int rover_loop(int argc, char** argv) {
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
-	Globals::opts = ParseCommandLineOptions(argc, argv);
 
 	// Target locations for autonomous navigation
 	// Eventually this will be set by communication from the base station
@@ -109,5 +105,5 @@ int rover_loop(int argc, char** argv) {
 				desiredUsecs / 1000, elapsedUsecs / 1000);
 		}
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CommandLineOptions.h"
 #include "network/websocket/WebSocketServer.h"
 
 #include <vector>
@@ -18,7 +17,6 @@ enum class RoverState {
 // NOTE(sasha): To keep linker happy, declare globals with "extern" here and then
 //              provide variable definition in Globals.cpp
 namespace Globals {
-extern CommandLineOptions opts;
 /**
    @deprecated
  */
