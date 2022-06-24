@@ -192,23 +192,6 @@ URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
 
-const std::unordered_map<motorid_t, double> positive_arm_pwm_scales = {
-	{motorid_t::armBase, 0.1831},
-	{motorid_t::shoulder, -0.3052},
-	{motorid_t::elbow, -0.5},
-	{motorid_t::forearm, -0.0916},
-	{motorid_t::differentialLeft, 0.0763},
-	{motorid_t::differentialRight, -0.0763},
-	{motorid_t::hand, 0.2289}};
-const std::unordered_map<motorid_t, double> negative_arm_pwm_scales = {
-	{motorid_t::armBase, 0.1831},
-	{motorid_t::shoulder, -0.2136},
-	{motorid_t::elbow, -0.2747},
-	{motorid_t::forearm, -0.0916},
-	{motorid_t::differentialLeft, 0.0763},
-	{motorid_t::differentialRight, -0.1526},
-	{motorid_t::hand, 0.2289}};
-
 template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 	auto itr = std::find(vec.begin(), vec.end(), val);
 	return itr == vec.end() ? -1 : itr - vec.begin();
