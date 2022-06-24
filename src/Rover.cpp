@@ -1,4 +1,5 @@
 #include "Autonomous.h"
+#include "Constants.h"
 #include "Globals.h"
 #include "network/MissionControlProtocol.h"
 #include "Util.h"
@@ -78,7 +79,7 @@ int main(int argc, char** argv) {
 	// Target locations for autonomous navigation
 	// Eventually this will be set by communication from the base station
 	std::vector<URCLegGPS> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
-	Autonomous autonomous(urc_legs, CONTROL_HZ);
+	Autonomous autonomous(urc_legs, Constants::CONTROL_HZ);
 	auto roverStart = steady_clock::now();
 	for (int iter = 0; /*no termination condition*/; iter++) {
 		auto loopStart = steady_clock::now();
@@ -95,7 +96,7 @@ int main(int argc, char** argv) {
 
 		long elapsedUsecs =
 			duration_cast<microseconds>(steady_clock::now() - loopStart).count();
-		long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
+		long desiredUsecs = 1000 * 1000 / Constants::CONTROL_HZ;
 		if (desiredUsecs - elapsedUsecs > 0) {
 			// We drift by approximately 1ms per second unless we
 			// reduce our sleep time slightly
