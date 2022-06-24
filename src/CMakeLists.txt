@@ -257,8 +257,8 @@ add_library(rover_common SHARED
   rospub.cpp
   filters/PoseEstimator.cpp
   filters/PoseEstimatorLinear.cpp
-  Networking/websocket/WebSocketServer.cpp
-  Networking/websocket/WebSocketProtocol.cpp
+  network/websocket/WebSocketServer.cpp
+  network/websocket/WebSocketProtocol.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
@@ -272,7 +272,6 @@ list(APPEND rover_libs
   rover_common
   Threads::Threads
   websocket_utils
-  hr_slam
   filters
   utils
 )
