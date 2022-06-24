@@ -24,4 +24,10 @@ std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) 
 	return data ^ other.data;
 }
 
-} // namespace robot
+} // namespace robot::types
+
+namespace std {
+std::string to_string(const robot::types::CameraID& id) {
+	return id;
+}
+}

@@ -233,3 +233,7 @@ private:
 };
 
 } // namespace robot::types
+
+namespace std {
+std::string to_string(const robot::types::CameraID& id);
+}
