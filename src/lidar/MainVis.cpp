@@ -1,4 +1,6 @@
 #include "LidarVis.h"
+#include "URGLidar.h"
+#include <RPLidar/rplidar.h>
 #include "../Constants.h"
 
 #include <iostream>
