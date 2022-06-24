@@ -289,6 +289,20 @@ sudo make install
 cd ../..
 ```
 
+## Install other libraries
+
+We need the Frozen library for making immutable compile-time constant
+containers, and argparse for parsing command-line arguments.
+
+### Linux
+On Ubuntu, make sure you have followed the
+[instructions to install our Ubuntu
+repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
+
+```bash
+sudo apt-get install frozen argparse
+```
+
 ## Set up the build directory
   
 Now, you're ready to build the Resurgence project. Return to the Resurgence directory and run:
