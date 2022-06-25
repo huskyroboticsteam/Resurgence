@@ -30,6 +30,7 @@ constexpr float PotentiometerParams::scale() const {
 } // namespace robot::types
 
 namespace std {
+
 std::string to_string(robot::types::jointid_t joint) {
 	using robot::types::jointid_t;
 	switch (joint) {
@@ -54,4 +55,9 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "<unknown>";
 	}
 }
+
+std::string to_string(const robot::types::CameraID& id) {
+	return id;
+}
+
 } // namespace std

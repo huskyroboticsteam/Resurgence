@@ -97,6 +97,14 @@ include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 find_package(websocketpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
+# Find Frozen, library used for constexpr immutable containers
+find_package(frozen REQUIRED)
+# Frozen is just an interface library, only containing headers and some CMake settings. It
+# should be fine to "link" the library to every target, since if the headers are not included,
+# it will not have any effect on size or performance. This will help us not have to worry about
+# making sure the headers are available in every file that includes Constants.h, for example.
+link_libraries(frozen::frozen)
+
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
@@ -210,7 +218,6 @@ add_library(stub_world_interface STATIC
   world_interface/noop_world.cpp)
 
 add_library(real_world_interface STATIC
-  world_interface/real_world_constants.cpp
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
   lidar/read_rp_lidar.cpp
