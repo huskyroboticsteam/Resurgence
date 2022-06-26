@@ -33,9 +33,9 @@ static void libgps_dump_state(struct gps_data_t* collect) {
 				  gps_maskdump(collect->set));
 #endif
 	if (collect->set & ONLINE_SET)
-		(void)fprintf(stdout, "ONLINE: %lf\n", collect->online);
+		(void)fprintf(stdout, "ONLINE: %ld.%09ld\n", collect->online.tv_sec, collect->online.tv_nsec);
 	if (collect->set & TIME_SET)
-		(void)fprintf(stdout, "TIME: %lf\n", collect->fix.time);
+		(void)fprintf(stdout, "TIME: %ld.%09ld\n", collect->fix.time.tv_sec, collect->online.tv_nsec);
 	if (collect->set & LATLON_SET)
 		(void)fprintf(stdout, "LATLON: lat/lon: %lf %lf\n", collect->fix.latitude,
 					  collect->fix.longitude);
@@ -72,7 +72,7 @@ static void libgps_dump_state(struct gps_data_t* collect) {
 
 		(void)fprintf(stdout, "SKY: satellites in view: %d\n", collect->satellites_visible);
 		for (i = 0; i < collect->satellites_visible; i++) {
-			(void)fprintf(stdout, "    %2.2d: %2.2d %3.3d %3.0f %c\n", collect->skyview[i].PRN,
+			(void)fprintf(stdout, "    %2.2d: %2.2f %3.3f %3.0f %c\n", collect->skyview[i].PRN,
 						  collect->skyview[i].elevation, collect->skyview[i].azimuth,
 						  collect->skyview[i].ss, collect->skyview[i].used ? 'Y' : 'N');
 		}

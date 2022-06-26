@@ -427,7 +427,7 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 	printLandmarks(landmarks, LOG_DEBUG);
 	// check if any of the landmark data is new
 	bool new_landmark_data = false;
-	for (int i = 0; i < landmarks.size(); i++) {
+	for (size_t i = 0; i < landmarks.size(); i++) {
 		const auto& lm = landmarks[i];
 		// we don't check isFresh() because that's handled in the AR code
 		if (lm) {
