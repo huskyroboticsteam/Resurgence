@@ -133,7 +133,7 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
-			std::to_string(joint).c_str());
+			util::to_string(joint).c_str());
 	}
 }
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
@@ -147,7 +147,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
 		log(LOG_WARN, "getJointPower called for currently unsupported joint %s\n",
-			std::to_string(joint).c_str());
+			util::to_string(joint).c_str());
 		return {};
 	}
 }
@@ -191,7 +191,7 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	} else {
 		// FIXME: this should never happen and is only temporary
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
-			std::to_string(joint).c_str());
+			util::to_string(joint).c_str());
 	}
 }
 } // namespace

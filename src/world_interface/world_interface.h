@@ -235,9 +235,13 @@ callbackid_t addLimitSwitchCallback(
 
 void removeLimitSwitchCallback(callbackid_t id);
 
+// TODO: document
 void setJointPower(robot::types::jointid_t joint, double power);
+// TODO: document
 void setJointPos(robot::types::jointid_t joint, int32_t targetPos);
+// TODO: document
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint);
+// TODO: document
 void zeroJoint(robot::types::jointid_t joint);
 } // namespace robot
 
