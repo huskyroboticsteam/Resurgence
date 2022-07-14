@@ -7,7 +7,7 @@
 
 namespace Globals {
 RoverState curr_state;
-const net::websocket::SingleClientWSServer websocketServer("DefaultServer", Constants::WS_SERVER_PORT);
+net::websocket::SingleClientWSServer websocketServer("DefaultServer", Constants::WS_SERVER_PORT);
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
 auto mountedPeripheral = mountedperipheral_t::none;

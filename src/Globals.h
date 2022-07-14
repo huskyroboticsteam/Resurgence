@@ -28,7 +28,7 @@ namespace Globals {
    @deprecated
  */
 extern RoverState curr_state;
-extern const net::websocket::SingleClientWSServer websocketServer;
+extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern mountedperipheral_t mountedPeripheral;
