@@ -86,8 +86,8 @@ void setupCameras() {
 		arCam->openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
 		cameraMap[Constants::AR_CAMERA_ID] = arCam;
 	} catch (const std::exception& e) {
-		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n", Constants::AR_CAMERA_ID,
-			e.what());
+		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n",
+			util::to_string(Constants::AR_CAMERA_ID).c_str(), e.what());
 	}
 
 	// Set up the rest of the cameras here
@@ -110,7 +110,7 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	if (itr != cameraMap.end()) {
 		return itr->second->hasNext(oldFrameNum);
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return false;
 	}
 }
@@ -128,7 +128,7 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 			return DataPoint<CameraFrame>{};
 		}
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return DataPoint<CameraFrame>{};
 	}
 }
@@ -140,7 +140,7 @@ std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 		return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
 											: std::optional<cam::CameraParams>{};
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return {};
 	}
 }
@@ -152,7 +152,7 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 		return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
 											: std::optional<cv::Mat>{};
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", cameraID);
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return {};
 	}
 }
@@ -191,23 +191,6 @@ DataPoint<pose_t> readVisualOdomVel() {
 URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
-
-const std::unordered_map<motorid_t, double> positive_arm_pwm_scales = {
-	{motorid_t::armBase, 0.1831},
-	{motorid_t::shoulder, -0.3052},
-	{motorid_t::elbow, -0.5},
-	{motorid_t::forearm, -0.0916},
-	{motorid_t::differentialLeft, 0.0763},
-	{motorid_t::differentialRight, -0.0763},
-	{motorid_t::hand, 0.2289}};
-const std::unordered_map<motorid_t, double> negative_arm_pwm_scales = {
-	{motorid_t::armBase, 0.1831},
-	{motorid_t::shoulder, -0.2136},
-	{motorid_t::elbow, -0.2747},
-	{motorid_t::forearm, -0.0916},
-	{motorid_t::differentialLeft, 0.0763},
-	{motorid_t::differentialRight, -0.1526},
-	{motorid_t::hand, 0.2289}};
 
 template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 	auto itr = std::find(vec.begin(), vec.end(), val);

@@ -145,7 +145,7 @@ int main() {
 			// Serial 0 seems to work. Nothing else (up to 17, the largest I tried)
 			serial = prompt("Enter serial");
 			uint8_t sensor_code = 42; // Nonsense for now, just testing CAN connection
-			AssembleScienceSensorPullPacket(&p, science_group, (uint8_t)serial, sensor_code);
+			AssembleTelemetryPullPacket(&p, science_group, (uint8_t)serial, sensor_code);
 			can::sendCANPacket(p);
 		} else if (testMode == TestMode::ScienceMotors) {
 			// CAREFUL, there are no safety checks / limit switches
@@ -154,9 +154,8 @@ int main() {
 			// 2: drill rotate (clockwise/down is positive, ~300 PWM with no soil)
 			int motor_no = prompt("Enter motor no");
 			int pwm = prompt("Enter pwm");
-			AssembleScienceMotorControlPacket(&p, science_group, 0x0, (uint8_t)motor_no,
-											  (int16_t)pwm);
-			can::sendCANPacket(p);
+			can::motor::setMotorMode(motor_no, motormode_t::pwm);
+			can::motor::setMotorPower(motor_no, static_cast<int16_t>(pwm));
 		} else if (testMode == TestMode::ScienceServos) {
 			int servo_no = prompt("Enter servo no");
 			int degrees = prompt("Enter degrees");
