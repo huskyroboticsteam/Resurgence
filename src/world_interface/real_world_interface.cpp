@@ -87,7 +87,7 @@ void setupCameras() {
 		cameraMap[Constants::AR_CAMERA_ID] = arCam;
 	} catch (const std::exception& e) {
 		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n",
-			std::to_string(Constants::AR_CAMERA_ID).c_str(), e.what());
+			util::to_string(Constants::AR_CAMERA_ID).c_str(), e.what());
 	}
 
 	// Set up the rest of the cameras here
@@ -114,7 +114,7 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	if (itr != cameraMap.end()) {
 		return itr->second->hasNext(oldFrameNum);
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", std::to_string(cameraID).c_str());
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return false;
 	}
 }
@@ -132,7 +132,7 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 			return DataPoint<CameraFrame>{};
 		}
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", std::to_string(cameraID).c_str());
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return DataPoint<CameraFrame>{};
 	}
 }
@@ -144,7 +144,7 @@ std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 		return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
 											: std::optional<cam::CameraParams>{};
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", std::to_string(cameraID).c_str());
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return {};
 	}
 }
@@ -156,7 +156,7 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 		return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
 											: std::optional<cv::Mat>{};
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", std::to_string(cameraID).c_str());
+		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
 		return {};
 	}
 }

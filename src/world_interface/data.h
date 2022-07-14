@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../navtypes.h"
+#include "../Util.h"
 
 #include <bitset>
 #include <chrono>
@@ -266,7 +267,7 @@ private:
 
 } // namespace robot::types
 
-namespace std {
+namespace util {
 std::string to_string(robot::types::jointid_t joint);
 std::string to_string(const robot::types::CameraID& id);
-} // namespace std
+} // namespace util

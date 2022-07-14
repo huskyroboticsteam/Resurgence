@@ -213,6 +213,21 @@ std::unordered_set<K> keySet(const std::unordered_map<K, V>& input) {
 	return output;
 }
 
-uint64_t getUnixTime();
+/**
+ * @brief Convert the given value to a string.
+ *
+ * This method is necessary because we cannot extend the std namespace; having our own method
+ * allows us to extend it with template specializations whenever we want, and have it "fall
+ * back" to using the std version when no specialization is available.
+ *
+ * @param val The value to convert to string.
+ * @tparam The type of the value to convert to string.
+ * @return A string representation of that value, as a std::string. The exact representation of
+ * the value is up to the implementation.
+ */
+template <typename T>
+std::string to_string(const T& val) {
+	return std::to_string(val);
+}
 
 } // namespace util
