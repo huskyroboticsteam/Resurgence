@@ -159,12 +159,12 @@ const <a class="el" href="classDiffWristKinematics.html">DiffWristKinematics</a>
 <tr class="memitem:aa05c542f73e2d891ba2668a48b7a57b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnavtypes_1_1URCLeg.html">URCLeg</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aa05c542f73e2d891ba2668a48b7a57b8">getLeg</a> (int <a class="elRef" href="https://docs.opencv.org/4.2.0/d9/db7/group__datasets__gr.html#gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c">index</a>)</td></tr>
 <tr class="memdesc:aa05c542f73e2d891ba2668a48b7a57b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the URC leg of the given index.  <a href="namespacerobot.html#aa05c542f73e2d891ba2668a48b7a57b8">More...</a><br /></td></tr>
 <tr class="separator:aa05c542f73e2d891ba2668a48b7a57b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad44ac5c5e111853330b0025450e2acc3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ad44ac5c5e111853330b0025450e2acc3">setMotorPower</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, double power)</td></tr>
-<tr class="memdesc:ad44ac5c5e111853330b0025450e2acc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the PWM command of the given motor.  <a href="namespacerobot.html#ad44ac5c5e111853330b0025450e2acc3">More...</a><br /></td></tr>
-<tr class="separator:ad44ac5c5e111853330b0025450e2acc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a885f8a319493d7b6c2143a2414409d7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a885f8a319493d7b6c2143a2414409d7a">setMotorPos</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos)</td></tr>
-<tr class="memdesc:a885f8a319493d7b6c2143a2414409d7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the target position of the motor. This will have no effect if the motor does not support PID.  <a href="namespacerobot.html#a885f8a319493d7b6c2143a2414409d7a">More...</a><br /></td></tr>
-<tr class="separator:a885f8a319493d7b6c2143a2414409d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cbb6f1cbe802704b9e71c0f29700e45"><td class="memItemLeft" align="right" valign="top"><a id="a3cbb6f1cbe802704b9e71c0f29700e45" name="a3cbb6f1cbe802704b9e71c0f29700e45"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotorPower</b> (motorid_t motor, double normalizedPWM)</td></tr>
+<tr class="separator:a3cbb6f1cbe802704b9e71c0f29700e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa20f8b1067f70e82adc0b6bf538b6fe4"><td class="memItemLeft" align="right" valign="top"><a id="aa20f8b1067f70e82adc0b6bf538b6fe4" name="aa20f8b1067f70e82adc0b6bf538b6fe4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotorPos</b> (motorid_t motor, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos)</td></tr>
+<tr class="separator:aa20f8b1067f70e82adc0b6bf538b6fe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae800298bad4e0c54e8112edd16e860b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ae800298bad4e0c54e8112edd16e860b5">getMotorPos</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor)</td></tr>
 <tr class="memdesc:ae800298bad4e0c54e8112edd16e860b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last reported position of the specified motor.  <a href="namespacerobot.html#ae800298bad4e0c54e8112edd16e860b5">More...</a><br /></td></tr>
 <tr class="separator:ae800298bad4e0c54e8112edd16e860b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -197,6 +197,15 @@ constexpr <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstd
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a33cb8b052d5e3d7667019df5526b5fef"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><b>getIndex</b> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector</a>&lt; T &gt; &amp;vec, const T &amp;val)</td></tr>
 <tr class="separator:a33cb8b052d5e3d7667019df5526b5fef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad44ac5c5e111853330b0025450e2acc3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ad44ac5c5e111853330b0025450e2acc3">setMotorPower</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, double power)</td></tr>
+<tr class="memdesc:ad44ac5c5e111853330b0025450e2acc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the PWM command of the given motor.  <a href="namespacerobot.html#ad44ac5c5e111853330b0025450e2acc3">More...</a><br /></td></tr>
+<tr class="separator:ad44ac5c5e111853330b0025450e2acc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a885f8a319493d7b6c2143a2414409d7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a885f8a319493d7b6c2143a2414409d7a">setMotorPos</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos)</td></tr>
+<tr class="memdesc:a885f8a319493d7b6c2143a2414409d7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the target position of the motor. This will have no effect if the motor does not support PID.  <a href="namespacerobot.html#a885f8a319493d7b6c2143a2414409d7a">More...</a><br /></td></tr>
+<tr class="separator:a885f8a319493d7b6c2143a2414409d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a915a340eeb215123cbde249845595c9f"><td class="memItemLeft" align="right" valign="top"><a id="a915a340eeb215123cbde249845595c9f" name="a915a340eeb215123cbde249845595c9f"></a>
+<a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getMotorPos</b> (motorid_t motor)</td></tr>
+<tr class="separator:a915a340eeb215123cbde249845595c9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b58b5557c06caa8eb3d64c510042a26"><td class="memItemLeft" align="right" valign="top"><a id="a3b58b5557c06caa8eb3d64c510042a26" name="a3b58b5557c06caa8eb3d64c510042a26"></a>
 callbackid_t&#160;</td><td class="memItemRight" valign="bottom"><b>addLimitSwitchCallback</b> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, const std::function&lt; void(<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="el" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a>&lt; <a class="el" href="classrobot_1_1types_1_1LimitSwitchData.html">robot::types::LimitSwitchData</a> &gt; limitSwitchData)&gt; &amp;callback)</td></tr>
 <tr class="separator:a3b58b5557c06caa8eb3d64c510042a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -207,30 +216,27 @@ Variables</h2></td></tr>
 const <a class="el" href="namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e">WorldInterface</a>&#160;</td><td class="memItemRight" valign="bottom"><b>WORLD_INTERFACE</b> = WorldInterface::noop</td></tr>
 <tr class="memdesc:ad2a31e2720609dd7619fc2bbafcf441e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current world interface being used. <br /></td></tr>
 <tr class="separator:ad2a31e2720609dd7619fc2bbafcf441e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47d4f531c954b2b70cd871438dead04b"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html">std::unordered_set</a>&lt; motorid_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a47d4f531c954b2b70cd871438dead04b">pidMotors</a></td></tr>
-<tr class="memdesc:a47d4f531c954b2b70cd871438dead04b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The set of motors that are PID controlled.  <a href="namespacerobot.html#a47d4f531c954b2b70cd871438dead04b">More...</a><br /></td></tr>
-<tr class="separator:a47d4f531c954b2b70cd871438dead04b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04bc8ef36eff8a3ba08ba6743e7782ce"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; motorid_t, <a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">can::deviceserial_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a04bc8ef36eff8a3ba08ba6743e7782ce">motorSerialIDMap</a></td></tr>
-<tr class="memdesc:a04bc8ef36eff8a3ba08ba6743e7782ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to their corresponding serial number.  <a href="namespacerobot.html#a04bc8ef36eff8a3ba08ba6743e7782ce">More...</a><br /></td></tr>
-<tr class="separator:a04bc8ef36eff8a3ba08ba6743e7782ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ae4dc4491b3870eabf7bcde9e388251"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; motorid_t, <a class="el" href="structrobot_1_1pidcoef__t.html">pidcoef_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a4ae4dc4491b3870eabf7bcde9e388251">motorPIDMap</a></td></tr>
-<tr class="memdesc:a4ae4dc4491b3870eabf7bcde9e388251"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of PID controlled motors to their pid coefficients.  <a href="namespacerobot.html#a4ae4dc4491b3870eabf7bcde9e388251">More...</a><br /></td></tr>
-<tr class="separator:a4ae4dc4491b3870eabf7bcde9e388251"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90f0167f90350503b542f1a7098953ea"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; motorid_t, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a90f0167f90350503b542f1a7098953ea">motorEncInvMap</a></td></tr>
-<tr class="memdesc:a90f0167f90350503b542f1a7098953ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map that represents whether a motor's encoder is inverted.  <a href="namespacerobot.html#a90f0167f90350503b542f1a7098953ea">More...</a><br /></td></tr>
-<tr class="separator:a90f0167f90350503b542f1a7098953ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a137af2b02d865426bf9c5f3d0a096121"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a2e2bf34f6d75c7c4bd05605e1c5e33e1">uint32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a137af2b02d865426bf9c5f3d0a096121">motorPulsesPerJointRevMap</a></td></tr>
-<tr class="memdesc:a137af2b02d865426bf9c5f3d0a096121"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to the number of pulses per joint revolution.  <a href="namespacerobot.html#a137af2b02d865426bf9c5f3d0a096121">More...</a><br /></td></tr>
-<tr class="separator:a137af2b02d865426bf9c5f3d0a096121"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56b26c6a8799a43ecd957f83813df04d"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a56b26c6a8799a43ecd957f83813df04d">positive_arm_pwm_scales</a></td></tr>
-<tr class="memdesc:a56b26c6a8799a43ecd957f83813df04d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to <br  />
-  <a href="namespacerobot.html#a56b26c6a8799a43ecd957f83813df04d">More...</a><br /></td></tr>
-<tr class="separator:a56b26c6a8799a43ecd957f83813df04d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b8a7285f3d9ea59377f010faa9aafd3"><td class="memItemLeft" align="right" valign="top">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a6b8a7285f3d9ea59377f010faa9aafd3">negative_arm_pwm_scales</a></td></tr>
-<tr class="separator:a6b8a7285f3d9ea59377f010faa9aafd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45b6bf094d15c6f5a91cc1bb25aad9e9"><td class="memItemLeft" align="right" valign="top"><a id="a45b6bf094d15c6f5a91cc1bb25aad9e9" name="a45b6bf094d15c6f5a91cc1bb25aad9e9"></a>
-const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>motorGearRatioMap</b></td></tr>
-<tr class="separator:a45b6bf094d15c6f5a91cc1bb25aad9e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98f16731da8ac7f980fe19c12aa3a4f8"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a98f16731da8ac7f980fe19c12aa3a4f8">pidMotors</a></td></tr>
+<tr class="memdesc:a98f16731da8ac7f980fe19c12aa3a4f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The set of motors that are PID controlled.  <a href="namespacerobot.html#a98f16731da8ac7f980fe19c12aa3a4f8">More...</a><br /></td></tr>
+<tr class="separator:a98f16731da8ac7f980fe19c12aa3a4f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa66a3a3666eb218c89671933350db78f"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">motorSerialIDMap</a></td></tr>
+<tr class="memdesc:aa66a3a3666eb218c89671933350db78f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to their corresponding serial number.  <a href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">More...</a><br /></td></tr>
+<tr class="separator:aa66a3a3666eb218c89671933350db78f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">motorPIDMap</a></td></tr>
+<tr class="memdesc:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of PID controlled motors to their pid coefficients.  <a href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">More...</a><br /></td></tr>
+<tr class="separator:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a436c1c0143c6eec42ef58f593178aa24"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a436c1c0143c6eec42ef58f593178aa24">motorEncInvMap</a></td></tr>
+<tr class="memdesc:a436c1c0143c6eec42ef58f593178aa24"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map that represents whether a motor's encoder is inverted.  <a href="namespacerobot.html#a436c1c0143c6eec42ef58f593178aa24">More...</a><br /></td></tr>
+<tr class="separator:a436c1c0143c6eec42ef58f593178aa24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a3f9d8b438d2f5a9d83f05e6520e07e1a">motorPulsesPerJointRevMap</a></td></tr>
+<tr class="memdesc:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to the number of pulses per joint revolution.  <a href="namespacerobot.html#a3f9d8b438d2f5a9d83f05e6520e07e1a">More...</a><br /></td></tr>
+<tr class="separator:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ad90b629578c7ed32a4d1f7e46c1d5e"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a4ad90b629578c7ed32a4d1f7e46c1d5e">positive_arm_pwm_scales</a></td></tr>
+<tr class="memdesc:a4ad90b629578c7ed32a4d1f7e46c1d5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to <br  />
+  <a href="namespacerobot.html#a4ad90b629578c7ed32a4d1f7e46c1d5e">More...</a><br /></td></tr>
+<tr class="separator:a4ad90b629578c7ed32a4d1f7e46c1d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a021a3bafbf7e6051e2ffc640c25eabb2"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a021a3bafbf7e6051e2ffc640c25eabb2">negative_arm_pwm_scales</a></td></tr>
+<tr class="separator:a021a3bafbf7e6051e2ffc640c25eabb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae917757337e6e1a1b99392c7c1db4069"><td class="memItemLeft" align="right" valign="top"><a id="ae917757337e6e1a1b99392c7c1db4069" name="ae917757337e6e1a1b99392c7c1db4069"></a>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>WHEEL_BASE</b> = 0.66</td></tr>
 <tr class="separator:ae917757337e6e1a1b99392c7c1db4069"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -817,8 +823,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a90f0167f90350503b542f1a7098953ea" name="a90f0167f90350503b542f1a7098953ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90f0167f90350503b542f1a7098953ea">&#9670;&nbsp;</a></span>motorEncInvMap</h2>
+<a id="a436c1c0143c6eec42ef58f593178aa24" name="a436c1c0143c6eec42ef58f593178aa24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a436c1c0143c6eec42ef58f593178aa24">&#9670;&nbsp;</a></span>motorEncInvMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -827,30 +833,30 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, bool &gt; robot::motorEncInvMap</td>
+          <td class="memname">constexpr auto robot::motorEncInvMap</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {motorid_t::armBase, <span class="keyword">false</span>},</div>
-<div class="line">    {motorid_t::shoulder, <span class="keyword">false</span>},</div>
-<div class="line">    {motorid_t::elbow, <span class="keyword">true</span>},</div>
-<div class="line">    {motorid_t::forearm, <span class="keyword">false</span>},</div>
-<div class="line">    {motorid_t::differentialLeft, <span class="keyword">false</span>},</div>
-<div class="line">    {motorid_t::differentialRight, <span class="keyword">false</span>}}</div>
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    frozen::make_unordered_map&lt;motorid_t, bool&gt;({{motorid_t::armBase, <span class="keyword">false</span>},</div>
+<div class="line">                                                 {motorid_t::shoulder, <span class="keyword">false</span>},</div>
+<div class="line">                                                 {motorid_t::elbow, <span class="keyword">true</span>},</div>
+<div class="line">                                                 {motorid_t::forearm, <span class="keyword">false</span>},</div>
+<div class="line">                                                 {motorid_t::differentialLeft, <span class="keyword">false</span>},</div>
+<div class="line">                                                 {motorid_t::differentialRight, <span class="keyword">false</span>}})</div>
 </div><!-- fragment -->
 <p>A map that represents whether a motor's encoder is inverted. </p>
-<p >If a value is true, that motor's encoder should be inverted. If a motor is not in this map, it's encoder should not be inverted, if it has one. </p>
+<p >If a value is true, that motor's encoder should be inverted. If a motor is not in this map, its encoder should not be inverted, if it has one. </p>
 
 </div>
 </div>
-<a id="a4ae4dc4491b3870eabf7bcde9e388251" name="a4ae4dc4491b3870eabf7bcde9e388251"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ae4dc4491b3870eabf7bcde9e388251">&#9670;&nbsp;</a></span>motorPIDMap</h2>
+<a id="ac1eaa5d6745c8aad93d6304c0f8b1821" name="ac1eaa5d6745c8aad93d6304c0f8b1821"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1eaa5d6745c8aad93d6304c0f8b1821">&#9670;&nbsp;</a></span>motorPIDMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -859,26 +865,29 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, <a class="el" href="structrobot_1_1pidcoef__t.html">pidcoef_t</a> &gt; robot::motorPIDMap</td>
+          <td class="memname">constexpr auto robot::motorPIDMap</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {motorid_t::armBase, {1000, 50, 10000}},     {motorid_t::shoulder, {100, 0, 1000}},</div>
-<div class="line">    {motorid_t::elbow, {500, 50, 10000}},        {motorid_t::forearm, {1000, 0, 0}},</div>
-<div class="line">    {motorid_t::differentialLeft, {1000, 0, 0}}, {motorid_t::differentialRight, {1000, 0, 0}}}</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;(</div>
+<div class="line">    {{motorid_t::armBase, {1000, 50, 10000}},</div>
+<div class="line">     {motorid_t::shoulder, {100, 0, 1000}},</div>
+<div class="line">     {motorid_t::elbow, {500, 50, 10000}},</div>
+<div class="line">     {motorid_t::forearm, {1000, 0, 0}},</div>
+<div class="line">     {motorid_t::differentialLeft, {1000, 0, 0}},</div>
+<div class="line">     {motorid_t::differentialRight, {1000, 0, 0}}})</div>
 </div><!-- fragment -->
 <p>A mapping of PID controlled motors to their pid coefficients. </p>
 
 </div>
 </div>
-<a id="a137af2b02d865426bf9c5f3d0a096121" name="a137af2b02d865426bf9c5f3d0a096121"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a137af2b02d865426bf9c5f3d0a096121">&#9670;&nbsp;</a></span>motorPulsesPerJointRevMap</h2>
+<a id="a3f9d8b438d2f5a9d83f05e6520e07e1a" name="a3f9d8b438d2f5a9d83f05e6520e07e1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f9d8b438d2f5a9d83f05e6520e07e1a">&#9670;&nbsp;</a></span>motorPulsesPerJointRevMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -887,26 +896,29 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a2e2bf34f6d75c7c4bd05605e1c5e33e1">uint32_t</a> &gt; robot::motorPulsesPerJointRevMap</td>
+          <td class="memname">constexpr auto robot::motorPulsesPerJointRevMap</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {motorid_t::armBase, 17 * 1000},  {motorid_t::armBase, 20 * 1000},</div>
-<div class="line">    {motorid_t::armBase, 36 * 1000},  {motorid_t::armBase, 360 * 1000},</div>
-<div class="line">    {motorid_t::armBase, 360 * 1000}, {motorid_t::armBase, 360 * 1000}}</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, uint32_t&gt;(</div>
+<div class="line">    {{motorid_t::armBase, 17 * 1000},</div>
+<div class="line">     {motorid_t::shoulder, 20 * 1000},</div>
+<div class="line">     {motorid_t::elbow, 36 * 1000},</div>
+<div class="line">     {motorid_t::forearm, 360 * 1000},</div>
+<div class="line">     {motorid_t::differentialLeft, 360 * 1000},</div>
+<div class="line">     {motorid_t::differentialRight, 360 * 1000}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to the number of pulses per joint revolution. </p>
 
 </div>
 </div>
-<a id="a04bc8ef36eff8a3ba08ba6743e7782ce" name="a04bc8ef36eff8a3ba08ba6743e7782ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04bc8ef36eff8a3ba08ba6743e7782ce">&#9670;&nbsp;</a></span>motorSerialIDMap</h2>
+<a id="aa66a3a3666eb218c89671933350db78f" name="aa66a3a3666eb218c89671933350db78f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa66a3a3666eb218c89671933350db78f">&#9670;&nbsp;</a></span>motorSerialIDMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -915,56 +927,34 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, <a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">can::deviceserial_t</a> &gt; robot::motorSerialIDMap</td>
+          <td class="memname">constexpr auto robot::motorSerialIDMap</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},</div>
-<div class="line">    {motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},</div>
-<div class="line">    {motorid_t::rearLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},</div>
-<div class="line">    {motorid_t::rearRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BR},</div>
-<div class="line">    {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},</div>
-<div class="line">    {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},</div>
-<div class="line">    {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},</div>
-<div class="line">    {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},</div>
-<div class="line">    {motorid_t::differentialRight, DEVICE_SERIAL_MOTOR_DIFF_WRIST_R},</div>
-<div class="line">    {motorid_t::differentialLeft, DEVICE_SERIAL_MOTOR_DIFF_WRIST_L},</div>
-<div class="line">    {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}}</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, can::deviceserial_t&gt;(</div>
+<div class="line">    {{motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},</div>
+<div class="line">     {motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},</div>
+<div class="line">     {motorid_t::rearLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},</div>
+<div class="line">     {motorid_t::rearRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BR},</div>
+<div class="line">     {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},</div>
+<div class="line">     {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},</div>
+<div class="line">     {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},</div>
+<div class="line">     {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},</div>
+<div class="line">     {motorid_t::differentialRight, DEVICE_SERIAL_MOTOR_DIFF_WRIST_R},</div>
+<div class="line">     {motorid_t::differentialLeft, DEVICE_SERIAL_MOTOR_DIFF_WRIST_L},</div>
+<div class="line">     {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to their corresponding serial number. </p>
 
 </div>
 </div>
-<a id="a6b8a7285f3d9ea59377f010faa9aafd3" name="a6b8a7285f3d9ea59377f010faa9aafd3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b8a7285f3d9ea59377f010faa9aafd3">&#9670;&nbsp;</a></span>negative_arm_pwm_scales</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double &gt; robot::negative_arm_pwm_scales</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {motorid_t::armBase, 0.1831},</div>
-<div class="line">    {motorid_t::shoulder, -0.2136},</div>
-<div class="line">    {motorid_t::elbow, -0.2747},</div>
-<div class="line">    {motorid_t::forearm, -0.0916},</div>
-<div class="line">    {motorid_t::differentialLeft, 0.0763},</div>
-<div class="line">    {motorid_t::differentialRight, -0.1526},</div>
-<div class="line">    {motorid_t::hand, 0.2289}}</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a47d4f531c954b2b70cd871438dead04b" name="a47d4f531c954b2b70cd871438dead04b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47d4f531c954b2b70cd871438dead04b">&#9670;&nbsp;</a></span>pidMotors</h2>
+<a id="a021a3bafbf7e6051e2ffc640c25eabb2" name="a021a3bafbf7e6051e2ffc640c25eabb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a021a3bafbf7e6051e2ffc640c25eabb2">&#9670;&nbsp;</a></span>negative_arm_pwm_scales</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -973,42 +963,80 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html">std::unordered_set</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> &gt; robot::pidMotors</td>
+          <td class="memname">constexpr auto robot::negative_arm_pwm_scales</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    motorid_t::armBase, motorid_t::shoulder,         motorid_t::elbow,</div>
-<div class="line">    motorid_t::forearm, motorid_t::differentialLeft, motorid_t::differentialRight}</div>
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.1831},</div>
+<div class="line">                                                   {motorid_t::shoulder, -0.2136},</div>
+<div class="line">                                                   {motorid_t::elbow, -0.2747},</div>
+<div class="line">                                                   {motorid_t::forearm, -0.0916},</div>
+<div class="line">                                                   {motorid_t::differentialLeft, 0.0763},</div>
+<div class="line">                                                   {motorid_t::differentialRight, -0.1526},</div>
+<div class="line">                                                   {motorid_t::hand, 0.2289}})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a98f16731da8ac7f980fe19c12aa3a4f8" name="a98f16731da8ac7f980fe19c12aa3a4f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98f16731da8ac7f980fe19c12aa3a4f8">&#9670;&nbsp;</a></span>pidMotors</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr auto robot::pidMotors</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;motorid_t&gt;(</div>
+<div class="line">    {motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,</div>
+<div class="line">     motorid_t::differentialLeft, motorid_t::differentialRight})</div>
 </div><!-- fragment -->
 <p>The set of motors that are PID controlled. </p>
 
 </div>
 </div>
-<a id="a56b26c6a8799a43ecd957f83813df04d" name="a56b26c6a8799a43ecd957f83813df04d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56b26c6a8799a43ecd957f83813df04d">&#9670;&nbsp;</a></span>positive_arm_pwm_scales</h2>
+<a id="a4ad90b629578c7ed32a4d1f7e46c1d5e" name="a4ad90b629578c7ed32a4d1f7e46c1d5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ad90b629578c7ed32a4d1f7e46c1d5e">&#9670;&nbsp;</a></span>positive_arm_pwm_scales</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">motorid_t</a>, double &gt; robot::positive_arm_pwm_scales</td>
+          <td class="memname">constexpr auto robot::positive_arm_pwm_scales</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {motorid_t::armBase, 0.1831},</div>
-<div class="line">    {motorid_t::shoulder, -0.3052},</div>
-<div class="line">    {motorid_t::elbow, -0.5},</div>
-<div class="line">    {motorid_t::forearm, -0.0916},</div>
-<div class="line">    {motorid_t::differentialLeft, 0.0763},</div>
-<div class="line">    {motorid_t::differentialRight, -0.0763},</div>
-<div class="line">    {motorid_t::hand, 0.2289}}</div>
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.1831},</div>
+<div class="line">                                                   {motorid_t::shoulder, -0.3052},</div>
+<div class="line">                                                   {motorid_t::elbow, -0.5},</div>
+<div class="line">                                                   {motorid_t::forearm, -0.0916},</div>
+<div class="line">                                                   {motorid_t::differentialLeft, 0.0763},</div>
+<div class="line">                                                   {motorid_t::differentialRight, -0.0763},</div>
+<div class="line">                                                   {motorid_t::hand, 0.2289}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to <br  />
  </p>
