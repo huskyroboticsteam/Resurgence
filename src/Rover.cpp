@@ -65,6 +65,10 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 	return urc_legs;
 }
 
+void parseCommandLine(int argc, char** argv) {
+	
+}
+
 int main(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;

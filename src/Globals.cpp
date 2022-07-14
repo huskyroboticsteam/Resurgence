@@ -10,4 +10,5 @@ RoverState curr_state;
 net::websocket::SingleClientWSServer websocketServer("DefaultServer", Constants::WS_SERVER_PORT);
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
+auto mountedPeripheral = mountedperipheral_t::none;
 } // namespace Globals

@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.8) # Latest versions of Ubuntu should have at least 3.8
+cmake_minimum_required(VERSION 3.13) # Latest versions of Ubuntu should have at least 3.16;
+                                     # argparse library requires 3.12.4 currently
 
 set(CMAKE_CXX_STANDARD 17) # 11 For the json library, 17 for std library features
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -104,6 +105,10 @@ find_package(frozen REQUIRED)
 # it will not have any effect on size or performance. This will help us not have to worry about
 # making sure the headers are available in every file that includes Constants.h, for example.
 link_libraries(frozen::frozen)
+
+# Find argparse, library used for parsing command line arguments
+find_package(argparse REQUIRED)
+
 
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
