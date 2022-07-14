@@ -2,10 +2,13 @@
 #include "../Globals.h"
 #include "../Util.h"
 #include "../kinematics/DiffDriveKinematics.h"
+#include "../log.h"
 #include "../navtypes.h"
 #include "world_interface.h"
 
 #include <chrono>
+#include <mutex>
+#include <atomic>
 
 using namespace navtypes;
 using namespace robot::types;
@@ -13,17 +16,37 @@ using util::toTransform;
 
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
-
-static DataPoint<transform_t> lastOdom;
-static wheelvel_t commandedWheelVel{0, 0};
+using namespace std::chrono_literals;
 
 namespace robot {
 namespace {
+DataPoint<transform_t> lastOdom;
+wheelvel_t commandedWheelVel{0, 0};
+jointpos_t commandedWristPos{0, 0};
+std::mutex wristPosMutex;
+
 void setCmdVelToIntegrate(const wheelvel_t& wheelVels) {
 	auto odom = robot::readOdom();
 	lastOdom = odom;
 	commandedWheelVel = wheelVels;
 }
+
+void setJointMotorPower(robot::types::jointid_t joint, double power);
+const std::unordered_map<robot::types::jointid_t, robot::types::motorid_t> jointMotorMap{
+	{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
+	{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
+	{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
+	{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
+	{robot::types::jointid_t::hand, robot::types::motorid_t::hand}};
+
+constexpr auto jointPowerRepeatDelay = 333ms;
+std::thread jointPowerRepeatThread;
+void jointPowerRepeatTask();
+
+std::unordered_map<types::jointid_t, double> jointPowerValues{};
+std::mutex jointPowerValuesMutex;
+void setJointPowerValue(types::jointid_t joint, double power);
+double getJointPowerValue(types::jointid_t joint);
 } // namespace
 
 DataPoint<transform_t> readOdom() {
@@ -70,5 +93,107 @@ std::pair<double, double> getCmdVel() {
 	pose_t robotVel = driveKinematics().wheelVelToRobotVel(l, r);
 	return {robotVel(2), robotVel(0)};
 }
+
+
+void setJointPower(robot::types::jointid_t joint, double power) {
+	// make sure power value is normalized
+	if (std::abs(power) > 1) {
+		power /= std::abs(power);
+	}
+
+	// store power value
+	setJointPowerValue(joint, power);
+	// set motor power
+	setJointMotorPower(joint, power);
+}
+
+void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
+	using robot::types::jointid_t;
+	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
+		setMotorPos(jointMotorMap.at(joint), targetPos);
+	}
+	// FIXME: need to do some extra control (probably implementing our own PID control) for the
+	// differential position, since the potentiometers are giving us joint position instead of
+	// motor position.
+	/*
+	else if (joint == jointid_t::differentialPitch || joint == jointid_t::differentialRoll) {
+		std::lock_guard<std::mutex> lk(wristPosMutex);
+		if (joint == jointid_t::differentialPitch){
+			commandedWristPos.pitch = targetPos;
+		} else {
+			commandedWristPos.roll = targetPos;
+		}
+		gearpos_t gearPos = wristKinematics().jointPosToGearPos(commandedWristPos);
+		setMotorPos(motorid_t::differentialLeft, gearPos.left);
+		setMotorPos(motorid_t::differentialRight, gearPos.right);
+	}
+	*/
+	else {
+		// FIXME: this should ideally never happen, but we don't have support for all joints
+		// yet because we don't know anything about the drill arm (and need to do extra work
+		// for the differential)
+		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
+			std::to_string(joint).c_str());
+	}
+}
+types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
+	if(jointMotorMap.find(joint) != jointMotorMap.end()){
+		return getMotorPos(jointMotorMap.at(joint));
+	}
+	// FIXME: need to do some extra work for differential - we will have to figure out which
+	// motor boards the potentiometers are plugged into and query those for "motor position"
+	else {
+		// FIXME: this should ideally never happen, but we don't have support for all joints
+		// yet because we don't know anything about the drill arm (and need to do extra work
+		// for the differential)
+		log(LOG_WARN, "getJointPower called for currently unsupported joint %s\n",
+			std::to_string(joint).c_str());
+		return {};
+	}
+}
+
+namespace {
+void setJointPowerValue(types::jointid_t joint, double power){
+	// make sure power value is normalized
+	if (std::abs(power) > 1) {
+		power /= std::abs(power);
+	}
+
+	std::lock_guard<std::mutex> jointPwrValLock(jointPowerValuesMutex);
+	jointPowerValues[joint] = power;
+}
+
+double getJointPowerValue(types::jointid_t joint) {
+	std::lock_guard<std::mutex> jointPwrValLock(jointPowerValuesMutex);
+	if (jointPowerValues.find(joint) == jointPowerValues.end()) {
+		jointPowerValues.emplace(joint, 0);
+	}
+	return jointPowerValues.at(joint);
+}
+
+void setJointMotorPower(robot::types::jointid_t joint, double power) {
+	using robot::types::jointid_t;
+
+	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
+		setMotorPower(jointMotorMap.at(joint), power);
+	} else if (joint == jointid_t::differentialPitch) {
+		float pitchPwr = power;
+		float rollPwr = getJointPowerValue(jointid_t::differentialRoll);
+		gearpos_t gearPwr = wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
+		setMotorPos(motorid_t::differentialLeft, gearPwr.left);
+		setMotorPos(motorid_t::differentialRight, gearPwr.right);
+	} else if (joint == jointid_t::differentialRoll) {
+		float pitchPwr = getJointPowerValue(jointid_t::differentialPitch);
+		float rollPwr = power;
+		gearpos_t gearPwr = wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
+		setMotorPos(motorid_t::differentialLeft, gearPwr.left);
+		setMotorPos(motorid_t::differentialRight, gearPwr.right);
+	} else {
+		// FIXME: this should never happen and is only temporary
+		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
+			std::to_string(joint).c_str());
+	}
+}
+} // namespace
 
 } // namespace robot
