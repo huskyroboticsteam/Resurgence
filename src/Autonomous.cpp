@@ -482,7 +482,9 @@ transform_t Autonomous::optimizePoseGraph(transform_t current_odom) {
 }
 
 void Autonomous::autonomyIter() {
-	if (robot::gpsHasFix() && !initialized) {
+	if (!Globals::AUTONOMOUS) {
+		return;
+	} else if (robot::gpsHasFix() && !initialized) {
 		init();
 	} else if (!robot::gpsHasFix()) {
 		log(LOG_WARN, "Waiting for GPS fix...\n");
