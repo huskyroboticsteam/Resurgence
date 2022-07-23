@@ -8,6 +8,9 @@
 #include <optional>
 #include <vector>
 
+#include <frozen/string.h>
+#include <frozen/unordered_map.h>
+
 // forward declare cv::Mat instead of importing OpenCV
 // we do this to avoid unnecessarily including OpenCV in all build targets
 namespace cv {
@@ -67,6 +70,17 @@ enum class jointid_t {
 	hand,
 	drill_arm
 };
+
+constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
+	{{"armBase", jointid_t::armBase},
+	 {"shoulder", jointid_t::shoulder},
+	 {"elbow", jointid_t::elbow},
+	 {"forearm", jointid_t::forearm},
+	 {"differentialRoll", jointid_t::differentialRoll},
+	 {"differentialPitch", jointid_t::differentialPitch},
+	 {"hand", jointid_t::hand},
+	 {"drillArm", jointid_t::drill_arm}});
+
 /**
  * @brief Represents parameters defining a potentiometer scale.
  *

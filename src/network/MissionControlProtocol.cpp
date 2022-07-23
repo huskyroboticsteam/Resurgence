@@ -124,10 +124,15 @@ static bool validateJointPowerRequest(const json& j) {
 }
 
 static void handleJointPowerRequest(const json& j) {
-	std::string motor = j["joint"];
+	using robot::types::jointid_t;
+	using robot::types::name_to_jointid;
+	std::string joint = j["joint"];
 	double power = j["power"];
-	// TODO adapt this when we have the new CAN/motor interface
-	//setMotorPWM(motor, power);
+	auto it = name_to_jointid.find(joint);
+	if(it != name_to_jointid.end()) {
+		jointid_t joint_id = it->second;
+		robot::setJointPower(joint_id, power);
+	}
 }
 
 static bool validateJointPositionRequest(const json& j) {
@@ -255,6 +260,7 @@ static bool validateKey(const json& j, const std::string& key,
 
 static bool validateOneOf(const json& j, const std::string& key,
 						  const std::unordered_set<std::string>& vals) {
+	// TODO convert this to use Frozen sets
 	return validateKey(j, key, val_t::string) &&
 		   vals.find(static_cast<std::string>(j[key])) != vals.end();
 }
