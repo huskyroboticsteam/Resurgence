@@ -128,7 +128,7 @@ static void handleJointPowerRequest(const json& j) {
 	using robot::types::name_to_jointid;
 	std::string joint = j["joint"];
 	double power = j["power"];
-	auto it = name_to_jointid.find(joint);
+	auto it = name_to_jointid.find(frozen::string(joint.c_str(), joint.size()));
 	if(it != name_to_jointid.end()) {
 		jointid_t joint_id = it->second;
 		robot::setJointPower(joint_id, power);
