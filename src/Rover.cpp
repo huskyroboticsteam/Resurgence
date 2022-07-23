@@ -1,10 +1,10 @@
 #include "Autonomous.h"
 #include "Constants.h"
 #include "Globals.h"
-#include "network/MissionControlProtocol.h"
 #include "Util.h"
-#include "navtypes.h"
 #include "log.h"
+#include "navtypes.h"
+#include "network/MissionControlProtocol.h"
 #include "rospub.h"
 #include "world_interface/world_interface.h"
 
@@ -18,6 +18,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <argparse/argparse.hpp>
+#include <frozen/unordered_set.h>
+#include <frozen/string.h>
 #include <sys/time.h>
 
 using std::chrono::duration_cast;
@@ -59,13 +62,34 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 
 	if (urc_legs.size() == 0) {
 		log(LOG_ERROR, "could not get URC legs\n");
-		exit(EXIT_FAILURE);
+		std::exit(EXIT_FAILURE);
 	}
 
 	return urc_legs;
 }
 
 void parseCommandLine(int argc, char** argv) {
+	// *  argparse::ArgumentParser program("Rover");
+
+	// *  program.add_argument("-p", "--peripheral")
+	// *  	.help("specify the peripheral mounted on the rover")
+	// *  	.default_value(std::string("none"))
+	// *  	.action([](const std::string& value) {
+	// *  		constexpr frozen::unordered choices = frozen::make_unordered_set<frozen::string>({"lidar", "science", "arm", "none"});
+	// *  		if (choices.find(value) != choices.end()) {
+	// *  			return value;
+	// *  		} else {
+	// *  			throw std::runtime_error("Invalid peripheral " + value);
+	// *  		}
+	// *  	});
+	// *  try {
+	// *  	program.parse_args(argc, argv);
+	// *  } catch (const std::runtime_error& err) {
+	// *  	std::cerr << err.what() << std::endl;
+	// *  	std::cerr << program;
+	// *  	std::exit(EXIT_FAILURE);
+	// *  }
+
 	
 }
 
