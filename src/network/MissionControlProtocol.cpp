@@ -103,7 +103,7 @@ static void handleDriveRequest(const json& j) {
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
-	double steer = j["steer"];
+	double steer = -j["steer"].get<double>();
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? -steer / norm : steer);

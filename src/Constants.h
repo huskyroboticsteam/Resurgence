@@ -85,7 +85,7 @@ constexpr double ELBOW_MIN = 0.0;
 constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent self-collisions
 
 constexpr const char* AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
-const robot::types::CameraID AR_CAMERA_ID = "AR_CAMERA"; // TODO: replace with real camera name
+const robot::types::CameraID AR_CAMERA_ID = "front"; // TODO: replace with real camera name
 
 /**
    @deprecated No need for this constant once we fully switch over the Mission Control PlanViz

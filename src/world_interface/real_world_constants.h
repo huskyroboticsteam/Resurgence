@@ -86,6 +86,10 @@ constexpr auto positive_arm_pwm_scales =
 												   {motorid_t::forearm, -0.0916},
 												   {motorid_t::differentialLeft, 0.0763},
 												   {motorid_t::differentialRight, -0.0763},
+												   {motorid_t::frontLeftWheel, -0.5},
+												   {motorid_t::frontRightWheel, 0.5},
+												   {motorid_t::rearLeftWheel, -0.5},
+												   {motorid_t::rearRightWheel, -0.5},
 												   {motorid_t::hand, 0.2289}});
 constexpr auto negative_arm_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.1831},
@@ -93,6 +97,10 @@ constexpr auto negative_arm_pwm_scales =
 												   {motorid_t::elbow, -0.2747},
 												   {motorid_t::forearm, -0.0916},
 												   {motorid_t::differentialLeft, 0.0763},
+                                                   {motorid_t::frontLeftWheel, -0.5},
+												   {motorid_t::frontRightWheel, 0.5},
+												   {motorid_t::rearLeftWheel, -0.5},
+												   {motorid_t::rearRightWheel, -0.5},
 												   {motorid_t::differentialRight, -0.1526},
 												   {motorid_t::hand, 0.2289}});
 
