@@ -18,6 +18,10 @@ using namespace navtypes;
 namespace rospub {
 namespace ws = websocketpp;
 
+// TODO: Completely remove this in favor of using the new plan reports
+/**
+   @deprecated
+ */
 class PlanVizServer {
 public:
 	PlanVizServer();

@@ -106,10 +106,12 @@ int main(int argc, char** argv) {
 	signal(SIGINT, closeRover);
 
 	// Target locations for autonomous navigation
-	// Eventually this will be set by communication from the base station
+	// FIXME: Eventually this will be set by communication from the base station
 	std::vector<URCLegGPS> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
 	Autonomous autonomous(urc_legs, Constants::CONTROL_HZ);
 	auto roverStart = steady_clock::now();
+	// FIXME: should this possibly be a while loop instead? doesn't look like we're using the
+	// value of iter anywhere 
 	for (int iter = 0; /*no termination condition*/; iter++) {
 		auto loopStart = steady_clock::now();
 		long loopStartElapsedUsecs =

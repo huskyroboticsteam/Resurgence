@@ -84,6 +84,7 @@ constexpr double SHOULDER_MAX = M_PI * 5. / 6.; // Can't quite lie flat
 constexpr double ELBOW_MIN = 0.0;
 constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent self-collisions
 
+// TODO: We need to recalibrate the camera, since we replaced it with a different one.
 constexpr const char* AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
 const robot::types::CameraID AR_CAMERA_ID = "front"; // TODO: replace with real camera name
 

@@ -21,6 +21,7 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
+// TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
@@ -113,7 +114,7 @@ static void handleDriveRequest(const json& j) {
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? -steer / norm : steer);
-	log(LOG_INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
+	log(LOG_TRACE, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
 		dtheta, dx);
 	robot::setCmdVel(dtheta, dx);
 }
