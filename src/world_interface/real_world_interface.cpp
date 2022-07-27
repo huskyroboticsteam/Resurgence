@@ -203,7 +203,7 @@ template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 
 void setMotorPower(robot::types::motorid_t motor, double power) {
 	can::deviceserial_t serial = motorSerialIDMap.at(motor);
-	auto& scaleMap = power < 0 ? negative_arm_pwm_scales : positive_arm_pwm_scales;
+	auto& scaleMap = power < 0 ? negative_pwm_scales : positive_pwm_scales;
 	auto entry = scaleMap.find(motor);
 	if (entry != scaleMap.end()) {
 		power *= entry->second;
