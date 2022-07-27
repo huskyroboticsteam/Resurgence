@@ -7,10 +7,6 @@
 #include <string>
 
 namespace Constants {
-/**
-   @deprecated No need for this constant once we fully switch to the new network protocol
- */
-constexpr size_t PACKET_PAYLOAD_SIZE = 8;
 // TODO: make sure these are still accurate with the new arm.
 constexpr double SHOULDER_LENGTH = 0.6; // placeholder(m)
 constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
