@@ -69,6 +69,7 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 }
 
 void parseCommandLine(int argc, char** argv) {
+	// TODO: implement this method and use it to set the mounted peripheral
 	// *  argparse::ArgumentParser program("Rover");
 
 	// *  program.add_argument("-p", "--peripheral")

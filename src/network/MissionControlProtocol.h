@@ -19,7 +19,7 @@ using robot::types::CameraID;
 using websocket::SingleClientWSServer;
 using websocket::WebSocketProtocol;
 
-class MissionControlProtocol : public WebSocketProtocol {
+class MissionControlProtocol : public WebSocketProtocol { // TODO: add documentation
 public:
 	MissionControlProtocol(SingleClientWSServer& server);
 	~MissionControlProtocol();

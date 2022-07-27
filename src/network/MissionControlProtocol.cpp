@@ -37,6 +37,8 @@ constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
 constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
+// TODO: add support for missing report types
+// autonomousPlannedPathReport, poseConfidenceReport
 
 /**
    Check if the given json object has the given key.
@@ -79,6 +81,10 @@ static void handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
 		robot::setCmdVel(0, 0);
+		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
+		// use it to send estop packets to all motor controllers.
+		// This will stop the arm and everything else too.
+		// @see can::motor::emergencyStopMotors()
 	}
 	Globals::E_STOP = stop;
 }
@@ -177,12 +183,16 @@ void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 }
 
 void MissionControlProtocol::handleConnection() {
+	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", "arm"}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams() {
+	// TODO: Add support for tank drive requests
+	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill, syringe)
+
 	this->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
 							validateEmergencyStopRequest);
 	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
@@ -205,6 +215,8 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
+	// TODO: add new thread to handle resending motor power values
+	// TODO: add new thread to periodically send motor status reports
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
