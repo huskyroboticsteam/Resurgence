@@ -1,11 +1,10 @@
-#include "Rover.h"
-
 #include "Autonomous.h"
-#include "CommandLineOptions.h"
+#include "Constants.h"
 #include "Globals.h"
 #include "Util.h"
-#include "navtypes.h"
 #include "log.h"
+#include "navtypes.h"
+#include "network/MissionControlProtocol.h"
 #include "rospub.h"
 #include "world_interface/world_interface.h"
 
@@ -19,6 +18,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <argparse/argparse.hpp>
+#include <frozen/unordered_set.h>
+#include <frozen/string.h>
 #include <sys/time.h>
 
 using std::chrono::duration_cast;
@@ -60,28 +62,56 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 
 	if (urc_legs.size() == 0) {
 		log(LOG_ERROR, "could not get URC legs\n");
-		exit(0);
+		std::exit(EXIT_FAILURE);
 	}
 
 	return urc_legs;
 }
 
-int rover_loop(int argc, char** argv) {
+void parseCommandLine(int argc, char** argv) {
+	// TODO: implement this method and use it to set the mounted peripheral
+	// *  argparse::ArgumentParser program("Rover");
+
+	// *  program.add_argument("-p", "--peripheral")
+	// *  	.help("specify the peripheral mounted on the rover")
+	// *  	.default_value(std::string("none"))
+	// *  	.action([](const std::string& value) {
+	// *  		constexpr frozen::unordered choices = frozen::make_unordered_set<frozen::string>({"lidar", "science", "arm", "none"});
+	// *  		if (choices.find(value) != choices.end()) {
+	// *  			return value;
+	// *  		} else {
+	// *  			throw std::runtime_error("Invalid peripheral " + value);
+	// *  		}
+	// *  	});
+	// *  try {
+	// *  	program.parse_args(argc, argv);
+	// *  } catch (const std::runtime_error& err) {
+	// *  	std::cerr << err.what() << std::endl;
+	// *  	std::cerr << program;
+	// *  	std::exit(EXIT_FAILURE);
+	// *  }
+
+	
+}
+
+int main(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
+	net::mc::MissionControlProtocol mcProto(Globals::websocketServer);
+	Globals::websocketServer.addProtocol(mcProto);
 	robot::world_interface_init();
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
-	Globals::opts = ParseCommandLineOptions(argc, argv);
-	CANPacket packet;
 
 	// Target locations for autonomous navigation
-	// Eventually this will be set by communication from the base station
+	// FIXME: Eventually this will be set by communication from the base station
 	std::vector<URCLegGPS> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
-	Autonomous autonomous(urc_legs, CONTROL_HZ);
+	Autonomous autonomous(urc_legs, Constants::CONTROL_HZ);
 	auto roverStart = steady_clock::now();
+	// FIXME: should this possibly be a while loop instead? doesn't look like we're using the
+	// value of iter anywhere 
 	for (int iter = 0; /*no termination condition*/; iter++) {
 		auto loopStart = steady_clock::now();
 		long loopStartElapsedUsecs =
@@ -97,7 +127,7 @@ int rover_loop(int argc, char** argv) {
 
 		long elapsedUsecs =
 			duration_cast<microseconds>(steady_clock::now() - loopStart).count();
-		long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
+		long desiredUsecs = 1000 * 1000 / Constants::CONTROL_HZ;
 		if (desiredUsecs - elapsedUsecs > 0) {
 			// We drift by approximately 1ms per second unless we
 			// reduce our sleep time slightly
@@ -107,5 +137,5 @@ int rover_loop(int argc, char** argv) {
 				desiredUsecs / 1000, elapsedUsecs / 1000);
 		}
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }

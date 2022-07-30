@@ -1,7 +1,8 @@
 #include "WebSocketProtocol.h"
 
+#include "../../Constants.h"
 #include "../../log.h"
-
+namespace net {
 namespace websocket {
 
 static const std::string TYPE_KEY = "type";
@@ -10,13 +11,13 @@ WebSocketProtocol::WebSocketProtocol(const std::string& protocolPath)
 	: protocolPath(protocolPath), handlerMap(), validatorMap() {}
 
 bool WebSocketProtocol::addMessageHandler(const std::string& messageType,
-										  const std::function<void(json)>& callback) {
-	return this->addMessageHandler(messageType, callback, [](json) { return true; });
+										  const msghandler_t& callback) {
+	return this->addMessageHandler(messageType, callback, [](const json&) { return true; });
 }
 
 bool WebSocketProtocol::addMessageHandler(const std::string& messageType,
-										  const std::function<void(json)>& callback,
-										  const std::function<bool(json)>& validator) {
+										  const msghandler_t& callback,
+										  const validator_t& validator) {
 	if (!hasMessageHandler(messageType)) {
 		handlerMap[messageType] = callback;
 		validatorMap[messageType] = validator;
@@ -37,11 +38,11 @@ bool WebSocketProtocol::removeMessageHandler(const std::string& messageType) {
 	return false;
 }
 
-void WebSocketProtocol::addConnectionHandler(const std::function<void()>& handler) {
+void WebSocketProtocol::addConnectionHandler(const connhandler_t& handler) {
 	connectionHandlers.push_back(handler);
 }
 
-void WebSocketProtocol::addDisconnectionHandler(const std::function<void()>& handler) {
+void WebSocketProtocol::addDisconnectionHandler(const connhandler_t& handler) {
 	disconnectionHandlers.push_back(handler);
 }
 
@@ -63,6 +64,9 @@ void WebSocketProtocol::processMessage(const json& obj) const {
 		auto validatorEntry = validatorMap.find(messageType);
 		if (validatorEntry != validatorMap.end()) {
 			if (validatorEntry->second(obj)) {
+				if (protocolPath == Constants::MC_PROTOCOL_NAME) {
+					log(LOG_INFO, "MC->R: %s\n", obj.dump().c_str());
+				}
 				handlerMap.at(messageType)(obj);
 			} else {
 				log(LOG_WARN, "Endpoint=%s : Invalid message received of type=%s: %s\n",
@@ -83,3 +87,4 @@ std::string WebSocketProtocol::getProtocolPath() const {
 }
 
 } // namespace websocket
+} // namespace net

@@ -1,9 +1,9 @@
 #include "CAN/CAN.h"
 #include "CAN/CANMotor.h"
-#include "Rover.h"
 #include "log.h"
 #include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"
+#include "Constants.h"
 
 #include <csignal>
 #include <ctime>
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
 			   current_angle);
 		total_steps += 1;
 
-		timestep += 1.0 / CONTROL_HZ;
+		timestep += 1.0 / Constants::CONTROL_HZ;
 		angle_target =
 			(int32_t)round(amplitude * sin(2 * M_PI * timestep / period)) + starting_angle;
 
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 		gettimeofday(&tp0, NULL);
 		long elapsedUsecs =
 			(tp0.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp0.tv_usec - tp_start.tv_usec);
-		long desiredUsecs = 1000 * 1000 / CONTROL_HZ;
+		long desiredUsecs = 1000 * 1000 / Constants::CONTROL_HZ;
 		if (desiredUsecs - elapsedUsecs > 0) {
 			usleep(desiredUsecs - elapsedUsecs);
 		} else {

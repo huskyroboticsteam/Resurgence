@@ -494,6 +494,11 @@ int main(int argc, char** argv) {
 	if (capture.isOpened())
 		printf("%s", liveCaptureHelp);
 
+	imageSize = {640, 480}; // TODO change this
+
+	capture.set(cv::CAP_PROP_FRAME_WIDTH, imageSize.width);
+	capture.set(cv::CAP_PROP_FRAME_HEIGHT, imageSize.height);
+
 	cv::namedWindow("Image View", 1);
 
 	for (i = 0;; i++) {

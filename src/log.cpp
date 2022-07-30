@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdarg.h>
 
-int LOG_LEVEL = LOG_TRACE;
+int LOG_LEVEL = LOG_INFO;
 
 void log(int level, const char* fmt, ...) {
 	va_list arg;

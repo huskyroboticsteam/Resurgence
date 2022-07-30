@@ -7,6 +7,7 @@
 #include "../kinematics/DiffWristKinematics.h"
 
 #include <optional>
+#include <unordered_set>
 
 // forward declare cam::CameraParams instead of including it
 // we do this to avoid unnecessarily including OpenCV in all build targets
@@ -30,6 +31,7 @@ enum class WorldInterface { real, sim2d, sim3d, noop };
 /** @brief The current world interface being used. */
 extern const WorldInterface WORLD_INTERFACE;
 
+// TODO: add documentation
 const DiffDriveKinematics& driveKinematics();
 const DiffWristKinematics& wristKinematics();
 
@@ -67,6 +69,14 @@ std::pair<double, double> getCmdVel();
  * @return types::DataPoint<navtypes::points_t> The lidar scan, if available.
  */
 types::DataPoint<navtypes::points_t> readLidarScan();
+
+/**
+ * @brief Get the IDs of the currently supported cameras.
+ *
+ * @return The IDs of all cameras currently supported by the world interface, as a @ref
+ * std::unordered_set.
+ */
+std::unordered_set<types::CameraID> getCameras();
 
 /**
  * @brief Check if a new camera frame from the specified camera is available.
@@ -220,12 +230,20 @@ using callbackid_t = unsigned long long;
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
-	const std::function<void(robot::types::motorid_t motor,
-					   robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>&
-		callback);
+	const std::function<void(
+		robot::types::motorid_t motor,
+		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
 void removeLimitSwitchCallback(callbackid_t id);
 
+// TODO: document
+void setJointPower(robot::types::jointid_t joint, double power);
+// TODO: document
+void setJointPos(robot::types::jointid_t joint, int32_t targetPos);
+// TODO: document
+types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint);
+// TODO: document
+void zeroJoint(robot::types::jointid_t joint);
 } // namespace robot
 
 namespace gps {

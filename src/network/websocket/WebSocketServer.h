@@ -11,6 +11,7 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
+namespace net {
 namespace websocket {
 
 using nlohmann::json;
@@ -112,3 +113,4 @@ private:
 	void serverTask();
 };
 } // namespace websocket
+} // namespace net

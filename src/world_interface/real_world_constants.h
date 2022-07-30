@@ -78,21 +78,36 @@ constexpr auto motorPulsesPerJointRevMap = frozen::make_unordered_map<motorid_t,
 	 {motorid_t::differentialLeft, 360 * 1000},
 	 {motorid_t::differentialRight, 360 * 1000}});
 
-/** @brief A mapping of motorids to  */
-constexpr auto positive_arm_pwm_scales =
+/**
+ * @brief A mapping of motorids to power scale factors when commanded with positive power.
+ * Negative values mean that the motor is inverted.
+*/
+constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.1831},
 												   {motorid_t::shoulder, -0.3052},
 												   {motorid_t::elbow, -0.5},
 												   {motorid_t::forearm, -0.0916},
 												   {motorid_t::differentialLeft, 0.0763},
 												   {motorid_t::differentialRight, -0.0763},
+												   {motorid_t::frontLeftWheel, -0.5},
+												   {motorid_t::frontRightWheel, 0.5},
+												   {motorid_t::rearLeftWheel, -0.5},
+												   {motorid_t::rearRightWheel, -0.5},
 												   {motorid_t::hand, 0.2289}});
-constexpr auto negative_arm_pwm_scales =
+/**
+ * @brief A mapping of motorids to power scale factors when commanded with negative power.
+ * Negative values mean that the motor is inverted.
+*/
+constexpr auto negative_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.1831},
 												   {motorid_t::shoulder, -0.2136},
 												   {motorid_t::elbow, -0.2747},
 												   {motorid_t::forearm, -0.0916},
 												   {motorid_t::differentialLeft, 0.0763},
+                                                   {motorid_t::frontLeftWheel, -0.5},
+												   {motorid_t::frontRightWheel, 0.5},
+												   {motorid_t::rearLeftWheel, -0.5},
+												   {motorid_t::rearRightWheel, -0.5},
 												   {motorid_t::differentialRight, -0.1526},
 												   {motorid_t::hand, 0.2289}});
 

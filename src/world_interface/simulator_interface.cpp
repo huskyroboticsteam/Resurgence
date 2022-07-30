@@ -1,6 +1,6 @@
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../Networking/websocket/WebSocketProtocol.h"
+#include "../network/websocket/WebSocketProtocol.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
@@ -16,6 +16,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include <unordered_map>
 
 #include <nlohmann/json.hpp>
 #include <opencv2/core.hpp>
@@ -62,14 +63,14 @@ std::map<robot::callbackid_t, motorid_t> lsCallbackToMotorMap;
 std::mutex limitSwitchCallbackMapMutex; // protects both maps and nextCallbackID
 
 // stores the last camera frame for each camera
-std::map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
+std::unordered_map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // stores the index of the last camera frame for each camera
 // cameraFrameMap is not guaranteed to have valid data points,
 // but this one is guaranteed to have indices, if there are any
-std::map<CameraID, uint32_t> cameraLastFrameIdxMap;
+std::unordered_map<CameraID, uint32_t> cameraLastFrameIdxMap;
 std::shared_mutex cameraFrameMapMutex; // protects both of the above maps
 // not modified after startup, no need to synchronize
-std::map<CameraID, cam::CameraConfig> cameraConfigMap;
+std::unordered_map<CameraID, cam::CameraConfig> cameraConfigMap;
 
 std::condition_variable connectionCV;
 std::mutex connectionMutex;
@@ -79,16 +80,23 @@ void sendJSON(const json& obj) {
 	Globals::websocketServer.sendJSON(PROTOCOL_PATH, obj);
 }
 
+static void openCamera(CameraID cam, uint8_t fps = 20, uint16_t width = 640,
+					   uint16_t height = 480) {
+	json msg = {{"type", "simCameraStreamOpenRequest"},
+				{"camera", cam},
+				{"fps", fps},
+				{"width", width},
+				{"height", height}};
+	sendJSON(msg);
+}
+
 void initCameras() {
 	auto cfg = cam::readConfigFromFile(Constants::AR_CAMERA_CONFIG_PATH);
 	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
-
-	json msg = {{"type", "simCameraStreamOpenRequest"},
-				{"camera", Constants::AR_CAMERA_ID},
-				{"fps", 20},
-				{"width", 640},
-				{"height", 480}};
-	sendJSON(msg);
+	//openCamera(Constants::AR_CAMERA_ID);
+	openCamera("front");
+	openCamera("rear");
+	openCamera("upperArm");
 }
 
 void handleGPS(json msg) {
@@ -198,7 +206,7 @@ void clientDisconnected() {
 }
 
 void initSimServer() {
-	websocket::WebSocketProtocol protocol(PROTOCOL_PATH);
+	net::websocket::WebSocketProtocol protocol(PROTOCOL_PATH);
 	protocol.addMessageHandler("simImuOrientationReport", handleIMU);
 	protocol.addMessageHandler("simLidarReport", handleLidar);
 	protocol.addMessageHandler("simGpsPositionReport", handleGPS);
@@ -243,6 +251,11 @@ void world_interface_init() {
 	initCameras();
 
 	AR::initializeLandmarkDetection();
+}
+
+std::unordered_set<CameraID> getCameras(){
+	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
+	return util::keySet(cameraLastFrameIdxMap);
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {

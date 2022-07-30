@@ -8,6 +8,9 @@
 #include <optional>
 #include <vector>
 
+#include <frozen/string.h>
+#include <frozen/unordered_map.h>
+
 // forward declare cv::Mat instead of importing OpenCV
 // we do this to avoid unnecessarily including OpenCV in all build targets
 namespace cv {
@@ -55,6 +58,49 @@ enum class motorid_t {
 	differentialRight,
 	differentialLeft,
 	hand
+};
+
+enum class jointid_t {
+	armBase,
+	shoulder,
+	elbow,
+	forearm,
+	differentialRoll,
+	differentialPitch,
+	hand,
+	drill_arm
+};
+
+constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
+	{{"armBase", jointid_t::armBase},
+	 {"shoulder", jointid_t::shoulder},
+	 {"elbow", jointid_t::elbow},
+	 {"forearm", jointid_t::forearm},
+	 {"differentialRoll", jointid_t::differentialRoll},
+	 {"differentialPitch", jointid_t::differentialPitch},
+	 {"hand", jointid_t::hand},
+	 {"drillArm", jointid_t::drill_arm}});
+
+/**
+ * @brief Represents parameters defining a potentiometer scale.
+ *
+ * Contains two joint angles in millidegrees and their associated potentiometer ADC values;
+ * this defines a linear scale from potentiometer ADC value to joint angle that can be sent to
+ * the motor boards for position control and feedback.
+ */
+struct PotentiometerParams {
+	/**
+	   @brief Computes the potentiometer scale as a real number.
+	 */
+	constexpr float scale() const;
+	/** The "low" point on the ADC scale. */
+	uint16_t adc_lo;
+	/** The "low" point on the joint rotation scale. */
+	int32_t mdeg_lo;
+	/** The "high" point on the ADC scale. */
+	uint16_t adc_hi;
+	/** The "high" point on the joint rotation scale. */
+	int32_t mdeg_hi;
 };
 
 /**
@@ -236,5 +282,6 @@ private:
 } // namespace robot::types
 
 namespace util {
+std::string to_string(robot::types::jointid_t joint);
 std::string to_string(const robot::types::CameraID& id);
-}
+} // namespace util

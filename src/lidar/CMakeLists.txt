@@ -9,5 +9,5 @@ add_executable(lidar_vis
   MainVis.cpp
   LidarVis.cpp)
 target_include_directories(lidar_vis SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(lidar_interface URGLidar::urg_c RPLidar::RPLidar)
+target_link_libraries(lidar_interface URGLidar::urg_c RPLidar::RPLidar utils)
 target_link_libraries(lidar_vis lidar_interface ${OpenCV_LIBS})

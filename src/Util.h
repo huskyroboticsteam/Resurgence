@@ -4,6 +4,8 @@
 
 #include <chrono>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <Eigen/Geometry>
 
@@ -196,6 +198,20 @@ double stdn(int thread_id);
  * @return The random seed.
  */
 long getNormalSeed();
+
+/**
+ * @brief Get the keys of the given map.
+ *
+ * @param An unordered map.
+ * @return The keys of the given map, as an unordered set.
+ */
+template <typename K, typename V>
+std::unordered_set<K> keySet(const std::unordered_map<K, V>& input) {
+	std::unordered_set<K> output;
+	std::transform(input.begin(), input.end(), std::inserter(output, output.end()),
+				   [](auto pair) { return pair.first; });
+	return output;
+}
 
 /**
  * @brief Convert the given value to a string.

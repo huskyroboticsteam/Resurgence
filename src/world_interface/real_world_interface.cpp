@@ -105,6 +105,10 @@ void world_interface_init() {
 	initMotors();
 }
 
+std::unordered_set<CameraID> getCameras() {
+	return util::keySet(cameraMap);
+}
+
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
@@ -199,7 +203,7 @@ template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 
 void setMotorPower(robot::types::motorid_t motor, double power) {
 	can::deviceserial_t serial = motorSerialIDMap.at(motor);
-	auto& scaleMap = power < 0 ? negative_arm_pwm_scales : positive_arm_pwm_scales;
+	auto& scaleMap = power < 0 ? negative_pwm_scales : positive_pwm_scales;
 	auto entry = scaleMap.find(motor);
 	if (entry != scaleMap.end()) {
 		power *= entry->second;

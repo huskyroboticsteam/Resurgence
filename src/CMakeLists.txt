@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.8) # Latest versions of Ubuntu should have at least 3.8
+cmake_minimum_required(VERSION 3.13) # Latest versions of Ubuntu should have at least 3.16;
+                                     # argparse library requires 3.12.4 currently
 
 set(CMAKE_CXX_STANDARD 17) # 11 For the json library, 17 for std library features
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -46,11 +47,9 @@ endif()
 
 ##====== Module settings ======
 # These variables control whether various modules are enabled or disabled. The goal is to allow
-# a user to selectively exclude modules that they do not need; for example if we are just
-# trying to drive the rover for a demo, we don't need computer vision or autonomous navigation
-# code. We also need a way to disable CAN on non-Linux systems that don't support it, so this
-# is a way to do that.
-set(WITH_CV ON CACHE BOOL "Enable/Disable computer vision code.")
+# a user to selectively exclude modules that they do not need (and/or cannot compile on their
+# system); for example, we need a way to disable CAN on non-Linux systems that don't support
+# it, so this is a way to do that.
 set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
 systems.")
 set(WITH_GPS ${WITH_GPS_DEFAULT} CACHE BOOL "Enable/Disable the USB GPS interface. Disabled on
@@ -68,7 +67,6 @@ endif()
 
 message("========================================\n\
 Module settings:")
-message("  Computer Vision:\t${WITH_CV}")
 if(NOT WITH_CAN_DEFAULT)
   message("  CAN Networking:\t${WITH_CAN} (non-Linux system - disabled by default)")
 else()
@@ -108,6 +106,10 @@ find_package(frozen REQUIRED)
 # making sure the headers are available in every file that includes Constants.h, for example.
 link_libraries(frozen::frozen)
 
+# Find argparse, library used for parsing command line arguments
+find_package(argparse REQUIRED)
+
+
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
@@ -116,9 +118,8 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(HindsightCAN REQUIRED)
 
 find_package(Threads REQUIRED)
-if(WITH_CV)
-  find_package(OpenCV REQUIRED)
-endif()
+find_package(OpenCV REQUIRED)
+
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()
@@ -162,9 +163,11 @@ add_library(utils SHARED
   Util.cpp
   gps/gps_util.cpp
   base64/base64.cpp
+  base64/base64_img.cpp
   kinematics/DiffDriveKinematics.cpp
   kinematics/DiffWristKinematics.cpp
   world_interface/data.cpp)
+target_link_libraries(utils ${OpenCV_LIBS})
 
 ## ====== CAN Interfaces =======
 # Stub CAN interface is used for the tests (and for the Rover if
@@ -197,9 +200,6 @@ target_link_libraries(can_interface PUBLIC
   utils
 )
 
-add_library(real_base_station SHARED
-  Networking/Network.cpp)
-
 ## ====== World Interfaces =======
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
@@ -210,7 +210,7 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  base64/base64_img.cpp
+  Util.cpp
   ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -260,33 +260,33 @@ list(APPEND real_world_libs
 list(APPEND simulator_libs
   simulator_interface)
 
-add_executable(Rover rover_main.cpp)
+add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
-  Rover.cpp
   Autonomous.cpp
-  CommandLineOptions.cpp
   Globals.cpp
   rospub.cpp
-  Networking/websocket/WebSocketServer.cpp
-  Networking/websocket/WebSocketProtocol.cpp
+  filters/PoseEstimator.cpp
+  filters/PoseEstimatorLinear.cpp
+  network/websocket/WebSocketServer.cpp
+  network/websocket/WebSocketProtocol.cpp
   worldmap/GlobalMap.cpp
   worldmap/TrICP.cpp
   worldmap/QuadTree.cpp
   planning/plan.cpp
   )
-target_link_libraries(rover_common utils)
+target_link_libraries(rover_common
+  utils
+  mission_control_interface)
 
 list(APPEND rover_libs
   rover_common
   Threads::Threads
+  websocket_utils
   filters
-  ${Boost_LIBRARIES}
-  websocketpp::websocketpp
-  nlohmann_json::nlohmann_json
   utils
 )
 target_link_libraries(Rover
-  ${rover_libs} real_base_station)
+  ${rover_libs})
 
 if(WORLD_INTERFACE STREQUAL "REAL")
   target_link_libraries(Rover ${real_world_libs})
@@ -296,10 +296,6 @@ else()
   target_link_libraries(Rover ${real_world_libs}) # TODO: support other interfaces
 endif()
 
-list(APPEND vision_libs
-  ${OpenCV_LIBS}
-  opencv_aruco)
-
 target_link_libraries(Rover ${vision_libs})
 
 if(WITH_CAN)
@@ -307,8 +303,7 @@ if(WITH_CAN)
   target_link_libraries(TunePID 
     ${rover_libs}
     can_interface
-	  real_base_station
-	  ${real_world_libs}
+	${real_world_libs}
 	)
   target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
 endif()
@@ -353,9 +348,8 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
-if(WITH_CV)
-  add_subdirectory(ar)
-  add_subdirectory(camera)
-endif()
+add_subdirectory(ar)
+add_subdirectory(camera)
 add_subdirectory(CAN)
+add_subdirectory(network)
 add_subdirectory(filters)

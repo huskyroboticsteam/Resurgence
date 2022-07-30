@@ -2,8 +2,6 @@
 
 #include "PointCloudProcessing.h"
 #include "PointGenerator.h"
-#include "URGLidar.h"
-#include <RPLidar/rplidar.h>
 
 #include <vector>
 
