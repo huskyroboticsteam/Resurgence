@@ -49,7 +49,7 @@ var searchData=
   ['wcube_46',['WCube',['https://docs.opencv.org/4.2.0/d2/d17/classcv_1_1viz_1_1WCube.html#a44bf09b13ea2ddee4e38659e7c5784f1',1,'cv::viz::WCube']]],
   ['wcylinder_47',['WCylinder',['https://docs.opencv.org/4.2.0/d2/d4c/classcv_1_1viz_1_1WCylinder.html#a1aa7889f10133c6de861d548fbd70232',1,'cv::viz::WCylinder']]],
   ['weakclassifierhaarfeature_48',['WeakClassifierHaarFeature',['https://docs.opencv.org/4.2.0/da/d94/classcv_1_1WeakClassifierHaarFeature.html#a7cdcfbdf409dc392c1c3846eb72fb4c4',1,'cv::WeakClassifierHaarFeature']]],
-  ['websocketprotocol_49',['WebSocketProtocol',['../classwebsocket_1_1WebSocketProtocol.html#a49126d6de1f4566a511d36109ff6abf4',1,'websocket::WebSocketProtocol']]],
+  ['websocketprotocol_49',['WebSocketProtocol',['../classnet_1_1websocket_1_1WebSocketProtocol.html#acb9e9923df5ff09138e690f34e02f5e1',1,'net::websocket::WebSocketProtocol']]],
   ['weight1_50',['weight1',['https://docs.opencv.org/4.2.0/d3/d59/classcv_1_1videostab_1_1LpMotionStabilizer.html#a8a5f330f99a5cc01f6ed2fa0e983a859',1,'cv::videostab::LpMotionStabilizer']]],
   ['weight2_51',['weight2',['https://docs.opencv.org/4.2.0/d3/d59/classcv_1_1videostab_1_1LpMotionStabilizer.html#a842368f828925974c9b8296a903bb006',1,'cv::videostab::LpMotionStabilizer']]],
   ['weight3_52',['weight3',['https://docs.opencv.org/4.2.0/d3/d59/classcv_1_1videostab_1_1LpMotionStabilizer.html#abee11c0c97b8c54f114e498d6049f5b5',1,'cv::videostab::LpMotionStabilizer']]],

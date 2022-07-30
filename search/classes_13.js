@@ -154,7 +154,7 @@ var searchData=
   ['sin_5ffunc_3c_20uchar_20_3e_151',['sin_func&lt; uchar &gt;',['https://docs.opencv.org/4.2.0/d2/dfd/structcv_1_1cudev_1_1sin__func_3_01uchar_01_4.html',1,'cv::cudev']]],
   ['sin_5ffunc_3c_20uint_20_3e_152',['sin_func&lt; uint &gt;',['https://docs.opencv.org/4.2.0/d5/dbd/structcv_1_1cudev_1_1sin__func_3_01uint_01_4.html',1,'cv::cudev']]],
   ['sin_5ffunc_3c_20ushort_20_3e_153',['sin_func&lt; ushort &gt;',['https://docs.opencv.org/4.2.0/d8/d22/structcv_1_1cudev_1_1sin__func_3_01ushort_01_4.html',1,'cv::cudev']]],
-  ['singleclientwsserver_154',['SingleClientWSServer',['../classwebsocket_1_1SingleClientWSServer.html',1,'websocket']]],
+  ['singleclientwsserver_154',['SingleClientWSServer',['../classnet_1_1websocket_1_1SingleClientWSServer.html',1,'net::websocket']]],
   ['singlemaskchannels_155',['SingleMaskChannels',['https://docs.opencv.org/4.2.0/db/dce/structcv_1_1cudev_1_1SingleMaskChannels.html',1,'cv::cudev']]],
   ['singlemaskchannelssz_156',['SingleMaskChannelsSz',['https://docs.opencv.org/4.2.0/d0/d19/structcv_1_1cudev_1_1SingleMaskChannelsSz.html',1,'cv::cudev']]],
   ['sinh_5ffunc_157',['sinh_func',['https://docs.opencv.org/4.2.0/d8/da0/structcv_1_1cudev_1_1sinh__func.html',1,'cv::cudev']]],

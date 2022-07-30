@@ -132,6 +132,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a2337a0214f903f0ba6174b3d8b9e025b"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a>&lt; double, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">getCmdVel</a> ()</td></tr>
 <tr class="memdesc:a2337a0214f903f0ba6174b3d8b9e025b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the velocity commanded to the robot. Depending on scaling, may not be the same numbers passed to <a class="el" href="namespacerobot.html#a8363ee6c4c4bd4b93c4188984dc77ad6" title="Request the robot to drive at the given velocities.">setCmdVel()</a>.  <a href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">More...</a><br /></td></tr>
 <tr class="separator:a2337a0214f903f0ba6174b3d8b9e025b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5133347c2d5d86918b6b8267ae42c5fc"><td class="memItemLeft" align="right" valign="top"><a id="a5133347c2d5d86918b6b8267ae42c5fc" name="a5133347c2d5d86918b6b8267ae42c5fc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setJointPower</b> (robot::types::jointid_t joint, double power)</td></tr>
+<tr class="separator:a5133347c2d5d86918b6b8267ae42c5fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22bae8dc460f5d2413092e99d59c6c07"><td class="memItemLeft" align="right" valign="top"><a id="a22bae8dc460f5d2413092e99d59c6c07" name="a22bae8dc460f5d2413092e99d59c6c07"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setJointPos</b> (robot::types::jointid_t joint, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos)</td></tr>
+<tr class="separator:a22bae8dc460f5d2413092e99d59c6c07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memItemLeft" align="right" valign="top"><a id="a0f7f6a213f9815daf709cdfb8aa975fe" name="a0f7f6a213f9815daf709cdfb8aa975fe"></a>
+<a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getJointPos</b> (robot::types::jointid_t joint)</td></tr>
+<tr class="separator:a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af156944ae2405af9ad492ab2ffe4ffec"><td class="memItemLeft" align="right" valign="top"><a id="af156944ae2405af9ad492ab2ffe4ffec" name="af156944ae2405af9ad492ab2ffe4ffec"></a>
 const <a class="el" href="classDiffDriveKinematics.html">DiffDriveKinematics</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>driveKinematics</b> ()</td></tr>
 <tr class="separator:af156944ae2405af9ad492ab2ffe4ffec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -181,6 +190,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>removeLimitSwitchCall
 constexpr <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a>&#160;</td><td class="memItemRight" valign="bottom"><b>TELEM_PERIOD</b> (50)</td></tr>
 <tr class="memdesc:a014644aaac752932a2caa9d0be8b2842"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default telemetry period for motors. <br /></td></tr>
 <tr class="separator:a014644aaac752932a2caa9d0be8b2842"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6099ae9d542759c6681569d4bf34910f"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html">std::unordered_set</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a854dec5b2c63324dfe817fcd0d163557">CameraID</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a6099ae9d542759c6681569d4bf34910f">getCameras</a> ()</td></tr>
+<tr class="memdesc:a6099ae9d542759c6681569d4bf34910f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the IDs of the currently supported cameras.  <a href="namespacerobot.html#a6099ae9d542759c6681569d4bf34910f">More...</a><br /></td></tr>
+<tr class="separator:a6099ae9d542759c6681569d4bf34910f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f5a1efb713c48bdf856cbc794d8412d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a3f5a1efb713c48bdf856cbc794d8412d">hasNewCameraFrame</a> (<a class="el" href="namespacerobot_1_1types.html#a854dec5b2c63324dfe817fcd0d163557">types::CameraID</a> camera, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a2e2bf34f6d75c7c4bd05605e1c5e33e1">uint32_t</a> oldFrameNum)</td></tr>
 <tr class="memdesc:a3f5a1efb713c48bdf856cbc794d8412d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a new camera frame from the specified camera is available.  <a href="namespacerobot.html#a3f5a1efb713c48bdf856cbc794d8412d">More...</a><br /></td></tr>
 <tr class="separator:a3f5a1efb713c48bdf856cbc794d8412d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,6 +221,9 @@ template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a3b58b5557c06caa8eb3d64c510042a26"><td class="memItemLeft" align="right" valign="top"><a id="a3b58b5557c06caa8eb3d64c510042a26" name="a3b58b5557c06caa8eb3d64c510042a26"></a>
 callbackid_t&#160;</td><td class="memItemRight" valign="bottom"><b>addLimitSwitchCallback</b> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, const std::function&lt; void(<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="el" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a>&lt; <a class="el" href="classrobot_1_1types_1_1LimitSwitchData.html">robot::types::LimitSwitchData</a> &gt; limitSwitchData)&gt; &amp;callback)</td></tr>
 <tr class="separator:a3b58b5557c06caa8eb3d64c510042a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb6c5baa7bd1bf5c795ea0e100a5ef30"><td class="memItemLeft" align="right" valign="top"><a id="adb6c5baa7bd1bf5c795ea0e100a5ef30" name="adb6c5baa7bd1bf5c795ea0e100a5ef30"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>zeroJoint</b> (robot::types::jointid_t joint)</td></tr>
+<tr class="separator:adb6c5baa7bd1bf5c795ea0e100a5ef30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -231,12 +246,12 @@ const <a class="el" href="namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e"
 <tr class="memitem:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a3f9d8b438d2f5a9d83f05e6520e07e1a">motorPulsesPerJointRevMap</a></td></tr>
 <tr class="memdesc:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to the number of pulses per joint revolution.  <a href="namespacerobot.html#a3f9d8b438d2f5a9d83f05e6520e07e1a">More...</a><br /></td></tr>
 <tr class="separator:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ad90b629578c7ed32a4d1f7e46c1d5e"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a4ad90b629578c7ed32a4d1f7e46c1d5e">positive_arm_pwm_scales</a></td></tr>
-<tr class="memdesc:a4ad90b629578c7ed32a4d1f7e46c1d5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to <br  />
-  <a href="namespacerobot.html#a4ad90b629578c7ed32a4d1f7e46c1d5e">More...</a><br /></td></tr>
-<tr class="separator:a4ad90b629578c7ed32a4d1f7e46c1d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a021a3bafbf7e6051e2ffc640c25eabb2"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a021a3bafbf7e6051e2ffc640c25eabb2">negative_arm_pwm_scales</a></td></tr>
-<tr class="separator:a021a3bafbf7e6051e2ffc640c25eabb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf2d3136c13712a212ebf41ed4a6ff58"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a></td></tr>
+<tr class="memdesc:abf2d3136c13712a212ebf41ed4a6ff58"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with positive power. Negative values mean that the motor is inverted.  <a href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">More...</a><br /></td></tr>
+<tr class="separator:abf2d3136c13712a212ebf41ed4a6ff58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5b3523412c0bfd79035091d88e01624"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">negative_pwm_scales</a></td></tr>
+<tr class="memdesc:ad5b3523412c0bfd79035091d88e01624"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with negative power. Negative values mean that the motor is inverted.  <a href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">More...</a><br /></td></tr>
+<tr class="separator:ad5b3523412c0bfd79035091d88e01624"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae917757337e6e1a1b99392c7c1db4069"><td class="memItemLeft" align="right" valign="top"><a id="ae917757337e6e1a1b99392c7c1db4069" name="ae917757337e6e1a1b99392c7c1db4069"></a>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>WHEEL_BASE</b> = 0.66</td></tr>
 <tr class="separator:ae917757337e6e1a1b99392c7c1db4069"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -336,6 +351,26 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 
 </div>
 </div>
+<a id="a6099ae9d542759c6681569d4bf34910f" name="a6099ae9d542759c6681569d4bf34910f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6099ae9d542759c6681569d4bf34910f">&#9670;&nbsp;</a></span>getCameras()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html">std::unordered_set</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a854dec5b2c63324dfe817fcd0d163557">types::CameraID</a> &gt; robot::getCameras </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the IDs of the currently supported cameras. </p>
+<dl class="section return"><dt>Returns</dt><dd>The IDs of all cameras currently supported by the world interface, as a <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html">std::unordered_set</a>. </dd></dl>
+
+</div>
+</div>
 <a id="a2337a0214f903f0ba6174b3d8b9e025b" name="a2337a0214f903f0ba6174b3d8b9e025b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2337a0214f903f0ba6174b3d8b9e025b">&#9670;&nbsp;</a></span>getCmdVel()</h2>
 
@@ -380,7 +415,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="structnavtypes_1_1URCLeg.html">navtypes::URCLeg</a> Information for the URC leg of the given index.</dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This function is probably deprecated, and will be replaced in the future. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>This function is probably deprecated, and will be replaced in the future. </dd></dl>
 
 </div>
 </div>
@@ -953,8 +988,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 
 </div>
 </div>
-<a id="a021a3bafbf7e6051e2ffc640c25eabb2" name="a021a3bafbf7e6051e2ffc640c25eabb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a021a3bafbf7e6051e2ffc640c25eabb2">&#9670;&nbsp;</a></span>negative_arm_pwm_scales</h2>
+<a id="ad5b3523412c0bfd79035091d88e01624" name="ad5b3523412c0bfd79035091d88e01624"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5b3523412c0bfd79035091d88e01624">&#9670;&nbsp;</a></span>negative_pwm_scales</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -963,7 +998,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr auto robot::negative_arm_pwm_scales</td>
+          <td class="memname">constexpr auto robot::negative_pwm_scales</td>
         </tr>
       </table>
   </td>
@@ -978,9 +1013,15 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::elbow, -0.2747},</div>
 <div class="line">                                                   {motorid_t::forearm, -0.0916},</div>
 <div class="line">                                                   {motorid_t::differentialLeft, 0.0763},</div>
+<div class="line">                                                   {motorid_t::frontLeftWheel, -0.5},</div>
+<div class="line">                                                   {motorid_t::frontRightWheel, 0.5},</div>
+<div class="line">                                                   {motorid_t::rearLeftWheel, -0.5},</div>
+<div class="line">                                                   {motorid_t::rearRightWheel, -0.5},</div>
 <div class="line">                                                   {motorid_t::differentialRight, -0.1526},</div>
 <div class="line">                                                   {motorid_t::hand, 0.2289}})</div>
 </div><!-- fragment -->
+<p>A mapping of motorids to power scale factors when commanded with negative power. Negative values mean that the motor is inverted. </p>
+
 </div>
 </div>
 <a id="a98f16731da8ac7f980fe19c12aa3a4f8" name="a98f16731da8ac7f980fe19c12aa3a4f8"></a>
@@ -1010,8 +1051,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 
 </div>
 </div>
-<a id="a4ad90b629578c7ed32a4d1f7e46c1d5e" name="a4ad90b629578c7ed32a4d1f7e46c1d5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ad90b629578c7ed32a4d1f7e46c1d5e">&#9670;&nbsp;</a></span>positive_arm_pwm_scales</h2>
+<a id="abf2d3136c13712a212ebf41ed4a6ff58" name="abf2d3136c13712a212ebf41ed4a6ff58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf2d3136c13712a212ebf41ed4a6ff58">&#9670;&nbsp;</a></span>positive_pwm_scales</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1020,7 +1061,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr auto robot::positive_arm_pwm_scales</td>
+          <td class="memname">constexpr auto robot::positive_pwm_scales</td>
         </tr>
       </table>
   </td>
@@ -1036,10 +1077,13 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::forearm, -0.0916},</div>
 <div class="line">                                                   {motorid_t::differentialLeft, 0.0763},</div>
 <div class="line">                                                   {motorid_t::differentialRight, -0.0763},</div>
+<div class="line">                                                   {motorid_t::frontLeftWheel, -0.5},</div>
+<div class="line">                                                   {motorid_t::frontRightWheel, 0.5},</div>
+<div class="line">                                                   {motorid_t::rearLeftWheel, -0.5},</div>
+<div class="line">                                                   {motorid_t::rearRightWheel, -0.5},</div>
 <div class="line">                                                   {motorid_t::hand, 0.2289}})</div>
 </div><!-- fragment -->
-<p>A mapping of motorids to <br  />
- </p>
+<p>A mapping of motorids to power scale factors when commanded with positive power. Negative values mean that the motor is inverted. </p>
 
 </div>
 </div>

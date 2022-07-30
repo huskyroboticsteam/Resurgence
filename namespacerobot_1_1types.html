@@ -94,6 +94,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot_1_1types_1_1LimitSwitchData.html">LimitSwitchData</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class that represents limit switches from a specific motor.  <a href="classrobot_1_1types_1_1LimitSwitchData.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrobot_1_1types_1_1PotentiometerParams.html">PotentiometerParams</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents parameters defining a potentiometer scale.  <a href="structrobot_1_1types_1_1PotentiometerParams.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -144,9 +147,24 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a7278b81a300fa12b4b6525bff976f190"><td class="mdescLeft">&#160;</td><td class="mdescRight">The motors on the robot. <br /></td></tr>
 <tr class="separator:a7278b81a300fa12b4b6525bff976f190"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e0fafe7d1af6624074f9dbb7402fdbc"><td class="memItemLeft" align="right" valign="top"><a id="a4e0fafe7d1af6624074f9dbb7402fdbc" name="a4e0fafe7d1af6624074f9dbb7402fdbc"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>jointid_t</b> { <br />
+&#160;&#160;<b>armBase</b>
+, <b>shoulder</b>
+, <b>elbow</b>
+, <b>forearm</b>
+, <br />
+&#160;&#160;<b>differentialRoll</b>
+, <b>differentialPitch</b>
+, <b>hand</b>
+, <b>drill_arm</b>
+<br />
+ }</td></tr>
+<tr class="separator:a4e0fafe7d1af6624074f9dbb7402fdbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a98231f677dcd844641e6a4290424f9cc"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot_1_1types.html#a98231f677dcd844641e6a4290424f9cc">name_to_jointid</a></td></tr>
+<tr class="separator:a98231f677dcd844641e6a4290424f9cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae97c57e01b5bad73f687df87ce66b4b9"><td class="memItemLeft" align="right" valign="top"><a id="ae97c57e01b5bad73f687df87ce66b4b9" name="ae97c57e01b5bad73f687df87ce66b4b9"></a>
 constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>N_LIMIT_SWITCH</b> = 8</td></tr>
 <tr class="memdesc:ae97c57e01b5bad73f687df87ce66b4b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum number of limit switches associated with any motor. <br /></td></tr>
@@ -176,6 +194,38 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 <p>A data structure that represents when each landmark was seen. </p>
 <dl class="section see"><dt>See also</dt><dd>AR::readLandmarks() </dd></dl>
 
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a98231f677dcd844641e6a4290424f9cc" name="a98231f677dcd844641e6a4290424f9cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98231f677dcd844641e6a4290424f9cc">&#9670;&nbsp;</a></span>name_to_jointid</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr auto robot::types::name_to_jointid</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;frozen::string, jointid_t&gt;(</div>
+<div class="line">    {{<span class="stringliteral">&quot;armBase&quot;</span>, jointid_t::armBase},</div>
+<div class="line">     {<span class="stringliteral">&quot;shoulder&quot;</span>, jointid_t::shoulder},</div>
+<div class="line">     {<span class="stringliteral">&quot;elbow&quot;</span>, jointid_t::elbow},</div>
+<div class="line">     {<span class="stringliteral">&quot;forearm&quot;</span>, jointid_t::forearm},</div>
+<div class="line">     {<span class="stringliteral">&quot;differentialRoll&quot;</span>, jointid_t::differentialRoll},</div>
+<div class="line">     {<span class="stringliteral">&quot;differentialPitch&quot;</span>, jointid_t::differentialPitch},</div>
+<div class="line">     {<span class="stringliteral">&quot;hand&quot;</span>, jointid_t::hand},</div>
+<div class="line">     {<span class="stringliteral">&quot;drillArm&quot;</span>, jointid_t::drill_arm}})</div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

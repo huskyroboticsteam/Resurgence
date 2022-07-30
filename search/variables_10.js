@@ -114,7 +114,7 @@ var searchData=
   ['poselist_111',['poseList',['https://docs.opencv.org/4.2.0/d2/d4b/classcv_1_1ppf__match__3d_1_1PoseCluster3D.html#a84383c0098dac446b5ef9338a2c294ba',1,'cv::ppf_match_3d::PoseCluster3D']]],
   ['posesarray_112',['posesArray',['https://docs.opencv.org/4.2.0/da/df4/structcv_1_1datasets_1_1SLAM__kittiObj.html#abbc38afefaaddd2a451a62e8419581a4',1,'cv::datasets::SLAM_kittiObj']]],
   ['position_5fthreshold_113',['position_threshold',['https://docs.opencv.org/4.2.0/db/d25/classcv_1_1ppf__match__3d_1_1PPF3DDetector.html#a7b87b6bec0033ccb112f1ea211be2e1f',1,'cv::ppf_match_3d::PPF3DDetector']]],
-  ['positive_5farm_5fpwm_5fscales_114',['positive_arm_pwm_scales',['../namespacerobot.html#a4ad90b629578c7ed32a4d1f7e46c1d5e',1,'robot']]],
+  ['positive_5fpwm_5fscales_114',['positive_pwm_scales',['../namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58',1,'robot']]],
   ['power_115',['power',['https://docs.opencv.org/4.2.0/d2/da0/classcv_1_1dnn_1_1PowerLayer.html#a4601f5017ef110040e09ece8307a2888',1,'cv::dnn::PowerLayer']]],
   ['ppbuffers_116',['ppBuffers',['https://docs.opencv.org/4.2.0/da/da9/structNppStInterpolationState.html#ac3a1af68ad97248705ef457596e00f64',1,'NppStInterpolationState']]],
   ['ppf_117',['ppf',['https://docs.opencv.org/4.2.0/db/d25/classcv_1_1ppf__match__3d_1_1PPF3DDetector.html#a104f79f2f9f2d9b4e6b7f9c1c107f395',1,'cv::ppf_match_3d::PPF3DDetector']]],

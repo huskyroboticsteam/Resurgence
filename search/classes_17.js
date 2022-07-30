@@ -17,7 +17,7 @@ var searchData=
   ['weak_5fptr_14',['weak_ptr',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06903.html',1,'std']]],
   ['weak_5fptr_3c_20_5fstate_5fbasev2_20_3e_15',['weak_ptr&lt; _State_baseV2 &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06903.html',1,'']]],
   ['weakclassifierhaarfeature_16',['WeakClassifierHaarFeature',['https://docs.opencv.org/4.2.0/da/d94/classcv_1_1WeakClassifierHaarFeature.html',1,'cv']]],
-  ['websocketprotocol_17',['WebSocketProtocol',['../classwebsocket_1_1WebSocketProtocol.html',1,'websocket']]],
+  ['websocketprotocol_17',['WebSocketProtocol',['../classnet_1_1websocket_1_1WebSocketProtocol.html',1,'net::websocket']]],
   ['weibull_5fdistribution_18',['weibull_distribution',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06475.html',1,'std']]],
   ['weightingdeblurer_19',['WeightingDeblurer',['https://docs.opencv.org/4.2.0/df/d5b/classcv_1_1videostab_1_1WeightingDeblurer.html',1,'cv::videostab']]],
   ['wgrid_20',['WGrid',['https://docs.opencv.org/4.2.0/d2/dea/classcv_1_1viz_1_1WGrid.html',1,'cv::viz']]],
