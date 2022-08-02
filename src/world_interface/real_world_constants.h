@@ -84,11 +84,11 @@ constexpr auto motorPulsesPerJointRevMap = frozen::make_unordered_map<motorid_t,
 */
 constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.1831},
-												   {motorid_t::shoulder, -0.3052},
-												   {motorid_t::elbow, -0.5},
-												   {motorid_t::forearm, -0.0916},
-												   {motorid_t::differentialLeft, 0.0763},
-												   {motorid_t::differentialRight, -0.0763},
+												   {motorid_t::shoulder, -1},
+												   {motorid_t::elbow, 0.75},
+												   {motorid_t::forearm, 0.1},
+												   {motorid_t::differentialLeft, -0.5},
+												   {motorid_t::differentialRight, 0.5},
 												   {motorid_t::frontLeftWheel, -0.5},
 												   {motorid_t::frontRightWheel, 0.5},
 												   {motorid_t::rearLeftWheel, -0.5},
@@ -100,15 +100,15 @@ constexpr auto positive_pwm_scales =
 */
 constexpr auto negative_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.1831},
-												   {motorid_t::shoulder, -0.2136},
-												   {motorid_t::elbow, -0.2747},
-												   {motorid_t::forearm, -0.0916},
-												   {motorid_t::differentialLeft, 0.0763},
+												   {motorid_t::shoulder, -1},
+												   {motorid_t::elbow, 0.75},
+												   {motorid_t::forearm, 0.1},
+												   {motorid_t::differentialLeft, -0.5},
+												   {motorid_t::differentialRight, 0.5},
                                                    {motorid_t::frontLeftWheel, -0.5},
 												   {motorid_t::frontRightWheel, 0.5},
 												   {motorid_t::rearLeftWheel, -0.5},
 												   {motorid_t::rearRightWheel, -0.5},
-												   {motorid_t::differentialRight, -0.1526},
 												   {motorid_t::hand, 0.2289}});
 
 } // namespace robot

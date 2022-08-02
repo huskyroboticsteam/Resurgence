@@ -180,14 +180,14 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		float pitchPwr = power;
 		float rollPwr = getJointPowerValue(jointid_t::differentialRoll);
 		gearpos_t gearPwr = wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
-		setMotorPos(motorid_t::differentialLeft, gearPwr.left);
-		setMotorPos(motorid_t::differentialRight, gearPwr.right);
+		setMotorPower(motorid_t::differentialLeft, gearPwr.left);
+		setMotorPower(motorid_t::differentialRight, gearPwr.right);
 	} else if (joint == jointid_t::differentialRoll) {
 		float pitchPwr = getJointPowerValue(jointid_t::differentialPitch);
 		float rollPwr = power;
 		gearpos_t gearPwr = wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
-		setMotorPos(motorid_t::differentialLeft, gearPwr.left);
-		setMotorPos(motorid_t::differentialRight, gearPwr.right);
+		setMotorPower(motorid_t::differentialLeft, gearPwr.left);
+		setMotorPower(motorid_t::differentialRight, gearPwr.right);
 	} else {
 		// FIXME: this should never happen and is only temporary
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
