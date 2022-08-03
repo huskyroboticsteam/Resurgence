@@ -136,4 +136,8 @@ uint64_t getUnixTime() {
 									 .count());
 }
 
+frozen::string freezeStr(const std::string& str) {
+	return frozen::string(str.c_str(), str.size());
+}
+
 } // namespace util
