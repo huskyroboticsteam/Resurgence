@@ -17,25 +17,6 @@ constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
  */
 constexpr float MDEG_PER_DEG = 1000;
 
-constexpr std::array<uint32_t, 6> arm_PPJRs = {
-	17 * 1000, // base, estimate
-
-	20 * 1000, // shoulder, estimate
-	36 * 1000, // elbow, rough estimate
-
-	360 * 1000, // forearm, unmeasured
-	360 * 1000, // diff_left, unmeasured
-	360 * 1000	// diff_right, unmeasured
-};
-
-// So far only the base, shoulder, elbow have been tuned
-//
-// base, shoulder, elbow, forearm, diff_left, diff_right
-constexpr std::array<int32_t, 6> arm_Ps = {1000, 100, 500, 0, 0, 0};
-constexpr std::array<int32_t, 6> arm_Is = {50, 0, 50, 0, 0, 0};
-constexpr std::array<int32_t, 6> arm_Ds = {10000, 1000, 10000, 0, 0, 0};
-constexpr std::array<uint8_t, 6> arm_encoder_signs = {0, 0, 1, 0, 0, 0};
-
 // TODO: tune these drive constants
 constexpr double ROBOT_LENGTH = 1.0;
 /**
