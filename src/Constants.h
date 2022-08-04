@@ -3,6 +3,7 @@
 #include "kinematics/DiffDriveKinematics.h"
 #include "world_interface/data.h"
 
+#include <chrono>
 #include <cmath>
 #include <string>
 
@@ -102,6 +103,8 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
    WebSocket server endpoint for the DGPS protocol.
  */
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
+
+constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian

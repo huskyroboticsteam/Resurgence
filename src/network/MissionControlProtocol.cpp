@@ -7,6 +7,7 @@
 #include <functional>
 #include <mutex>
 #include <shared_mutex>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -130,15 +131,15 @@ static bool validateJointPowerRequest(const json& j) {
 	return validateJoint(j) && validateRange(j, "power", -1, 1);
 }
 
-static void handleJointPowerRequest(const json& j) {
+void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	using robot::types::jointid_t;
 	using robot::types::name_to_jointid;
 	std::string joint = j["joint"];
 	double power = j["power"];
-	auto it = name_to_jointid.find(frozen::string(joint.c_str(), joint.size()));
-	if(it != name_to_jointid.end()) {
+	auto it = name_to_jointid.find(util::freezeStr(joint));
+	if (it != name_to_jointid.end()) {
 		jointid_t joint_id = it->second;
-		robot::setJointPower(joint_id, power);
+		setRequestedJointPower(joint_id, power);
 	}
 }
 
@@ -190,7 +191,8 @@ void MissionControlProtocol::handleConnection() {
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams() {
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
+	  _last_joint_power() {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill, syringe)
 
@@ -199,8 +201,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
 							validateOperationModeRequest);
 	this->addMessageHandler(DRIVE_REQ_TYPE, handleDriveRequest, validateDriveRequest);
-	this->addMessageHandler(JOINT_POWER_REQ_TYPE, handleJointPowerRequest,
-							validateJointPowerRequest);
+	this->addMessageHandler(
+		JOINT_POWER_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
+		validateJointPowerRequest);
 	this->addMessageHandler(JOINT_POSITION_REQ_TYPE, handleJointPositionRequest,
 							validateJointPositionRequest);
 	// camera stream handlers need the class for context since they must modify _open_streams
@@ -216,17 +220,44 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
-	// TODO: add new thread to handle resending motor power values
+	this->_joint_repeat_running = true;
+	this->_joint_repeat_thread =
+		std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
 	// TODO: add new thread to periodically send motor status reports
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
+	this->_joint_repeat_running = false;
+	this->_joint_repeat_thread.detach();
+
 	this->_streaming_running = false;
 	if (this->_streaming_thread.joinable()) {
 		this->_streaming_thread.join();
 	}
 }
 
+void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {
+	std::unique_lock<std::shared_mutex> joint_lock(this->_joint_power_mutex);
+	this->_last_joint_power[joint] = power;
+	robot::setJointPower(joint, power);
+}
+
+void MissionControlProtocol::jointPowerRepeatTask() {
+	while (this->_joint_repeat_running) {
+		std::this_thread::sleep_for(Constants::JOINT_POWER_REPEAT_PERIOD);
+		{
+			std::shared_lock<std::shared_mutex> joint_lock(this->_joint_power_mutex);
+			for (const auto& current_pair : this->_last_joint_power) {
+				if (!this->_joint_repeat_running) {
+					break;
+				}
+				const jointid_t& joint = current_pair.first;
+				const double& power = current_pair.second;
+				robot::setJointPower(joint, power);
+			}
+		}
+	}
+}
 
 void MissionControlProtocol::videoStreamTask() {
 	while (this->_streaming_running) {
