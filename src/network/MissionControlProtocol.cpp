@@ -2,6 +2,7 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../base64/base64_img.h"
 #include "../log.h"
 
 #include <functional>
@@ -10,8 +11,6 @@
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
-
-#include "../base64/base64_img.h"
 
 namespace net {
 namespace mc {
@@ -152,7 +151,7 @@ static void handleJointPositionRequest(const json& j) {
 	double position_deg = j["position"];
 	int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO adapt this when we have the new CAN/motor interface;
-	//setMotorPos(motor, position_mdeg);
+	// setMotorPos(motor, position_mdeg);
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
@@ -194,7 +193,8 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
 	  _last_joint_power() {
 	// TODO: Add support for tank drive requests
-	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill, syringe)
+	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
+	// syringe)
 
 	this->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
 							validateEmergencyStopRequest);
