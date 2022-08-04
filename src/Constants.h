@@ -108,15 +108,15 @@ constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
-const double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
+constexpr double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
 // Planner stays this far away from obstacles (m)
-const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3;
-const int MAX_ITERS = 3000; // Max number of nodes expanded during A* search
-const double PLAN_RESOLUTION = Constants::ROBOT_LENGTH; // m
-const double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH * 3;
-const double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
-const double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
-const double EPS = 2.0; // heuristic weight for weighted A*
+constexpr double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3;
+constexpr int MAX_ITERS = 3000; // Max number of nodes expanded during A* search
+constexpr double PLAN_RESOLUTION = Constants::ROBOT_LENGTH; // m
+constexpr double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH * 3;
+constexpr double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
+constexpr double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
+constexpr double EPS = 2.0; // heuristic weight for weighted A*
 } // namespace Nav
 
 // Lidar
