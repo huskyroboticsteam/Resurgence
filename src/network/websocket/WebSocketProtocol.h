@@ -36,6 +36,8 @@ public:
 	 */
 	WebSocketProtocol(const std::string& protocolPath);
 
+	virtual ~WebSocketProtocol() = default;
+
 	/**
 	 * @brief Add a message handler for the given message type, if no handler already exists.
 	 * Messages for this message type will not be validated.

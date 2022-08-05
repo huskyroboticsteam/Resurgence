@@ -98,8 +98,8 @@ int main(int argc, char** argv) {
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
-	net::mc::MissionControlProtocol mcProto(Globals::websocketServer);
-	Globals::websocketServer.addProtocol(mcProto);
+	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
+	Globals::websocketServer.addProtocol(std::move(mcProto));
 	robot::world_interface_init();
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
