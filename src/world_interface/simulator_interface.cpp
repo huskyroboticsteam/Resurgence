@@ -206,18 +206,18 @@ void clientDisconnected() {
 }
 
 void initSimServer() {
-	net::websocket::WebSocketProtocol protocol(PROTOCOL_PATH);
-	protocol.addMessageHandler("simImuOrientationReport", handleIMU);
-	protocol.addMessageHandler("simLidarReport", handleLidar);
-	protocol.addMessageHandler("simGpsPositionReport", handleGPS);
-	protocol.addMessageHandler("simCameraStreamReport", handleCamFrame);
-	protocol.addMessageHandler("simMotorStatusReport", handleMotorStatus);
-	protocol.addMessageHandler("simLimitSwitchAlert", handleLimitSwitch);
-	protocol.addMessageHandler("simRoverTruePoseReport", handleTruePose);
-	protocol.addConnectionHandler(clientConnected);
-	protocol.addDisconnectionHandler(clientDisconnected);
+	auto protocol = std::make_unique<net::websocket::WebSocketProtocol>(PROTOCOL_PATH);
+	protocol->addMessageHandler("simImuOrientationReport", handleIMU);
+	protocol->addMessageHandler("simLidarReport", handleLidar);
+	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
+	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
+	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
+	protocol->addMessageHandler("simLimitSwitchAlert", handleLimitSwitch);
+	protocol->addMessageHandler("simRoverTruePoseReport", handleTruePose);
+	protocol->addConnectionHandler(clientConnected);
+	protocol->addDisconnectionHandler(clientDisconnected);
 
-	Globals::websocketServer.addProtocol(protocol);
+	Globals::websocketServer.addProtocol(std::move(protocol));
 
 	{
 		// wait for simulator to connect

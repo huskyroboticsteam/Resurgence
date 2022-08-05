@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <optional>
 #include <thread>
 
@@ -71,7 +72,7 @@ public:
 	 * @return true iff no protocol existed with the given protocol path, and the given
 	 * protocol was successfully added.
 	 */
-	bool addProtocol(const WebSocketProtocol& protocol);
+	bool addProtocol(std::unique_ptr<WebSocketProtocol> protocol);
 
 	/**
 	 * @brief Send a string to the client connected to the given protocol path, if there is
@@ -94,8 +95,8 @@ public:
 private:
 	class ProtocolData {
 	public:
-		ProtocolData(const WebSocketProtocol& protocol);
-		WebSocketProtocol protocol;
+		ProtocolData(std::unique_ptr<WebSocketProtocol> protocol);
+		std::unique_ptr<WebSocketProtocol> protocol;
 		std::optional<connection_hdl> client;
 	};
 

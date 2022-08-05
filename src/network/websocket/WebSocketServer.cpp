@@ -9,8 +9,8 @@ namespace websocket {
 
 using nlohmann::json;
 
-SingleClientWSServer::ProtocolData::ProtocolData(const WebSocketProtocol& protocol)
-	: protocol(protocol) {}
+SingleClientWSServer::ProtocolData::ProtocolData(std::unique_ptr<WebSocketProtocol> protocol)
+	: protocol(std::move(protocol)) {}
 
 SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16_t port)
 	: serverName(serverName), port(port), server(), isRunning(false), protocolMap(),
@@ -76,10 +76,10 @@ void SingleClientWSServer::stop() {
 	}
 }
 
-bool SingleClientWSServer::addProtocol(const WebSocketProtocol& protocol) {
-	std::string path = protocol.getProtocolPath();
+bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protocol) {
+	std::string path = protocol->getProtocolPath();
 	if (protocolMap.find(path) == protocolMap.end()) {
-		protocolMap.emplace(path, protocol);
+		protocolMap.emplace(path, std::move(protocol));
 		return true;
 	} else {
 		return false;
@@ -90,7 +90,7 @@ void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 										 const std::string& str) {
 	auto entry = protocolMap.find(protocolPath);
 	if (entry != protocolMap.end()) {
-		auto protocolData = entry->second;
+		auto& protocolData = entry->second;
 		if (protocolData.client) {
 			connection_hdl hdl = protocolData.client.value();
 			auto conn = server.get_con_from_hdl(hdl);
@@ -136,7 +136,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 
 	auto& protocolData = protocolMap.at(path);
 	protocolData.client = hdl;
-	protocolData.protocol.clientConnected();
+	protocolData.protocol->clientConnected();
 }
 
 void SingleClientWSServer::onClose(connection_hdl hdl) {
@@ -148,7 +148,7 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 
 	auto& protocolData = protocolMap.at(path);
 	protocolData.client.reset();
-	protocolData.protocol.clientDisconnected();
+	protocolData.protocol->clientDisconnected();
 }
 
 void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
@@ -160,7 +160,7 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	std::string jsonStr = message->get_payload();
 	log(LOG_TRACE, "Message on %s: %s\n", path.c_str(), jsonStr.c_str());
 	json obj = json::parse(jsonStr);
-	protocolMap.at(path).protocol.processMessage(obj);
+	protocolMap.at(path).protocol->processMessage(obj);
 }
 } // namespace websocket
 } // namespace net
