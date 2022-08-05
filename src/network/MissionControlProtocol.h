@@ -45,6 +45,7 @@ private:
 	void handleJointPowerRequest(const json& j);
 	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
 	void handleConnection();
+	void stopAndShutdownPowerRepeat();
 	void setRequestedJointPower(jointid_t joint, double power);
 };
 

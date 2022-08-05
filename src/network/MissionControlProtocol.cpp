@@ -66,6 +66,11 @@ static bool validateOneOf(const json& j, const std::string& key,
  */
 static bool validateRange(const json& j, const std::string& key, double min, double max);
 
+/**
+   Set power for all joints to zero.
+ */
+static void stopAllJoints();
+
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
 
   For each protocol message type, there is a pair of functions in this section: a validator and
@@ -82,6 +87,7 @@ static void handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
 		robot::setCmdVel(0, 0);
+		stopAllJoints();
 		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
 		// use it to send estop packets to all motor controllers.
 		// This will stop the arm and everything else too.
@@ -187,11 +193,31 @@ void MissionControlProtocol::handleConnection() {
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", "arm"}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
+
+	// start power repeat thread (if not already running)
+	if (!this->_joint_repeat_running) {
+		this->_joint_repeat_running = true;
+		this->_joint_repeat_thread =
+			std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
+	}
+}
+
+void MissionControlProtocol::stopAndShutdownPowerRepeat() {
+	// Clear the last_joint_power map so the repeater thread won't do anything
+	std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
+	this->_last_joint_power.clear();
+	// explicitly set all joints to zero
+	stopAllJoints();
+	// shut down the power repeat thread
+	this->_joint_repeat_running = false;
+	if (this->_joint_repeat_thread.joinable()) {
+		this->_joint_repeat_thread.join();
+	}
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
-	  _last_joint_power() {
+	  _last_joint_power(), _joint_repeat_running(false) {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
 	// syringe)
@@ -217,18 +243,15 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
+	this->addDisconnectionHandler(
+		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this));
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
-	this->_joint_repeat_running = true;
-	this->_joint_repeat_thread =
-		std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
-	// TODO: add new thread to periodically send motor status reports
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
-	this->_joint_repeat_running = false;
-	this->_joint_repeat_thread.detach();
+	this->stopAndShutdownPowerRepeat();
 
 	this->_streaming_running = false;
 	if (this->_streaming_thread.joinable()) {
@@ -316,6 +339,12 @@ static bool validateRange(const json& j, const std::string& key, double min, dou
 		return min <= d && d <= max;
 	}
 	return false;
+}
+
+static void stopAllJoints() {
+	for (jointid_t current : robot::types::all_jointid_t) {
+		robot::setJointPower(current, 0.0);
+	}
 }
 
 } // namespace mc

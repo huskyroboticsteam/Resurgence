@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../navtypes.h"
 #include "../Util.h"
+#include "../navtypes.h"
 
 #include <bitset>
 #include <chrono>
@@ -10,6 +10,7 @@
 
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
+#include <frozen/unordered_set.h>
 
 // forward declare cv::Mat instead of importing OpenCV
 // we do this to avoid unnecessarily including OpenCV in all build targets
@@ -70,6 +71,10 @@ enum class jointid_t {
 	hand,
 	drill_arm
 };
+constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
+	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
+	 jointid_t::differentialRoll, jointid_t::differentialPitch, jointid_t::hand,
+	 jointid_t::drill_arm});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
