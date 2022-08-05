@@ -195,10 +195,13 @@ void MissionControlProtocol::handleConnection() {
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 
 	// start power repeat thread (if not already running)
-	if (!this->_joint_repeat_running) {
-		this->_joint_repeat_running = true;
-		this->_joint_repeat_thread =
-			std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
+	{
+		std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
+		if (!this->_joint_repeat_running) {
+			this->_joint_repeat_running = true;
+			this->_joint_repeat_thread =
+				std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
+		}
 	}
 }
 
@@ -209,7 +212,11 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 	// explicitly set all joints to zero
 	stopAllJoints();
 	// shut down the power repeat thread
-	this->_joint_repeat_running = false;
+	{
+		std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
+		this->_joint_repeat_running = false;
+	}
+	_power_repeat_cv.notify_one();
 	if (this->_joint_repeat_thread.joinable()) {
 		this->_joint_repeat_thread.join();
 	}
@@ -266,8 +273,8 @@ void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double powe
 }
 
 void MissionControlProtocol::jointPowerRepeatTask() {
+	std::unique_lock<std::mutex> joint_repeat_lock(this->_joint_repeat_mutex);
 	while (this->_joint_repeat_running) {
-		std::this_thread::sleep_for(Constants::JOINT_POWER_REPEAT_PERIOD);
 		{
 			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
 			for (const auto& current_pair : this->_last_joint_power) {
@@ -279,6 +286,8 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				robot::setJointPower(joint, power);
 			}
 		}
+		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
+								  [this] { return !_joint_repeat_running; });
 	}
 }
 

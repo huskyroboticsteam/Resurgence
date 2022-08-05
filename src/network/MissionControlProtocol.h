@@ -5,6 +5,7 @@
 #include "../world_interface/world_interface.h"
 
 #include <atomic>
+#include <condition_variable>
 #include <memory>
 #include <shared_mutex>
 #include <thread>
@@ -33,13 +34,17 @@ private:
 	void jointPowerRepeatTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
+	// protects _last_joint_power
 	std::mutex _joint_power_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
 	std::unordered_map<jointid_t, double> _last_joint_power;
 	std::atomic<bool> _streaming_running;
 	std::thread _streaming_thread;
-	std::atomic<bool> _joint_repeat_running;
+	// protects _joint_repeat_running and _joint_repeat_thread
+	std::mutex _joint_repeat_mutex;
+	bool _joint_repeat_running;
 	std::thread _joint_repeat_thread;
+	std::condition_variable _power_repeat_cv;
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
