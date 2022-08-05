@@ -33,7 +33,7 @@ private:
 	void jointPowerRepeatTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
-	std::shared_mutex _joint_power_mutex;
+	std::mutex _joint_power_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
 	std::unordered_map<jointid_t, double> _last_joint_power;
 	std::atomic<bool> _streaming_running;

@@ -237,7 +237,7 @@ MissionControlProtocol::~MissionControlProtocol() {
 }
 
 void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {
-	std::unique_lock<std::shared_mutex> joint_lock(this->_joint_power_mutex);
+	std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
 	this->_last_joint_power[joint] = power;
 	robot::setJointPower(joint, power);
 }
@@ -246,7 +246,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 	while (this->_joint_repeat_running) {
 		std::this_thread::sleep_for(Constants::JOINT_POWER_REPEAT_PERIOD);
 		{
-			std::shared_lock<std::shared_mutex> joint_lock(this->_joint_power_mutex);
+			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
 			for (const auto& current_pair : this->_last_joint_power) {
 				if (!this->_joint_repeat_running) {
 					break;
