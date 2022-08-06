@@ -86,6 +86,7 @@ static bool validateEmergencyStopRequest(const json& j) {
 static void handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
+		// TODO: shutdown joint power repeat
 		robot::setCmdVel(0, 0);
 		stopAllJoints();
 		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
@@ -103,6 +104,7 @@ static bool validateOperationModeRequest(const json& j) {
 
 static void handleOperationModeRequest(const json& j) {
 	std::string mode = j["mode"];
+	// TODO: shutdown joint power repeat if we go to autonomous mode
 	Globals::AUTONOMOUS = (mode == "autonomous");
 }
 
@@ -112,7 +114,7 @@ static bool validateDriveRequest(const json& j) {
 		   hasKey(j, "steer") && validateRange(j, "steer", -1, 1);
 }
 
-static void handleDriveRequest(const json& j) {
+void MissionControlProtocol::handleDriveRequest(const json& j) {
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
@@ -122,6 +124,14 @@ static void handleDriveRequest(const json& j) {
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? -steer / norm : steer);
 	log(LOG_TRACE, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
 		dtheta, dx);
+	this->setRequestedCmdVel(dtheta, dx);
+}
+
+void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
+	{
+		std::lock_guard<std::mutex> power_lock(this->_joint_power_mutex);
+		this->_last_cmd_vel = {dtheta, dx};
+	}
 	robot::setCmdVel(dtheta, dx);
 }
 
@@ -233,7 +243,11 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 							validateEmergencyStopRequest);
 	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
 							validateOperationModeRequest);
-	this->addMessageHandler(DRIVE_REQ_TYPE, handleDriveRequest, validateDriveRequest);
+	// drive and joint power handlers need the class for context since they must modify
+	// _last_joint_power and _last_cmd_vel (for the repeater thread)
+	this->addMessageHandler(DRIVE_REQ_TYPE,
+							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
+							validateDriveRequest);
 	this->addMessageHandler(
 		JOINT_POWER_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
@@ -285,6 +299,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				const double& power = current_pair.second;
 				robot::setJointPower(joint, power);
 			}
+			robot::setCmdVel(this->_last_cmd_vel.first, this->_last_cmd_vel.second);
 		}
 		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
 								  [this] { return !_joint_repeat_running; });

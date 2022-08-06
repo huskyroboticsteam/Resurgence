@@ -34,12 +34,13 @@ private:
 	void jointPowerRepeatTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
-	// protects _last_joint_power
-	std::mutex _joint_power_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
-	std::unordered_map<jointid_t, double> _last_joint_power;
 	std::atomic<bool> _streaming_running;
 	std::thread _streaming_thread;
+	// protects _last_joint_power, _last_cmd_vel
+	std::mutex _joint_power_mutex;
+	std::unordered_map<jointid_t, double> _last_joint_power;
+	std::pair<double, double> _last_cmd_vel;
 	// protects _joint_repeat_running and _joint_repeat_thread
 	std::mutex _joint_repeat_mutex;
 	bool _joint_repeat_running;
@@ -48,10 +49,12 @@ private:
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
+	void handleDriveRequest(const json& j);
 	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
 	void handleConnection();
 	void stopAndShutdownPowerRepeat();
 	void setRequestedJointPower(jointid_t joint, double power);
+	void setRequestedCmdVel(double dtheta, double dx);
 };
 
 }; // namespace mc
