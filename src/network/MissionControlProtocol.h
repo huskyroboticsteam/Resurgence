@@ -48,6 +48,8 @@ private:
 	bool _joint_repeat_running;
 	std::thread _joint_repeat_thread;
 	std::condition_variable _power_repeat_cv;
+	void handleEmergencyStopRequest(const json& j);
+	void handleOperationModeRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);

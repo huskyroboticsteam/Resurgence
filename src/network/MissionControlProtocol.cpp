@@ -83,16 +83,17 @@ static bool validateEmergencyStopRequest(const json& j) {
 	return validateKey(j, "stop", val_t::boolean);
 }
 
-static void handleEmergencyStopRequest(const json& j) {
+void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
-		// TODO: shutdown joint power repeat
-		robot::setCmdVel(0, 0);
-		stopAllJoints();
+		this->stopAndShutdownPowerRepeat();
 		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
 		// use it to send estop packets to all motor controllers.
 		// This will stop the arm and everything else too.
 		// @see can::motor::emergencyStopMotors()
+	} else if (!Globals::AUTONOMOUS) {
+		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
+		this->startPowerRepeat();
 	}
 	Globals::E_STOP = stop;
 }
@@ -102,10 +103,16 @@ static bool validateOperationModeRequest(const json& j) {
 		   validateOneOf(j, "mode", {"teleoperation", "autonomous"});
 }
 
-static void handleOperationModeRequest(const json& j) {
+void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	std::string mode = j["mode"];
-	// TODO: shutdown joint power repeat if we go to autonomous mode
 	Globals::AUTONOMOUS = (mode == "autonomous");
+	if (Globals::AUTONOMOUS) {
+		// if we have entered autonomous mode, we need to stop all the power repeater stuff.
+		this->stopAndShutdownPowerRepeat();
+	} else {
+		// if we have left autonomous mode, we need to start the power repeater again.
+		this->startPowerRepeat();
+	}
 }
 
 static bool validateDriveRequest(const json& j) {
@@ -207,6 +214,7 @@ void MissionControlProtocol::handleConnection() {
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", "arm"}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 
+	// TODO: maybe don't do this if we are in autonomous mode
 	// start power repeat thread (if not already running)
 	this->startPowerRepeat();
 }
@@ -221,22 +229,25 @@ void MissionControlProtocol::startPowerRepeat() {
 }
 
 void MissionControlProtocol::stopAndShutdownPowerRepeat() {
-	// Clear the last_joint_power map so the repeater thread won't do anything
-	std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
-	this->_last_joint_power.clear();
-	this->_last_cmd_vel = {};
-	// explicitly set all joints to zero
-	stopAllJoints();
-	// explicitly stop chassis
-	robot::setCmdVel(0, 0);
-	// shut down the power repeat thread
-	{
-		std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
+	// check to make sure the thread is actually running first (so we don't stop everything
+	// unnecessarily if it isn't; this could be bad in the case where we receive a spurious
+	// operation mode request while already in autonomous and shut down all the motors)
+	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
+	if(this->_joint_repeat_running){
+		// Clear the last_joint_power map so the repeater thread won't do anything
+		std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
+		this->_last_joint_power.clear();
+		this->_last_cmd_vel = {};
+		// explicitly set all joints to zero
+		stopAllJoints();
+		// explicitly stop chassis
+		robot::setCmdVel(0, 0);
+		// shut down the power repeat thread
 		this->_joint_repeat_running = false;
-	}
-	_power_repeat_cv.notify_one();
-	if (this->_joint_repeat_thread.joinable()) {
-		this->_joint_repeat_thread.join();
+		_power_repeat_cv.notify_one();
+		if (this->_joint_repeat_thread.joinable()) {
+			this->_joint_repeat_thread.join();
+		}
 	}
 }
 
@@ -247,10 +258,16 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
 	// syringe)
 
-	this->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
-							validateEmergencyStopRequest);
-	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
-							validateOperationModeRequest);
+	// emergency stop and operation mode handlers need the class for context since they must
+	// be able to access the methods to start and stop the power repeater thread
+	this->addMessageHandler(
+		EMERGENCY_STOP_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleEmergencyStopRequest, this, _1),
+		validateEmergencyStopRequest);
+	this->addMessageHandler(
+		OPERATION_MODE_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
+		validateOperationModeRequest);
 	// drive and joint power handlers need the class for context since they must modify
 	// _last_joint_power and _last_cmd_vel (for the repeater thread)
 	this->addMessageHandler(DRIVE_REQ_TYPE,
@@ -307,7 +324,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				const double& power = current_pair.second;
 				robot::setJointPower(joint, power);
 			}
-			if(this->_last_cmd_vel) {
+			if (this->_last_cmd_vel) {
 				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
 			}
 		}
