@@ -95,6 +95,7 @@ void parseCommandLine(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
+	// TODO: make it possible to set this from the command line
 	LOG_LEVEL = LOG_INFO;
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();

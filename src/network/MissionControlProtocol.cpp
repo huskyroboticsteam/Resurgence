@@ -2,15 +2,15 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../base64/base64_img.h"
 #include "../log.h"
 
 #include <functional>
 #include <mutex>
 #include <shared_mutex>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
-
-#include "../base64/base64_img.h"
 
 namespace net {
 namespace mc {
@@ -66,6 +66,11 @@ static bool validateOneOf(const json& j, const std::string& key,
  */
 static bool validateRange(const json& j, const std::string& key, double min, double max);
 
+/**
+   Set power for all joints to zero.
+ */
+static void stopAllJoints();
+
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
 
   For each protocol message type, there is a pair of functions in this section: a validator and
@@ -78,14 +83,17 @@ static bool validateEmergencyStopRequest(const json& j) {
 	return validateKey(j, "stop", val_t::boolean);
 }
 
-static void handleEmergencyStopRequest(const json& j) {
+void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
-		robot::setCmdVel(0, 0);
+		this->stopAndShutdownPowerRepeat();
 		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
 		// use it to send estop packets to all motor controllers.
 		// This will stop the arm and everything else too.
 		// @see can::motor::emergencyStopMotors()
+	} else if (!Globals::AUTONOMOUS) {
+		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
+		this->startPowerRepeat();
 	}
 	Globals::E_STOP = stop;
 }
@@ -95,9 +103,16 @@ static bool validateOperationModeRequest(const json& j) {
 		   validateOneOf(j, "mode", {"teleoperation", "autonomous"});
 }
 
-static void handleOperationModeRequest(const json& j) {
+void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	Globals::AUTONOMOUS = (mode == "autonomous");
+	if (Globals::AUTONOMOUS) {
+		// if we have entered autonomous mode, we need to stop all the power repeater stuff.
+		this->stopAndShutdownPowerRepeat();
+	} else {
+		// if we have left autonomous mode, we need to start the power repeater again.
+		this->startPowerRepeat();
+	}
 }
 
 static bool validateDriveRequest(const json& j) {
@@ -106,7 +121,8 @@ static bool validateDriveRequest(const json& j) {
 		   hasKey(j, "steer") && validateRange(j, "steer", -1, 1);
 }
 
-static void handleDriveRequest(const json& j) {
+void MissionControlProtocol::handleDriveRequest(const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
@@ -116,6 +132,14 @@ static void handleDriveRequest(const json& j) {
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? -steer / norm : steer);
 	log(LOG_TRACE, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
 		dtheta, dx);
+	this->setRequestedCmdVel(dtheta, dx);
+}
+
+void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
+	{
+		std::lock_guard<std::mutex> power_lock(this->_joint_power_mutex);
+		this->_last_cmd_vel = {dtheta, dx};
+	}
 	robot::setCmdVel(dtheta, dx);
 }
 
@@ -130,15 +154,16 @@ static bool validateJointPowerRequest(const json& j) {
 	return validateJoint(j) && validateRange(j, "power", -1, 1);
 }
 
-static void handleJointPowerRequest(const json& j) {
+void MissionControlProtocol::handleJointPowerRequest(const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
 	using robot::types::jointid_t;
 	using robot::types::name_to_jointid;
 	std::string joint = j["joint"];
 	double power = j["power"];
-	auto it = name_to_jointid.find(frozen::string(joint.c_str(), joint.size()));
-	if(it != name_to_jointid.end()) {
+	auto it = name_to_jointid.find(util::freezeStr(joint));
+	if (it != name_to_jointid.end()) {
 		jointid_t joint_id = it->second;
-		robot::setJointPower(joint_id, power);
+		setRequestedJointPower(joint_id, power);
 	}
 }
 
@@ -147,11 +172,12 @@ static bool validateJointPositionRequest(const json& j) {
 }
 
 static void handleJointPositionRequest(const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
 	std::string motor = j["joint"];
 	double position_deg = j["position"];
 	int32_t position_mdeg = std::round(position_deg * 1000);
-	// TODO adapt this when we have the new CAN/motor interface;
-	//setMotorPos(motor, position_mdeg);
+	// TODO: actually implement joint position requests
+	// setMotorPos(motor, position_mdeg);
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
@@ -187,20 +213,80 @@ void MissionControlProtocol::handleConnection() {
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", "arm"}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
+
+	if (!Globals::AUTONOMOUS) {
+		// start power repeat thread (if not already running)
+		this->startPowerRepeat();
+	}
+}
+
+void MissionControlProtocol::startPowerRepeat() {
+	// note: take care to lock mutexes in a consistent order
+	std::lock_guard<std::mutex> flagLock(_joint_repeat_running_mutex);
+	std::lock_guard<std::mutex> threadLock(_joint_repeat_thread_mutex);
+	if (!this->_joint_repeat_running) {
+		this->_joint_repeat_running = true;
+		this->_joint_repeat_thread =
+			std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
+	}
+}
+
+void MissionControlProtocol::stopAndShutdownPowerRepeat() {
+	// check to make sure the thread is actually running first (so we don't stop everything
+	// unnecessarily if it isn't; this could be bad in the case where we receive a spurious
+	// operation mode request while already in autonomous and shut down all the motors)
+	// note: take care to lock mutexes in a consistent order
+	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_running_mutex);
+	if (this->_joint_repeat_running) {
+		// Clear the last_joint_power map so the repeater thread won't do anything
+		{
+			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
+			this->_last_joint_power.clear();
+			this->_last_cmd_vel = {};
+		}
+		// explicitly set all joints to zero
+		stopAllJoints();
+		// explicitly stop chassis
+		robot::setCmdVel(0, 0);
+		// shut down the power repeat thread
+		this->_joint_repeat_running = false;
+		// release before joining to prevent deadlock
+		power_repeat_lock.unlock();
+		_power_repeat_cv.notify_one();
+
+		std::lock_guard<std::mutex> threadLock(_joint_repeat_thread_mutex);
+		if (this->_joint_repeat_thread.joinable()) {
+			this->_joint_repeat_thread.join();
+		}
+	}
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams() {
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
+	  _last_joint_power(), _joint_repeat_running(false) {
 	// TODO: Add support for tank drive requests
-	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill, syringe)
+	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
+	// syringe)
 
-	this->addMessageHandler(EMERGENCY_STOP_REQ_TYPE, handleEmergencyStopRequest,
-							validateEmergencyStopRequest);
-	this->addMessageHandler(OPERATION_MODE_REQ_TYPE, handleOperationModeRequest,
-							validateOperationModeRequest);
-	this->addMessageHandler(DRIVE_REQ_TYPE, handleDriveRequest, validateDriveRequest);
-	this->addMessageHandler(JOINT_POWER_REQ_TYPE, handleJointPowerRequest,
-							validateJointPowerRequest);
+	// emergency stop and operation mode handlers need the class for context since they must
+	// be able to access the methods to start and stop the power repeater thread
+	this->addMessageHandler(
+		EMERGENCY_STOP_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleEmergencyStopRequest, this, _1),
+		validateEmergencyStopRequest);
+	this->addMessageHandler(
+		OPERATION_MODE_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
+		validateOperationModeRequest);
+	// drive and joint power handlers need the class for context since they must modify
+	// _last_joint_power and _last_cmd_vel (for the repeater thread)
+	this->addMessageHandler(DRIVE_REQ_TYPE,
+							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
+							validateDriveRequest);
+	this->addMessageHandler(
+		JOINT_POWER_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
+		validateJointPowerRequest);
 	this->addMessageHandler(JOINT_POSITION_REQ_TYPE, handleJointPositionRequest,
 							validateJointPositionRequest);
 	// camera stream handlers need the class for context since they must modify _open_streams
@@ -213,20 +299,49 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
+	this->addDisconnectionHandler(
+		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this));
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
-	// TODO: add new thread to handle resending motor power values
-	// TODO: add new thread to periodically send motor status reports
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
+	this->stopAndShutdownPowerRepeat();
+
 	this->_streaming_running = false;
 	if (this->_streaming_thread.joinable()) {
 		this->_streaming_thread.join();
 	}
 }
 
+void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {
+	std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
+	this->_last_joint_power[joint] = power;
+	robot::setJointPower(joint, power);
+}
+
+void MissionControlProtocol::jointPowerRepeatTask() {
+	std::unique_lock<std::mutex> joint_repeat_lock(this->_joint_repeat_running_mutex);
+	while (this->_joint_repeat_running) {
+		{
+			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
+			for (const auto& current_pair : this->_last_joint_power) {
+				if (!this->_joint_repeat_running) {
+					break;
+				}
+				const jointid_t& joint = current_pair.first;
+				const double& power = current_pair.second;
+				robot::setJointPower(joint, power);
+			}
+			if (this->_last_cmd_vel) {
+				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
+			}
+		}
+		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
+								  [this] { return !_joint_repeat_running; });
+	}
+}
 
 void MissionControlProtocol::videoStreamTask() {
 	while (this->_streaming_running) {
@@ -285,6 +400,12 @@ static bool validateRange(const json& j, const std::string& key, double min, dou
 		return min <= d && d <= max;
 	}
 	return false;
+}
+
+static void stopAllJoints() {
+	for (jointid_t current : robot::types::all_jointid_t) {
+		robot::setJointPower(current, 0.0);
+	}
 }
 
 } // namespace mc

@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <string>
+#include <frozen/string.h>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -230,4 +231,8 @@ std::string to_string(const T& val) {
 	return std::to_string(val);
 }
 
+/**
+ * @brief Convert the given std::string to a frozen::string.
+ */
+frozen::string freezeStr(const std::string& str);
 } // namespace util

@@ -39,10 +39,6 @@ const std::unordered_map<robot::types::jointid_t, robot::types::motorid_t> joint
 	{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
 	{robot::types::jointid_t::hand, robot::types::motorid_t::hand}};
 
-constexpr auto jointPowerRepeatDelay = 333ms;
-std::thread jointPowerRepeatThread;
-void jointPowerRepeatTask();
-
 std::unordered_map<types::jointid_t, double> jointPowerValues{};
 std::mutex jointPowerValuesMutex;
 void setJointPowerValue(types::jointid_t joint, double power);

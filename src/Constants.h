@@ -3,6 +3,7 @@
 #include "kinematics/DiffDriveKinematics.h"
 #include "world_interface/data.h"
 
+#include <chrono>
 #include <cmath>
 #include <string>
 
@@ -15,25 +16,6 @@ constexpr double ELBOW_LENGTH = 0.7;	// placeholder(m)
    Number of millidegrees per degree
  */
 constexpr float MDEG_PER_DEG = 1000;
-
-constexpr std::array<uint32_t, 6> arm_PPJRs = {
-	17 * 1000, // base, estimate
-
-	20 * 1000, // shoulder, estimate
-	36 * 1000, // elbow, rough estimate
-
-	360 * 1000, // forearm, unmeasured
-	360 * 1000, // diff_left, unmeasured
-	360 * 1000	// diff_right, unmeasured
-};
-
-// So far only the base, shoulder, elbow have been tuned
-//
-// base, shoulder, elbow, forearm, diff_left, diff_right
-constexpr std::array<int32_t, 6> arm_Ps = {1000, 100, 500, 0, 0, 0};
-constexpr std::array<int32_t, 6> arm_Is = {50, 0, 50, 0, 0, 0};
-constexpr std::array<int32_t, 6> arm_Ds = {10000, 1000, 10000, 0, 0, 0};
-constexpr std::array<uint8_t, 6> arm_encoder_signs = {0, 0, 1, 0, 0, 0};
 
 // TODO: tune these drive constants
 constexpr double ROBOT_LENGTH = 1.0;
@@ -103,17 +85,19 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
  */
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
 
+constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
+
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
-const double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
+constexpr double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
 // Planner stays this far away from obstacles (m)
-const double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3;
-const int MAX_ITERS = 3000; // Max number of nodes expanded during A* search
-const double PLAN_RESOLUTION = Constants::ROBOT_LENGTH; // m
-const double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH * 3;
-const double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
-const double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
-const double EPS = 2.0; // heuristic weight for weighted A*
+constexpr double SAFE_RADIUS = Constants::ROBOT_LENGTH * 1.3;
+constexpr int MAX_ITERS = 3000; // Max number of nodes expanded during A* search
+constexpr double PLAN_RESOLUTION = Constants::ROBOT_LENGTH; // m
+constexpr double SEARCH_RADIUS_INCREMENT = Constants::ROBOT_LENGTH * 3;
+constexpr double GPS_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.5;
+constexpr double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
+constexpr double EPS = 2.0; // heuristic weight for weighted A*
 } // namespace Nav
 
 // Lidar
