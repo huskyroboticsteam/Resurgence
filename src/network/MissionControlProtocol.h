@@ -43,9 +43,11 @@ private:
 	std::unordered_map<jointid_t, double> _last_joint_power;
 	// if not present, then there is no last requested drive power
 	std::optional<std::pair<double, double>> _last_cmd_vel;
-	// protects _joint_repeat_running and _joint_repeat_thread
-	std::mutex _joint_repeat_mutex;
+	// protects _joint_repeat_running, ALWAYS lock before thread and joint_power_mutex
+	std::mutex _joint_repeat_running_mutex;
 	bool _joint_repeat_running;
+	// protects _joint_repeat_thread
+	std::mutex _joint_repeat_thread_mutex;
 	std::thread _joint_repeat_thread;
 	std::condition_variable _power_repeat_cv;
 	void handleEmergencyStopRequest(const json& j);

@@ -221,7 +221,9 @@ void MissionControlProtocol::handleConnection() {
 }
 
 void MissionControlProtocol::startPowerRepeat() {
-	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
+	// note: take care to lock mutexes in a consistent order
+	std::lock_guard<std::mutex> flagLock(_joint_repeat_running_mutex);
+	std::lock_guard<std::mutex> threadLock(_joint_repeat_thread_mutex);
 	if (!this->_joint_repeat_running) {
 		this->_joint_repeat_running = true;
 		this->_joint_repeat_thread =
@@ -233,19 +235,26 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 	// check to make sure the thread is actually running first (so we don't stop everything
 	// unnecessarily if it isn't; this could be bad in the case where we receive a spurious
 	// operation mode request while already in autonomous and shut down all the motors)
-	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
+	// note: take care to lock mutexes in a consistent order
+	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_running_mutex);
 	if (this->_joint_repeat_running) {
 		// Clear the last_joint_power map so the repeater thread won't do anything
-		std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
-		this->_last_joint_power.clear();
-		this->_last_cmd_vel = {};
+		{
+			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
+			this->_last_joint_power.clear();
+			this->_last_cmd_vel = {};
+		}
 		// explicitly set all joints to zero
 		stopAllJoints();
 		// explicitly stop chassis
 		robot::setCmdVel(0, 0);
 		// shut down the power repeat thread
 		this->_joint_repeat_running = false;
+		// release before joining to prevent deadlock
+		power_repeat_lock.unlock();
 		_power_repeat_cv.notify_one();
+
+		std::lock_guard<std::mutex> threadLock(_joint_repeat_thread_mutex);
 		if (this->_joint_repeat_thread.joinable()) {
 			this->_joint_repeat_thread.join();
 		}
@@ -313,7 +322,7 @@ void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double powe
 }
 
 void MissionControlProtocol::jointPowerRepeatTask() {
-	std::unique_lock<std::mutex> joint_repeat_lock(this->_joint_repeat_mutex);
+	std::unique_lock<std::mutex> joint_repeat_lock(this->_joint_repeat_running_mutex);
 	while (this->_joint_repeat_running) {
 		{
 			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
