@@ -208,13 +208,15 @@ void MissionControlProtocol::handleConnection() {
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 
 	// start power repeat thread (if not already running)
-	{
-		std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
-		if (!this->_joint_repeat_running) {
-			this->_joint_repeat_running = true;
-			this->_joint_repeat_thread =
-				std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
-		}
+	this->startPowerRepeat();
+}
+
+void MissionControlProtocol::startPowerRepeat() {
+	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
+	if (!this->_joint_repeat_running) {
+		this->_joint_repeat_running = true;
+		this->_joint_repeat_thread =
+			std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
 	}
 }
 

@@ -54,6 +54,7 @@ private:
 	void handleDriveRequest(const json& j);
 	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
 	void handleConnection();
+	void startPowerRepeat();
 	void stopAndShutdownPowerRepeat();
 	void setRequestedJointPower(jointid_t joint, double power);
 	void setRequestedCmdVel(double dtheta, double dx);
