@@ -129,7 +129,7 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	double steer = -j["steer"].get<double>();
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
-	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? -steer / norm : steer);
+	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
 	log(LOG_TRACE, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
 		dtheta, dx);
 	this->setRequestedCmdVel(dtheta, dx);
