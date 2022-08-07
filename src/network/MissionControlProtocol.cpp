@@ -214,9 +214,10 @@ void MissionControlProtocol::handleConnection() {
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", "arm"}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 
-	// TODO: maybe don't do this if we are in autonomous mode
-	// start power repeat thread (if not already running)
-	this->startPowerRepeat();
+	if (!Globals::AUTONOMOUS) {
+		// start power repeat thread (if not already running)
+		this->startPowerRepeat();
+	}
 }
 
 void MissionControlProtocol::startPowerRepeat() {
@@ -233,7 +234,7 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 	// unnecessarily if it isn't; this could be bad in the case where we receive a spurious
 	// operation mode request while already in autonomous and shut down all the motors)
 	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
-	if(this->_joint_repeat_running){
+	if (this->_joint_repeat_running) {
 		// Clear the last_joint_power map so the repeater thread won't do anything
 		std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
 		this->_last_joint_power.clear();
