@@ -115,6 +115,7 @@ static bool validateDriveRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
@@ -147,6 +148,7 @@ static bool validateJointPowerRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleJointPowerRequest(const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
 	using robot::types::jointid_t;
 	using robot::types::name_to_jointid;
 	std::string joint = j["joint"];
@@ -163,10 +165,11 @@ static bool validateJointPositionRequest(const json& j) {
 }
 
 static void handleJointPositionRequest(const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
 	std::string motor = j["joint"];
 	double position_deg = j["position"];
 	int32_t position_mdeg = std::round(position_deg * 1000);
-	// TODO adapt this when we have the new CAN/motor interface;
+	// TODO: actually implement joint position requests
 	// setMotorPos(motor, position_mdeg);
 }
 
@@ -219,8 +222,11 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 	// Clear the last_joint_power map so the repeater thread won't do anything
 	std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
 	this->_last_joint_power.clear();
+	this->_last_cmd_vel = {};
 	// explicitly set all joints to zero
 	stopAllJoints();
+	// explicitly stop chassis
+	robot::setCmdVel(0, 0);
 	// shut down the power repeat thread
 	{
 		std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_mutex);
@@ -299,7 +305,9 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				const double& power = current_pair.second;
 				robot::setJointPower(joint, power);
 			}
-			robot::setCmdVel(this->_last_cmd_vel.first, this->_last_cmd_vel.second);
+			if(this->_last_cmd_vel) {
+				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
+			}
 		}
 		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
 								  [this] { return !_joint_repeat_running; });

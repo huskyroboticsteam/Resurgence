@@ -11,6 +11,7 @@
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
+#include <optional>
 
 namespace net {
 namespace mc {
@@ -40,7 +41,8 @@ private:
 	// protects _last_joint_power, _last_cmd_vel
 	std::mutex _joint_power_mutex;
 	std::unordered_map<jointid_t, double> _last_joint_power;
-	std::pair<double, double> _last_cmd_vel;
+	// if not present, then there is no last requested drive power
+	std::optional<std::pair<double, double>> _last_cmd_vel;
 	// protects _joint_repeat_running and _joint_repeat_thread
 	std::mutex _joint_repeat_mutex;
 	bool _joint_repeat_running;
