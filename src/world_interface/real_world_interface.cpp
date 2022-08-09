@@ -82,15 +82,31 @@ void initMotors() {
 
 void setupCameras() {
 	try {
-		auto arCam = std::make_shared<cam::Camera>();
-		arCam->openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
-		cameraMap[Constants::AR_CAMERA_ID] = arCam;
+		auto cam = std::make_shared<cam::Camera>();
+		cam->openFromConfigFile(Constants::AR_CAMERA_CONFIG_PATH);
+		cameraMap[Constants::AR_CAMERA_ID] = cam;
 	} catch (const std::exception& e) {
 		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n",
 			util::to_string(Constants::AR_CAMERA_ID).c_str(), e.what());
 	}
-
-	// Set up the rest of the cameras here
+	/* TODO: see why only 2 cams can be open at a time
+	try {
+		auto cam = std::make_shared<cam::Camera>();
+		cam->openFromConfigFile(Constants::FOREARM_CAMERA_CONFIG_PATH);
+		cameraMap[Constants::FOREARM_CAMERA_ID] = cam;
+	} catch (const std::exception& e) {
+		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n",
+			util::to_string(Constants::AR_CAMERA_ID).c_str(), e.what());
+	}
+	*/
+	try {
+		auto cam = std::make_shared<cam::Camera>();
+		cam->openFromConfigFile(Constants::HAND_CAMERA_CONFIG_PATH);
+		cameraMap[Constants::HAND_CAMERA_ID] = cam;
+	} catch (const std::exception& e) {
+		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n",
+			util::to_string(Constants::AR_CAMERA_ID).c_str(), e.what());
+	}
 }
 } // namespace
 

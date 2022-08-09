@@ -1,9 +1,9 @@
 %YAML:1.0
 ---
-name: "mast"
-description: "Camera located on the mast of the rover."
+name: "forearm"
+description: "Camera located on the forearm of the rover."
 # Make sure that this camera_id matches the one defined in the udev rules.
-camera_id: 20
+camera_id: 30
 calib_info:
    calibration_time: "Sat 01 May 2021 01:54:16 PM PDT"
    board_width: 11
