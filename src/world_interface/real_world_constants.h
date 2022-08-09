@@ -83,7 +83,7 @@ constexpr auto motorPulsesPerJointRevMap = frozen::make_unordered_map<motorid_t,
  * Negative values mean that the motor is inverted.
 */
 constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.1831},
+	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.5},
 												   {motorid_t::shoulder, -1},
 												   {motorid_t::elbow, 0.75},
 												   {motorid_t::forearm, 0.1},
@@ -93,13 +93,13 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::frontRightWheel, 0.5},
 												   {motorid_t::rearLeftWheel, -0.5},
 												   {motorid_t::rearRightWheel, -0.5},
-												   {motorid_t::hand, 0.2289}});
+												   {motorid_t::hand, 0.75}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
 */
 constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.1831},
+	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, 0.5},
 												   {motorid_t::shoulder, -1},
 												   {motorid_t::elbow, 0.75},
 												   {motorid_t::forearm, 0.1},
@@ -109,6 +109,6 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::frontRightWheel, 0.5},
 												   {motorid_t::rearLeftWheel, -0.5},
 												   {motorid_t::rearRightWheel, -0.5},
-												   {motorid_t::hand, 0.2289}});
+												   {motorid_t::hand, 0.75}});
 
 } // namespace robot
