@@ -146,7 +146,7 @@ $(function() {
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>     {motorid_t::differentialRight, 360 * 1000}});</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">   85</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a> =</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.1831},</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.5},</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>                                                   {motorid_t::shoulder, -1},</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                                                   {motorid_t::elbow, 0.75},</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                                                   {motorid_t::forearm, 0.1},</div>
@@ -156,9 +156,9 @@ $(function() {
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                                                   {motorid_t::frontRightWheel, 0.5},</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>                                                   {motorid_t::rearLeftWheel, -0.5},</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>                                                   {motorid_t::rearRightWheel, -0.5},</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>                                                   {motorid_t::hand, 0.2289}});</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>                                                   {motorid_t::hand, 0.75}});</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">  101</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">negative_pwm_scales</a> =</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.1831},</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.5},</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>                                                   {motorid_t::shoulder, -1},</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>                                                   {motorid_t::elbow, 0.75},</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>                                                   {motorid_t::forearm, 0.1},</div>
@@ -168,7 +168,7 @@ $(function() {
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>                                                   {motorid_t::frontRightWheel, 0.5},</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>                                                   {motorid_t::rearLeftWheel, -0.5},</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>                                                   {motorid_t::rearRightWheel, -0.5},</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>                                                   {motorid_t::hand, 0.2289}});</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>                                                   {motorid_t::hand, 0.75}});</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>} <span class="comment">// namespace robot</span></div>
 <div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
