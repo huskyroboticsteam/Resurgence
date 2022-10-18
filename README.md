@@ -1,22 +1,43 @@
 # Resurgence
 Main onboard codebase for the Husky Robotics 2021-2022 rover Resurgence.
 
-# Project Setup
-### Notes for users of non-Linux operating systems
+# Pre-Setup Notes
 
 Our codebase is developed for an NVIDIA Jetson TX2, which runs Ubuntu Linux; as such, much
 of our code will be Unix-specific.
 
+> ⚠️ The only supported platform is Ubuntu 20.04 LTS. Other versions/distros/platforms may work, but if you want as easy as possible, go with this version. 
+
 **Windows users:** You should use either [Windows Subsystem for
 Linux](https://docs.microsoft.com/en-us/windows/wsl/about) or a VM with a Linux
-distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions.
+distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions. As noted above, **use Ubuntu 20.04**.
 
 **Mac users:** We do not make any effort to support Mac systems. You *may* be able to get things working, but if you try you'll be on your own. It's **highly recommended** for Mac users to use a Linux VM.
 
-**From here on out, the installation instructions will assume you are using Linux**. Windows users should run commands in either their Linux VM or their WSL
+**From here on out, the installation instructions will assume you are using Ubuntu 20.04 LTS**. Windows users should run commands in either their Linux VM or their WSL
 terminal. For Linux users, we'll assume you're running Ubuntu; users of another
 distribution may need to change some instructions (e.g. package managers) depending on
 your distro.
+
+# Project Setup (Easy Install)
+
+Make sure software is up to date (`sudo apt upgrade` is optional):
+```bash
+sudo apt update
+```
+
+Install dependencies in one go:
+```bash
+bash easy-install.sh
+```
+
+Clone repository:
+```bash
+cd <place to put repository>
+git clone https://github.com/huskyroboticsteam/Resurgence/
+```
+
+# Project Setup (Manual)
 
 ## Install System Tools
 For further steps (and development in general) you'll need:
@@ -163,6 +184,7 @@ repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
 sudo apt-get install frozen libargparse-dev
 ```
 
+# Running the code
 ## Set up the build directory
   
 Now, you're ready to build the Resurgence project. Return to the Resurgence directory and run:
@@ -215,7 +237,7 @@ Since the `Rover` target now builds the simulator rover code instead of the real
 
 ```bash
 cd build
-rm -rf *
+rm -r *
 cmake ../src
 make -j Rover
 ```
