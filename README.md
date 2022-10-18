@@ -5,36 +5,18 @@ Main onboard codebase for the Husky Robotics 2021-2022 rover Resurgence.
 ### Notes for users of non-Linux operating systems
 
 Our codebase is developed for an NVIDIA Jetson TX2, which runs Ubuntu Linux; as such, much
-of our code will be Unix-specific. Mac is Unix-like, so most things should work on Mac
-(except for a few Linux-specific bits) but Windows will not be compatible as it uses a
-completely different API.
+of our code will be Unix-specific.
 
 **Windows users:** You should use either [Windows Subsystem for
 Linux](https://docs.microsoft.com/en-us/windows/wsl/about) or a VM with a Linux
-distribution installed (Ubuntu recommended). **In most cases, it's highly recommended you
-use a VM**, since WSL does not support USB hardware access (for cameras, LiDAR, etc.,
-**and only supports graphics on Windows 11**. If you are going to need either of these,
-**please use a VM.**
+distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions.
 
-**Mac users:** Mac does not support
-[CAN](https://en.wikipedia.org/wiki/CAN_bus), the protocol which we
-use to communicate with hardware made by the Electronics team. If you
-are doing any low-level hardware integration (e.g. controlling motors
-or communicating with any Electronics board) then **please use a VM**
-to develop the code (so that Linux kernel headers are present); you
-may need to use the Jetson anyway to test the CAN code since usually
-only embedded computers have CAN hardware. Otherwise, Mac should
-mostly work out of the box (_TODO: verify this_) although the
-installation instructions are different.
+**Mac users:** We do not make any effort to support Mac systems. You *may* be able to get things working, but if you try you'll be on your own. It's **highly recommended** for Mac users to use a Linux VM.
 
-**From here on out, the installation instructions will assume you are using Linux or
-Mac**. Windows users should run commands in either their Linux VM or their WSL
+**From here on out, the installation instructions will assume you are using Linux**. Windows users should run commands in either their Linux VM or their WSL
 terminal. For Linux users, we'll assume you're running Ubuntu; users of another
 distribution may need to change some instructions (e.g. package managers) depending on
-your distro. If you are using a GNU/Linux distribution natively or in a VM, you can often
-paste with `CTRL+SHIFT+v`. If you are using Windows Subsystem for Linux, these commands
-should be executed in your WSL terminal, and you can paste with right click. Mac users
-should be able to paste with `Command+v`.
+your distro.
 
 ## Install System Tools
 For further steps (and development in general) you'll need:
@@ -53,19 +35,7 @@ Then, to install the tools, run
 sudo apt install build-essential cmake git
 ```
 
-### Mac
-First, you'll need to get the [Homebrew](https://brew.sh) package manager
-installed. To do this, run the following command in a terminal:
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-Then, to install the tools, run
-```bash
-brew install cmake
-```
-
-## (*Linux users only*) Setup Ubuntu repository
+## Setup Ubuntu repository
 The project depends on many third-party libraries (mostly for sensors,
 distributed by the sensor manufacturers) that we have packaged in a third-party
 Ubuntu package repository. *Before continuing*, you should follow the
@@ -94,41 +64,13 @@ This is a library developed by Electronics for interfacing with their
 motors and sensors over the
 [CAN](https://en.wikipedia.org/wiki/CAN_bus) bus; it is needed for packet definitions and utility functions and doesn't actually require support for a physical CAN bus.
 
-### Linux
+
 Assuming the Ubuntu repository has been set up:
 ```bash
 sudo apt install hindsight-can
 ```
 
-### Mac
-You will unfortunately need to build from source:
-```bash
-# Clone the repository
-git clone https://github.com/huskyroboticsteam/HindsightCAN
-# Navigate inside the cloned repository
-cd HindsightCAN
-# Set up a build folder and enter it
-mkdir -p build && cd build
-# Run CMake configuration
-cmake ..
-# Build project and install
-sudo cmake --build . --target install
-# Navigate back to previous directory
-cd ../..
-```
-
 ## Install OpenCV
-
-OpenCV takes a while to install ~~and is **optional** unless you're running
-computer vision code.~~ (not yet!)
-
-OpenCV is a computer vision library that's used for our computer vision code, including
-the AR tag detection. We will also need its extra contributed ("contrib") modules for its
-ARUco implementation. **You must install OpenCV 4, preferably at least OpenCV 4.1.0**
-(although most of our code will be built against 4.2.0, since that is what is packaged in
-Ubuntu's repositories, any 4.X.X version should theoretically work).
-
-### Linux
 
 OpenCV and its contrib modules are packaged for Ubuntu. For other distributions, check to
 see if `libopencv` and `libopencv-contrib` are included in your distribution's package
@@ -139,14 +81,8 @@ To install, run the following command:
 sudo apt install libopencv-dev libopencv-contrib-dev
 ```
 
-### On Mac
-There is a Homebrew package available for OpenCV on Mac OS; run this command to install it:
-```bash
-brew install opencv@4
-```
-
 ## Install Catch2 (for unit testing)
-### Linux
+
 If you are on Ubuntu, you can use our Ubuntu package repository.
 Follow the instructions on <https://huskyroboticsteam.github.io/ubuntu-repo> first, and 
 then once you're finished, you can run
@@ -154,17 +90,7 @@ then once you're finished, you can run
 sudo apt install catch2
 ```
 
-### On Mac
-There is a Homebrew package for Catch2 as well. Open the Terminal and run this
-command:
-```bash
-brew install catch2
-```
-
 ## Install URG library (Hokuyo lidar)
-
-~~This is **optional** unless you are connecting to our hardware lidar
-sensor.~~ (not yet!)
 
 ### Linux
 On Ubuntu, make sure you have followed the
@@ -174,69 +100,35 @@ repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
 sudo apt install urg-lidar
 ```
 
+If you need to actually access the hardware (e.g. you're provisioning the jetson)
 
-### Mac
-Unfortunately on Mac, you will have to build the library from source. These instructions
-can also be found in the
-[huskyrobotics/urg-lidar](https://github.com/huskyroboticsteam/urg-lidar)
-repository's README.
 ```bash
-# Clone repository
-git clone https://github.com/huskyroboticsteam/urg-lidar.git
-# Enter cloned directory
-cd urg-lidar
-# Make a build directory to hold compiled code
-mkdir -p build
-# Enter build directory
-cd build
-# Configure CMake
-cmake ..
-# Build/Install URG lidar library
-sudo make install
-# Navigate back to working directory
-cd ../..
-```
-
-
-(TODO: actually include udev rules) ~~By default on Ubuntu, the USB lidar device
-will only be accessible to the root user (e.g. via sudo). To make it accessible
-to everyone:~~
-
-```
 sudo cp src/lidar/50-usb-hokuyo-lidar.rules /etc/udev/rules.d
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
+## Install RPLidar
+
+```bash
+sudo apt install rplidar
+```
+
 ## Install [Eigen](http://eigen.tuxfamily.org)
 
-### Linux
 On Ubuntu, you will be able to install via
 
 ```bash
 sudo apt-get install libeigen3-dev
 ```
 
-### Mac
-On Mac, you will be able to install via
-```bash
-brew install eigen
-```
-
 ## Install JSON library
 
-### Ubuntu 20.04
 ```bash
 sudo apt-get install nlohmann-json3-dev
 ```
 
-### Mac
-```bash
-brew install nlohmann-json
-```
-
 ## Install WebSocket library
 
-### Ubuntu 20.04
 Websocket++ depends on a module from boost, so we'll need to install that too.
 ```bash
 sudo apt install libwebsocketpp-dev libboost-system-dev
@@ -244,10 +136,6 @@ sudo apt install libwebsocketpp-dev libboost-system-dev
 
 ## Install GPS libraries
 
-~~This is **optional** unless you are connecting to our hardware GPS
-sensor.~~ (not yet!** This is required to build for now.
-
-### Linux
 
 On Ubuntu, make sure you have followed the
 [instructions to install our Ubuntu
@@ -262,39 +150,11 @@ command installs `ublox-linux` as well to interact with that. Even `ublox-linux`
 is a temporary solution; Electronics plans to integrate the GPS into a board
 which we will query over CAN.)
 
-### Mac
-
-On Mac, you are able to install `gpsd` via
-```bash
-brew install gpsd
-```
-but you will have to build `ublox-linux` from source. These instructions
-can also be found in the
-[huskyrobotics/ublox-linux](https://github.com/huskyroboticsteam/ublox-linux)
-repository's README.
-```bash
-# Clone repository (--recursive is important! Build won't work without submodules)
-git clone --recursive https://github.com/huskyroboticsteam/ublox-linux.git
-# Enter cloned directory
-cd ublox-linux
-# Make a build directory to hold compiled code
-mkdir -p build
-# Enter build directory
-cd build
-# Configure CMake
-cmake ..
-# Build/Install Ublox Linux library
-sudo make install
-# Navigate back to working directory
-cd ../..
-```
-
 ## Install other libraries
 
 We need the Frozen library for making immutable compile-time constant
 containers, and argparse for parsing command-line arguments.
 
-### Linux
 On Ubuntu, make sure you have followed the
 [instructions to install our Ubuntu
 repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
