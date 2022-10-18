@@ -1,5 +1,5 @@
 # Resurgence
-Main onboard codebase for the Husky Robotics 2021-2022 rover Resurgence.
+Main onboard codebase for the Husky Robotics rover.
 
 # Pre-Setup Notes
 
@@ -21,14 +21,10 @@ your distro.
 
 # Project Setup (Easy Install)
 
-Make sure software is up to date (`sudo apt upgrade` is optional):
+Make sure software is up to date (`sudo apt upgrade` is optional) and install required tools:
 ```bash
 sudo apt update
-```
-
-Install dependencies in one go:
-```bash
-bash easy-install.sh
+sudo apt install -y git
 ```
 
 Clone repository:
@@ -37,6 +33,12 @@ cd <place to put repository>
 git clone https://github.com/huskyroboticsteam/Resurgence/
 ```
 
+Install dependencies in one go:
+```bash
+cd Resurgence
+chmod +x easy_install.sh
+./easy_install.sh
+```
 # Project Setup (Manual)
 
 ## Install System Tools
@@ -183,6 +185,25 @@ repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
 ```bash
 sudo apt-get install frozen libargparse-dev
 ```
+
+# IDE Setup
+
+## Native Linux 
+If you're running Linux natively, set up your IDE however you like. We recommend [VSCode](https://code.visualstudio.com/).
+
+## WSL2 on Windows
+Again, we recommend [VSCode](https://code.visualstudio.com/), which has very good [WSL integration](https://code.visualstudio.com/docs/remote/wsl).
+
+## Linux on VM
+You could do one of the following:
+
+a) Develop within the VM, in which case see "Native Linux" above.
+
+b) Create a shared folder (shared between your computer and VM) and clone the project there. Then use an editor to edit the files on your machine and run them within the VM.
+
+c) Set up the VM as an ssh server (pretty easy) and run VSCode on your machine (not the VM) using the [remote development](https://code.visualstudio.com/docs/remote/ssh) feature.
+
+Of these, (c) probably has the most convenient/usable setup, while (a) is probably the least work.
 
 # Running the code
 ## Set up the build directory
