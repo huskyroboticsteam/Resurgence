@@ -3,6 +3,7 @@
 #include "../log.h"
 #include "CANUtils.h"
 
+#include <memory>
 #include <chrono>
 #include <cstring>
 #include <mutex>
