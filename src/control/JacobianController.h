@@ -12,12 +12,31 @@
 
 namespace control {
 
+/**
+ * @brief This class controls the position of a multidimensional mechanism
+ * with a trapezoidal velocity profile using the jacobian of the kinematics.
+ *
+ * @tparam outputDim The dimension of the output vector of the kinematic function.
+ * @tparam inputDim The dimension of the input vector of the kinematic function.
+ * @see https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant
+ */
 template <int outputDim, int inputDim> class JacobianController {
 private:
 	template <int dim> using Vectord = filters::statespace::Vectord<dim>;
 	template <int rows, int cols> using Matrixd = filters::statespace::Matrixd<rows, cols>;
 
 public:
+	/**
+	 * @brief Construct a new controller.
+	 *
+	 * @param kinematicsFunc The kinematics of the mechanism being controlled. This is
+	 * a function that takes in some input vector (ex: joint angles of an arm) and outputs
+	 * another vector (ex: the 3d pose of the hand)
+	 * @param jacobianFunc The jacobian of the kinematic function.
+	 * When executing a command, getCommand() should be called at this rate.
+	 * @param maxVels The maximum velocity in the output space of the kinematic function.
+	 * @param maxAccels The maximum acceleration in the output space of the kinematic function.
+	 */
 	JacobianController(
 		const std::function<Vectord<outputDim>(const Vectord<inputDim>&)>& kinematicsFunc,
 		const std::function<Matrixd<outputDim, inputDim>(const Vectord<inputDim>&)>&
@@ -34,11 +53,29 @@ public:
 		assert(this->jacobianFunc);
 	}
 
+	/**
+	 * @brief Get the current command.
+	 *
+	 * @param elapsedTime The time since the target was commanded.
+	 * @param currPos The current position, in the input space.
+	 * @return Vectord<inputDim> The target position, in the input space of the kinematic function.
+	 * Returns the current position if no target is set.
+	 */
 	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos) const {
 		double unused;
 		return getCommand(elapsedTime, currPos, unused);
 	}
 
+	/**
+	 * @brief Get the current command.
+	 *
+	 * @param elapsedTime The time since the target was commanded.
+	 * @param currPos The current position, in the input space.
+	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the returned target and the delta to the commanded target.
+	 * This similarity may be low if the kinematics of the mechanism do not allow it to move in the commanded direction.
+	 * @return Vectord<inputDim> The target position, in the input space of the kinematic function.
+	 * Returns the current position if no target is set.
+	 */
 	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos,
 								 double& cosineSim) const {
 		if (!velocityProfile.hasTarget()) {
@@ -58,15 +95,29 @@ public:
 		return currPos + inputPosDiff;
 	}
 
+	/**
+	 * @brief Set the target position of the controller.
+	 *
+	 * @param currPos The current position in the input space.
+	 * @param target The target position in the output space.
+	 */
 	void setTarget(const Vectord<inputDim>& currPos, const Vectord<outputDim>& target) {
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		velocityProfile.setTarget(currPosOutput, target);
 	}
 
+	/**
+	 * @brief Check if a target has been set.
+	 *
+	 * @return bool True iff a target has been set.
+	 */
 	bool hasTarget() {
 		return velocityProfile.hasTarget();
 	}
 
+	/**
+	 * @brief Reset the controller, unsetting the target.
+	 */
 	void reset() {
 		velocityProfile.reset();
 	}

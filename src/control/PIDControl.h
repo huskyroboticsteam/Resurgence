@@ -13,28 +13,40 @@ namespace control {
 
 constexpr int MS_PER_S = 1000;
 
+/**
+ * @brief A set of PID gains.
+ * @see https://en.wikipedia.org/wiki/PID_controller
+ */
 struct PIDGains {
 	double kP, kI, kD, kF;
 	double iZone;
 };
 
+/**
+ * @brief A PID controller for multiple independent dimensions.
+ *
+ * @tparam dim The number of dimensions to control.
+ * @see https://en.wikipedia.org/wiki/PID_controller
+ */
 template <int dim> class PIDController {
 public:
 	template <int d> using Arrayd = Eigen::Array<double, d, 1>;
 
-	PIDController(const std::array<PIDGains, dim>& gains)
-		: PIDController(
-			  gains, [](const auto& x) { return x; }, [](const auto& x) { return x; }) {}
-
-	PIDController(
-		const std::array<PIDGains, dim>& gains,
-		std::function<Arrayd<dim>(const Arrayd<dim>&)> ctrlToObsFn,
-		std::function<Eigen::Matrix<double, dim, dim>(const Arrayd<dim>&)> ctrlToObsJacobianFn)
-		: ctrlToObsFn(ctrlToObsFn), ctrlToObsJacobianFn(ctrlToObsJacobianFn) {
+	/**
+	 * @brief Construct a new PIDController.
+	 *
+	 * @param gains The gains to use for the controller.
+	 */
+	PIDController(const std::array<PIDGains, dim>& gains) {
 		reset();
 		setGains(gains);
 	}
 
+	/**
+	 * @brief Set the gains of the PID controller.
+	 *
+	 * @param gains The new gains to set.
+	 */
 	void setGains(const std::array<PIDGains, dim>& gains) {
 		for (int i = 0; i < dim; i++) {
 			kP(i) = gains[i].kP;
@@ -45,20 +57,35 @@ public:
 		}
 	}
 
+	/**
+	 * @brief Check if a target is currently set.
+	 *
+	 * @return bool True iff the controller currently has a target.
+	 */
 	bool hasTarget() {
 		return setPoint.has_value();
 	}
 
+	/**
+	 * @brief Set the target of the controller.
+	 *
+	 * @param setPoint An array of setpoints, one for each dimension.
+	 */
 	void setTarget(const Arrayd<dim>& setPoint) {
-		this->setPoint = ctrlToObsJacobianFn(setPoint);
+		this->setPoint = setPoint;
 	}
 
-	Arrayd<dim> getOutput(robot::types::datatime_t currTime, const Arrayd<dim>& currValue_) {
+	/**
+	 * @brief Get the output from the controller.
+	 *
+	 * @param currTime The current timestamp.
+	 * @param currValue The current values of the controlled signals.
+	 * @return Arrayd<dim> Targets for each dimension if target is set, else zeros.
+	 */
+	Arrayd<dim> getOutput(robot::types::datatime_t currTime, const Arrayd<dim>& currValue) {
 		if (!setPoint.has_value()) {
 			return Arrayd<dim>::Zero();
 		}
-
-		Arrayd<dim> currValue = ctrlToObsFn(currValue_);
 
 		Arrayd<dim> err = setPoint.value() - currValue;
 		Arrayd<dim> pTerm = err * kP;
@@ -68,6 +95,7 @@ public:
 		Arrayd<dim> dTerm = Arrayd<dim>::Zero();
 
 		if (lastData.has_value()) {
+			// TODO: instead of numerically differentiating we can use a model (if we have one)
 			auto [lastTime, lastValue] = lastData.value();
 			auto dt =
 				std::chrono::duration_cast<std::chrono::milliseconds>(currTime - lastTime);
@@ -84,13 +112,12 @@ public:
 		lastData = {currTime, currValue};
 		Arrayd<dim> output = pTerm + iTerm + dTerm + fTerm;
 
-		// TODO: verify - is the inverse jacobian the right thing to do here?
-		// It's not. Use jacobian of position, or just use ctrlToObsPowerMapping or something.
-		// Controlled value doesn't have to be position.
-		Eigen::Matrix<double, dim, dim> jacobian = ctrlToObsJacobianFn(currValue_);
-		return jacobian.colPivHouseholderQR().solve(output.matrix());
+		return output;
 	}
 
+	/**
+	 * @brief Reset the controller.
+	 */
 	void reset() {
 		setPoint.reset();
 		lastData.reset();
@@ -103,9 +130,5 @@ private:
 	Arrayd<dim> iAccum;
 	std::optional<Arrayd<dim>> setPoint;
 	std::optional<std::pair<robot::types::datatime_t, Arrayd<dim>>> lastData;
-
-	// trf takes from observed space -> control space, trvInv is inverse
-	std::function<Arrayd<dim>(const Arrayd<dim>&)> ctrlToObsFn;
-	std::function<Eigen::Matrix<double, dim, dim>(const Arrayd<dim>&)> ctrlToObsJacobianFn;
 };
 } // namespace control

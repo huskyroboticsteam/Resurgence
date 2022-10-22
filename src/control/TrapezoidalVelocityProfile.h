@@ -11,17 +11,48 @@
 
 namespace control {
 
+// TODO: change to use timestamps instead of elapsed time (maybe use both)
+
+/**
+ * @brief Trapezoidal velocity profile in a single dimension.
+ * @see https://robotacademy.net.au/lesson/1d-trapezoidal-trajectory/
+ */
 class SingleDimTrapezoidalVelocityProfile {
 public:
+	/**
+	 * @brief Construct a new velocity profile.
+	 *
+	 * @param maxVel The maximum velocity the profile should attain.
+	 * @param maxAccel The maximum acceleration the profile should use.
+	 */
 	SingleDimTrapezoidalVelocityProfile(double maxVel, double maxAccel);
 
+	/**
+	 * @brief Calculate a profile.
+	 *
+	 * @param startPos The position the profile starts at.
+	 * @param endPos The position the profile ends at.
+	 */
 	void setTarget(double startPos, double endPos);
 
+	/**
+	 * @brief Check if a profile has been calculated.
+	 *
+	 * @return bool True iff setTarget() has been called since construction or the last reset.
+	 */
 	bool hasTarget() const;
 
-	// returns target position
+	/**
+	 * @brief Get the target position.
+	 *
+	 * @param elapsedTime Time elapsed, in seconds, since the profile was constructed.
+	 * @return double The target position if hasTarget() is true, else 0.
+	 */
 	double getCommand(double elapsedTime) const;
 
+	/**
+	 * @brief Reset the profile and clear any calculated profile.
+	 */
 	void reset();
 
 private:
