@@ -11,8 +11,6 @@
 
 namespace control {
 
-// TODO: change to use timestamps instead of elapsed time (maybe use both)
-
 /**
  * @brief Trapezoidal velocity profile in a single dimension.
  * @see https://robotacademy.net.au/lesson/1d-trapezoidal-trajectory/
@@ -28,12 +26,13 @@ public:
 	SingleDimTrapezoidalVelocityProfile(double maxVel, double maxAccel);
 
 	/**
-	 * @brief Calculate a profile.
+	 * @brief Calculate a profile, assuming the mechanism begins and ends at rest.
 	 *
+	 * @param currTime The current timestamp.
 	 * @param startPos The position the profile starts at.
 	 * @param endPos The position the profile ends at.
 	 */
-	void setTarget(double startPos, double endPos);
+	void setTarget(robot::types::datatime_t currTime, double startPos, double endPos);
 
 	/**
 	 * @brief Check if a profile has been calculated.
@@ -45,10 +44,10 @@ public:
 	/**
 	 * @brief Get the target position.
 	 *
-	 * @param elapsedTime Time elapsed, in seconds, since the profile was constructed.
+	 * @param currTime The current timestamp.
 	 * @return double The target position if hasTarget() is true, else 0.
 	 */
-	double getCommand(double elapsedTime) const;
+	double getCommand(robot::types::datatime_t currTime) const;
 
 	/**
 	 * @brief Reset the profile and clear any calculated profile.
@@ -57,6 +56,7 @@ public:
 
 private:
 	struct profile_t {
+		robot::types::datatime_t startTime;
 		double stopAccelTime;
 		double startDecelTime;
 		double totalTime;
@@ -87,25 +87,27 @@ public:
 						   [](const auto& p) { return p.hasTarget(); });
 	}
 
-	void setTarget(const std::array<double, dim>& startPos,
+	void setTarget(robot::types::datatime_t currTime,
+				   const std::array<double, dim>& startPos,
 				   const std::array<double, dim>& endPos) {
 		for (int i = 0; i < dim; i++) {
-			profiles[i].setTarget(startPos[i], endPos[i]);
+			profiles[i].setTarget(currTime, startPos[i], endPos[i]);
 		}
 	}
 
-	void setTarget(const Eigen::Matrix<double, dim, 1>& startPos,
+	void setTarget(robot::types::datatime_t currTime,
+				   const Eigen::Matrix<double, dim, 1>& startPos,
 				   const Eigen::Matrix<double, dim, 1>& endPos) {
 		for (int i = 0; i < dim; i++) {
-			profiles[i].setTarget(startPos[i], endPos[i]);
+			profiles[i].setTarget(currTime, startPos[i], endPos[i]);
 		}
 	}
 
 	// returns zero vector if no target
-	Eigen::Matrix<double, dim, 1> getCommand(double elapsedTime) const {
+	Eigen::Matrix<double, dim, 1> getCommand(robot::types::datatime_t currTime) const {
 		Eigen::Matrix<double, dim, 1> ret;
 		for (int i = 0; i < dim; i++) {
-			ret[i] = profiles[i].getCommand(elapsedTime);
+			ret[i] = profiles[i].getCommand(currTime);
 		}
 		return ret;
 	}

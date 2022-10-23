@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../filters/StateSpaceUtil.h"
+#include "../Util.h"
 
 #include <functional>
 #include <optional>
@@ -34,38 +35,39 @@ public:
 	JacobianVelController(
 		const std::function<Vectord<outputDim>(const Vectord<inputDim>&)>& kinematicsFunc,
 		const std::function<Matrixd<outputDim, inputDim>(const Vectord<inputDim>&)>&
-			jacobianFunc,
-		double dt) : kinematicsFunc(kinematicsFunc), jacobianFunc(jacobianFunc), dt(dt) {}
+			jacobianFunc) : kinematicsFunc(kinematicsFunc), jacobianFunc(jacobianFunc) {}
 
 	/**
 	 * @brief Get the current target position.
 	 *
+	 * @param currTime The current timestamp.
 	 * @param currPos The current position of the mechanism, in the kinematic input space.
 	 * @return Vectord<inputDim> The target position of the mechanism, in the kinematic input space.
 	 */
-	Vectord<inputDim> getCommand(const Vectord<inputDim>& currPos) const {
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, Vectord<inputDim>& currPos) const {
 		double unused;
-		return getCommand(currPos, unused);
+		return getCommand(currTime, currPos, unused);
 	}
 
 	/**
 	 * @brief Get the current target position.
 	 *
+	 * @param currTime The current timestamp.
 	 * @param currPos The current position of the mechanism, in the kinematic input sequence.
 	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the returned target and the delta to the commanded target.
 	 * This similarity may be low if the kinematics of the mechanism do not allow it to move in the commanded direction.
 	 * @return Vectord<inputDim> The target position of the mechanism, in the kinematic input space.
 	 * Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(const Vectord<inputDim>& currPos, double& cosineSim) const {
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, Vectord<inputDim>& currPos, double& cosineSim) const {
 		if (!controllerState) {
 			return currPos;
 		}
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		state_t state = controllerState.value();
+		double dt = util::durationToSec(currTime - state.timestamp);
 		Vectord<outputDim> lastTarget = state.lastTarget.value_or(currPosOutput);
 		Vectord<outputDim> currTarget = lastTarget + dt * state.targetVel;
-		state.lastTarget = currTarget;
 		Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
 		Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
 		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQR().solve(outputPosDiff);
@@ -74,16 +76,20 @@ public:
 		cosineSim = outputPosDiff.dot(trueOutputPosDiff) /
 					(outputPosDiff.norm() * trueOutputPosDiff.norm());
 
+		state_t newState = {.timestamp = currTime, .targetVel = state.targetVel, .lastTarget = currTarget};
+		controllerState = newState;
+
 		return currPos + inputPosDiff;
 	}
 
 	/**
 	 * @brief Set the target velocity.
 	 *
+	 * @param currTime The current timestamp.
 	 * @param targetVel The target velocity, in the output space of the kinematic function.
 	 */
-	void setTarget(const Vectord<outputDim>& targetVel) {
-		state_t state = {.targetVel = targetVel, .lastTarget = {}};
+	void setTarget(robot::types::datatime_t currTime, Vectord<outputDim>& targetVel) {
+		state_t state = {.timestamp = currTime, .targetVel = targetVel, .lastTarget = {}};
 		this->controllerState = state;
 	}
 
@@ -105,12 +111,12 @@ public:
 
 private:
 	struct state_t {
+		robot::types::datatime_t timestamp;
 		Vectord<outputDim> targetVel;
 		std::optional<Vectord<outputDim>> lastTarget;
 	};
 
 	std::function<Vectord<outputDim>(const Vectord<inputDim>&)> kinematicsFunc;
 	std::function<Matrixd<outputDim, inputDim>(const Vectord<inputDim>&)> jacobianFunc;
-	double dt;
 	std::optional<state_t> controllerState;
 };

@@ -339,6 +339,8 @@ if(WITH_TESTS)
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
     ../tests/worldmap/QuadTreeTest.cpp
+    # Util tests
+    ../tests/util/UtilTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)
 

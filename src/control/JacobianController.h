@@ -56,33 +56,33 @@ public:
 	/**
 	 * @brief Get the current command.
 	 *
-	 * @param elapsedTime The time since the target was commanded.
+	 * @param currTime The current timestamp.
 	 * @param currPos The current position, in the input space.
 	 * @return Vectord<inputDim> The target position, in the input space of the kinematic function.
 	 * Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos) const {
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos) const {
 		double unused;
-		return getCommand(elapsedTime, currPos, unused);
+		return getCommand(currTime, currPos, unused);
 	}
 
 	/**
 	 * @brief Get the current command.
 	 *
-	 * @param elapsedTime The time since the target was commanded.
+	 * @param currTime The current timestamp.
 	 * @param currPos The current position, in the input space.
 	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the returned target and the delta to the commanded target.
 	 * This similarity may be low if the kinematics of the mechanism do not allow it to move in the commanded direction.
 	 * @return Vectord<inputDim> The target position, in the input space of the kinematic function.
 	 * Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(double elapsedTime, const Vectord<inputDim>& currPos,
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos,
 								 double& cosineSim) const {
 		if (!velocityProfile.hasTarget()) {
 			return currPos;
 		}
 
-		Vectord<outputDim> currTarget = velocityProfile.getCommand(elapsedTime);
+		Vectord<outputDim> currTarget = velocityProfile.getCommand(currTime);
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
 		Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
@@ -98,12 +98,13 @@ public:
 	/**
 	 * @brief Set the target position of the controller.
 	 *
+	 * @param currTime The current timestamp.
 	 * @param currPos The current position in the input space.
 	 * @param target The target position in the output space.
 	 */
-	void setTarget(const Vectord<inputDim>& currPos, const Vectord<outputDim>& target) {
+	void setTarget(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos, const Vectord<outputDim>& target) {
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
-		velocityProfile.setTarget(currPosOutput, target);
+		velocityProfile.setTarget(currTime, currPosOutput, target);
 	}
 
 	/**

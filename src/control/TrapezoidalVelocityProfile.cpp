@@ -1,6 +1,9 @@
 #include "TrapezoidalVelocityProfile.h"
+#include <chrono>
 
 using namespace control;
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
 
 SingleDimTrapezoidalVelocityProfile::SingleDimTrapezoidalVelocityProfile(double maxVel,
 																		 double maxAccel)
@@ -10,8 +13,8 @@ void SingleDimTrapezoidalVelocityProfile::reset() {
 	profile.reset();
 }
 
-void SingleDimTrapezoidalVelocityProfile::setTarget(double startPos, double endPos) {
-	profile_t profile{.startPos = startPos, .endPos = endPos};
+void SingleDimTrapezoidalVelocityProfile::setTarget(robot::types::datatime_t currTime, double startPos, double endPos) {
+	profile_t profile{.startTime = currTime, .startPos = startPos, .endPos = endPos};
 	double rampUpTime = maxVel / maxAccel;
 	double rampUpDist = std::pow(maxVel, 2) / (2 * maxAccel);
 
@@ -33,13 +36,14 @@ bool SingleDimTrapezoidalVelocityProfile::hasTarget() const {
 	return this->profile.has_value();
 }
 
-double SingleDimTrapezoidalVelocityProfile::getCommand(double elapsedTime) const {
+double SingleDimTrapezoidalVelocityProfile::getCommand(robot::types::datatime_t currTime) const {
 	if (!profile) {
 		return 0;
 	}
 
 	profile_t profile = this->profile.value();
 	double sign = profile.endPos - profile.startPos;
+	double elapsedTime = duration_cast<milliseconds>(currTime - profile.startTime).count() / 1000.0;
 	if (elapsedTime < 0) {
 		return profile.startPos;
 	} else if (elapsedTime < profile.stopAccelTime) {
