@@ -73,6 +73,7 @@ public:
 	 * @param currPos The current position, in the input space.
 	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the returned target and the delta to the commanded target.
 	 * This similarity may be low if the kinematics of the mechanism do not allow it to move in the commanded direction.
+	 * May be NaN if stuck in singularity point, in which case the command is the current position.
 	 * @return Vectord<inputDim> The target position, in the input space of the kinematic function.
 	 * Returns the current position if no target is set.
 	 */
@@ -86,7 +87,7 @@ public:
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
 		Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
-		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQR().solve(outputPosDiff);
+		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQr().solve(outputPosDiff);
 
 		Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
 		cosineSim = outputPosDiff.dot(trueOutputPosDiff) /
@@ -112,7 +113,7 @@ public:
 	 *
 	 * @return bool True iff a target has been set.
 	 */
-	bool hasTarget() {
+	bool hasTarget() const {
 		return velocityProfile.hasTarget();
 	}
 

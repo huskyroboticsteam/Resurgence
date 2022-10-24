@@ -82,7 +82,7 @@ public:
 		}
 	}
 
-	bool hasTarget() {
+	bool hasTarget() const {
 		return std::any_of(profiles.begin(), profiles.end(),
 						   [](const auto& p) { return p.hasTarget(); });
 	}
