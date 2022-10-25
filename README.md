@@ -240,10 +240,10 @@ Note that (for now) unit tests cannot be run when configured to build the simula
 
 ### Launching the simulator
 
-Launch the appropriate simulator executable for your platform. Then, run the rover code:
+Launch the appropriate simulator executable for your platform. Then, run the rover code, using the `p` flag to specify a peripheral:
 
 ```bash
-./Rover
+./Rover -p {none|arm|science|lidar}
 ```
 
 The programs can be started in any order, it doesn't matter.
