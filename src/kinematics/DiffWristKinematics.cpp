@@ -5,6 +5,8 @@
 using Eigen::Matrix2f;
 using Eigen::Vector2f;
 
+namespace kinematics {
+
 gearpos_t::gearpos_t(const Vector2f& vec) : left(vec(0)), right(vec(1)) {}
 gearpos_t::gearpos_t(float left, float right) : left(left), right(right) {}
 Vector2f gearpos_t::vec() const {
@@ -61,4 +63,5 @@ gearpos_t DiffWristKinematics::jointPowerToGearPower(const jointpos_t &jointPwr)
 		gearPwr /= maxVal;
 	}
 	return gearPwr;
+}
 }

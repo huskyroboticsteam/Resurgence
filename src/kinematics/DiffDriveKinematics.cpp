@@ -5,6 +5,8 @@
 using namespace navtypes;
 using util::toTransformRotateFirst;
 
+namespace kinematics {
+
 DiffDriveKinematics::DiffDriveKinematics(double wheelBaseWidth)
 	: wheelBaseWidth(wheelBaseWidth) {
 }
@@ -49,4 +51,5 @@ pose_t DiffDriveKinematics::getPoseUpdate(const wheelvel_t& wheelVel, double hea
 pose_t DiffDriveKinematics::getNextPose(const wheelvel_t& wheelVel, const pose_t& pose,
 										double dt) const {
 	return pose + getPoseUpdate(wheelVel, pose(2), dt);
+}
 }
