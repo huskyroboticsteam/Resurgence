@@ -80,12 +80,10 @@ void parseCommandLine(int argc, char** argv) {
 																		 {"arm", mountedperipheral_t::arm}, 
 																		 {"science", mountedperipheral_t::scienceStation}, 
 																		 {"lidar", mountedperipheral_t::lidar}};
-			
-			log(LOG_INFO, "parseCommandLine got peripheral specified as %s\n", value);
 
 			if (allowed.find(value) != allowed.end())
 			{
-				log(LOG_INFO, "parseCommandLine validated peripheral\n");
+				log(LOG_INFO, "parseCommandLine got peripheral specified as: \"%s\"\n", value.c_str());
 				Globals::mountedPeripheral = allowed[value];
 				return value;
 			}
