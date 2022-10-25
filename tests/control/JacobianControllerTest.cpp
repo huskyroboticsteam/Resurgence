@@ -22,7 +22,7 @@ Eigen::Vector2d kinematics(const Eigen::Vector2d& joints) {
 }
 
 TEST_CASE("JacobianController", "[control][jacobiancontroller]") {
-	JacobianController<2,2> jc(kinematics, {}, {2, 2}, {1, 1});
+	JacobianController<2,2> jc(kinematics, {}, 2, 1);
 	datatime_t startTime(0s);
 
 	SECTION("Test Possible Target") {

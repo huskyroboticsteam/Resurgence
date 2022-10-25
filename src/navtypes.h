@@ -19,6 +19,9 @@ struct gpscoords_t {
 using obstacle_t = Eigen::ArrayX2d;
 using obstacles_t = std::vector<obstacle_t>;
 
+template <int d> using Vectord = Eigen::Matrix<double, d, 1>;
+template <int r, int c> using Matrixd = Eigen::Matrix<double, r, c>;
+
 using pose_t = Eigen::Vector3d;		 // Robot pose: x, y, theta
 using transform_t = Eigen::Matrix3d; // a pose in matrix form; see toPose below
 using trajectory_t = std::vector<transform_t>;

@@ -41,14 +41,13 @@ public:
 		const std::function<Vectord<outputDim>(const Vectord<inputDim>&)>& kinematicsFunc,
 		const std::function<Matrixd<outputDim, inputDim>(const Vectord<inputDim>&)>&
 			jacobianFunc,
-		const std::array<double, outputDim>& maxVels,
-		const std::array<double, outputDim>& maxAccels)
+		double maxVel, double maxAccel)
 		: kinematicsFunc(kinematicsFunc),
 		  jacobianFunc(jacobianFunc
 						   ? jacobianFunc
 						   : std::bind(filters::statespace::numericalJacobian, kinematicsFunc,
 									   std::placeholders::_1, outputDim)),
-		  velocityProfile(maxVels, maxAccels) {
+		  velocityProfile(maxVel, maxAccel) {
 		assert(this->kinematicsFunc);
 		assert(this->jacobianFunc);
 	}

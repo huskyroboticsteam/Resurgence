@@ -236,6 +236,8 @@ std::string to_string(const T& val) {
  */
 frozen::string freezeStr(const std::string& str);
 
+using dseconds = std::chrono::duration<double, std::chrono::seconds::period>;
+
 /**
  * @brief Convert a duration to seconds, as a double.
  * 
@@ -246,6 +248,6 @@ frozen::string freezeStr(const std::string& str);
  */
 template <typename Rep, typename Period>
 double durationToSec(std::chrono::duration<Rep, Period> dur) {
-	return std::chrono::duration_cast<std::chrono::duration<double, std::chrono::seconds::period>>(dur).count();
+	return std::chrono::duration_cast<dseconds>(dur).count();
 }
 } // namespace util

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../world_interface/data.h"
+#include "../Util.h"
+#include "../navtypes.h"
 
 #include <array>
 #include <cmath>
@@ -10,6 +12,141 @@
 #include <Eigen/Core>
 
 namespace control {
+
+/**
+ * @brief Trapezoidal velocity profile in multiple dimensions.
+ * Motion is coordinated so that all dimensions arrive at the goal at the same time.
+ */
+template <int dim> class TrapezoidalVelocityProfile {
+public:
+	/**
+	 * @brief Construct a new velocity profile object.
+	 *
+	 * @param maxVel The maximum velocity the profile should attain.
+	 * @param maxAccel The maximum acceleration the profile should use.
+	 */
+	TrapezoidalVelocityProfile(double maxVel, double maxAccel) : maxVel(maxVel), maxAccel(maxAccel) {}
+
+	/**
+	 * @brief Reset the profile and clear any calculated profile.
+	 */
+	void reset() {
+		profile.reset();
+	}
+
+	/**
+	 * @brief Check if a profile has been calculated.
+	 *
+	 * @return bool True iff setTarget() has been called since construction or the last reset.
+	 */
+	bool hasTarget() const {
+		return profile.has_value();
+	}
+
+	/**
+	 * @brief Calculate a profile, assuming the mechanism begins and ends at rest.
+	 *
+	 * @param currTime The current timestamp.
+	 * @param startPos The position the profile starts at.
+	 * @param endPos The position the profile ends at.
+	 */
+	void setTarget(robot::types::datatime_t currTime,
+				   const std::array<double, dim>& startPos,
+				   const std::array<double, dim>& endPos) {
+		navtypes::Vectord<dim> startVec, endVec;
+		for (int i = 0; i < dim; i++) {
+			startVec(i) = startPos[i];
+			endVec(i) = endPos[i];
+		}
+		setTarget(currTime, startVec, endVec);
+	}
+
+	/**
+	 * @brief Calculate a profile, assuming the mechanism begins and ends at rest.
+	 *
+	 * @param currTime The current timestamp.
+	 * @param startPos The position the profile starts at.
+	 * @param endPos The position the profile ends at.
+	 */
+	void setTarget(robot::types::datatime_t currTime,
+				   const navtypes::Vectord<dim>& startPos,
+				   const navtypes::Vectord<dim>& endPos) {
+		profile_t profile{.startTime = currTime, .startPos = startPos, .endPos = endPos};
+		double rampUpTime = maxVel / maxAccel;
+		double rampUpDist = std::pow(maxVel, 2) / (2 * maxAccel);
+
+		double dist = (endPos - startPos).norm();
+		if (2 * rampUpDist < dist) {
+			profile.stopAccelTime = rampUpTime;
+			double coastTime = (dist - 2 * rampUpDist) / maxVel;
+			profile.startDecelTime = rampUpTime + coastTime;
+			profile.totalTime = coastTime + 2 * rampUpTime;
+		} else {
+			double totalTime = 2 * std::sqrt(dist / maxAccel);
+			profile.stopAccelTime = profile.startDecelTime = totalTime / 2;
+			profile.totalTime = totalTime;
+		}
+		this->profile = profile;
+	}
+
+	/**
+	 * @brief Get the target position.
+	 *
+	 * @param currTime The current timestamp.
+	 * @return navtypes::Vectord<dim> The target position if hasTarget() is true, else 0 vector.
+	 */
+	navtypes::Vectord<dim> getCommand(robot::types::datatime_t currTime) const {
+		if (!profile) {
+			return navtypes::Vectord<dim>::Zero();
+		}
+
+		profile_t profile = this->profile.value();
+		navtypes::Vectord<dim> dir = (profile.endPos - profile.startPos).normalized();
+		double elapsedTime = util::durationToSec(currTime - profile.startTime);
+		if (elapsedTime < 0) {
+			return profile.startPos;
+		} else if (elapsedTime < profile.stopAccelTime) {
+			double dist = 0.5 * maxAccel * std::pow(elapsedTime, 2);
+			return profile.startPos + dir * dist;
+		} else if (elapsedTime < profile.startDecelTime) {
+			// area of trapezoid is average of bases times height
+			double dist = (2 * elapsedTime - profile.stopAccelTime) / 2.0 * maxVel;
+			return profile.startPos + dir * dist;
+		} else if (elapsedTime < profile.totalTime) {
+			double distFromEnd = 0.5 * maxAccel * std::pow(profile.totalTime - elapsedTime, 2);
+			return profile.endPos - dir * distFromEnd;
+		} else {
+			return profile.endPos;
+		}
+	}
+
+	/**
+	 * @brief Get the total time it takes to perform the profile.
+	 *
+	 * @return std::optional<util::dseconds> The total time.
+	 * If hasTarget() is false, returns empty optional.
+	 */
+	std::optional<util::dseconds> getTotalTime() const {
+		if (profile.has_value()) {
+			return util::dseconds(profile->totalTime);
+		} else {
+			return {};
+		}
+	}
+
+private:
+	struct profile_t {
+		robot::types::datatime_t startTime;
+		double stopAccelTime;
+		double startDecelTime;
+		double totalTime;
+		navtypes::Vectord<dim> startPos;
+		navtypes::Vectord<dim> endPos;
+	};
+	double maxVel, maxAccel;
+	std::optional<profile_t> profile;
+};
+
 
 /**
  * @brief Trapezoidal velocity profile in a single dimension.
@@ -54,66 +191,16 @@ public:
 	 */
 	void reset();
 
-private:
-	struct profile_t {
-		robot::types::datatime_t startTime;
-		double stopAccelTime;
-		double startDecelTime;
-		double totalTime;
-		double startPos;
-		double endPos;
-	};
-	double maxVel, maxAccel;
-	std::optional<profile_t> profile;
-};
-
-template <int dim> class TrapezoidalVelocityProfile {
-public:
-	TrapezoidalVelocityProfile(const std::array<double, dim>& maxVels,
-							   const std::array<double, dim>& maxAccels) {
-		for (int i = 0; i < dim; i++) {
-			profiles.emplace_back(maxVels[i], maxAccels[i]);
-		}
-	}
-
-	void reset() {
-		for (auto& profile : profiles) {
-			profile.reset();
-		}
-	}
-
-	bool hasTarget() const {
-		return std::any_of(profiles.begin(), profiles.end(),
-						   [](const auto& p) { return p.hasTarget(); });
-	}
-
-	void setTarget(robot::types::datatime_t currTime,
-				   const std::array<double, dim>& startPos,
-				   const std::array<double, dim>& endPos) {
-		for (int i = 0; i < dim; i++) {
-			profiles[i].setTarget(currTime, startPos[i], endPos[i]);
-		}
-	}
-
-	void setTarget(robot::types::datatime_t currTime,
-				   const Eigen::Matrix<double, dim, 1>& startPos,
-				   const Eigen::Matrix<double, dim, 1>& endPos) {
-		for (int i = 0; i < dim; i++) {
-			profiles[i].setTarget(currTime, startPos[i], endPos[i]);
-		}
-	}
-
-	// returns zero vector if no target
-	Eigen::Matrix<double, dim, 1> getCommand(robot::types::datatime_t currTime) const {
-		Eigen::Matrix<double, dim, 1> ret;
-		for (int i = 0; i < dim; i++) {
-			ret[i] = profiles[i].getCommand(currTime);
-		}
-		return ret;
-	}
+	/**
+	 * @brief Get the total time it takes to perform the profile.
+	 *
+	 * @return std::optional<util::dseconds> The total time.
+	 * If hasTarget() is false, returns empty optional.
+	 */
+	std::optional<util::dseconds> getTotalTime() const;
 
 private:
-	std::vector<SingleDimTrapezoidalVelocityProfile> profiles;
+	TrapezoidalVelocityProfile<1> profile;
 };
 
 } // namespace control

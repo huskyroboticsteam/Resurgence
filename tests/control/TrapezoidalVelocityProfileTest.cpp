@@ -55,6 +55,11 @@ TEST_CASE("Single Dimensional Trapezoidal Velocity Profile", "[control][trapvel]
 		REQUIRE_FALSE(profile.hasTarget());
 	}
 
+	SECTION("Test Total Time") {
+		profile.setTarget(start, 1, 11);
+		REQUIRE(profile.getTotalTime()->count() == 7_a);
+	}
+
 	SECTION("Test Monotonic") {
 		int steps = 100;
 		auto untilTime = start + 10s;
@@ -76,46 +81,74 @@ TEST_CASE("Single Dimensional Trapezoidal Velocity Profile", "[control][trapvel]
 TEST_CASE("Test Multi-Dimensional Trapezoidal Velocity Profile", "[control][trapvel]") {
 	double maxVel = 2, maxAccel = 1;
 	constexpr int dim = 2;
-	TrapezoidalVelocityProfile<dim> profile({maxVel, maxVel}, {maxAccel, maxAccel});
-	std::array<double, dim> startPos = {1, 11};
-	std::array<double, dim> endPos = {11, 1};
+	TrapezoidalVelocityProfile<dim> profile(maxVel, maxAccel);
+	Eigen::Vector2d startPos = {1, 11};
+	Eigen::Vector2d endPos = {11, 1};
 	datatime_t startTime(0s);
 
 	SECTION("Test Reset and Has Target") {
 		REQUIRE_FALSE(profile.hasTarget());
 		REQUIRE(profile.getCommand(startTime).array().isZero());
+		REQUIRE_FALSE(profile.getTotalTime().has_value());
+
 		profile.setTarget(startTime, startPos, endPos);
+
 		REQUIRE(profile.hasTarget());
 		REQUIRE_FALSE(profile.getCommand(startTime).array().isZero());
+		REQUIRE(profile.getTotalTime().has_value());
+
 		profile.reset();
+
 		REQUIRE_FALSE(profile.hasTarget());
 		REQUIRE(profile.getCommand(startTime).array().isZero());
+		REQUIRE_FALSE(profile.getTotalTime().has_value());
+	}
+
+	SECTION("Test Total Time") {
+		profile.setTarget(startTime, startPos, endPos);
+		REQUIRE(profile.getTotalTime()->count() == 9.07107_a);
+
+		Eigen::Vector2d start = {0, 0};
+		Eigen::Vector2d end = {10, 4};
+		profile.setTarget(startTime, start, end);
+		REQUIRE(profile.getTotalTime()->count() == 7.38516_a);
 	}
 
 	SECTION("Test Points") {
 		profile.setTarget(startTime, startPos, endPos);
+		auto profileTime = duration_cast<nanoseconds>(profile.getTotalTime().value());
 
-		REQUIRE(profile.getCommand(startTime + 0s).isApprox(Eigen::Vector2d{1, 11}));
-		REQUIRE(profile.getCommand(startTime + 1s).isApprox(Eigen::Vector2d{1.5, 10.5}));
-		REQUIRE(profile.getCommand(startTime + 2s).isApprox(Eigen::Vector2d{3, 9}));
-		REQUIRE(profile.getCommand(startTime + 6s).isApprox(Eigen::Vector2d{10.5, 1.5}));
-		REQUIRE(profile.getCommand(startTime + 7s).isApprox(Eigen::Vector2d{11, 1}));
+		REQUIRE(profile.getCommand(startTime + 0s).isApprox(startPos));
+		REQUIRE(profile.getCommand(startTime + 2s).isApprox(startPos + (endPos - startPos).normalized() * 2));
+		REQUIRE(profile.getCommand(startTime + profileTime / 2).isApprox((startPos + endPos)/2, 1e-5));
+		REQUIRE(profile.getCommand(startTime + profileTime - 2s).isApprox(endPos + (startPos - endPos).normalized() * 2, 1e-5));
+		REQUIRE(profile.getCommand(startTime + profileTime).isApprox(endPos));
 	}
 
-	SECTION("Test Set Target - Array") {
+	SECTION("Test Before and After Timestamps") {
 		profile.setTarget(startTime, startPos, endPos);
-		REQUIRE(profile.getCommand(startTime + 0s).isApprox(Eigen::Vector2d{1, 11}));
-		REQUIRE(profile.getCommand(startTime + 7s).isApprox(Eigen::Vector2d{11, 1}));
+		auto profileTime = duration_cast<nanoseconds>(profile.getTotalTime().value());
+
+		REQUIRE(profile.getCommand(startTime - 1s).isApprox(startPos));
+		REQUIRE(profile.getCommand(startTime + profileTime + 1s).isApprox(endPos));
 	}
 
 	SECTION("Test Set Target - Vector") {
-		Eigen::Matrix<double, dim, 1> startPosVec, endPosVec;
-		for (int i = 0; i < dim; i++) {
-			startPosVec(i) = startPos[i];
-			endPosVec(i) = endPos[i];
-		}
-		profile.setTarget(startTime, startPosVec, endPosVec);
+		profile.setTarget(startTime, startPos, endPos);
 		REQUIRE(profile.getCommand(startTime + 0s).isApprox(Eigen::Vector2d{1, 11}));
-		REQUIRE(profile.getCommand(startTime + 7s).isApprox(Eigen::Vector2d{11, 1}));
+		REQUIRE(profile.getCommand(startTime + duration_cast<nanoseconds>(profile.getTotalTime().value()))
+				.isApprox(Eigen::Vector2d{11, 1}));
+	}
+
+	SECTION("Test Set Target - Vector") {
+		std::array<double, dim> startPosArr, endPosArr;
+		for (int i = 0; i < dim; i++) {
+			startPosArr[i] = startPos(i);
+			endPosArr[i] = endPos(i);
+		}
+		profile.setTarget(startTime, startPosArr, endPosArr);
+		REQUIRE(profile.getCommand(startTime + 0s).isApprox(Eigen::Vector2d{1, 11}));
+		REQUIRE(profile.getCommand(startTime + duration_cast<nanoseconds>(profile.getTotalTime().value()))
+				.isApprox(Eigen::Vector2d{endPos[0], endPos[1]}));
 	}
 }
