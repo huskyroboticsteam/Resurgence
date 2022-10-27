@@ -21,7 +21,7 @@ information.
 - Opening curly braces should be placed on the same line as the block header. 
   For example:
   ```c
-  int MyFunction() {
+  int myFunction() {
       if (true) {
           while (false) {
           }
