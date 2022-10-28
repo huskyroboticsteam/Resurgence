@@ -9,6 +9,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
+using navtypes::Vectord;
 namespace filters {
 
 /**
@@ -149,9 +150,9 @@ private:
 template <int stateDim, int inputDim, int processNoiseDim, int numOutputs>
 class MultiSensorEKF : public KalmanFilterBase<stateDim, inputDim> {
 public:
-	using state_t = statespace::Vectord<stateDim>;
-	using input_t = statespace::Vectord<inputDim>;
-	using processnoise_t = statespace::Vectord<processNoiseDim>;
+	using state_t = navtypes::Vectord<stateDim>;
+	using input_t = navtypes::Vectord<inputDim>;
+	using processnoise_t = navtypes::Vectord<processNoiseDim>;
 
 	using statefunc_t =
 		std::function<state_t(const state_t&, const input_t&, const processnoise_t&)>;

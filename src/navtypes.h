@@ -29,36 +29,11 @@ using point_t =
 using points_t = std::vector<point_t>;
 using traj_points_t = std::vector<points_t>; // points_t for each time along a trajectory
 
-template <int dim>
-namespace filters::statespace {
-
 template <int rows, int cols>
 using Matrixd = Eigen::Matrix<double, rows, cols>;
 
 template <int dim>
 using Vectord = Eigen::Matrix<double, dim, 1>;
-
-constexpr double epsilon = 1e-5;
-
-Eigen::MatrixXd
-numericalJacobian(const std::function<Eigen::VectorXd(const Eigen::VectorXd&)>& func,
-				  const Eigen::VectorXd& x, int outputDim);
-
-/**
- * @brief Create a covariance matrix modelling independent variables with the given standard
- * deviations.
- *
- * @tparam size The dimension of the noise.
- * @param stdDevs The standard deviation of each element.
- * @return A size x size covariance matrix.
- */
-template <int size>
-Eigen::Matrix<double, size, size>
-createCovarianceMatrix(const Eigen::Matrix<double, size, 1>& stdDevs) {
-	Eigen::Matrix<double, size, 1> variances = stdDevs.array().square();
-	Eigen::Matrix<double, size, size> mat = variances.asDiagonal();
-	return mat;
-}
 
 struct URCLeg {
 	int left_post_id;

@@ -8,7 +8,7 @@
 
 using namespace filters;
 using namespace navtypes;
-using filters::statespace::Vectord;
+using navtypes::Vectord;
 
 TEST_CASE("FullPoseEstimator", "[filters]") {
 	FullPoseEstimator estimator({0.01, 0.01}, Constants::EFF_WHEEL_BASE, 0.1, {0.01, 0.01},
