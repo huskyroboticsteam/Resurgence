@@ -38,7 +38,6 @@ git clone https://github.com/huskyroboticsteam/Resurgence/
 Install dependencies in one go:
 ```bash
 cd Resurgence
-chmod +x easy_install.sh
 ./easy_install.sh
 ```
 
