@@ -69,34 +69,38 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 }
 
 void parseCommandLine(int argc, char** argv) {
-	// TODO: implement this method and use it to set the mounted peripheral
-	// *  argparse::ArgumentParser program("Rover");
+	argparse::ArgumentParser program("Rover", "N/A");
 
-	// *  program.add_argument("-p", "--peripheral")
-	// *  	.help("specify the peripheral mounted on the rover")
-	// *  	.default_value(std::string("none"))
-	// *  	.action([](const std::string& value) {
-	// *  		constexpr frozen::unordered choices = frozen::make_unordered_set<frozen::string>({"lidar", "science", "arm", "none"});
-	// *  		if (choices.find(value) != choices.end()) {
-	// *  			return value;
-	// *  		} else {
-	// *  			throw std::runtime_error("Invalid peripheral " + value);
-	// *  		}
-	// *  	});
-	// *  try {
-	// *  	program.parse_args(argc, argv);
-	// *  } catch (const std::runtime_error& err) {
-	// *  	std::cerr << err.what() << std::endl;
-	// *  	std::cerr << program;
-	// *  	std::exit(EXIT_FAILURE);
-	// *  }
+	program.add_argument("-p", "--peripheral")
+	  	.help("specify the peripheral mounted on the rover")
+	  	.default_value(std::string("none"))
+	  	.action([](const std::string& value) {
+			std::unordered_map<std::string, mountedperipheral_t> allowed{{"none", mountedperipheral_t::none}, 
+																		 {"arm", mountedperipheral_t::arm}, 
+																		 {"science", mountedperipheral_t::scienceStation}, 
+																		 {"lidar", mountedperipheral_t::lidar}};
 
-	
+			if (allowed.find(value) != allowed.end()) {
+				Globals::mountedPeripheral = allowed[value];
+				return value;
+			}
+
+			throw std::runtime_error("Invalid peripheral " + value);
+	  	});
+	  try {
+	  	program.parse_args(argc, argv);
+		log(LOG_INFO, "parseCommandLine got peripheral specified as: \"%s\"\n", program.get<std::string>("peripheral").c_str());
+	  } catch (const std::runtime_error& err) {
+	  	std::cerr << err.what() << std::endl;
+	  	std::cerr << program;
+	  	std::exit(EXIT_FAILURE);
+	}
 }
 
 int main(int argc, char** argv) {
 	// TODO: make it possible to set this from the command line
 	LOG_LEVEL = LOG_INFO;
+	parseCommandLine(argc, argv);
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
 	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
