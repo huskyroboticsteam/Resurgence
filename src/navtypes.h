@@ -47,6 +47,5 @@ struct URCLegGPS {
 	gpscoords_t gps;
 };
 
-x
 
 } // namespace navtypes
