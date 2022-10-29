@@ -1,6 +1,5 @@
 #include "Globals.h"
 #include "Constants.h"
-#include "log.h"
 
 #include <vector>
 #include <atomic>

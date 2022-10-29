@@ -1,4 +1,3 @@
-#include "Globals.h"
 #include "log.h"
 
 #include <iostream>
