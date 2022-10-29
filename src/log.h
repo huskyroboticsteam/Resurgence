@@ -3,8 +3,6 @@
 
 #include <string>
 
-extern int LOG_LEVEL;
-
 constexpr int LOG_TRACE = 0;
 constexpr int LOG_DEBUG = 1;
 constexpr int LOG_INFO = 2;

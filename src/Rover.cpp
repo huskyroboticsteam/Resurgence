@@ -87,9 +87,28 @@ void parseCommandLine(int argc, char** argv) {
 
 			throw std::runtime_error("Invalid peripheral " + value);
 	  	});
+
+	program.add_argument("-llvl", "--loglevel")
+		.help("specify the log level to use (must be one of: LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR)")
+		.default_value(std::string("LOG_INFO"))
+		.action([](const std::string& value) {
+			std::unordered_map<std::string, int> allowed{{"LOG_TRACE", LOG_TRACE}, 
+														 {"LOG_DEBUG", LOG_DEBUG}, 
+														 {"LOG_INFO", LOG_INFO}, 
+														 {"LOG_WARN", LOG_WARN},
+														 {"LOG_ERROR", LOG_ERROR}};
+
+			if (allowed.find(value) != allowed.end()) {
+				Globals::logLevel = allowed[value];
+				return value;
+			}
+
+			throw std::runtime_error("Invalid log level " + value);
+	  	});
+
 	  try {
 	  	program.parse_args(argc, argv);
-		log(LOG_INFO, "parseCommandLine got peripheral specified as: \"%s\"\n", program.get<std::string>("peripheral").c_str());
+		log(LOG_INFO, "parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: \"%s\"\n", program.get<std::string>("peripheral").c_str(), program.get<std::string>("loglevel").c_str());
 	  } catch (const std::runtime_error& err) {
 	  	std::cerr << err.what() << std::endl;
 	  	std::cerr << program;
@@ -98,8 +117,6 @@ void parseCommandLine(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-	// TODO: make it possible to set this from the command line
-	LOG_LEVEL = LOG_INFO;
 	parseCommandLine(argc, argv);
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
