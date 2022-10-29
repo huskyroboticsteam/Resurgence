@@ -329,6 +329,7 @@ if(WITH_TESTS)
     # Controller tests
     ../tests/control/TrapezoidalVelocityProfileTest.cpp
     ../tests/control/JacobianControllerTest.cpp
+    ../tests/control/PIDControllerTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp

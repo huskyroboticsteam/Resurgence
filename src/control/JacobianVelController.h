@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../filters/StateSpaceUtil.h"
 #include "../Util.h"
+#include "../filters/StateSpaceUtil.h"
 
 #include <functional>
 #include <optional>
@@ -35,16 +35,26 @@ public:
 	JacobianVelController(
 		const std::function<Vectord<outputDim>(const Vectord<inputDim>&)>& kinematicsFunc,
 		const std::function<Matrixd<outputDim, inputDim>(const Vectord<inputDim>&)>&
-			jacobianFunc) : kinematicsFunc(kinematicsFunc), jacobianFunc(jacobianFunc) {}
+			jacobianFunc)
+		: kinematicsFunc(kinematicsFunc),
+		  jacobianFunc(jacobianFunc
+						   ? jacobianFunc
+						   : std::bind(filters::statespace::numericalJacobian, kinematicsFunc,
+									   std::placeholders::_1, outputDim)) {
+		assert(this->kinematicsFunc);
+		assert(this->jacobianFunc);
+	}
 
 	/**
 	 * @brief Get the current target position.
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currPos The current position of the mechanism, in the kinematic input space.
-	 * @return Vectord<inputDim> The target position of the mechanism, in the kinematic input space.
+	 * @return Vectord<inputDim> The target position of the mechanism, in the kinematic input
+	 * space.
 	 */
-	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, Vectord<inputDim>& currPos) const {
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
+								 const Vectord<inputDim>& currPos) {
 		double unused;
 		return getCommand(currTime, currPos, unused);
 	}
@@ -54,12 +64,14 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currPos The current position of the mechanism, in the kinematic input sequence.
-	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the returned target and the delta to the commanded target.
-	 * This similarity may be low if the kinematics of the mechanism do not allow it to move in the commanded direction.
-	 * @return Vectord<inputDim> The target position of the mechanism, in the kinematic input space.
-	 * Returns the current position if no target is set.
+	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the
+	 * returned target and the delta to the commanded target. This similarity may be low if the
+	 * kinematics of the mechanism do not allow it to move in the commanded direction.
+	 * @return Vectord<inputDim> The target position of the mechanism, in the kinematic input
+	 * space. Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, Vectord<inputDim>& currPos, double& cosineSim) const {
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
+								 const Vectord<inputDim>& currPos, double& cosineSim) {
 		if (!controllerState) {
 			return currPos;
 		}
@@ -70,13 +82,14 @@ public:
 		Vectord<outputDim> currTarget = lastTarget + dt * state.targetVel;
 		Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
 		Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
-		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQR().solve(outputPosDiff);
+		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQr().solve(outputPosDiff);
 
 		Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
 		cosineSim = outputPosDiff.dot(trueOutputPosDiff) /
 					(outputPosDiff.norm() * trueOutputPosDiff.norm());
 
-		state_t newState = {.timestamp = currTime, .targetVel = state.targetVel, .lastTarget = currTarget};
+		state_t newState = {
+			.timestamp = currTime, .targetVel = state.targetVel, .lastTarget = currTarget};
 		controllerState = newState;
 
 		return currPos + inputPosDiff;
@@ -88,7 +101,7 @@ public:
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target velocity, in the output space of the kinematic function.
 	 */
-	void setTarget(robot::types::datatime_t currTime, Vectord<outputDim>& targetVel) {
+	void setTarget(robot::types::datatime_t currTime, const Vectord<outputDim>& targetVel) {
 		state_t state = {.timestamp = currTime, .targetVel = targetVel, .lastTarget = {}};
 		this->controllerState = state;
 	}

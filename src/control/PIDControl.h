@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../world_interface/data.h"
+#include "../Util.h"
 
 #include <chrono>
 #include <functional>
@@ -11,15 +12,13 @@
 
 namespace control {
 
-constexpr int MS_PER_S = 1000;
-
 /**
  * @brief A set of PID gains.
  * @see https://en.wikipedia.org/wiki/PID_controller
  */
 struct PIDGains {
 	double kP, kI, kD, kF;
-	double iZone;
+	std::optional<double> iZone;
 };
 
 /**
@@ -53,7 +52,7 @@ public:
 			kI(i) = gains[i].kI;
 			kD(i) = gains[i].kD;
 			kF(i) = gains[i].kF;
-			iZone(i) = gains[i].iZone;
+			iZone(i) = gains[i].iZone.value_or(std::numeric_limits<double>::infinity());
 		}
 	}
 
@@ -97,9 +96,7 @@ public:
 		if (lastData.has_value()) {
 			// TODO: instead of numerically differentiating we can use a model (if we have one)
 			auto [lastTime, lastValue] = lastData.value();
-			auto dt =
-				std::chrono::duration_cast<std::chrono::milliseconds>(currTime - lastTime);
-			double dtSec = dt.count() / static_cast<double>(MS_PER_S);
+			double dtSec = util::durationToSec(currTime - lastTime);
 
 			Arrayd<dim> derivative = (currValue - lastValue) / dtSec;
 			dTerm = derivative * kD;
@@ -126,7 +123,7 @@ public:
 
 private:
 	Arrayd<dim> kP, kI, kD, kF;
-	Arrayd<dim> iZone;
+	Arrayd<dim> iZone; // +inf indicates no i zone
 	Arrayd<dim> iAccum;
 	std::optional<Arrayd<dim>> setPoint;
 	std::optional<std::pair<robot::types::datatime_t, Arrayd<dim>>> lastData;
