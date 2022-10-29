@@ -51,6 +51,7 @@ TEST_CASE("Test PID Controller", "[control][pid]") {
 	}
 
 	SECTION("Test I control - With iZone") {
+		// test integral control with i zone
 		std::array<PIDGains, dim> gains = {PIDGains{.kP = .2, .kI = 0.1, .iZone = 0.15},
 										   PIDGains{.kP = .3, .kI = 0.2, .iZone = 0.15}};
 		PIDController<dim> controller(gains);
@@ -73,6 +74,7 @@ TEST_CASE("Test PID Controller", "[control][pid]") {
 	}
 
 	SECTION("Test I control - Without iZone") {
+		// test that not specifying an i-zone disables it
 		std::array<PIDGains, dim> gains = {PIDGains{.kP = .2, .kI = 0.1},
 										   PIDGains{.kP = .3, .kI = 0.2}};
 		PIDController<dim> controller(gains);

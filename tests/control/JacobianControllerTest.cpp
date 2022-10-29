@@ -27,6 +27,7 @@ TEST_CASE("JacobianController", "[control][jacobiancontroller]") {
 	datatime_t startTime(0s);
 
 	SECTION("Test Possible Target") {
+		// test that going to a possible target will have a correct target (cosine sim=1)
 		Eigen::Vector2d startPos = {0, M_PI / 2};
 		jc.setTarget(startTime, startPos, {1.2, 1.2});
 		double cosineSim;
@@ -37,6 +38,7 @@ TEST_CASE("JacobianController", "[control][jacobiancontroller]") {
 	}
 
 	SECTION("Test Impossible Target") {
+		// test that going to an impossible target will have a non-one cosine similarity
 		Eigen::Vector2d startPos = {0, 0};
 		jc.setTarget(startTime, startPos, {1, 0});
 		double cosineSim;
@@ -68,6 +70,7 @@ TEST_CASE("JacobianVelController", "[control][jacobiancontroller]") {
 	}
 
 	SECTION("Test Possible Target") {
+		// test that going to a possible target will have a correct target (cosine sim=1)
 		Eigen::Vector2d startPos = {0, M_PI / 2};
 		jvc.setTarget(startTime, {1.0, 1.0});
 		double cosineSim;
@@ -78,6 +81,7 @@ TEST_CASE("JacobianVelController", "[control][jacobiancontroller]") {
 	}
 
 	SECTION("Test Impossible Target") {
+		// test that going to an impossible target will have a non-one cosine similarity
 		Eigen::Vector2d startPos = {0, 0};
 		jvc.setTarget(startTime, {-1, 0});
 		double cosineSim;

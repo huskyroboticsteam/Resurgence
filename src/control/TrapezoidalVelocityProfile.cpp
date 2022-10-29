@@ -12,9 +12,10 @@ void SingleDimTrapezoidalVelocityProfile::reset() {
 	profile.reset();
 }
 
-void SingleDimTrapezoidalVelocityProfile::setTarget(robot::types::datatime_t currTime, double startPos, double endPos) {
-	Vectord<1> startVec {startPos};
-	Vectord<1> endVec {endPos};
+void SingleDimTrapezoidalVelocityProfile::setTarget(robot::types::datatime_t currTime,
+													double startPos, double endPos) {
+	Vectord<1> startVec{startPos};
+	Vectord<1> endVec{endPos};
 	profile.setTarget(currTime, startVec, endVec);
 }
 
@@ -22,7 +23,8 @@ bool SingleDimTrapezoidalVelocityProfile::hasTarget() const {
 	return profile.hasTarget();
 }
 
-double SingleDimTrapezoidalVelocityProfile::getCommand(robot::types::datatime_t currTime) const {
+double
+SingleDimTrapezoidalVelocityProfile::getCommand(robot::types::datatime_t currTime) const {
 	return profile.getCommand(currTime)(0);
 }
 
@@ -30,4 +32,4 @@ std::optional<util::dseconds> SingleDimTrapezoidalVelocityProfile::getTotalTime(
 	return profile.getTotalTime();
 }
 
-}
+} // namespace control

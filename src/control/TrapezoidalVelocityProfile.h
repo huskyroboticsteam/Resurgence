@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../world_interface/data.h"
 #include "../Util.h"
 #include "../navtypes.h"
+#include "../world_interface/data.h"
 
 #include <array>
 #include <cmath>
@@ -25,7 +25,8 @@ public:
 	 * @param maxVel The maximum velocity the profile should attain.
 	 * @param maxAccel The maximum acceleration the profile should use.
 	 */
-	TrapezoidalVelocityProfile(double maxVel, double maxAccel) : maxVel(maxVel), maxAccel(maxAccel) {}
+	TrapezoidalVelocityProfile(double maxVel, double maxAccel)
+		: maxVel(maxVel), maxAccel(maxAccel) {}
 
 	/**
 	 * @brief Reset the profile and clear any calculated profile.
@@ -50,8 +51,7 @@ public:
 	 * @param startPos The position the profile starts at.
 	 * @param endPos The position the profile ends at.
 	 */
-	void setTarget(robot::types::datatime_t currTime,
-				   const std::array<double, dim>& startPos,
+	void setTarget(robot::types::datatime_t currTime, const std::array<double, dim>& startPos,
 				   const std::array<double, dim>& endPos) {
 		navtypes::Vectord<dim> startVec, endVec;
 		for (int i = 0; i < dim; i++) {
@@ -68,8 +68,7 @@ public:
 	 * @param startPos The position the profile starts at.
 	 * @param endPos The position the profile ends at.
 	 */
-	void setTarget(robot::types::datatime_t currTime,
-				   const navtypes::Vectord<dim>& startPos,
+	void setTarget(robot::types::datatime_t currTime, const navtypes::Vectord<dim>& startPos,
 				   const navtypes::Vectord<dim>& endPos) {
 		profile_t profile{.startTime = currTime, .startPos = startPos, .endPos = endPos};
 		double rampUpTime = maxVel / maxAccel;
@@ -93,7 +92,8 @@ public:
 	 * @brief Get the target position.
 	 *
 	 * @param currTime The current timestamp.
-	 * @return navtypes::Vectord<dim> The target position if hasTarget() is true, else 0 vector.
+	 * @return navtypes::Vectord<dim> The target position if hasTarget() is true,
+	 * else 0 vector.
 	 */
 	navtypes::Vectord<dim> getCommand(robot::types::datatime_t currTime) const {
 		if (!profile) {
@@ -146,7 +146,6 @@ private:
 	double maxVel, maxAccel;
 	std::optional<profile_t> profile;
 };
-
 
 /**
  * @brief Trapezoidal velocity profile in a single dimension.

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../world_interface/data.h"
 #include "../Util.h"
+#include "../world_interface/data.h"
 
 #include <chrono>
 #include <functional>

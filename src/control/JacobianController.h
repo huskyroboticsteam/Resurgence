@@ -57,10 +57,11 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currPos The current position, in the input space.
-	 * @return Vectord<inputDim> The target position, in the input space of the kinematic function.
-	 * Returns the current position if no target is set.
+	 * @return Vectord<inputDim> The target position, in the input space of the kinematic
+	 * function. Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos) const {
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
+								 const Vectord<inputDim>& currPos) const {
 		double unused;
 		return getCommand(currTime, currPos, unused);
 	}
@@ -70,14 +71,15 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currPos The current position, in the input space.
-	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the returned target and the delta to the commanded target.
-	 * This similarity may be low if the kinematics of the mechanism do not allow it to move in the commanded direction.
-	 * May be NaN if stuck in singularity point, in which case the command is the current position.
-	 * @return Vectord<inputDim> The target position, in the input space of the kinematic function.
-	 * Returns the current position if no target is set.
+	 * @param[out] cosineSim Output parameter, gives the cosine similarity of the delta to the
+	 * returned target and the delta to the commanded target. This similarity may be low if the
+	 * kinematics of the mechanism do not allow it to move in the commanded direction. May be
+	 * NaN if stuck in singularity point, in which case the command is the current position.
+	 * @return Vectord<inputDim> The target position, in the input space of the kinematic
+	 * function. Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos,
-								 double& cosineSim) const {
+	Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
+								 const Vectord<inputDim>& currPos, double& cosineSim) const {
 		if (!velocityProfile.hasTarget()) {
 			return currPos;
 		}
@@ -102,7 +104,8 @@ public:
 	 * @param currPos The current position in the input space.
 	 * @param target The target position in the output space.
 	 */
-	void setTarget(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos, const Vectord<outputDim>& target) {
+	void setTarget(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos,
+				   const Vectord<outputDim>& target) {
 		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		velocityProfile.setTarget(currTime, currPosOutput, target);
 	}

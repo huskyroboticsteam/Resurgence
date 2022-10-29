@@ -1,6 +1,6 @@
-#include <catch2/catch.hpp>
-
 #include "../../src/control/TrapezoidalVelocityProfile.h"
+
+#include <catch2/catch.hpp>
 
 using namespace Catch::literals;
 using namespace control;
@@ -14,6 +14,7 @@ TEST_CASE("Single Dimensional Trapezoidal Velocity Profile", "[control][trapvel]
 	datatime_t start(0s);
 
 	SECTION("Test Forward Points") {
+		// test that the profile is correct
 		profile.setTarget(start, 1, 11);
 
 		REQUIRE(profile.getCommand(start + 0s) == 1_a);
@@ -27,6 +28,7 @@ TEST_CASE("Single Dimensional Trapezoidal Velocity Profile", "[control][trapvel]
 	}
 
 	SECTION("Test Backward Points") {
+		// test that profile is correct when going from high position -> low position
 		profile.setTarget(start, 11, 1);
 
 		REQUIRE(profile.getCommand(start + 0s) == 11_a);
@@ -61,6 +63,7 @@ TEST_CASE("Single Dimensional Trapezoidal Velocity Profile", "[control][trapvel]
 	}
 
 	SECTION("Test Monotonic") {
+		// test that trapezoidal velocity profiles have monotonic positions
 		int steps = 100;
 		auto untilTime = start + 10s;
 
@@ -119,9 +122,12 @@ TEST_CASE("Test Multi-Dimensional Trapezoidal Velocity Profile", "[control][trap
 		auto profileTime = duration_cast<nanoseconds>(profile.getTotalTime().value());
 
 		REQUIRE(profile.getCommand(startTime + 0s).isApprox(startPos));
-		REQUIRE(profile.getCommand(startTime + 2s).isApprox(startPos + (endPos - startPos).normalized() * 2));
-		REQUIRE(profile.getCommand(startTime + profileTime / 2).isApprox((startPos + endPos)/2, 1e-5));
-		REQUIRE(profile.getCommand(startTime + profileTime - 2s).isApprox(endPos + (startPos - endPos).normalized() * 2, 1e-5));
+		REQUIRE(profile.getCommand(startTime + 2s)
+					.isApprox(startPos + (endPos - startPos).normalized() * 2));
+		REQUIRE(profile.getCommand(startTime + profileTime / 2)
+					.isApprox((startPos + endPos) / 2, 1e-5));
+		REQUIRE(profile.getCommand(startTime + profileTime - 2s)
+					.isApprox(endPos + (startPos - endPos).normalized() * 2, 1e-5));
 		REQUIRE(profile.getCommand(startTime + profileTime).isApprox(endPos));
 	}
 
@@ -136,8 +142,10 @@ TEST_CASE("Test Multi-Dimensional Trapezoidal Velocity Profile", "[control][trap
 	SECTION("Test Set Target - Vector") {
 		profile.setTarget(startTime, startPos, endPos);
 		REQUIRE(profile.getCommand(startTime + 0s).isApprox(Eigen::Vector2d{1, 11}));
-		REQUIRE(profile.getCommand(startTime + duration_cast<nanoseconds>(profile.getTotalTime().value()))
-				.isApprox(Eigen::Vector2d{11, 1}));
+		REQUIRE(profile
+					.getCommand(startTime +
+								duration_cast<nanoseconds>(profile.getTotalTime().value()))
+					.isApprox(Eigen::Vector2d{11, 1}));
 	}
 
 	SECTION("Test Set Target - Vector") {
@@ -148,7 +156,9 @@ TEST_CASE("Test Multi-Dimensional Trapezoidal Velocity Profile", "[control][trap
 		}
 		profile.setTarget(startTime, startPosArr, endPosArr);
 		REQUIRE(profile.getCommand(startTime + 0s).isApprox(Eigen::Vector2d{1, 11}));
-		REQUIRE(profile.getCommand(startTime + duration_cast<nanoseconds>(profile.getTotalTime().value()))
-				.isApprox(Eigen::Vector2d{endPos[0], endPos[1]}));
+		REQUIRE(profile
+					.getCommand(startTime +
+								duration_cast<nanoseconds>(profile.getTotalTime().value()))
+					.isApprox(Eigen::Vector2d{endPos[0], endPos[1]}));
 	}
 }
