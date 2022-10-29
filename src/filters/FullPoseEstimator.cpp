@@ -3,7 +3,7 @@
 #include "../Util.h"
 
 #include <functional>
-#include "../../src/navtypes.h"
+#include "../navtypes.h"
 
 namespace filters {
 namespace {

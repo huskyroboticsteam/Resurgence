@@ -2,15 +2,13 @@
 
 #include "KalmanFilterBase.h"
 #include "StateSpaceUtil.h"
-#include "../../src/navtypes.h"
+#include "../navtypes.h"
 
 #include <array>
 #include <functional>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
-
-using namespace navtypes;
 
 namespace filters {
 
