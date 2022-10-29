@@ -9,10 +9,10 @@ namespace {
 using namespace navtypes;
 using state_t = FullPoseEstimator::state_t;
 using action_t = Eigen::Vector2d;
-using statespace::Matrixd;
+using navtypes::Matrixd;
 using statespace::NoiseCovMat;
 using statespace::NoiseCovMatX;
-using statespace::Vectord;
+using navtypes::Vectord;
 constexpr int numStates = FullPoseEstimator::numStates;
 constexpr int numSensors = FullPoseEstimator::numSensors;
 

@@ -164,11 +164,11 @@ public:
 		: stateFunc(stateFunc), Q(processNoise), dt(dt), outputs(outputs) {}
 
 	void predict(const input_t& input) override {
-		statespace::Matrixd<stateDim, stateDim> F = stateFuncJacobianX(this->xHat, input);
-		statespace::Matrixd<processNoiseDim, processNoiseDim> processNoise =
+		navtypes::Matrixd<stateDim, stateDim> F = stateFuncJacobianX(this->xHat, input);
+		navtypes::Matrixd<processNoiseDim, processNoiseDim> processNoise =
 			Q.get(this->xHat, input);
 
-		statespace::Matrixd<stateDim, processNoiseDim> L =
+		navtypes::Matrixd<stateDim, processNoiseDim> L =
 			stateFuncJacobianW(this->xHat, input);
 
 		this->xHat = stateFunc(this->xHat, input, processnoise_t::Zero());
@@ -201,18 +201,18 @@ public:
 	}
 
 	void setStateFuncJacobianX(
-		const std::function<statespace::Matrixd<stateDim, stateDim>(
+		const std::function<navtypes::Matrixd<stateDim, stateDim>(
 			const state_t&, const input_t&, const processnoise_t&)>& stateFuncJacobianX) {
 		this->stateFuncJacobianXSol = stateFuncJacobianX;
 	}
 
 	void setStateFuncJacobianW(
-		const std::function<statespace::Matrixd<stateDim, processNoiseDim>(
+		const std::function<navtypes::Matrixd<stateDim, processNoiseDim>(
 			const state_t&, const input_t&, const processnoise_t&)>& stateFuncJacobianW) {
 		this->stateFuncJacobianWSol = stateFuncJacobianW;
 	}
 
-	statespace::Matrixd<stateDim, stateDim> stateFuncJacobianX(const state_t& x,
+	navtypes::Matrixd<stateDim, stateDim> stateFuncJacobianX(const state_t& x,
 															   const input_t& u) {
 		processnoise_t w = processnoise_t::Zero();
 		if (stateFuncJacobianXSol) {
@@ -223,7 +223,7 @@ public:
 		}
 	}
 
-	statespace::Matrixd<stateDim, processNoiseDim> stateFuncJacobianW(const state_t& x,
+	navtypes::Matrixd<stateDim, processNoiseDim> stateFuncJacobianW(const state_t& x,
 																	  const input_t& u) {
 		processnoise_t w = processnoise_t::Zero();
 		if (stateFuncJacobianWSol) {
@@ -240,11 +240,11 @@ private:
 	double dt;
 	std::array<Output, numOutputs> outputs;
 
-	std::function<statespace::Matrixd<stateDim, stateDim>(const state_t&, const input_t&,
+	std::function<navtypes::Matrixd<stateDim, stateDim>(const state_t&, const input_t&,
 														  const processnoise_t&)>
 		stateFuncJacobianXSol;
 
-	std::function<statespace::Matrixd<stateDim, processNoiseDim>(
+	std::function<navtypes::Matrixd<stateDim, processNoiseDim>(
 		const state_t&, const input_t&, const processnoise_t&)>
 		stateFuncJacobianWSol;
 };
