@@ -89,17 +89,18 @@ $(function() {
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00152.html">string</a>&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">extern</span> <span class="keywordtype">int</span> LOG_LEVEL;</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_TRACE = 0;</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_DEBUG = 1;</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_INFO = 2;</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_WARN = 3;</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_ERROR = 4;</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keywordtype">void</span> <a class="code hl_functionRef" href="https://docs.opencv.org/4.2.0/d2/de8/group__core__array.html#ga937ecdce4679a77168730830a955bea7">log</a>(<span class="keywordtype">int</span> level, <span class="keyword">const</span> <span class="keywordtype">char</span>* fmt, ...);</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_TRACE = 0;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_DEBUG = 1;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_INFO = 2;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_WARN = 3;</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LOG_ERROR = 4;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keywordtype">void</span> <a class="code hl_functionRef" href="https://docs.opencv.org/4.2.0/d2/de8/group__core__array.html#ga937ecdce4679a77168730830a955bea7">log</a>(<span class="keywordtype">int</span> level, <span class="keyword">const</span> <span class="keywordtype">char</span>* fmt, ...);</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keywordtype">void</span> <a class="code hl_functionRef" href="https://docs.opencv.org/4.2.0/d3/dcb/group__core__logging.html#gaa022dd6c6e2d72539cc1e5100bcb378b">setLogLevel</a>(<span class="keywordtype">int</span> level);</div>
 <div class="ttc" id="aa00152_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00152.html">string</a></div></div>
 <div class="ttc" id="agroup__core__array_html_ga937ecdce4679a77168730830a955bea7"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d2/de8/group__core__array.html#ga937ecdce4679a77168730830a955bea7">log</a></div><div class="ttdeci">void log(InputArray src, OutputArray dst)</div></div>
+<div class="ttc" id="agroup__core__logging_html_gaa022dd6c6e2d72539cc1e5100bcb378b"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d3/dcb/group__core__logging.html#gaa022dd6c6e2d72539cc1e5100bcb378b">setLogLevel</a></div><div class="ttdeci">LogLevel setLogLevel(LogLevel logLevel)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
