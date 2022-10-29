@@ -11,5 +11,4 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer", Constants:
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
 mountedperipheral_t mountedPeripheral = mountedperipheral_t::none;
-int logLevel = LOG_INFO;
 } // namespace Globals

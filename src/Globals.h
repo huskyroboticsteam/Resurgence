@@ -32,5 +32,4 @@ extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern mountedperipheral_t mountedPeripheral;
-extern int logLevel;
 } // namespace Globals

@@ -99,7 +99,7 @@ void parseCommandLine(int argc, char** argv) {
 														 {"LOG_ERROR", LOG_ERROR}};
 
 			if (allowed.find(value) != allowed.end()) {
-				Globals::logLevel = allowed[value];
+				setLogLevel(allowed[value]);
 				return value;
 			}
 
