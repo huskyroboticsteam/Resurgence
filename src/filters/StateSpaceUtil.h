@@ -10,12 +10,6 @@
  */
 namespace filters::statespace {
 
-template <int rows, int cols>
-using Matrixd = Eigen::Matrix<double, rows, cols>;
-
-template <int dim>
-using Vectord = Eigen::Matrix<double, dim, 1>;
-
 constexpr double epsilon = 1e-5;
 
 Eigen::MatrixXd

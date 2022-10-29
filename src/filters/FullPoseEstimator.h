@@ -3,9 +3,10 @@
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
 #include "MultiSensorEKF.h"
+#include "../../src/navtypes.h"
 
 #include <array>
-
+using namespace navtypes;
 namespace filters {
 
 /**
@@ -21,7 +22,7 @@ class FullPoseEstimator {
 public:
 	static constexpr int numStates = 3;
 	static constexpr int numSensors = 2;
-	using state_t = statespace::Vectord<numStates>;
+	using state_t = navtypes::Vectord<numStates>;
 
 	FullPoseEstimator(const Eigen::Vector2d& inputNoiseGains, double wheelBase, double dt,
 					  const Eigen::Vector2d& gpsStdDev, double headingStdDev);

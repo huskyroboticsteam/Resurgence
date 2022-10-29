@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../navtypes.h"
+#include "../../src/navtypes.h"
 
 /**
  * @brief A GPS datum that specifies the reference ellipsoid for use in GPS calculations.
