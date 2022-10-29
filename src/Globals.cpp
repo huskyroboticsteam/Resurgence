@@ -1,5 +1,4 @@
 #include "Globals.h"
-
 #include "Constants.h"
 
 #include <vector>
