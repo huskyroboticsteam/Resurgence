@@ -9,6 +9,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
+using namespace navtypes;
 using navtypes::Vectord;
 namespace filters {
 
