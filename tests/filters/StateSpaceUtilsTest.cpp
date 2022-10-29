@@ -44,7 +44,9 @@ TEST_CASE("Test Numerical Jacobian", "[statespace][filters]") {
 		REQUIRE((jacob - Eigen::Matrix3d::Identity()).cwiseAbs().maxCoeff() <= 1e-4);
 	}
 	SECTION("Test inner product with self") {
-		auto func = [](const Eigen::Vector3d& x) { return x.transpose() * x; };
+		auto func = [](const Eigen::Vector3d& x) -> Eigen::Matrix<double, 1, 1> {
+			  return x.transpose() * x;
+		};
 		Eigen::Vector3d vec{1.0, 2.0, 3.0};
 		Eigen::MatrixXd jacob = statespace::numericalJacobian(func, vec, 1);
 		REQUIRE(jacob.rows() == 1);
