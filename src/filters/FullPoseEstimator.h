@@ -3,7 +3,6 @@
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
 #include "MultiSensorEKF.h"
-#include "../navtypes.h"
 
 #include <array>
 
