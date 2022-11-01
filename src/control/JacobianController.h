@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../filters/StateSpaceUtil.h"
+#include "../navtypes.h"
 #include "../world_interface/data.h"
 #include "TrapezoidalVelocityProfile.h"
 
@@ -21,10 +22,6 @@ namespace control {
  * @see https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant
  */
 template <int outputDim, int inputDim> class JacobianController {
-private:
-	template <int dim> using Vectord = filters::statespace::Vectord<dim>;
-	template <int rows, int cols> using Matrixd = filters::statespace::Matrixd<rows, cols>;
-
 public:
 	/**
 	 * @brief Construct a new controller.
@@ -38,9 +35,10 @@ public:
 	 * @param maxAccels The maximum acceleration in the output space of the kinematic function.
 	 */
 	JacobianController(
-		const std::function<Vectord<outputDim>(const Vectord<inputDim>&)>& kinematicsFunc,
-		const std::function<Matrixd<outputDim, inputDim>(const Vectord<inputDim>&)>&
-			jacobianFunc,
+		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>&
+			kinematicsFunc,
+		const std::function<navtypes::Matrixd<outputDim, inputDim>(
+			const navtypes::Vectord<inputDim>&)>& jacobianFunc,
 		double maxVel, double maxAccel)
 		: kinematicsFunc(kinematicsFunc),
 		  jacobianFunc(jacobianFunc
@@ -57,11 +55,11 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currPos The current position, in the input space.
-	 * @return Vectord<inputDim> The target position, in the input space of the kinematic
-	 * function. Returns the current position if no target is set.
+	 * @return navtypes::Vectord<inputDim> The target position, in the input space of the
+	 * kinematic function. Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
-								 const Vectord<inputDim>& currPos) const {
+	navtypes::Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
+										   const navtypes::Vectord<inputDim>& currPos) const {
 		double unused;
 		return getCommand(currTime, currPos, unused);
 	}
@@ -75,22 +73,24 @@ public:
 	 * returned target and the delta to the commanded target. This similarity may be low if the
 	 * kinematics of the mechanism do not allow it to move in the commanded direction. May be
 	 * NaN if stuck in singularity point, in which case the command is the current position.
-	 * @return Vectord<inputDim> The target position, in the input space of the kinematic
-	 * function. Returns the current position if no target is set.
+	 * @return navtypes::Vectord<inputDim> The target position, in the input space of the
+	 * kinematic function. Returns the current position if no target is set.
 	 */
-	Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
-								 const Vectord<inputDim>& currPos, double& cosineSim) const {
+	navtypes::Vectord<inputDim> getCommand(robot::types::datatime_t currTime,
+										   const navtypes::Vectord<inputDim>& currPos,
+										   double& cosineSim) const {
 		if (!velocityProfile.hasTarget()) {
 			return currPos;
 		}
 
-		Vectord<outputDim> currTarget = velocityProfile.getCommand(currTime);
-		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
-		Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
-		Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
-		Vectord<inputDim> inputPosDiff = jacobian.colPivHouseholderQr().solve(outputPosDiff);
+		navtypes::Vectord<outputDim> currTarget = velocityProfile.getCommand(currTime);
+		navtypes::Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
+		navtypes::Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
+		navtypes::Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
+		navtypes::Vectord<inputDim> inputPosDiff =
+			jacobian.colPivHouseholderQr().solve(outputPosDiff);
 
-		Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
+		navtypes::Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
 		cosineSim = outputPosDiff.dot(trueOutputPosDiff) /
 					(outputPosDiff.norm() * trueOutputPosDiff.norm());
 
@@ -104,9 +104,10 @@ public:
 	 * @param currPos The current position in the input space.
 	 * @param target The target position in the output space.
 	 */
-	void setTarget(robot::types::datatime_t currTime, const Vectord<inputDim>& currPos,
-				   const Vectord<outputDim>& target) {
-		Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
+	void setTarget(robot::types::datatime_t currTime,
+				   const navtypes::Vectord<inputDim>& currPos,
+				   const navtypes::Vectord<outputDim>& target) {
+		navtypes::Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		velocityProfile.setTarget(currTime, currPosOutput, target);
 	}
 
@@ -127,7 +128,8 @@ public:
 	}
 
 private:
-	std::function<Vectord<outputDim>(const Vectord<inputDim>&)> kinematicsFunc;
+	std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>
+		kinematicsFunc;
 	std::function<Eigen::Matrix<double, outputDim, inputDim>(
 		const Eigen::Matrix<double, inputDim, 1>&)>
 		jacobianFunc;
