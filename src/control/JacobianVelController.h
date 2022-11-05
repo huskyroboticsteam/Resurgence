@@ -26,8 +26,6 @@ public:
 	 * a function that takes in some input vector (ex: joint angles of an arm) and outputs
 	 * another vector (ex: the 3d pose of the hand)
 	 * @param jacobianFunc The jacobian of the kinematic function.
-	 * @param dt The time delta of this controller.
-	 * When executing a command, getCommand() should be called at this rate.
 	 */
 	JacobianVelController(
 		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>&
@@ -74,6 +72,13 @@ public:
 		if (!controllerState) {
 			return currPos;
 		}
+
+		// The jacobian of the kinematics function represents a linearization of the kinematics
+		// around the current position. We then use this approximation to find the position
+		// delta in the input space that yields the required position delta in the output space
+		// This is similar to JacobianController, but the command position is calculated
+		// from a velocity instead of a profile.
+
 		navtypes::Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		state_t state = controllerState.value();
 		double dt = util::durationToSec(currTime - state.timestamp);
@@ -84,6 +89,8 @@ public:
 		navtypes::Vectord<inputDim> inputPosDiff =
 			jacobian.colPivHouseholderQr().solve(outputPosDiff);
 
+		// the cosine similarity of the actual and required position deltas in the output space
+		// is metric of how much the kinematics allows the commanded movement.
 		navtypes::Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
 		cosineSim = outputPosDiff.dot(trueOutputPosDiff) /
 					(outputPosDiff.norm() * trueOutputPosDiff.norm());
@@ -108,7 +115,7 @@ public:
 	}
 
 	/**
-	 * @brief Check if a target has been set.
+	 * @brief Check if a target velocity has been set.
 	 *
 	 * @return bool True iff a target has been set.
 	 */

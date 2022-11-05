@@ -1,4 +1,4 @@
-#include "../../src/control/JacobianController.h"
+#include "../../src/control/JacobianPosController.h"
 
 #include "../../src/control/JacobianVelController.h"
 
@@ -11,8 +11,8 @@ using namespace std::chrono_literals;
 
 namespace {
 
+// we use a 2-jointed arm for testing kinematics
 constexpr double seg1 = 1.0, seg2 = 1.0;
-
 Eigen::Vector2d kinematics(const Eigen::Vector2d& joints) {
 	double joint1 = joints(0);
 	double joint2 = joints(0) + joints(1);
@@ -22,8 +22,8 @@ Eigen::Vector2d kinematics(const Eigen::Vector2d& joints) {
 
 } // namespace
 
-TEST_CASE("JacobianController", "[control][jacobiancontroller]") {
-	JacobianController<2, 2> jc(kinematics, {}, 2, 1);
+TEST_CASE("JacobianPosController", "[control][jacobiancontroller]") {
+	JacobianPosController<2, 2> jc(kinematics, {}, 2, 1);
 	datatime_t startTime(0s);
 
 	SECTION("Test Possible Target") {

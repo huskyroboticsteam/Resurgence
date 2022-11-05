@@ -16,6 +16,8 @@ namespace control {
 /**
  * @brief Trapezoidal velocity profile in multiple dimensions.
  * Motion is coordinated so that all dimensions arrive at the goal at the same time.
+ *
+ * @tparam dim The number of dimensions that are controlled by this profile.
  */
 template <int dim> class TrapezoidalVelocityProfile {
 public:
@@ -71,16 +73,22 @@ public:
 	void setTarget(robot::types::datatime_t currTime, const navtypes::Vectord<dim>& startPos,
 				   const navtypes::Vectord<dim>& endPos) {
 		profile_t profile{.startTime = currTime, .startPos = startPos, .endPos = endPos};
+		// min time required to accelerate to top speed
 		double rampUpTime = maxVel / maxAccel;
+		// min distance required to accelerate to top speed
 		double rampUpDist = std::pow(maxVel, 2) / (2 * maxAccel);
 
 		double dist = (endPos - startPos).norm();
 		if (2 * rampUpDist < dist) {
+			// the profile distance is too short to allow us to get to top speed
+			// so the profile looks like a triangle instead of a trapezoid
 			profile.stopAccelTime = rampUpTime;
 			double coastTime = (dist - 2 * rampUpDist) / maxVel;
 			profile.startDecelTime = rampUpTime + coastTime;
 			profile.totalTime = coastTime + 2 * rampUpTime;
 		} else {
+			// this is the normal case, where we accelerate to top speed, coast for a bit, then
+			// decelerate.
 			double totalTime = 2 * std::sqrt(dist / maxAccel);
 			profile.stopAccelTime = profile.startDecelTime = totalTime / 2;
 			profile.totalTime = totalTime;

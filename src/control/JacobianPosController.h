@@ -21,7 +21,7 @@ namespace control {
  * @tparam inputDim The dimension of the input vector of the kinematic function.
  * @see https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant
  */
-template <int outputDim, int inputDim> class JacobianController {
+template <int outputDim, int inputDim> class JacobianPosController {
 public:
 	/**
 	 * @brief Construct a new controller.
@@ -34,7 +34,7 @@ public:
 	 * @param maxVels The maximum velocity in the output space of the kinematic function.
 	 * @param maxAccels The maximum acceleration in the output space of the kinematic function.
 	 */
-	JacobianController(
+	JacobianPosController(
 		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>&
 			kinematicsFunc,
 		const std::function<navtypes::Matrixd<outputDim, inputDim>(
@@ -51,7 +51,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the current command.
+	 * @brief Get the current command position in the input space.
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currPos The current position, in the input space.
@@ -65,7 +65,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the current command.
+	 * @brief Get the current command position in the input space.
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currPos The current position, in the input space.
@@ -83,6 +83,10 @@ public:
 			return currPos;
 		}
 
+		// The jacobian of the kinematics function represents a linearization of the kinematics
+		// around the current position. We then use this approximation to find the position
+		// delta in the input space that yields the required position delta in the output space
+
 		navtypes::Vectord<outputDim> currTarget = velocityProfile.getCommand(currTime);
 		navtypes::Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
 		navtypes::Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
@@ -90,6 +94,8 @@ public:
 		navtypes::Vectord<inputDim> inputPosDiff =
 			jacobian.colPivHouseholderQr().solve(outputPosDiff);
 
+		// the cosine similarity of the actual and required position deltas in the output space
+		// is metric of how much the kinematics allows the commanded movement.
 		navtypes::Vectord<outputDim> trueOutputPosDiff = jacobian * inputPosDiff;
 		cosineSim = outputPosDiff.dot(trueOutputPosDiff) /
 					(outputPosDiff.norm() * trueOutputPosDiff.norm());

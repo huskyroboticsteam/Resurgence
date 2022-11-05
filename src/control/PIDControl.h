@@ -86,6 +86,8 @@ public:
 			return Arrayd<dim>::Zero();
 		}
 
+		// see wikipedia link above for in-depth explanation
+
 		Arrayd<dim> err = setPoint.value() - currValue;
 		Arrayd<dim> pTerm = err * kP;
 		Arrayd<dim> fTerm = setPoint.value() * kF;
@@ -98,9 +100,11 @@ public:
 			auto [lastTime, lastValue] = lastData.value();
 			double dtSec = util::durationToSec(currTime - lastTime);
 
+			// use the backwards finite difference for approximating the derivative
 			Arrayd<dim> derivative = (currValue - lastValue) / dtSec;
 			dTerm = derivative * kD;
 
+			// use the trapezoid rule for approximating the integral
 			Arrayd<dim> area = (lastValue + currValue) * dtSec / 2.0;
 			iAccum += area;
 			iTerm = (err.abs() <= iZone).select(iAccum * kI, Arrayd<dim>::Zero());
