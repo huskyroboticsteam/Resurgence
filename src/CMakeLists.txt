@@ -317,7 +317,7 @@ if(WITH_TESTS)
     ar/DetectorTests.cpp
     ar/MarkerSetTests.cpp
     # Camera tests
-    camera/CameraParamsTests.cpp
+    ../tests/camera/CameraParamsTests.cpp
     # GPS tests
     ../tests/gps/GPSDatumTest.cpp
     ../tests/gps/GPSConverterTest.cpp
