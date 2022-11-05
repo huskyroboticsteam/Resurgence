@@ -79,6 +79,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">util Namespace Reference</div></div>
 </div><!--header-->
@@ -92,6 +93,12 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1ScopedTimer.html">ScopedTimer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A utility class that helps with timing.  <a href="classutil_1_1ScopedTimer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:abcce6dcf31d754cfa60673ef5c747d45"><td class="memItemLeft" align="right" valign="top"><a id="abcce6dcf31d754cfa60673ef5c747d45" name="abcce6dcf31d754cfa60673ef5c747d45"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>dseconds</b> = <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::duration</a>&lt; double, std::chrono::seconds::period &gt;</td></tr>
+<tr class="separator:abcce6dcf31d754cfa60673ef5c747d45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -146,6 +153,10 @@ frozen::string&#160;</td><td class="memItemRight" valign="bottom"><b>freezeStr</
 <tr class="memitem:a38a49bcfa8ed1a20f65a28d004e7af74"><td class="memTemplItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceutil.html#a38a49bcfa8ed1a20f65a28d004e7af74">to_string</a> (const T &amp;val)</td></tr>
 <tr class="memdesc:a38a49bcfa8ed1a20f65a28d004e7af74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the given value to a string.  <a href="namespaceutil.html#a38a49bcfa8ed1a20f65a28d004e7af74">More...</a><br /></td></tr>
 <tr class="separator:a38a49bcfa8ed1a20f65a28d004e7af74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d368bf202be12ecd7f66176f3088da3"><td class="memTemplParams" colspan="2">template&lt;typename Rep , typename Period &gt; </td></tr>
+<tr class="memitem:a4d368bf202be12ecd7f66176f3088da3"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceutil.html#a4d368bf202be12ecd7f66176f3088da3">durationToSec</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::duration</a>&lt; Rep, Period &gt; dur)</td></tr>
+<tr class="memdesc:a4d368bf202be12ecd7f66176f3088da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a duration to seconds, as a double.  <a href="namespaceutil.html#a4d368bf202be12ecd7f66176f3088da3">More...</a><br /></td></tr>
+<tr class="separator:a4d368bf202be12ecd7f66176f3088da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2d02ad5947a1c5a8b80513f8c72ecef"><td class="memItemLeft" align="right" valign="top"><a id="aa2d02ad5947a1c5a8b80513f8c72ecef" name="aa2d02ad5947a1c5a8b80513f8c72ecef"></a>
 <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> (robot::types::jointid_t joint)</td></tr>
 <tr class="separator:aa2d02ad5947a1c5a8b80513f8c72ecef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -282,6 +293,42 @@ frozen::string&#160;</td><td class="memItemRight" valign="bottom"><b>freezeStr</
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>If any point of <code>lms</code> is within <code>radius</code> distance of the robot. </dd></dl>
+
+</div>
+</div>
+<a id="a4d368bf202be12ecd7f66176f3088da3" name="a4d368bf202be12ecd7f66176f3088da3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d368bf202be12ecd7f66176f3088da3">&#9670;&#160;</a></span>durationToSec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep , typename Period &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double util::durationToSec </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">std::chrono::duration</a>&lt; Rep, Period &gt;&#160;</td>
+          <td class="paramname"><em>dur</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert a duration to seconds, as a double. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>The rep of the duration. </td></tr>
+    <tr><td class="paramname">Period</td><td>The period of the duration. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dur</td><td>The duration to convert. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>double The length of the duration, in seconds. </dd></dl>
 
 </div>
 </div>
