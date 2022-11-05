@@ -17,6 +17,8 @@ namespace control {
  * @brief This class controls the position of a multidimensional mechanism
  * with a trapezoidal velocity profile using the jacobian of the kinematics.
  *
+ * Note that the jacobian matrix is of dimension outputDim x inputDim
+ *
  * @tparam outputDim The dimension of the output vector of the kinematic function.
  * @tparam inputDim The dimension of the input vector of the kinematic function.
  * @see https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant
@@ -30,7 +32,6 @@ public:
 	 * a function that takes in some input vector (ex: joint angles of an arm) and outputs
 	 * another vector (ex: the 3d pose of the hand)
 	 * @param jacobianFunc The jacobian of the kinematic function.
-	 * When executing a command, getCommand() should be called at this rate.
 	 * @param maxVels The maximum velocity in the output space of the kinematic function.
 	 * @param maxAccels The maximum acceleration in the output space of the kinematic function.
 	 */
