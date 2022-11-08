@@ -44,7 +44,7 @@ void log(int level, const char* fmt, ...) {
 		va_end(arg);
 
 		if (useColors) {
-			std::cout << "\033[0m";
+			std::cout << "\033[0m"; // ANSI escape for color reset
 		}
 
 		std::cout << std::flush;
