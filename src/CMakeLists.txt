@@ -246,6 +246,10 @@ add_library(filters SHARED
   filters/pose_graph/factors.cpp
   )
 
+add_library(control SHARED
+  control/TrapezoidalVelocityProfile.cpp
+)
+
 if(WITH_LIDAR)
   add_subdirectory(lidar)
 endif()
@@ -283,6 +287,7 @@ list(APPEND rover_libs
   Threads::Threads
   websocket_utils
   filters
+  control
   utils
 )
 target_link_libraries(Rover
@@ -321,6 +326,10 @@ if(WITH_TESTS)
     # GPS tests
     ../tests/gps/GPSDatumTest.cpp
     ../tests/gps/GPSConverterTest.cpp
+    # Controller tests
+    ../tests/control/TrapezoidalVelocityProfileTest.cpp
+    ../tests/control/JacobianControllerTest.cpp
+    ../tests/control/PIDControllerTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
@@ -331,6 +340,8 @@ if(WITH_TESTS)
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
     ../tests/worldmap/QuadTreeTest.cpp
+    # Util tests
+    ../tests/util/UtilTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
