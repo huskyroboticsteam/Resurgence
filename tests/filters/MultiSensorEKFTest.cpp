@@ -7,9 +7,11 @@
 	}
 
 #include "../../src/filters/MultiSensorEKF.h"
+#include "../../src/navtypes.h"
 
 #include <Eigen/Core>
 
+using namespace navtypes;
 using namespace filters;
 using namespace filters::statespace;
 
