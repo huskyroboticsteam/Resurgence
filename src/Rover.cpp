@@ -106,10 +106,16 @@ void parseCommandLine(int argc, char** argv) {
 			throw std::runtime_error("Invalid log level " + value);
 	  	});
 
-	  try {
-	  	program.parse_args(argc, argv);
+	program.add_argument("-nc", "--no-colors")
+		.help("disables colors in console logging")
+		.action([&](const auto &) {
+			setColorsEnabled(false);
+	  	}).nargs(0);
+
+	try {
+		program.parse_args(argc, argv);
 		log(LOG_INFO, "parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: \"%s\"\n", program.get<std::string>("peripheral").c_str(), program.get<std::string>("loglevel").c_str());
-	  } catch (const std::runtime_error& err) {
+	} catch (const std::runtime_error& err) {
 	  	std::cerr << err.what() << std::endl;
 	  	std::cerr << program;
 	  	std::exit(EXIT_FAILURE);

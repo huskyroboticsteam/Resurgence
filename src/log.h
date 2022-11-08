@@ -21,3 +21,9 @@ void log(int level, const char* fmt, ...);
  * @param level, the log level threshold (LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR) 
  */
 void setLogLevel(int level);
+
+/**
+ * @brief Sets whether to enable logging colors.
+ * @param enabled, whether ANSI escape colors should be enabled for logging.
+ */
+void setColorsEnabled(bool enabled);
