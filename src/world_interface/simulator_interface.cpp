@@ -83,7 +83,11 @@ void sendJSON(const json& obj) {
 
 static void openCamera(CameraID cam, uint8_t fps = 20, uint16_t width = 640,
 					   uint16_t height = 480) {
-	json msg = {{"type", "simCameraStreamOpenRequest"}, {"camera", cam}, {"fps", fps}, {"width", width}, {"height", height}};
+	json msg = {{"type", "simCameraStreamOpenRequest"}, 
+		    {"camera", cam}, 
+		    {"fps", fps}, 
+		    {"width", width}, 
+		    {"height", height}};
 	sendJSON(msg);
 }
 
