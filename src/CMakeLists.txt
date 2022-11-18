@@ -166,6 +166,7 @@ add_library(utils SHARED
   base64/base64_img.cpp
   kinematics/DiffDriveKinematics.cpp
   kinematics/DiffWristKinematics.cpp
+  kinematics/SwerveDriveKinematics.cpp
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
