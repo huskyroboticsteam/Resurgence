@@ -75,15 +75,16 @@ swervewheelvel_t SwerveDriveKinematics::robotVelToWheelVel(double xVel, double y
 
 pose_t SwerveDriveKinematics::getLocalPoseUpdate(const swervewheelvel_t& wheelVel,
 												 double dt) const {
-	return {0, 0, 0};
+    pose_t robotVel = wheelVelToRobotVel(wheelVel);
+	return robotVel * dt;
 }
 
 pose_t SwerveDriveKinematics::getPoseUpdate(const swervewheelvel_t& wheelVel, double heading,
 											double dt) const {
-	return {0, 0, 0};
+	return toTransformRotateFirst(0, 0, -heading) * getLocalPoseUpdate(wheelVel, dt);
 }
 
 pose_t SwerveDriveKinematics::getNextPose(const swervewheelvel_t& wheelVel,
 										  const navtypes::pose_t& pose, double dt) const {
-	return {0, 0, 0};
+	return pose + getPoseUpdate(wheelVel, pose(2), dt);
 }
