@@ -333,6 +333,7 @@ if(WITH_TESTS)
     ../tests/control/PIDControllerTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
+    ../tests/kinematics/SwerveDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp
