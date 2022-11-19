@@ -49,9 +49,7 @@ SwerveDriveKinematics::getSwerveVelComponents(swervewheelvel_t wheelVel) const {
 pose_t SwerveDriveKinematics::wheelVelToRobotVel(swervewheelvel_t wheelVel) const {
 	Eigen::MatrixXd M(8, 3);
 	M = getIKMatrix();
-
-	Eigen::MatrixXd mPI = M.completeOrthogonalDecomposition().pseudoInverse();
-	return mPI * getSwerveVelComponents(wheelVel);
+	return M.colPivHouseholderQr().solve(getSwerveVelComponents(wheelVel));
 }
 
 swervewheelvel_t SwerveDriveKinematics::robotVelToWheelVel(double xVel, double yVel,
