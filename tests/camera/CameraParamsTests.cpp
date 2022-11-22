@@ -1,4 +1,4 @@
-#include "CameraParams.h"
+#include "../../src/camera/CameraParams.h"
 
 #include <cstdio>
 #include <string>
