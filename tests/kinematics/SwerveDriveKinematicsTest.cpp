@@ -63,4 +63,25 @@ TEST_CASE("Swerve Drive Kinematics Test") {
 	// drive forward 4 m, left 5 m, rotate 0.42 * PI radians CCW
 	swervewheelvel_t targetWheelVels = kinematics.robotVelToWheelVel(4, 5, 0.42 * PI);
 	assertApprox({4, 5, 0.42 * PI}, kinematics.getPoseUpdate(targetWheelVels, 0, 1));
+
+	// drive forward 8 m, left 10 m, rotate 0.84 * PI radians CCW w/ same velocity of previous test
+	assertApprox({8, 10, 0.84 * PI}, kinematics.getPoseUpdate(targetWheelVels, 0, 2));
+
+	// drive forward 3 m, left 7 m, rotate 0.25 * PI radians (45 degrees) CCW from existing 45-degree CCW heading
+	// expected xf = -4/sqrt(2) = -2.828427125 , yf = 10/sqrt(2) = 7.071067812, angle = 0.5*PI
+	targetWheelVels = kinematics.robotVelToWheelVel(3, 7, 0.25 * PI);
+	assertApprox({-2.828427125, 7.071067812, 0.5 * PI},
+				  kinematics.getNextPose(targetWheelVels, {0, 0, 0.25 * PI}, 1));
+
+	// drive forward 6 m, left 14 m, rotate 0.5 * PI radians (90 degrees) CCW from existing 45-degree CCW heading
+	// w/ same velocity of previous test
+	// expected xf = -8/sqrt(2), yf = 20/sqrt(2), angle = 0.75*PI
+	assertApprox({-2.828427125 * 2, 7.071067812 * 2, 0.75 * PI},
+				  kinematics.getNextPose(targetWheelVels, {0, 0, 0.25 * PI}, 2));
+
+	// drive forward 6 m, left 14 m, rotate 0.5 * PI radians (90 degrees) CCW from existing 45-degree CCW heading
+	// w/ same velocity of previous test from starting position 3 meters forward, 4 meters left
+	// expected xf = 3 - 8/sqrt(2), yf = 4 + 20/sqrt(2), angle = 0.75*PI
+	assertApprox({3.0 - (2.828427125 * 2), 4.0 + (7.071067812 * 2), 0.75 * PI},
+				  kinematics.getNextPose(targetWheelVels, {3, 4, 0.25 * PI}, 2));
 }
