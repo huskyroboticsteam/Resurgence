@@ -2,8 +2,6 @@
 
 #include "../Util.h"
 
-#include <cmath>
-
 #include <Eigen/QR>
 
 using namespace navtypes;
@@ -34,14 +32,14 @@ Eigen::Matrix<double, 8, 1>
 SwerveDriveKinematics::getSwerveVelComponents(swervewheelvel_t wheelVel) const {
 	Eigen::Matrix<double, 8, 1> res;
 
-	res << wheelVel.lfVel * cos(wheelVel.lfRot), 
-           wheelVel.lfVel * sin(wheelVel.lfRot),
-		   wheelVel.rfVel * cos(wheelVel.rfRot), 
-           wheelVel.rfVel * sin(wheelVel.rfRot),
-		   wheelVel.lbVel * cos(wheelVel.lbRot), 
-           wheelVel.lbVel * sin(wheelVel.lbRot),
-		   wheelVel.rbVel * cos(wheelVel.rbRot), 
-           wheelVel.rbVel * sin(wheelVel.rbRot);
+	res << wheelVel.lfVel * std::cos(wheelVel.lfRot), 
+           wheelVel.lfVel * std::sin(wheelVel.lfRot),
+		   wheelVel.rfVel * std::cos(wheelVel.rfRot), 
+           wheelVel.rfVel * std::sin(wheelVel.rfRot),
+		   wheelVel.lbVel * std::cos(wheelVel.lbRot), 
+           wheelVel.lbVel * std::sin(wheelVel.lbRot),
+		   wheelVel.rbVel * std::cos(wheelVel.rbRot), 
+           wheelVel.rbVel * std::sin(wheelVel.rbRot);
 
 	return res;
 }
@@ -59,14 +57,14 @@ swervewheelvel_t SwerveDriveKinematics::robotVelToWheelVel(double xVel, double y
 	// M * robotVels returns column wheel velocity vectors {lfx, lfy, rfx, rfy, lbx, lby, rbx,
 	// rby}
 
-	return {hypot(wheelVels(1), wheelVels(0)), 
-            atan2(wheelVels(1), wheelVels(0)),
-			hypot(wheelVels(3), wheelVels(2)), 
-            atan2(wheelVels(3), wheelVels(2)),
-			hypot(wheelVels(5), wheelVels(4)), 
-            atan2(wheelVels(5), wheelVels(4)),
-			hypot(wheelVels(7), wheelVels(6)), 
-            atan2(wheelVels(7), wheelVels(6))};
+	return {std::hypot(wheelVels(1), wheelVels(0)), 
+            std::atan2(wheelVels(1), wheelVels(0)),
+			std::hypot(wheelVels(3), wheelVels(2)), 
+            std::atan2(wheelVels(3), wheelVels(2)),
+			std::hypot(wheelVels(5), wheelVels(4)), 
+            std::atan2(wheelVels(5), wheelVels(4)),
+			std::hypot(wheelVels(7), wheelVels(6)), 
+            std::atan2(wheelVels(7), wheelVels(6))};
 }
 
 pose_t SwerveDriveKinematics::getLocalPoseUpdate(const swervewheelvel_t& wheelVel,
