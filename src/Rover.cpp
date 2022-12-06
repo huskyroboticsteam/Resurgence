@@ -19,8 +19,8 @@
 #include <unistd.h>
 
 #include <argparse/argparse.hpp>
-#include <frozen/unordered_set.h>
 #include <frozen/string.h>
+#include <frozen/unordered_set.h>
 #include <sys/time.h>
 
 using std::chrono::duration_cast;
@@ -72,13 +72,14 @@ void parseCommandLine(int argc, char** argv) {
 	argparse::ArgumentParser program("Rover", "N/A");
 
 	program.add_argument("-p", "--peripheral")
-	  	.help("specify the peripheral mounted on the rover")
-	  	.default_value(std::string("none"))
-	  	.action([](const std::string& value) {
-			std::unordered_map<std::string, mountedperipheral_t> allowed{{"none", mountedperipheral_t::none}, 
-																		 {"arm", mountedperipheral_t::arm}, 
-																		 {"science", mountedperipheral_t::scienceStation}, 
-																		 {"lidar", mountedperipheral_t::lidar}};
+		.help("specify the peripheral mounted on the rover")
+		.default_value(std::string("none"))
+		.action([](const std::string& value) {
+			std::unordered_map<std::string, mountedperipheral_t> allowed{
+				{"none", mountedperipheral_t::none},
+				{"arm", mountedperipheral_t::arm},
+				{"science", mountedperipheral_t::scienceStation},
+				{"lidar", mountedperipheral_t::lidar}};
 
 			if (allowed.find(value) != allowed.end()) {
 				Globals::mountedPeripheral = allowed[value];
@@ -86,20 +87,47 @@ void parseCommandLine(int argc, char** argv) {
 			}
 
 			throw std::runtime_error("Invalid peripheral " + value);
-	  	});
-	  try {
-	  	program.parse_args(argc, argv);
-		log(LOG_INFO, "parseCommandLine got peripheral specified as: \"%s\"\n", program.get<std::string>("peripheral").c_str());
-	  } catch (const std::runtime_error& err) {
-	  	std::cerr << err.what() << std::endl;
-	  	std::cerr << program;
-	  	std::exit(EXIT_FAILURE);
+		});
+
+	program.add_argument("-llvl", "--loglevel")
+		.help("specify the log level to use (must be one of: LOG_TRACE, LOG_DEBUG, LOG_INFO, "
+			  "LOG_WARN, LOG_ERROR)")
+		.default_value(std::string("LOG_INFO"))
+		.action([](const std::string& value) {
+			std::unordered_map<std::string, int> allowed{{"LOG_TRACE", LOG_TRACE},
+														 {"LOG_DEBUG", LOG_DEBUG},
+														 {"LOG_INFO", LOG_INFO},
+														 {"LOG_WARN", LOG_WARN},
+														 {"LOG_ERROR", LOG_ERROR}};
+
+			if (allowed.find(value) != allowed.end()) {
+				setLogLevel(allowed[value]);
+				return value;
+			}
+
+			throw std::runtime_error("Invalid log level " + value);
+		});
+
+	program.add_argument("-nc", "--no-colors")
+		.help("disables colors in console logging")
+		.action([&](const auto&) { setColorsEnabled(false); })
+		.nargs(0);
+
+	try {
+		program.parse_args(argc, argv);
+		log(LOG_INFO,
+			"parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: "
+			"\"%s\"\n",
+			program.get<std::string>("peripheral").c_str(),
+			program.get<std::string>("loglevel").c_str());
+	} catch (const std::runtime_error& err) {
+		std::cerr << err.what() << std::endl;
+		std::cerr << program;
+		std::exit(EXIT_FAILURE);
 	}
 }
 
 int main(int argc, char** argv) {
-	// TODO: make it possible to set this from the command line
-	LOG_LEVEL = LOG_INFO;
 	parseCommandLine(argc, argv);
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
@@ -115,9 +143,7 @@ int main(int argc, char** argv) {
 	std::vector<URCLegGPS> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
 	Autonomous autonomous(urc_legs, Constants::CONTROL_HZ);
 	auto roverStart = steady_clock::now();
-	// FIXME: should this possibly be a while loop instead? doesn't look like we're using the
-	// value of iter anywhere 
-	for (int iter = 0; /*no termination condition*/; iter++) {
+	while (true) {
 		auto loopStart = steady_clock::now();
 		long loopStartElapsedUsecs =
 			duration_cast<microseconds>(loopStart - roverStart).count();

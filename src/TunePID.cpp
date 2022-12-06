@@ -52,7 +52,6 @@ void cleanup(int signum) {
 }
 
 int main(int argc, char** argv) {
-	LOG_LEVEL = LOG_INFO;
 	robot::world_interface_init();
 	struct timeval tp0, tp_start;
 
