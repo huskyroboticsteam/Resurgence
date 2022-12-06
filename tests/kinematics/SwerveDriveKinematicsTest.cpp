@@ -18,8 +18,8 @@ std::string toString(const pose_t& pose) {
 	return ss.str();
 }
 
-void assertApprox(const pose_t& p1, const pose_t& p2, double dist = 0.01,
-				  double angle = 0.01) {
+void assertApprox(const pose_t& p1, const pose_t& p2, double dist = 1e-5,
+				  double angle = 1e-5) {
 	pose_t diff = p1 - p2;
 	bool distEqual = diff.topRows<2>().norm() <= dist;
 	double thetaDiff = std::fmod(abs(diff(2)), 2 * PI);
@@ -38,7 +38,7 @@ void assertApprox(const pose_t& p1, const pose_t& p2, double dist = 0.01,
 
 swervewheelvel_t wheelVel(double lfVel, double lfRot, double rfVel, double rfRot, double lbVel,
 						  double lbRot, double rbVel, double rbRot) {
-	return (swervewheelvel_t){lfVel, lfRot, rfVel, rfRot, lbVel, lbRot, rbVel, rbRot};
+	return {lfVel, lfRot, rfVel, rfRot, lbVel, lbRot, rbVel, rbRot};
 }
 } // namespace
 
