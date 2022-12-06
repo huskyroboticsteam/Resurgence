@@ -96,11 +96,11 @@ private:
 	double baseLength;
 
 	/**
-	 * Computes the Inverse Kinematics matrix of the robot that, when multipled by a 3x1
+	 * Computes the 8x3 Inverse Kinematics matrix of the robot that, when multiplied by a 3x1
 	 * vector of the robot's translational and angular velocities, gives the 8x1 vector of
 	 * wheel velocity components of the robot.
 	 */
-	Eigen::MatrixXd getIKMatrix() const;
+	Eigen::Matrix<double, 8, 3> getIKMatrix() const;
 
 	/**
 	 * Converts the polar speed data of wheelVel (wheel speed of each wheel and direction of each wheel)
@@ -109,5 +109,5 @@ private:
 	 * @param wheelVel the robot's wheel velocities in the robot's reference frame in polar format.
 	 * @return a 8x1 vector of the robot's rectangular wheel velocity components in the robot's reference frame.
 	 */
-	Eigen::VectorXd getSwerveVelComponents(swervewheelvel_t wheelVel) const;
+	Eigen::Matrix<double, 8, 1> getSwerveVelComponents(swervewheelvel_t wheelVel) const;
 };

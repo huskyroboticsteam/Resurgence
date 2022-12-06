@@ -12,11 +12,11 @@ using util::toTransformRotateFirst;
 SwerveDriveKinematics::SwerveDriveKinematics(double baseWidth, double baseLength)
 	: baseWidth(baseWidth), baseLength(baseLength) {}
 
-Eigen::MatrixXd SwerveDriveKinematics::getIKMatrix() const {
+Eigen::Matrix<double, 8, 3> SwerveDriveKinematics::getIKMatrix() const {
 	double lfx = baseLength / 2.0, rfx = lfx, lbx = -lfx, rbx = -lfx;
 	double lfy = baseWidth / 2.0, rfy = -lfy, lby = lfy, rby = -lfy;
 
-	Eigen::MatrixXd M(8, 3);
+	Eigen::Matrix<double, 8, 3> M;
 
 	M << 1, 0, -lfy, 
          0, 1, lfx, 
@@ -30,9 +30,9 @@ Eigen::MatrixXd SwerveDriveKinematics::getIKMatrix() const {
 	return M;
 }
 
-Eigen::VectorXd
+Eigen::Matrix<double, 8, 1>
 SwerveDriveKinematics::getSwerveVelComponents(swervewheelvel_t wheelVel) const {
-	Eigen::VectorXd res(8);
+	Eigen::Matrix<double, 8, 1> res;
 
 	res << wheelVel.lfVel * cos(wheelVel.lfRot), 
            wheelVel.lfVel * sin(wheelVel.lfRot),
@@ -47,8 +47,7 @@ SwerveDriveKinematics::getSwerveVelComponents(swervewheelvel_t wheelVel) const {
 }
 
 pose_t SwerveDriveKinematics::wheelVelToRobotVel(swervewheelvel_t wheelVel) const {
-	Eigen::MatrixXd M(8, 3);
-	M = getIKMatrix();
+	Eigen::Matrix<double, 8, 3> M = getIKMatrix();
 	return M.colPivHouseholderQr().solve(getSwerveVelComponents(wheelVel));
 }
 
@@ -56,8 +55,7 @@ swervewheelvel_t SwerveDriveKinematics::robotVelToWheelVel(double xVel, double y
 														   double thetaVel) const {
 	pose_t robotVels = {xVel, yVel, thetaVel};
 
-	Eigen::VectorXd wheelVels(8);
-	wheelVels = getIKMatrix() * robotVels;
+	Eigen::Matrix<double, 8, 1> wheelVels = getIKMatrix() * robotVels;
 	// M * robotVels returns column wheel velocity vectors {lfx, lfy, rfx, rfy, lbx, lby, rbx,
 	// rby}
 
