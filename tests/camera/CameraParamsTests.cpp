@@ -1,4 +1,7 @@
 #include "../../src/camera/CameraParams.h"
+#include "../../src/camera/CameraConfig.h"
+#include "../../src/Constants.h"
+
 
 #include <cstdio>
 #include <string>
@@ -71,6 +74,17 @@ TEST_CASE("Serialization works", "[camera][camera_params]") {
 	checkEqual(params2, read2);
 	checkEqual(params3, read3);
 	remove(filename.c_str());
+}
+
+TEST_CASE("List Conversation Works"){
+	std::unordered_map<robot::types::CameraID, cam::CameraConfig> cameraConfigMap;
+	auto cfg = cam::readConfigFromFile("../camera-config/global.yml");
+	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
+	std::vector<double> x1 = cfg.intrinsicParams->getIntrinsicList();
+	std::vector<double> x1test {8.2342295124138286e+02, 0., 3.0932599345522056e+02, 0.,
+          8.2343518498999936e+02, 2.5535163960018482e+02, 0., 0., 1.};
+	REQUIRE(x1 == x1test);
+
 }
 
 } // namespace cam
