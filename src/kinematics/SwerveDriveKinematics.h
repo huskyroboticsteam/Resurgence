@@ -4,12 +4,11 @@
 
 using namespace navtypes;
 
+/**
+ * Represents robot wheel velocities in robot reference frame,
+ * in polar form (wheel speed and angle)
+ */
 struct swervewheelvel_t {
-	/**
-	 * Represents robot wheel velocities in robot reference frame,
-	 * in polar form (wheel speed and angle)
-	 */
-	
 	double lfVel;
 	double lfRot;
 	double rfVel;
@@ -20,6 +19,10 @@ struct swervewheelvel_t {
 	double rbRot;
 };
 
+/**
+ * Calculates forward and inverse drivebase kinematics for a 4-wheel swerve drivebase
+ * with specifiable width and length.
+ */
 class SwerveDriveKinematics {
 public:
 	/**
