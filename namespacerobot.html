@@ -122,7 +122,7 @@ Enumerations</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a15b5204e1fdb2370d1b7eb627ec13924"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; point_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a15b5204e1fdb2370d1b7eb627ec13924">readGPS</a> ()</td></tr>
-<tr class="memdesc:a15b5204e1fdb2370d1b7eb627ec13924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current position in the global map frame based on a GPS measurement. Note that these values are NOT lat/long. Note that for the map frame, +x=+lat,+y=-lon.  <a href="namespacerobot.html#a15b5204e1fdb2370d1b7eb627ec13924">More...</a><br /></td></tr>
+<tr class="memdesc:a15b5204e1fdb2370d1b7eb627ec13924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current position in the global map frame based on a GPS measurement.  <a href="namespacerobot.html#a15b5204e1fdb2370d1b7eb627ec13924">More...</a><br /></td></tr>
 <tr class="separator:a15b5204e1fdb2370d1b7eb627ec13924"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6a5934b2f45b677e668a20df8c440f8"><td class="memItemLeft" align="right" valign="top">std::optional&lt; point_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ae6a5934b2f45b677e668a20df8c440f8">gpsToMeters</a> (const <a class="el" href="structnavtypes_1_1gpscoords__t.html">navtypes::gpscoords_t</a> &amp;coord)</td></tr>
 <tr class="memdesc:ae6a5934b2f45b677e668a20df8c440f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert GPS coordinates into a coordinate on the map frame.  <a href="namespacerobot.html#ae6a5934b2f45b677e668a20df8c440f8">More...</a><br /></td></tr>
@@ -137,7 +137,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the robot to drive at the given velocities.  <a href="namespacerobot.html#a8363ee6c4c4bd4b93c4188984dc77ad6">More...</a><br /></td></tr>
 <tr class="separator:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2337a0214f903f0ba6174b3d8b9e025b"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a>&lt; double, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">getCmdVel</a> ()</td></tr>
-<tr class="memdesc:a2337a0214f903f0ba6174b3d8b9e025b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the velocity commanded to the robot. Depending on scaling, may not be the same numbers passed to <a class="el" href="namespacerobot.html#a8363ee6c4c4bd4b93c4188984dc77ad6" title="Request the robot to drive at the given velocities.">setCmdVel()</a>.  <a href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">More...</a><br /></td></tr>
+<tr class="memdesc:a2337a0214f903f0ba6174b3d8b9e025b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the velocity commanded to the robot.  <a href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">More...</a><br /></td></tr>
 <tr class="separator:a2337a0214f903f0ba6174b3d8b9e025b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5133347c2d5d86918b6b8267ae42c5fc"><td class="memItemLeft" align="right" valign="top"><a id="a5133347c2d5d86918b6b8267ae42c5fc" name="a5133347c2d5d86918b6b8267ae42c5fc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setJointPower</b> (robot::types::jointid_t joint, double <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a>)</td></tr>
@@ -161,13 +161,13 @@ const <a class="el" href="classDiffWristKinematics.html">DiffWristKinematics</a>
 <tr class="memdesc:a128a6cb4047cf1e3164ea3afc4de4224"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last measurement from the lidar.  <a href="namespacerobot.html#a128a6cb4047cf1e3164ea3afc4de4224">More...</a><br /></td></tr>
 <tr class="separator:a128a6cb4047cf1e3164ea3afc4de4224"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdba67256ee6b98d21f683ecf1acc9f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacerobot_1_1types.html#a59f80e8ea8d9eaeb27b959ecf74a1d9b">landmarks_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#acdba67256ee6b98d21f683ecf1acc9f0">readLandmarks</a> ()</td></tr>
-<tr class="memdesc:acdba67256ee6b98d21f683ecf1acc9f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read measurement from the CV system. As of now, returns a vector of fixed length, one for each post in the competition.  <a href="namespacerobot.html#acdba67256ee6b98d21f683ecf1acc9f0">More...</a><br /></td></tr>
+<tr class="memdesc:acdba67256ee6b98d21f683ecf1acc9f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read measurement from the CV system.  <a href="namespacerobot.html#acdba67256ee6b98d21f683ecf1acc9f0">More...</a><br /></td></tr>
 <tr class="separator:acdba67256ee6b98d21f683ecf1acc9f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aa11e482ffaef27ea65955d70d7eaa6a9">readIMUHeading</a> ()</td></tr>
-<tr class="memdesc:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the current heading in the global map frame based on an IMU measurement. Note that the heading is in radians, CCW, and 0=North.  <a href="namespacerobot.html#aa11e482ffaef27ea65955d70d7eaa6a9">More...</a><br /></td></tr>
+<tr class="memdesc:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the current heading in the global map frame based on an IMU measurement.  <a href="namespacerobot.html#aa11e482ffaef27ea65955d70d7eaa6a9">More...</a><br /></td></tr>
 <tr class="separator:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a504c5a158430139ba046b30394ecc695"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; pose_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a504c5a158430139ba046b30394ecc695">getTruePose</a> ()</td></tr>
-<tr class="memdesc:a504c5a158430139ba046b30394ecc695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ground truth pose, if available. This is only available in simulation.  <a href="namespacerobot.html#a504c5a158430139ba046b30394ecc695">More...</a><br /></td></tr>
+<tr class="memdesc:a504c5a158430139ba046b30394ecc695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ground truth pose, if available.  <a href="namespacerobot.html#a504c5a158430139ba046b30394ecc695">More...</a><br /></td></tr>
 <tr class="separator:a504c5a158430139ba046b30394ecc695"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b22076ebfb4d42900af348550ba0b6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; pose_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a6b22076ebfb4d42900af348550ba0b6e">readVisualOdomVel</a> ()</td></tr>
 <tr class="memdesc:a6b22076ebfb4d42900af348550ba0b6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the current pose velocity (in the robot's reference frame) using visual odometry.  <a href="namespacerobot.html#a6b22076ebfb4d42900af348550ba0b6e">More...</a><br /></td></tr>
@@ -204,7 +204,7 @@ constexpr <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstd
 <tr class="memdesc:a3f5a1efb713c48bdf856cbc794d8412d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a new camera frame from the specified camera is available.  <a href="namespacerobot.html#a3f5a1efb713c48bdf856cbc794d8412d">More...</a><br /></td></tr>
 <tr class="separator:a3f5a1efb713c48bdf856cbc794d8412d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f3e430760dcde603cf49d380bfe5aba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a78ac07d0bba15e275647bf4124509e1b">CameraFrame</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a2f3e430760dcde603cf49d380bfe5aba">readCamera</a> (<a class="el" href="namespacerobot_1_1types.html#a854dec5b2c63324dfe817fcd0d163557">types::CameraID</a> camera)</td></tr>
-<tr class="memdesc:a2f3e430760dcde603cf49d380bfe5aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the latest frame from the given camera. This is not guaranteed to change between calls, so use <a class="el" href="namespacerobot.html#a3f5a1efb713c48bdf856cbc794d8412d" title="Check if a new camera frame from the specified camera is available.">hasNewCameraFrame()</a> to check if a new frame is available.  <a href="namespacerobot.html#a2f3e430760dcde603cf49d380bfe5aba">More...</a><br /></td></tr>
+<tr class="memdesc:a2f3e430760dcde603cf49d380bfe5aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the latest frame from the given camera.  <a href="namespacerobot.html#a2f3e430760dcde603cf49d380bfe5aba">More...</a><br /></td></tr>
 <tr class="separator:a2f3e430760dcde603cf49d380bfe5aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a480ad2cd13e79eb88652aadca2caef85"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classcam_1_1CameraParams.html">cam::CameraParams</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a480ad2cd13e79eb88652aadca2caef85">getCameraIntrinsicParams</a> (<a class="el" href="namespacerobot_1_1types.html#a854dec5b2c63324dfe817fcd0d163557">types::CameraID</a> camera)</td></tr>
 <tr class="memdesc:a480ad2cd13e79eb88652aadca2caef85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the intrinsic params of the specified camera, if it exists.  <a href="namespacerobot.html#a480ad2cd13e79eb88652aadca2caef85">More...</a><br /></td></tr>
@@ -220,7 +220,7 @@ template&lt;typename T &gt; </td></tr>
 <tr class="memdesc:ad44ac5c5e111853330b0025450e2acc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the PWM command of the given motor.  <a href="namespacerobot.html#ad44ac5c5e111853330b0025450e2acc3">More...</a><br /></td></tr>
 <tr class="separator:ad44ac5c5e111853330b0025450e2acc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a885f8a319493d7b6c2143a2414409d7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a885f8a319493d7b6c2143a2414409d7a">setMotorPos</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos)</td></tr>
-<tr class="memdesc:a885f8a319493d7b6c2143a2414409d7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the target position of the motor. This will have no effect if the motor does not support PID.  <a href="namespacerobot.html#a885f8a319493d7b6c2143a2414409d7a">More...</a><br /></td></tr>
+<tr class="memdesc:a885f8a319493d7b6c2143a2414409d7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the target position of the motor.  <a href="namespacerobot.html#a885f8a319493d7b6c2143a2414409d7a">More...</a><br /></td></tr>
 <tr class="separator:a885f8a319493d7b6c2143a2414409d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a915a340eeb215123cbde249845595c9f"><td class="memItemLeft" align="right" valign="top"><a id="a915a340eeb215123cbde249845595c9f" name="a915a340eeb215123cbde249845595c9f"></a>
 <a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getMotorPos</b> (motorid_t motor)</td></tr>
@@ -254,10 +254,10 @@ const <a class="el" href="namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e"
 <tr class="memdesc:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to the number of pulses per joint revolution.  <a href="namespacerobot.html#a3f9d8b438d2f5a9d83f05e6520e07e1a">More...</a><br /></td></tr>
 <tr class="separator:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf2d3136c13712a212ebf41ed4a6ff58"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a></td></tr>
-<tr class="memdesc:abf2d3136c13712a212ebf41ed4a6ff58"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with positive power. Negative values mean that the motor is inverted.  <a href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">More...</a><br /></td></tr>
+<tr class="memdesc:abf2d3136c13712a212ebf41ed4a6ff58"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with positive power.  <a href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">More...</a><br /></td></tr>
 <tr class="separator:abf2d3136c13712a212ebf41ed4a6ff58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5b3523412c0bfd79035091d88e01624"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">negative_pwm_scales</a></td></tr>
-<tr class="memdesc:ad5b3523412c0bfd79035091d88e01624"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with negative power. Negative values mean that the motor is inverted.  <a href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">More...</a><br /></td></tr>
+<tr class="memdesc:ad5b3523412c0bfd79035091d88e01624"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with negative power.  <a href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">More...</a><br /></td></tr>
 <tr class="separator:ad5b3523412c0bfd79035091d88e01624"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae917757337e6e1a1b99392c7c1db4069"><td class="memItemLeft" align="right" valign="top"><a id="ae917757337e6e1a1b99392c7c1db4069" name="ae917757337e6e1a1b99392c7c1db4069"></a>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>WHEEL_BASE</b> = 0.66</td></tr>
@@ -393,7 +393,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
       </table>
 </div><div class="memdoc">
 
-<p>Get the velocity commanded to the robot. Depending on scaling, may not be the same numbers passed to <a class="el" href="namespacerobot.html#a8363ee6c4c4bd4b93c4188984dc77ad6" title="Request the robot to drive at the given velocities.">setCmdVel()</a>. </p>
+<p>Get the velocity commanded to the robot. </p>
+<p >Depending on scaling, may not be the same numbers passed to <a class="el" href="namespacerobot.html#a8363ee6c4c4bd4b93c4188984dc77ad6" title="Request the robot to drive at the given velocities.">setCmdVel()</a>.</p>
 <dl class="section return"><dt>Returns</dt><dd>std::pair&lt;double, double&gt; Pair of thetaVel, xVel. </dd></dl>
 
 </div>
@@ -468,7 +469,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
       </table>
 </div><div class="memdoc">
 
-<p>Get the ground truth pose, if available. This is only available in simulation. </p>
+<p>Get the ground truth pose, if available. </p>
+<p >This is only available in simulation.</p>
 <dl class="section return"><dt>Returns</dt><dd>DataPoint&lt;pose_t&gt; The ground truth pose, or an empty datapoint if unavailable. </dd></dl>
 
 </div>
@@ -574,7 +576,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
       </table>
 </div><div class="memdoc">
 
-<p>Read the latest frame from the given camera. This is not guaranteed to change between calls, so use <a class="el" href="namespacerobot.html#a3f5a1efb713c48bdf856cbc794d8412d" title="Check if a new camera frame from the specified camera is available.">hasNewCameraFrame()</a> to check if a new frame is available. </p>
+<p>Read the latest frame from the given camera. </p>
+<p >This is not guaranteed to change between calls, so use <a class="el" href="namespacerobot.html#a3f5a1efb713c48bdf856cbc794d8412d" title="Check if a new camera frame from the specified camera is available.">hasNewCameraFrame()</a> to check if a new frame is available.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">camera</td><td>The ID of the camera to read from. </td></tr>
@@ -600,7 +603,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
       </table>
 </div><div class="memdoc">
 
-<p>Get the current position in the global map frame based on a GPS measurement. Note that these values are NOT lat/long. Note that for the map frame, +x=+lat,+y=-lon. </p>
+<p>Get the current position in the global map frame based on a GPS measurement. </p>
+<p >Note that these values are NOT lat/long. Note that for the map frame, +x=+lat,+y=-lon.</p>
 <dl class="section return"><dt>Returns</dt><dd>DataPoint&lt;point_t&gt; The last GPS reading, in the map space. </dd></dl>
 
 </div>
@@ -620,7 +624,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
       </table>
 </div><div class="memdoc">
 
-<p>Read the current heading in the global map frame based on an IMU measurement. Note that the heading is in radians, CCW, and 0=North. </p>
+<p>Read the current heading in the global map frame based on an IMU measurement. </p>
+<p >Note that the heading is in radians, CCW, and 0=North.</p>
 <dl class="section return"><dt>Returns</dt><dd>DataPoint&lt;double&gt; The last heading reading, or none if measurement not available. </dd></dl>
 
 </div>
@@ -640,7 +645,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
       </table>
 </div><div class="memdoc">
 
-<p>Read measurement from the CV system. As of now, returns a vector of fixed length, one for each post in the competition. </p>
+<p>Read measurement from the CV system. </p>
+<p >As of now, returns a vector of fixed length, one for each post in the competition.</p>
 <dl class="section return"><dt>Returns</dt><dd>DataPoint&lt;points_t&gt; A vector of fixed lengths. Non-visible markers are denoted with {0,0,0}, while all nonzero points are visible marker. The index of a landmark in this vector is its id. </dd></dl>
 
 </div>
@@ -796,7 +802,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
       </table>
 </div><div class="memdoc">
 
-<p>Set the target position of the motor. This will have no effect if the motor does not support PID. </p>
+<p>Set the target position of the motor. </p>
+<p >This will have no effect if the motor does not support PID.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">motor</td><td>The motor to set the target position of. </td></tr>
@@ -1027,7 +1034,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::rearRightWheel, -0.5},</div>
 <div class="line">                                                   {motorid_t::hand, 0.75}})</div>
 </div><!-- fragment -->
-<p>A mapping of motorids to power scale factors when commanded with negative power. Negative values mean that the motor is inverted. </p>
+<p>A mapping of motorids to power scale factors when commanded with negative power. </p>
+<p >Negative values mean that the motor is inverted. </p>
 
 </div>
 </div>
@@ -1090,7 +1098,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::rearRightWheel, -0.5},</div>
 <div class="line">                                                   {motorid_t::hand, 0.75}})</div>
 </div><!-- fragment -->
-<p>A mapping of motorids to power scale factors when commanded with positive power. Negative values mean that the motor is inverted. </p>
+<p>A mapping of motorids to power scale factors when commanded with positive power. </p>
+<p >Negative values mean that the motor is inverted. </p>
 
 </div>
 </div>

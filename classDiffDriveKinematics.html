@@ -84,25 +84,35 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Represents the kinematics of a differential drive.  
+ <a href="classDiffDriveKinematics.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="DiffDriveKinematics_8h_source.html">DiffDriveKinematics.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa3624e7f47090d299fab9591b25b63b9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aa3624e7f47090d299fab9591b25b63b9">DiffDriveKinematics</a> (double wheelBaseWidth)</td></tr>
+<tr class="memdesc:aa3624e7f47090d299fab9591b25b63b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classDiffDriveKinematics.html" title="Represents the kinematics of a differential drive.">DiffDriveKinematics</a> with the given wheel base width.  <a href="classDiffDriveKinematics.html#aa3624e7f47090d299fab9591b25b63b9">More...</a><br /></td></tr>
 <tr class="separator:aa3624e7f47090d299fab9591b25b63b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#af4f04aecd5ab5c7361f0958c9c3b0138">wheelVelToRobotVel</a> (double lVel, double rVel) const</td></tr>
+<tr class="memdesc:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the left and right wheel velocities, find the robot velocity in the robot's reference frame.  <a href="classDiffDriveKinematics.html#af4f04aecd5ab5c7361f0958c9c3b0138">More...</a><br /></td></tr>
 <tr class="separator:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22f42429446747e810e4d85c671f10ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structwheelvel__t.html">wheelvel_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#a22f42429446747e810e4d85c671f10ca">robotVelToWheelVel</a> (double xVel, double thetaVel) const</td></tr>
+<tr class="memdesc:a22f42429446747e810e4d85c671f10ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the robot velocity in the robot's local reference frame, find the left and right tangential wheel velocities.  <a href="classDiffDriveKinematics.html#a22f42429446747e810e4d85c671f10ca">More...</a><br /></td></tr>
 <tr class="separator:a22f42429446747e810e4d85c671f10ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec54118f4bab8a82f40cf4a21c417500"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aec54118f4bab8a82f40cf4a21c417500">getLocalPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double dt) const</td></tr>
+<tr class="memdesc:aec54118f4bab8a82f40cf4a21c417500"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the local reference frame assuming the left and right wheels have constant velocity.  <a href="classDiffDriveKinematics.html#aec54118f4bab8a82f40cf4a21c417500">More...</a><br /></td></tr>
 <tr class="separator:aec54118f4bab8a82f40cf4a21c417500"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aa0d0f3830ee9cc483a110f8e42c43e72">getPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double heading, double dt) const</td></tr>
+<tr class="memdesc:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the global reference frame (map space) assuming the left and right wheels have constant velocity.  <a href="classDiffDriveKinematics.html#aa0d0f3830ee9cc483a110f8e42c43e72">More...</a><br /></td></tr>
 <tr class="separator:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab55546370d415616eb4478dfd98f7a77"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#ab55546370d415616eb4478dfd98f7a77">getNextPose</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, const navtypes::pose_t &amp;pose, double dt) const</td></tr>
+<tr class="memdesc:ab55546370d415616eb4478dfd98f7a77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the next pose of the robot in the global reference frame.  <a href="classDiffDriveKinematics.html#ab55546370d415616eb4478dfd98f7a77">More...</a><br /></td></tr>
 <tr class="separator:ab55546370d415616eb4478dfd98f7a77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Represents the kinematics of a differential drive. This class can be used to calculate various velocities and pose updates using the mathematical representation of the drivebase. </p>
+<div class="textblock"><p >Represents the kinematics of a differential drive. </p>
+<p >This class can be used to calculate various velocities and pose updates using the mathematical representation of the drivebase. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa3624e7f47090d299fab9591b25b63b9" name="aa3624e7f47090d299fab9591b25b63b9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa3624e7f47090d299fab9591b25b63b9">&#9670;&#160;</a></span>DiffDriveKinematics()</h2>
@@ -127,7 +137,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Create a new <a class="el" href="classDiffDriveKinematics.html">DiffDriveKinematics</a> with the given wheel base width.</p>
+
+<p>Create a new <a class="el" href="classDiffDriveKinematics.html" title="Represents the kinematics of a differential drive.">DiffDriveKinematics</a> with the given wheel base width. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelBaseWidth</td><td>The width of the wheelbase. The units themselves don't matter, as long as you're consistent. </td></tr>
@@ -163,7 +174,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Calculate the pose update in the local reference frame assuming the left and right wheels have constant velocity.</p>
+
+<p>Calculate the pose update in the local reference frame assuming the left and right wheels have constant velocity. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelVel</td><td>The velocities of the wheels. </td></tr>
@@ -206,7 +218,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Calculate the next pose of the robot in the global reference frame. (map space)</p>
+
+<p>Calculate the next pose of the robot in the global reference frame. </p>
+<p >(map space)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelVel</td><td>The velocities of the wheels. </td></tr>
@@ -250,7 +264,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Calculate the pose update in the global reference frame (map space) assuming the left and right wheels have constant velocity.</p>
+
+<p>Calculate the pose update in the global reference frame (map space) assuming the left and right wheels have constant velocity. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelVel</td><td>The velocities of the wheels. </td></tr>
@@ -287,7 +302,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Given the robot velocity in the robot's local reference frame, find the left and right tangential wheel velocities.</p>
+
+<p>Given the robot velocity in the robot's local reference frame, find the left and right tangential wheel velocities. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">xVel</td><td>The x velocity in the robot's reference frame. </td></tr>
@@ -324,7 +340,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Given the left and right wheel velocities, find the robot velocity in the robot's reference frame. Since this is a non-holonomic drivebase, the y velocity will be 0.</p>
+
+<p>Given the left and right wheel velocities, find the robot velocity in the robot's reference frame. </p>
+<p >Since this is a non-holonomic drivebase, the y velocity will be 0.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">lVel</td><td>The tangential velocity of the left wheel. </td></tr>

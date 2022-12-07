@@ -99,12 +99,17 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Tag</b> (<a class="el" href="classAR_1_1MarkerPattern.html">MarkerPattern</a> marker, <a class="elRef" href="https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga370d94209693b5b13437ab4991cabf73">cv::Vec3d</a> rvec, <a class="elRef" href="https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga370d94209693b5b13437ab4991cabf73">cv::Vec3d</a> tvec)</td></tr>
 <tr class="separator:ace4dbbf00f03c6215f7f269cb6aba5cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c106533bf2eef5fffe633112ccec6fe"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga370d94209693b5b13437ab4991cabf73">cv::Vec3d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAR_1_1Tag.html#a5c106533bf2eef5fffe633112ccec6fe">getRVec</a> () const</td></tr>
+<tr class="memdesc:a5c106533bf2eef5fffe633112ccec6fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the rotation vector of the tag.  <a href="classAR_1_1Tag.html#a5c106533bf2eef5fffe633112ccec6fe">More...</a><br /></td></tr>
 <tr class="separator:a5c106533bf2eef5fffe633112ccec6fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf13474e6584539c096be20ee7fc61be"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga370d94209693b5b13437ab4991cabf73">cv::Vec3d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAR_1_1Tag.html#adf13474e6584539c096be20ee7fc61be">getTVec</a> () const</td></tr>
+<tr class="memdesc:adf13474e6584539c096be20ee7fc61be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the translation vector of the tag.  <a href="classAR_1_1Tag.html#adf13474e6584539c096be20ee7fc61be">More...</a><br /></td></tr>
 <tr class="separator:adf13474e6584539c096be20ee7fc61be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a166811d0a22ccb5759a039687ba30ae9"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://docs.opencv.org/4.2.0/dc/d84/group__core__basic.html#ga370d94209693b5b13437ab4991cabf73">cv::Vec3d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAR_1_1Tag.html#a166811d0a22ccb5759a039687ba30ae9">getCoordinates</a> () const</td></tr>
+<tr class="memdesc:a166811d0a22ccb5759a039687ba30ae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the 3D coordinates of the tag with respect to the camera.  <a href="classAR_1_1Tag.html#a166811d0a22ccb5759a039687ba30ae9">More...</a><br /></td></tr>
 <tr class="separator:a166811d0a22ccb5759a039687ba30ae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac841bf92ef87dcac6196435afc7c2f59"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classAR_1_1MarkerPattern.html">MarkerPattern</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAR_1_1Tag.html#ac841bf92ef87dcac6196435afc7c2f59">getMarker</a> () const</td></tr>
+<tr class="memitem:ac841bf92ef87dcac6196435afc7c2f59"><td class="memItemLeft" align="right" valign="top"><a id="ac841bf92ef87dcac6196435afc7c2f59" name="ac841bf92ef87dcac6196435afc7c2f59"></a>
+<a class="el" href="classAR_1_1MarkerPattern.html">MarkerPattern</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getMarker</b> () const</td></tr>
+<tr class="memdesc:ac841bf92ef87dcac6196435afc7c2f59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the Marker associated with the tag. <br /></td></tr>
 <tr class="separator:ac841bf92ef87dcac6196435afc7c2f59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -125,26 +130,10 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets the 3D coordinates of the tag with respect to the camera. The return value is currently the same as getTVec, but this function is provided for convenience as its name is more intuitive.</p>
+
+<p>Gets the 3D coordinates of the tag with respect to the camera. </p>
+<p >The return value is currently the same as getTVec, but this function is provided for convenience as its name is more intuitive.</p>
 <p >This function will return real world units; these are dependent upon the camera parameters you are currently using. </p>
-
-</div>
-</div>
-<a id="ac841bf92ef87dcac6196435afc7c2f59" name="ac841bf92ef87dcac6196435afc7c2f59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac841bf92ef87dcac6196435afc7c2f59">&#9670;&#160;</a></span>getMarker()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classAR_1_1MarkerPattern.html">MarkerPattern</a> AR::Tag::getMarker </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >Gets the Marker associated with the tag. </p>
 
 </div>
 </div>
@@ -162,7 +151,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets the rotation vector of the tag. This vector defines a line through the origin around which points are rotated to transform them from the object reference frame to the camera reference frame; its length is the angle of rotation. You will likely not need this for most uses. </p>
+
+<p>Gets the rotation vector of the tag. </p>
+<p >This vector defines a line through the origin around which points are rotated to transform them from the object reference frame to the camera reference frame; its length is the angle of rotation. You will likely not need this for most uses. </p>
 
 </div>
 </div>
@@ -180,7 +171,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets the translation vector of the tag. This vector defines the translation necessary to transform points from the object reference frame to the camera reference frame. For the center of the tag (0,0,0), this vector is in effect the 3D coordinates of the tag relative to the camera.</p>
+
+<p>Gets the translation vector of the tag. </p>
+<p >This vector defines the translation necessary to transform points from the object reference frame to the camera reference frame. For the center of the tag (0,0,0), this vector is in effect the 3D coordinates of the tag relative to the camera.</p>
 <p >This function will return real world units; these are dependent upon the camera parameters you are currently using. </p>
 
 </div>

@@ -85,7 +85,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A GPS datum that specifies the reference ellipsoid for use in GPS calculations. This is important to resolve what exact location a gps coordinate specifies.  
+<p>A GPS datum that specifies the reference ellipsoid for use in GPS calculations.  
  <a href="classGPSDatum.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="gps__util_8h_source.html">gps_util.h</a>&gt;</code></p>
@@ -94,31 +94,42 @@ Collaboration diagram for GPSDatum:</div>
 <div class="dyncontent">
 <div class="center"><img src="classGPSDatum__coll__graph.png" border="0" usemap="#aGPSDatum_coll__map" alt="Collaboration graph"/></div>
 <map name="aGPSDatum_coll__map" id="aGPSDatum_coll__map">
-<area shape="rect" title="A GPS datum that specifies the reference ellipsoid for use in GPS calculations. This is important to ..." alt="" coords="5,5,93,31"/>
+<area shape="rect" title="A GPS datum that specifies the reference ellipsoid for use in GPS calculations." alt="" coords="5,5,93,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa8cf8c82596db122af4edb702aaa808d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSDatum.html#aa8cf8c82596db122af4edb702aaa808d">GPSDatum</a> (double a, double b)</td></tr>
-<tr class="memdesc:aa8cf8c82596db122af4edb702aaa808d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classGPSDatum.html" title="A GPS datum that specifies the reference ellipsoid for use in GPS calculations. This is important to ...">GPSDatum</a> object, with the specified parameters for the ellipsoid.  <a href="classGPSDatum.html#aa8cf8c82596db122af4edb702aaa808d">More...</a><br /></td></tr>
+<tr class="memdesc:aa8cf8c82596db122af4edb702aaa808d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classGPSDatum.html" title="A GPS datum that specifies the reference ellipsoid for use in GPS calculations.">GPSDatum</a> object, with the specified parameters for the ellipsoid.  <a href="classGPSDatum.html#aa8cf8c82596db122af4edb702aaa808d">More...</a><br /></td></tr>
 <tr class="separator:aa8cf8c82596db122af4edb702aaa808d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6199b4c53d6ab5fbe14774f99b296ee"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSDatum.html#aa6199b4c53d6ab5fbe14774f99b296ee">getA</a> () const</td></tr>
+<tr class="memitem:aa6199b4c53d6ab5fbe14774f99b296ee"><td class="memItemLeft" align="right" valign="top"><a id="aa6199b4c53d6ab5fbe14774f99b296ee" name="aa6199b4c53d6ab5fbe14774f99b296ee"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>getA</b> () const</td></tr>
+<tr class="memdesc:aa6199b4c53d6ab5fbe14774f99b296ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the semi-major axis of the reference ellipsoid. <br /></td></tr>
 <tr class="separator:aa6199b4c53d6ab5fbe14774f99b296ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf74954b42657295aa8c4a48275596ef"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSDatum.html#acf74954b42657295aa8c4a48275596ef">getB</a> () const</td></tr>
+<tr class="memitem:acf74954b42657295aa8c4a48275596ef"><td class="memItemLeft" align="right" valign="top"><a id="acf74954b42657295aa8c4a48275596ef" name="acf74954b42657295aa8c4a48275596ef"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>getB</b> () const</td></tr>
+<tr class="memdesc:acf74954b42657295aa8c4a48275596ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the semi-minor axis of the reference ellipsoid. <br /></td></tr>
 <tr class="separator:acf74954b42657295aa8c4a48275596ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d68b6684d03a624c5f03ed2d5eceaaf"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSDatum.html#a0d68b6684d03a624c5f03ed2d5eceaaf">getFlattening</a> () const</td></tr>
+<tr class="memitem:a0d68b6684d03a624c5f03ed2d5eceaaf"><td class="memItemLeft" align="right" valign="top"><a id="a0d68b6684d03a624c5f03ed2d5eceaaf" name="a0d68b6684d03a624c5f03ed2d5eceaaf"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>getFlattening</b> () const</td></tr>
+<tr class="memdesc:a0d68b6684d03a624c5f03ed2d5eceaaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the flattening parameter of the reference ellipsoid. <br /></td></tr>
 <tr class="separator:a0d68b6684d03a624c5f03ed2d5eceaaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a950d3a9a6a4b00167eb6d7d3960346c0"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSDatum.html#a950d3a9a6a4b00167eb6d7d3960346c0">getSquareEccentricity</a> () const</td></tr>
+<tr class="memitem:a950d3a9a6a4b00167eb6d7d3960346c0"><td class="memItemLeft" align="right" valign="top"><a id="a950d3a9a6a4b00167eb6d7d3960346c0" name="a950d3a9a6a4b00167eb6d7d3960346c0"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>getSquareEccentricity</b> () const</td></tr>
+<tr class="memdesc:a950d3a9a6a4b00167eb6d7d3960346c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the square of the (first) eccentricity of the ellipsoid. <br /></td></tr>
 <tr class="separator:a950d3a9a6a4b00167eb6d7d3960346c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a9797e6a1da01ead0d64a961fdb7b3f40"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classGPSDatum.html">GPSDatum</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSDatum.html#a9797e6a1da01ead0d64a961fdb7b3f40">WGS84</a></td></tr>
+<tr class="memitem:a9797e6a1da01ead0d64a961fdb7b3f40"><td class="memItemLeft" align="right" valign="top"><a id="a9797e6a1da01ead0d64a961fdb7b3f40" name="a9797e6a1da01ead0d64a961fdb7b3f40"></a>
+static const <a class="el" href="classGPSDatum.html">GPSDatum</a>&#160;</td><td class="memItemRight" valign="bottom"><b>WGS84</b></td></tr>
+<tr class="memdesc:a9797e6a1da01ead0d64a961fdb7b3f40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference links: <a href="https://en.wikipedia.org/wiki/Geodetic_datum#Earth_reference_ellipsoid">https://en.wikipedia.org/wiki/Geodetic_datum#Earth_reference_ellipsoid</a> <a href="https://en.wikipedia.org/wiki/World_Geodetic_System#1984_version">https://en.wikipedia.org/wiki/World_Geodetic_System#1984_version</a> <a href="https://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude">https://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude</a> <a href="https://en.wikipedia.org/wiki/Latitude#Meridian_distance_on_the_ellipsoid">https://en.wikipedia.org/wiki/Latitude#Meridian_distance_on_the_ellipsoid</a>. <br /></td></tr>
 <tr class="separator:a9797e6a1da01ead0d64a961fdb7b3f40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >A GPS datum that specifies the reference ellipsoid for use in GPS calculations. This is important to resolve what exact location a gps coordinate specifies. </p>
+<div class="textblock"><p >A GPS datum that specifies the reference ellipsoid for use in GPS calculations. </p>
+<p >This is important to resolve what exact location a gps coordinate specifies. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa8cf8c82596db122af4edb702aaa808d" name="aa8cf8c82596db122af4edb702aaa808d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa8cf8c82596db122af4edb702aaa808d">&#9670;&#160;</a></span>GPSDatum()</h2>
@@ -146,7 +157,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Construct a new <a class="el" href="classGPSDatum.html" title="A GPS datum that specifies the reference ellipsoid for use in GPS calculations. This is important to ...">GPSDatum</a> object, with the specified parameters for the ellipsoid. </p>
+<p>Construct a new <a class="el" href="classGPSDatum.html" title="A GPS datum that specifies the reference ellipsoid for use in GPS calculations.">GPSDatum</a> object, with the specified parameters for the ellipsoid. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">a</td><td>The semi-major axis of the ellipsoid. </td></tr>
@@ -154,103 +165,6 @@ Static Public Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="aa6199b4c53d6ab5fbe14774f99b296ee" name="aa6199b4c53d6ab5fbe14774f99b296ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6199b4c53d6ab5fbe14774f99b296ee">&#9670;&#160;</a></span>getA()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double GPSDatum::getA </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >Get the semi-major axis of the reference ellipsoid </p>
-
-</div>
-</div>
-<a id="acf74954b42657295aa8c4a48275596ef" name="acf74954b42657295aa8c4a48275596ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf74954b42657295aa8c4a48275596ef">&#9670;&#160;</a></span>getB()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double GPSDatum::getB </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >Get the semi-minor axis of the reference ellipsoid </p>
-
-</div>
-</div>
-<a id="a0d68b6684d03a624c5f03ed2d5eceaaf" name="a0d68b6684d03a624c5f03ed2d5eceaaf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d68b6684d03a624c5f03ed2d5eceaaf">&#9670;&#160;</a></span>getFlattening()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double GPSDatum::getFlattening </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >Get the flattening parameter of the reference ellipsoid </p>
-
-</div>
-</div>
-<a id="a950d3a9a6a4b00167eb6d7d3960346c0" name="a950d3a9a6a4b00167eb6d7d3960346c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a950d3a9a6a4b00167eb6d7d3960346c0">&#9670;&#160;</a></span>getSquareEccentricity()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double GPSDatum::getSquareEccentricity </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >Get the square of the (first) eccentricity of the ellipsoid </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="a9797e6a1da01ead0d64a961fdb7b3f40" name="a9797e6a1da01ead0d64a961fdb7b3f40"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9797e6a1da01ead0d64a961fdb7b3f40">&#9670;&#160;</a></span>WGS84</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classGPSDatum.html">GPSDatum</a> GPSDatum::WGS84</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Reference links: <a href="https://en.wikipedia.org/wiki/Geodetic_datum#Earth_reference_ellipsoid">https://en.wikipedia.org/wiki/Geodetic_datum#Earth_reference_ellipsoid</a> <a href="https://en.wikipedia.org/wiki/World_Geodetic_System#1984_version">https://en.wikipedia.org/wiki/World_Geodetic_System#1984_version</a> <a href="https://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude">https://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude</a> <a href="https://en.wikipedia.org/wiki/Latitude#Meridian_distance_on_the_ellipsoid">https://en.wikipedia.org/wiki/Latitude#Meridian_distance_on_the_ellipsoid</a> </p>
 
 </div>
 </div>

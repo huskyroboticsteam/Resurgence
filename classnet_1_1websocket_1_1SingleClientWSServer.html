@@ -89,7 +89,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A WebSocket server class that only accepts a single client at a time to each endpoint served by this server. Users of this class will create endpoints by adding websocket protocols using <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#aa08f6e05407ab181016886ef95b81f6c" title="Register a protocol with this server. It will create an endpoint at a protocol path which clients can...">addProtocol()</a>. This server processes messages from the client and invokes message handlers, which are defined by a <a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html" title="Defines a protocol which will be served at an endpoint of a server. This protocol defines several mes...">websocket::WebSocketProtocol</a> object.  
+<p>A WebSocket server class that only accepts a single client at a time to each endpoint served by this server.  
  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="WebSocketServer_8h_source.html">WebSocketServer.h</a>&gt;</code></p>
@@ -100,7 +100,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ac665bc5e8ae3112c4471b1352ddb2132"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new server object, without starting it.  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#ac665bc5e8ae3112c4471b1352ddb2132">More...</a><br /></td></tr>
 <tr class="separator:ac665bc5e8ae3112c4471b1352ddb2132"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea232573631f9818696d1faa66d2204f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#aea232573631f9818696d1faa66d2204f">~SingleClientWSServer</a> ()</td></tr>
-<tr class="memdesc:aea232573631f9818696d1faa66d2204f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the server after calling <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#ac6eba89635a679c01f7b6891123c1d80" title="Stop the server. Disconnects from all clients and shuts down the server.">stop()</a>  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#aea232573631f9818696d1faa66d2204f">More...</a><br /></td></tr>
+<tr class="memdesc:aea232573631f9818696d1faa66d2204f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the server after calling <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#ac6eba89635a679c01f7b6891123c1d80" title="Stop the server.">stop()</a>  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#aea232573631f9818696d1faa66d2204f">More...</a><br /></td></tr>
 <tr class="separator:aea232573631f9818696d1faa66d2204f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2a6f9edb3460646eca4c7d3ca217d21"><td class="memItemLeft" align="right" valign="top"><a id="ad2a6f9edb3460646eca4c7d3ca217d21" name="ad2a6f9edb3460646eca4c7d3ca217d21"></a>
 <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html">SingleClientWSServer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html">SingleClientWSServer</a> &amp;)=delete</td></tr>
@@ -108,12 +108,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae5f4b4ef17fb26725e0c6d52909ec9da"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#ae5f4b4ef17fb26725e0c6d52909ec9da">start</a> ()</td></tr>
 <tr class="memdesc:ae5f4b4ef17fb26725e0c6d52909ec9da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start the server.  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#ae5f4b4ef17fb26725e0c6d52909ec9da">More...</a><br /></td></tr>
 <tr class="separator:ae5f4b4ef17fb26725e0c6d52909ec9da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6eba89635a679c01f7b6891123c1d80"><td class="memItemLeft" align="right" valign="top"><a id="ac6eba89635a679c01f7b6891123c1d80" name="ac6eba89635a679c01f7b6891123c1d80"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>stop</b> ()</td></tr>
-<tr class="memdesc:ac6eba89635a679c01f7b6891123c1d80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop the server. Disconnects from all clients and shuts down the server. <br /></td></tr>
+<tr class="memitem:ac6eba89635a679c01f7b6891123c1d80"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#ac6eba89635a679c01f7b6891123c1d80">stop</a> ()</td></tr>
+<tr class="memdesc:ac6eba89635a679c01f7b6891123c1d80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop the server.  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#ac6eba89635a679c01f7b6891123c1d80">More...</a><br /></td></tr>
 <tr class="separator:ac6eba89635a679c01f7b6891123c1d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa08f6e05407ab181016886ef95b81f6c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#aa08f6e05407ab181016886ef95b81f6c">addProtocol</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08015.html">std::unique_ptr</a>&lt; <a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html">WebSocketProtocol</a> &gt; protocol)</td></tr>
-<tr class="memdesc:aa08f6e05407ab181016886ef95b81f6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a protocol with this server. It will create an endpoint at a protocol path which clients can connect to. The protocol and message handlers are defined by the protocol object. If a protocol already exists at the given protocol path, do nothing.  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#aa08f6e05407ab181016886ef95b81f6c">More...</a><br /></td></tr>
+<tr class="memdesc:aa08f6e05407ab181016886ef95b81f6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a protocol with this server.  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#aa08f6e05407ab181016886ef95b81f6c">More...</a><br /></td></tr>
 <tr class="separator:aa08f6e05407ab181016886ef95b81f6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96d029a7fcc48f6339b896ee17c64343"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#a96d029a7fcc48f6339b896ee17c64343">sendRawString</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;protocolPath, const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;str)</td></tr>
 <tr class="memdesc:a96d029a7fcc48f6339b896ee17c64343"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a string to the client connected to the given protocol path, if there is one.  <a href="classnet_1_1websocket_1_1SingleClientWSServer.html#a96d029a7fcc48f6339b896ee17c64343">More...</a><br /></td></tr>
@@ -123,8 +122,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>stop</b> ()</td></tr>
 <tr class="separator:a1c61e5d20850e351ee97760a0c65e13b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >A WebSocket server class that only accepts a single client at a time to each endpoint served by this server. Users of this class will create endpoints by adding websocket protocols using <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#aa08f6e05407ab181016886ef95b81f6c" title="Register a protocol with this server. It will create an endpoint at a protocol path which clients can...">addProtocol()</a>. This server processes messages from the client and invokes message handlers, which are defined by a <a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html" title="Defines a protocol which will be served at an endpoint of a server. This protocol defines several mes...">websocket::WebSocketProtocol</a> object. </p>
-<p >Messages recieved by this server are expected to be JSON-encoded. Further requirements are dictated by the <a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html" title="Defines a protocol which will be served at an endpoint of a server. This protocol defines several mes...">websocket::WebSocketProtocol</a> documentation. The entire json object will be passed to message handlers. </p>
+<div class="textblock"><p >A WebSocket server class that only accepts a single client at a time to each endpoint served by this server. </p>
+<p >Users of this class will create endpoints by adding websocket protocols using <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#aa08f6e05407ab181016886ef95b81f6c" title="Register a protocol with this server.">addProtocol()</a>. This server processes messages from the client and invokes message handlers, which are defined by a <a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html" title="Defines a protocol which will be served at an endpoint of a server.">websocket::WebSocketProtocol</a> object.</p>
+<p >Messages recieved by this server are expected to be JSON-encoded. Further requirements are dictated by the <a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html" title="Defines a protocol which will be served at an endpoint of a server.">websocket::WebSocketProtocol</a> documentation. The entire json object will be passed to message handlers. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac665bc5e8ae3112c4471b1352ddb2132" name="ac665bc5e8ae3112c4471b1352ddb2132"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac665bc5e8ae3112c4471b1352ddb2132">&#9670;&#160;</a></span>SingleClientWSServer()</h2>
@@ -178,7 +178,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>stop</b> ()</td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Destroy the server after calling <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#ac6eba89635a679c01f7b6891123c1d80" title="Stop the server. Disconnects from all clients and shuts down the server.">stop()</a> </p>
+<p>Destroy the server after calling <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html#ac6eba89635a679c01f7b6891123c1d80" title="Stop the server.">stop()</a> </p>
 
 </div>
 </div>
@@ -199,7 +199,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>stop</b> ()</td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Register a protocol with this server. It will create an endpoint at a protocol path which clients can connect to. The protocol and message handlers are defined by the protocol object. If a protocol already exists at the given protocol path, do nothing. </p>
+<p>Register a protocol with this server. </p>
+<p >It will create an endpoint at a protocol path which clients can connect to. The protocol and message handlers are defined by the protocol object. If a protocol already exists at the given protocol path, do nothing.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">protocol</td><td>The protocol object to add to the server. </td></tr>
@@ -301,6 +302,26 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>stop</b> ()</td></tr>
 
 <p>Start the server. </p>
 <dl class="section return"><dt>Returns</dt><dd>true iff the server was successfully started. May return false if the server is already running. </dd></dl>
+
+</div>
+</div>
+<a id="ac6eba89635a679c01f7b6891123c1d80" name="ac6eba89635a679c01f7b6891123c1d80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6eba89635a679c01f7b6891123c1d80">&#9670;&#160;</a></span>stop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::websocket::SingleClientWSServer::stop </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stop the server. </p>
+<p >Disconnects from all clients and shuts down the server. </p>
 
 </div>
 </div>

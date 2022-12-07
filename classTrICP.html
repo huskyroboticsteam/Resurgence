@@ -84,17 +84,22 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Implements the Trimmed Iterative Closest Point algorithm for 2D point cloud registration.  
+ <a href="classTrICP.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="TrICP_8h_source.html">TrICP.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:adf3f636eec42c3a59d256cf6ca1eb8a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTrICP.html#adf3f636eec42c3a59d256cf6ca1eb8a8">TrICP</a> (int maxIter, double relErrChangeThresh, std::function&lt; navtypes::point_t(const navtypes::point_t &amp;)&gt; getClosest)</td></tr>
+<tr class="memdesc:adf3f636eec42c3a59d256cf6ca1eb8a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="classTrICP.html" title="Implements the Trimmed Iterative Closest Point algorithm for 2D point cloud registration.">TrICP</a> object.  <a href="classTrICP.html#adf3f636eec42c3a59d256cf6ca1eb8a8">More...</a><br /></td></tr>
 <tr class="separator:adf3f636eec42c3a59d256cf6ca1eb8a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3020049e04037fccedbe9543c09d5c06"><td class="memItemLeft" align="right" valign="top">navtypes::transform_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTrICP.html#a3020049e04037fccedbe9543c09d5c06">correct</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">navtypes::points_t</a> &amp;<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a16583.html#a483f29861e583496e66e73e420ae7ab8">sample</a>, double overlap)</td></tr>
+<tr class="memdesc:a3020049e04037fccedbe9543c09d5c06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds a rigid transformation that transforms the given sample to match the map.  <a href="classTrICP.html#a3020049e04037fccedbe9543c09d5c06">More...</a><br /></td></tr>
 <tr class="separator:a3020049e04037fccedbe9543c09d5c06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Implements the Trimmed Iterative Closest Point algorithm for 2D point cloud registration.</p>
+<div class="textblock"><p >Implements the Trimmed Iterative Closest Point algorithm for 2D point cloud registration. </p>
 <dl class="section see"><dt>See also</dt><dd><a href="https://www.researchgate.net/publication/3974183_The_Trimmed_Iterative_Closest_Point_algorithm">Research paper</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="adf3f636eec42c3a59d256cf6ca1eb8a8" name="adf3f636eec42c3a59d256cf6ca1eb8a8"></a>
@@ -136,7 +141,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Creates a new <a class="el" href="classTrICP.html">TrICP</a> object.</p>
+
+<p>Creates a new <a class="el" href="classTrICP.html" title="Implements the Trimmed Iterative Closest Point algorithm for 2D point cloud registration.">TrICP</a> object. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">maxIter</td><td>Maximum number of iterations for point cloud registration. </td></tr>
@@ -174,7 +180,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Finds a rigid transformation that transforms the given sample to match the map.</p>
+
+<p>Finds a rigid transformation that transforms the given sample to match the map. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">sample</td><td>The sample to register. </td></tr>

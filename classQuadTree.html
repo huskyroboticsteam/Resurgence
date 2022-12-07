@@ -84,37 +84,53 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Implements a quadtree for fast point lookups in 2D space.  
+ <a href="classQuadTree.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="QuadTree_8h_source.html">QuadTree.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ab4e2372750f1fdd565ed067687cf50a4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#ab4e2372750f1fdd565ed067687cf50a4">QuadTree</a> (double width, int nodeCapacity=4)</td></tr>
+<tr class="memdesc:ab4e2372750f1fdd565ed067687cf50a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new quadtree with the given area size centered at the origin.  <a href="classQuadTree.html#ab4e2372750f1fdd565ed067687cf50a4">More...</a><br /></td></tr>
 <tr class="separator:ab4e2372750f1fdd565ed067687cf50a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd6dab29c6f7ea8fd0c5034bf4f4893f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#abd6dab29c6f7ea8fd0c5034bf4f4893f">QuadTree</a> (navtypes::point_t center, double width, int nodeCapacity=4)</td></tr>
+<tr class="memdesc:abd6dab29c6f7ea8fd0c5034bf4f4893f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new quadtree with the given area size centered at the given point.  <a href="classQuadTree.html#abd6dab29c6f7ea8fd0c5034bf4f4893f">More...</a><br /></td></tr>
 <tr class="separator:abd6dab29c6f7ea8fd0c5034bf4f4893f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1528c5a86d608cf01358acfa289db273"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a1528c5a86d608cf01358acfa289db273">getSize</a> () const</td></tr>
+<tr class="memdesc:a1528c5a86d608cf01358acfa289db273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the total number of points stored in this quadtree.  <a href="classQuadTree.html#a1528c5a86d608cf01358acfa289db273">More...</a><br /></td></tr>
 <tr class="separator:a1528c5a86d608cf01358acfa289db273"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a383998dae77988cc36b0575c344356"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a5a383998dae77988cc36b0575c344356">empty</a> () const</td></tr>
+<tr class="memdesc:a5a383998dae77988cc36b0575c344356"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets if this quadtree is empty.  <a href="classQuadTree.html#a5a383998dae77988cc36b0575c344356">More...</a><br /></td></tr>
 <tr class="separator:a5a383998dae77988cc36b0575c344356"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a379991b96e8de354a5de261adf944abb"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">navtypes::points_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">getAllPoints</a> () const</td></tr>
+<tr class="memdesc:a379991b96e8de354a5de261adf944abb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a vector of all points in this quadtree.  <a href="classQuadTree.html#a379991b96e8de354a5de261adf944abb">More...</a><br /></td></tr>
 <tr class="separator:a379991b96e8de354a5de261adf944abb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b82deeccbd9337ebc0f3f5ca61a6cdf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a2b82deeccbd9337ebc0f3f5ca61a6cdf">add</a> (const navtypes::point_t &amp;point)</td></tr>
+<tr class="memdesc:a2b82deeccbd9337ebc0f3f5ca61a6cdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the given point to this quadtree.  <a href="classQuadTree.html#a2b82deeccbd9337ebc0f3f5ca61a6cdf">More...</a><br /></td></tr>
 <tr class="separator:a2b82deeccbd9337ebc0f3f5ca61a6cdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64c0f52882f8f42ee0ba98e75e425dfe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a64c0f52882f8f42ee0ba98e75e425dfe">remove</a> (const navtypes::point_t &amp;point)</td></tr>
+<tr class="memdesc:a64c0f52882f8f42ee0ba98e75e425dfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the first occurrence of the given point from this quadtree.  <a href="classQuadTree.html#a64c0f52882f8f42ee0ba98e75e425dfe">More...</a><br /></td></tr>
 <tr class="separator:a64c0f52882f8f42ee0ba98e75e425dfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5486033c92d36fe8de902a904720a66"><td class="memItemLeft" align="right" valign="top">navtypes::point_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#ac5486033c92d36fe8de902a904720a66">getClosest</a> (const navtypes::point_t &amp;point) const</td></tr>
+<tr class="memdesc:ac5486033c92d36fe8de902a904720a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the closest point to the given point in this quadtree.  <a href="classQuadTree.html#ac5486033c92d36fe8de902a904720a66">More...</a><br /></td></tr>
 <tr class="separator:ac5486033c92d36fe8de902a904720a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5afa9bfdead0f1f80e48f561fa3d5431"><td class="memItemLeft" align="right" valign="top">navtypes::point_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a5afa9bfdead0f1f80e48f561fa3d5431">getClosestWithin</a> (const navtypes::point_t &amp;point, double areaSize) const</td></tr>
+<tr class="memdesc:a5afa9bfdead0f1f80e48f561fa3d5431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the point in this quadtree that is closest to the given point.  <a href="classQuadTree.html#a5afa9bfdead0f1f80e48f561fa3d5431">More...</a><br /></td></tr>
 <tr class="separator:a5afa9bfdead0f1f80e48f561fa3d5431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97c8ebcfef5efeed01c12867e8be23d2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a97c8ebcfef5efeed01c12867e8be23d2">hasPointWithin</a> (const navtypes::point_t &amp;point, double areaSize) const</td></tr>
+<tr class="memdesc:a97c8ebcfef5efeed01c12867e8be23d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the given point has at least one point within the given distance from it.  <a href="classQuadTree.html#a97c8ebcfef5efeed01c12867e8be23d2">More...</a><br /></td></tr>
 <tr class="separator:a97c8ebcfef5efeed01c12867e8be23d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2374569818ea16e1c984072cc25578ff"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">navtypes::points_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#a2374569818ea16e1c984072cc25578ff">getPointsWithin</a> (const navtypes::point_t &amp;point, double areaSize) const</td></tr>
+<tr class="memdesc:a2374569818ea16e1c984072cc25578ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets all points in the quadtree that lie in the axis-aligned square bounding box centered at the given point with the given size.  <a href="classQuadTree.html#a2374569818ea16e1c984072cc25578ff">More...</a><br /></td></tr>
 <tr class="separator:a2374569818ea16e1c984072cc25578ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa45c33925d7f38f7dea5332865b0bb79"><td class="memItemLeft" align="right" valign="top">navtypes::point_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">getArbitraryPoint</a> () const</td></tr>
+<tr class="memdesc:aa45c33925d7f38f7dea5332865b0bb79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an arbitrary point stored in this <a class="el" href="classQuadTree.html" title="Implements a quadtree for fast point lookups in 2D space.">QuadTree</a>.  <a href="classQuadTree.html#aa45c33925d7f38f7dea5332865b0bb79">More...</a><br /></td></tr>
 <tr class="separator:aa45c33925d7f38f7dea5332865b0bb79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Implements a quadtree for fast point lookups in 2D space. All points are expected to be in {x,y,1} format.</p>
+<div class="textblock"><p >Implements a quadtree for fast point lookups in 2D space. </p>
+<p >All points are expected to be in {x,y,1} format.</p>
 <p >The quadtree represents a square area of a given size and supports roughly logarithmic lookup times within that area.</p>
 <dl class="section see"><dt>See also</dt><dd><a href="https://en.wikipedia.org/wiki/Quadtree">Quadtree</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -151,7 +167,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Creates a new quadtree with the given area size centered at the origin. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Creates a new quadtree with the given area size centered at the origin. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">width</td><td>The size (height and width) of the square area covered by this quadtree. </td></tr>
     <tr><td class="paramname">nodeCapacity</td><td>The number of points stored in each node. Too high means slower lookup times, too low means higher memory overhead. </td></tr>
@@ -192,7 +210,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Creates a new quadtree with the given area size centered at the given point. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Creates a new quadtree with the given area size centered at the given point. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">center</td><td>The center of the area spanned by this quadtree. </td></tr>
     <tr><td class="paramname">width</td><td>The size (height and width) of the square area covered by this quadtree. </td></tr>
@@ -219,7 +239,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Add the given point to this quadtree. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Add the given point to this quadtree. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">point</td><td>The point to add. </td></tr>
   </table>
@@ -243,7 +265,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets if this quadtree is empty. </p><dl class="section return"><dt>Returns</dt><dd>True iff there are no points in this quadtree. </dd></dl>
+
+<p>Gets if this quadtree is empty. </p>
+<dl class="section return"><dt>Returns</dt><dd>True iff there are no points in this quadtree. </dd></dl>
 
 </div>
 </div>
@@ -261,7 +285,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets a vector of all points in this quadtree. This is a linear-time operation, so don't use too often if there are a large number of points. Modifying this vector does not modify the tree. </p><dl class="section return"><dt>Returns</dt><dd>A vector consisting of all points in this quadtree. </dd></dl>
+
+<p>Gets a vector of all points in this quadtree. </p>
+<p >This is a linear-time operation, so don't use too often if there are a large number of points. Modifying this vector does not modify the tree. </p><dl class="section return"><dt>Returns</dt><dd>A vector consisting of all points in this quadtree. </dd></dl>
 
 </div>
 </div>
@@ -279,7 +305,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets an arbitrary point stored in this <a class="el" href="classQuadTree.html">QuadTree</a>. It is undefined which specific point this is.</p>
+
+<p>Gets an arbitrary point stored in this <a class="el" href="classQuadTree.html" title="Implements a quadtree for fast point lookups in 2D space.">QuadTree</a>. </p>
+<p >It is undefined which specific point this is.</p>
 <dl class="section return"><dt>Returns</dt><dd>An arbitrary point in this tree, or {0,0,0} if this is empty. </dd></dl>
 
 </div>
@@ -299,7 +327,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets the closest point to the given point in this quadtree.</p>
+
+<p>Gets the closest point to the given point in this quadtree. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">point</td><td>The point for which to find the nearest neighbor. </td></tr>
@@ -335,7 +364,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Get the point in this quadtree that is closest to the given point. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Get the point in this quadtree that is closest to the given point. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">point</td><td>The point for which to find the nearest neighbor. </td></tr>
     <tr><td class="paramname">areaSize</td><td>The size of the axis-aligned square bounding box centered at the given point in which to perform the search. Larger values will slow down the search. </td></tr>
@@ -371,7 +402,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets all points in the quadtree that lie in the axis-aligned square bounding box centered at the given point with the given size. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Gets all points in the quadtree that lie in the axis-aligned square bounding box centered at the given point with the given size. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">point</td><td>The center of the bounding box. </td></tr>
     <tr><td class="paramname">areaSize</td><td>The size of the bounding box. </td></tr>
@@ -396,7 +429,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Gets the total number of points stored in this quadtree. </p><dl class="section return"><dt>Returns</dt><dd>The number of points in this quadtree. </dd></dl>
+
+<p>Gets the total number of points stored in this quadtree. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of points in this quadtree. </dd></dl>
 
 </div>
 </div>
@@ -425,7 +460,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Checks if the given point has at least one point within the given distance from it. Although it's functionally equivalent to checking the size of the vector returned by <a class="el" href="classQuadTree.html#a2374569818ea16e1c984072cc25578ff">getPointsWithin()</a>, it is much cheaper to call this method.</p>
+
+<p>Checks if the given point has at least one point within the given distance from it. </p>
+<p >Although it's functionally equivalent to checking the size of the vector returned by <a class="el" href="classQuadTree.html#a2374569818ea16e1c984072cc25578ff" title="Gets all points in the quadtree that lie in the axis-aligned square bounding box centered at the give...">getPointsWithin()</a>, it is much cheaper to call this method.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">point</td><td>The point to check if it has a nearby point. </td></tr>
@@ -452,7 +489,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Remove the first occurrence of the given point from this quadtree. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Remove the first occurrence of the given point from this quadtree. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">point</td><td>The point to remove. </td></tr>
   </table>

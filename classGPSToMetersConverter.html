@@ -84,7 +84,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa. The xy-plane will always be measured in meters. Additionally, the xy-plane will be aligned such that +x = +lat, +y = -lon.  
+<p>A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa.  
  <a href="classGPSToMetersConverter.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="gps__util_8h_source.html">gps_util.h</a>&gt;</code></p>
@@ -92,19 +92,26 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac84802d0a3f19a04361ee93cb5e17d62"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSToMetersConverter.html#ac84802d0a3f19a04361ee93cb5e17d62">GPSToMetersConverter</a> (const <a class="el" href="classGPSDatum.html">GPSDatum</a> &amp;datum, const <a class="el" href="structnavtypes_1_1gpscoords__t.html">navtypes::gpscoords_t</a> &amp;origin)</td></tr>
-<tr class="memdesc:ac84802d0a3f19a04361ee93cb5e17d62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classGPSToMetersConverter.html" title="A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa....">GPSToMetersConverter</a> object.  <a href="classGPSToMetersConverter.html#ac84802d0a3f19a04361ee93cb5e17d62">More...</a><br /></td></tr>
+<tr class="memdesc:ac84802d0a3f19a04361ee93cb5e17d62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classGPSToMetersConverter.html" title="A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa.">GPSToMetersConverter</a> object.  <a href="classGPSToMetersConverter.html#ac84802d0a3f19a04361ee93cb5e17d62">More...</a><br /></td></tr>
 <tr class="separator:ac84802d0a3f19a04361ee93cb5e17d62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab94a3ba7211f8498b04b91a4e1a290fd"><td class="memItemLeft" align="right" valign="top">navtypes::point_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSToMetersConverter.html#ab94a3ba7211f8498b04b91a4e1a290fd">gpsToMeters</a> (const <a class="el" href="structnavtypes_1_1gpscoords__t.html">navtypes::gpscoords_t</a> &amp;coords) const</td></tr>
+<tr class="memitem:ab94a3ba7211f8498b04b91a4e1a290fd"><td class="memItemLeft" align="right" valign="top"><a id="ab94a3ba7211f8498b04b91a4e1a290fd" name="ab94a3ba7211f8498b04b91a4e1a290fd"></a>
+navtypes::point_t&#160;</td><td class="memItemRight" valign="bottom"><b>gpsToMeters</b> (const <a class="el" href="structnavtypes_1_1gpscoords__t.html">navtypes::gpscoords_t</a> &amp;coords) const</td></tr>
+<tr class="memdesc:ab94a3ba7211f8498b04b91a4e1a290fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert the given gps coordinates to a coordinate on the xy plane, in meters <br /></td></tr>
 <tr class="separator:ab94a3ba7211f8498b04b91a4e1a290fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a434ba240ca25217c058cfa2b3f58b68d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnavtypes_1_1gpscoords__t.html">navtypes::gpscoords_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSToMetersConverter.html#a434ba240ca25217c058cfa2b3f58b68d">metersToGPS</a> (const navtypes::point_t &amp;pos) const</td></tr>
+<tr class="memitem:a434ba240ca25217c058cfa2b3f58b68d"><td class="memItemLeft" align="right" valign="top"><a id="a434ba240ca25217c058cfa2b3f58b68d" name="a434ba240ca25217c058cfa2b3f58b68d"></a>
+<a class="el" href="structnavtypes_1_1gpscoords__t.html">navtypes::gpscoords_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>metersToGPS</b> (const navtypes::point_t &amp;pos) const</td></tr>
+<tr class="memdesc:a434ba240ca25217c058cfa2b3f58b68d"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert a coordinate on the xy-plane to a gps coordinate <br /></td></tr>
 <tr class="separator:a434ba240ca25217c058cfa2b3f58b68d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2c717dd7f0006b8bfefcadf062f3bc2"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSToMetersConverter.html#ac2c717dd7f0006b8bfefcadf062f3bc2">getMetersPerDegLat</a> () const</td></tr>
+<tr class="memdesc:ac2c717dd7f0006b8bfefcadf062f3bc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of meters per degree of latitude.  <a href="classGPSToMetersConverter.html#ac2c717dd7f0006b8bfefcadf062f3bc2">More...</a><br /></td></tr>
 <tr class="separator:ac2c717dd7f0006b8bfefcadf062f3bc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3afc3dde00581f9cbdc2360cd8899a82"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGPSToMetersConverter.html#a3afc3dde00581f9cbdc2360cd8899a82">getMetersPerDegLon</a> () const</td></tr>
+<tr class="memdesc:a3afc3dde00581f9cbdc2360cd8899a82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of meters per degree of longitude.  <a href="classGPSToMetersConverter.html#a3afc3dde00581f9cbdc2360cd8899a82">More...</a><br /></td></tr>
 <tr class="separator:a3afc3dde00581f9cbdc2360cd8899a82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa. The xy-plane will always be measured in meters. Additionally, the xy-plane will be aligned such that +x = +lat, +y = -lon. </p>
+<div class="textblock"><p >A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa. </p>
+<p >The xy-plane will always be measured in meters. Additionally, the xy-plane will be aligned such that +x = +lat, +y = -lon. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac84802d0a3f19a04361ee93cb5e17d62" name="ac84802d0a3f19a04361ee93cb5e17d62"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac84802d0a3f19a04361ee93cb5e17d62">&#9670;&#160;</a></span>GPSToMetersConverter()</h2>
@@ -132,7 +139,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Construct a new <a class="el" href="classGPSToMetersConverter.html" title="A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa....">GPSToMetersConverter</a> object. </p>
+<p>Construct a new <a class="el" href="classGPSToMetersConverter.html" title="A class used to convert gps coordinates to coordinates on a flat xy-plane, and vice versa.">GPSToMetersConverter</a> object. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">datum</td><td>The datum to use for the GPS calculations. </td></tr>
@@ -158,7 +165,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Get the number of meters per degree of latitude. Given the datum and the origin, this is a constant. </p>
+
+<p>Get the number of meters per degree of latitude. </p>
+<p >Given the datum and the origin, this is a constant. </p>
 
 </div>
 </div>
@@ -176,45 +185,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Get the number of meters per degree of longitude. Given the datum and the origin, this is a constant. </p>
 
-</div>
-</div>
-<a id="ab94a3ba7211f8498b04b91a4e1a290fd" name="ab94a3ba7211f8498b04b91a4e1a290fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab94a3ba7211f8498b04b91a4e1a290fd">&#9670;&#160;</a></span>gpsToMeters()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">point_t GPSToMetersConverter::gpsToMeters </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structnavtypes_1_1gpscoords__t.html">navtypes::gpscoords_t</a> &amp;&#160;</td>
-          <td class="paramname"><em>coords</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >convert the given gps coordinates to a coordinate on the xy plane, in meters </p>
-
-</div>
-</div>
-<a id="a434ba240ca25217c058cfa2b3f58b68d" name="a434ba240ca25217c058cfa2b3f58b68d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a434ba240ca25217c058cfa2b3f58b68d">&#9670;&#160;</a></span>metersToGPS()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structnavtypes_1_1gpscoords__t.html">gpscoords_t</a> GPSToMetersConverter::metersToGPS </td>
-          <td>(</td>
-          <td class="paramtype">const navtypes::point_t &amp;&#160;</td>
-          <td class="paramname"><em>pos</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >convert a coordinate on the xy-plane to a gps coordinate </p>
+<p>Get the number of meters per degree of longitude. </p>
+<p >Given the datum and the origin, this is a constant. </p>
 
 </div>
 </div>

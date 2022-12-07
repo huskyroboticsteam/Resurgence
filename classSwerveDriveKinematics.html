@@ -84,21 +84,30 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Calculates forward and inverse drivebase kinematics for a 4-wheel swerve drivebase with specifiable width and length.  
+ <a href="classSwerveDriveKinematics.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="SwerveDriveKinematics_8h_source.html">SwerveDriveKinematics.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ab783455238b34a91076cac23c9df7d23"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSwerveDriveKinematics.html#ab783455238b34a91076cac23c9df7d23">SwerveDriveKinematics</a> (double baseWidth, double baseLength)</td></tr>
+<tr class="memdesc:ab783455238b34a91076cac23c9df7d23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classSwerveDriveKinematics.html" title="Calculates forward and inverse drivebase kinematics for a 4-wheel swerve drivebase with specifiable w...">SwerveDriveKinematics</a> with the given wheel base width and length from rear of robot.  <a href="classSwerveDriveKinematics.html#ab783455238b34a91076cac23c9df7d23">More...</a><br /></td></tr>
 <tr class="separator:ab783455238b34a91076cac23c9df7d23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affc370f0a30bb1b1b54b62bd54f1c53d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structswervewheelvel__t.html">swervewheelvel_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSwerveDriveKinematics.html#affc370f0a30bb1b1b54b62bd54f1c53d">robotVelToWheelVel</a> (double xVel, double yVel, double thetaVel) const</td></tr>
+<tr class="memdesc:affc370f0a30bb1b1b54b62bd54f1c53d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the robot's translational and angular velocity in the robot's reference frame, find the speeds and angles of the robot's wheels in the robot's reference frame.  <a href="classSwerveDriveKinematics.html#affc370f0a30bb1b1b54b62bd54f1c53d">More...</a><br /></td></tr>
 <tr class="separator:affc370f0a30bb1b1b54b62bd54f1c53d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc29f5fa731567c8945e961348144829"><td class="memItemLeft" align="right" valign="top">pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSwerveDriveKinematics.html#acc29f5fa731567c8945e961348144829">wheelVelToRobotVel</a> (<a class="el" href="structswervewheelvel__t.html">swervewheelvel_t</a> wheelVel) const</td></tr>
+<tr class="memdesc:acc29f5fa731567c8945e961348144829"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the speeds and angles of the robot's wheels in the robot's reference frame, find the robot's translational velocity and angular velocity in the robot's reference frame.  <a href="classSwerveDriveKinematics.html#acc29f5fa731567c8945e961348144829">More...</a><br /></td></tr>
 <tr class="separator:acc29f5fa731567c8945e961348144829"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cb188ca3884c6735f4b8650ecf6b892"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSwerveDriveKinematics.html#a1cb188ca3884c6735f4b8650ecf6b892">getLocalPoseUpdate</a> (const <a class="el" href="structswervewheelvel__t.html">swervewheelvel_t</a> &amp;wheelVel, double dt) const</td></tr>
+<tr class="memdesc:a1cb188ca3884c6735f4b8650ecf6b892"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the local reference frame given the velocities of the robot's wheels and the time step.  <a href="classSwerveDriveKinematics.html#a1cb188ca3884c6735f4b8650ecf6b892">More...</a><br /></td></tr>
 <tr class="separator:a1cb188ca3884c6735f4b8650ecf6b892"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4aee70108af7aad609fc5f81b8117c3"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSwerveDriveKinematics.html#ac4aee70108af7aad609fc5f81b8117c3">getPoseUpdate</a> (const <a class="el" href="structswervewheelvel__t.html">swervewheelvel_t</a> &amp;wheelVel, double heading, double dt) const</td></tr>
+<tr class="memdesc:ac4aee70108af7aad609fc5f81b8117c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the global reference frame given the velocities of the robot's wheels and the time step.  <a href="classSwerveDriveKinematics.html#ac4aee70108af7aad609fc5f81b8117c3">More...</a><br /></td></tr>
 <tr class="separator:ac4aee70108af7aad609fc5f81b8117c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f986f9bf88e605926eb583f378161d7"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSwerveDriveKinematics.html#a1f986f9bf88e605926eb583f378161d7">getNextPose</a> (const <a class="el" href="structswervewheelvel__t.html">swervewheelvel_t</a> &amp;wheelVel, const navtypes::pose_t &amp;pose, double dt) const</td></tr>
+<tr class="memdesc:a1f986f9bf88e605926eb583f378161d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the next pose of the robot in the global reference frame.  <a href="classSwerveDriveKinematics.html#a1f986f9bf88e605926eb583f378161d7">More...</a><br /></td></tr>
 <tr class="separator:a1f986f9bf88e605926eb583f378161d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -137,7 +146,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Create a new <a class="el" href="classSwerveDriveKinematics.html">SwerveDriveKinematics</a> with the given wheel base width and length from rear of robot.</p>
+
+<p>Create a new <a class="el" href="classSwerveDriveKinematics.html" title="Calculates forward and inverse drivebase kinematics for a 4-wheel swerve drivebase with specifiable w...">SwerveDriveKinematics</a> with the given wheel base width and length from rear of robot. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">baseWidth</td><td>The width of the wheelbase. The units themselves don't matter, as long as you're consistent. </td></tr>
@@ -174,7 +184,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Calculate the pose update in the local reference frame given the velocities of the robot's wheels and the time step.</p>
+
+<p>Calculate the pose update in the local reference frame given the velocities of the robot's wheels and the time step. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelVel</td><td>The velocities of the wheels. </td></tr>
@@ -217,7 +228,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Calculate the next pose of the robot in the global reference frame. (map space)</p>
+
+<p>Calculate the next pose of the robot in the global reference frame. </p>
+<p >(map space)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelVel</td><td>The velocities of the wheels. </td></tr>
@@ -261,7 +274,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Calculate the pose update in the global reference frame given the velocities of the robot's wheels and the time step.</p>
+
+<p>Calculate the pose update in the global reference frame given the velocities of the robot's wheels and the time step. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelVel</td><td>The velocities of the wheels. </td></tr>
@@ -305,7 +319,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Given the robot's translational and angular velocity in the robot's reference frame, find the speeds and angles of the robot's wheels in the robot's reference frame.</p>
+
+<p>Given the robot's translational and angular velocity in the robot's reference frame, find the speeds and angles of the robot's wheels in the robot's reference frame. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">xVel</td><td>the forward velocity component of the robot, in the robot's reference frame. (positive = front) </td></tr>
@@ -333,7 +348,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Given the speeds and angles of the robot's wheels in the robot's reference frame, find the robot's translational velocity and angular velocity in the robot's reference frame.</p>
+
+<p>Given the speeds and angles of the robot's wheels in the robot's reference frame, find the robot's translational velocity and angular velocity in the robot's reference frame. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelVel</td><td>the struct containing the speeds and angles of the robot's wheels in the robot's reference frame. </td></tr>
