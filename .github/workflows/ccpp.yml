@@ -30,4 +30,4 @@ jobs:
         mkdir build && cd build && cmake ../src && cmake --build . -j$(nproc)
     - name: Run tests
       run: |
-      cd build && ./build/tests
+        cd build && ./build/tests
