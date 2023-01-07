@@ -250,6 +250,9 @@ add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
 )
 
+add_library(commands STATIC
+  commands/DriveToWaypointCommand.cpp)
+
 if(WITH_LIDAR)
   add_subdirectory(lidar)
 endif()
@@ -288,6 +291,7 @@ list(APPEND rover_libs
   websocket_utils
   filters
   control
+  commands
   utils
 )
 target_link_libraries(Rover
