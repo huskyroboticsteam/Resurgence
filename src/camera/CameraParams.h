@@ -1,6 +1,7 @@
 #pragma once
 
 #include <opencv2/core.hpp>
+#include <vector>
 
 namespace cam {
 
@@ -32,6 +33,7 @@ const std::string KEY_CAMERA_MATRIX = "camera_matrix";
    Config file key for the distortion coefficients.
  */
 const std::string KEY_DIST_COEFFS = "distortion_coefficients";
+
 /**@}*/
 
 /**
@@ -106,7 +108,10 @@ public:
 	   Gets the image size this set of intrinsic parameters was calibrated for.
 	 */
 	cv::Size getImageSize() const;
-
+	/**
+	 @brief Gets the camera intrinsics as a 1d list.
+	*/
+	std::vector<double> getIntrinsicList();
 	/**
 	   @brief Reads the data for this CameraParams object from the given cv::FileNode object.
 
@@ -142,4 +147,6 @@ void write(cv::FileStorage& fs, const std::string& name, const CameraParams& par
 
 /** @} */
 
-} // namespace cam
+}
+
+// namespace cam

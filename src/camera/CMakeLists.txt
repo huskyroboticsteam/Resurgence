@@ -11,5 +11,4 @@ add_executable(calibration
   calibration.cpp)
 
 target_link_libraries(calibration ${OpenCV_LIBS})
-target_link_libraries(camera_tester ${OpenCV_LIBS})
-target_link_libraries(camera_tester Threads::Threads)
+target_link_libraries(camera_tester ${OpenCV_LIBS} Threads::Threads utils)

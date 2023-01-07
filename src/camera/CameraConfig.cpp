@@ -1,5 +1,6 @@
 #include "CameraConfig.h"
-
+#include <opencv2/core.hpp>
+#include <vector>
 namespace cam {
 
 invalid_camera_config::invalid_camera_config() : _msg("Invalid camera configuration") {}
@@ -22,6 +23,7 @@ CameraConfig readConfigFromFile(const std::string& filename) {
 	// read intrinsic parameters
 	if (!fs[KEY_INTRINSIC_PARAMS].empty()) {
 		CameraParams intrinsics;
+		std::vector<double> intrinsic_list1d;
 		fs[KEY_INTRINSIC_PARAMS] >> intrinsics;
 		cfg.intrinsicParams = intrinsics;
 	}
