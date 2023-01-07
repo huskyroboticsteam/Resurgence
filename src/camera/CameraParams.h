@@ -111,7 +111,6 @@ public:
 	/**
 	 @brief Gets the camera intrinsics as a 1d list.
 	*/
-	
 	std::vector<double> getIntrinsicList();
 	/**
 	   @brief Reads the data for this CameraParams object from the given cv::FileNode object.

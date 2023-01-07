@@ -84,7 +84,6 @@ TEST_CASE("List Conversation Works"){
 	std::vector<double> x1test {8.2342295124138286e+02, 0., 3.0932599345522056e+02, 0.,
           8.2343518498999936e+02, 2.5535163960018482e+02, 0., 0., 1.};
 	REQUIRE(x1 == x1test);
-
 }
 
 } // namespace cam

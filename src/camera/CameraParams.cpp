@@ -67,19 +67,15 @@ cv::Size CameraParams::getImageSize() const {
 }
 
 std::vector<double> CameraParams::getIntrinsicList(){
-	cv::Mat temp = _camera_matrix;
 	std::vector<double> intrinsic_list1D;
 	for (int i = 0; i < 3; i++){
 		for (int j = 0; j < 3; j++){
-			double x = temp.at<double>(i,j);
+			double x = _camera_matrix.at<double>(i,j);
 			intrinsic_list1D.push_back(x);
 		}
 	}
 	return intrinsic_list1D;
-	
 }
-
-
 ////////////// SERIALIZATION //////////////
 
 void CameraParams::readFromFileNode(const cv::FileNode& file_node) {
