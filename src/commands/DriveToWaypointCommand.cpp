@@ -1,4 +1,5 @@
 #include "DriveToWaypointCommand.h"
+#include "log.h"
 
 using namespace navtypes;
 using namespace robot::types;
@@ -12,13 +13,24 @@ DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double the
 											   double driveVel, double slowDriveVel,
 											   double doneThresh)
 	: target(target), thetaKP(thetaKP), driveVel(driveVel), slowDriveVel(slowDriveVel),
-	  doneThresh(doneThresh), pose(pose_t::Zero()) {}
+	  doneThresh(doneThresh), pose(pose_t::Zero()), setStateCalledBeforeOutput(false) {}
+
+void DriveToWaypointCommand::setState(const navtypes::pose_t& pose) {
+	this->pose = pose;
+	this->setStateCalledBeforeOutput = true;
+}
 
 command_t DriveToWaypointCommand::getOutput() {
+	if (!this->setStateCalledBeforeOutput) {
+		log(LOG_WARN, "DriveToWaypointCommand: getOutput() called before getState() call!");
+	}
+
+	this->setStateCalledBeforeOutput = false;
 	Eigen::Vector2d toTarget = target.topRows<2>() - pose.topRows<2>();
 	double targetAngle = std::atan2(toTarget(1), toTarget(0));
+	double angleDelta = targetAngle - pose(2);
 	double thetaErr =
-		std::atan2(std::sin(targetAngle - pose(2)), std::cos(targetAngle - pose(2)));
+		std::atan2(std::sin(angleDelta), std::cos(angleDelta));
 
 	double thetaVel = thetaKP * thetaErr;
 
