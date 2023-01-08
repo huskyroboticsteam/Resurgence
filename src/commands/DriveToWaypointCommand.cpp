@@ -1,5 +1,5 @@
 #include "DriveToWaypointCommand.h"
-#include "log.h"
+#include "../log.h"
 
 using namespace navtypes;
 using namespace robot::types;
@@ -12,8 +12,8 @@ namespace commands {
 DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double thetaKP,
 											   double driveVel, double slowDriveVel,
 											   double doneThresh)
-	: target(target), thetaKP(thetaKP), driveVel(driveVel), slowDriveVel(slowDriveVel),
-	  doneThresh(doneThresh), pose(pose_t::Zero()), setStateCalledBeforeOutput(false) {}
+	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
+	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), setStateCalledBeforeOutput(false) {}
 
 void DriveToWaypointCommand::setState(const navtypes::pose_t& pose) {
 	this->pose = pose;

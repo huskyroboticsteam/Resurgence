@@ -55,8 +55,8 @@ private:
 	double driveVel;
 	double slowDriveVel;
 	double doneThresh;
-	std::optional<robot::types::datatime_t> closeToTargetStartTime;
 	bool setStateCalledBeforeOutput;
+	std::optional<robot::types::datatime_t> closeToTargetStartTime;
 };
 
 } // namespace commands
