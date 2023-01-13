@@ -64,8 +64,8 @@ TEST_CASE("DriveToWaypointCommand Test") {
 
   // test robot uses slow drive speed if within done threshold
   // (in this case, done threshold is 25 cm)
-  navtypes::pose_t close_enough(3.0 - (sqrt(9.0 / 25.0) / 16.0),
-                                4.0 - (sqrt(9.0 / 25.0) / 12.0), 0.0);
+  navtypes::pose_t close_enough(3.0 - (3.0 / (5.0 * 16.0)),
+                                4.0 - (3.0 / (5.0 * 12.0)), 0.0);
   cmd.setState(close_enough);
   assertApprox(theta_kp * atan_4_3, 2.0, cmd.getOutput());
 }
