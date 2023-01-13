@@ -344,6 +344,8 @@ if(WITH_TESTS)
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
     ../tests/worldmap/QuadTreeTest.cpp
+    # Command tests
+    ../tests/commands/DriveToWaypointCommandTest.cpp
     # Util tests
     ../tests/util/UtilTest.cpp
 	# Protocol/teleop tests
