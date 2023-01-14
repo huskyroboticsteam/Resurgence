@@ -24,6 +24,7 @@
 using nlohmann::json;
 using namespace navtypes;
 using namespace robot::types;
+using namespace cam;
 
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
@@ -80,23 +81,36 @@ void sendJSON(const json& obj) {
 	Globals::websocketServer.sendJSON(PROTOCOL_PATH, obj);
 }
 
-static void openCamera(CameraID cam, uint8_t fps = 20, uint16_t width = 640,
+
+static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d=std::nullopt, uint8_t fps = 20, uint16_t width = 640,
 					   uint16_t height = 480) {
-	json msg = {{"type", "simCameraStreamOpenRequest"},
-				{"camera", cam},
-				{"fps", fps},
-				{"width", width},
-				{"height", height}};
-	sendJSON(msg);
+	if (list1d){
+				json msg = {{"type", "simCameraStreamOpenRequest"}, 
+							{"camera", cam}, 
+							{"fps", fps}, 
+							{"width", width}, 
+							{"height", height}, 
+							{"intrinsics", list1d.value()}};
+				sendJSON(msg);
+	}
+	else{
+		json msg = {{"type", "simCameraStreamOpenRequest"}, 
+					{"camera", cam}, 
+					{"fps", fps}, 
+					{"width", width}, 
+					{"height", height},
+					{"intrinsics", nullptr}};
+		sendJSON(msg);
+	}
 }
 
 void initCameras() {
 	auto cfg = cam::readConfigFromFile(Constants::AR_CAMERA_CONFIG_PATH);
 	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
 	//openCamera(Constants::AR_CAMERA_ID);
-	openCamera("front");
-	openCamera("rear");
-	openCamera("upperArm");
+	openCamera("front", cfg.intrinsicParams->getIntrinsicList());
+	openCamera("rear", cfg.intrinsicParams->getIntrinsicList());
+	openCamera("upperArm", cfg.intrinsicParams->getIntrinsicList());
 }
 
 void handleGPS(json msg) {

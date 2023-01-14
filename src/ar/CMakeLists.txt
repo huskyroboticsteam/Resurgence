@@ -11,5 +11,4 @@ add_executable(ar_tester
   MarkerPattern.cpp
   Tag.cpp)
 
-target_link_libraries(ar_tester ${OpenCV_LIBS} opencv_aruco)
-target_link_libraries(ar_tester Threads::Threads)
+target_link_libraries(ar_tester ${OpenCV_LIBS} opencv_aruco Threads::Threads utils)

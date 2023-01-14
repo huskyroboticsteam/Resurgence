@@ -166,6 +166,7 @@ add_library(utils SHARED
   base64/base64_img.cpp
   kinematics/DiffDriveKinematics.cpp
   kinematics/DiffWristKinematics.cpp
+  kinematics/SwerveDriveKinematics.cpp
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
@@ -336,6 +337,7 @@ if(WITH_TESTS)
     ../tests/control/PIDControllerTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
+    ../tests/kinematics/SwerveDriveKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp
