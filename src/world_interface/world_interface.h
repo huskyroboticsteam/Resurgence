@@ -43,6 +43,8 @@ const DiffWristKinematics& wristKinematics();
  */
 void world_interface_init();
 
+//std::shared_ptr<bASEmOTORtYPE> getMotor(motorid blah);
+
 /**
  * @brief Request the robot to drive at the given velocities.
  *
@@ -215,6 +217,14 @@ void setMotorPower(robot::types::motorid_t motor, double power);
  * information.
  */
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
+
+/**
+ * @brief Sets the velocity of the given motor.
+ *
+ * @param motor The motor to set the target position of.
+ * @param targetVel The target velocity, in millidegrees per second.
+ */
+void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
 
 /**
  * @brief Get the last reported position of the specified motor.
