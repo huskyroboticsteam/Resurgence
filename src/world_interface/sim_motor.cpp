@@ -1,44 +1,36 @@
-#include "can_base_motor.h"
-#include "../world_interface/real_world_constants.h"
-#include "CAN.h"
-#include "CANMotor.h"
-#include "CANUtils.h"
+#include "sim_motor.h"
+#include "../Globals.h"
+#include "world_interface.h"
 
 namespace robot {
-class can_motor: public base_motor {
-	public: 
-		can_motor(robot::types::motorid_t motor) {
+class sim_motor: public base_motor {
+	public:
+		sim_motor(robot::types::motorid_t motor, bool hasPosSensor, std::string name, std::string path) {
 			motor_id = motor;
-		}
-
-		void setPositionSensor(bool hasPosSensor) {
 			posSensor = hasPosSensor;
+            motor_name = name;
+            protocol_path = path;
 		}
 
-		bool hasPositionSensor() {
+		bool hasPositionSensor() const {
 			return posSensor;
 		}
 
-		void setMotorPower(robot::types::motorid_t motor, double power) {
-			can::deviceserial_t serial = motorSerialIDMap.at(motor);
-			auto& scaleMap = power < 0 ? negative_pwm_scales : positive_pwm_scales;
-			auto entry = scaleMap.find(motor);
-			if (entry != scaleMap.end()) {
-				power *= entry->second;
-			}
-			can::motor::setMotorPower(serial, power);
+		void setMotorPower(double power) {
+	        json msg = {{"type", "simMotorPowerRequest"}, {"motor", motor_name}, {"power", power}};
+			sendJSON(msg);
 		}
 
-		void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
-			can::deviceserial_t serial = motorSerialIDMap.at(motor);
-			can::motor::setMotorPIDTarget(serial, targetPos);
+		void setMotorPos(int32_t targetPos) {
+	        json msg = {{"type", "simMotorPositionRequest"}, {"motor", motor_name}, {"position", targetPos}};
+            sendJSON(msg);
 		}
 
-		types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
-			return can::motor::getMotorPosition(motorSerialIDMap.at(motor));
+        types::DataPoint<int32_t> getMotorPos() const {
+			robot::getMotorPos(motor_id);
 		}
 
-		void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
+		void setMotorVel(int32_t targetVel) {
 			// thread will run when called for the first time (std::thread in global) / velocity thread
 			// if no thread running, spin up a thread
 			// velocity task (Evan wrote this a while ago)
@@ -53,7 +45,7 @@ class can_motor: public base_motor {
 				// different implementation depending on world interface (init method in world interfaces - sim motor, can motor)
 
 			// get motor position and set its dimensions
-			types::DataPoint<int32_t> motorPos = getMotorPos(motor);
+			types::DataPoint<int32_t> motorPos = getMotorPos();
 			if (!motorPos.isValid()) {
 				return;
 			}
@@ -87,6 +79,13 @@ class can_motor: public base_motor {
 			velController.setTarget(currTime, velocityVector);
 			assert(("Target velocity should be set in setMotorVel", velController.hasTarget()));
 		}
+    
+    private:
+        std::string motor_name;
+        std::string protocol_path;
 
-}; // class can_motor
+        void sendJSON(const json& obj) {
+	        Globals::websocketServer.sendJSON(protocol_path, obj);
+        }
+}; // class sim_motor
 } // namespace robot

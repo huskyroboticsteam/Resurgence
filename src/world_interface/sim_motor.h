@@ -16,21 +16,22 @@ class sim_motor: public base_motor {
         /**
          * @brief Constructor for can motor.
          *
-         * @param motor The motor to manipulate.
+         * @param motor The motor id to manipulate.
+         * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
+         * @param name The name of the motor.
+         * @param protocol_path Websocket protocol path.
          */
-		sim_motor(robot::types::motorid_t motor, std::string name, std::string protocol_path) {}
+		sim_motor(robot::types::motorid_t motor, bool hasPosSensor, std::string name, std::string protocol_path) {}
 
-		void setPositionSensor(bool hasPosSensor) {}
+		bool hasPositionSensor() const {}
 
-		bool hasPositionSensor() {}
+		void setMotorPower(double power) {}
 
-		void setMotorPower(robot::types::motorid_t motor, double power) {}
+		void setMotorPos(int32_t targetPos) {}
 
-		void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {}
+        types::DataPoint<int32_t> getMotorPos() const {}
 
-        types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {}
-
-		void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {}
+		void setMotorVel(int32_t targetVel) {}
 
     private:
         std::string motor_name;

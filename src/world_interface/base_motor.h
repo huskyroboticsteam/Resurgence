@@ -21,54 +21,43 @@ public:
     base_motor();
 
     /**
-     * @brief Sets the status of the motor position sensor.
-     *
-     * @param hasPosSensor True if the motor has a position sensor and false if not
-     */
-    virtual void setPositionSensor(bool hasPosSensor) = 0;
-
-    /**
      * @brief Returns the status of the motor position sensor.
      *
      * @return True if the motor has a position sensor and false if not
      */
-    virtual bool hasPositionSensor() = 0;
+    virtual bool hasPositionSensor() const = 0;
 
     /**
-     * @brief Set the PWM command of the given motor.
+     * @brief Set the PWM command of the motor.
      *
-     * @param motor The motor to set the PWM of.
      * @param power The power command, in the range [-1, 1]
      */
-    virtual void setMotorPower(robot::types::motorid_t motor, double power) = 0;
+    virtual void setMotorPower(double power) = 0;
 
     /**
      * @brief Set the target position of the motor. This will have no effect if the motor
      * does not support PID.
      *
-     * @param motor The motor to set the target position of.
      * @param targetPos The target position, in millidegrees. Refer to the specific motor for more
      * information.
      */
-    virtual void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) = 0;
+    virtual void setMotorPos(int32_t targetPos) = 0;
 
     /**
      * @brief Get the last reported position of the specified motor.
      *
-     * @param motor The motor to get the position from.
      * @return types::DataPoint<int32_t> The last reported position of the motor, if it exists.
      * If the motor has not reported a position (because it hasn't been received yet or if it
      * doesn't have an encoder) then an empty data point is returned.
      */
-    virtual types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) = 0;
+    virtual types::DataPoint<int32_t> getMotorPos() const = 0;
 
     /**
-     * @brief Sets the velocity of the given motor.
+     * @brief Sets the velocity of the motor.
      *
-     * @param motor The motor to set the target position of.
      * @param targetVel The target velocity, in millidegrees per second.
      */
-    virtual void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) = 0;
+    virtual void setMotorVel(int32_t targetVel) = 0;
 
 protected:
     robot::types::motorid_t motor_id;

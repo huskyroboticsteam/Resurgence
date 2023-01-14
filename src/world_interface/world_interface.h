@@ -43,7 +43,7 @@ const DiffWristKinematics& wristKinematics();
  */
 void world_interface_init();
 
-//std::shared_ptr<bASEmOTORtYPE> getMotor(motorid blah);
+//std::shared_ptr<bASEmOTORtYPE> getMotor(motorid blah); have motor class call 
 
 /**
  * @brief Request the robot to drive at the given velocities.
