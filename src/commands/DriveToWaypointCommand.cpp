@@ -15,9 +15,11 @@ DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double the
 	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
 	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), setStateCalledBeforeOutput(false) {}
 
-void DriveToWaypointCommand::setState(const navtypes::pose_t& pose) {
+void DriveToWaypointCommand::setState(const navtypes::pose_t& pose, 
+									  const robot::types::datatime_t time) {
 	this->pose = pose;
 	this->setStateCalledBeforeOutput = true;
+	this->lastRecordedTime = time;
 }
 
 command_t DriveToWaypointCommand::getOutput() {
@@ -41,12 +43,13 @@ command_t DriveToWaypointCommand::getOutput() {
 }
 
 bool DriveToWaypointCommand::isDone() {
-	if ((pose.topRows<2>() - target.topRows<2>()).norm() <= doneThresh) {
+	double distance = (pose.topRows<2>() - target.topRows<2>()).norm();
+	if (distance <= doneThresh) {
 		if (!closeToTargetStartTime.has_value()) {
-			datatime_t time = dataclock::now();
-			closeToTargetStartTime = time;
+			closeToTargetStartTime = lastRecordedTime;
 		}
-		return dataclock::now() - closeToTargetStartTime.value() >= CLOSE_TO_TARGET_DUR;
+		return lastRecordedTime.value() - closeToTargetStartTime.value() >= 
+			   CLOSE_TO_TARGET_DUR;
 	} else {
 		closeToTargetStartTime.reset();
 	}

@@ -31,8 +31,9 @@ public:
 	 * the global reference frame used by DriveToWaypointCommand.
 	 * 
 	 * @param pose, the current pose of the robot in the global reference frame.
+	 * @param time, the current time from robot::types::dataclock.
 	 */
-	void setState(const navtypes::pose_t& pose);
+	void setState(const navtypes::pose_t& pose, const robot::types::datatime_t time);
 
 	/**
 	 * Gets the angular velocity and forward speed to run the robot at in order to navigate robot to target.
@@ -56,6 +57,7 @@ private:
 	double slowDriveVel;
 	double doneThresh;
 	bool setStateCalledBeforeOutput;
+	std::optional<robot::types::datatime_t> lastRecordedTime;
 	std::optional<robot::types::datatime_t> closeToTargetStartTime;
 };
 
