@@ -5,15 +5,17 @@ using namespace navtypes;
 using namespace robot::types;
 using namespace std::chrono_literals;
 
-static std::chrono::duration CLOSE_TO_TARGET_DUR = 1s;
-
 namespace commands {
 
 DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double thetaKP,
 											   double driveVel, double slowDriveVel,
-											   double doneThresh)
+											   double doneThresh, 
+											   double closeToTargetDurVal)
 	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
-	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), setStateCalledBeforeOutput(false) {}
+	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), 
+	  setStateCalledBeforeOutput(false) {
+	      closeToTargetDur = std::chrono::duration<double>(closeToTargetDurVal);
+	  }
 
 void DriveToWaypointCommand::setState(const navtypes::pose_t& pose, 
 									  const robot::types::datatime_t time) {
@@ -48,8 +50,9 @@ bool DriveToWaypointCommand::isDone() {
 		if (!closeToTargetStartTime.has_value()) {
 			closeToTargetStartTime = lastRecordedTime;
 		}
+
 		return lastRecordedTime.value() - closeToTargetStartTime.value() >= 
-			   CLOSE_TO_TARGET_DUR;
+			   closeToTargetDur;
 	} else {
 		closeToTargetStartTime.reset();
 	}

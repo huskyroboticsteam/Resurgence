@@ -30,6 +30,7 @@ const double THETA_KP = 3.5;
 const double NORMAL_DRIVE_SPEED = 4.0;
 const double SLOW_DRIVE_SPEED = 2.0;
 const double DONE_THRESHOLD = 0.25;
+const double CLOSE_TO_TARGET_DUR_VAL = 1.0;
 
 TEST_CASE("DriveToWaypointCommand Test") {
   // sample target is at position (3,4).
@@ -39,7 +40,8 @@ TEST_CASE("DriveToWaypointCommand Test") {
 
   // instantiate DriveToWaypointCommand with sample target.
   commands::DriveToWaypointCommand cmd(target, THETA_KP, NORMAL_DRIVE_SPEED,
-                                       SLOW_DRIVE_SPEED, DONE_THRESHOLD);
+                                       SLOW_DRIVE_SPEED, DONE_THRESHOLD, 
+                                       CLOSE_TO_TARGET_DUR_VAL);
 
   // test robot at origin, target at (3,4)
   navtypes::pose_t origin(0.0, 0.0, 0.0);

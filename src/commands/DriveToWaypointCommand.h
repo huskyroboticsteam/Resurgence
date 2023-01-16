@@ -22,9 +22,11 @@ public:
 	 * @param driveVel, the speed to drive the robot at.
 	 * @param slowDriveVel, the slower speed to drive the robot at when near the target.
 	 * @param doneThresh, the threshold for minimum robot-target distance to complete command.
+	 * @param closeToTargetDurVal, the duration within doneThresh after which robot navigation 
+	 * 							   is considered done, seconds.
 	 */
 	DriveToWaypointCommand(const navtypes::point_t& target, double thetaKP, double driveVel,
-						   double slowDriveVel, double doneThresh);
+						   double slowDriveVel, double doneThresh, double closeToTargetDurVal);
 
 	/**
 	 * Must be called before getOutput() for each iteration. Updates the current pose of the robot in 
@@ -57,6 +59,7 @@ private:
 	double slowDriveVel;
 	double doneThresh;
 	bool setStateCalledBeforeOutput;
+	std::chrono::duration<double> closeToTargetDur;
 	std::optional<robot::types::datatime_t> lastRecordedTime;
 	std::optional<robot::types::datatime_t> closeToTargetStartTime;
 };
