@@ -164,6 +164,7 @@ add_library(utils SHARED
   utils/random.cpp
   utils/ScopedTimer.cpp
   utils/transform.cpp
+  utils/scheduler.cpp
   gps/gps_util.cpp
   base64/base64.cpp
   base64/base64_img.cpp
@@ -346,6 +347,7 @@ if(WITH_TESTS)
     ../tests/worldmap/QuadTreeTest.cpp
     # Util tests
     ../tests/util/UtilTest.cpp
+    ../tests/util/SchedulerTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
