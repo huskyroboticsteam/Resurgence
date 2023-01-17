@@ -160,7 +160,10 @@ list(APPEND camera_src
 # shared library for utility code
 add_library(utils SHARED 
   log.cpp
-  Util.cpp
+  utils/core.cpp
+  utils/random.cpp
+  utils/ScopedTimer.cpp
+  utils/transform.cpp
   gps/gps_util.cpp
   base64/base64.cpp
   base64/base64_img.cpp
@@ -211,7 +214,6 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  Util.cpp
   ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
