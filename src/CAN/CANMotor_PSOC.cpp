@@ -31,11 +31,13 @@ struct telemschedule_t {
 	deviceserial_t serial;
 };
 
-bool operator<(const telemschedule_t& t1, const telemschedule_t& t2) {
-	return t1.nextSendTime < t2.nextSendTime;
+bool operator>(const telemschedule_t& t1, const telemschedule_t& t2) {
+	return t1.nextSendTime > t2.nextSendTime;
 }
 
-std::priority_queue<telemschedule_t> telemetrySchedule;
+std::priority_queue<telemschedule_t, std::vector<telemschedule_t>,
+					std::greater<telemschedule_t>>
+	telemetrySchedule;
 bool startedMotorThread = false;
 bool newMotorAdded = false;
 std::condition_variable motorsCV;
