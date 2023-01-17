@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): src/Util.h Source File</title>
+<title>Resurgence (PY2022): src/utils/random.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,20 +77,25 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_313caf1132e152dd9b58bea13a4052ca.html">utils</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="headertitle"><div class="title">Util.h</div></div>
+  <div class="headertitle"><div class="title">random.h</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;utils/ScopedTimer.h&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;utils/core.h&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;utils/random.h&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;utils/time.h&quot;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;utils/transform.h&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceutil.html">util</a> {</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keywordtype">double</span> <a class="code hl_function" href="namespaceutil.html#a1b6af13be4df99a79372afcde0448fe4">stdn</a>(<span class="keywordtype">int</span> thread_id);</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keywordtype">long</span> <a class="code hl_function" href="namespaceutil.html#aef644ff86939b8fb6d59d0fce202e8fd">getNormalSeed</a>();</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>} <span class="comment">// namespace util</span></div>
+<div class="ttc" id="anamespaceutil_html"><div class="ttname"><a href="namespaceutil.html">util</a></div><div class="ttdoc">A collection of utility functions and classes with common use-cases.</div><div class="ttdef"><b>Definition:</b> core.cpp:3</div></div>
+<div class="ttc" id="anamespaceutil_html_a1b6af13be4df99a79372afcde0448fe4"><div class="ttname"><a href="namespaceutil.html#a1b6af13be4df99a79372afcde0448fe4">util::stdn</a></div><div class="ttdeci">double stdn(int thread_id)</div><div class="ttdoc">Sample from the standard normal distribution.</div><div class="ttdef"><b>Definition:</b> random.cpp:24</div></div>
+<div class="ttc" id="anamespaceutil_html_aef644ff86939b8fb6d59d0fce202e8fd"><div class="ttname"><a href="namespaceutil.html#aef644ff86939b8fb6d59d0fce202e8fd">util::getNormalSeed</a></div><div class="ttdeci">long getNormalSeed()</div><div class="ttdoc">Get the random seed used for util::stdn().</div><div class="ttdef"><b>Definition:</b> random.cpp:20</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
