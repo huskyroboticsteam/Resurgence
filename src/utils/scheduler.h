@@ -53,10 +53,14 @@ public:
 
 	/**
 	 * @brief Clears all currently scheduled recurring events.
+	 *
+	 * This invalidates all previously returned event ids.
 	 */
 	void clear() {
 		std::unique_lock lock(scheduleMutex);
 		schedule = decltype(schedule)();
+		toRemove.clear();
+		nextID = 0;
 	}
 
 	/**
