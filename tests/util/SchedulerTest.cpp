@@ -47,7 +47,7 @@ void advanceFakeClock(std::chrono::milliseconds dur, std::chrono::milliseconds i
 }
 } // namespace
 
-TEST_CASE("Test PeriodicScheduler", "[util]") {
+TEST_CASE("Test PeriodicScheduler", "[util][scheduler]") {
 	PeriodicScheduler<fake_clock> sched;
 	auto i = std::make_shared<latch>(2);
 	auto j = std::make_shared<latch>(3);
@@ -72,4 +72,18 @@ TEST_CASE("Test PeriodicScheduler", "[util]") {
 	// check that i was counted down but not j
 	REQUIRE(i->wait_for(100ms));
 	REQUIRE_FALSE(j->wait_for(100ms));
+}
+
+TEST_CASE("Test PeriodicScheduler Remove", "[util][scheduler]") {
+	PeriodicScheduler<fake_clock> sched;
+	auto i = std::make_shared<latch>(1);
+	auto id = sched.scheduleEvent(100ms, [&]() { i->count_down(); });
+	advanceFakeClock(100ms, 5ms, sched);
+
+	REQUIRE(i->wait_for(100ms));
+
+	sched.removeEvent(id);
+	i = std::make_shared<latch>(1);
+	advanceFakeClock(100ms, 5ms, sched);
+	REQUIRE_FALSE(i->wait_for(100ms));
 }

@@ -6,6 +6,7 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <unordered_set>
 
 namespace util {
 
@@ -26,10 +27,15 @@ template <typename Clock> void notifyScheduler(PeriodicScheduler<Clock>& schedul
 template <typename Clock = std::chrono::steady_clock> class PeriodicScheduler {
 public:
 	/**
+	 * @brief The type of event ids.
+	 */
+	using eventid_t = uint64_t;
+
+	/**
 	 * @brief Create a new PeriodicScheduler.
 	 */
 	PeriodicScheduler()
-		: newEventAdded(false), quitting(false),
+		: newEventAdded(false), quitting(false), nextID(0),
 		  thread(std::bind(&PeriodicScheduler::threadFn, this)) {}
 
 	/**
@@ -54,21 +60,40 @@ public:
 	}
 
 	/**
+	 * @brief Remove an event from the schedule.
+	 *
+	 * It is undefined behavior to remove events that are not scheduled,
+	 * e.g. have already been removed.
+	 *
+	 * @param id The id of the event.
+	 */
+	void removeEvent(eventid_t id) {
+		std::unique_lock lock(scheduleMutex);
+		toRemove.insert(id);
+	}
+
+	/**
 	 * @brief Schedule a new event to be executed periodically.
 	 *
 	 * The first execution will be scheduled to happen one period from now.
+	 * It is undefined behavior to schedule more than 2^64 events.
 	 *
 	 * @param period The period in between executions of the event.
 	 * @param fn The function to call when the event is executed. This should not block.
+	 * @return The id of the scheduled event, which can be used with removeEvent().
 	 */
-	void scheduleEvent(std::chrono::milliseconds period, const std::function<void()>& fn) {
+	eventid_t scheduleEvent(std::chrono::milliseconds period,
+							const std::function<void()>& fn) {
+		eventid_t id;
 		{
 			std::unique_lock lock(scheduleMutex);
+			id = nextID++;
 			auto now = Clock::now();
-			schedule.push({now + period, period, fn});
+			schedule.push({id, now + period, period, fn});
 			newEventAdded = true;
 		}
 		scheduleCV.notify_one();
+		return id;
 	}
 
 private:
@@ -81,14 +106,20 @@ private:
 				newEventAdded = false;
 			} else {
 				auto now = Clock::now();
-				schedule_t ts = schedule.top();
-				if (ts.nextSendTime <= now) {
+				schedule_t event = schedule.top();
+				if (toRemove.find(event.id) != toRemove.end()) {
+					// if we should remove this id then remove the event and don't reschedule
 					schedule.pop();
-					ts.fn();
-					ts.nextSendTime += ts.period;
-					schedule.push(ts);
+					toRemove.erase(event.id);
+				} else if (event.nextSendTime <= now) {
+					// execute the event and reschedule it
+					schedule.pop();
+					event.fn();
+					event.nextSendTime += event.period;
+					schedule.push(event);
 				} else {
-					scheduleCV.wait_until(lock, ts.nextSendTime,
+					// wait until the event should be executed
+					scheduleCV.wait_until(lock, event.nextSendTime,
 										  [&] { return newEventAdded; });
 					newEventAdded = false;
 				}
@@ -97,6 +128,7 @@ private:
 	}
 
 	struct schedule_t {
+		eventid_t id;
 		std::chrono::time_point<Clock> nextSendTime;
 		std::chrono::milliseconds period;
 		std::function<void()> fn;
@@ -108,12 +140,14 @@ private:
 
 	bool newEventAdded;
 	bool quitting;
+	eventid_t nextID = 0;
 	std::thread thread;
 	// we need a min priority queue
 	std::priority_queue<schedule_t, std::vector<schedule_t>, std::greater<schedule_t>>
 		schedule;
 	std::mutex scheduleMutex;
 	std::condition_variable scheduleCV;
+	std::unordered_set<eventid_t> toRemove;
 };
 
 namespace impl {
