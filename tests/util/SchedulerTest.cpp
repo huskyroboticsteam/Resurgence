@@ -1,6 +1,6 @@
 #include "../../src/utils/scheduler.h"
 
-#include "../../src/utils/latch.h"
+#include "../../src/utils/threading.h"
 
 #include <chrono>
 #include <memory>
