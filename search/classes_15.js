@@ -81,12 +81,13 @@ var searchData=
   ['unordered_5fmultimap_78',['unordered_multimap',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08887.html',1,'std::__debug::unordered_multimap&lt; class, class, class, class, class &gt;'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09127.html',1,'std::__profile::unordered_multimap&lt; class, class, class, class, class &gt;'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08043.html',1,'std::unordered_multimap&lt; class, class, class, class, class &gt;']]],
   ['unordered_5fmultiset_79',['unordered_multiset',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08895.html',1,'std::__debug::unordered_multiset&lt; class, class, class, class &gt;'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09135.html',1,'std::__profile::unordered_multiset&lt; class, class, class, class &gt;'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08051.html',1,'std::unordered_multiset&lt; class, class, class, class &gt;']]],
   ['unordered_5fset_80',['unordered_set',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08891.html',1,'std::__debug::unordered_set&lt; class, class, class, class &gt;'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09131.html',1,'std::__profile::unordered_set&lt; class, class, class, class &gt;'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html',1,'std::unordered_set&lt; _Value, _Hash, _Pred, _Alloc &gt;']]],
-  ['unscentedkalmanfilter_81',['UnscentedKalmanFilter',['https://docs.opencv.org/4.2.0/de/d72/classcv_1_1tracking_1_1UnscentedKalmanFilter.html',1,'cv::tracking']]],
-  ['unscentedkalmanfilterparams_82',['UnscentedKalmanFilterParams',['https://docs.opencv.org/4.2.0/da/d73/classcv_1_1tracking_1_1UnscentedKalmanFilterParams.html',1,'cv::tracking']]],
-  ['urcleg_83',['URCLeg',['../structnavtypes_1_1URCLeg.html',1,'navtypes']]],
-  ['urcleggps_84',['URCLegGPS',['../structnavtypes_1_1URCLegGPS.html',1,'navtypes']]],
-  ['urglidar_85',['URGLidar',['../classURGLidar.html',1,'']]],
-  ['use_5fonly_86',['use_only',['https://docs.opencv.org/4.2.0/d6/d25/structcv_1_1gapi_1_1use__only.html',1,'cv::gapi']]],
-  ['uses_5fallocator_87',['uses_allocator',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06047.html',1,'std']]],
-  ['uses_5fallocator_3c_20tuple_3c_20_5ftypes_2e_2e_2e_20_3e_2c_20_5falloc_20_3e_88',['uses_allocator&lt; tuple&lt; _Types... &gt;, _Alloc &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a03043.html',1,'std']]]
+  ['unordered_5fset_3c_20eventid_5ft_20_3e_81',['unordered_set&lt; eventid_t &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html',1,'std']]],
+  ['unscentedkalmanfilter_82',['UnscentedKalmanFilter',['https://docs.opencv.org/4.2.0/de/d72/classcv_1_1tracking_1_1UnscentedKalmanFilter.html',1,'cv::tracking']]],
+  ['unscentedkalmanfilterparams_83',['UnscentedKalmanFilterParams',['https://docs.opencv.org/4.2.0/da/d73/classcv_1_1tracking_1_1UnscentedKalmanFilterParams.html',1,'cv::tracking']]],
+  ['urcleg_84',['URCLeg',['../structnavtypes_1_1URCLeg.html',1,'navtypes']]],
+  ['urcleggps_85',['URCLegGPS',['../structnavtypes_1_1URCLegGPS.html',1,'navtypes']]],
+  ['urglidar_86',['URGLidar',['../classURGLidar.html',1,'']]],
+  ['use_5fonly_87',['use_only',['https://docs.opencv.org/4.2.0/d6/d25/structcv_1_1gapi_1_1use__only.html',1,'cv::gapi']]],
+  ['uses_5fallocator_88',['uses_allocator',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06047.html',1,'std']]],
+  ['uses_5fallocator_3c_20tuple_3c_20_5ftypes_2e_2e_2e_20_3e_2c_20_5falloc_20_3e_89',['uses_allocator&lt; tuple&lt; _Types... &gt;, _Alloc &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a03043.html',1,'std']]]
 ];
