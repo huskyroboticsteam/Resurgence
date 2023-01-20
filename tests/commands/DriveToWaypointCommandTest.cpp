@@ -8,14 +8,6 @@
 using namespace robot::types;
 using namespace std::chrono_literals;
 
-void assertApprox(double expectedThetaVel, double expectedXVel,
-                  const commands::command_t& actual, double angleThresh = 1e-5,
-                  double velThresh = 1e-5) {
-  REQUIRE_THAT(actual.thetaVel,
-               Catch::WithinAbs(expectedThetaVel, angleThresh));
-  REQUIRE_THAT(actual.xVel, Catch::WithinAbs(expectedXVel, velThresh));
-}
-
 namespace {
 const double ATAN_4_3 = 0.927295218002;  // value of atan(4/3) in rad.
 const double THETA_KP = 3.5;
@@ -24,6 +16,15 @@ const double SLOW_DRIVE_SPEED = 2.0;
 const double DONE_THRESHOLD = 0.25;
 const util::dseconds CLOSE_TO_TARGET_DUR_VAL = 1s;
 const util::dseconds CLOSE_TO_TARGET_DUR_ALTVAL = 2s;
+
+void assertApprox(double expectedThetaVel, double expectedXVel,
+                  const commands::command_t& actual, double angleThresh = 1e-5,
+                  double velThresh = 1e-5) {
+  REQUIRE_THAT(actual.thetaVel,
+               Catch::WithinAbs(expectedThetaVel, angleThresh));
+  REQUIRE_THAT(actual.xVel, Catch::WithinAbs(expectedXVel, velThresh));
+}
+
 }  // namespace
 
 TEST_CASE("DriveToWaypointCommand Test") {
