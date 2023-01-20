@@ -9,10 +9,10 @@ using namespace robot::types;
 using namespace std::chrono_literals;
 
 void assertApprox(double expectedThetaVel, double expectedXVel,
-                  const commands::command_t& actual, double angle = 1e-5,
-                  double vel = 1e-5) {
-  bool velEqual = abs(expectedThetaVel - actual.thetaVel) <= angle;
-  bool angleEqual = abs(expectedXVel - actual.xVel) <= vel;
+                  const commands::command_t& actual, double angleThresh = 1e-5,
+                  double velThresh = 1e-5) {
+  bool velEqual = abs(expectedThetaVel - actual.thetaVel) <= angleThresh;
+  bool angleEqual = abs(expectedXVel - actual.xVel) <= velThresh;
 
   if (velEqual && angleEqual) {
     SUCCEED();
@@ -25,12 +25,16 @@ void assertApprox(double expectedThetaVel, double expectedXVel,
   }
 }
 
-const double ATAN_4_3 = 0.927295218002; // value of atan(4/3) in rad.
-const double THETA_KP = 3.5;
-const double NORMAL_DRIVE_SPEED = 4.0;
-const double SLOW_DRIVE_SPEED = 2.0;
-const double DONE_THRESHOLD = 0.25;
-const double CLOSE_TO_TARGET_DUR_VAL = 1.0;
+namespace {
+  const double ATAN_4_3 = 0.927295218002; // value of atan(4/3) in rad.
+  const double THETA_KP = 3.5;
+  const double NORMAL_DRIVE_SPEED = 4.0;
+  const double SLOW_DRIVE_SPEED = 2.0;
+  const double DONE_THRESHOLD = 0.25;
+  const util::dseconds CLOSE_TO_TARGET_DUR_VAL = 1s;
+}
+
+
 
 TEST_CASE("DriveToWaypointCommand Test") {
   // sample target is at position (3,4).

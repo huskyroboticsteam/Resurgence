@@ -26,7 +26,7 @@ public:
 	 * 							   is considered done, seconds.
 	 */
 	DriveToWaypointCommand(const navtypes::point_t& target, double thetaKP, double driveVel,
-						   double slowDriveVel, double doneThresh, double closeToTargetDurVal);
+						   double slowDriveVel, double doneThresh, util::dseconds closeToTargetDur);
 
 	/**
 	 * Must be called before getOutput() for each iteration. Updates the current pose of the robot in 
@@ -35,7 +35,7 @@ public:
 	 * @param pose, the current pose of the robot in the global reference frame.
 	 * @param time, the current time from robot::types::dataclock.
 	 */
-	void setState(const navtypes::pose_t& pose, const robot::types::datatime_t time);
+	void setState(const navtypes::pose_t& pose, robot::types::datatime_t time);
 
 	/**
 	 * Gets the angular velocity and forward speed to run the robot at in order to navigate robot to target.
@@ -59,7 +59,7 @@ private:
 	double slowDriveVel;
 	double doneThresh;
 	bool setStateCalledBeforeOutput;
-	std::chrono::duration<double> closeToTargetDur;
+	util::dseconds closeToTargetDur;
 	std::optional<robot::types::datatime_t> lastRecordedTime;
 	std::optional<robot::types::datatime_t> closeToTargetStartTime;
 };

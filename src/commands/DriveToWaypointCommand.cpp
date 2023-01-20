@@ -10,15 +10,13 @@ namespace commands {
 DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double thetaKP,
 											   double driveVel, double slowDriveVel,
 											   double doneThresh, 
-											   double closeToTargetDurVal)
+											   util::dseconds closeToTargetDur)
 	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
 	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), 
-	  setStateCalledBeforeOutput(false) {
-	      closeToTargetDur = std::chrono::duration<double>(closeToTargetDurVal);
-	  }
+	  setStateCalledBeforeOutput(false), closeToTargetDur(closeToTargetDur) {}
 
 void DriveToWaypointCommand::setState(const navtypes::pose_t& pose, 
-									  const robot::types::datatime_t time) {
+									  robot::types::datatime_t time) {
 	this->pose = pose;
 	this->setStateCalledBeforeOutput = true;
 	this->lastRecordedTime = time;
@@ -45,6 +43,10 @@ command_t DriveToWaypointCommand::getOutput() {
 }
 
 bool DriveToWaypointCommand::isDone() {
+	if (!lastRecordedTime.has_value()) {
+		return false;
+	}
+
 	double distance = (pose.topRows<2>() - target.topRows<2>()).norm();
 	if (distance <= doneThresh) {
 		if (!closeToTargetStartTime.has_value()) {
