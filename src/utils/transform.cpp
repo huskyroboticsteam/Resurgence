@@ -1,21 +1,10 @@
-#include "Util.h"
-
-#include "navtypes.h"
-
-#include <algorithm>
-#include <iostream>
-#include <random>
-#include <time.h>
+#include "transform.h"
 
 #include <Eigen/LU>
-#include <sys/time.h>
 
 using namespace navtypes;
 
 namespace util {
-bool almostEqual(double a, double b, double threshold) {
-	return std::abs(a - b) < threshold;
-}
 
 double quatToHeading(double qw, double qx, double qy, double qz) {
 	Eigen::Quaterniond quat(qw, qx, qy, qz);
@@ -31,25 +20,6 @@ double quatToHeading(Eigen::Quaterniond quat) {
 	// recover heading
 	double heading = std::atan2(transformedX(1), transformedX(0));
 	return heading;
-}
-
-ScopedTimer::ScopedTimer(std::string name)
-	: startTime(std::chrono::high_resolution_clock::now()), name(std::move(name)) {}
-
-ScopedTimer::ScopedTimer() : ScopedTimer("") {}
-
-ScopedTimer::~ScopedTimer() {
-	if (!name.empty()) {
-		auto now = std::chrono::high_resolution_clock::now();
-		auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - startTime);
-		std::cout << "[" << name << "] ElapsedTime: " << elapsed.count() << "us\n";
-	}
-}
-
-std::chrono::microseconds ScopedTimer::elapsedTime() const {
-	auto now = std::chrono::high_resolution_clock::now();
-	auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - startTime);
-	return elapsed;
 }
 
 points_t transformReadings(const points_t& ps, const transform_t& tf) {
@@ -110,34 +80,4 @@ transform_t toTransform(const pose_t& pose) {
 	return toTransformRotateFirst(0, 0, pose(2)) * toTransformRotateFirst(pose(0), pose(1), 0);
 }
 
-/**
- * There still might be some variation due to the dependence of the robot position
- * on when exactly each context switch occurs.
- *
- * For programs with more threads, a more sophisticated solution will be necessary.
- */
-static std::normal_distribution<double> stdn_dist(0.0, 1.0);
-static long seed = std::chrono::system_clock::now().time_since_epoch().count();
-// long seed = 1626474823108702150;
-static std::default_random_engine main_generator(seed);
-static std::default_random_engine spin_generator(seed);
-
-long getNormalSeed() {
-	return seed;
 }
-
-double stdn(int thread_id) {
-	return stdn_dist(thread_id == 0 ? main_generator : spin_generator);
-}
-
-uint64_t getUnixTime() {
-	return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
-									 std::chrono::system_clock::now().time_since_epoch())
-									 .count());
-}
-
-frozen::string freezeStr(const std::string& str) {
-	return frozen::string(str.c_str(), str.size());
-}
-
-} // namespace util

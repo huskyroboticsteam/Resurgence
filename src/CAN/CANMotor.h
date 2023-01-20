@@ -58,8 +58,19 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 				 int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod);
 
-// TODO: figure out the correct parameters needed and implement for both motor boards
-void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi,
+/**
+ * @brief Initialize a potentiometer attached to the given motor.
+ * 
+ * @param serial The CAN serial number of the motor board.
+ * @param posLo The joint position that corresponds to @p adcLo
+ * @param posHi The joint position that corresponds to @p adcHi
+ * @param adcLo The ADC value when the joint is at @p posLo
+ * @param adcHi The ADC value when the joint is at @p posHi
+ * @param telemetryPeriod An optional parameter specifying the telemetry period.
+ * The telemetry will be fetched at this period automatically. An empty optional disables this
+ * behavior, in which case the motor position must be explicitly pulled.
+ */
+void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo, uint16_t adcHi,
 					   std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**

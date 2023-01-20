@@ -11,9 +11,9 @@
 #include <vector>
 
 extern "C" {
-#include "../HindsightCAN/CANCommon.h"
-#include "../HindsightCAN/CANMotorUnit.h"
-#include "../HindsightCAN/CANPacket.h"
+#include <HindsightCAN/CANCommon.h>
+#include <HindsightCAN/CANMotorUnit.h>
+#include <HindsightCAN/CANPacket.h>
 }
 
 using namespace std::chrono_literals;
@@ -31,11 +31,13 @@ struct telemschedule_t {
 	deviceserial_t serial;
 };
 
-bool operator<(const telemschedule_t& t1, const telemschedule_t& t2) {
-	return t1.nextSendTime < t2.nextSendTime;
+bool operator>(const telemschedule_t& t1, const telemschedule_t& t2) {
+	return t1.nextSendTime > t2.nextSendTime;
 }
 
-std::priority_queue<telemschedule_t> telemetrySchedule;
+std::priority_queue<telemschedule_t, std::vector<telemschedule_t>,
+					std::greater<telemschedule_t>>
+	telemetrySchedule;
 bool startedMotorThread = false;
 bool newMotorAdded = false;
 std::condition_variable motorsCV;
@@ -79,7 +81,8 @@ void startMonitoringMotor(deviceserial_t motor, std::chrono::milliseconds period
 } // namespace
 
 void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-				 int32_t pulsesPerJointRev, std::optional<std::chrono::milliseconds> telemetryPeriod) {
+				 int32_t pulsesPerJointRev,
+				 std::optional<std::chrono::milliseconds> telemetryPeriod) {
 	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);
 	CANPacket p;
 	AssembleEncoderInitializePacket(&p, motorGroupCode, serial, sensor_t::encoder,
@@ -89,6 +92,20 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 	AssembleEncoderPPJRSetPacket(&p, motorGroupCode, serial, pulsesPerJointRev);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
+	if (telemetryPeriod) {
+		startMonitoringMotor(serial, telemetryPeriod.value());
+	}
+}
+
+void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo,
+					   uint16_t adcHi,
+					   std::optional<std::chrono::milliseconds> telemetryPeriod) {
+	CANPacket packet;
+	auto group = static_cast<uint8_t>(devicegroup_t::motor);
+	AssemblePotHiSetPacket(&packet, group, serial, adcHi, posHi);
+	sendCANPacket(packet);
+	AssemblePotLoSetPacket(&packet, group, serial, adcLo, posLo);
+	sendCANPacket(packet);
 	if (telemetryPeriod) {
 		startMonitoringMotor(serial, telemetryPeriod.value());
 	}
