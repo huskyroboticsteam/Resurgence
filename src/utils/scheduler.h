@@ -38,6 +38,8 @@ public:
 		: newEventAdded(false), quitting(false), nextID(0),
 		  thread(std::bind(&PeriodicScheduler::threadFn, this)) {}
 
+	PeriodicScheduler(const PeriodicScheduler&) = delete;
+
 	/**
 	 * @brief Join the thread and destruct.
 	 */
@@ -45,11 +47,14 @@ public:
 		{
 			std::unique_lock lock(scheduleMutex);
 			quitting = true;
+			// wake up the thread with the cv so it can quit
 			newEventAdded = true;
 		}
 		scheduleCV.notify_one();
 		thread.join();
 	}
+
+	PeriodicScheduler& operator=(const PeriodicScheduler&) = delete;
 
 	/**
 	 * @brief Clears all currently scheduled recurring events.
@@ -102,6 +107,10 @@ public:
 
 private:
 	friend void util::impl::notifyScheduler<>(PeriodicScheduler&);
+
+	/**
+	 * @brief Method executed by the scheduler thread.
+	 */
 	void threadFn() {
 		std::unique_lock lock(scheduleMutex);
 		while (!quitting) {
@@ -131,6 +140,9 @@ private:
 		}
 	}
 
+	/**
+	 * @brief Utility type for holding information about a scheduled event.
+	 */
 	struct schedule_t {
 		eventid_t id;
 		std::chrono::time_point<Clock> nextSendTime;
