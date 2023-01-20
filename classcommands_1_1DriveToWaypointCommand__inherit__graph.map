@@ -1,0 +1,4 @@
+<map id="commands::DriveToWaypointCommand" name="commands::DriveToWaypointCommand">
+<area shape="rect" id="node1" title="Provides robot drive velocity commands to navigate the robot to a given waypoint given the velocity p..." alt="" coords="5,79,196,119"/>
+<area shape="rect" id="node2" href="$classcommands_1_1CommandBase.html" title=" " alt="" coords="10,5,191,31"/>
+</map>
