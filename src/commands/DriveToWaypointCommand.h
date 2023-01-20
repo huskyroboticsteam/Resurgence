@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../navtypes.h"
 #include "../world_interface/data.h"
 #include "CommandBase.h"
