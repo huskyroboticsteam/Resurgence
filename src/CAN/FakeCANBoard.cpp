@@ -116,7 +116,11 @@ int main() {
 					int ppjr = prompt("Pulses per joint revolution");
 					can::motor::initEncoder(serial, false, true, ppjr, telemPeriod);
 				} else if (sensorType == 1) {
-					// TODO: initialize potentiometer
+					int posLo = prompt("Pos Lo");
+					int posHi = prompt("Pos Hi");
+					int adcLo = prompt("ADC Lo");
+					int adcHi = prompt("ADC Hi");
+					can::motor::initPotentiometer(serial, posLo, posHi, adcLo, adcHi, telemPeriod);
 				}
 				mode_has_been_set = true;
 			}
