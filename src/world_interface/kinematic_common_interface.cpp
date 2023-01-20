@@ -87,6 +87,19 @@ double setCmdVel(double dtheta, double dx) {
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
 
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+	auto itr = motor_ptrs.find(motor);  
+     
+    if (itr == motor_ptrs.end()) {  
+		// motor id not in map
+		return nullptr;
+    }   
+    else {  
+        // return motor object pointer
+        return itr->second;
+    }
+}
+
 std::pair<double, double> getCmdVel() {
 	double l = commandedWheelVel.lVel;
 	double r = commandedWheelVel.rVel;

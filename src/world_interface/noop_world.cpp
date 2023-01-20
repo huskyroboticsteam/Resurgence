@@ -2,6 +2,7 @@
 #include "world_interface.h"
 
 #include <unistd.h>
+#include <memory>
 
 using namespace navtypes;
 using namespace robot::types;
@@ -24,6 +25,10 @@ const DiffWristKinematics& wristKinematics() {
 }
 
 void world_interface_init() {}
+
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+	return nullptr;
+}
 
 DataPoint<points_t> readLidarScan() {
 	return points_t{};

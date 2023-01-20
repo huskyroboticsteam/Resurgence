@@ -14,6 +14,10 @@ namespace robot {
  */
 class base_motor {
 public:
+
+    // TODO: spin up thread in constructor, use it for setMotorVel -> suspend this thread if motor 
+    // position is set (use a state)
+
     /**
      * @brief Default constructor for base motor.
      *

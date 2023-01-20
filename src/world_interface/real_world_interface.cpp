@@ -121,6 +121,19 @@ void world_interface_init() {
 	initMotors();
 }
 
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+	auto itr = motor_ptrs.find(motor);  
+     
+    if (itr == motor_ptrs.end()) {  
+		// motor id not in map
+		return nullptr;
+    }   
+    else {  
+        // return motor object pointer
+        return itr->second;
+    }
+}
+
 std::unordered_set<CameraID> getCameras() {
 	return util::keySet(cameraMap);
 }

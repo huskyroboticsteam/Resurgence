@@ -266,6 +266,19 @@ void world_interface_init() {
 	AR::initializeLandmarkDetection();
 }
 
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+	auto itr = motor_ptrs.find(motor);  
+     
+    if (itr == motor_ptrs.end()) {  
+		// motor id not in map
+		return nullptr;
+    }   
+    else {  
+        // return motor object pointer
+        return itr->second;
+    }
+}
+
 std::unordered_set<CameraID> getCameras(){
 	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
 	return util::keySet(cameraLastFrameIdxMap);

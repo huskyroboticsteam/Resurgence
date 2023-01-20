@@ -5,6 +5,7 @@
 #include "../kinematics/DiffWristKinematics.h"
 #include "../navtypes.h"
 #include "data.h"
+#include "base_motor.h"
 
 #include <optional>
 #include <unordered_set>
@@ -35,6 +36,9 @@ extern const WorldInterface WORLD_INTERFACE;
 const DiffDriveKinematics& driveKinematics();
 const DiffWristKinematics& wristKinematics();
 
+// A mapping of (motor_id, shared pointer to object of the motor)
+std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+
 /**
  * @brief Initialize the world interface.
  *
@@ -43,7 +47,13 @@ const DiffWristKinematics& wristKinematics();
  */
 void world_interface_init();
 
-//std::shared_ptr<bASEmOTORtYPE> getMotor(motorid blah); have motor class call 
+/**
+ * @brief Get a pointer to the motor object associated with the motor id.
+ *
+ * @param motor The motor id to manipulate.
+ * @return A shared pointer to the motor object
+ */
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor);
 
 /**
  * @brief Request the robot to drive at the given velocities.
