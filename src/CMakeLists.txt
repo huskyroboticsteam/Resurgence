@@ -254,6 +254,9 @@ add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
 )
 
+add_library(commands STATIC
+  commands/DriveToWaypointCommand.cpp)
+
 if(WITH_LIDAR)
   add_subdirectory(lidar)
 endif()
@@ -292,6 +295,7 @@ list(APPEND rover_libs
   websocket_utils
   filters
   control
+  commands
   utils
 )
 target_link_libraries(Rover
@@ -345,6 +349,8 @@ if(WITH_TESTS)
     ../tests/worldmap/TrICPTest.cpp
     ../tests/worldmap/GlobalMapTest.cpp
     ../tests/worldmap/QuadTreeTest.cpp
+    # Command tests
+    ../tests/commands/DriveToWaypointCommandTest.cpp
     # Util tests
     ../tests/util/UtilTest.cpp
     ../tests/util/SchedulerTest.cpp
