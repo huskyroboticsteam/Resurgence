@@ -141,15 +141,18 @@ Functions</h2></td></tr>
 <tr class="memitem:a6a94bbe1a8abe8fd968d4c56658960a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#a6a94bbe1a8abe8fd968d4c56658960a7">initEncoder</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, bool invertEncoder, bool zeroEncoder, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> pulsesPerJointRev, std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> &gt; telemetryPeriod)</td></tr>
 <tr class="memdesc:a6a94bbe1a8abe8fd968d4c56658960a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize an encoder attached to the given motor.  <br /></td></tr>
 <tr class="separator:a6a94bbe1a8abe8fd968d4c56658960a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae14d402fe28df7de9b2fed9f8efae7f2"><td class="memItemLeft" align="right" valign="top"><a id="ae14d402fe28df7de9b2fed9f8efae7f2" name="ae14d402fe28df7de9b2fed9f8efae7f2"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>initPotentiometer</b> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> posLo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> posHi, std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> &gt; telemetryPeriod)</td></tr>
-<tr class="separator:ae14d402fe28df7de9b2fed9f8efae7f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7831a61147dcf3f0a72e80878ae13bfa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#a7831a61147dcf3f0a72e80878ae13bfa">initPotentiometer</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> posLo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> posHi, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a> adcLo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a> adcHi, std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> &gt; telemetryPeriod)</td></tr>
+<tr class="memdesc:a7831a61147dcf3f0a72e80878ae13bfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a potentiometer attached to the given motor.  <br /></td></tr>
+<tr class="separator:a7831a61147dcf3f0a72e80878ae13bfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26b1ed31074df37917d234af08c2aa67"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#a26b1ed31074df37917d234af08c2aa67">pullMotorPosition</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial)</td></tr>
 <tr class="memdesc:a26b1ed31074df37917d234af08c2aa67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Poll the position data from a motor board.  <br /></td></tr>
 <tr class="separator:a26b1ed31074df37917d234af08c2aa67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a94bbe1a8abe8fd968d4c56658960a7"><td class="memItemLeft" align="right" valign="top"><a id="a6a94bbe1a8abe8fd968d4c56658960a7" name="a6a94bbe1a8abe8fd968d4c56658960a7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>initEncoder</b> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, bool invertEncoder, bool zeroEncoder, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> pulsesPerJointRev, std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> &gt; telemetryPeriod)</td></tr>
 <tr class="separator:a6a94bbe1a8abe8fd968d4c56658960a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7831a61147dcf3f0a72e80878ae13bfa"><td class="memItemLeft" align="right" valign="top"><a id="a7831a61147dcf3f0a72e80878ae13bfa" name="a7831a61147dcf3f0a72e80878ae13bfa"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>initPotentiometer</b> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> posLo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> posHi, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a> adcLo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a> adcHi, std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> &gt; telemetryPeriod)</td></tr>
+<tr class="separator:a7831a61147dcf3f0a72e80878ae13bfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utilities for interacting with motor boards over a CAN interface. </p>
@@ -287,7 +290,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>initEncoder</b> (<a c
 </div><div class="memdoc">
 
 <p>Initialize an encoder attached to the given motor. </p>
-<p>For potentiometers, use initPotentiometer().</p>
+<p>For potentiometers, use <a class="el" href="namespacecan_1_1motor.html#a7831a61147dcf3f0a72e80878ae13bfa" title="Initialize a potentiometer attached to the given motor.">initPotentiometer()</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">serial</td><td>The CAN serial number of the motor board. </td></tr>
@@ -322,6 +325,71 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>initEncoder</b> (<a c
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">serial</td><td>The CAN serial number of the motor to initialize. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7831a61147dcf3f0a72e80878ae13bfa" name="a7831a61147dcf3f0a72e80878ae13bfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7831a61147dcf3f0a72e80878ae13bfa">&#9670;&#160;</a></span>initPotentiometer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can::motor::initPotentiometer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a>&#160;</td>
+          <td class="paramname"><em>serial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td>
+          <td class="paramname"><em>posLo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td>
+          <td class="paramname"><em>posHi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a>&#160;</td>
+          <td class="paramname"><em>adcLo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a>&#160;</td>
+          <td class="paramname"><em>adcHi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> &gt;&#160;</td>
+          <td class="paramname"><em>telemetryPeriod</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize a potentiometer attached to the given motor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">serial</td><td>The CAN serial number of the motor board. </td></tr>
+    <tr><td class="paramname">posLo</td><td>The joint position that corresponds to <code>adcLo</code> </td></tr>
+    <tr><td class="paramname">posHi</td><td>The joint position that corresponds to <code>adcHi</code> </td></tr>
+    <tr><td class="paramname">adcLo</td><td>The ADC value when the joint is at <code>posLo</code> </td></tr>
+    <tr><td class="paramname">adcHi</td><td>The ADC value when the joint is at <code>posHi</code> </td></tr>
+    <tr><td class="paramname">telemetryPeriod</td><td>An optional parameter specifying the telemetry period. The telemetry will be fetched at this period automatically. An empty optional disables this behavior, in which case the motor position must be explicitly pulled. </td></tr>
   </table>
   </dd>
 </dl>
