@@ -211,7 +211,7 @@ void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 
 void MissionControlProtocol::handleConnection() {
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
-	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", "arm"}};
+	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", Globals::mountedPeripheral}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 
 	if (!Globals::AUTONOMOUS) {
