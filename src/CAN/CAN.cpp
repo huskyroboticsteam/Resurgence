@@ -3,9 +3,9 @@
 #include "../log.h"
 #include "CANUtils.h"
 
-#include <memory>
 #include <chrono>
 #include <cstring>
+#include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <string>
@@ -39,7 +39,6 @@ template <typename T1, typename T2> struct std::hash<std::pair<T1, T2>> {
 	}
 };
 
-
 namespace can {
 namespace {
 // time to sleep after getting a CAN read error
@@ -49,6 +48,10 @@ constexpr uint32_t CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
 
 int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
+
+std::shared_ptr<util::PeriodicScheduler<>> telemScheduler;
+std::unordered_map<std::pair<deviceid_t, telemtype_t>, util::PeriodicScheduler<>::eventid_t>
+	telemEventIDMap;
 
 using telemetrycode_t = uint8_t;
 
@@ -79,9 +82,10 @@ using devicemap_t =
 std::unordered_map<deviceid_t, devicemap_t> telemMap;
 std::shared_mutex telemMapMutex;
 
-std::unordered_map<std::pair<deviceid_t, telemetrycode_t>,
-		 std::unordered_map<uint32_t, std::function<void(deviceid_t, telemtype_t,
-											   robot::types::DataPoint<telemetry_t>)>>>
+std::unordered_map<
+	std::pair<deviceid_t, telemetrycode_t>,
+	std::unordered_map<uint32_t, std::function<void(deviceid_t, telemtype_t,
+													robot::types::DataPoint<telemetry_t>)>>>
 	telemetryCallbackMap;
 uint32_t nextCallbackID = 0;
 std::mutex telemetryCallbackMapMutex; // protects callbackMap and callbackID
@@ -291,6 +295,60 @@ robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype
 	} else {
 		return {};
 	}
+}
+
+void pullDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
+	CANPacket p;
+	auto groupCode = static_cast<uint8_t>(id.first);
+	auto serial = static_cast<uint8_t>(id.second);
+	auto telemCode = static_cast<uint8_t>(telemType);
+	AssembleTelemetryPullPacket(&p, groupCode, serial, telemCode);
+	sendCANPacket(p);
+}
+
+void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
+						   std::chrono::milliseconds period) {
+	if (!telemScheduler) {
+		telemScheduler = std::make_shared<util::PeriodicScheduler<>>();
+	}
+
+	auto mapKey = std::make_pair(id, telemType);
+	auto it = telemEventIDMap.find(mapKey);
+	if (it != telemEventIDMap.end()) {
+		auto eventID = it->second;
+		telemEventIDMap.erase(it);
+		telemScheduler->removeEvent(eventID);
+	}
+
+	auto eventID =
+		telemScheduler->scheduleEvent(period, [=]() { pullDeviceTelemetry(id, telemType); });
+	telemEventIDMap.insert_or_assign(mapKey, eventID);
+
+	// pull immediately since scheduling does not send right now
+	pullDeviceTelemetry(id, telemType);
+}
+
+void unscheduleTelemetryPull(deviceid_t id, telemtype_t telemType) {
+	if (!telemScheduler) {
+		return;
+	}
+
+	auto mapKey = std::make_pair(id, telemType);
+	auto it = telemEventIDMap.find(mapKey);
+	if (it != telemEventIDMap.end()) {
+		auto eventID = it->second;
+		telemEventIDMap.erase(it);
+		telemScheduler->removeEvent(eventID);
+	}
+}
+
+void unscheduleAllTelemetryPulls() {
+	if (!telemScheduler) {
+		return;
+	}
+
+	telemScheduler->clear();
+	telemEventIDMap.clear();
 }
 
 callbackid_t addDeviceTelemetryCallback(
