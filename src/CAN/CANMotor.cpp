@@ -76,6 +76,10 @@ DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
 							  telemtype_t::angle);
 }
 
+void pullMotorPosition(deviceserial_t serial) {
+	pullDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle);
+}
+
 callbackid_t addLimitSwitchCallback(
 	deviceserial_t serial,
 	const std::function<void(deviceserial_t serial,

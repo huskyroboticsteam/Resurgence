@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../utils/scheduler.h"
 #include "../world_interface/data.h"
 #include "CANUtils.h"
 
@@ -43,7 +44,9 @@ void initCAN();
 void sendCANPacket(const CANPacket& packet);
 
 /**
- * @brief Get telemetry from a CAN device.
+ * @brief Get the latest telemetry from a CAN device.
+ *
+ * This method does NOT query for new data, it just returns the last reported value.
  *
  * @param id The device group and serial number of the device.
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
@@ -52,6 +55,47 @@ void sendCANPacket(const CANPacket& packet);
  * is returned.
  */
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType);
+
+/**
+ * @brief Ping the given CAN device to send the given telemetry data.
+ *
+ * The CAN device will asynchronously send the new data in an unspecified amount of time.
+ * Not all CAN devices may support pulling telemetry.
+ *
+ * @param id The device group and serial number of the device.
+ * @param telemType The type of telemetry to get, as dictated by the specific device specs.
+ */
+void pullDeviceTelemetry(deviceid_t id, telemtype_t telemType);
+
+/**
+ * @brief Periodically pull the latest telemetry data from the specified CAN device
+ * asychronously.
+ *
+ * This method is NOT thread safe.
+ *
+ * @param id The device group and serial number of the device.
+ * @param telemType The type of telemetry to get, as dictated by the specific device specs.
+ * @param period The period to wait in between sending pull requests.
+ */
+void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
+						   std::chrono::milliseconds period);
+
+/**
+ * @brief Stop pulling the latest telemetry data from the given device.
+ *
+ * This method is NOT thread safe.
+ *
+ * @param id The device group and serial number of the device.
+ * @param telemType The type of telemetry to get, as dictated by the specific device specs.
+ */
+void unscheduleTelemetryPull(deviceid_t id, telemtype_t telemType);
+
+/**
+ * @brief Stop pulling the latest telemetry data from all currently scheduled devices.
+ *
+ * This method is NOT thread safe.
+ */
+void unscheduleAllTelemetryPulls();
 
 /**
  * @brief Add a callback which is invoked when data is recieved.
