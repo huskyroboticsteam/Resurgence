@@ -168,8 +168,20 @@ Functions</h2></td></tr>
 <tr class="memdesc:a3e4a4acc87fbf8cfad2a9a9252811314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a CAN packet.  <br /></td></tr>
 <tr class="separator:a3e4a4acc87fbf8cfad2a9a9252811314"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a308dd5a174588199d03e8cc8f723394b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a>&lt; <a class="el" href="namespacecan.html#a83ed0f0f4b4503bc12119eb6fb95eb58">telemetry_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan.html#a308dd5a174588199d03e8cc8f723394b">getDeviceTelemetry</a> (<a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a> id, <a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a> telemType)</td></tr>
-<tr class="memdesc:a308dd5a174588199d03e8cc8f723394b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get telemetry from a CAN device.  <br /></td></tr>
+<tr class="memdesc:a308dd5a174588199d03e8cc8f723394b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the latest telemetry from a CAN device.  <br /></td></tr>
 <tr class="separator:a308dd5a174588199d03e8cc8f723394b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e2b4dcc5578fd7dbc59f7ccc8f2f84c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan.html#a7e2b4dcc5578fd7dbc59f7ccc8f2f84c">pullDeviceTelemetry</a> (<a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a> id, <a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a> telemType)</td></tr>
+<tr class="memdesc:a7e2b4dcc5578fd7dbc59f7ccc8f2f84c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ping the given CAN device to send the given telemetry data.  <br /></td></tr>
+<tr class="separator:a7e2b4dcc5578fd7dbc59f7ccc8f2f84c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60a17e1ae5b26cd35f4322028435b6cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan.html#a60a17e1ae5b26cd35f4322028435b6cc">scheduleTelemetryPull</a> (<a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a> id, <a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a> telemType, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> period)</td></tr>
+<tr class="memdesc:a60a17e1ae5b26cd35f4322028435b6cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Periodically pull the latest telemetry data from the specified CAN device asychronously.  <br /></td></tr>
+<tr class="separator:a60a17e1ae5b26cd35f4322028435b6cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09de91bf58066e0b3a582701d6e1741f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan.html#a09de91bf58066e0b3a582701d6e1741f">unscheduleTelemetryPull</a> (<a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a> id, <a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a> telemType)</td></tr>
+<tr class="memdesc:a09de91bf58066e0b3a582701d6e1741f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop pulling the latest telemetry data from the given device.  <br /></td></tr>
+<tr class="separator:a09de91bf58066e0b3a582701d6e1741f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8360869b24ff9b9e905abec24857968a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan.html#a8360869b24ff9b9e905abec24857968a">unscheduleAllTelemetryPulls</a> ()</td></tr>
+<tr class="memdesc:a8360869b24ff9b9e905abec24857968a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop pulling the latest telemetry data from all currently scheduled devices.  <br /></td></tr>
+<tr class="separator:a8360869b24ff9b9e905abec24857968a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28d32525275273034e35a21e40a35b92"><td class="memItemLeft" align="right" valign="top"><a id="a28d32525275273034e35a21e40a35b92" name="a28d32525275273034e35a21e40a35b92"></a>
 <a class="el" href="namespacecan.html#ab8d3110d8e240e98c6299118bf2fba9a">callbackid_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>addDeviceTelemetryCallback</b> (<a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a> id, <a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a> telemType, const std::function&lt; void(<a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a>, <a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a>, <a class="el" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a>&lt; <a class="el" href="namespacecan.html#a83ed0f0f4b4503bc12119eb6fb95eb58">telemetry_t</a> &gt;)&gt; &amp;callback)</td></tr>
 <tr class="separator:a28d32525275273034e35a21e40a35b92"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -443,7 +455,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get telemetry from a CAN device. </p>
+<p>Get the latest telemetry from a CAN device. </p>
+<p>This method does NOT query for new data, it just returns the last reported value.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>The device group and serial number of the device. </td></tr>
@@ -586,6 +599,44 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a7e2b4dcc5578fd7dbc59f7ccc8f2f84c" name="a7e2b4dcc5578fd7dbc59f7ccc8f2f84c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e2b4dcc5578fd7dbc59f7ccc8f2f84c">&#9670;&#160;</a></span>pullDeviceTelemetry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can::pullDeviceTelemetry </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a>&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a>&#160;</td>
+          <td class="paramname"><em>telemType</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Ping the given CAN device to send the given telemetry data. </p>
+<p>The CAN device will asynchronously send the new data in an unspecified amount of time. Not all CAN devices may support pulling telemetry.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The device group and serial number of the device. </td></tr>
+    <tr><td class="paramname">telemType</td><td>The type of telemetry to get, as dictated by the specific device specs. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a8a46628f8f55f509c3d745ba51814c80" name="a8a46628f8f55f509c3d745ba51814c80"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8a46628f8f55f509c3d745ba51814c80">&#9670;&#160;</a></span>removeDeviceTelemetryCallback()</h2>
 
@@ -613,6 +664,51 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a60a17e1ae5b26cd35f4322028435b6cc" name="a60a17e1ae5b26cd35f4322028435b6cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60a17e1ae5b26cd35f4322028435b6cc">&#9670;&#160;</a></span>scheduleTelemetryPull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can::scheduleTelemetryPull </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a>&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a>&#160;</td>
+          <td class="paramname"><em>telemType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a>&#160;</td>
+          <td class="paramname"><em>period</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Periodically pull the latest telemetry data from the specified CAN device asychronously. </p>
+<p>This method is NOT thread safe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The device group and serial number of the device. </td></tr>
+    <tr><td class="paramname">telemType</td><td>The type of telemetry to get, as dictated by the specific device specs. </td></tr>
+    <tr><td class="paramname">period</td><td>The period to wait in between sending pull requests. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a3e4a4acc87fbf8cfad2a9a9252811314" name="a3e4a4acc87fbf8cfad2a9a9252811314"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3e4a4acc87fbf8cfad2a9a9252811314">&#9670;&#160;</a></span>sendCANPacket()</h2>
 
@@ -634,6 +730,64 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">packet</td><td>The CAN packet to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8360869b24ff9b9e905abec24857968a" name="a8360869b24ff9b9e905abec24857968a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8360869b24ff9b9e905abec24857968a">&#9670;&#160;</a></span>unscheduleAllTelemetryPulls()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can::unscheduleAllTelemetryPulls </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stop pulling the latest telemetry data from all currently scheduled devices. </p>
+<p>This method is NOT thread safe. </p>
+
+</div>
+</div>
+<a id="a09de91bf58066e0b3a582701d6e1741f" name="a09de91bf58066e0b3a582701d6e1741f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09de91bf58066e0b3a582701d6e1741f">&#9670;&#160;</a></span>unscheduleTelemetryPull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can::unscheduleTelemetryPull </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#ac3cf7d7a03c88d29e19a12b501f1fa23">deviceid_t</a>&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#af98139e403f1d81f1d91b55695b90ad4">telemtype_t</a>&#160;</td>
+          <td class="paramname"><em>telemType</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stop pulling the latest telemetry data from the given device. </p>
+<p>This method is NOT thread safe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The device group and serial number of the device. </td></tr>
+    <tr><td class="paramname">telemType</td><td>The type of telemetry to get, as dictated by the specific device specs. </td></tr>
   </table>
   </dd>
 </dl>
