@@ -214,7 +214,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName, 
-													 int32_t jointPos) {
+													 int32_t jointPos) {										
 	json msg = {{"type", JOINT_POSITION_REQ_TYPE}, {"joint", jointName}, {"position", jointPos}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);				
 }
@@ -369,9 +369,11 @@ void MissionControlProtocol::jointPosReportTask() {
 		for (auto cur = robot::types::name_to_jointid.begin(); 
 			 cur != robot::types::name_to_jointid.end(); cur++) {
 			robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur->second);
-			auto frozenStr = cur->first;
-			std::string str(frozenStr.data(), frozenStr.size());
-			sendJointPositionReport(str, jpos.getData());
+			if (jpos.isValid()) {
+				auto frozenStr = cur->first;
+				std::string str(frozenStr.data(), frozenStr.size());
+				sendJointPositionReport(str, jpos.getData());
+			}
 		}
 
 		std::this_thread::sleep_until(pt + JOINT_POS_REPORT_PERIOD);
