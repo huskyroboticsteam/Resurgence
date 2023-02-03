@@ -27,8 +27,7 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
-const std::chrono::duration
-	<double, std::chrono::milliseconds::period> JOINT_POS_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -363,7 +362,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 }
 
 void MissionControlProtocol::jointPosReportTask() {
-	datatime_t pt = dataclock::now();
+	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
 		for (auto cur = robot::types::name_to_jointid.begin(); 
@@ -376,8 +375,8 @@ void MissionControlProtocol::jointPosReportTask() {
 			}
 		}
 
-		std::this_thread::sleep_until(pt + JOINT_POS_REPORT_PERIOD);
-		pt = dataclock::now();
+		pt += JOINT_POS_REPORT_PERIOD;
+		std::this_thread::sleep_until(pt);
 	}
 }
 
