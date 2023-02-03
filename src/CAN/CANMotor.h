@@ -129,8 +129,8 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target);
  * This only reports the cached position, it does not poll the motor board for new data.
  *
  * @param serial The serial number of the motor board.
- * @return robot::types::DataPoint<int32_t> The position data of the given motor. If no
- * position data has been received, returns an empty data point.
+ * @return robot::types::DataPoint<int32_t> The position data of the given motor, in millidegrees. 
+ * If no position data has been received, returns an empty data point.
  */
 robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial);
 
