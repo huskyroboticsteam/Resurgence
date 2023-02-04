@@ -214,7 +214,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName, 
 													 int32_t jointPos) {										
-	json msg = {{"type", JOINT_POSITION_REQ_TYPE}, {"joint", jointName}, {"position", jointPos}};
+	json msg = {{"type", JOINT_POSITION_REP_TYPE}, {"joint", jointName}, {"position", jointPos}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);				
 }
 
