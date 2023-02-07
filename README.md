@@ -76,15 +76,16 @@ cd ~
 git clone https://github.com/huskyroboticsteam/Resurgence/
 ``` 
 
-### Install HindsightCAN
-This is a library developed by Electronics for interfacing with their
+### Install Team Repositories
+We have a few team libraries that we maintain internally.
+HindsightCAN, for example, is a library developed by Electronics for interfacing with their
 motors and sensors over the
 [CAN](https://en.wikipedia.org/wiki/CAN_bus) bus; it is needed for packet definitions and utility functions and doesn't actually require support for a physical CAN bus.
 
 
 Assuming the Ubuntu repository has been set up:
 ```bash
-sudo apt install hindsight-can
+sudo apt install hindsight-can h264encoder
 ```
 
 ### Install OpenCV
