@@ -210,6 +210,8 @@ navtypes::URCLeg getLeg(int index);
  */
 void setIndicator(types::indication_t signal);
 
+// TODO: do I need to remove this since it's now in the motor class?
+
 /**
  * @brief Set the PWM command of the given motor.
  *
