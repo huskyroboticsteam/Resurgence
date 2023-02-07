@@ -241,6 +241,7 @@ void setMotorPower(robot::types::motorid_t motor, double power) {
 	can::motor::setMotorPower(serial, power);
 }
 
+// TODO: should be removed?
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
 	can::deviceserial_t serial = motorSerialIDMap.at(motor);
 	ensureMotorMode(motor, motormode_t::pid);
