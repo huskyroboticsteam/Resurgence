@@ -15,17 +15,17 @@ class can_motor: public base_motor {
          * @param motor The motor id to manipulate.
          * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
          */
-		can_motor(robot::types::motorid_t motor, bool hasPosSensor) {}
+		can_motor(robot::types::motorid_t motor, bool hasPosSensor);
 
-		bool hasPositionSensor() const {}
+		bool hasPositionSensor() const;
 
-		void setMotorPower(double power) {}
+		void setMotorPower(double power);
 
-		void setMotorPos(int32_t targetPos) {}
+		void setMotorPos(int32_t targetPos);
 
-        types::DataPoint<int32_t> getMotorPos() const {}
+        types::DataPoint<int32_t> getMotorPos() const;
 
-		void setMotorVel(int32_t targetVel) {}
-
-}; // class can_motor
+    private:
+        void constructVelController();
+}; // class can
 } // namespace robot

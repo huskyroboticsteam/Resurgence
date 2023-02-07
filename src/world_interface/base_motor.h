@@ -2,6 +2,9 @@
 
 #include "data.h"
 #include "../control/JacobianVelController.h"
+#include "../utils/scheduler.h"
+
+using namespace std::chrono_literals;
 
 /**
  * @namespace robot
@@ -15,8 +18,7 @@ namespace robot {
 class base_motor {
 public:
 
-    // TODO: spin up thread in constructor, use it for setMotorVel -> suspend this thread if motor 
-    // position is set (use a state)
+    // TODO: spin up thread in constructor, use it for setMotorVel (static mutex lock)
 
     /**
      * @brief Default constructor for base motor.
@@ -61,10 +63,82 @@ public:
      *
      * @param targetVel The target velocity, in millidegrees per second.
      */
-    virtual void setMotorVel(int32_t targetVel) = 0;
+    void setMotorVel(int32_t targetVel) {
+        // create a velocity controller if it's not already initialized
+        if (!velController) {
+            constructVelController();
+        }
+        assert(("Vel controller is initialized", velController));
+
+        // set velocity target
+        navtypes::Vectord<1> velocityVector {targetVel};
+        types::datatime_t currTime = types::dataclock::now();
+        velController->setTarget(currTime, velocityVector);
+        assert(("Target velocity should be set in setMotorVel", velController->hasTarget()));
+
+        // check to see if the event exists. if yes, unschedule it
+        resetEventID();
+
+        // schedule position event
+        velEventID = pSched.scheduleEvent(100ms, [&]() -> void {
+                        types::datatime_t currTime = types::dataclock::now();
+                        const navtypes::Vectord<1> currPos {getMotorPos().getData()};
+                        navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
+                        // TODO: is there only one position value in the matrix?
+                        setMotorPos(posCommand.coeff(0, 0));
+                    });
+    }
 
 protected:
     robot::types::motorid_t motor_id;
     bool posSensor;
+    static util::PeriodicScheduler<std::chrono::steady_clock> pSched;
+    std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
+    std::optional<JacobianVelController<1, 1>> velController;
+
+    /**
+     * @brief Constructs a Jacobian Vel Controller
+     *
+     */
+    void constructVelController() {
+        types::DataPoint<int32_t> motorPos = getMotorPos();
+        if (!motorPos.isValid()) {
+            return;
+        }
+        constexpr int32_t inputDim = 1;
+        constexpr int32_t outputDim = 1;
+
+        // create vector for motor position
+        navtypes::Vectord<inputDim> posVector {motorPos.getData()};
+
+        // create kinematics function (input and output will both be the current motor position)
+        const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>& kinematicsFunct = 
+            [](const navtypes::Vectord<inputDim>& inputVec)->navtypes::Vectord<outputDim> { 
+            // returns a copy of the input vector
+            navtypes::Vectord<outputDim> res {inputVec(0)};
+            return res; }
+        ;
+
+        // create jacobian function (value will be 1 since it's the derivative of the kinematics function)
+        const std::function<navtypes::Matrixd<outputDim, inputDim>(const navtypes::Vectord<inputDim>&)>& jacobianFunct = 
+            [](const navtypes::Vectord<inputDim>& inputVec)->navtypes::Matrixd<outputDim, inputDim> { 
+                navtypes::Matrixd<outputDim, inputDim> res = navtypes::Matrixd<outputDim, inputDim>::Ones();
+            }
+        ;
+
+        velController = {kinematicsFunct, jacobianFunct};
+    }
+
+    /**
+     * @brief Unschedules the velocity event if it exists
+     *
+     */
+    void resetEventID() {
+        if (velEventID) {
+            pSched.removeEvent(velEventID.value());
+            velEventID.reset();
+        }
+        assert(("velEventId has been removed", !velEventID));
+    }
 }; // abstract class base_motor
 } // namespace robot

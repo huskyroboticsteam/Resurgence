@@ -21,21 +21,19 @@ class sim_motor: public base_motor {
          * @param name The name of the motor.
          * @param protocol_path Websocket protocol path.
          */
-		sim_motor(robot::types::motorid_t motor, bool hasPosSensor, std::string name, std::string protocol_path) {}
+		sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name, const std::string& path);
 
-		bool hasPositionSensor() const {}
+		bool hasPositionSensor() const;
 
-		void setMotorPower(double power) {}
+		void setMotorPower(double power);
 
-		void setMotorPos(int32_t targetPos) {}
+		void setMotorPos(int32_t targetPos);
 
-        types::DataPoint<int32_t> getMotorPos() const {}
-
-		void setMotorVel(int32_t targetVel) {}
+        types::DataPoint<int32_t> getMotorPos() const;
 
     private:
         std::string motor_name;
         std::string protocol_path;
-        void sendJSON(const json& obj) {}
+        void sendJSON(const json& obj);
 }; // class sim_motor
 } // namespace robot

@@ -62,6 +62,8 @@ types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
 	return {};
 }
 
+void setMotorVel(int32_t targetVel) {}
+
 void setIndicator(indication_t signal) {}
 
 callbackid_t addLimitSwitchCallback(
