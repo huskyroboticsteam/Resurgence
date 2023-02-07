@@ -2,15 +2,21 @@
 #include <string>
 #include <vector>
 #include <opencv2/core/core.hpp>
+// need Encoder include
+
+class Encoder {  // delete once Encoder is included
+
+};
 
 namespace video {
 class H264Encoder {
 private:
-    Encoder encoder;
+    std::unique_ptr<Encoder> encoder;
     bool flag;
+    int fps;
 
 public:
-    H264Encoder(int width, int height, int fps);
+    H264Encoder(int fps);
 
     /**
      * Frame must be the same resolution as passed in the constructor.

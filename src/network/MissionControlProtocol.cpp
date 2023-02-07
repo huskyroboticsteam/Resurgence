@@ -199,6 +199,9 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		this->_open_streams[cam] = 0;
+		if (this->_camera_encoders.find(cam) == this->_camera_encoders.end()) {
+			this->_camera_encoders[cam] = std::make_shared<video::H264Encoder>(j["fps"]);
+		}
 	}
 }
 
@@ -210,6 +213,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
 	std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 	this->_open_streams.erase(cam);
+	this->_camera_encoders.erase(cam);
 }
 
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
@@ -221,8 +225,8 @@ void MissionControlProtocol::sendJointPositionReport(const std::string& jointNam
 }
 
 void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
-													const std::string& b64_data) {
-	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+													const std::basic_string<uint8_t>& nal_data) {
+	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", nal_data}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
@@ -286,7 +290,7 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),_open_streams(),
 	  _last_joint_power(), _joint_repeat_running(false) {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
@@ -399,16 +403,20 @@ void MissionControlProtocol::videoStreamTask() {
 			if (robot::hasNewCameraFrame(cam, frame_num)) {
 				// if there is a new frame, grab it
 				auto camDP = robot::readCamera(cam);
+
 				if (camDP) {
 					auto data = camDP.getData();
 					uint32_t& new_frame_num = data.second;
 					cv::Mat frame = data.first;
 					// update the previous frame number
 					this->_open_streams[cam] = new_frame_num;
-
-					// convert frame to base64 and send it
-					std::string b64_data = base64::encodeMat(frame, ".jpg");
-					sendCameraStreamReport(cam, b64_data);
+					const auto& encoder = this->_camera_encoders[cam];
+					
+					// convert frame to nals and send it
+					auto nals_vector = encoder->encode_frame(frame);
+					for (auto nal_string : nals_vector) {  // for each nal, send it.
+						sendCameraStreamReport(cam, nal_string);
+					}
 				}
 			}
 
