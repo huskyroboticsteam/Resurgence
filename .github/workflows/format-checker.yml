@@ -1,0 +1,28 @@
+name: Check Formatting
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Install dependencies from APT
+      run: |
+        sudo apt install -y git clang-format
+    - name: Check Formatting
+      run: |
+        cd ${{ github.workspace }}
+        git reset --soft $(git merge-base HEAD origin/master)
+        diff=$(git clang-format --diff)
+        if [ $(echo "${diff}" | wc -l) != 1 ]; then
+          echo "Formatting errors detected! Suggested changes:" >&2
+          echo "${diff}" >&2
+          exit 1
+        else
+          echo "No formatting errors detected!"
+          exit 0
+        fi
