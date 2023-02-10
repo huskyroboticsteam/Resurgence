@@ -1,13 +1,28 @@
 name: Check Formatting
-on: [push, pull_request]
+
+on: [pull_request]
+
 jobs:
-  formatting-check:
-    name: Formatting Check
+  build:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Run clang-format style check for C/C++/Protobuf programs.
-      uses: jidicula/clang-format-action@v4.10.2
+    - name: Checkout
+      uses: actions/checkout@v1
       with:
-        clang-format-version: '13'
-        check-path: 'src'
+        submodules: true
+    - name: Install dependencies from APT
+      run: |
+        sudo apt install git clang-format
+    - name: Check Formatting
+      run: |
+        cd ${{ github.workspace }}
+        git reset --soft $(git merge-base HEAD origin/master)
+        diff=$(git clang-format --diff)
+        if [ $(echo "${diff}" | wc -l) != 1 ]; then
+          echo "Formatting errors detected! Suggested changes:" >&2
+          echo "${diff}" >&2
+          exit 1
+        else
+          echo "No formatting errors detected!"
+          exit 0
+        fi
