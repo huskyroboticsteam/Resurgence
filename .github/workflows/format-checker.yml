@@ -12,7 +12,7 @@ jobs:
         submodules: true
     - name: Install dependencies from APT
       run: |
-        sudo apt install git clang-format
+        sudo apt install -y git clang-format
     - name: Check Formatting
       run: |
         cd ${{ github.workspace }}
