@@ -214,8 +214,10 @@ void MissionControlProtocol::handleConnection() {
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
 
-	if (Globals::mountedPeripheral != mountedperipheral_t::none) {
-		j["peripheral"] =  util::to_string(Globals::mountedPeripheral);
+	if (Globals::mountedPeripheral == mountedperipheral_t::none) {
+		j["peripheral"] = json(nullptr); 
+	} else {
+		j["peripheral"] = util::to_string(Globals::mountedPeripheral);
 	}
 
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
