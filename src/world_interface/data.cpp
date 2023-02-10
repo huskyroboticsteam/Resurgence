@@ -55,8 +55,31 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "<unknown>";
 	}
 }
+
 std::string to_string(const robot::types::CameraID& id) {
 	return id;
+}
+
+std::string to_string(robot::types::mountedperipheral_t peripheral) {
+	using robot::types::mountedperipheral_t;
+
+	switch (peripheral) {
+		case mountedperipheral_t::none:
+			return "none";
+
+		case mountedperipheral_t::arm:
+			return "arm";
+
+		case mountedperipheral_t::lidar:
+			return "lidar";
+
+		case mountedperipheral_t::scienceStation:
+			return "scienceStation";
+
+		default:
+			// should never happen
+			return "<unknown>";
+	}
 }
 
 } // namespace util
