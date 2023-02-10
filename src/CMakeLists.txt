@@ -118,7 +118,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(HindsightCAN 1.1.2 REQUIRED)
 
 # Find the H264 encoder library
-find_package(H264Encoder 1.1.0 REQUIRED)
+find_package(H264Encoder 1.1.1 REQUIRED)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
