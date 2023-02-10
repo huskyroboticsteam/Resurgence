@@ -20,6 +20,7 @@ using std::placeholders::_1;
 using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
+using robot::types::mountedperipheral_t;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
