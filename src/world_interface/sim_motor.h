@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../world_interface/base_motor.h"
 #include "../network/websocket/WebSocketProtocol.h"
+#include "../world_interface/base_motor.h"
+
 #include <nlohmann/json.hpp>
 
 using nlohmann::json;
@@ -11,29 +12,28 @@ using nlohmann::json;
  * @brief Collection of functions for manipulating a motor.
  */
 namespace robot {
-class sim_motor: public base_motor {
-    public: 
-        /**
-         * @brief Constructor for can motor.
-         *
-         * @param motor The motor id to manipulate.
-         * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
-         * @param name The name of the motor.
-         * @param protocol_path Websocket protocol path.
-         */
-		sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name, const std::string& path);
+class sim_motor : public base_motor {
+public:
+	/**
+	 * @brief Constructor for can motor.
+	 *
+	 * @param motor The motor id to manipulate.
+	 * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
+	 * @param name The name of the motor.
+	 * @param protocol_path Websocket protocol path.
+	 */
+	sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name,
+			  const std::string& path);
 
-		bool hasPositionSensor() const;
+	void setMotorPower(double power);
 
-		void setMotorPower(double power);
+	void setMotorPos(int32_t targetPos);
 
-		void setMotorPos(int32_t targetPos);
+	types::DataPoint<int32_t> getMotorPos() const;
 
-        types::DataPoint<int32_t> getMotorPos() const;
-
-    private:
-        std::string motor_name;
-        std::string protocol_path;
-        void sendJSON(const json& obj);
+private:
+	std::string motor_name;
+	std::string protocol_path;
+	void sendJSON(const json& obj);
 }; // class sim_motor
 } // namespace robot
