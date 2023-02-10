@@ -61,6 +61,14 @@ enum class motorid_t {
 	hand
 };
 
+/** @brief the mounted peripheral on the robot. */
+enum class mountedperipheral_t {
+	none,
+	arm,
+	scienceStation,
+	lidar
+};
+
 enum class jointid_t {
 	armBase,
 	shoulder,
@@ -289,4 +297,5 @@ private:
 namespace util {
 std::string to_string(robot::types::jointid_t joint);
 std::string to_string(const robot::types::CameraID& id);
+std::string to_string(robot::types::mountedperipheral_t peripheral);
 } // namespace util
