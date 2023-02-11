@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../gps/gps_util.h"
-#include "../navtypes.h"
-#include "data.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../kinematics/DiffWristKinematics.h"
+#include "../navtypes.h"
+#include "data.h"
 
 #include <optional>
 #include <unordered_set>
@@ -220,7 +220,7 @@ void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
  * @brief Get the last reported position of the specified motor.
  *
  * @param motor The motor to get the position from.
- * @return types::DataPoint<int32_t> The last reported position of the motor in millidegrees, 
+ * @return types::DataPoint<int32_t> The last reported position of the motor in millidegrees,
  * if it exists. If the motor has not reported a position (because it hasn't been received yet
  * or if it doesn't have an encoder) then an empty data point is returned.
  */

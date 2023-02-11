@@ -60,7 +60,7 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 
 /**
  * @brief Initialize a potentiometer attached to the given motor.
- * 
+ *
  * @param serial The CAN serial number of the motor board.
  * @param posLo The joint position that corresponds to @p adcLo
  * @param posHi The joint position that corresponds to @p adcHi
@@ -70,7 +70,8 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
  * The telemetry will be fetched at this period automatically. An empty optional disables this
  * behavior, in which case the motor position must be explicitly pulled.
  */
-void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo, uint16_t adcHi,
+void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo,
+					   uint16_t adcHi,
 					   std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**
@@ -129,8 +130,8 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target);
  * This only reports the cached position, it does not poll the motor board for new data.
  *
  * @param serial The serial number of the motor board.
- * @return robot::types::DataPoint<int32_t> The position data of the given motor, in millidegrees. 
- * If no position data has been received, returns an empty data point.
+ * @return robot::types::DataPoint<int32_t> The position data of the given motor, in
+ * millidegrees. If no position data has been received, returns an empty data point.
  */
 robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial);
 
