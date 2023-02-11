@@ -6,6 +6,8 @@
 #include "../log.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
+#include "../world_interface/data.h"
+#include "../world_interface/world_interface.h"
 
 #include <functional>
 #include <mutex>
@@ -26,6 +28,8 @@ using std::placeholders::_1;
 using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
+
+const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
 
 const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
 
