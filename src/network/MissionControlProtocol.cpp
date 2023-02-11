@@ -6,8 +6,6 @@
 #include "../log.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
-#include "../world_interface/data.h"
-#include "../world_interface/world_interface.h"
 
 #include <functional>
 #include <mutex>
