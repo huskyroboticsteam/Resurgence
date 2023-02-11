@@ -10,6 +10,8 @@
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../navtypes.h"
+#include "base_motor.h"
+#include "can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
 
@@ -67,6 +69,12 @@ void initMotors() {
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftWheel));
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
 
+	// initialize motor objects and add them to map
+	addMotorMapping(motorid_t::frontLeftWheel, true);
+	addMotorMapping(motorid_t::frontRightWheel, true);
+	addMotorMapping(motorid_t::rearLeftWheel, true);
+	addMotorMapping(motorid_t::rearRightWheel, true);
+
 	for (motorid_t motor : pidMotors) {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		bool invEnc = motorEncInvMap.at(motor);
@@ -75,9 +83,18 @@ void initMotors() {
 		can::motor::initMotor(serial);
 		can::motor::initEncoder(serial, invEnc, true, ppjr, TELEM_PERIOD);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
+
+		// initialize motor objects and add them to map
+		addMotorMapping(motor, true);
 	}
 
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
+	addMotorMapping(motorid_t::hand, true);
+}
+
+void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+	std::shared_ptr<robot::base_motor> ptr(new can_motor(motor, hasPosSensor));
+	motor_ptrs.insert({motor, ptr});
 }
 
 void setupCameras() {
@@ -122,16 +139,15 @@ void world_interface_init() {
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
-	auto itr = motor_ptrs.find(motor);  
-     
-    if (itr == motor_ptrs.end()) {  
+	auto itr = motor_ptrs.find(motor);
+
+	if (itr == motor_ptrs.end()) {
 		// motor id not in map
 		return nullptr;
-    }   
-    else {  
-        // return motor object pointer
-        return itr->second;
-    }
+	} else {
+		// return motor object pointer
+		return itr->second;
+	}
 }
 
 std::unordered_set<CameraID> getCameras() {
@@ -231,28 +247,27 @@ template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 }
 
 void setMotorPower(robot::types::motorid_t motor, double power) {
-	can::deviceserial_t serial = motorSerialIDMap.at(motor);
-	auto& scaleMap = power < 0 ? negative_pwm_scales : positive_pwm_scales;
-	auto entry = scaleMap.find(motor);
-	if (entry != scaleMap.end()) {
-		power *= entry->second;
-	}
-	ensureMotorMode(motor, motormode_t::pwm);
-	can::motor::setMotorPower(serial, power);
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorPower(power);
 }
 
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
-	can::deviceserial_t serial = motorSerialIDMap.at(motor);
-	ensureMotorMode(motor, motormode_t::pid);
-	can::motor::setMotorPIDTarget(serial, targetPos);
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorPos(targetPos);
+}
+
+types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	return motor_ptr->getMotorPos();
+}
+
+void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorVel(targetVel);
 }
 
 // TODO: implement
 void setIndicator(indication_t signal) {}
-
-types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
-	return can::motor::getMotorPosition(motorSerialIDMap.at(motor));
-}
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,

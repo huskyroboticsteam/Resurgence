@@ -1,6 +1,5 @@
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../network/websocket/WebSocketProtocol.h"
 #include "../Util.h"
 #include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
@@ -9,6 +8,9 @@
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
 #include "../navtypes.h"
+#include "../network/websocket/WebSocketProtocol.h"
+#include "base_motor.h"
+#include "sim_motor.h"
 #include "world_interface.h"
 
 #include <atomic>
@@ -80,23 +82,21 @@ void sendJSON(const json& obj) {
 	Globals::websocketServer.sendJSON(PROTOCOL_PATH, obj);
 }
 
-
-static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d=std::nullopt, uint8_t fps = 20, uint16_t width = 640,
-					   uint16_t height = 480) {
-	if (list1d){
-				json msg = {{"type", "simCameraStreamOpenRequest"}, 
-							{"camera", cam}, 
-							{"fps", fps}, 
-							{"width", width}, 
-							{"height", height}, 
-							{"intrinsics", list1d.value()}};
-				sendJSON(msg);
-	}
-	else{
-		json msg = {{"type", "simCameraStreamOpenRequest"}, 
-					{"camera", cam}, 
-					{"fps", fps}, 
-					{"width", width}, 
+static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
+					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
+	if (list1d) {
+		json msg = {{"type", "simCameraStreamOpenRequest"},
+					{"camera", cam},
+					{"fps", fps},
+					{"width", width},
+					{"height", height},
+					{"intrinsics", list1d.value()}};
+		sendJSON(msg);
+	} else {
+		json msg = {{"type", "simCameraStreamOpenRequest"},
+					{"camera", cam},
+					{"fps", fps},
+					{"width", width},
 					{"height", height},
 					{"intrinsics", nullptr}};
 		sendJSON(msg);
@@ -106,10 +106,18 @@ static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d=s
 void initCameras() {
 	auto cfg = cam::readConfigFromFile(Constants::AR_CAMERA_CONFIG_PATH);
 	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
-	//openCamera(Constants::AR_CAMERA_ID);
+	// openCamera(Constants::AR_CAMERA_ID);
 	openCamera("front", cfg.intrinsicParams->getIntrinsicList());
 	openCamera("rear", cfg.intrinsicParams->getIntrinsicList());
 	openCamera("upperArm", cfg.intrinsicParams->getIntrinsicList());
+}
+
+void initMotors() {
+	// initializes map of motor ids and shared ptrs of their objects
+	for (auto const& x : motorNameMap) {
+		std::shared_ptr<robot::base_motor> ptr(new robot::sim_motor(x.first, true, x.second, PROTOCOL_PATH));
+		robot::motor_ptrs.insert({x.first, ptr});
+	}
 }
 
 void handleGPS(json msg) {
@@ -247,7 +255,7 @@ namespace robot {
 namespace {
 DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 DiffWristKinematics wrist_kinematics;
-}
+} // namespace
 
 const DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
@@ -262,24 +270,24 @@ extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 void world_interface_init() {
 	initSimServer();
 	initCameras();
+	initMotors();
 
 	AR::initializeLandmarkDetection();
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
-	auto itr = motor_ptrs.find(motor);  
-     
-    if (itr == motor_ptrs.end()) {  
+	auto itr = motor_ptrs.find(motor);
+
+	if (itr == motor_ptrs.end()) {
 		// motor id not in map
 		return nullptr;
-    }   
-    else {  
-        // return motor object pointer
-        return itr->second;
-    }
+	} else {
+		// return motor object pointer
+		return itr->second;
+	}
 }
 
-std::unordered_set<CameraID> getCameras(){
+std::unordered_set<CameraID> getCameras() {
 	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
 	return util::keySet(cameraLastFrameIdxMap);
 }
@@ -361,15 +369,13 @@ URCLeg getLeg(int index) {
 }
 
 void setMotorPower(motorid_t motor, double normalizedPWM) {
-	std::string name = motorNameMap.at(motor);
-	json msg = {{"type", "simMotorPowerRequest"}, {"motor", name}, {"power", normalizedPWM}};
-	sendJSON(msg);
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorPower(normalizedPWM);
 }
 
 void setMotorPos(motorid_t motor, int32_t targetPos) {
-	std::string name = motorNameMap.at(motor);
-	json msg = {{"type", "simMotorPositionRequest"}, {"motor", name}, {"position", targetPos}};
-	sendJSON(msg);
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorPos(targetPos);
 }
 
 DataPoint<int32_t> getMotorPos(motorid_t motor) {
@@ -381,6 +387,11 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 	} else {
 		return {};
 	}
+}
+
+void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorVel(targetVel);
 }
 
 callbackid_t addLimitSwitchCallback(

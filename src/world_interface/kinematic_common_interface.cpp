@@ -1,17 +1,17 @@
+#include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../Util.h"
-#include "../kinematics/DiffDriveKinematics.h"
 #include "../control/JacobianVelController.h"
-#include "../CAN/CANUtils.h"
+#include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
 #include "../navtypes.h"
-#include "world_interface.h"
 #include "real_world_constants.h"
+#include "world_interface.h"
 
+#include <atomic>
 #include <chrono>
 #include <mutex>
-#include <atomic>
 
 using namespace navtypes;
 using namespace robot::types;
@@ -87,19 +87,6 @@ double setCmdVel(double dtheta, double dx) {
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
 
-std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
-	auto itr = motor_ptrs.find(motor);  
-     
-    if (itr == motor_ptrs.end()) {  
-		// motor id not in map
-		return nullptr;
-    }   
-    else {  
-        // return motor object pointer
-        return itr->second;
-    }
-}
-
 std::pair<double, double> getCmdVel() {
 	double l = commandedWheelVel.lVel;
 	double r = commandedWheelVel.rVel;
@@ -149,7 +136,7 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	}
 }
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
-	if(jointMotorMap.find(joint) != jointMotorMap.end()){
+	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
 		return getMotorPos(jointMotorMap.at(joint));
 	}
 	// FIXME: need to do some extra work for differential - we will have to figure out which
@@ -165,7 +152,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 }
 
 namespace {
-void setJointPowerValue(types::jointid_t joint, double power){
+void setJointPowerValue(types::jointid_t joint, double power) {
 	// make sure power value is normalized
 	if (std::abs(power) > 1) {
 		power /= std::abs(power);
@@ -188,6 +175,20 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 
 	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
 		setMotorPower(jointMotorMap.at(joint), power);
+	} else if (joint == jointid_t::differentialPitch) {
+		float pitchPwr = power;
+		float rollPwr = getJointPowerValue(jointid_t::differentialRoll);
+		gearpos_t gearPwr =
+			wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
+		setMotorPower(motorid_t::differentialLeft, gearPwr.left);
+		setMotorPower(motorid_t::differentialRight, gearPwr.right);
+	} else if (joint == jointid_t::differentialRoll) {
+		float pitchPwr = getJointPowerValue(jointid_t::differentialPitch);
+		float rollPwr = power;
+		gearpos_t gearPwr =
+			wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
+		setMotorPower(motorid_t::differentialLeft, gearPwr.left);
+		setMotorPower(motorid_t::differentialRight, gearPwr.right);
 	} else {
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());

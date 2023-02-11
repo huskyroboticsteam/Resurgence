@@ -1,9 +1,9 @@
 #pragma once
-// #include "data.h"
+#include "data.h"
 #include "../control/JacobianVelController.h"
 #include "../utils/scheduler.h"
 
-// using namespace std::chrono_literals;
+using namespace std::chrono_literals;
 
 /**
  * @namespace robot
@@ -16,15 +16,21 @@ namespace robot {
  */
 class base_motor {
 public:
-	// TODO: spin up thread in constructor, use it for setMotorVel (static mutex lock)
-
 	/**
 	 * @brief Constructor for base motor.
-     * 
-     * @param motor The motor id to manipulate.
+	 *
+	 * @param motor The motor id to manipulate.
 	 * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
 	 */
-	base_motor(robot::types::motorid_t motor, bool hasPosSensor) : motor_id(motor), posSensor(hasPosSensor) {};
+	base_motor(robot::types::motorid_t motor, bool hasPosSensor)
+		: motor_id(motor), posSensor(hasPosSensor) {
+		// create scheduler if needed
+		mtx.lock();
+		if (!pSched) {
+			pSched.emplace();
+		}
+		mtx.unlock();
+	};
 
 	/**
 	 * @brief Returns the status of the motor position sensor.
@@ -68,9 +74,10 @@ public:
 protected:
 	robot::types::motorid_t motor_id;
 	bool posSensor;
-	static util::PeriodicScheduler<std::chrono::steady_clock> pSched;
+	static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
 	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
 	std::optional<JacobianVelController<1, 1>> velController;
+	static std::mutex mtx;
 
 	/**
 	 * @brief Constructs a Jacobian Vel Controller

@@ -7,7 +7,8 @@ namespace robot {
 class sim_motor : public base_motor {
 public:
 	sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name,
-			  const std::string& path) : base_motor(motor, hasPosSensor), motor_name(name), protocol_path(path) {}
+			  const std::string& path)
+		: base_motor(motor, hasPosSensor), motor_name(name), protocol_path(path) {}
 
 	void setMotorPower(double power) {
 		// unschedule velocity event if exists
@@ -28,6 +29,7 @@ public:
 	}
 
 	types::DataPoint<int32_t> getMotorPos() const {
+		// this calles the method implementation in world interface
 		robot::getMotorPos(motor_id);
 	}
 

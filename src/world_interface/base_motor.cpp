@@ -1,8 +1,4 @@
-#include "data.h"
 #include "base_motor.h"
-
-
-using namespace std::chrono_literals;
 
 namespace robot {
     bool base_motor::hasPositionSensor() const {
@@ -24,7 +20,7 @@ namespace robot {
         base_motor::resetEventID();
 
         // schedule position event
-        velEventID = pSched.scheduleEvent(100ms, [&]() -> void {
+        velEventID = pSched->scheduleEvent(100ms, [&]() -> void {
             types::datatime_t currTime = types::dataclock::now();
             const navtypes::Vectord<1> currPos{getMotorPos().getData()};
             navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
@@ -47,7 +43,7 @@ namespace robot {
 		// create kinematics function (input and output will both be the current motor
 		// position)
 		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>& kinematicsFunct = 
-            [](const navtypes::Vectord<inputDim>& inputVec)->navtypes::Vectord<outputDim> { 
+            [](const navtypes::Vectord<inputDim>& inputVec) { 
                 // returns a copy of the input vector
                 navtypes::Vectord<outputDim> res {inputVec(0)};
                 return res; 
@@ -56,8 +52,9 @@ namespace robot {
         // create jacobian function (value will be 1 since it's the derivative of the 
         // kinematics function)
         const std::function<navtypes::Matrixd<outputDim, inputDim>(const navtypes::Vectord<inputDim>&)>& jacobianFunct = 
-            [](const navtypes::Vectord<inputDim>& inputVec)->navtypes::Matrixd<outputDim, inputDim> { 
+            [](const navtypes::Vectord<inputDim>& inputVec) { 
                 navtypes::Matrixd<outputDim, inputDim> res = navtypes::Matrixd<outputDim, inputDim>::Ones();
+                return res;
             };
 
 		velController.emplace(kinematicsFunct, jacobianFunct);
@@ -65,7 +62,7 @@ namespace robot {
 
     void base_motor::resetEventID() {
 		if (velEventID) {
-			pSched.removeEvent(velEventID.value());
+			pSched->removeEvent(velEventID.value());
 			velEventID.reset();
 		}
 	}
