@@ -7,13 +7,13 @@
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
 
+#include <chrono>
 #include <functional>
 #include <mutex>
 #include <shared_mutex>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
-#include <chrono>
 
 using namespace robot::types;
 using namespace std::chrono_literals;
@@ -22,11 +22,11 @@ namespace net {
 namespace mc {
 
 using val_t = json::value_t;
+using robot::types::mountedperipheral_t;
 using std::placeholders::_1;
 using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
-using robot::types::mountedperipheral_t;
 
 const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
 
@@ -213,10 +213,11 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	this->_open_streams.erase(cam);
 }
 
-void MissionControlProtocol::sendJointPositionReport(const std::string& jointName, 
-													 int32_t jointPos) {										
-	json msg = {{"type", JOINT_POSITION_REP_TYPE}, {"joint", jointName}, {"position", jointPos}};
-	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);				
+void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
+													 int32_t jointPos) {
+	json msg = {
+		{"type", JOINT_POSITION_REP_TYPE}, {"joint", jointName}, {"position", jointPos}};
+	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
 void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
@@ -230,7 +231,7 @@ void MissionControlProtocol::handleConnection() {
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
 
 	if (Globals::mountedPeripheral == mountedperipheral_t::none) {
-		j["peripheral"] = json(nullptr); 
+		j["peripheral"] = json(nullptr);
 	} else {
 		j["peripheral"] = util::to_string(Globals::mountedPeripheral);
 	}
@@ -329,7 +330,8 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
 
 	// Joint position reporting
-	this->_joint_report_thread = std::thread(&MissionControlProtocol::jointPosReportTask, this);
+	this->_joint_report_thread =
+		std::thread(&MissionControlProtocol::jointPosReportTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
@@ -373,7 +375,7 @@ void MissionControlProtocol::jointPosReportTask() {
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
-		for (auto cur = robot::types::name_to_jointid.begin(); 
+		for (auto cur = robot::types::name_to_jointid.begin();
 			 cur != robot::types::name_to_jointid.end(); cur++) {
 			robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur->second);
 			if (jpos.isValid()) {
