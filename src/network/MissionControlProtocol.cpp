@@ -31,8 +31,6 @@ using websocket::validator_t;
 
 const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
 
-const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
-
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
