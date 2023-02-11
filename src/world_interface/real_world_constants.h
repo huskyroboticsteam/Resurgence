@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
 #include <frozen/unordered_map.h>
 #include <frozen/unordered_set.h>
@@ -81,6 +82,12 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wrist, DEVICE_SERIAL_MOTOR_WRIST},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
+
+// TODO: verify limit switch limits
+/** @brief Maps motors to their corresponding limit switch limits, if they have them. */
+constexpr auto limitSwitchLimitsMap =
+	frozen::make_unordered_map<motorid_t, std::pair<int32_t, int32_t>>(
+		{{motorid_t::shoulder, {-90000, 90000}}, {motorid_t::elbow, {-90000, 90000}}});
 
 // TODO: tune pid
 /** @brief A mapping of PID controlled motors to their pid coefficients. */

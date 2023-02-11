@@ -132,18 +132,36 @@ int main() {
 			std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
 			std::this_thread::sleep_for(20ms);
 		} else if (testMode == TestMode::LimitSwitch) {
+			static bool testLimits = false;
 			if (!mode_has_been_set) {
-				can::deviceid_t id = std::make_pair(can::devicegroup_t::motor, serial);
-				can::addDeviceTelemetryCallback(
-					id, can::telemtype_t::limit_switch,
-					[](can::deviceid_t id, can::telemtype_t telemType,
-					   DataPoint<can::telemetry_t> data) {
-						std::cout << "Motor Limit: serial=" << std::hex
-								  << static_cast<int>(id.second)
-								  << ", data=" << std::bitset<8>(data.getDataOrElse(0))
-								  << std::endl;
-					});
+				testLimits = static_cast<bool>(prompt("Set limits? 1=yes,0=no"));
+				if (testLimits) {
+					int lo = prompt("Low position");
+					int hi = prompt("High position");
+					std::chrono::milliseconds telemPeriod(prompt("Telemetry period (ms)"));
+					int ppjr = prompt("Pulses per joint revolution");
+					can::motor::initEncoder(serial, false, true, ppjr, telemPeriod);
+					can::motor::setLimitSwitchLimits(serial, lo, hi);
+				} else {
+					can::deviceid_t id = std::make_pair(can::devicegroup_t::motor, serial);
+					can::addDeviceTelemetryCallback(
+						id, can::telemtype_t::limit_switch,
+						[](can::deviceid_t id, can::telemtype_t telemType,
+						DataPoint<can::telemetry_t> data) {
+							std::cout << "Motor Limit: serial=" << std::hex
+									<< static_cast<int>(id.second)
+									<< ", data=" << std::bitset<8>(data.getDataOrElse(0))
+									<< std::endl;
+						});
+				}
 				mode_has_been_set = true;
+			}
+			if (testLimits) {
+				auto encoderData = can::motor::getMotorPosition(serial);
+				std::string encoderStr =
+					encoderData ? std::to_string(encoderData.getData()) : "null";
+				std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
+				std::this_thread::sleep_for(20ms);
 			}
 		} else if (testMode == TestMode::ScienceTelemetry) {
 			// Serial 0 seems to work. Nothing else (up to 17, the largest I tried)

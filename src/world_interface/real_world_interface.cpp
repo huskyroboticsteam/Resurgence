@@ -62,10 +62,9 @@ void ensureMotorMode(motorid_t motor, motormode_t mode) {
 }
 
 void initMotors() {
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontLeftWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontRightWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
+	for (const auto& it : motorSerialIDMap) {
+		can::motor::initMotor(it.second);
+	}
 
 	for (const auto& pot_motor_pair : robot::potMotors) {
 		motorid_t motor_id = pot_motor_pair.first;
@@ -97,7 +96,10 @@ void initMotors() {
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
 	}
 
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
+	for (const auto& it : limitSwitchLimitsMap) {
+		auto limits = it.second;
+		can::motor::setLimitSwitchLimits(motorSerialIDMap.at(it.first), limits.first, limits.second);
+	}
 }
 
 void setupCameras() {
