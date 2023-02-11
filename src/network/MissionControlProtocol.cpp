@@ -28,6 +28,7 @@ using std::placeholders::_1;
 using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
+using robot::types::mountedperipheral_t;
 
 const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
 
@@ -228,7 +229,17 @@ void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 
 void MissionControlProtocol::handleConnection() {
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
-	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", Globals::mountedPeripheral}};
+<<<<<<< HEAD
+=======
+	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
+
+	if (Globals::mountedPeripheral == mountedperipheral_t::none) {
+		j["peripheral"] = json(nullptr); 
+	} else {
+		j["peripheral"] = util::to_string(Globals::mountedPeripheral);
+	}
+
+>>>>>>> master
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 
 	if (!Globals::AUTONOMOUS) {

@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "Constants.h"
+#include "world_interface/data.h"
 
 #include <vector>
 #include <atomic>
@@ -9,5 +10,5 @@ RoverState curr_state;
 net::websocket::SingleClientWSServer websocketServer("DefaultServer", Constants::WS_SERVER_PORT);
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
-mountedperipheral_t mountedPeripheral = mountedperipheral_t::none;
+robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 } // namespace Globals
