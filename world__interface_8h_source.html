@@ -87,10 +87,10 @@ $(function() {
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;../gps/gps_util.h&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;../navtypes.h&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;data.h&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;../kinematics/DiffDriveKinematics.h&quot;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;../kinematics/DiffWristKinematics.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;../kinematics/DiffDriveKinematics.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;../kinematics/DiffWristKinematics.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;../navtypes.h&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;data.h&quot;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01016.html">optional</a>&gt;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00173.html">unordered_set</a>&gt;</span></div>
@@ -167,17 +167,17 @@ $(function() {
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span> </div>
 <div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="comment">// TODO: document</span></div>
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="keywordtype">void</span> setJointPower(robot::types::jointid_t joint, <span class="keywordtype">double</span> power);</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="comment">// TODO: document</span></div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="keywordtype">void</span> setJointPos(robot::types::jointid_t joint, <a class="code hl_typedefRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos);</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="comment">// TODO: document</span></div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>types::DataPoint&lt;int32_t&gt; getJointPos(robot::types::jointid_t joint);</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="comment">// TODO: document</span></div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="keywordtype">void</span> zeroJoint(robot::types::jointid_t joint);</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>} <span class="comment">// namespace robot</span></div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="keyword">namespace </span>gps {</div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><a class="code hl_class" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint&lt;navtypes::gpscoords_t&gt;</a> readGPSCoords();</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>} <span class="comment">// namespace gps</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span> </div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacerobot.html#a22bae8dc460f5d2413092e99d59c6c07">setJointPos</a>(robot::types::jointid_t joint, <a class="code hl_typedefRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>types::DataPoint&lt;int32_t&gt; <a class="code hl_function" href="namespacerobot.html#a0f7f6a213f9815daf709cdfb8aa975fe">getJointPos</a>(robot::types::jointid_t joint);</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="comment">// TODO: document</span></div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><span class="keywordtype">void</span> zeroJoint(robot::types::jointid_t joint);</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>} <span class="comment">// namespace robot</span></div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="keyword">namespace </span>gps {</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><a class="code hl_class" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint&lt;navtypes::gpscoords_t&gt;</a> readGPSCoords();</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>} <span class="comment">// namespace gps</span></div>
 <div class="ttc" id="aa00173_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00173.html">unordered_set</a></div></div>
 <div class="ttc" id="aa01016_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01016.html">optional</a></div></div>
 <div class="ttc" id="aa07803_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a></div></div>
@@ -193,8 +193,10 @@ $(function() {
 <div class="ttc" id="anamespacerobot_1_1types_html_a7278b81a300fa12b4b6525bff976f190"><div class="ttname"><a href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a></div><div class="ttdeci">motorid_t</div><div class="ttdoc">The motors on the robot.</div><div class="ttdef"><b>Definition:</b> data.h:50</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_a854dec5b2c63324dfe817fcd0d163557"><div class="ttname"><a href="namespacerobot_1_1types.html#a854dec5b2c63324dfe817fcd0d163557">robot::types::CameraID</a></div><div class="ttdeci">std::string CameraID</div><div class="ttdoc">The type of a camera id.</div><div class="ttdef"><b>Definition:</b> data.h:44</div></div>
 <div class="ttc" id="anamespacerobot_html"><div class="ttname"><a href="namespacerobot.html">robot</a></div><div class="ttdoc">Collection of functions that allows interfacing with the hardware and the world.</div><div class="ttdef"><b>Definition:</b> data.cpp:3</div></div>
+<div class="ttc" id="anamespacerobot_html_a0f7f6a213f9815daf709cdfb8aa975fe"><div class="ttname"><a href="namespacerobot.html#a0f7f6a213f9815daf709cdfb8aa975fe">robot::getJointPos</a></div><div class="ttdeci">types::DataPoint&lt; int32_t &gt; getJointPos(robot::types::jointid_t joint)</div><div class="ttdef"><b>Definition:</b> kinematic_common_interface.cpp:135</div></div>
 <div class="ttc" id="anamespacerobot_html_a128a6cb4047cf1e3164ea3afc4de4224"><div class="ttname"><a href="namespacerobot.html#a128a6cb4047cf1e3164ea3afc4de4224">robot::readLidarScan</a></div><div class="ttdeci">DataPoint&lt; points_t &gt; readLidarScan()</div><div class="ttdoc">Get the last measurement from the lidar.</div><div class="ttdef"><b>Definition:</b> noop_world.cpp:28</div></div>
 <div class="ttc" id="anamespacerobot_html_a15b5204e1fdb2370d1b7eb627ec13924"><div class="ttname"><a href="namespacerobot.html#a15b5204e1fdb2370d1b7eb627ec13924">robot::readGPS</a></div><div class="ttdeci">DataPoint&lt; point_t &gt; readGPS()</div><div class="ttdoc">Get the current position in the global map frame based on a GPS measurement.</div><div class="ttdef"><b>Definition:</b> gps_common_interface.cpp:13</div></div>
+<div class="ttc" id="anamespacerobot_html_a22bae8dc460f5d2413092e99d59c6c07"><div class="ttname"><a href="namespacerobot.html#a22bae8dc460f5d2413092e99d59c6c07">robot::setJointPos</a></div><div class="ttdeci">void setJointPos(robot::types::jointid_t joint, int32_t targetPos)</div><div class="ttdef"><b>Definition:</b> kinematic_common_interface.cpp:106</div></div>
 <div class="ttc" id="anamespacerobot_html_a2337a0214f903f0ba6174b3d8b9e025b"><div class="ttname"><a href="namespacerobot.html#a2337a0214f903f0ba6174b3d8b9e025b">robot::getCmdVel</a></div><div class="ttdeci">std::pair&lt; double, double &gt; getCmdVel()</div><div class="ttdoc">Get the velocity commanded to the robot.</div><div class="ttdef"><b>Definition:</b> kinematic_common_interface.cpp:86</div></div>
 <div class="ttc" id="anamespacerobot_html_a2f3e430760dcde603cf49d380bfe5aba"><div class="ttname"><a href="namespacerobot.html#a2f3e430760dcde603cf49d380bfe5aba">robot::readCamera</a></div><div class="ttdeci">DataPoint&lt; CameraFrame &gt; readCamera(CameraID cameraID)</div><div class="ttdoc">Read the latest frame from the given camera.</div><div class="ttdef"><b>Definition:</b> real_world_interface.cpp:138</div></div>
 <div class="ttc" id="anamespacerobot_html_a3f5a1efb713c48bdf856cbc794d8412d"><div class="ttname"><a href="namespacerobot.html#a3f5a1efb713c48bdf856cbc794d8412d">robot::hasNewCameraFrame</a></div><div class="ttdeci">bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum)</div><div class="ttdoc">Check if a new camera frame from the specified camera is available.</div><div class="ttdef"><b>Definition:</b> real_world_interface.cpp:128</div></div>
