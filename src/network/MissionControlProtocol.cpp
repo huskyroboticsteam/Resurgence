@@ -375,13 +375,12 @@ void MissionControlProtocol::jointPosReportTask() {
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
-		for (auto cur = robot::types::name_to_jointid.begin();
-			 cur != robot::types::name_to_jointid.end(); cur++) {
-			robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur->second);
+		for (const auto& cur : robot::types::name_to_jointid) {
+			robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur.second);
 			if (jpos.isValid()) {
-				auto frozenStr = cur->first;
-				std::string str(frozenStr.data(), frozenStr.size());
-				sendJointPositionReport(str, jpos.getData());
+				auto jointNameFrznStr = cur.first;
+				std::string jointNameStdStr(jointNameFrznStr.data(), jointNameFrznStr.size());
+				sendJointPositionReport(jointNameStdStr, jpos.getData());
 			}
 		}
 
