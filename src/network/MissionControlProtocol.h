@@ -1,17 +1,17 @@
 #pragma once
 
+#include "../world_interface/world_interface.h"
 #include "websocket/WebSocketProtocol.h"
 #include "websocket/WebSocketServer.h"
-#include "../world_interface/world_interface.h"
 
 #include <atomic>
 #include <condition_variable>
 #include <memory>
+#include <optional>
 #include <shared_mutex>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
-#include <optional>
 
 namespace net {
 namespace mc {
@@ -33,11 +33,14 @@ public:
 private:
 	void videoStreamTask();
 	void jointPowerRepeatTask();
+	void jointPosReportTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
 	std::atomic<bool> _streaming_running;
 	std::thread _streaming_thread;
+	// for joint position reporting.
+	std::thread _joint_report_thread;
 	// protects _last_joint_power, _last_cmd_vel
 	std::mutex _joint_power_mutex;
 	std::unordered_map<jointid_t, double> _last_joint_power;
@@ -56,6 +59,7 @@ private:
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
 	void handleDriveRequest(const json& j);
+	void sendJointPositionReport(const std::string& jointName, int32_t position);
 	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
 	void handleConnection();
 	void startPowerRepeat();
