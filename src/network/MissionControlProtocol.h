@@ -62,7 +62,7 @@ private:
 	void handleJointPowerRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
-	void sendCameraStreamReport(const CameraID& cam, const std::basic_string<uint8_t>& nal_data);
+	void sendCameraStreamReport(const CameraID& cam, const std::basic_string<uint8_t>& frame_data);
 	void handleConnection();
 	void startPowerRepeat();
 	void stopAndShutdownPowerRepeat();

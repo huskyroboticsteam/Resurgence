@@ -255,6 +255,15 @@ add_library(filters SHARED
   )
 target_link_libraries(filters utils)
 
+add_library(video STATIC
+  video/H264Encoder.cpp
+)
+
+target_link_libraries(video
+  ${OpenCV_LIBS}
+  H264Encoder
+)
+
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
 )

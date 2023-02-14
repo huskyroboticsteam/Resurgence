@@ -199,9 +199,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		this->_open_streams[cam] = 0;
-		if (this->_camera_encoders.find(cam) == this->_camera_encoders.end()) {
-			this->_camera_encoders[cam] = std::make_shared<video::H264Encoder>(j["fps"]);
-		}
+		this->_camera_encoders[cam] = std::make_shared<video::H264Encoder>(j["fps"]);
 	}
 }
 
