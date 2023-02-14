@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../network/websocket/WebSocketProtocol.h"
-#include "../world_interface/base_motor.h"
+#include "../../network/websocket/WebSocketProtocol.h"
+#include "base_motor.h"
 
 #include <nlohmann/json.hpp>
 

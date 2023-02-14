@@ -9,9 +9,8 @@
 #include "../log.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketProtocol.h"
-#include "base_motor.h"
-#include "sim_motor.h"
 #include "world_interface.h"
+#include "motor/sim_motor.h"
 
 #include <atomic>
 #include <condition_variable>

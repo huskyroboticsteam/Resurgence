@@ -10,10 +10,9 @@
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../navtypes.h"
-#include "base_motor.h"
-#include "can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
+#include "motor/can_motor.h"
 
 #include <future>
 #include <iostream>

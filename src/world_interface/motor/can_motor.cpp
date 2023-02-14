@@ -1,9 +1,9 @@
 #include "can_motor.h"
 
-#include "../world_interface/real_world_constants.h"
-#include "CAN.h"
-#include "CANMotor.h"
-#include "CANUtils.h"
+#include "../real_world_constants.h"
+#include "../../CAN/CAN.h"
+#include "../../CAN/CANMotor.h"
+#include "../../CAN/CANUtils.h"
 
 namespace robot {
 class can_motor : public base_motor {

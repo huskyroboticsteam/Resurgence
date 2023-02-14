@@ -5,7 +5,7 @@
 #include "../kinematics/DiffWristKinematics.h"
 #include "../navtypes.h"
 #include "data.h"
-#include "base_motor.h"
+#include "motor/base_motor.h"
 
 #include <optional>
 #include <unordered_set>

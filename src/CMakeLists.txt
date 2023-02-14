@@ -192,7 +192,6 @@ target_sources(can_interface PRIVATE
   CAN/CANMotor_PSOC.cpp
   CAN/CANMotor.cpp
   CAN/CANUtils.cpp
-  CAN/can_motor.cpp
 )
 
 # Hardware specific source files
@@ -219,8 +218,9 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  world_interface/base_motor.cpp
-  world_interface/sim_motor.cpp
+  world_interface/motor/base_motor.cpp
+  world_interface/motor/sim_motor.cpp
+  world_interface/motor/can_motor.cpp
   ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})

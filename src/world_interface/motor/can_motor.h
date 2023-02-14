@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../world_interface/base_motor.h"
+#include "base_motor.h"
 
 /**
  * @namespace robot

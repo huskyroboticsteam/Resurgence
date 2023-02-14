@@ -1,7 +1,7 @@
 #include "sim_motor.h"
 
-#include "../Globals.h"
-#include "world_interface.h"
+#include "../../Globals.h"
+#include "../world_interface.h"
 
 namespace robot {
 class sim_motor : public base_motor {
