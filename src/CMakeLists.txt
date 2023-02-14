@@ -219,8 +219,6 @@ add_library(world_interface_core STATIC
   ar/Tag.cpp
   ar/read_landmarks.cpp
   world_interface/motor/base_motor.cpp
-  world_interface/motor/sim_motor.cpp
-  world_interface/motor/can_motor.cpp
   ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -237,9 +235,11 @@ add_library(real_world_interface STATIC
   lidar/read_hokuyo_lidar.cpp
   lidar/read_rp_lidar.cpp
   gps/usb_gps/read_usb_gps.cpp
+  world_interface/motor/can_motor.cpp
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
+  world_interface/motor/sim_motor.cpp
   )
 
 target_link_libraries(real_world_interface can_interface world_interface_core)

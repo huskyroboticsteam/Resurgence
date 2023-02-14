@@ -36,9 +36,6 @@ extern const WorldInterface WORLD_INTERFACE;
 const DiffDriveKinematics& driveKinematics();
 const DiffWristKinematics& wristKinematics();
 
-// A mapping of (motor_id, shared pointer to object of the motor)
-std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
-
 /**
  * @brief Initialize the world interface.
  *

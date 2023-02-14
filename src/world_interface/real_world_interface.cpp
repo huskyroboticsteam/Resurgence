@@ -30,9 +30,17 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
+// A mapping of (motor_id, shared pointer to object of the motor)
+std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+
 namespace {
 DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 DiffWristKinematics wrist_kinematics;
+
+void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(motor, hasPosSensor);;
+	motor_ptrs.insert({motor, ptr});
+}
 } // namespace
 
 const DiffDriveKinematics& driveKinematics() {
@@ -69,10 +77,10 @@ void initMotors() {
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
 
 	// initialize motor objects and add them to map
-	addMotorMapping(motorid_t::frontLeftWheel, true);
-	addMotorMapping(motorid_t::frontRightWheel, true);
-	addMotorMapping(motorid_t::rearLeftWheel, true);
-	addMotorMapping(motorid_t::rearRightWheel, true);
+	addMotorMapping(motorid_t::frontLeftWheel, false);
+	addMotorMapping(motorid_t::frontRightWheel, false);
+	addMotorMapping(motorid_t::rearLeftWheel, false);
+	addMotorMapping(motorid_t::rearRightWheel, false);
 
 	for (motorid_t motor : pidMotors) {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
@@ -88,12 +96,7 @@ void initMotors() {
 	}
 
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
-	addMotorMapping(motorid_t::hand, true);
-}
-
-void addMotorMapping(motorid_t motor, bool hasPosSensor) {
-	std::shared_ptr<robot::base_motor> ptr(new can_motor(motor, hasPosSensor));
-	motor_ptrs.insert({motor, ptr});
+	addMotorMapping(motorid_t::hand, false);
 }
 
 void setupCameras() {
@@ -142,6 +145,7 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 	if (itr == motor_ptrs.end()) {
 		// motor id not in map
+		log(LOG_ERROR, "getMotor(): Unknown motor %d\n", static_cast<int>(motor));
 		return nullptr;
 	} else {
 		// return motor object pointer

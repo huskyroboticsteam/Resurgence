@@ -1,6 +1,17 @@
 #include "base_motor.h"
 
+using namespace std::chrono_literals;
+
 namespace robot {
+    base_motor::base_motor(robot::types::motorid_t motor, bool hasPosSensor)
+		: motor_id(motor), posSensor(hasPosSensor) {
+        // create scheduler if needed
+        std::lock_guard<std::mutex> lg(schedulerMutex);
+		if (!pSched) {
+			pSched.emplace();
+		}
+    }
+
     bool base_motor::hasPositionSensor() const {
 		return posSensor;
 	}
@@ -17,7 +28,7 @@ namespace robot {
         velController->setTarget(currTime, velocityVector);
 
         // check to see if the event exists. if yes, unschedule it
-        base_motor::resetEventID();
+        base_motor::unscheduleVelocityEvent();
 
         // schedule position event
         velEventID = pSched->scheduleEvent(100ms, [&]() -> void {
@@ -45,22 +56,21 @@ namespace robot {
 		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>& kinematicsFunct = 
             [](const navtypes::Vectord<inputDim>& inputVec) { 
                 // returns a copy of the input vector
-                navtypes::Vectord<outputDim> res {inputVec(0)};
-                return res; 
+                return inputVec;
             };
 
         // create jacobian function (value will be 1 since it's the derivative of the 
         // kinematics function)
         const std::function<navtypes::Matrixd<outputDim, inputDim>(const navtypes::Vectord<inputDim>&)>& jacobianFunct = 
             [](const navtypes::Vectord<inputDim>& inputVec) { 
-                navtypes::Matrixd<outputDim, inputDim> res = navtypes::Matrixd<outputDim, inputDim>::Ones();
+                navtypes::Matrixd<outputDim, inputDim> res = navtypes::Matrixd<outputDim, inputDim>::Identity();
                 return res;
             };
 
 		velController.emplace(kinematicsFunct, jacobianFunct);
 	}
 
-    void base_motor::resetEventID() {
+    void base_motor::unscheduleVelocityEvent() {
 		if (velEventID) {
 			pSched->removeEvent(velEventID.value());
 			velEventID.reset();

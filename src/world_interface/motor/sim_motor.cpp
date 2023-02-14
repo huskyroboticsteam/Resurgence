@@ -3,6 +3,8 @@
 #include "../../Globals.h"
 #include "../world_interface.h"
 
+using nlohmann::json;
+
 namespace robot {
 class sim_motor : public base_motor {
 public:
@@ -12,7 +14,7 @@ public:
 
 	void setMotorPower(double power) {
 		// unschedule velocity event if exists
-		resetEventID();
+		unscheduleVelocityEvent();
 
 		json msg = {{"type", "simMotorPowerRequest"}, {"motor", motor_name}, {"power", power}};
 		sendJSON(msg);
@@ -20,7 +22,7 @@ public:
 
 	void setMotorPos(int32_t targetPos) {
 		// unschedule velocity event if exists
-		resetEventID();
+		unscheduleVelocityEvent();
 
 		json msg = {{"type", "simMotorPositionRequest"},
 					{"motor", motor_name},
@@ -30,7 +32,7 @@ public:
 
 	types::DataPoint<int32_t> getMotorPos() const {
 		// this calles the method implementation in world interface
-		robot::getMotorPos(motor_id);
+		return robot::getMotorPos(motor_id);
 	}
 
 private:

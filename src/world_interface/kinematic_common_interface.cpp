@@ -1,12 +1,9 @@
-#include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../Util.h"
-#include "../control/JacobianVelController.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../log.h"
 #include "../navtypes.h"
-#include "real_world_constants.h"
 #include "world_interface.h"
 
 #include <atomic>

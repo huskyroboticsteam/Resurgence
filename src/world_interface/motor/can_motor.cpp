@@ -12,7 +12,7 @@ public:
 
 	void setMotorPower(double power) {
 		// unschedule velocity event if exists
-		resetEventID();
+		unscheduleVelocityEvent();
 
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 		auto& scaleMap = power < 0 ? negative_pwm_scales : positive_pwm_scales;
@@ -25,7 +25,7 @@ public:
 
 	void setMotorPos(int32_t targetPos) {
 		// unschedule velocity event if exists
-		resetEventID();
+		unscheduleVelocityEvent();
 
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 		can::motor::setMotorPIDTarget(serial, targetPos);

@@ -56,6 +56,9 @@ std::mutex truePoseMutex;
 std::map<std::string, DataPoint<int32_t>> motorPosMap;
 std::shared_mutex motorPosMapMutex;
 
+// A mapping of (motor_id, shared pointer to object of the motor)
+std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+
 using lscallback_t =
 	std::function<void(robot::types::DataPoint<LimitSwitchData> limitSwitchData)>;
 std::map<std::string, std::map<robot::callbackid_t, lscallback_t>> limitSwitchCallbackMap;
@@ -114,8 +117,8 @@ void initCameras() {
 void initMotors() {
 	// initializes map of motor ids and shared ptrs of their objects
 	for (auto const& x : motorNameMap) {
-		std::shared_ptr<robot::base_motor> ptr(new robot::sim_motor(x.first, true, x.second, PROTOCOL_PATH));
-		robot::motor_ptrs.insert({x.first, ptr});
+		std::shared_ptr<robot::base_motor> ptr = std::make_shared<robot::sim_motor>(x.first, true, x.second, PROTOCOL_PATH);
+		motor_ptrs.insert({x.first, ptr});
 	}
 }
 

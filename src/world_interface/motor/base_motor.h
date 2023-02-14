@@ -3,8 +3,6 @@
 #include "../../control/JacobianVelController.h"
 #include "../../utils/scheduler.h"
 
-using namespace std::chrono_literals;
-
 /**
  * @namespace robot
  * @brief Collection of functions for manipulating a motor.
@@ -22,22 +20,14 @@ public:
 	 * @param motor The motor id to manipulate.
 	 * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
 	 */
-	base_motor(robot::types::motorid_t motor, bool hasPosSensor)
-		: motor_id(motor), posSensor(hasPosSensor) {
-		// create scheduler if needed
-		mtx.lock();
-		if (!pSched) {
-			pSched.emplace();
-		}
-		mtx.unlock();
-	};
+	base_motor(robot::types::motorid_t motor, bool hasPosSensor);
 
 	/**
 	 * @brief Returns the status of the motor position sensor.
 	 *
 	 * @return True if the motor has a position sensor and false if not
 	 */
-	bool hasPositionSensor() const {};
+	bool hasPositionSensor() const;
 
 	/**
 	 * @brief Set the PWM command of the motor.
@@ -69,26 +59,26 @@ public:
 	 *
 	 * @param targetVel The target velocity, in millidegrees per second.
 	 */
-	void setMotorVel(int32_t targetVel) {}
+	void setMotorVel(int32_t targetVel);
 
 protected:
 	robot::types::motorid_t motor_id;
 	bool posSensor;
-	static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
+	inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
 	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
 	std::optional<JacobianVelController<1, 1>> velController;
-	static std::mutex mtx;
+	inline static std::mutex schedulerMutex;
 
 	/**
 	 * @brief Constructs a Jacobian Vel Controller
 	 *
 	 */
-	void constructVelController() {}
+	void constructVelController();
 
 	/**
 	 * @brief Unschedules the velocity event if it exists
 	 *
 	 */
-	void resetEventID() {}
+	void unscheduleVelocityEvent();
 }; // abstract class base_motor
 } // namespace robot

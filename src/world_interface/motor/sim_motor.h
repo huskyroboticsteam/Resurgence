@@ -5,8 +5,6 @@
 
 #include <nlohmann/json.hpp>
 
-using nlohmann::json;
-
 /**
  * @namespace robot
  * @brief Collection of functions for manipulating a motor.
