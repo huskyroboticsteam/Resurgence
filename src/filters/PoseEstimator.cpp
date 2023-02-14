@@ -15,10 +15,10 @@ namespace {
 using statevec_t = PoseEstimator::statevec_t;
 using statespace::NoiseCovMat;
 
-statevec_t stateFunc(const DiffDriveKinematics& kinematics, double dt, const statevec_t& x,
+statevec_t stateFunc(const kinematics::DiffDriveKinematics& kinematics, double dt, const statevec_t& x,
 					 const Eigen::Vector2d& u, const Eigen::Vector2d& w) {
 	Eigen::Vector2d input = u + w; // noise is applied to the input vector
-	wheelvel_t wheelVel{input(0), input(1)};
+	kinematics::wheelvel_t wheelVel{input(0), input(1)};
 	return kinematics.getNextPose(wheelVel, x, dt);
 }
 
@@ -32,7 +32,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d& inputNoiseGains,
 							 double dt)
 	: ekf(
 		  [this](const statevec_t& x, const Eigen::Vector2d& u, const Eigen::Vector2d& w) {
-			  return stateFunc(this->kinematics, this->dt, x, u, w);
+			  return stateFunc(this->PoseEstimator::kinematics, this->dt, x, u, w);
 		  },
 		  measurementFunc,
 		  NoiseCovMat<numStates, 2, 2>(
@@ -59,7 +59,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d& inputNoiseGains,
 
 void PoseEstimator::predict(double thetaVel, double xVel) {
 	// convert xVel, thetaVel to wheel velocities
-	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(xVel, thetaVel);
+	kinematics::wheelvel_t wheelVels = kinematics.robotVelToWheelVel(xVel, thetaVel);
 	Eigen::Vector2d u;
 	u << wheelVels.lVel, wheelVels.rVel;
 	ekf.predict(u);

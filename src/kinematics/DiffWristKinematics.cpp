@@ -1,7 +1,7 @@
 #include "DiffWristKinematics.h"
 
 #include <Eigen/Dense>
-
+namespace kinematics { 
 using Eigen::Matrix2f;
 using Eigen::Vector2f;
 
@@ -52,7 +52,7 @@ jointpos_t DiffWristKinematics::gearPowerToJointPower(const gearpos_t &gearPwr) 
 }
 
 gearpos_t DiffWristKinematics::jointPowerToGearPower(const jointpos_t &jointPwr) const {
-    Vector2f gearPwr = jointToGearPosTransform * jointPwr.vec();
+	Vector2f gearPwr = jointToGearPosTransform * jointPwr.vec();
 	// compute infinity norm; i.e. component with max absolute value
 	float maxVal = gearPwr.lpNorm<Eigen::Infinity>();
 	// if any component is absolutely greater than 1, divide by maximum component to scale
@@ -62,3 +62,8 @@ gearpos_t DiffWristKinematics::jointPowerToGearPower(const jointpos_t &jointPwr)
 	}
 	return gearPwr;
 }
+}
+
+
+
+

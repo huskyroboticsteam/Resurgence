@@ -110,7 +110,7 @@ public:
 
 private:
 	ExtendedKalmanFilter<numStates, 2, 3, 2, 3> ekf;
-	DiffDriveKinematics kinematics;
+	kinematics::DiffDriveKinematics kinematics;
 	double dt;
 };
 

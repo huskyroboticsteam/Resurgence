@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../navtypes.h"
-
+namespace kinematics { 
 struct wheelvel_t {
 	double lVel;
 	double rVel;
@@ -79,3 +79,6 @@ public:
 private:
 	double wheelBaseWidth;
 };
+}
+
+

@@ -7,6 +7,8 @@
 #include <cmath>
 #include <string>
 
+using namespace kinematics;
+
 namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 constexpr double SHOULDER_LENGTH = 0.6; // placeholder(m)
@@ -49,7 +51,7 @@ constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_
    is going at full speed forwards.
  */
 const double MAX_DTHETA =
-	DiffDriveKinematics(EFF_WHEEL_BASE).wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
+	kinematics::DiffDriveKinematics(EFF_WHEEL_BASE).wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
 // Joint limits
 // TODO: make sure these are still accurate with the new arm.

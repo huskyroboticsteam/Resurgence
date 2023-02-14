@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 
+namespace kinematics { 
 /**
    \brief Represents the positions (or power) of the two motor-driven gears in the differential
    wrist.
@@ -120,3 +121,6 @@ public:
 	 */
 	gearpos_t jointPowerToGearPower(const jointpos_t& jointPwr) const;
 };
+
+
+}
