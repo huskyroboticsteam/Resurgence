@@ -3,6 +3,7 @@ TabWidth: 4
 ColumnLimit: 95
 UseTab: Always
 BreakBeforeBraces: Attach
+AllowShortEnumsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
 AccessModifierOffset: -4
