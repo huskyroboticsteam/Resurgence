@@ -16,6 +16,7 @@ jobs:
         submodules: true
     - name: Install dependencies from APT
       run: |
+        sudo apt update
         sudo apt install curl wget
         sudo curl -s --compressed "https://huskyroboticsteam.github.io/ubuntu-repo/KEY.gpg" | sudo apt-key add -
         sudo wget -P /etc/apt/sources.list.d "https://huskyroboticsteam.github.io/ubuntu-repo/husky_robotics.list"
