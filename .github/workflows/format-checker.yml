@@ -3,7 +3,7 @@ name: Check Formatting
 on: [pull_request]
 
 jobs:
-  build:
+  check-format:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout
