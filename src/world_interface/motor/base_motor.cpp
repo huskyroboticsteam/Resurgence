@@ -1,5 +1,3 @@
-#include "data.h"
-
 #include "base_motor.h"
 
 using namespace std::chrono_literals;
