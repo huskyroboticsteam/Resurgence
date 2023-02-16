@@ -12,12 +12,14 @@ jobs:
         submodules: true
     - name: Install dependencies from APT
       run: |
-        sudo apt install -y git clang-format
+        sudo apt install -y git clang-format-11
+        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-11 100 \
+          --slave /usr/share/man/man1/clang-format.1.gz clang-format.1.gz /usr/share/man/man1/clang-format-11.1.gz
     - name: Check Formatting
       run: |
         cd ${{ github.workspace }}
         git reset --soft $(git merge-base HEAD origin/master)
-        diff=$(git clang-format --diff)
+        diff=$(git clang-format-11 --diff)
         if [ $(echo "${diff}" | wc -l) != 1 ]; then
           echo "Formatting errors detected! Suggested changes:" >&2
           echo "${diff}" >&2
