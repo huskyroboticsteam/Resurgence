@@ -44,7 +44,12 @@ using CameraFrame = std::pair<cv::Mat, uint32_t>;
 using CameraID = std::string;
 
 /** @brief An indication enum, used to command the LED to flash different signals */
-enum class indication_t { off, autonomous, teleop, arrivedAtDest };
+enum class indication_t {
+	off,
+	autonomous,
+	teleop,
+	arrivedAtDest
+};
 
 /** @brief The motors on the robot. */
 enum class motorid_t {
@@ -56,8 +61,7 @@ enum class motorid_t {
 	shoulder,
 	elbow,
 	forearm,
-	differentialRight,
-	differentialLeft,
+	wrist,
 	hand
 };
 
@@ -74,23 +78,21 @@ enum class jointid_t {
 	shoulder,
 	elbow,
 	forearm,
-	differentialRoll,
-	differentialPitch,
+	wrist,
 	hand,
 	drill_arm
 };
+
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::differentialRoll, jointid_t::differentialPitch, jointid_t::hand,
-	 jointid_t::drill_arm});
+	 jointid_t::wrist, jointid_t::hand, jointid_t::drill_arm});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
 	 {"shoulder", jointid_t::shoulder},
 	 {"elbow", jointid_t::elbow},
 	 {"forearm", jointid_t::forearm},
-	 {"differentialRoll", jointid_t::differentialRoll},
-	 {"differentialPitch", jointid_t::differentialPitch},
+	 {"wrist", jointid_t::wrist},
 	 {"hand", jointid_t::hand},
 	 {"drillArm", jointid_t::drill_arm}});
 

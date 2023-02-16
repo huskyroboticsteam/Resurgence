@@ -37,6 +37,7 @@ const std::unordered_map<robot::types::jointid_t, robot::types::motorid_t> joint
 	{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
 	{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
 	{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
+	{robot::types::jointid_t::wrist, robot::types::motorid_t::wrist},
 	{robot::types::jointid_t::hand, robot::types::motorid_t::hand}};
 
 std::unordered_map<types::jointid_t, double> jointPowerValues{};
@@ -172,20 +173,7 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 
 	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
 		setMotorPower(jointMotorMap.at(joint), power);
-	} else if (joint == jointid_t::differentialPitch) {
-		float pitchPwr = power;
-		float rollPwr = getJointPowerValue(jointid_t::differentialRoll);
-		gearpos_t gearPwr = wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
-		setMotorPower(motorid_t::differentialLeft, gearPwr.left);
-		setMotorPower(motorid_t::differentialRight, gearPwr.right);
-	} else if (joint == jointid_t::differentialRoll) {
-		float pitchPwr = getJointPowerValue(jointid_t::differentialPitch);
-		float rollPwr = power;
-		gearpos_t gearPwr = wristKinematics().jointPowerToGearPower(jointpos_t{pitchPwr, rollPwr});
-		setMotorPower(motorid_t::differentialLeft, gearPwr.left);
-		setMotorPower(motorid_t::differentialRight, gearPwr.right);
 	} else {
-		// FIXME: this should never happen and is only temporary
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());
 	}
