@@ -954,8 +954,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                 {motorid_t::shoulder, <span class="keyword">false</span>},</div>
 <div class="line">                                                 {motorid_t::elbow, <span class="keyword">true</span>},</div>
 <div class="line">                                                 {motorid_t::forearm, <span class="keyword">false</span>},</div>
-<div class="line">                                                 {motorid_t::differentialLeft, <span class="keyword">false</span>},</div>
-<div class="line">                                                 {motorid_t::differentialRight, <span class="keyword">false</span>}})</div>
+<div class="line">                                                 {motorid_t::wrist, <span class="keyword">false</span>}})</div>
 </div><!-- fragment -->
 <p>A map that represents whether a motor's encoder is inverted. </p>
 <p>If a value is true, that motor's encoder should be inverted. If a motor is not in this map, its encoder should not be inverted, if it has one. </p>
@@ -981,13 +980,12 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;(</div>
-<div class="line">    {{motorid_t::armBase, {1000, 50, 10000}},</div>
-<div class="line">     {motorid_t::shoulder, {100, 0, 1000}},</div>
-<div class="line">     {motorid_t::elbow, {500, 50, 10000}},</div>
-<div class="line">     {motorid_t::forearm, {1000, 0, 0}},</div>
-<div class="line">     {motorid_t::differentialLeft, {1000, 0, 0}},</div>
-<div class="line">     {motorid_t::differentialRight, {1000, 0, 0}}})</div>
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;({{motorid_t::armBase, {1000, 50, 10000}},</div>
+<div class="line">                                                      {motorid_t::shoulder, {100, 0, 1000}},</div>
+<div class="line">                                                      {motorid_t::elbow, {500, 50, 10000}},</div>
+<div class="line">                                                      {motorid_t::forearm, {1000, 0, 0}},</div>
+<div class="line">                                                      {motorid_t::wrist, {1000, 0, 0}}})</div>
 </div><!-- fragment -->
 <p>A mapping of PID controlled motors to their pid coefficients. </p>
 
@@ -1012,13 +1010,12 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, uint32_t&gt;(</div>
-<div class="line">    {{motorid_t::armBase, 17 * 1000},</div>
-<div class="line">     {motorid_t::shoulder, 20 * 1000},</div>
-<div class="line">     {motorid_t::elbow, 36 * 1000},</div>
-<div class="line">     {motorid_t::forearm, 360 * 1000},</div>
-<div class="line">     {motorid_t::differentialLeft, 360 * 1000},</div>
-<div class="line">     {motorid_t::differentialRight, 360 * 1000}})</div>
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    frozen::make_unordered_map&lt;motorid_t, uint32_t&gt;({{motorid_t::armBase, 17 * 1000},</div>
+<div class="line">                                                     {motorid_t::shoulder, 20 * 1000},</div>
+<div class="line">                                                     {motorid_t::elbow, 36 * 1000},</div>
+<div class="line">                                                     {motorid_t::forearm, 360 * 1000},</div>
+<div class="line">                                                     {motorid_t::wrist, 360 * 1000}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to the number of pulses per joint revolution. </p>
 
@@ -1052,8 +1049,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">     {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},</div>
 <div class="line">     {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},</div>
 <div class="line">     {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},</div>
-<div class="line">     {motorid_t::differentialRight, DEVICE_SERIAL_MOTOR_DIFF_WRIST_R},</div>
-<div class="line">     {motorid_t::differentialLeft, DEVICE_SERIAL_MOTOR_DIFF_WRIST_L},</div>
+<div class="line">     {motorid_t::wrist, DEVICE_SERIAL_MOTOR_WRIST},</div>
 <div class="line">     {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to their corresponding serial number. </p>
@@ -1084,8 +1080,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::shoulder, -1},</div>
 <div class="line">                                                   {motorid_t::elbow, 0.75},</div>
 <div class="line">                                                   {motorid_t::forearm, 0.1},</div>
-<div class="line">                                                   {motorid_t::differentialLeft, -0.5},</div>
-<div class="line">                                                   {motorid_t::differentialRight, 0.5},</div>
+<div class="line">                                                   {motorid_t::wrist, -0.5},</div>
 <div class="line">                                                   {motorid_t::frontLeftWheel, -0.5},</div>
 <div class="line">                                                   {motorid_t::frontRightWheel, 0.5},</div>
 <div class="line">                                                   {motorid_t::rearLeftWheel, -0.5},</div>
@@ -1118,7 +1113,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;motorid_t&gt;(</div>
 <div class="line">    {motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,</div>
-<div class="line">     motorid_t::differentialLeft, motorid_t::differentialRight})</div>
+<div class="line">     motorid_t::wrist})</div>
 </div><!-- fragment -->
 <p>The set of motors that are PID controlled. </p>
 
@@ -1148,8 +1143,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::shoulder, -1},</div>
 <div class="line">                                                   {motorid_t::elbow, 0.75},</div>
 <div class="line">                                                   {motorid_t::forearm, 0.1},</div>
-<div class="line">                                                   {motorid_t::differentialLeft, -0.5},</div>
-<div class="line">                                                   {motorid_t::differentialRight, 0.5},</div>
+<div class="line">                                                   {motorid_t::wrist, -0.5},</div>
 <div class="line">                                                   {motorid_t::frontLeftWheel, -0.5},</div>
 <div class="line">                                                   {motorid_t::frontRightWheel, 0.5},</div>
 <div class="line">                                                   {motorid_t::rearLeftWheel, -0.5},</div>
