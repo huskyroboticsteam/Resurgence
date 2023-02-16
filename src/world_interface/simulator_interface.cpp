@@ -9,8 +9,8 @@
 #include "../log.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketProtocol.h"
-#include "world_interface.h"
 #include "motor/sim_motor.h"
+#include "world_interface.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -117,7 +117,8 @@ void initCameras() {
 void initMotors() {
 	// initializes map of motor ids and shared ptrs of their objects
 	for (auto const& x : motorNameMap) {
-		std::shared_ptr<robot::base_motor> ptr = std::make_shared<robot::sim_motor>(x.first, true, x.second, PROTOCOL_PATH);
+		std::shared_ptr<robot::base_motor> ptr =
+			std::make_shared<robot::sim_motor>(x.first, true, x.second, PROTOCOL_PATH);
 		motor_ptrs.insert({x.first, ptr});
 	}
 }

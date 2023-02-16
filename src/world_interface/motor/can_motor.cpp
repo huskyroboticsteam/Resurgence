@@ -1,14 +1,15 @@
 #include "can_motor.h"
 
-#include "../real_world_constants.h"
 #include "../../CAN/CAN.h"
 #include "../../CAN/CANMotor.h"
 #include "../../CAN/CANUtils.h"
+#include "../real_world_constants.h"
 
 namespace robot {
 class can_motor : public base_motor {
 public:
-	can_motor(robot::types::motorid_t motor, bool hasPosSensor) : base_motor(motor, hasPosSensor) {}
+	can_motor(robot::types::motorid_t motor, bool hasPosSensor)
+		: base_motor(motor, hasPosSensor) {}
 
 	void setMotorPower(double power) {
 		// unschedule velocity event if exists

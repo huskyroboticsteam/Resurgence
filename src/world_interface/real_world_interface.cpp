@@ -10,9 +10,9 @@
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../navtypes.h"
+#include "motor/can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
-#include "motor/can_motor.h"
 
 #include <future>
 #include <iostream>
@@ -38,7 +38,7 @@ DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 DiffWristKinematics wrist_kinematics;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
-	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(motor, hasPosSensor);;
+	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(motor, hasPosSensor);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace

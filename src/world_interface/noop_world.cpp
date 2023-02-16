@@ -1,8 +1,8 @@
 #include "../navtypes.h"
 #include "world_interface.h"
 
-#include <unistd.h>
 #include <memory>
+#include <unistd.h>
 
 using namespace navtypes;
 using namespace robot::types;
@@ -11,10 +11,10 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
 
-namespace{
-	DiffDriveKinematics drive_kinematics(1);  //doesn't really matter what we set this to
-	DiffWristKinematics wrist_kinematics;
-}
+namespace {
+DiffDriveKinematics drive_kinematics(1); // doesn't really matter what we set this to
+DiffWristKinematics wrist_kinematics;
+} // namespace
 
 const DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
