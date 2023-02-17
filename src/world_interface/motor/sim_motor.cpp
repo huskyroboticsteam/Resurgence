@@ -6,13 +6,11 @@
 using nlohmann::json;
 
 namespace robot {
-class sim_motor : public base_motor {
-public:
-	sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name,
+	sim_motor::sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name,
 			  const std::string& path)
 		: base_motor(motor, hasPosSensor), motor_name(name), protocol_path(path) {}
 
-	void setMotorPower(double power) {
+	void sim_motor::setMotorPower(double power) {
 		// unschedule velocity event if exists
 		unscheduleVelocityEvent();
 
@@ -20,7 +18,7 @@ public:
 		sendJSON(msg);
 	}
 
-	void setMotorPos(int32_t targetPos) {
+	void sim_motor::setMotorPos(int32_t targetPos) {
 		// unschedule velocity event if exists
 		unscheduleVelocityEvent();
 
@@ -30,17 +28,12 @@ public:
 		sendJSON(msg);
 	}
 
-	types::DataPoint<int32_t> getMotorPos() const {
+	types::DataPoint<int32_t> sim_motor::getMotorPos() const {
 		// this calles the method implementation in world interface
 		return robot::getMotorPos(motor_id);
 	}
 
-private:
-	std::string motor_name;
-	std::string protocol_path;
-
-	void sendJSON(const json& obj) {
+	void sim_motor::sendJSON(const json& obj) {
 		Globals::websocketServer.sendJSON(protocol_path, obj);
 	}
-}; // class sim_motor
 } // namespace robot
