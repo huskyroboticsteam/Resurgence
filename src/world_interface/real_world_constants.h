@@ -54,8 +54,8 @@ struct encparams_t {
 };
 
 constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>(
-	{{motorid_t::shoulder, {.isInverted = false, .pulses_per_joint_revolution = 20 * 1000}},
-	 {motorid_t::elbow, {.isInverted = true, .pulses_per_joint_revolution = 36 * 1000}}});
+	{{motorid_t::shoulder, {.isInverted = false, .pulses_per_joint_revolution = 1620 * 1024}},
+	 {motorid_t::elbow, {.isInverted = true, .pulses_per_joint_revolution = 1620 * 1024}}});
 
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,
