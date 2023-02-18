@@ -29,7 +29,6 @@ constexpr auto pidMotors = frozen::make_unordered_set<motorid_t>(
 	{motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,
 	 motorid_t::wrist});
 
-// struct PotenetiometerParams => potparams_t
 /**
  * @brief Represents parameters defining a potentiometer scale.
  *
@@ -49,13 +48,15 @@ struct potparams_t {
 };
 
 struct encparams_t {
+	/** Whether the encoder motor is inverted. */
 	bool isInverted;
-	int pulses_per_joint_revolution;
+	/** Encoder pulses count per joint revolution */
+	int ppjr;
 };
 
 constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>(
-	{{motorid_t::shoulder, {.isInverted = false, .pulses_per_joint_revolution = 1620 * 1024}},
-	 {motorid_t::elbow, {.isInverted = true, .pulses_per_joint_revolution = 1620 * 1024}}});
+	{{motorid_t::shoulder, {.isInverted = false, .ppjr = 1620 * 1024}},
+	 {motorid_t::elbow, {.isInverted = true, .ppjr = 1620 * 1024}}});
 
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,

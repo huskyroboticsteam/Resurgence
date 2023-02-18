@@ -88,7 +88,7 @@ void initMotors() {
 
 		can::motor::initMotor(serial);
 		can::motor::initEncoder(serial, enc_params.isInverted, true,
-								enc_params.pulses_per_joint_revolution, TELEM_PERIOD);
+								enc_params.ppjr, TELEM_PERIOD);
 
 		// TODO: set limit switch limits
 	}
