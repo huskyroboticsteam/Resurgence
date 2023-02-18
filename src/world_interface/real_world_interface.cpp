@@ -87,8 +87,8 @@ void initMotors() {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
 		can::motor::initMotor(serial);
-		can::motor::initEncoder(serial, enc_params.isInverted, true,
-								enc_params.ppjr, TELEM_PERIOD);
+		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
+								TELEM_PERIOD);
 
 		// TODO: set limit switch limits
 	}
