@@ -98,10 +98,10 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::elbow, 0.75},
 												   {motorid_t::forearm, 0.1},
 												   {motorid_t::wrist, -0.5},
-												   {motorid_t::frontLeftWheel, -0.5},
-												   {motorid_t::frontRightWheel, 0.5},
-												   {motorid_t::rearLeftWheel, -0.5},
-												   {motorid_t::rearRightWheel, -0.5},
+												   {motorid_t::frontLeftWheel, 0.7},
+												   {motorid_t::frontRightWheel, -0.7},
+												   {motorid_t::rearLeftWheel, 0.7},
+												   {motorid_t::rearRightWheel, 0.7},
 												   {motorid_t::hand, 0.75}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
@@ -113,10 +113,10 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::elbow, 0.75},
 												   {motorid_t::forearm, 0.1},
 												   {motorid_t::wrist, -0.5},
-												   {motorid_t::frontLeftWheel, -0.5},
-												   {motorid_t::frontRightWheel, 0.5},
-												   {motorid_t::rearLeftWheel, -0.5},
-												   {motorid_t::rearRightWheel, -0.5},
+												   {motorid_t::frontLeftWheel, 0.7},
+												   {motorid_t::frontRightWheel, -0.7},
+												   {motorid_t::rearLeftWheel, 0.7},
+												   {motorid_t::rearRightWheel, 0.7},
 												   {motorid_t::hand, 0.75}});
 
 } // namespace robot
