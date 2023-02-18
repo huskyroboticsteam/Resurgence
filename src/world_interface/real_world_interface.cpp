@@ -67,8 +67,6 @@ void initMotors() {
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftWheel));
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
 
-	// loop over potMotors and init accordingly with can::motor::initPotentiometer
-	// loop over encMMotors and init accordingly
 	for (const auto& pot_motor_pair : robot::potMotors) {
 		motorid_t motor_id = pot_motor_pair.first;
 		potparams_t pot_params = pot_motor_pair.second;
