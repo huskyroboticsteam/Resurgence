@@ -76,8 +76,8 @@ void initMotors() {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
 		can::motor::initMotor(serial);
-		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi, 
-			pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
+		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
+									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
 	}
 
 	for (const auto& enc_motor_pair : robot::encMotors) {
@@ -87,8 +87,8 @@ void initMotors() {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
 		can::motor::initMotor(serial);
-		can::motor::initEncoder(serial, enc_params.isInverted, true, 
-			enc_params.pulses_per_joint_revolution, TELEM_PERIOD);
+		can::motor::initEncoder(serial, enc_params.isInverted, true,
+								enc_params.pulses_per_joint_revolution, TELEM_PERIOD);
 
 		// TODO: set limit switch limits
 	}

@@ -58,9 +58,12 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>(
 	 {motorid_t::elbow, {.isInverted = true, .pulses_per_joint_revolution = 36 * 1000}}});
 
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
-	{{motorid_t::armBase, { .adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000 }},
-	 {motorid_t::forearm, { .adc_lo = 123, .mdeg_lo = -360 * 1000, .adc_hi = 456, .mdeg_hi = 360 * 1000 }},
-	 {motorid_t::wrist, { .adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000 }}});
+	{{motorid_t::armBase,
+	  {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},
+	 {motorid_t::forearm,
+	  {.adc_lo = 123, .mdeg_lo = -360 * 1000, .adc_hi = 456, .mdeg_hi = 360 * 1000}},
+	 {motorid_t::wrist,
+	  {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}}});
 
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
