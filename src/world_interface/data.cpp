@@ -23,10 +23,6 @@ bool LimitSwitchData::isAnyOpen() {
 std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) {
 	return data ^ other.data;
 }
-
-constexpr float PotentiometerParams::scale() const {
-	return (static_cast<int16_t>(adc_hi) - static_cast<int16_t>(adc_lo))/(mdeg_hi - mdeg_lo);
-}
 } // namespace robot::types
 
 namespace util {

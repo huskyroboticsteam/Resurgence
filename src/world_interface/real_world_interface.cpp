@@ -67,13 +67,33 @@ void initMotors() {
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftWheel));
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
 
+	for (const auto& pot_motor_pair : robot::potMotors) {
+		motorid_t motor_id = pot_motor_pair.first;
+		potparams_t pot_params = pot_motor_pair.second;
+
+		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
+
+		can::motor::initMotor(serial);
+		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
+									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
+	}
+
+	for (const auto& enc_motor_pair : robot::encMotors) {
+		motorid_t motor_id = enc_motor_pair.first;
+		encparams_t enc_params = enc_motor_pair.second;
+
+		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
+
+		can::motor::initMotor(serial);
+		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
+								TELEM_PERIOD);
+
+		// TODO: set limit switch limits
+	}
+
 	for (motorid_t motor : pidMotors) {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
-		bool invEnc = motorEncInvMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
-		uint32_t ppjr = motorPulsesPerJointRevMap.at(motor);
-		can::motor::initMotor(serial);
-		can::motor::initEncoder(serial, invEnc, true, ppjr, TELEM_PERIOD);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
 	}
 
