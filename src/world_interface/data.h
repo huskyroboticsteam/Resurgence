@@ -97,28 +97,6 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"drillArm", jointid_t::drill_arm}});
 
 /**
- * @brief Represents parameters defining a potentiometer scale.
- *
- * Contains two joint angles in millidegrees and their associated potentiometer ADC values;
- * this defines a linear scale from potentiometer ADC value to joint angle that can be sent to
- * the motor boards for position control and feedback.
- */
-struct PotentiometerParams {
-	/**
-	   @brief Computes the potentiometer scale as a real number.
-	 */
-	constexpr float scale() const;
-	/** The "low" point on the ADC scale. */
-	uint16_t adc_lo;
-	/** The "low" point on the joint rotation scale. */
-	int32_t mdeg_lo;
-	/** The "high" point on the ADC scale. */
-	uint16_t adc_hi;
-	/** The "high" point on the joint rotation scale. */
-	int32_t mdeg_hi;
-};
-
-/**
  * @brief Represents data measured using a sensor at a given time.
  *
  * @tparam T The type of data measured from the sensor.

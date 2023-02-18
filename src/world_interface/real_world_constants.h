@@ -29,6 +29,39 @@ constexpr auto pidMotors = frozen::make_unordered_set<motorid_t>(
 	{motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,
 	 motorid_t::wrist});
 
+// struct PotenetiometerParams => potparams_t
+/**
+ * @brief Represents parameters defining a potentiometer scale.
+ *
+ * Contains two joint angles in millidegrees and their associated potentiometer ADC values;
+ * this defines a linear scale from potentiometer ADC value to joint angle that can be sent to
+ * the motor boards for position control and feedback.
+ */
+struct potparams_t {
+	/** The "low" point on the ADC scale. */
+	uint16_t adc_lo;
+	/** The "low" point on the joint rotation scale. */
+	int32_t mdeg_lo;
+	/** The "high" point on the ADC scale. */
+	uint16_t adc_hi;
+	/** The "high" point on the joint rotation scale. */
+	int32_t mdeg_hi;
+};
+
+struct encparams_t {
+	bool isInverted;
+	int pulses_per_joint_revolution;
+};
+
+constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>(
+	{{motorid_t::shoulder, {.isInverted = false, .pulses_per_joint_revolution = 20 * 1000}},
+	 {motorid_t::elbow, {.isInverted = true, .pulses_per_joint_revolution = 36 * 1000}}});
+
+constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
+	{{motorid_t::armBase, { .adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000 }},
+	 {motorid_t::forearm, { .adc_lo = 123, .mdeg_lo = -360 * 1000, .adc_hi = 456, .mdeg_hi = 360 * 1000 }},
+	 {motorid_t::wrist, { .adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000 }}});
+
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
 	{{motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},
@@ -50,29 +83,6 @@ constexpr auto motorPIDMap =
 													  {motorid_t::elbow, {500, 50, 10000}},
 													  {motorid_t::forearm, {1000, 0, 0}},
 													  {motorid_t::wrist, {1000, 0, 0}}});
-
-// TODO: verify encoder inversions
-/**
- * @brief A map that represents whether a motor's encoder is inverted.
- *
- * If a value is true, that motor's encoder should be inverted.
- * If a motor is not in this map, its encoder should not be inverted, if it has one.
- */
-constexpr auto motorEncInvMap =
-	frozen::make_unordered_map<motorid_t, bool>({{motorid_t::armBase, false},
-												 {motorid_t::shoulder, false},
-												 {motorid_t::elbow, true},
-												 {motorid_t::forearm, false},
-												 {motorid_t::wrist, false}});
-
-// TODO: measure/verify this
-/** @brief A mapping of motorids to the number of pulses per joint revolution. */
-constexpr auto motorPulsesPerJointRevMap =
-	frozen::make_unordered_map<motorid_t, uint32_t>({{motorid_t::armBase, 17 * 1000},
-													 {motorid_t::shoulder, 20 * 1000},
-													 {motorid_t::elbow, 36 * 1000},
-													 {motorid_t::forearm, 360 * 1000},
-													 {motorid_t::wrist, 360 * 1000}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
