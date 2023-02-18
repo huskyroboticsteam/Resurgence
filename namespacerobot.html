@@ -99,8 +99,13 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrobot_1_1encparams__t.html">encparams_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrobot_1_1pidcoef__t.html">pidcoef_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A struct containing a set of PID coefficients.  <a href="structrobot_1_1pidcoef__t.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrobot_1_1potparams__t.html">potparams_t</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents parameters defining a potentiometer scale.  <a href="structrobot_1_1potparams__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
@@ -239,18 +244,16 @@ const <a class="el" href="namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e"
 <tr class="memitem:a98f16731da8ac7f980fe19c12aa3a4f8"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a98f16731da8ac7f980fe19c12aa3a4f8">pidMotors</a></td></tr>
 <tr class="memdesc:a98f16731da8ac7f980fe19c12aa3a4f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The set of motors that are PID controlled.  <br /></td></tr>
 <tr class="separator:a98f16731da8ac7f980fe19c12aa3a4f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04b54fc9d9d5912feb6dca13bd1bf223"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a04b54fc9d9d5912feb6dca13bd1bf223">encMotors</a></td></tr>
+<tr class="separator:a04b54fc9d9d5912feb6dca13bd1bf223"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9acbcb79337aba8f5d847566cd2d9510"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a9acbcb79337aba8f5d847566cd2d9510">potMotors</a></td></tr>
+<tr class="separator:a9acbcb79337aba8f5d847566cd2d9510"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa66a3a3666eb218c89671933350db78f"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">motorSerialIDMap</a></td></tr>
 <tr class="memdesc:aa66a3a3666eb218c89671933350db78f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to their corresponding serial number.  <br /></td></tr>
 <tr class="separator:aa66a3a3666eb218c89671933350db78f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">motorPIDMap</a></td></tr>
 <tr class="memdesc:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of PID controlled motors to their pid coefficients.  <br /></td></tr>
 <tr class="separator:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a436c1c0143c6eec42ef58f593178aa24"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a436c1c0143c6eec42ef58f593178aa24">motorEncInvMap</a></td></tr>
-<tr class="memdesc:a436c1c0143c6eec42ef58f593178aa24"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map that represents whether a motor's encoder is inverted.  <br /></td></tr>
-<tr class="separator:a436c1c0143c6eec42ef58f593178aa24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a3f9d8b438d2f5a9d83f05e6520e07e1a">motorPulsesPerJointRevMap</a></td></tr>
-<tr class="memdesc:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to the number of pulses per joint revolution.  <br /></td></tr>
-<tr class="separator:a3f9d8b438d2f5a9d83f05e6520e07e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf2d3136c13712a212ebf41ed4a6ff58"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a></td></tr>
 <tr class="memdesc:abf2d3136c13712a212ebf41ed4a6ff58"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with positive power.  <br /></td></tr>
 <tr class="separator:abf2d3136c13712a212ebf41ed4a6ff58"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -930,8 +933,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a436c1c0143c6eec42ef58f593178aa24" name="a436c1c0143c6eec42ef58f593178aa24"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a436c1c0143c6eec42ef58f593178aa24">&#9670;&#160;</a></span>motorEncInvMap</h2>
+<a id="a04b54fc9d9d5912feb6dca13bd1bf223" name="a04b54fc9d9d5912feb6dca13bd1bf223"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04b54fc9d9d5912feb6dca13bd1bf223">&#9670;&#160;</a></span>encMotors</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -940,7 +943,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr auto robot::motorEncInvMap</td>
+          <td class="memname">constexpr auto robot::encMotors</td>
         </tr>
       </table>
   </td>
@@ -949,16 +952,10 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div>
-<div class="line">    frozen::make_unordered_map&lt;motorid_t, bool&gt;({{motorid_t::armBase, <span class="keyword">false</span>},</div>
-<div class="line">                                                 {motorid_t::shoulder, <span class="keyword">false</span>},</div>
-<div class="line">                                                 {motorid_t::elbow, <span class="keyword">true</span>},</div>
-<div class="line">                                                 {motorid_t::forearm, <span class="keyword">false</span>},</div>
-<div class="line">                                                 {motorid_t::wrist, <span class="keyword">false</span>}})</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, encparams_t&gt;(</div>
+<div class="line">    {{motorid_t::shoulder, {.isInverted = <span class="keyword">false</span>, .ppjr = 1620 * 1024}},</div>
+<div class="line">     {motorid_t::elbow, {.isInverted = <span class="keyword">true</span>, .ppjr = 1620 * 1024}}})</div>
 </div><!-- fragment -->
-<p>A map that represents whether a motor's encoder is inverted. </p>
-<p>If a value is true, that motor's encoder should be inverted. If a motor is not in this map, its encoder should not be inverted, if it has one. </p>
-
 </div>
 </div>
 <a id="ac1eaa5d6745c8aad93d6304c0f8b1821" name="ac1eaa5d6745c8aad93d6304c0f8b1821"></a>
@@ -988,36 +985,6 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                      {motorid_t::wrist, {1000, 0, 0}}})</div>
 </div><!-- fragment -->
 <p>A mapping of PID controlled motors to their pid coefficients. </p>
-
-</div>
-</div>
-<a id="a3f9d8b438d2f5a9d83f05e6520e07e1a" name="a3f9d8b438d2f5a9d83f05e6520e07e1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f9d8b438d2f5a9d83f05e6520e07e1a">&#9670;&#160;</a></span>motorPulsesPerJointRevMap</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr auto robot::motorPulsesPerJointRevMap</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div>
-<div class="line">    frozen::make_unordered_map&lt;motorid_t, uint32_t&gt;({{motorid_t::armBase, 17 * 1000},</div>
-<div class="line">                                                     {motorid_t::shoulder, 20 * 1000},</div>
-<div class="line">                                                     {motorid_t::elbow, 36 * 1000},</div>
-<div class="line">                                                     {motorid_t::forearm, 360 * 1000},</div>
-<div class="line">                                                     {motorid_t::wrist, 360 * 1000}})</div>
-</div><!-- fragment -->
-<p>A mapping of motorids to the number of pulses per joint revolution. </p>
 
 </div>
 </div>
@@ -1153,6 +1120,35 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <p>A mapping of motorids to power scale factors when commanded with positive power. </p>
 <p>Negative values mean that the motor is inverted. </p>
 
+</div>
+</div>
+<a id="a9acbcb79337aba8f5d847566cd2d9510" name="a9acbcb79337aba8f5d847566cd2d9510"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9acbcb79337aba8f5d847566cd2d9510">&#9670;&#160;</a></span>potMotors</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr auto robot::potMotors</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, potparams_t&gt;(</div>
+<div class="line">    {{motorid_t::armBase,</div>
+<div class="line">      {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},</div>
+<div class="line">     {motorid_t::forearm,</div>
+<div class="line">      {.adc_lo = 123, .mdeg_lo = -360 * 1000, .adc_hi = 456, .mdeg_hi = 360 * 1000}},</div>
+<div class="line">     {motorid_t::wrist,</div>
+<div class="line">      {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}}})</div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

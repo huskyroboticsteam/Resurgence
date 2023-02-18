@@ -150,7 +150,7 @@ var searchData=
   ['posecluster3d_147',['PoseCluster3D',['https://docs.opencv.org/4.2.0/d2/d4b/classcv_1_1ppf__match__3d_1_1PoseCluster3D.html',1,'cv::ppf_match_3d']]],
   ['poseestimator_148',['PoseEstimator',['../classfilters_1_1PoseEstimator.html',1,'filters']]],
   ['poseestimatorlinear_149',['PoseEstimatorLinear',['../classfilters_1_1PoseEstimatorLinear.html',1,'filters']]],
-  ['potentiometerparams_150',['PotentiometerParams',['../structrobot_1_1types_1_1PotentiometerParams.html',1,'robot::types']]],
+  ['potparams_5ft_150',['potparams_t',['../structrobot_1_1potparams__t.html',1,'robot']]],
   ['pow_5ffunc_151',['pow_func',['https://docs.opencv.org/4.2.0/da/dda/structcv_1_1cudev_1_1pow__func.html',1,'cv::cudev']]],
   ['pow_5ffunc_3c_20double_20_3e_152',['pow_func&lt; double &gt;',['https://docs.opencv.org/4.2.0/d2/deb/structcv_1_1cudev_1_1pow__func_3_01double_01_4.html',1,'cv::cudev']]],
   ['powerlayer_153',['PowerLayer',['https://docs.opencv.org/4.2.0/d2/da0/classcv_1_1dnn_1_1PowerLayer.html',1,'cv::dnn']]],

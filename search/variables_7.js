@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['gain_0',['gain',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html#a077d73eb075b00779dc009a9057c27c3',1,'cv::KalmanFilter']]],
-  ['gain_1',['GAIN',['https://docs.opencv.org/4.2.0/d2/d37/classcv_1_1detail_1_1ExposureCompensator.html#ad3218eb95457927897dd65880727e5baa6ba7b5295c631d353f070e1e471d8cee',1,'cv::detail::ExposureCompensator']]],
+  ['gain_0',['GAIN',['https://docs.opencv.org/4.2.0/d2/d37/classcv_1_1detail_1_1ExposureCompensator.html#ad3218eb95457927897dd65880727e5baa6ba7b5295c631d353f070e1e471d8cee',1,'cv::detail::ExposureCompensator']]],
+  ['gain_1',['gain',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html#a077d73eb075b00779dc009a9057c27c3',1,'cv::KalmanFilter']]],
   ['gain_5fblocks_2',['GAIN_BLOCKS',['https://docs.opencv.org/4.2.0/d2/d37/classcv_1_1detail_1_1ExposureCompensator.html#ad3218eb95457927897dd65880727e5baac165e2abfe45df8b7216509597a833e8',1,'cv::detail::ExposureCompensator']]],
   ['gamma_3',['gamma',['https://docs.opencv.org/4.2.0/db/d7a/structNCVBroxOpticalFlowDescriptor.html#ad81e016e54ee7a22491514d95f91d901',1,'NCVBroxOpticalFlowDescriptor']]],
   ['gamma_4',['GAMMA',['https://docs.opencv.org/4.2.0/d1/d2d/classcv_1_1ml_1_1SVM.html#a32d2e8d21aaa4f58cdf9c27c102becf3a9b81805a0cd06dc59c354b0ad6fc9e9a',1,'cv::ml::SVM']]],

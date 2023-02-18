@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): robot::types::PotentiometerParams Struct Reference</title>
+<title>Resurgence (PY2022): robot::potparams_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,55 +77,46 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacerobot.html">robot</a></li><li class="navelem"><a class="el" href="namespacerobot_1_1types.html">types</a></li><li class="navelem"><a class="el" href="structrobot_1_1types_1_1PotentiometerParams.html">PotentiometerParams</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacerobot.html">robot</a></li><li class="navelem"><a class="el" href="structrobot_1_1potparams__t.html">potparams_t</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structrobot_1_1types_1_1PotentiometerParams-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">robot::types::PotentiometerParams Struct Reference</div></div>
+<a href="structrobot_1_1potparams__t-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">robot::potparams_t Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>Represents parameters defining a potentiometer scale.  
- <a href="structrobot_1_1types_1_1PotentiometerParams.html#details">More...</a></p>
+ <a href="structrobot_1_1potparams__t.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="data_8h_source.html">data.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="real__world__constants_8h_source.html">real_world_constants.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:abc3774576836b8f7d39f5777886f006b"><td class="memItemLeft" align="right" valign="top"><a id="abc3774576836b8f7d39f5777886f006b" name="abc3774576836b8f7d39f5777886f006b"></a>
-constexpr float&#160;</td><td class="memItemRight" valign="bottom"><b>scale</b> () const</td></tr>
-<tr class="memdesc:abc3774576836b8f7d39f5777886f006b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the potentiometer scale as a real number. <br /></td></tr>
-<tr class="separator:abc3774576836b8f7d39f5777886f006b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a702ac3d00f9784c79e8e4b3e53593b1c"><td class="memItemLeft" align="right" valign="top"><a id="a702ac3d00f9784c79e8e4b3e53593b1c" name="a702ac3d00f9784c79e8e4b3e53593b1c"></a>
+<tr class="memitem:a87295d583b98d62556477be5aa24b8b2"><td class="memItemLeft" align="right" valign="top"><a id="a87295d583b98d62556477be5aa24b8b2" name="a87295d583b98d62556477be5aa24b8b2"></a>
 <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>adc_lo</b></td></tr>
-<tr class="memdesc:a702ac3d00f9784c79e8e4b3e53593b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "low" point on the ADC scale. <br /></td></tr>
-<tr class="separator:a702ac3d00f9784c79e8e4b3e53593b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a894d37c75128cd6796a0ce58e4ff6b"><td class="memItemLeft" align="right" valign="top"><a id="a5a894d37c75128cd6796a0ce58e4ff6b" name="a5a894d37c75128cd6796a0ce58e4ff6b"></a>
+<tr class="memdesc:a87295d583b98d62556477be5aa24b8b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "low" point on the ADC scale. <br /></td></tr>
+<tr class="separator:a87295d583b98d62556477be5aa24b8b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae13661659fc4f1e0409529632325e025"><td class="memItemLeft" align="right" valign="top"><a id="ae13661659fc4f1e0409529632325e025" name="ae13661659fc4f1e0409529632325e025"></a>
 <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mdeg_lo</b></td></tr>
-<tr class="memdesc:a5a894d37c75128cd6796a0ce58e4ff6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "low" point on the joint rotation scale. <br /></td></tr>
-<tr class="separator:a5a894d37c75128cd6796a0ce58e4ff6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97c41409f7bf4d2f3a593b5ae3da930a"><td class="memItemLeft" align="right" valign="top"><a id="a97c41409f7bf4d2f3a593b5ae3da930a" name="a97c41409f7bf4d2f3a593b5ae3da930a"></a>
+<tr class="memdesc:ae13661659fc4f1e0409529632325e025"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "low" point on the joint rotation scale. <br /></td></tr>
+<tr class="separator:ae13661659fc4f1e0409529632325e025"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b6358aeac9f69642493e43be0e4ee7c"><td class="memItemLeft" align="right" valign="top"><a id="a7b6358aeac9f69642493e43be0e4ee7c" name="a7b6358aeac9f69642493e43be0e4ee7c"></a>
 <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ab8f9e3c8d45fa2f89547aa6367185a6f">uint16_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>adc_hi</b></td></tr>
-<tr class="memdesc:a97c41409f7bf4d2f3a593b5ae3da930a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "high" point on the ADC scale. <br /></td></tr>
-<tr class="separator:a97c41409f7bf4d2f3a593b5ae3da930a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a198a466c5c477599af508093ad3ce3e8"><td class="memItemLeft" align="right" valign="top"><a id="a198a466c5c477599af508093ad3ce3e8" name="a198a466c5c477599af508093ad3ce3e8"></a>
+<tr class="memdesc:a7b6358aeac9f69642493e43be0e4ee7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "high" point on the ADC scale. <br /></td></tr>
+<tr class="separator:a7b6358aeac9f69642493e43be0e4ee7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaccebb6ae121edbf0a82d1d148d5f1b3"><td class="memItemLeft" align="right" valign="top"><a id="aaccebb6ae121edbf0a82d1d148d5f1b3" name="aaccebb6ae121edbf0a82d1d148d5f1b3"></a>
 <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mdeg_hi</b></td></tr>
-<tr class="memdesc:a198a466c5c477599af508093ad3ce3e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "high" point on the joint rotation scale. <br /></td></tr>
-<tr class="separator:a198a466c5c477599af508093ad3ce3e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:aaccebb6ae121edbf0a82d1d148d5f1b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "high" point on the joint rotation scale. <br /></td></tr>
+<tr class="separator:aaccebb6ae121edbf0a82d1d148d5f1b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents parameters defining a potentiometer scale. </p>
 <p>Contains two joint angles in millidegrees and their associated potentiometer ADC values; this defines a linear scale from potentiometer ADC value to joint angle that can be sent to the motor boards for position control and feedback. </p>
-</div><hr/>The documentation for this struct was generated from the following files:<ul>
-<li>src/world_interface/<a class="el" href="data_8h_source.html">data.h</a></li>
-<li>src/world_interface/data.cpp</li>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>src/world_interface/<a class="el" href="real__world__constants_8h_source.html">real_world_constants.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
