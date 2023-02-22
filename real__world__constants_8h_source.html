@@ -157,22 +157,22 @@ $(function() {
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                                                      {motorid_t::wrist, {1000, 0, 0}}});</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">   95</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a> =</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.5},</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>                                                   {motorid_t::shoulder, -1},</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>                                                   {motorid_t::elbow, 0.75},</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>                                                   {motorid_t::forearm, 0.1},</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>                                                   {motorid_t::wrist, -0.5},</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.5},</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>                                                   {motorid_t::shoulder, 1},</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>                                                   {motorid_t::elbow, -1},</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>                                                   {motorid_t::forearm, 0.5},</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>                                                   {motorid_t::wrist, 0.6},</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>                                                   {motorid_t::frontLeftWheel, 0.7},</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>                                                   {motorid_t::frontRightWheel, -0.7},</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>                                                   {motorid_t::rearLeftWheel, 0.7},</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>                                                   {motorid_t::rearRightWheel, 0.7},</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>                                                   {motorid_t::hand, 0.75}});</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">  110</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">negative_pwm_scales</a> =</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, 0.5},</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>                                                   {motorid_t::shoulder, -1},</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                                                   {motorid_t::elbow, 0.75},</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                                                   {motorid_t::forearm, 0.1},</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>                                                   {motorid_t::wrist, -0.5},</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.5},</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>                                                   {motorid_t::shoulder, 1},</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                                                   {motorid_t::elbow, -1},</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                                                   {motorid_t::forearm, 0.5},</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>                                                   {motorid_t::wrist, 0.6},</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>                                                   {motorid_t::frontLeftWheel, 0.7},</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>                                                   {motorid_t::frontRightWheel, -0.7},</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>                                                   {motorid_t::rearLeftWheel, 0.7},</div>
