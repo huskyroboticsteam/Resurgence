@@ -98,7 +98,8 @@ void initMotors() {
 
 	for (const auto& it : limitSwitchLimitsMap) {
 		auto limits = it.second;
-		can::motor::setLimitSwitchLimits(motorSerialIDMap.at(it.first), limits.first, limits.second);
+		can::motor::setLimitSwitchLimits(motorSerialIDMap.at(it.first), limits.first,
+										 limits.second);
 	}
 }
 

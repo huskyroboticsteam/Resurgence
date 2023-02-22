@@ -147,11 +147,11 @@ int main() {
 					can::addDeviceTelemetryCallback(
 						id, can::telemtype_t::limit_switch,
 						[](can::deviceid_t id, can::telemtype_t telemType,
-						DataPoint<can::telemetry_t> data) {
+						   DataPoint<can::telemetry_t> data) {
 							std::cout << "Motor Limit: serial=" << std::hex
-									<< static_cast<int>(id.second)
-									<< ", data=" << std::bitset<8>(data.getDataOrElse(0))
-									<< std::endl;
+									  << static_cast<int>(id.second)
+									  << ", data=" << std::bitset<8>(data.getDataOrElse(0))
+									  << std::endl;
 						});
 				}
 				mode_has_been_set = true;
