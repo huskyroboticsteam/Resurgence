@@ -41,7 +41,6 @@ constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
 constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
-//add request key for telem data report?
 
 // report keys
 constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
@@ -49,6 +48,7 @@ constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
+constexpr const char* TELEM_DATA_REP_TYPE = "roverPositionReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
 
@@ -191,7 +191,7 @@ void MissionControlProtocol::sendTelemetryData() {
 		double recency = util::durationToSec(dataclock::now() - gps.getTime());
 	
 		json msg = {
-			{"type","roverPositionReport"}, 
+			{"type", TELEM_DATA_REP_TYPE}, 
 			{"orientW", orientW}, 
 			{"orientX", orientX},
 			{"orientY", orientY},
