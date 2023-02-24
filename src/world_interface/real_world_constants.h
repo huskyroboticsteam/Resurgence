@@ -84,13 +84,13 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 
 // TODO: tune pid
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
-constexpr auto motorPIDMap =
-	frozen::make_unordered_map<motorid_t, pidcoef_t>({{motorid_t::armBase, {1000, 50, 10000}},
-													  {motorid_t::shoulder, {100, 0, 1000}},
-													  {motorid_t::elbow, {500, 50, 10000}},
-													  {motorid_t::forearm, {1000, 0, 0}},
-													  {motorid_t::wrist, {1000, 0, 0}},
-													  {motorid_t::activeSuspension, {1000, 0, 0}}});
+constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
+	{{motorid_t::armBase, {1000, 50, 10000}},
+	 {motorid_t::shoulder, {100, 0, 1000}},
+	 {motorid_t::elbow, {500, 50, 10000}},
+	 {motorid_t::forearm, {1000, 0, 0}},
+	 {motorid_t::wrist, {1000, 0, 0}},
+	 {motorid_t::activeSuspension, {1000, 0, 0}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
