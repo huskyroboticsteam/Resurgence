@@ -2,6 +2,7 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../autonomous/AutonomousTask.h"
 #include "../base64/base64_img.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
@@ -45,6 +46,7 @@ constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
 constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
+constexpr const char* WAYPOINT_NAV_REQ_TYPE = "waypointNavRequest";
 
 // report keys
 constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
@@ -101,6 +103,7 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		// if we have entered autonomous mode, we need to stop all the power repeater stuff.
 		this->stopAndShutdownPowerRepeat(true);
 	} else {
+		_autonomous_task.kill();
 		// if we have left autonomous mode, we need to start the power repeater again.
 		this->startPowerRepeat();
 	}
@@ -218,6 +221,25 @@ void MissionControlProtocol::sendRoverPos() {
 					{"lat", lat},
 					{"recency", recency}};
 		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
+}
+
+static bool validateWaypointNavRequest(const json& j) {
+	return util::validateKey(j, "latitude", val_t::string) &&
+		   util::validateKey(j, "longitude", val_t::string) &&
+		   util::validateKey(j, "isApproximate", val_t::boolean) &&
+		   util::validateKey(j, "isGate", val_t::boolean);
+}
+
+void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
+	double latitude = j["latitude"];
+	double longitude = j["longitude"];
+	bool isApproximate = j["isApproximate"];
+	bool isGate = j["isGate"];
+
+	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
+		navtypes::point_t waypointCoords(latitude, longitude, 1);
+		_autonomous_task.start(waypointCoords);
 	}
 }
 
@@ -355,8 +377,8 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
-	  _last_joint_power(), _joint_repeat_running(false) {
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _autonomous_task(),
+	  _open_streams(), _last_joint_power(), _joint_repeat_running(false) {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
 	// syringe)
@@ -395,6 +417,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		CAMERA_STREAM_CLOSE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
+	this->addMessageHandler(
+		WAYPOINT_NAV_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
+		validateWaypointNavRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this, false));

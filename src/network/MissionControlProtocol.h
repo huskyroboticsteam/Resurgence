@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../autonomous/AutonomousTask.h"
 #include "../video/H264Encoder.h"
 #include "../world_interface/world_interface.h"
 #include "websocket/WebSocketProtocol.h"
@@ -37,6 +38,7 @@ private:
 	void updateArmIKRepeatTask();
 	void telemReportTask();
 	SingleClientWSServer& _server;
+	autonomous::AutonomousTask _autonomous_task;
 	std::shared_mutex _stream_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
 	std::unordered_map<CameraID, std::shared_ptr<video::H264Encoder>> _camera_encoders;
@@ -62,6 +64,7 @@ private:
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
+	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
 	void sendArmIKEnabledReport();
