@@ -1,7 +1,7 @@
 #include "DiffWristKinematics.h"
 
 #include <Eigen/Dense>
-namespace kinematics { 
+namespace kinematics {
 using Eigen::Matrix2f;
 using Eigen::Vector2f;
 
@@ -19,51 +19,44 @@ Vector2f jointpos_t::vec() const {
 
 static Matrix2f createTransform() {
 	Matrix2f ret;
-	ret <<
-		0.5, 0.5,
-		-0.5, 0.5;
+	ret << 0.5, 0.5, -0.5, 0.5;
 	return ret;
 }
 
 static const Matrix2f gearToJointPosTransform = createTransform();
 static const Matrix2f jointToGearPosTransform = gearToJointPosTransform.inverse();
 
-
 jointpos_t DiffWristKinematics::gearPosToJointPos(const gearpos_t& gearPos) const {
 	Vector2f res = gearToJointPosTransform * gearPos.vec();
 	return res;
 }
 
-gearpos_t DiffWristKinematics::jointPosToGearPos(const jointpos_t &jointPos) const {
+gearpos_t DiffWristKinematics::jointPosToGearPos(const jointpos_t& jointPos) const {
 	Vector2f res = jointToGearPosTransform * jointPos.vec();
 	return res;
 }
 
-jointpos_t DiffWristKinematics::gearPowerToJointPower(const gearpos_t &gearPwr) const {
+jointpos_t DiffWristKinematics::gearPowerToJointPower(const gearpos_t& gearPwr) const {
 	Vector2f jointPwr = gearToJointPosTransform * gearPwr.vec();
 	// compute infinity norm; i.e. component with max absolute value
 	float maxVal = jointPwr.lpNorm<Eigen::Infinity>();
 	// if any component is absolutely greater than 1, divide by maximum component to scale
 	// everything to the interval [-1,1]
-	if(maxVal > 1){
+	if (maxVal > 1) {
 		jointPwr /= maxVal;
 	}
 	return jointPwr;
 }
 
-gearpos_t DiffWristKinematics::jointPowerToGearPower(const jointpos_t &jointPwr) const {
+gearpos_t DiffWristKinematics::jointPowerToGearPower(const jointpos_t& jointPwr) const {
 	Vector2f gearPwr = jointToGearPosTransform * jointPwr.vec();
 	// compute infinity norm; i.e. component with max absolute value
 	float maxVal = gearPwr.lpNorm<Eigen::Infinity>();
 	// if any component is absolutely greater than 1, divide by maximum component to scale
 	// everything to the interval [-1,1]
-	if(maxVal > 1){
+	if (maxVal > 1) {
 		gearPwr /= maxVal;
 	}
 	return gearPwr;
 }
-}
-
-
-
-
+} // namespace kinematics
