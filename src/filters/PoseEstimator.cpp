@@ -15,8 +15,8 @@ namespace {
 using statevec_t = PoseEstimator::statevec_t;
 using statespace::NoiseCovMat;
 
-statevec_t stateFunc(const kinematics::DiffDriveKinematics& kinematics, double dt, const statevec_t& x,
-					 const Eigen::Vector2d& u, const Eigen::Vector2d& w) {
+statevec_t stateFunc(const kinematics::DiffDriveKinematics& kinematics, double dt,
+					 const statevec_t& x, const Eigen::Vector2d& u, const Eigen::Vector2d& w) {
 	Eigen::Vector2d input = u + w; // noise is applied to the input vector
 	kinematics::wheelvel_t wheelVel{input(0), input(1)};
 	return kinematics.getNextPose(wheelVel, x, dt);

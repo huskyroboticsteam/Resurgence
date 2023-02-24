@@ -2,7 +2,7 @@
 
 #include <Eigen/Dense>
 
-namespace kinematics { 
+namespace kinematics {
 /**
    \brief Represents the positions (or power) of the two motor-driven gears in the differential
    wrist.
@@ -94,11 +94,11 @@ public:
 	/**
 	 * \brief Given the motor power of each gear, calculate the resulting power of each axis of
 	 * the joint.
-     *
+	 *
 	 * \param gearPwr The motor power of each gear; each value in the structure should be in
 	 * the range \f$[-1, 1]\f$.
 	 * \return The resulting power of each axis, in the range \f$[-1, 1]\f$.
-     *
+	 *
 	 * \warning This method will always return a normalized power value in the range \f$[-1,
 	 * 1]\f$; if the given gear power values would cause the joint power to be outside of this
 	 * range (which should only happen if the gear power values themselves were outside of this
@@ -109,11 +109,11 @@ public:
 	/**
 	 * \brief Given the desired power of each axis of the joint, calculate the required motor
 	 * power for each of the gears.
-     *
+	 *
 	 * \param jointPwr The desired power of each axis of the joint; each value in the structure
 	 * should be in the range \f$[-1, 1]\f$.
 	 * \return The required power of each of the gears, in the range \f$[-1, 1]\f$.
-     *
+	 *
 	 * \warning Not all combinations of joint power are possible! This method will always
 	 * return normalized gear power values in the range \f$[-1, 1]\f$; if the given joint power
 	 * values would cause any gear power value to be outside of this range, then the resulting
@@ -122,5 +122,4 @@ public:
 	gearpos_t jointPowerToGearPower(const jointpos_t& jointPwr) const;
 };
 
-
-}
+} // namespace kinematics

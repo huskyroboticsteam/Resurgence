@@ -50,8 +50,8 @@ constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_
    Computed assuming that the left wheel is going at full speed backwards while the right wheel
    is going at full speed forwards.
  */
-const double MAX_DTHETA =
-	kinematics::DiffDriveKinematics(EFF_WHEEL_BASE).wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
+const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
+							  .wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
 // Joint limits
 // TODO: make sure these are still accurate with the new arm.
@@ -69,12 +69,12 @@ constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent se
 constexpr const char* AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
 const robot::types::CameraID AR_CAMERA_ID = "front"; // TODO: replace with real camera name
 
-constexpr const char* FOREARM_CAMERA_CONFIG_PATH = "../camera-config/ForearmCameraCalibration.yml";
+constexpr const char* FOREARM_CAMERA_CONFIG_PATH =
+	"../camera-config/ForearmCameraCalibration.yml";
 const robot::types::CameraID FOREARM_CAMERA_ID = "rear";
 
 constexpr const char* HAND_CAMERA_CONFIG_PATH = "../camera-config/HandCameraCalibration.yml";
 const robot::types::CameraID HAND_CAMERA_ID = "upperArm";
-
 
 /**
    @deprecated No need for this constant once we fully switch over the Mission Control PlanViz
@@ -116,7 +116,7 @@ const std::string RP_PATH = "/dev/ttyUSB0";
 constexpr double MM_PER_M = 1000;
 constexpr uint32_t RPLIDAR_A1_BAUDRATE = 115200;
 constexpr uint32_t RPLIDAR_S1_BAUDRATE = 256000;
-}
+} // namespace Lidar
 
 constexpr double CONTROL_HZ = 10.0;
 } // namespace Constants
