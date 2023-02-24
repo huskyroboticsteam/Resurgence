@@ -27,7 +27,7 @@ constexpr std::chrono::milliseconds TELEM_PERIOD(50);
 /** @brief The set of motors that are PID controlled. */
 constexpr auto pidMotors = frozen::make_unordered_set<motorid_t>(
 	{motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,
-	 motorid_t::wrist});
+	 motorid_t::wrist, motorid_t::activeSuspension});
 
 /**
  * @brief Represents parameters defining a potentiometer scale.
@@ -64,6 +64,8 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	 {motorid_t::forearm,
 	  {.adc_lo = 123, .mdeg_lo = -360 * 1000, .adc_hi = 456, .mdeg_hi = 360 * 1000}},
 	 {motorid_t::wrist,
+	  {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}},
+	 {motorid_t::activeSuspension,
 	  {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}}});
 
 /** @brief A mapping of motorids to their corresponding serial number. */
@@ -77,7 +79,8 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
 	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
 	 {motorid_t::wrist, DEVICE_SERIAL_MOTOR_WRIST},
-	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}});
+	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
+	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
 
 // TODO: tune pid
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
@@ -86,7 +89,8 @@ constexpr auto motorPIDMap =
 													  {motorid_t::shoulder, {100, 0, 1000}},
 													  {motorid_t::elbow, {500, 50, 10000}},
 													  {motorid_t::forearm, {1000, 0, 0}},
-													  {motorid_t::wrist, {1000, 0, 0}}});
+													  {motorid_t::wrist, {1000, 0, 0}},
+													  {motorid_t::activeSuspension, {1000, 0, 0}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.

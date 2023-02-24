@@ -62,7 +62,8 @@ enum class motorid_t {
 	elbow,
 	forearm,
 	wrist,
-	hand
+	hand,
+	activeSuspension
 };
 
 /** @brief the mounted peripheral on the robot. */
