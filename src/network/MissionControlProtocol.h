@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/scheduler.h"
+#include "../autonomous/AutonomousTask.h"
 #include "../video/H264Encoder.h"
 #include "../world_interface/world_interface.h"
 #include "MissionControlTasks.h"
@@ -38,12 +39,14 @@ private:
 	tasks::CameraStreamTask _camera_stream_task;
 	tasks::TelemReportTask _telem_report_task;
 	tasks::ArmIKTask _arm_ik_task;
+	autonomous::AutonomousTask _autonomous_task;
 
 	void handleEmergencyStopRequest(const json& j);
 	void handleOperationModeRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
+	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
 	void sendArmIKEnabledReport(bool enabled);
