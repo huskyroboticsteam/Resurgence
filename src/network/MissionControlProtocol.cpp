@@ -41,6 +41,7 @@ constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
 constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
+//add request key for telem data report?
 
 // report keys
 constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
@@ -173,6 +174,34 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	if (it != name_to_jointid.end()) {
 		jointid_t joint_id = it->second;
 		setRequestedJointPower(joint_id, power);
+	}
+}
+
+void MissionControlProtocol::sendTelemetryData() {
+	auto heading = robot::readIMUHeading();
+	auto gps = robot::readGPS();
+	if (gps.isValid() && heading.isValid()) {
+		double orientX = 0.0;
+		double orientY = 0.0;
+		double orientZ = sin(heading.getData() / 2);
+		double orientW = cos(heading.getData() / 2);
+		double posX = gps.getData()[0];
+		double posY = gps.getData()[1];
+		double posZ = 1.0;
+		double recency = util::durationToSec(dataclock::now() - gps.getTime());
+	
+		json msg = {
+			{"type","roverPositionReport"}, 
+			{"orientW", orientW}, 
+			{"orientX", orientX},
+			{"orientY", orientY},
+			{"orientZ", orientZ},
+			{"posX", posX},
+			{"posY", posY},
+			{"posZ", posZ},
+			{"recency",  recency}
+			};
+		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
 }
 
@@ -382,6 +411,8 @@ void MissionControlProtocol::jointPosReportTask() {
 				sendJointPositionReport(jointNameStdStr, jpos.getData());
 			}
 		}
+
+		// send data
 
 		pt += JOINT_POS_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);
