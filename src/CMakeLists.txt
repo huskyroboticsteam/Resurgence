@@ -254,8 +254,12 @@ add_library(control SHARED
 )
 target_link_libraries(control utils)
 
-add_library(commands STATIC
+add_library(commands SHARED
   commands/DriveToWaypointCommand.cpp)
+
+add_library(autonomous SHARED
+  autonomous/AutonomousTask.cpp)
+target_link_libraries(autonomous commands)
 
 list(APPEND simulator_libs
   simulator_interface)

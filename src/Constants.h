@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kinematics/DiffDriveKinematics.h"
+#include "utils/time.h"
 #include "world_interface/data.h"
 
 #include <array>
@@ -184,3 +185,12 @@ constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size(
 
 constexpr double CONTROL_HZ = 10.0;
 } // namespace Constants
+
+namespace autonomous {
+constexpr double THETA_KP = 2.0;
+constexpr double DRIVE_VEL = 1.5;
+constexpr double SLOW_DRIVE_VEL = 1.0;
+constexpr double DONE_THRESHOLD = 0.5;
+// Duration long enough to confirm we are there, not so long that time is wasted
+constexpr util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::seconds(1);
+} // namespace autonomous
