@@ -222,8 +222,8 @@ void MissionControlProtocol::sendJointPositionReport(const std::string& jointNam
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
-void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
-													const std::basic_string<uint8_t>& nal_data) {
+void MissionControlProtocol::sendCameraStreamReport(
+	const CameraID& cam, const std::basic_string<uint8_t>& nal_data) {
 	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", nal_data}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
@@ -288,7 +288,7 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),_open_streams(),
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
 	  _last_joint_power(), _joint_repeat_running(false) {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
@@ -409,10 +409,10 @@ void MissionControlProtocol::videoStreamTask() {
 					// update the previous frame number
 					this->_open_streams[cam] = new_frame_num;
 					const auto& encoder = this->_camera_encoders[cam];
-					
+
 					// convert frame to nals and send it
 					auto nals_vector = encoder->encode_frame(frame);
-					for (auto nal_string : nals_vector) {  // for each nal, send it.
+					for (auto nal_string : nals_vector) { // for each nal, send it.
 						sendCameraStreamReport(cam, nal_string);
 					}
 				}
