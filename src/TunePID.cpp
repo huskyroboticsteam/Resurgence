@@ -38,7 +38,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::elbow, "elbow"},
 	{motorid_t::forearm, "forearm"},
 	{motorid_t::wrist, "wrist"},
-	{motorid_t::hand, "hand"}};
+	{motorid_t::hand, "hand"},
+	{motorid_t::activeSuspension, "activeSuspension"}};
 
 const std::map<std::string, motorid_t> nameToMotorMap = reverseMap(motorNameMap);
 
