@@ -95,7 +95,7 @@ constexpr auto motorPIDMap =
 constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.5},
 												   {motorid_t::shoulder, 1},
-												   {motorid_t::elbow, -1},
+												   {motorid_t::elbow, -0.7},
 												   {motorid_t::forearm, 0.5},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
