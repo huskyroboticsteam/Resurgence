@@ -168,6 +168,7 @@ add_library(utils SHARED
   utils/ScopedTimer.cpp
   utils/transform.cpp
   utils/threading.cpp
+  utils/math.cpp
   gps/gps_util.cpp
   base64/base64.cpp
   base64/base64_img.cpp
@@ -255,10 +256,12 @@ add_library(filters SHARED
   filters/pose_graph/friendly_graph.cpp
   filters/pose_graph/factors.cpp
   )
+target_link_libraries(filters utils)
 
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
 )
+target_link_libraries(control utils)
 
 add_library(commands STATIC
   commands/DriveToWaypointCommand.cpp)
