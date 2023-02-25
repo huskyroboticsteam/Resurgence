@@ -1,9 +1,9 @@
 #pragma once
 
-#include "KalmanFilterBase.h"
-#include "StateSpaceUtil.h"
 #include "../navtypes.h"
 #include "../utils/math.h"
+#include "KalmanFilterBase.h"
+#include "StateSpaceUtil.h"
 
 #include <array>
 #include <functional>
