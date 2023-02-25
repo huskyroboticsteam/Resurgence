@@ -97,10 +97,10 @@ constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
  * Negative values mean that the motor is inverted.
  */
 constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.5},
+	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
 												   {motorid_t::shoulder, 1},
-												   {motorid_t::elbow, -0.7},
-												   {motorid_t::forearm, 0.5},
+												   {motorid_t::elbow, -1},
+												   {motorid_t::forearm, 0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, -0.7},
@@ -113,10 +113,10 @@ constexpr auto positive_pwm_scales =
  * Negative values mean that the motor is inverted.
  */
 constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.5},
+	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
 												   {motorid_t::shoulder, 1},
 												   {motorid_t::elbow, -1},
-												   {motorid_t::forearm, 0.5},
+												   {motorid_t::forearm, 0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, -0.7},
