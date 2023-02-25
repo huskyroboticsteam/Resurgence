@@ -4,7 +4,10 @@
 #include "../Globals.h"
 #include "../base64/base64_img.h"
 #include "../log.h"
+#include "../world_interface/data.h"
+#include "../world_interface/world_interface.h"
 
+#include <chrono>
 #include <functional>
 #include <mutex>
 #include <shared_mutex>
@@ -12,14 +15,20 @@
 #include <unordered_map>
 #include <unordered_set>
 
+using namespace robot::types;
+using namespace std::chrono_literals;
+
 namespace net {
 namespace mc {
 
 using val_t = json::value_t;
+using robot::types::mountedperipheral_t;
 using std::placeholders::_1;
 using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
+
+const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -38,6 +47,7 @@ constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
 constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
+constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
 
@@ -146,8 +156,7 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 static bool validateJoint(const json& j) {
 	return validateKey(j, "joint", val_t::string) &&
 		   validateOneOf(j, "joint",
-						 {"armBase", "shoulder", "elbow", "forearm", "differentialRoll",
-						  "differentialPitch", "hand"});
+						 {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand"});
 }
 
 static bool validateJointPowerRequest(const json& j) {
@@ -203,6 +212,13 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	this->_open_streams.erase(cam);
 }
 
+void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
+													 int32_t jointPos) {
+	json msg = {
+		{"type", JOINT_POSITION_REP_TYPE}, {"joint", jointName}, {"position", jointPos}};
+	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+}
+
 void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 													const std::string& b64_data) {
 	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
@@ -211,7 +227,14 @@ void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
 
 void MissionControlProtocol::handleConnection() {
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
-	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}, {"peripheral", Globals::mountedPeripheral}};
+	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
+
+	if (Globals::mountedPeripheral == mountedperipheral_t::none) {
+		j["peripheral"] = json(nullptr);
+	} else {
+		j["peripheral"] = util::to_string(Globals::mountedPeripheral);
+	}
+
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
 
 	if (!Globals::AUTONOMOUS) {
@@ -304,6 +327,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
+
+	// Joint position reporting
+	this->_joint_report_thread =
+		std::thread(&MissionControlProtocol::jointPosReportTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
@@ -340,6 +367,24 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 		}
 		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
 								  [this] { return !_joint_repeat_running; });
+	}
+}
+
+void MissionControlProtocol::jointPosReportTask() {
+	dataclock::time_point pt = dataclock::now();
+
+	while (true) {
+		for (const auto& cur : robot::types::name_to_jointid) {
+			robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur.second);
+			if (jpos.isValid()) {
+				auto jointNameFrznStr = cur.first;
+				std::string jointNameStdStr(jointNameFrznStr.data(), jointNameFrznStr.size());
+				sendJointPositionReport(jointNameStdStr, jpos.getData());
+			}
+		}
+
+		pt += JOINT_POS_REPORT_PERIOD;
+		std::this_thread::sleep_until(pt);
 	}
 }
 
