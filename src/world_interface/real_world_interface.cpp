@@ -250,11 +250,13 @@ template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 }
 
 void setMotorPower(robot::types::motorid_t motor, double power) {
+	ensureMotorMode(motor, motormode_t::pwm);
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPower(power);
 }
 
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
+	ensureMotorMode(motor, motormode_t::pid);
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
 }
