@@ -1,7 +1,7 @@
 #pragma once
-#include "../data.h"
 #include "../../control/JacobianVelController.h"
 #include "../../utils/scheduler.h"
+#include "../data.h"
 
 /**
  * @namespace robot
