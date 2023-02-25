@@ -44,6 +44,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "wrist";
 		case jointid_t::drill_arm:
 			return "drillArm";
+		case jointid_t::activeSuspension:
+			return "activeSuspension";
 		default:
 			// should never happen
 			return "<unknown>";
