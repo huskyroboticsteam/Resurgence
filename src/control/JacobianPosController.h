@@ -2,6 +2,7 @@
 
 #include "../filters/StateSpaceUtil.h"
 #include "../navtypes.h"
+#include "../utils/math.h"
 #include "../world_interface/data.h"
 #include "TrapezoidalVelocityProfile.h"
 
@@ -42,10 +43,9 @@ public:
 			const navtypes::Vectord<inputDim>&)>& jacobianFunc,
 		double maxVel, double maxAccel)
 		: kinematicsFunc(kinematicsFunc),
-		  jacobianFunc(jacobianFunc
-						   ? jacobianFunc
-						   : std::bind(filters::statespace::numericalJacobian, kinematicsFunc,
-									   std::placeholders::_1, outputDim)),
+		  jacobianFunc(jacobianFunc ? jacobianFunc
+									: std::bind(util::numericalJacobian, kinematicsFunc,
+												std::placeholders::_1, outputDim)),
 		  velocityProfile(maxVel, maxAccel) {
 		assert(this->kinematicsFunc);
 		assert(this->jacobianFunc);

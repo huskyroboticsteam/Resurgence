@@ -168,6 +168,7 @@ add_library(utils SHARED
   utils/ScopedTimer.cpp
   utils/transform.cpp
   utils/threading.cpp
+  utils/math.cpp
   gps/gps_util.cpp
   base64/base64.cpp
   base64/base64_img.cpp
