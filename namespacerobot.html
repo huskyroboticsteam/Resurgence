@@ -977,12 +977,13 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div>
-<div class="line">    frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;({{motorid_t::armBase, {1000, 50, 10000}},</div>
-<div class="line">                                                      {motorid_t::shoulder, {100, 0, 1000}},</div>
-<div class="line">                                                      {motorid_t::elbow, {500, 50, 10000}},</div>
-<div class="line">                                                      {motorid_t::forearm, {1000, 0, 0}},</div>
-<div class="line">                                                      {motorid_t::wrist, {1000, 0, 0}}})</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;(</div>
+<div class="line">    {{motorid_t::armBase, {1000, 50, 10000}},</div>
+<div class="line">     {motorid_t::shoulder, {100, 0, 1000}},</div>
+<div class="line">     {motorid_t::elbow, {500, 50, 10000}},</div>
+<div class="line">     {motorid_t::forearm, {1000, 0, 0}},</div>
+<div class="line">     {motorid_t::wrist, {1000, 0, 0}},</div>
+<div class="line">     {motorid_t::activeSuspension, {1000, 0, 0}}})</div>
 </div><!-- fragment -->
 <p>A mapping of PID controlled motors to their pid coefficients. </p>
 
@@ -1017,7 +1018,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">     {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},</div>
 <div class="line">     {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},</div>
 <div class="line">     {motorid_t::wrist, DEVICE_SERIAL_MOTOR_WRIST},</div>
-<div class="line">     {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}})</div>
+<div class="line">     {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},</div>
+<div class="line">     {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to their corresponding serial number. </p>
 
@@ -1052,7 +1054,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::frontRightWheel, -0.7},</div>
 <div class="line">                                                   {motorid_t::rearLeftWheel, 0.7},</div>
 <div class="line">                                                   {motorid_t::rearRightWheel, 0.7},</div>
-<div class="line">                                                   {motorid_t::hand, 0.75}})</div>
+<div class="line">                                                   {motorid_t::hand, 0.75},</div>
+<div class="line">                                                   {motorid_t::activeSuspension, 1.0}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to power scale factors when commanded with negative power. </p>
 <p>Negative values mean that the motor is inverted. </p>
@@ -1080,7 +1083,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;motorid_t&gt;(</div>
 <div class="line">    {motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,</div>
-<div class="line">     motorid_t::wrist})</div>
+<div class="line">     motorid_t::wrist, motorid_t::activeSuspension})</div>
 </div><!-- fragment -->
 <p>The set of motors that are PID controlled. </p>
 
@@ -1115,7 +1118,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">                                                   {motorid_t::frontRightWheel, -0.7},</div>
 <div class="line">                                                   {motorid_t::rearLeftWheel, 0.7},</div>
 <div class="line">                                                   {motorid_t::rearRightWheel, 0.7},</div>
-<div class="line">                                                   {motorid_t::hand, 0.75}})</div>
+<div class="line">                                                   {motorid_t::hand, 0.75},</div>
+<div class="line">                                                   {motorid_t::activeSuspension, 1.0}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to power scale factors when commanded with positive power. </p>
 <p>Negative values mean that the motor is inverted. </p>
@@ -1147,6 +1151,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">     {motorid_t::forearm,</div>
 <div class="line">      {.adc_lo = 123, .mdeg_lo = -360 * 1000, .adc_hi = 456, .mdeg_hi = 360 * 1000}},</div>
 <div class="line">     {motorid_t::wrist,</div>
+<div class="line">      {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}},</div>
+<div class="line">     {motorid_t::activeSuspension,</div>
 <div class="line">      {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}}})</div>
 </div><!-- fragment -->
 </div>
