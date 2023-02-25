@@ -23,10 +23,6 @@ bool LimitSwitchData::isAnyOpen() {
 std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) {
 	return data ^ other.data;
 }
-
-constexpr float PotentiometerParams::scale() const {
-	return (static_cast<int16_t>(adc_hi) - static_cast<int16_t>(adc_lo))/(mdeg_hi - mdeg_lo);
-}
 } // namespace robot::types
 
 namespace util {
@@ -44,10 +40,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "forearm";
 		case jointid_t::hand:
 			return "hand";
-		case jointid_t::differentialPitch:
-			return "differentialPitch";
-		case jointid_t::differentialRoll:
-			return "differentialRoll";
+		case jointid_t::wrist:
+			return "wrist";
 		case jointid_t::drill_arm:
 			return "drillArm";
 		default:
@@ -55,8 +49,31 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "<unknown>";
 	}
 }
+
 std::string to_string(const robot::types::CameraID& id) {
 	return id;
+}
+
+std::string to_string(robot::types::mountedperipheral_t peripheral) {
+	using robot::types::mountedperipheral_t;
+
+	switch (peripheral) {
+		case mountedperipheral_t::none:
+			return "none";
+
+		case mountedperipheral_t::arm:
+			return "arm";
+
+		case mountedperipheral_t::lidar:
+			return "lidar";
+
+		case mountedperipheral_t::scienceStation:
+			return "scienceStation";
+
+		default:
+			// should never happen
+			return "<unknown>";
+	}
 }
 
 } // namespace util

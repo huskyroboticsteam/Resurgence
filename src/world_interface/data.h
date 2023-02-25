@@ -44,7 +44,12 @@ using CameraFrame = std::pair<cv::Mat, uint32_t>;
 using CameraID = std::string;
 
 /** @brief An indication enum, used to command the LED to flash different signals */
-enum class indication_t { off, autonomous, teleop, arrivedAtDest };
+enum class indication_t {
+	off,
+	autonomous,
+	teleop,
+	arrivedAtDest
+};
 
 /** @brief The motors on the robot. */
 enum class motorid_t {
@@ -56,9 +61,16 @@ enum class motorid_t {
 	shoulder,
 	elbow,
 	forearm,
-	differentialRight,
-	differentialLeft,
+	wrist,
 	hand
+};
+
+/** @brief the mounted peripheral on the robot. */
+enum class mountedperipheral_t {
+	none,
+	arm,
+	scienceStation,
+	lidar
 };
 
 enum class jointid_t {
@@ -66,47 +78,23 @@ enum class jointid_t {
 	shoulder,
 	elbow,
 	forearm,
-	differentialRoll,
-	differentialPitch,
+	wrist,
 	hand,
 	drill_arm
 };
+
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::differentialRoll, jointid_t::differentialPitch, jointid_t::hand,
-	 jointid_t::drill_arm});
+	 jointid_t::wrist, jointid_t::hand, jointid_t::drill_arm});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
 	 {"shoulder", jointid_t::shoulder},
 	 {"elbow", jointid_t::elbow},
 	 {"forearm", jointid_t::forearm},
-	 {"differentialRoll", jointid_t::differentialRoll},
-	 {"differentialPitch", jointid_t::differentialPitch},
+	 {"wrist", jointid_t::wrist},
 	 {"hand", jointid_t::hand},
 	 {"drillArm", jointid_t::drill_arm}});
-
-/**
- * @brief Represents parameters defining a potentiometer scale.
- *
- * Contains two joint angles in millidegrees and their associated potentiometer ADC values;
- * this defines a linear scale from potentiometer ADC value to joint angle that can be sent to
- * the motor boards for position control and feedback.
- */
-struct PotentiometerParams {
-	/**
-	   @brief Computes the potentiometer scale as a real number.
-	 */
-	constexpr float scale() const;
-	/** The "low" point on the ADC scale. */
-	uint16_t adc_lo;
-	/** The "low" point on the joint rotation scale. */
-	int32_t mdeg_lo;
-	/** The "high" point on the ADC scale. */
-	uint16_t adc_hi;
-	/** The "high" point on the joint rotation scale. */
-	int32_t mdeg_hi;
-};
 
 /**
  * @brief Represents data measured using a sensor at a given time.
@@ -289,4 +277,5 @@ private:
 namespace util {
 std::string to_string(robot::types::jointid_t joint);
 std::string to_string(const robot::types::CameraID& id);
+std::string to_string(robot::types::mountedperipheral_t peripheral);
 } // namespace util
