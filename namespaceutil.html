@@ -80,7 +80,8 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">util Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -123,6 +124,9 @@ frozen::string&#160;</td><td class="memItemRight" valign="bottom"><b>freezeStr</
 <tr class="memitem:a38a49bcfa8ed1a20f65a28d004e7af74"><td class="memTemplItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceutil.html#a38a49bcfa8ed1a20f65a28d004e7af74">to_string</a> (const T &amp;val)</td></tr>
 <tr class="memdesc:a38a49bcfa8ed1a20f65a28d004e7af74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the given value to a string.  <br /></td></tr>
 <tr class="separator:a38a49bcfa8ed1a20f65a28d004e7af74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e9d28b43adad26f05fd6a983e53b032"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutil.html#a7e9d28b43adad26f05fd6a983e53b032">numericalJacobian</a> (const std::function&lt; Eigen::VectorXd(const Eigen::VectorXd &amp;)&gt; &amp;func, const Eigen::VectorXd &amp;x, int outputDim)</td></tr>
+<tr class="memdesc:a7e9d28b43adad26f05fd6a983e53b032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Estimate the jacobian of a multivariate function using finite differences.  <br /></td></tr>
+<tr class="separator:a7e9d28b43adad26f05fd6a983e53b032"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef644ff86939b8fb6d59d0fce202e8fd"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutil.html#aef644ff86939b8fb6d59d0fce202e8fd">getNormalSeed</a> ()</td></tr>
 <tr class="memdesc:aef644ff86939b8fb6d59d0fce202e8fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the random seed used for <a class="el" href="namespaceutil.html#a1b6af13be4df99a79372afcde0448fe4" title="Sample from the standard normal distribution.">util::stdn()</a>.  <br /></td></tr>
 <tr class="separator:aef644ff86939b8fb6d59d0fce202e8fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -172,6 +176,13 @@ frozen::string&#160;</td><td class="memItemRight" valign="bottom"><b>freezeStr</
 <tr class="memitem:a7983f873a316e073dd6ecdabb82379da"><td class="memItemLeft" align="right" valign="top"><a id="a7983f873a316e073dd6ecdabb82379da" name="a7983f873a316e073dd6ecdabb82379da"></a>
 <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> (<a class="el" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a> peripheral)</td></tr>
 <tr class="separator:a7983f873a316e073dd6ecdabb82379da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:af941384c3c1746bf015a31daf66829ec"><td class="memItemLeft" align="right" valign="top"><a id="af941384c3c1746bf015a31daf66829ec" name="af941384c3c1746bf015a31daf66829ec"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>epsilon</b> = 1e-5</td></tr>
+<tr class="memdesc:af941384c3c1746bf015a31daf66829ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">A small positive value, near zero. <br /></td></tr>
+<tr class="separator:af941384c3c1746bf015a31daf66829ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A collection of utility functions and classes with common use-cases. </p>
@@ -387,6 +398,51 @@ template&lt;typename K , typename V &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The keys of the given map, as an unordered set. </dd></dl>
+
+</div>
+</div>
+<a id="a7e9d28b43adad26f05fd6a983e53b032" name="a7e9d28b43adad26f05fd6a983e53b032"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e9d28b43adad26f05fd6a983e53b032">&#9670;&#160;</a></span>numericalJacobian()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd util::numericalJacobian </td>
+          <td>(</td>
+          <td class="paramtype">const std::function&lt; Eigen::VectorXd(const Eigen::VectorXd &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>func</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>outputDim</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Estimate the jacobian of a multivariate function using finite differences. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">func</td><td>The function to estimate the jacobian of. </td></tr>
+    <tr><td class="paramname">x</td><td>The point around which to calculate the jacobian. </td></tr>
+    <tr><td class="paramname">outputDim</td><td>The dimension of the output space of <code>func</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Eigen::MatrixXd An n-by-m matrix where n is the output dimension and m is the input dimension of <code>func</code>. </dd></dl>
 
 </div>
 </div>

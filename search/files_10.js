@@ -36,7 +36,7 @@ var searchData=
   ['merge_2eh_33',['merge.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00917.html',1,'']]],
   ['messages_5fmembers_2eh_34',['messages_members.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00710.html',1,'']]],
   ['miniflann_2ehpp_35',['miniflann.hpp',['https://docs.opencv.org/4.2.0/da/dfe/miniflann_8hpp.html',1,'']]],
-  ['ml_2ehpp_36',['ml.hpp',['https://docs.opencv.org/4.2.0/d3/d29/ml_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/df/d5c/ml_2ml_8hpp.html',1,'(Global Namespace)']]],
+  ['ml_2ehpp_36',['ml.hpp',['https://docs.opencv.org/4.2.0/df/d5c/ml_2ml_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d3/d29/ml_8hpp.html',1,'(Global Namespace)']]],
   ['ml_5fintro_2emarkdown_37',['ml_intro.markdown',['https://docs.opencv.org/4.2.0/db/df6/ml__intro_8markdown.html',1,'']]],
   ['mod_5fbased_5frange_5fhashing_2ehpp_38',['mod_based_range_hashing.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01322.html',1,'']]],
   ['model_5fanalysis_2emarkdown_39',['model_analysis.markdown',['https://docs.opencv.org/4.2.0/d7/d68/model__analysis_8markdown.html',1,'']]],
