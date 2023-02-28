@@ -1,13 +1,12 @@
 #include "DiffDriveKinematics.h"
 
 #include "../Util.h"
-
 using namespace navtypes;
 using util::toTransformRotateFirst;
 
+namespace kinematics {
 DiffDriveKinematics::DiffDriveKinematics(double wheelBaseWidth)
-	: wheelBaseWidth(wheelBaseWidth) {
-}
+	: wheelBaseWidth(wheelBaseWidth) {}
 
 pose_t DiffDriveKinematics::wheelVelToRobotVel(double lVel, double rVel) const {
 	return {(lVel + rVel) / 2.0, 0, (rVel - lVel) / wheelBaseWidth};
@@ -50,3 +49,4 @@ pose_t DiffDriveKinematics::getNextPose(const wheelvel_t& wheelVel, const pose_t
 										double dt) const {
 	return pose + getPoseUpdate(wheelVel, pose(2), dt);
 }
+} // namespace kinematics
