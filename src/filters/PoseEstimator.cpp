@@ -4,7 +4,7 @@
 #include "../navtypes.h"
 
 using namespace navtypes;
-using namespace kinematics; 
+using namespace kinematics;
 
 namespace filters {
 
