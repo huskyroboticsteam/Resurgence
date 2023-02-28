@@ -359,7 +359,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 
 	// Joint position reporting
 	this->_joint_report_thread =
-		std::thread(&MissionControlProtocol::jointPosReportTask, this);
+		std::thread(&MissionControlProtocol::roverPosReportTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
