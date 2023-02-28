@@ -189,15 +189,15 @@ void MissionControlProtocol::sendTelemetryData() {
 		double posY = gps.getData()[1];
 		double posZ = 1.0;
 		double recency = util::durationToSec(dataclock::now() - gps.getTime());
-		json msg = {{"type", TELEM_DATA_REP_TYPE}, 
-								{"orientW", orientW}, 
-								{"orientX", orientX},
-								{"orientY", orientY},
-								{"orientZ", orientZ},
-								{"posX", posX},
-								{"posY", posY},
-								{"posZ", posZ},
-								{"recency",  recency}};
+		json msg = {{"type", TELEM_DATA_REP_TYPE},
+					{"orientW", orientW},
+					{"orientX", orientX},
+					{"orientY", orientY},
+					{"orientZ", orientZ},
+					{"posX", posX},
+					{"posY", posY},
+					{"posZ", posZ},
+					{"recency", recency}};
 		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
 }
