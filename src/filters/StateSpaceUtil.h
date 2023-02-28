@@ -10,12 +10,6 @@
  */
 namespace filters::statespace {
 
-constexpr double epsilon = 1e-5;
-
-Eigen::MatrixXd
-numericalJacobian(const std::function<Eigen::VectorXd(const Eigen::VectorXd&)>& func,
-				  const Eigen::VectorXd& x, int outputDim);
-
 /**
  * @brief Create a covariance matrix modelling independent variables with the given standard
  * deviations.
