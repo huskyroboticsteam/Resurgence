@@ -21,7 +21,7 @@ var searchData=
   ['weibull_5fdistribution_18',['weibull_distribution',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06475.html',1,'std']]],
   ['weightingdeblurer_19',['WeightingDeblurer',['https://docs.opencv.org/4.2.0/df/d5b/classcv_1_1videostab_1_1WeightingDeblurer.html',1,'cv::videostab']]],
   ['wgrid_20',['WGrid',['https://docs.opencv.org/4.2.0/d2/dea/classcv_1_1viz_1_1WGrid.html',1,'cv::viz']]],
-  ['wheelvel_5ft_21',['wheelvel_t',['../structwheelvel__t.html',1,'']]],
+  ['wheelvel_5ft_21',['wheelvel_t',['../structkinematics_1_1wheelvel__t.html',1,'kinematics']]],
   ['whitebalancer_22',['WhiteBalancer',['https://docs.opencv.org/4.2.0/d9/d7a/classcv_1_1xphoto_1_1WhiteBalancer.html',1,'cv::xphoto']]],
   ['widget_23',['Widget',['https://docs.opencv.org/4.2.0/d7/dcd/classcv_1_1viz_1_1Widget.html',1,'cv::viz']]],
   ['widget2d_24',['Widget2D',['https://docs.opencv.org/4.2.0/d3/d49/classcv_1_1viz_1_1Widget2D.html',1,'cv::viz']]],

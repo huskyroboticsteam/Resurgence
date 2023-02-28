@@ -290,7 +290,7 @@ var searchData=
   ['pimpl_287',['pImpl',['https://docs.opencv.org/4.2.0/de/d29/classcv_1_1img__hash_1_1ImgHashBase.html#a3a6b4cc6dd3279018cefdf240c93e99c',1,'cv::img_hash::ImgHashBase']]],
   ['pinhole_288',['PINHOLE',['https://docs.opencv.org/4.2.0/d4/dc7/classcv_1_1multicalib_1_1MultiCameraCalibration.html#ab2a2522a8e0bf60ee24416e0ec37ba3ea833498d4f66baf027a178b9d299cf46b',1,'cv::multicalib::MultiCameraCalibration']]],
   ['pink_289',['pink',['https://docs.opencv.org/4.2.0/d4/dba/classcv_1_1viz_1_1Color.html#a2bb7ce663f58eeae244dc2c4c460eeaa',1,'cv::viz::Color']]],
-  ['pitch_290',['pitch',['../structjointpos__t.html#af5298a431c3dd42a7d302a4d90dda252',1,'jointpos_t::pitch()'],['https://docs.opencv.org/4.2.0/de/d26/classNCVMatrix.html#afe2cc277372b013c0a58a40e42ae8a88',1,'NCVMatrix::pitch()']]],
+  ['pitch_290',['pitch',['../structkinematics_1_1jointpos__t.html#ad11455e400c0db0d05eaab13f1d369c6',1,'kinematics::jointpos_t::pitch()'],['https://docs.opencv.org/4.2.0/de/d26/classNCVMatrix.html#afe2cc277372b013c0a58a40e42ae8a88',1,'NCVMatrix::pitch()']]],
   ['pixel_291',['pixel',['https://docs.opencv.org/4.2.0/db/d20/structcv_1_1text_1_1ERStat.html#adba2ef41119cfbb88742c646ee2e5d19',1,'cv::text::ERStat']]],
   ['pixel_5fpack_5fbuffer_292',['PIXEL_PACK_BUFFER',['https://docs.opencv.org/4.2.0/d3/d68/classcv_1_1ogl_1_1Buffer.html#a830568a629457171cb07918537ec66bea04aec232cc3ac3070953ba669bee3a3a',1,'cv::ogl::Buffer']]],
   ['pixel_5funpack_5fbuffer_293',['PIXEL_UNPACK_BUFFER',['https://docs.opencv.org/4.2.0/d3/d68/classcv_1_1ogl_1_1Buffer.html#a830568a629457171cb07918537ec66bea882899bdc22e1c13618c294343d4d9dc',1,'cv::ogl::Buffer']]],

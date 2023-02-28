@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): gearpos_t Struct Reference</title>
+<title>Resurgence (PY2022): kinematics::gearpos_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,58 +75,62 @@ $(function() {
 </div>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>kinematics</b></li><li class="navelem"><a class="el" href="structkinematics_1_1gearpos__t.html">gearpos_t</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structgearpos__t-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">gearpos_t Struct Reference</div></div>
+<a href="structkinematics_1_1gearpos__t-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">kinematics::gearpos_t Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>Represents the positions (or power) of the two motor-driven gears in the differential wrist.  
- <a href="structgearpos__t.html#details">More...</a></p>
+ <a href="structkinematics_1_1gearpos__t.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="DiffWristKinematics_8h_source.html">DiffWristKinematics.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab964cc9914242c662cf59bb26483efa5"><td class="memItemLeft" align="right" valign="top"><a id="ab964cc9914242c662cf59bb26483efa5" name="ab964cc9914242c662cf59bb26483efa5"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>gearpos_t</b> (float <a class="el" href="structgearpos__t.html#a2e2c762e66669156506f5e6e5bfcead7">left</a>, float <a class="el" href="structgearpos__t.html#a852def0322955823b63c759cb2213796">right</a>)</td></tr>
-<tr class="separator:ab964cc9914242c662cf59bb26483efa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b23daafbf41ca25ef36a0540892b73c"><td class="memItemLeft" align="right" valign="top"><a id="a2b23daafbf41ca25ef36a0540892b73c" name="a2b23daafbf41ca25ef36a0540892b73c"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>gearpos_t</b> (const Eigen::Vector2f &amp;<a class="el" href="structgearpos__t.html#ad926d88c4b8b588b22d2c0787f0efa4f">vec</a>)</td></tr>
-<tr class="memdesc:a2b23daafbf41ca25ef36a0540892b73c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a set of gear positions from a 2-component vector as \(\langle left,
+<tr class="memitem:ae1b8d9fbcf4ee0ea31e98dc8fceabc33"><td class="memItemLeft" align="right" valign="top"><a id="ae1b8d9fbcf4ee0ea31e98dc8fceabc33" name="ae1b8d9fbcf4ee0ea31e98dc8fceabc33"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>gearpos_t</b> (float <a class="el" href="structkinematics_1_1gearpos__t.html#ab9f24910ece227927746cb148af727f5">left</a>, float <a class="el" href="structkinematics_1_1gearpos__t.html#a269b54a5ab18fb7ff52ccf1ff4c6032f">right</a>)</td></tr>
+<tr class="separator:ae1b8d9fbcf4ee0ea31e98dc8fceabc33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50e316bb865e7f01fd2ca4c32c815f69"><td class="memItemLeft" align="right" valign="top"><a id="a50e316bb865e7f01fd2ca4c32c815f69" name="a50e316bb865e7f01fd2ca4c32c815f69"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>gearpos_t</b> (const Eigen::Vector2f &amp;<a class="el" href="structkinematics_1_1gearpos__t.html#a9389e03d0ec896769bbe7bf3e2673a26">vec</a>)</td></tr>
+<tr class="memdesc:a50e316bb865e7f01fd2ca4c32c815f69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a set of gear positions from a 2-component vector as \(\langle left,
 right\rangle \). <br /></td></tr>
-<tr class="separator:a2b23daafbf41ca25ef36a0540892b73c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad926d88c4b8b588b22d2c0787f0efa4f"><td class="memItemLeft" align="right" valign="top"><a id="ad926d88c4b8b588b22d2c0787f0efa4f" name="ad926d88c4b8b588b22d2c0787f0efa4f"></a>
+<tr class="separator:a50e316bb865e7f01fd2ca4c32c815f69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9389e03d0ec896769bbe7bf3e2673a26"><td class="memItemLeft" align="right" valign="top"><a id="a9389e03d0ec896769bbe7bf3e2673a26" name="a9389e03d0ec896769bbe7bf3e2673a26"></a>
 Eigen::Vector2f&#160;</td><td class="memItemRight" valign="bottom"><b>vec</b> () const</td></tr>
-<tr class="memdesc:ad926d88c4b8b588b22d2c0787f0efa4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a set of gear positions to a 2-component vector as \(\langle left,
+<tr class="memdesc:a9389e03d0ec896769bbe7bf3e2673a26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a set of gear positions to a 2-component vector as \(\langle left,
 right\rangle \). <br /></td></tr>
-<tr class="separator:ad926d88c4b8b588b22d2c0787f0efa4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a9389e03d0ec896769bbe7bf3e2673a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a2e2c762e66669156506f5e6e5bfcead7"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgearpos__t.html#a2e2c762e66669156506f5e6e5bfcead7">left</a></td></tr>
-<tr class="memdesc:a2e2c762e66669156506f5e6e5bfcead7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The position (or power) of the left gear.  <br /></td></tr>
-<tr class="separator:a2e2c762e66669156506f5e6e5bfcead7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a852def0322955823b63c759cb2213796"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgearpos__t.html#a852def0322955823b63c759cb2213796">right</a></td></tr>
-<tr class="memdesc:a852def0322955823b63c759cb2213796"><td class="mdescLeft">&#160;</td><td class="mdescRight">The position (or power) of the right gear.  <br /></td></tr>
-<tr class="separator:a852def0322955823b63c759cb2213796"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9f24910ece227927746cb148af727f5"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkinematics_1_1gearpos__t.html#ab9f24910ece227927746cb148af727f5">left</a></td></tr>
+<tr class="memdesc:ab9f24910ece227927746cb148af727f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The position (or power) of the left gear.  <br /></td></tr>
+<tr class="separator:ab9f24910ece227927746cb148af727f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a269b54a5ab18fb7ff52ccf1ff4c6032f"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkinematics_1_1gearpos__t.html#a269b54a5ab18fb7ff52ccf1ff4c6032f">right</a></td></tr>
+<tr class="memdesc:a269b54a5ab18fb7ff52ccf1ff4c6032f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The position (or power) of the right gear.  <br /></td></tr>
+<tr class="separator:a269b54a5ab18fb7ff52ccf1ff4c6032f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents the positions (or power) of the two motor-driven gears in the differential wrist. </p>
 <p>Contains position/power values for the left and right gears; when looking at the differential down the pitch axis, with the end effector to the right, the positive direction (for both gears) is counter-clockwise. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="a2e2c762e66669156506f5e6e5bfcead7" name="a2e2c762e66669156506f5e6e5bfcead7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e2c762e66669156506f5e6e5bfcead7">&#9670;&#160;</a></span>left</h2>
+<a id="ab9f24910ece227927746cb148af727f5" name="ab9f24910ece227927746cb148af727f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9f24910ece227927746cb148af727f5">&#9670;&#160;</a></span>left</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float gearpos_t::left</td>
+          <td class="memname">float kinematics::gearpos_t::left</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -136,14 +140,14 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a852def0322955823b63c759cb2213796" name="a852def0322955823b63c759cb2213796"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a852def0322955823b63c759cb2213796">&#9670;&#160;</a></span>right</h2>
+<a id="a269b54a5ab18fb7ff52ccf1ff4c6032f" name="a269b54a5ab18fb7ff52ccf1ff4c6032f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a269b54a5ab18fb7ff52ccf1ff4c6032f">&#9670;&#160;</a></span>right</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float gearpos_t::right</td>
+          <td class="memname">float kinematics::gearpos_t::right</td>
         </tr>
       </table>
 </div><div class="memdoc">

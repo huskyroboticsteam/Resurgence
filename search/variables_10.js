@@ -76,7 +76,7 @@ var searchData=
   ['piecewise_5fconstruct_73',['piecewise_construct',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01486.html#ga4be4b722e942cd646f19614bcff7a328',1,'std::piecewise_construct()'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01486.html#ga4be4b722e942cd646f19614bcff7a328',1,'piecewise_construct()(Global Namespace)']]],
   ['pimpl_74',['pImpl',['https://docs.opencv.org/4.2.0/de/d29/classcv_1_1img__hash_1_1ImgHashBase.html#a3a6b4cc6dd3279018cefdf240c93e99c',1,'cv::img_hash::ImgHashBase']]],
   ['pinhole_75',['PINHOLE',['https://docs.opencv.org/4.2.0/d4/dc7/classcv_1_1multicalib_1_1MultiCameraCalibration.html#ab2a2522a8e0bf60ee24416e0ec37ba3ea833498d4f66baf027a178b9d299cf46b',1,'cv::multicalib::MultiCameraCalibration']]],
-  ['pitch_76',['pitch',['../structjointpos__t.html#af5298a431c3dd42a7d302a4d90dda252',1,'jointpos_t']]],
+  ['pitch_76',['pitch',['../structkinematics_1_1jointpos__t.html#ad11455e400c0db0d05eaab13f1d369c6',1,'kinematics::jointpos_t']]],
   ['pixel_77',['pixel',['https://docs.opencv.org/4.2.0/db/d20/structcv_1_1text_1_1ERStat.html#adba2ef41119cfbb88742c646ee2e5d19',1,'cv::text::ERStat']]],
   ['pixel_5fpack_5fbuffer_78',['PIXEL_PACK_BUFFER',['https://docs.opencv.org/4.2.0/d3/d68/classcv_1_1ogl_1_1Buffer.html#a830568a629457171cb07918537ec66bea04aec232cc3ac3070953ba669bee3a3a',1,'cv::ogl::Buffer']]],
   ['pixel_5funpack_5fbuffer_79',['PIXEL_UNPACK_BUFFER',['https://docs.opencv.org/4.2.0/d3/d68/classcv_1_1ogl_1_1Buffer.html#a830568a629457171cb07918537ec66bea882899bdc22e1c13618c294343d4d9dc',1,'cv::ogl::Buffer']]],

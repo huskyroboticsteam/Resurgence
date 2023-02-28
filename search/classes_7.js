@@ -30,7 +30,7 @@ var searchData=
   ['gcpucontext_27',['GCPUContext',['https://docs.opencv.org/4.2.0/d4/dc1/classcv_1_1GCPUContext.html',1,'cv']]],
   ['gcpukernel_28',['GCPUKernel',['https://docs.opencv.org/4.2.0/df/d27/classcv_1_1GCPUKernel.html',1,'cv']]],
   ['gcpukernelimpl_29',['GCPUKernelImpl',['https://docs.opencv.org/4.2.0/d0/d6c/classcv_1_1GCPUKernelImpl.html',1,'cv']]],
-  ['gearpos_5ft_30',['gearpos_t',['../structgearpos__t.html',1,'']]],
+  ['gearpos_5ft_30',['gearpos_t',['../structkinematics_1_1gearpos__t.html',1,'kinematics']]],
   ['generalizedeigensolver_31',['GeneralizedEigenSolver',['https://eigen.tuxfamily.org/dox/classEigen_1_1GeneralizedEigenSolver.html',1,'Eigen']]],
   ['generalizedhough_32',['GeneralizedHough',['https://docs.opencv.org/4.2.0/d7/dd4/classcv_1_1GeneralizedHough.html',1,'cv']]],
   ['generalizedhoughballard_33',['GeneralizedHoughBallard',['https://docs.opencv.org/4.2.0/dc/d46/classcv_1_1GeneralizedHoughBallard.html',1,'cv']]],

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): DiffDriveKinematics Class Reference</title>
+<title>Resurgence (PY2022): kinematics::DiffDriveKinematics Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,47 +75,51 @@ $(function() {
 </div>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>kinematics</b></li><li class="navelem"><a class="el" href="classkinematics_1_1DiffDriveKinematics.html">DiffDriveKinematics</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classDiffDriveKinematics-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">DiffDriveKinematics Class Reference</div></div>
+<a href="classkinematics_1_1DiffDriveKinematics-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">kinematics::DiffDriveKinematics Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>Represents the kinematics of a differential drive.  
- <a href="classDiffDriveKinematics.html#details">More...</a></p>
+ <a href="classkinematics_1_1DiffDriveKinematics.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="DiffDriveKinematics_8h_source.html">DiffDriveKinematics.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa3624e7f47090d299fab9591b25b63b9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aa3624e7f47090d299fab9591b25b63b9">DiffDriveKinematics</a> (double wheelBaseWidth)</td></tr>
-<tr class="memdesc:aa3624e7f47090d299fab9591b25b63b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classDiffDriveKinematics.html" title="Represents the kinematics of a differential drive.">DiffDriveKinematics</a> with the given wheel base width.  <br /></td></tr>
-<tr class="separator:aa3624e7f47090d299fab9591b25b63b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#af4f04aecd5ab5c7361f0958c9c3b0138">wheelVelToRobotVel</a> (double lVel, double rVel) const</td></tr>
-<tr class="memdesc:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the left and right wheel velocities, find the robot velocity in the robot's reference frame.  <br /></td></tr>
-<tr class="separator:af4f04aecd5ab5c7361f0958c9c3b0138"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22f42429446747e810e4d85c671f10ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structwheelvel__t.html">wheelvel_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#a22f42429446747e810e4d85c671f10ca">robotVelToWheelVel</a> (double xVel, double thetaVel) const</td></tr>
-<tr class="memdesc:a22f42429446747e810e4d85c671f10ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the robot velocity in the robot's local reference frame, find the left and right tangential wheel velocities.  <br /></td></tr>
-<tr class="separator:a22f42429446747e810e4d85c671f10ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec54118f4bab8a82f40cf4a21c417500"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aec54118f4bab8a82f40cf4a21c417500">getLocalPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double dt) const</td></tr>
-<tr class="memdesc:aec54118f4bab8a82f40cf4a21c417500"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the local reference frame assuming the left and right wheels have constant velocity.  <br /></td></tr>
-<tr class="separator:aec54118f4bab8a82f40cf4a21c417500"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#aa0d0f3830ee9cc483a110f8e42c43e72">getPoseUpdate</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double heading, double dt) const</td></tr>
-<tr class="memdesc:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the global reference frame (map space) assuming the left and right wheels have constant velocity.  <br /></td></tr>
-<tr class="separator:aa0d0f3830ee9cc483a110f8e42c43e72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab55546370d415616eb4478dfd98f7a77"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffDriveKinematics.html#ab55546370d415616eb4478dfd98f7a77">getNextPose</a> (const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;wheelVel, const navtypes::pose_t &amp;pose, double dt) const</td></tr>
-<tr class="memdesc:ab55546370d415616eb4478dfd98f7a77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the next pose of the robot in the global reference frame.  <br /></td></tr>
-<tr class="separator:ab55546370d415616eb4478dfd98f7a77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7ed30b4de6cb335e3ca2e2a66a73247"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffDriveKinematics.html#aa7ed30b4de6cb335e3ca2e2a66a73247">DiffDriveKinematics</a> (double wheelBaseWidth)</td></tr>
+<tr class="memdesc:aa7ed30b4de6cb335e3ca2e2a66a73247"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classkinematics_1_1DiffDriveKinematics.html" title="Represents the kinematics of a differential drive.">DiffDriveKinematics</a> with the given wheel base width.  <br /></td></tr>
+<tr class="separator:aa7ed30b4de6cb335e3ca2e2a66a73247"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a64dcbc3638b58370305b89f21a8f89"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffDriveKinematics.html#a6a64dcbc3638b58370305b89f21a8f89">wheelVelToRobotVel</a> (double lVel, double rVel) const</td></tr>
+<tr class="memdesc:a6a64dcbc3638b58370305b89f21a8f89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the left and right wheel velocities, find the robot velocity in the robot's reference frame.  <br /></td></tr>
+<tr class="separator:a6a64dcbc3638b58370305b89f21a8f89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1b7c74cb5310b0de806301b19835e00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffDriveKinematics.html#ad1b7c74cb5310b0de806301b19835e00">robotVelToWheelVel</a> (double xVel, double thetaVel) const</td></tr>
+<tr class="memdesc:ad1b7c74cb5310b0de806301b19835e00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the robot velocity in the robot's local reference frame, find the left and right tangential wheel velocities.  <br /></td></tr>
+<tr class="separator:ad1b7c74cb5310b0de806301b19835e00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d99dfcd5c8fc3eda7d3e5c192293790"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffDriveKinematics.html#a9d99dfcd5c8fc3eda7d3e5c192293790">getLocalPoseUpdate</a> (const <a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double dt) const</td></tr>
+<tr class="memdesc:a9d99dfcd5c8fc3eda7d3e5c192293790"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the local reference frame assuming the left and right wheels have constant velocity.  <br /></td></tr>
+<tr class="separator:a9d99dfcd5c8fc3eda7d3e5c192293790"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c6a04b5945d3c66a404ec9878db1536"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffDriveKinematics.html#a8c6a04b5945d3c66a404ec9878db1536">getPoseUpdate</a> (const <a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a> &amp;wheelVel, double heading, double dt) const</td></tr>
+<tr class="memdesc:a8c6a04b5945d3c66a404ec9878db1536"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the pose update in the global reference frame (map space) assuming the left and right wheels have constant velocity.  <br /></td></tr>
+<tr class="separator:a8c6a04b5945d3c66a404ec9878db1536"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b488799b23e168b1803490a1ac54329"><td class="memItemLeft" align="right" valign="top">navtypes::pose_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffDriveKinematics.html#a3b488799b23e168b1803490a1ac54329">getNextPose</a> (const <a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a> &amp;wheelVel, const navtypes::pose_t &amp;pose, double dt) const</td></tr>
+<tr class="memdesc:a3b488799b23e168b1803490a1ac54329"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the next pose of the robot in the global reference frame.  <br /></td></tr>
+<tr class="separator:a3b488799b23e168b1803490a1ac54329"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents the kinematics of a differential drive. </p>
 <p>This class can be used to calculate various velocities and pose updates using the mathematical representation of the drivebase. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aa3624e7f47090d299fab9591b25b63b9" name="aa3624e7f47090d299fab9591b25b63b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3624e7f47090d299fab9591b25b63b9">&#9670;&#160;</a></span>DiffDriveKinematics()</h2>
+<a id="aa7ed30b4de6cb335e3ca2e2a66a73247" name="aa7ed30b4de6cb335e3ca2e2a66a73247"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7ed30b4de6cb335e3ca2e2a66a73247">&#9670;&#160;</a></span>DiffDriveKinematics()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -124,7 +128,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">DiffDriveKinematics::DiffDriveKinematics </td>
+          <td class="memname">kinematics::DiffDriveKinematics::DiffDriveKinematics </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>wheelBaseWidth</em></td><td>)</td>
@@ -138,7 +142,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Create a new <a class="el" href="classDiffDriveKinematics.html" title="Represents the kinematics of a differential drive.">DiffDriveKinematics</a> with the given wheel base width. </p>
+<p>Create a new <a class="el" href="classkinematics_1_1DiffDriveKinematics.html" title="Represents the kinematics of a differential drive.">DiffDriveKinematics</a> with the given wheel base width. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wheelBaseWidth</td><td>The width of the wheelbase. The units themselves don't matter, as long as you're consistent. </td></tr>
@@ -149,16 +153,16 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aec54118f4bab8a82f40cf4a21c417500" name="aec54118f4bab8a82f40cf4a21c417500"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec54118f4bab8a82f40cf4a21c417500">&#9670;&#160;</a></span>getLocalPoseUpdate()</h2>
+<a id="a9d99dfcd5c8fc3eda7d3e5c192293790" name="a9d99dfcd5c8fc3eda7d3e5c192293790"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d99dfcd5c8fc3eda7d3e5c192293790">&#9670;&#160;</a></span>getLocalPoseUpdate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pose_t DiffDriveKinematics::getLocalPoseUpdate </td>
+          <td class="memname">pose_t kinematics::DiffDriveKinematics::getLocalPoseUpdate </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a> &amp;&#160;</td>
           <td class="paramname"><em>wheelVel</em>, </td>
         </tr>
         <tr>
@@ -187,16 +191,16 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ab55546370d415616eb4478dfd98f7a77" name="ab55546370d415616eb4478dfd98f7a77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab55546370d415616eb4478dfd98f7a77">&#9670;&#160;</a></span>getNextPose()</h2>
+<a id="a3b488799b23e168b1803490a1ac54329" name="a3b488799b23e168b1803490a1ac54329"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b488799b23e168b1803490a1ac54329">&#9670;&#160;</a></span>getNextPose()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pose_t DiffDriveKinematics::getNextPose </td>
+          <td class="memname">pose_t kinematics::DiffDriveKinematics::getNextPose </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a> &amp;&#160;</td>
           <td class="paramname"><em>wheelVel</em>, </td>
         </tr>
         <tr>
@@ -233,16 +237,16 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa0d0f3830ee9cc483a110f8e42c43e72" name="aa0d0f3830ee9cc483a110f8e42c43e72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0d0f3830ee9cc483a110f8e42c43e72">&#9670;&#160;</a></span>getPoseUpdate()</h2>
+<a id="a8c6a04b5945d3c66a404ec9878db1536" name="a8c6a04b5945d3c66a404ec9878db1536"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c6a04b5945d3c66a404ec9878db1536">&#9670;&#160;</a></span>getPoseUpdate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pose_t DiffDriveKinematics::getPoseUpdate </td>
+          <td class="memname">pose_t kinematics::DiffDriveKinematics::getPoseUpdate </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structwheelvel__t.html">wheelvel_t</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a> &amp;&#160;</td>
           <td class="paramname"><em>wheelVel</em>, </td>
         </tr>
         <tr>
@@ -277,14 +281,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a22f42429446747e810e4d85c671f10ca" name="a22f42429446747e810e4d85c671f10ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22f42429446747e810e4d85c671f10ca">&#9670;&#160;</a></span>robotVelToWheelVel()</h2>
+<a id="ad1b7c74cb5310b0de806301b19835e00" name="ad1b7c74cb5310b0de806301b19835e00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1b7c74cb5310b0de806301b19835e00">&#9670;&#160;</a></span>robotVelToWheelVel()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structwheelvel__t.html">wheelvel_t</a> DiffDriveKinematics::robotVelToWheelVel </td>
+          <td class="memname"><a class="el" href="structkinematics_1_1wheelvel__t.html">wheelvel_t</a> kinematics::DiffDriveKinematics::robotVelToWheelVel </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>xVel</em>, </td>
@@ -315,14 +319,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="af4f04aecd5ab5c7361f0958c9c3b0138" name="af4f04aecd5ab5c7361f0958c9c3b0138"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4f04aecd5ab5c7361f0958c9c3b0138">&#9670;&#160;</a></span>wheelVelToRobotVel()</h2>
+<a id="a6a64dcbc3638b58370305b89f21a8f89" name="a6a64dcbc3638b58370305b89f21a8f89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a64dcbc3638b58370305b89f21a8f89">&#9670;&#160;</a></span>wheelVelToRobotVel()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pose_t DiffDriveKinematics::wheelVelToRobotVel </td>
+          <td class="memname">pose_t kinematics::DiffDriveKinematics::wheelVelToRobotVel </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>lVel</em>, </td>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Resurgence (PY2022): DiffWristKinematics Class Reference</title>
+<title>Resurgence (PY2022): kinematics::DiffWristKinematics Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,51 +75,55 @@ $(function() {
 </div>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>kinematics</b></li><li class="navelem"><a class="el" href="classkinematics_1_1DiffWristKinematics.html">DiffWristKinematics</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classDiffWristKinematics-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">DiffWristKinematics Class Reference</div></div>
+<a href="classkinematics_1_1DiffWristKinematics-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">kinematics::DiffWristKinematics Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>Represents the kinematics of a differential wrist.  
- <a href="classDiffWristKinematics.html#details">More...</a></p>
+ <a href="classkinematics_1_1DiffWristKinematics.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="DiffWristKinematics_8h_source.html">DiffWristKinematics.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a70a762bb7bb83b45c1473dafd2b2cc55"><td class="memItemLeft" align="right" valign="top"><a id="a70a762bb7bb83b45c1473dafd2b2cc55" name="a70a762bb7bb83b45c1473dafd2b2cc55"></a>
-<a class="el" href="structjointpos__t.html">jointpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>gearPosToJointPos</b> (const <a class="el" href="structgearpos__t.html">gearpos_t</a> &amp;gearPos) const</td></tr>
-<tr class="memdesc:a70a762bb7bb83b45c1473dafd2b2cc55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a set of gear positions, calculate the resulting position of the joint. <br /></td></tr>
-<tr class="separator:a70a762bb7bb83b45c1473dafd2b2cc55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a972e51d6dafb5e581249e1c57d6435eb"><td class="memItemLeft" align="right" valign="top"><a id="a972e51d6dafb5e581249e1c57d6435eb" name="a972e51d6dafb5e581249e1c57d6435eb"></a>
-<a class="el" href="structgearpos__t.html">gearpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>jointPosToGearPos</b> (const <a class="el" href="structjointpos__t.html">jointpos_t</a> &amp;jointPos) const</td></tr>
-<tr class="memdesc:a972e51d6dafb5e581249e1c57d6435eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a joint position, calculate the positions of the two gears. <br /></td></tr>
-<tr class="separator:a972e51d6dafb5e581249e1c57d6435eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a443ccbfcd70a38fabda7ef1026cc76d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structjointpos__t.html">jointpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffWristKinematics.html#a443ccbfcd70a38fabda7ef1026cc76d8">gearPowerToJointPower</a> (const <a class="el" href="structgearpos__t.html">gearpos_t</a> &amp;gearPwr) const</td></tr>
-<tr class="memdesc:a443ccbfcd70a38fabda7ef1026cc76d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the motor power of each gear, calculate the resulting power of each axis of the joint.  <br /></td></tr>
-<tr class="separator:a443ccbfcd70a38fabda7ef1026cc76d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4df6b467b60047bbe55b596ba9cb6c6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgearpos__t.html">gearpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDiffWristKinematics.html#a4df6b467b60047bbe55b596ba9cb6c6b">jointPowerToGearPower</a> (const <a class="el" href="structjointpos__t.html">jointpos_t</a> &amp;jointPwr) const</td></tr>
-<tr class="memdesc:a4df6b467b60047bbe55b596ba9cb6c6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the desired power of each axis of the joint, calculate the required motor power for each of the gears.  <br /></td></tr>
-<tr class="separator:a4df6b467b60047bbe55b596ba9cb6c6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8aa6bb5817fc05c158a35396d0867b45"><td class="memItemLeft" align="right" valign="top"><a id="a8aa6bb5817fc05c158a35396d0867b45" name="a8aa6bb5817fc05c158a35396d0867b45"></a>
+<a class="el" href="structkinematics_1_1jointpos__t.html">jointpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>gearPosToJointPos</b> (const <a class="el" href="structkinematics_1_1gearpos__t.html">gearpos_t</a> &amp;gearPos) const</td></tr>
+<tr class="memdesc:a8aa6bb5817fc05c158a35396d0867b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a set of gear positions, calculate the resulting position of the joint. <br /></td></tr>
+<tr class="separator:a8aa6bb5817fc05c158a35396d0867b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06cd252697b0207ef5c27755b09c1b2f"><td class="memItemLeft" align="right" valign="top"><a id="a06cd252697b0207ef5c27755b09c1b2f" name="a06cd252697b0207ef5c27755b09c1b2f"></a>
+<a class="el" href="structkinematics_1_1gearpos__t.html">gearpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>jointPosToGearPos</b> (const <a class="el" href="structkinematics_1_1jointpos__t.html">jointpos_t</a> &amp;jointPos) const</td></tr>
+<tr class="memdesc:a06cd252697b0207ef5c27755b09c1b2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a joint position, calculate the positions of the two gears. <br /></td></tr>
+<tr class="separator:a06cd252697b0207ef5c27755b09c1b2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab482a1e566e68d1e3c7e9be7b8436f1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkinematics_1_1jointpos__t.html">jointpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffWristKinematics.html#ab482a1e566e68d1e3c7e9be7b8436f1f">gearPowerToJointPower</a> (const <a class="el" href="structkinematics_1_1gearpos__t.html">gearpos_t</a> &amp;gearPwr) const</td></tr>
+<tr class="memdesc:ab482a1e566e68d1e3c7e9be7b8436f1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the motor power of each gear, calculate the resulting power of each axis of the joint.  <br /></td></tr>
+<tr class="separator:ab482a1e566e68d1e3c7e9be7b8436f1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c86d2d09536cd3bcfb3d6a3eaf0224c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structkinematics_1_1gearpos__t.html">gearpos_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1DiffWristKinematics.html#a1c86d2d09536cd3bcfb3d6a3eaf0224c">jointPowerToGearPower</a> (const <a class="el" href="structkinematics_1_1jointpos__t.html">jointpos_t</a> &amp;jointPwr) const</td></tr>
+<tr class="memdesc:a1c86d2d09536cd3bcfb3d6a3eaf0224c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the desired power of each axis of the joint, calculate the required motor power for each of the gears.  <br /></td></tr>
+<tr class="separator:a1c86d2d09536cd3bcfb3d6a3eaf0224c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents the kinematics of a differential wrist. </p>
 <p>A differential wrist is capable of adjusting both the pitch and roll of an end effector by driving two gears, one on each side. This class can be used to calculate the positions or motor powers of the gears given a desired joint position/power, and vice versa. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a443ccbfcd70a38fabda7ef1026cc76d8" name="a443ccbfcd70a38fabda7ef1026cc76d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a443ccbfcd70a38fabda7ef1026cc76d8">&#9670;&#160;</a></span>gearPowerToJointPower()</h2>
+<a id="ab482a1e566e68d1e3c7e9be7b8436f1f" name="ab482a1e566e68d1e3c7e9be7b8436f1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab482a1e566e68d1e3c7e9be7b8436f1f">&#9670;&#160;</a></span>gearPowerToJointPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structjointpos__t.html">jointpos_t</a> DiffWristKinematics::gearPowerToJointPower </td>
+          <td class="memname"><a class="el" href="structkinematics_1_1jointpos__t.html">jointpos_t</a> kinematics::DiffWristKinematics::gearPowerToJointPower </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structgearpos__t.html">gearpos_t</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structkinematics_1_1gearpos__t.html">gearpos_t</a> &amp;&#160;</td>
           <td class="paramname"><em>gearPwr</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -139,16 +143,16 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a4df6b467b60047bbe55b596ba9cb6c6b" name="a4df6b467b60047bbe55b596ba9cb6c6b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4df6b467b60047bbe55b596ba9cb6c6b">&#9670;&#160;</a></span>jointPowerToGearPower()</h2>
+<a id="a1c86d2d09536cd3bcfb3d6a3eaf0224c" name="a1c86d2d09536cd3bcfb3d6a3eaf0224c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c86d2d09536cd3bcfb3d6a3eaf0224c">&#9670;&#160;</a></span>jointPowerToGearPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structgearpos__t.html">gearpos_t</a> DiffWristKinematics::jointPowerToGearPower </td>
+          <td class="memname"><a class="el" href="structkinematics_1_1gearpos__t.html">gearpos_t</a> kinematics::DiffWristKinematics::jointPowerToGearPower </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structjointpos__t.html">jointpos_t</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structkinematics_1_1jointpos__t.html">jointpos_t</a> &amp;&#160;</td>
           <td class="paramname"><em>jointPwr</em></td><td>)</td>
           <td> const</td>
         </tr>
