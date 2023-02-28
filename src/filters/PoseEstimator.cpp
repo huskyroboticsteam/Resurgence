@@ -4,6 +4,7 @@
 #include "../navtypes.h"
 
 using namespace navtypes;
+using namespace kinematics; 
 
 namespace filters {
 
@@ -18,7 +19,7 @@ using statespace::NoiseCovMat;
 statevec_t stateFunc(const kinematics::DiffDriveKinematics& kinematics, double dt,
 					 const statevec_t& x, const Eigen::Vector2d& u, const Eigen::Vector2d& w) {
 	Eigen::Vector2d input = u + w; // noise is applied to the input vector
-	kinematics::wheelvel_t wheelVel{input(0), input(1)};
+	wheelvel_t wheelVel{input(0), input(1)};
 	return kinematics.getNextPose(wheelVel, x, dt);
 }
 
@@ -59,7 +60,7 @@ PoseEstimator::PoseEstimator(const Eigen::Vector2d& inputNoiseGains,
 
 void PoseEstimator::predict(double thetaVel, double xVel) {
 	// convert xVel, thetaVel to wheel velocities
-	kinematics::wheelvel_t wheelVels = kinematics.robotVelToWheelVel(xVel, thetaVel);
+	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(xVel, thetaVel);
 	Eigen::Vector2d u;
 	u << wheelVels.lVel, wheelVels.rVel;
 	ekf.predict(u);

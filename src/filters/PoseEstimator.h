@@ -6,6 +6,7 @@
 
 #include <Eigen/Core>
 
+using namespace kinematics;
 namespace filters {
 
 /**
@@ -110,7 +111,7 @@ public:
 
 private:
 	ExtendedKalmanFilter<numStates, 2, 3, 2, 3> ekf;
-	kinematics::DiffDriveKinematics kinematics;
+	DiffDriveKinematics kinematics;
 	double dt;
 };
 
