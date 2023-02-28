@@ -33,7 +33,7 @@ public:
 private:
 	void videoStreamTask();
 	void jointPowerRepeatTask();
-	void jointPosReportTask();
+	void roverPosReportTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
