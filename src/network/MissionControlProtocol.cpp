@@ -28,7 +28,7 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
-const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds ROVER_POS_REPORT_PERIOD = 100ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -399,7 +399,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 	}
 }
 
-void MissionControlProtocol::jointPosReportTask() {
+void MissionControlProtocol::roverPosReportTask() {
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
@@ -412,9 +412,9 @@ void MissionControlProtocol::jointPosReportTask() {
 			}
 		}
 
-		// send data
+		sendTelemetryData();
 
-		pt += JOINT_POS_REPORT_PERIOD;
+		pt += ROVER_POS_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);
 	}
 }
