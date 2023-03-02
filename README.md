@@ -1,6 +1,12 @@
 # Resurgence
 Main onboard codebase for the Husky Robotics rover.
 
+# Updating Dependencies
+
+Some of our dependencies are team-managed, including the CAN library and the H264Encoder. Leads can use the [ubuntu-repo](https://github.com/huskyroboticsteam/ubuntu-repo) to create new builds of these dependencies when they are updated.
+
+**IMPORTANT:** When a dependency is updated, remember to update the required version number in [CMakeLists.txt](src/CMakeLists.txt) as well as in the [CI script](.github/workflows/ccpp.yml).
+
 # Pre-Setup Notes
 
 Our codebase is developed for an NVIDIA Jetson TX2, which runs Ubuntu Linux; as such, much
