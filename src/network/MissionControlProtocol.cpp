@@ -28,7 +28,7 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
-const std::chrono::milliseconds ROVER_POS_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -48,7 +48,7 @@ constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
-constexpr const char* TELEM_DATA_REP_TYPE = "roverPositionReport";
+constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
 
@@ -187,10 +187,10 @@ void MissionControlProtocol::sendRoverPos() {
 		double orientW = cos(heading.getData() / 2);
 		double posX = gps.getData()[0];
 		double posY = gps.getData()[1];
-		double posZ = 1.0;
+		double posZ = 0.0;
 		double recency = util::durationToSec(dataclock::now() - gps.getTime()) > util::durationToSec(dataclock::now() - heading.getTime()) 
 		? util::durationToSec(dataclock::now() - gps.getTime()) : util::durationToSec(dataclock::now() - heading.getTime());
-		json msg = {{"type", TELEM_DATA_REP_TYPE},
+		json msg = {{"type", ROVER_POS_REP_TYPE},
 					{"orientW", orientW},
 					{"orientX", orientX},
 					{"orientY", orientY},
@@ -412,7 +412,7 @@ void MissionControlProtocol::roverPosReportTask() {
 
 		sendTelemetryData();
 
-		pt += ROVER_POS_REPORT_PERIOD;
+		pt += TELEM_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);
 	}
 }
