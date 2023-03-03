@@ -177,7 +177,7 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	}
 }
 
-void MissionControlProtocol::sendTelemetryData() {
+void MissionControlProtocol::sendRoverPos() {
 	auto heading = robot::readIMUHeading();
 	auto gps = robot::readGPS();
 	if (gps.isValid() && heading.isValid()) {
@@ -188,7 +188,8 @@ void MissionControlProtocol::sendTelemetryData() {
 		double posX = gps.getData()[0];
 		double posY = gps.getData()[1];
 		double posZ = 1.0;
-		double recency = util::durationToSec(dataclock::now() - gps.getTime());
+		double recency = util::durationToSec(dataclock::now() - gps.getTime()) > util::durationToSec(dataclock::now() - heading.getTime()) 
+		? util::durationToSec(dataclock::now() - gps.getTime()) : util::durationToSec(dataclock::now() - heading.getTime());
 		json msg = {{"type", TELEM_DATA_REP_TYPE},
 					{"orientW", orientW},
 					{"orientX", orientX},
