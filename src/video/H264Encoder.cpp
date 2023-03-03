@@ -9,12 +9,12 @@ std::vector<std::basic_string<uint8_t>> H264Encoder::encode_frame(const cv::Mat&
 		encoder = std::make_unique<h264encoder::Encoder>(size.width, size.height, size.width,
 														 size.height, fps);
 	}
-	std::vector<std::basic_string<uint8_t>> nals;
+	std::vector<std::basic_string<uint8_t>> video_data_units;
 	auto frame_size = encoder->encode(frame.data);
-	for (auto nal : encoder->nals) {
-		std::basic_string<uint8_t> data(nal.p_payload, nal.i_payload);
-		nals.push_back(data);
+	for (auto video_data : encoder->nals) {
+		std::basic_string<uint8_t> data(video_data.p_payload, video_data.i_payload);
+		video_data_units.push_back(data);
 	}
-	return nals;
+	return video_data_units;
 }
 } // namespace video

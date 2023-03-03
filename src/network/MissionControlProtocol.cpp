@@ -223,8 +223,8 @@ void MissionControlProtocol::sendJointPositionReport(const std::string& jointNam
 }
 
 void MissionControlProtocol::sendCameraStreamReport(
-	const CameraID& cam, const std::basic_string<uint8_t>& nal_data) {
-	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", nal_data}};
+	const CameraID& cam, const std::basic_string<uint8_t>& videoData) {
+	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", videoData}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
