@@ -62,7 +62,8 @@ enum class motorid_t {
 	elbow,
 	forearm,
 	wrist,
-	hand
+	hand,
+	activeSuspension
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -80,12 +81,13 @@ enum class jointid_t {
 	forearm,
 	wrist,
 	hand,
-	drill_arm
+	drill_arm,
+	activeSuspension
 };
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::wrist, jointid_t::hand, jointid_t::drill_arm});
+	 jointid_t::wrist, jointid_t::hand, jointid_t::drill_arm, jointid_t::activeSuspension});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -94,29 +96,8 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"forearm", jointid_t::forearm},
 	 {"wrist", jointid_t::wrist},
 	 {"hand", jointid_t::hand},
-	 {"drillArm", jointid_t::drill_arm}});
-
-/**
- * @brief Represents parameters defining a potentiometer scale.
- *
- * Contains two joint angles in millidegrees and their associated potentiometer ADC values;
- * this defines a linear scale from potentiometer ADC value to joint angle that can be sent to
- * the motor boards for position control and feedback.
- */
-struct PotentiometerParams {
-	/**
-	   @brief Computes the potentiometer scale as a real number.
-	 */
-	constexpr float scale() const;
-	/** The "low" point on the ADC scale. */
-	uint16_t adc_lo;
-	/** The "low" point on the joint rotation scale. */
-	int32_t mdeg_lo;
-	/** The "high" point on the ADC scale. */
-	uint16_t adc_hi;
-	/** The "high" point on the joint rotation scale. */
-	int32_t mdeg_hi;
-};
+	 {"drillArm", jointid_t::drill_arm},
+	 {"activeSuspension", jointid_t::activeSuspension}});
 
 /**
  * @brief Represents data measured using a sensor at a given time.

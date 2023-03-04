@@ -7,7 +7,7 @@
 #include <array>
 
 namespace filters {
-
+using namespace kinematics;
 /**
  * @brief This class implements a pose estimator that can fuse multiple sensors
  * with the kinematic model for accurate estimation.
@@ -102,7 +102,7 @@ public:
 	navtypes::pose_t getPose() const;
 
 private:
-	DiffDriveKinematics kinematics;
+	kinematics::DiffDriveKinematics kinematics;
 	double dt;
 	MultiSensorEKF<numStates, 2, 2, numSensors> ekf;
 };

@@ -9,6 +9,7 @@
 #include <optional>
 #include <unordered_set>
 
+using namespace kinematics;
 // forward declare cam::CameraParams instead of including it
 // we do this to avoid unnecessarily including OpenCV in all build targets
 namespace cam {
@@ -32,8 +33,8 @@ enum class WorldInterface { real, sim2d, sim3d, noop };
 extern const WorldInterface WORLD_INTERFACE;
 
 // TODO: add documentation
-const DiffDriveKinematics& driveKinematics();
-const DiffWristKinematics& wristKinematics();
+const kinematics::DiffDriveKinematics& driveKinematics();
+const kinematics::DiffWristKinematics& wristKinematics();
 
 /**
  * @brief Initialize the world interface.

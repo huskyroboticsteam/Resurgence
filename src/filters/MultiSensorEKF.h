@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../navtypes.h"
+#include "../utils/math.h"
 #include "KalmanFilterBase.h"
 #include "StateSpaceUtil.h"
-#include "../navtypes.h"
 
 #include <array>
 #include <functional>
@@ -62,7 +63,7 @@ public:
 			return this->outFuncJacobianX(state, outputNoise);
 		} else {
 			auto func = [&](const Eigen::VectorXd& s) { return outputFunc(s, outputNoise); };
-			return statespace::numericalJacobian(func, state, outputDim);
+			return util::numericalJacobian(func, state, outputDim);
 		}
 	}
 
@@ -85,7 +86,7 @@ public:
 				return outputFunc(state, outputNoise);
 			};
 			Eigen::VectorXd v = Eigen::VectorXd::Zero(outputNoiseDim);
-			return statespace::numericalJacobian(func, v, outputDim);
+			return util::numericalJacobian(func, v, outputDim);
 		}
 	}
 
@@ -219,7 +220,7 @@ public:
 			return stateFuncJacobianXSol(x, u, w);
 		} else {
 			auto func = [&](const state_t& state) { return stateFunc(state, u, w); };
-			return statespace::numericalJacobian(func, x, stateDim);
+			return util::numericalJacobian(func, x, stateDim);
 		}
 	}
 
@@ -230,7 +231,7 @@ public:
 			return stateFuncJacobianWSol(x, u, w);
 		} else {
 			auto func = [&](const processnoise_t& noise) { return stateFunc(x, u, noise); };
-			return statespace::numericalJacobian(func, w, stateDim);
+			return util::numericalJacobian(func, w, stateDim);
 		}
 	}
 

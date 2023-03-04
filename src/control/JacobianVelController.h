@@ -3,6 +3,7 @@
 #include "../Util.h"
 #include "../filters/StateSpaceUtil.h"
 #include "../navtypes.h"
+#include "../utils/math.h"
 
 #include <functional>
 #include <optional>
@@ -33,10 +34,9 @@ public:
 		const std::function<navtypes::Matrixd<outputDim, inputDim>(
 			const navtypes::Vectord<inputDim>&)>& jacobianFunc)
 		: kinematicsFunc(kinematicsFunc),
-		  jacobianFunc(jacobianFunc
-						   ? jacobianFunc
-						   : std::bind(filters::statespace::numericalJacobian, kinematicsFunc,
-									   std::placeholders::_1, outputDim)) {
+		  jacobianFunc(jacobianFunc ? jacobianFunc
+									: std::bind(util::numericalJacobian, kinematicsFunc,
+												std::placeholders::_1, outputDim)) {
 		assert(this->kinematicsFunc);
 		assert(this->jacobianFunc);
 	}

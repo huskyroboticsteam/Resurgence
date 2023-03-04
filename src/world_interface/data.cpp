@@ -23,10 +23,6 @@ bool LimitSwitchData::isAnyOpen() {
 std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) {
 	return data ^ other.data;
 }
-
-constexpr float PotentiometerParams::scale() const {
-	return (static_cast<int16_t>(adc_hi) - static_cast<int16_t>(adc_lo))/(mdeg_hi - mdeg_lo);
-}
 } // namespace robot::types
 
 namespace util {
@@ -48,6 +44,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "wrist";
 		case jointid_t::drill_arm:
 			return "drillArm";
+		case jointid_t::activeSuspension:
+			return "activeSuspension";
 		default:
 			// should never happen
 			return "<unknown>";

@@ -1,9 +1,10 @@
 #include "FullPoseEstimator.h"
 
 #include "../Util.h"
+#include "../navtypes.h"
 
 #include <functional>
-#include "../navtypes.h"
+using namespace kinematics;
 
 namespace filters {
 namespace {
@@ -11,9 +12,9 @@ using namespace navtypes;
 using state_t = FullPoseEstimator::state_t;
 using action_t = Eigen::Vector2d;
 using navtypes::Matrixd;
+using navtypes::Vectord;
 using statespace::NoiseCovMat;
 using statespace::NoiseCovMatX;
-using navtypes::Vectord;
 constexpr int numStates = FullPoseEstimator::numStates;
 constexpr int numSensors = FullPoseEstimator::numSensors;
 
@@ -23,7 +24,7 @@ constexpr int HEADING_IDX = 1;
 state_t stateFunc(const DiffDriveKinematics& kinematics, double dt, const state_t& x,
 				  const action_t& u, const action_t& w) {
 	action_t input = u + w; // noise is applied to the input vector
-	wheelvel_t wheelVel{input(0), input(1)};
+	kinematics::wheelvel_t wheelVel{input(0), input(1)};
 	return kinematics.getNextPose(wheelVel, x, dt);
 }
 
@@ -88,7 +89,8 @@ FullPoseEstimator::FullPoseEstimator(const Eigen::Vector2d& inputNoiseGains, dou
 									 double dt, const Eigen::Vector2d& gpsStdDev,
 									 double headingStdDev)
 	: kinematics(wheelBase), dt(dt),
-	  ekf(createEKF(kinematics, dt, inputNoiseGains, gpsStdDev, headingStdDev)) {}
+	  ekf(createEKF(filters::FullPoseEstimator::kinematics, dt, inputNoiseGains, gpsStdDev,
+					headingStdDev)) {}
 
 void FullPoseEstimator::correctGPS(const point_t& gps) {
 	ekf.correct<GPS_IDX>(gps.topRows<2>());
@@ -104,7 +106,8 @@ void FullPoseEstimator::correctHeading(double heading) {
 
 void FullPoseEstimator::predict(double thetaVel, double xVel) {
 	// convert xVel, thetaVel to wheel velocities
-	wheelvel_t wheelVels = kinematics.robotVelToWheelVel(xVel, thetaVel);
+	kinematics::wheelvel_t wheelVels =
+		kinematics.DiffDriveKinematics::robotVelToWheelVel(xVel, thetaVel);
 	Eigen::Vector2d u;
 	u << wheelVels.lVel, wheelVels.rVel;
 	ekf.predict(u);
