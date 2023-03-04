@@ -188,8 +188,10 @@ void MissionControlProtocol::sendRoverPos() {
 		double posX = gps.getData()[0];
 		double posY = gps.getData()[1];
 		double posZ = 0.0;
-		double recency = util::durationToSec(dataclock::now() - gps.getTime()) > util::durationToSec(dataclock::now() - heading.getTime()) 
-		? util::durationToSec(dataclock::now() - gps.getTime()) : util::durationToSec(dataclock::now() - heading.getTime());
+		double recency = util::durationToSec(dataclock::now() - gps.getTime()) >
+								 util::durationToSec(dataclock::now() - heading.getTime())
+							 ? util::durationToSec(dataclock::now() - gps.getTime())
+							 : util::durationToSec(dataclock::now() - heading.getTime());
 		json msg = {{"type", ROVER_POS_REP_TYPE},
 					{"orientW", orientW},
 					{"orientX", orientX},
