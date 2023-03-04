@@ -410,7 +410,7 @@ void MissionControlProtocol::roverPosReportTask() {
 			}
 		}
 
-		sendTelemetryData();
+		sendRoverPos();
 
 		pt += TELEM_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);
