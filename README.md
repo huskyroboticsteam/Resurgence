@@ -183,7 +183,7 @@ On Ubuntu, make sure you have followed the
 repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
 
 ```bash
-sudo apt-get install frozen libargparse-dev
+sudo apt-get install frozen libargparse-dev libavutil-dev
 ```
 
 Done!
