@@ -358,8 +358,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
 
 	// Joint position reporting
-	this->_joint_report_thread =
-		std::thread(&MissionControlProtocol::telemReportTask, this);
+	this->_joint_report_thread = std::thread(&MissionControlProtocol::telemReportTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
