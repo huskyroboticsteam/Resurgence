@@ -189,7 +189,7 @@ void MissionControlProtocol::sendRoverPos() {
 		double posY = gps.getData()[1];
 		double posZ = 0.0;
 		double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
-		double headingRecency = util::durationToSec(dataclock::now - heading.getTime());
+		double headingRecency = util::durationToSec(dataclock::now() - heading.getTime());
 		double recency = std::max(gpsRecency, headingRecency);
 		json msg = {{"type", ROVER_POS_REP_TYPE},
 					{"orientW", orientW},
@@ -399,7 +399,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 	}
 }
 
-void MissionControlProtocol::roverPosReportTask() {
+void MissionControlProtocol::telemReportTask() {
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
