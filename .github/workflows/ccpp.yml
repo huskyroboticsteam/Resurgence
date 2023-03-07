@@ -23,7 +23,7 @@ jobs:
         sudo apt install -y build-essential wget unzip curl gnupg2 lsb-release git \
           cmake libsfml-dev libeigen3-dev libopencv-dev libopencv-contrib-dev \
           libwebsocketpp-dev libboost-system-dev gpsd gpsd-clients libgps-dev nlohmann-json3-dev \
-          catch2 urg-lidar rplidar ublox-linux hindsight-can=1.3.0 h264encoder=1.1.1 frozen libargparse-dev
+          catch2 urg-lidar rplidar ublox-linux hindsight-can=1.3.0 h264encoder=2.0.0 frozen libargparse-dev
     - name: Build codebase
       run: |
         cd ${{ github.workspace }}
