@@ -62,7 +62,6 @@ private:
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
 	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
 	void sendRoverPos();
-	void roverPosReportTask();
 	void handleConnection();
 	void startPowerRepeat();
 	void stopAndShutdownPowerRepeat();
