@@ -1,9 +1,9 @@
 #pragma once
 
-#include "base_motor.h"
 #include "../../CAN/CAN.h"
 #include "../../CAN/CANMotor.h"
 #include "../../CAN/CANUtils.h"
+#include "base_motor.h"
 
 /**
  * @namespace robot
@@ -21,9 +21,9 @@ public:
 	 * @param pos_pwm_scales The positive pwm scales for the motor power.
 	 * @param neg_pwm_scales The positive pwm scales for the motor power.
 	 */
-	can_motor(robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial, 
-					frozen::unordered_map<robot::types::motorid_t, double, 10UL> pos_pwm_scales, 
-					frozen::unordered_map<robot::types::motorid_t, double, 10UL> neg_pwm_scales);
+	can_motor(robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial,
+			  frozen::unordered_map<robot::types::motorid_t, double, 10UL> pos_pwm_scales,
+			  frozen::unordered_map<robot::types::motorid_t, double, 10UL> neg_pwm_scales);
 
 	void setMotorPower(double power) override;
 
@@ -41,7 +41,7 @@ public:
 private:
 	can::deviceserial_t serial_id;
 	std::optional<can::motor::motormode_t> motor_mode;
-	frozen::unordered_map<robot::types::motorid_t, double, 10UL> positive_scales; 
+	frozen::unordered_map<robot::types::motorid_t, double, 10UL> positive_scales;
 	frozen::unordered_map<robot::types::motorid_t, double, 10UL> negative_scales;
 	void ensureMotorMode(robot::types::motorid_t motor, can::motor::motormode_t mode);
 }; // class can_motor

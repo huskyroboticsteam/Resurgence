@@ -1,10 +1,12 @@
 #include "can_motor.h"
 
 namespace robot {
-can_motor::can_motor(robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial, 
-					frozen::unordered_map<robot::types::motorid_t, double, 10UL> pos_pwm_scales, 
-					frozen::unordered_map<robot::types::motorid_t, double, 10UL> neg_pwm_scales)
-	: base_motor(motor, hasPosSensor), serial_id(serial), positive_scales(pos_pwm_scales), negative_scales(neg_pwm_scales) {}
+can_motor::can_motor(
+	robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial,
+	frozen::unordered_map<robot::types::motorid_t, double, 10UL> pos_pwm_scales,
+	frozen::unordered_map<robot::types::motorid_t, double, 10UL> neg_pwm_scales)
+	: base_motor(motor, hasPosSensor), serial_id(serial), positive_scales(pos_pwm_scales),
+	  negative_scales(neg_pwm_scales) {}
 
 void can_motor::setMotorPower(double power) {
 	ensureMotorMode(motor_id, can::motor::motormode_t::pwm);
