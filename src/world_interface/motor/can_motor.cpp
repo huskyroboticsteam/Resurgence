@@ -47,9 +47,8 @@ can::deviceserial_t can_motor::getMotorSerial() {
 }
 
 void can_motor::ensureMotorMode(robot::types::motorid_t motor, can::motor::motormode_t mode) {
-	if (!motor_mode) {
-		motor_mode.emplace(mode);
-	} else if (motor_mode.value() != mode) {
+	if (!motor_mode || motor_mode.value() != mode) {
+		// update the motor mode
 		motor_mode.emplace(mode);
 		can::motor::setMotorMode(serial_id, mode);
 	}
