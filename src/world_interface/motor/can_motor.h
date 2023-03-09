@@ -1,6 +1,9 @@
 #pragma once
 
 #include "base_motor.h"
+#include "../../CAN/CAN.h"
+#include "../../CAN/CANMotor.h"
+#include "../../CAN/CANUtils.h"
 
 /**
  * @namespace robot

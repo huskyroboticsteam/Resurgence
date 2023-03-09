@@ -1,9 +1,5 @@
 #include "can_motor.h"
 
-#include "../../CAN/CAN.h"
-#include "../../CAN/CANMotor.h"
-#include "../../CAN/CANUtils.h"
-
 namespace robot {
 can_motor::can_motor(robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial, 
 					frozen::unordered_map<robot::types::motorid_t, double, 10UL> pos_pwm_scales, 
