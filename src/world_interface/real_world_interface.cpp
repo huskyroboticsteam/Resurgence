@@ -38,7 +38,8 @@ DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 DiffWristKinematics wrist_kinematics;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
-	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(motor, hasPosSensor);
+	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
+																		positive_pwm_scales, negative_pwm_scales);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace
@@ -55,20 +56,8 @@ namespace {
 // map that associates camera id to the camera object
 std::unordered_map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 
-std::unordered_map<motorid_t, motormode_t> motorModeMap;
-
 callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
-
-void ensureMotorMode(motorid_t motor, motormode_t mode) {
-	auto entry = motorModeMap.find(motor);
-	if (entry == motorModeMap.end()) {
-		motorModeMap.insert(std::make_pair(motor, mode));
-	} else if (entry->second != mode) {
-		entry->second = mode;
-		can::motor::setMotorMode(motorSerialIDMap.at(motor), mode);
-	}
-}
 
 void initMotors() {
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontLeftWheel));
@@ -270,13 +259,11 @@ template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 }
 
 void setMotorPower(robot::types::motorid_t motor, double power) {
-	ensureMotorMode(motor, motormode_t::pwm);
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPower(power);
 }
 
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
-	ensureMotorMode(motor, motormode_t::pid);
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
 }

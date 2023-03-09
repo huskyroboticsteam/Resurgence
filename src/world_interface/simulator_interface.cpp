@@ -116,7 +116,7 @@ void initCameras() {
 
 void initMotors() {
 	// initializes map of motor ids and shared ptrs of their objects
-	for (auto const& x : motorNameMap) {
+	for (const auto& x : motorNameMap) {
 		std::shared_ptr<robot::base_motor> ptr =
 			std::make_shared<robot::sim_motor>(x.first, true, x.second, PROTOCOL_PATH);
 		motor_ptrs.insert({x.first, ptr});
@@ -283,6 +283,7 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 	if (itr == motor_ptrs.end()) {
 		// motor id not in map
+		log(LOG_ERROR, "getMotor(): Unknown motor %d\n", static_cast<int>(motor));
 		return nullptr;
 	} else {
 		// return motor object pointer

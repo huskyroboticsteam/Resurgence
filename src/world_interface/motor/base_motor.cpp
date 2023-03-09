@@ -35,21 +35,14 @@ void base_motor::setMotorVel(int32_t targetVel) {
 		types::datatime_t currTime = types::dataclock::now();
 		const navtypes::Vectord<1> currPos{getMotorPos().getData()};
 		navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
-		// TODO: is there only one position value in the matrix?
 		setMotorPos(posCommand.coeff(0, 0));
 	});
 }
 
 void base_motor::constructVelController() {
-	types::DataPoint<int32_t> motorPos = getMotorPos();
-	if (!motorPos.isValid()) {
-		return;
-	}
+	// define dimensions
 	constexpr int32_t inputDim = 1;
 	constexpr int32_t outputDim = 1;
-
-	// create vector for motor position
-	navtypes::Vectord<inputDim> posVector{motorPos.getData()};
 
 	// create kinematics function (input and output will both be the current motor
 	// position)

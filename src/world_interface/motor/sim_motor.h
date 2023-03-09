@@ -23,11 +23,11 @@ public:
 	sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name,
 			  const std::string& path);
 
-	void setMotorPower(double power);
+	void setMotorPower(double power) override;
 
-	void setMotorPos(int32_t targetPos);
+	void setMotorPos(int32_t targetPos) override;
 
-	types::DataPoint<int32_t> getMotorPos() const;
+	types::DataPoint<int32_t> getMotorPos() const override;
 
 private:
 	std::string motor_name;

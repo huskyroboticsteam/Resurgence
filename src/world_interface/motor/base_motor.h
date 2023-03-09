@@ -59,25 +59,24 @@ public:
 	 *
 	 * @param targetVel The target velocity, in millidegrees per second.
 	 */
-	void setMotorVel(int32_t targetVel);
+	virtual void setMotorVel(int32_t targetVel);
 
 protected:
 	robot::types::motorid_t motor_id;
 	bool posSensor;
-	inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
 	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
 	std::optional<JacobianVelController<1, 1>> velController;
+
+	inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
 	inline static std::mutex schedulerMutex;
 
 	/**
 	 * @brief Constructs a Jacobian Vel Controller
-	 *
 	 */
 	void constructVelController();
 
 	/**
 	 * @brief Unschedules the velocity event if it exists
-	 *
 	 */
 	void unscheduleVelocityEvent();
 }; // abstract class base_motor

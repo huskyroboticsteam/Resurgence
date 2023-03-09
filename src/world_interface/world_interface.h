@@ -207,9 +207,6 @@ navtypes::URCLeg getLeg(int index);
  */
 void setIndicator(types::indication_t signal);
 
-// TODO: update implementation in the files that inherit this (now have motor class
-// implementation)
-
 /**
  * @brief Set the PWM command of the given motor.
  *
