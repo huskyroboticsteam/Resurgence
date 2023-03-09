@@ -38,7 +38,8 @@ const std::unordered_map<robot::types::jointid_t, robot::types::motorid_t> joint
 	{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
 	{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
 	{robot::types::jointid_t::wrist, robot::types::motorid_t::wrist},
-	{robot::types::jointid_t::hand, robot::types::motorid_t::hand}};
+	{robot::types::jointid_t::hand, robot::types::motorid_t::hand},
+	{robot::types::jointid_t::activeSuspension, robot::types::motorid_t::activeSuspension}};
 
 std::unordered_map<types::jointid_t, double> jointPowerValues{};
 std::mutex jointPowerValuesMutex;

@@ -383,11 +383,16 @@ void setMotorPos(motorid_t motor, int32_t targetPos) {
 }
 
 DataPoint<int32_t> getMotorPos(motorid_t motor) {
-	std::string motorName = motorNameMap.at(motor);
-	std::shared_lock lock(motorPosMapMutex);
-	auto entry = motorPosMap.find(motorName);
-	if (entry != motorPosMap.end()) {
-		return entry->second;
+	auto itr = motorNameMap.find(motor);
+	if (itr != motorNameMap.end()) {
+		std::string motorName = itr->second;
+		std::shared_lock lock(motorPosMapMutex);
+		auto entry = motorPosMap.find(motorName);
+		if (entry != motorPosMap.end()) {
+			return entry->second;
+		} else {
+			return {};
+		}
 	} else {
 		return {};
 	}
@@ -403,15 +408,20 @@ callbackid_t addLimitSwitchCallback(
 	const std::function<void(robot::types::motorid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
-	auto func = std::bind(callback, motor, std::placeholders::_1);
-	std::string motorName = motorNameMap.at(motor);
+	auto itr = motorNameMap.find(motor);
+	if (itr != motorNameMap.end()) {
+		std::string motorName = itr->second;
+		auto func = std::bind(callback, motor, std::placeholders::_1);
 
-	std::lock_guard lock(limitSwitchCallbackMapMutex);
-	limitSwitchCallbackMap.insert({motorName, {}});
-	callbackid_t nextID = nextCallbackID++;
-	limitSwitchCallbackMap.at(motorName).insert({nextID, func});
-	lsCallbackToMotorMap.insert({nextID, motor});
-	return nextID;
+		std::lock_guard lock(limitSwitchCallbackMapMutex);
+		limitSwitchCallbackMap.insert({motorName, {}});
+		callbackid_t nextID = nextCallbackID++;
+		limitSwitchCallbackMap.at(motorName).insert({nextID, func});
+		lsCallbackToMotorMap.insert({nextID, motor});
+		return nextID;
+	} else {
+		return nextCallbackID++;
+	}
 }
 
 void removeLimitSwitchCallback(callbackid_t id) {
