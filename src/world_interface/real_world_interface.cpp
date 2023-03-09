@@ -34,8 +34,8 @@ extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
 namespace {
-DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
-DiffWristKinematics wrist_kinematics;
+kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+kinematics::DiffWristKinematics wrist_kinematics;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
@@ -44,11 +44,11 @@ void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 }
 } // namespace
 
-const DiffDriveKinematics& driveKinematics() {
+const kinematics::DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
 }
 
-const DiffWristKinematics& wristKinematics() {
+const kinematics::DiffWristKinematics& wristKinematics() {
 	return wrist_kinematics;
 }
 

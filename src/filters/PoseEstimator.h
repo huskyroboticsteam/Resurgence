@@ -6,6 +6,7 @@
 
 #include <Eigen/Core>
 
+using namespace kinematics;
 namespace filters {
 
 /**

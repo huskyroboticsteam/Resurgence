@@ -7,16 +7,17 @@ using namespace Catch::literals;
 using namespace filters;
 using namespace filters::statespace;
 using namespace navtypes;
+using namespace kinematics;
 
 namespace
 {
-const DiffDriveKinematics kinematics(1);
+const DiffDriveKinematics kinematics_(1);
 constexpr double dt = 0.1;
 
 pose_t stateFunc(const pose_t &x, const Eigen::Vector2d &u, const pose_t &w)
 {
 	pose_t pos = x + w;
-	return kinematics.getNextPose({u(0), u(1)}, pos, dt);
+	return kinematics_.getNextPose({u(0), u(1)}, pos, dt);
 }
 
 pose_t measurementFunc(const pose_t &x, const pose_t &v)
@@ -49,7 +50,7 @@ TEST_CASE("EKF Predict-only")
 		double r = randWheelVel();
 
 		constexpr int steps = 5; // maintain velocity for 0.5 sec
-		currPose = kinematics.getNextPose({l, r}, currPose, dt * steps);
+		currPose = kinematics_.getNextPose({l, r}, currPose, dt * steps);
 		for (int j = 0; j < steps; j++)
 		{
 			ekf.predict({l, r});

@@ -6,6 +6,7 @@
 #include <catch2/catch.hpp>
 
 using namespace navtypes;
+using namespace kinematics;
 
 namespace
 {

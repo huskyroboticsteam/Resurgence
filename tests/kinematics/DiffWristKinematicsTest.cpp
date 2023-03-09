@@ -2,6 +2,8 @@
 
 #include <catch2/catch.hpp>
 
+using namespace kinematics;
+
 namespace {
 
 void assertApprox(const gearpos_t& gp1, const gearpos_t& gp2, double eps = 1e-8) {

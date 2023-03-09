@@ -9,6 +9,7 @@
 
 using namespace filters;
 using namespace navtypes;
+using namespace kinematics;
 using navtypes::Vectord;
 
 TEST_CASE("FullPoseEstimator", "[filters]") {

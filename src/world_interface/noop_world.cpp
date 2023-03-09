@@ -4,6 +4,9 @@
 #include <memory>
 #include <unistd.h>
 
+// using namespace kinematics;
+using kinematics::DiffDriveKinematics;
+using kinematics::DiffWristKinematics;
 using namespace navtypes;
 using namespace robot::types;
 
