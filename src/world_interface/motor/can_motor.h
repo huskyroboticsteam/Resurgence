@@ -34,7 +34,7 @@ public:
 	void setMotorVel(int32_t targetVel) override;
 
 	/**
-	 * @brief Returns the serial id of the motor.
+	 * @brief Returns the motor's serial id.
 	 */
 	can::deviceserial_t getMotorSerial();
 
