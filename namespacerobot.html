@@ -952,9 +952,18 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, encparams_t&gt;(</div>
-<div class="line">    {{motorid_t::shoulder, {.isInverted = <span class="keyword">false</span>, .ppjr = 1620 * 1024}},</div>
-<div class="line">     {motorid_t::elbow, {.isInverted = <span class="keyword">true</span>, .ppjr = 1620 * 1024}}})</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, encparams_t&gt;({</div>
+<div class="line">    {motorid_t::shoulder,</div>
+<div class="line">        {.isInverted = <span class="keyword">false</span>,</div>
+<div class="line">        .ppjr = 1620 * 1024,</div>
+<div class="line">        .limitSwitchLow = -90000,</div>
+<div class="line">        .limitSwitchHigh = 90000}},</div>
+<div class="line">    {motorid_t::elbow,</div>
+<div class="line">        {.isInverted = <span class="keyword">true</span>,</div>
+<div class="line">        .ppjr = 1620 * 1024,</div>
+<div class="line">        .limitSwitchLow = -90000,</div>
+<div class="line">        .limitSwitchHigh = 90000}}</div>
+<div class="line">})</div>
 </div><!-- fragment -->
 </div>
 </div>

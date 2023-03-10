@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['h_0',['H',['https://docs.opencv.org/4.2.0/d2/d9a/structcv_1_1detail_1_1MatchesInfo.html#a7cb8ab58870d3190fba157dc82309573',1,'cv::detail::MatchesInfo']]],
-  ['h_1',['h',['https://docs.opencv.org/4.2.0/d7/d59/structcv_1_1ximgproc_1_1Box.html#aacf44126c02994ada2ebe5d3c1fc14e6',1,'cv::ximgproc::Box']]],
+  ['h_0',['h',['https://docs.opencv.org/4.2.0/d7/d59/structcv_1_1ximgproc_1_1Box.html#aacf44126c02994ada2ebe5d3c1fc14e6',1,'cv::ximgproc::Box']]],
+  ['h_1',['H',['https://docs.opencv.org/4.2.0/d2/d9a/structcv_1_1detail_1_1MatchesInfo.html#a7cb8ab58870d3190fba157dc82309573',1,'cv::detail::MatchesInfo']]],
   ['h264_2',['H264',['https://docs.opencv.org/4.2.0/d0/d61/group__cudacodec.html#gga71943a1181287609b5d649f53ce6c146a4d16556aa0f93abeb86c0c3e2f20faeb',1,'H264()(Global Namespace)'],['https://docs.opencv.org/4.2.0/d0/d61/group__cudacodec.html#gga71943a1181287609b5d649f53ce6c146a4d16556aa0f93abeb86c0c3e2f20faeb',1,'cv::cudacodec::H264()']]],
   ['h264_5fmvc_3',['H264_MVC',['https://docs.opencv.org/4.2.0/d0/d61/group__cudacodec.html#gga71943a1181287609b5d649f53ce6c146ab43df77d9c586151d39620eea3d13a51',1,'H264_MVC()(Global Namespace)'],['https://docs.opencv.org/4.2.0/d0/d61/group__cudacodec.html#gga71943a1181287609b5d649f53ce6c146ab43df77d9c586151d39620eea3d13a51',1,'cv::cudacodec::H264_MVC()']]],
   ['h264_5fsvc_4',['H264_SVC',['https://docs.opencv.org/4.2.0/d0/d61/group__cudacodec.html#gga71943a1181287609b5d649f53ce6c146a5f138ef5c88368b5b3e544c0d8798a60',1,'H264_SVC()(Global Namespace)'],['https://docs.opencv.org/4.2.0/d0/d61/group__cudacodec.html#gga71943a1181287609b5d649f53ce6c146a5f138ef5c88368b5b3e544c0d8798a60',1,'cv::cudacodec::H264_SVC()']]],
@@ -407,8 +407,8 @@ var searchData=
   ['histogram_5flr_404',['histogram_lr',['https://docs.opencv.org/4.2.0/d3/de9/structcv_1_1TrackerCSRT_1_1Params.html#a87a0492d85a62f7592ecf054e8d00044',1,'cv::TrackerCSRT::Params']]],
   ['histogrambody_405',['HistogramBody',['https://docs.opencv.org/4.2.0/d9/dea/structcv_1_1cudev_1_1HistogramBody.html',1,'cv::cudev']]],
   ['histogramcostextractor_406',['HistogramCostExtractor',['https://docs.opencv.org/4.2.0/df/d9a/classcv_1_1HistogramCostExtractor.html',1,'cv']]],
-  ['histogramnormtype_407',['histogramNormType',['https://docs.opencv.org/4.2.0/d5/d33/structcv_1_1HOGDescriptor.html#a03bb4bba3f3af82fc2674e4c3d7feb89',1,'cv::HOGDescriptor']]],
-  ['histogramnormtype_408',['HistogramNormType',['https://docs.opencv.org/4.2.0/d5/d33/structcv_1_1HOGDescriptor.html#aaf697bc744e0c0b561fa09099bb56ed8',1,'cv::HOGDescriptor']]],
+  ['histogramnormtype_407',['HistogramNormType',['https://docs.opencv.org/4.2.0/d5/d33/structcv_1_1HOGDescriptor.html#aaf697bc744e0c0b561fa09099bb56ed8',1,'cv::HOGDescriptor']]],
+  ['histogramnormtype_408',['histogramNormType',['https://docs.opencv.org/4.2.0/d5/d33/structcv_1_1HOGDescriptor.html#a03bb4bba3f3af82fc2674e4c3d7feb89',1,'cv::HOGDescriptor']]],
   ['histogramphaseunwrapping_409',['HistogramPhaseUnwrapping',['https://docs.opencv.org/4.2.0/d5/d7d/classcv_1_1phase__unwrapping_1_1HistogramPhaseUnwrapping.html',1,'cv::phase_unwrapping']]],
   ['histogramphaseunwrapping_2ehpp_410',['histogramphaseunwrapping.hpp',['https://docs.opencv.org/4.2.0/df/dce/histogramphaseunwrapping_8hpp.html',1,'']]],
   ['histograms_411',['Histograms',['https://docs.opencv.org/4.2.0/d6/dc7/group__imgproc__hist.html',1,'']]],

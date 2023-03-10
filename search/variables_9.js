@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['i_0',['i',['https://docs.opencv.org/4.2.0/d9/df3/unionCv32suf.html#a424508ebe407f2e67376ddfca524d16f',1,'Cv32suf::i()'],['https://docs.opencv.org/4.2.0/dd/d0f/unionCv16suf.html#a99b698f5f5c40c5542c844e595310353',1,'Cv16suf::i()']]],
+  ['i_0',['i',['https://docs.opencv.org/4.2.0/dd/d0f/unionCv16suf.html#a99b698f5f5c40c5542c844e595310353',1,'Cv16suf']]],
   ['i_1',['I',['https://docs.opencv.org/4.2.0/dd/dcb/structcv_1_1quality_1_1QualitySSIM_1_1__mat__data.html#a9273ad55d7ee6b78865cc627c59e5890',1,'cv::quality::QualitySSIM::_mat_data']]],
-  ['i_2',['i',['https://docs.opencv.org/4.2.0/de/d55/unionCv64suf.html#af9bfb67aa19f4eaf8eab3b0ee48784ac',1,'Cv64suf::i()'],['https://docs.opencv.org/4.2.0/da/dff/structTHash.html#a925e525d7c839cc562389743c45686d0',1,'THash::i()']]],
+  ['i_2',['i',['https://docs.opencv.org/4.2.0/da/dff/structTHash.html#a925e525d7c839cc562389743c45686d0',1,'THash::i()'],['https://docs.opencv.org/4.2.0/d9/df3/unionCv32suf.html#a424508ebe407f2e67376ddfca524d16f',1,'Cv32suf::i()'],['https://docs.opencv.org/4.2.0/de/d55/unionCv64suf.html#af9bfb67aa19f4eaf8eab3b0ee48784ac',1,'Cv64suf::i()']]],
   ['i_5f2_3',['I_2',['https://docs.opencv.org/4.2.0/dd/dcb/structcv_1_1quality_1_1QualitySSIM_1_1__mat__data.html#a0e2b01f52b5d8e9b15faf21b3afc0c21',1,'cv::quality::QualitySSIM::_mat_data']]],
   ['icap_4',['icap',['https://docs.opencv.org/4.2.0/d8/dfe/classcv_1_1VideoCapture.html#ad20c1542d32a3dfef0a083bede8b956a',1,'cv::VideoCapture']]],
   ['icase_5',['icase',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01574.html#a21c1f7289167aa3d0a40b24e39a80f00',1,'std::regex_constants']]],

@@ -114,6 +114,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aed6d24cbbf89da0bb3eb1dc11bc8b72e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#aed6d24cbbf89da0bb3eb1dc11bc8b72e">initMotor</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial)</td></tr>
 <tr class="memdesc:aed6d24cbbf89da0bb3eb1dc11bc8b72e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a motor.  <br /></td></tr>
 <tr class="separator:aed6d24cbbf89da0bb3eb1dc11bc8b72e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaeed0f12c1b4d0867d8731cf19dbf40e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#aaeed0f12c1b4d0867d8731cf19dbf40e">setLimitSwitchLimits</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> lo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> hi)</td></tr>
+<tr class="memdesc:aaeed0f12c1b4d0867d8731cf19dbf40e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the limits of the limit switch on a motor board.  <br /></td></tr>
+<tr class="separator:aaeed0f12c1b4d0867d8731cf19dbf40e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4cac5edf238d3d3dce9cd2b32015751"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#af4cac5edf238d3d3dce9cd2b32015751">setMotorPIDConstants</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> kP, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> kI, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> kD)</td></tr>
 <tr class="memdesc:af4cac5edf238d3d3dce9cd2b32015751"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the PID constants for a motor board.  <br /></td></tr>
 <tr class="separator:af4cac5edf238d3d3dce9cd2b32015751"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -443,6 +446,51 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>initPotentiometer</b>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>The callback ID that was returned when the callback was registered with <a class="el" href="namespacecan_1_1motor.html#a7603e86ca01598b51e3d5c3b4d76fa7b" title="Add a callback that is invoked when the limit switch is triggered for a motor board.">addLimitSwitchCallback()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aaeed0f12c1b4d0867d8731cf19dbf40e" name="aaeed0f12c1b4d0867d8731cf19dbf40e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaeed0f12c1b4d0867d8731cf19dbf40e">&#9670;&#160;</a></span>setLimitSwitchLimits()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can::motor::setLimitSwitchLimits </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a>&#160;</td>
+          <td class="paramname"><em>serial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td>
+          <td class="paramname"><em>lo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td>
+          <td class="paramname"><em>hi</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the limits of the limit switch on a motor board. </p>
+<p>When the corresponding limit switch is triggered, the encoder value is set to this value. Use this method for motorboard with both encoders and limit switches</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">serial</td><td>The CAN serial number of the motor board. </td></tr>
+    <tr><td class="paramname">lo</td><td>The joint position in millidegrees of the low limit switch. </td></tr>
+    <tr><td class="paramname">hi</td><td>The joint position in millidegrees of the high limit switch. </td></tr>
   </table>
   </dd>
 </dl>
