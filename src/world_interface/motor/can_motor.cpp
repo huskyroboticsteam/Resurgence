@@ -3,8 +3,8 @@
 namespace robot {
 can_motor::can_motor(
 	robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial,
-	frozen::unordered_map<robot::types::motorid_t, double, 10UL> pos_pwm_scales,
-	frozen::unordered_map<robot::types::motorid_t, double, 10UL> neg_pwm_scales)
+	frozen::unordered_map<robot::types::motorid_t, double, 11UL> pos_pwm_scales,
+	frozen::unordered_map<robot::types::motorid_t, double, 11UL> neg_pwm_scales)
 	: base_motor(motor, hasPosSensor), serial_id(serial), positive_scales(pos_pwm_scales),
 	  negative_scales(neg_pwm_scales) {}
 
