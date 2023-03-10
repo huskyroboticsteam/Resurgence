@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
 
 #include <frozen/unordered_map.h>
 #include <frozen/unordered_set.h>
@@ -60,17 +59,20 @@ struct encparams_t {
 };
 
 // TODO: verify limit switch limits
-constexpr auto encMotors =
-	frozen::make_unordered_map<motorid_t, encparams_t>({{motorid_t::shoulder,
-														 {.isInverted = false,
-														  .ppjr = 1620 * 1024,
-														  .limitSwitchLow = -90000,
-														  .limitSwitchHigh = 90000}},
-														{motorid_t::elbow,
-														 {.isInverted = true,
-														  .ppjr = 1620 * 1024,
-														  .limitSwitchLow = -90000,
-														  .limitSwitchHigh = 90000}}});
+// clang-format off
+constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
+	{motorid_t::shoulder,
+		{.isInverted = false,
+		.ppjr = 1620 * 1024,
+		.limitSwitchLow = -90000,
+		.limitSwitchHigh = 90000}},
+	{motorid_t::elbow,
+		{.isInverted = true,
+		.ppjr = 1620 * 1024,
+		.limitSwitchLow = -90000,
+		.limitSwitchHigh = 90000}}
+});
+// clang-format on
 
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,
