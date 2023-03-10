@@ -52,11 +52,27 @@ struct encparams_t {
 	bool isInverted;
 	/** Encoder pulses count per joint revolution */
 	int ppjr;
+	/** Limit switch low, in millidegrees */
+	int limitSwitchLow;
+	/** Limit switch high, in millidegrees */
+	int limitSwitchHigh;
 };
 
-constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>(
-	{{motorid_t::shoulder, {.isInverted = false, .ppjr = 1620 * 1024}},
-	 {motorid_t::elbow, {.isInverted = true, .ppjr = 1620 * 1024}}});
+// TODO: verify limit switch limits
+// clang-format off
+constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
+	{motorid_t::shoulder,
+		{.isInverted = false,
+		.ppjr = 1620 * 1024,
+		.limitSwitchLow = -90000,
+		.limitSwitchHigh = 90000}},
+	{motorid_t::elbow,
+		{.isInverted = true,
+		.ppjr = 1620 * 1024,
+		.limitSwitchLow = -90000,
+		.limitSwitchHigh = 90000}}
+});
+// clang-format on
 
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,
