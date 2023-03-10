@@ -53,11 +53,24 @@ struct encparams_t {
 	bool isInverted;
 	/** Encoder pulses count per joint revolution */
 	int ppjr;
+	/** Limit switch low, in millidegrees */
+	int limitSwitchLow;
+	/** Limit switch high, in millidegrees */
+	int limitSwitchHigh;
 };
 
-constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>(
-	{{motorid_t::shoulder, {.isInverted = false, .ppjr = 1620 * 1024}},
-	 {motorid_t::elbow, {.isInverted = true, .ppjr = 1620 * 1024}}});
+// TODO: verify limit switch limits
+constexpr auto encMotors =
+	frozen::make_unordered_map<motorid_t, encparams_t>({{motorid_t::shoulder,
+														 {.isInverted = false,
+														  .ppjr = 1620 * 1024,
+														  .limitSwitchLow = -90000,
+														  .limitSwitchHigh = 90000}},
+														{motorid_t::elbow,
+														 {.isInverted = true,
+														  .ppjr = 1620 * 1024,
+														  .limitSwitchLow = -90000,
+														  .limitSwitchHigh = 90000}}});
 
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,
@@ -82,12 +95,6 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wrist, DEVICE_SERIAL_MOTOR_WRIST},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
-
-// TODO: verify limit switch limits
-/** @brief Maps motors to their corresponding limit switch limits, if they have them. */
-constexpr auto limitSwitchLimitsMap =
-	frozen::make_unordered_map<motorid_t, std::pair<int32_t, int32_t>>(
-		{{motorid_t::shoulder, {-90000, 90000}}, {motorid_t::elbow, {-90000, 90000}}});
 
 // TODO: tune pid
 /** @brief A mapping of PID controlled motors to their pid coefficients. */

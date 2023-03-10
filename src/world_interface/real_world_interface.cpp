@@ -72,7 +72,6 @@ void initMotors() {
 
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initMotor(serial);
 		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
 	}
@@ -83,23 +82,16 @@ void initMotors() {
 
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initMotor(serial);
 		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
 								TELEM_PERIOD);
-
-		// TODO: set limit switch limits
+		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
+										 enc_params.limitSwitchHigh);
 	}
 
 	for (motorid_t motor : pidMotors) {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
-	}
-
-	for (const auto& it : limitSwitchLimitsMap) {
-		auto limits = it.second;
-		can::motor::setLimitSwitchLimits(motorSerialIDMap.at(it.first), limits.first,
-										 limits.second);
 	}
 }
 
