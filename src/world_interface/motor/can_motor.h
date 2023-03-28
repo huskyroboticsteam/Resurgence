@@ -18,12 +18,11 @@ public:
 	 * @param motor The motor id to manipulate.
 	 * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
 	 * @param serial The serial number of the motor board.
-	 * @param pos_pwm_scales The positive pwm scales for the motor power.
-	 * @param neg_pwm_scales The positive pwm scales for the motor power.
+	 * @param pos_pwm_scale The positive pwm scale for the motor power.
+	 * @param neg_pwm_scale The positive pwm scale for the motor power.
 	 */
 	can_motor(robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial,
-			  frozen::unordered_map<robot::types::motorid_t, double, 11UL> pos_pwm_scales,
-			  frozen::unordered_map<robot::types::motorid_t, double, 11UL> neg_pwm_scales);
+			  double pos_pwm_scale, double neg_pwm_scale);
 
 	void setMotorPower(double power) override;
 
@@ -41,8 +40,8 @@ public:
 private:
 	can::deviceserial_t serial_id;
 	std::optional<can::motor::motormode_t> motor_mode;
-	frozen::unordered_map<robot::types::motorid_t, double, 11UL> positive_scales;
-	frozen::unordered_map<robot::types::motorid_t, double, 11UL> negative_scales;
+	double positive_scale;
+	double negative_scale;
 	void ensureMotorMode(robot::types::motorid_t motor, can::motor::motormode_t mode);
 }; // class can_motor
 } // namespace robot

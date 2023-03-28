@@ -38,9 +38,13 @@ kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 kinematics::DiffWristKinematics wrist_kinematics;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
-	std::shared_ptr<robot::base_motor> ptr =
-		std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
-									positive_pwm_scales, negative_pwm_scales);
+	// get scales for motor
+	double posScale = positive_pwm_scales.at(motor);
+	double negScale = negative_pwm_scales.at(motor);
+
+	// create ptr and insert in map
+	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(
+		motor, hasPosSensor, motorSerialIDMap.at(motor), posScale, negScale);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace

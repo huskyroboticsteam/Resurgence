@@ -1,12 +1,10 @@
 #include "can_motor.h"
 
 namespace robot {
-can_motor::can_motor(
-	robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial,
-	frozen::unordered_map<robot::types::motorid_t, double, 11UL> pos_pwm_scales,
-	frozen::unordered_map<robot::types::motorid_t, double, 11UL> neg_pwm_scales)
-	: base_motor(motor, hasPosSensor), serial_id(serial), positive_scales(pos_pwm_scales),
-	  negative_scales(neg_pwm_scales) {}
+can_motor::can_motor(robot::types::motorid_t motor, bool hasPosSensor,
+					 can::deviceserial_t serial, double pos_pwm_scale, double neg_pwm_scale)
+	: base_motor(motor, hasPosSensor), serial_id(serial), positive_scale(pos_pwm_scale),
+	  negative_scale(neg_pwm_scale) {}
 
 void can_motor::setMotorPower(double power) {
 	ensureMotorMode(motor_id, can::motor::motormode_t::pwm);
@@ -14,11 +12,9 @@ void can_motor::setMotorPower(double power) {
 	// unschedule velocity event if exists
 	unscheduleVelocityEvent();
 
-	auto& scaleMap = power < 0 ? negative_scales : positive_scales;
-	auto entry = scaleMap.find(motor_id);
-	if (entry != scaleMap.end()) {
-		power *= entry->second;
-	}
+	// scale the power
+	double scale = power < 0 ? negative_scale : positive_scale;
+	power *= scale;
 	can::motor::setMotorPower(serial_id, power);
 }
 
