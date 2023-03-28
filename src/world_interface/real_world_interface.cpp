@@ -65,10 +65,9 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontLeftWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::frontRightWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearLeftWheel));
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::rearRightWheel));
+	for (const auto& it : motorSerialIDMap) {
+		can::motor::initMotor(it.second);
+	}
 
 	for (const auto& pot_motor_pair : robot::potMotors) {
 		motorid_t motor_id = pot_motor_pair.first;
@@ -76,7 +75,6 @@ void initMotors() {
 
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initMotor(serial);
 		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
 	}
@@ -87,11 +85,10 @@ void initMotors() {
 
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initMotor(serial);
 		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
 								TELEM_PERIOD);
-
-		// TODO: set limit switch limits
+		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
+										 enc_params.limitSwitchHigh);
 	}
 
 	// initialize motor objects and add them to map
@@ -108,7 +105,7 @@ void initMotors() {
 		// initialize motor objects and add them to map
 		addMotorMapping(motor, true);
 	}
-
+  
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
 	addMotorMapping(motorid_t::hand, false);
 }
