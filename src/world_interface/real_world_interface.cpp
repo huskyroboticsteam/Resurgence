@@ -77,6 +77,9 @@ void initMotors() {
 
 		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
+
+		// initialize motor objects and add them to map
+		addMotorMapping(motor_id, true);
 	}
 
 	for (const auto& enc_motor_pair : robot::encMotors) {
@@ -89,6 +92,9 @@ void initMotors() {
 								TELEM_PERIOD);
 		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
 										 enc_params.limitSwitchHigh);
+
+		// initialize motor objects and add them to map
+		addMotorMapping(motor_id, true);
 	}
 
 	// initialize motor objects and add them to map
@@ -101,9 +107,6 @@ void initMotors() {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
-
-		// initialize motor objects and add them to map
-		addMotorMapping(motor, true);
 	}
 
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
