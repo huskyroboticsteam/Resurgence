@@ -105,7 +105,7 @@ void initMotors() {
 		// initialize motor objects and add them to map
 		addMotorMapping(motor, true);
 	}
-  
+
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
 	addMotorMapping(motorid_t::hand, false);
 }
