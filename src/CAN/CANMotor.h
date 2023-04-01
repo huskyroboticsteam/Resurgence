@@ -59,6 +59,18 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**
+ * @brief Set the limits of the limit switch on a motor board.
+ *
+ * When the corresponding limit switch is triggered, the encoder value is set to this value.
+ * Use this method for motorboard with both encoders and limit switches
+ *
+ * @param serial The CAN serial number of the motor board.
+ * @param lo The joint position in millidegrees of the low limit switch.
+ * @param hi The joint position in millidegrees of the high limit switch.
+ */
+void setLimitSwitchLimits(deviceserial_t serial, int32_t lo, int32_t hi);
+
+/**
  * @brief Initialize a potentiometer attached to the given motor.
  *
  * @param serial The CAN serial number of the motor board.
