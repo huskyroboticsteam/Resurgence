@@ -183,8 +183,8 @@ void MissionControlProtocol::sendRoverPos() {
 	if (gps.isValid() && heading.isValid()) {
 		double orientX = 0.0;
 		double orientY = 0.0;
-		double orientZ = sin(heading.getData() / 2);
-		double orientW = cos(heading.getData() / 2);
+		double orientZ = std::sin(heading.getData() / 2);
+		double orientW = std::cos(heading.getData() / 2);
 		double posX = gps.getData()[0];
 		double posY = gps.getData()[1];
 		double posZ = 0.0;
