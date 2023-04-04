@@ -118,7 +118,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(HindsightCAN 1.3.0 REQUIRED)
 
 # Find the H264 encoder library
-find_package(H264Encoder 2.0.0 REQUIRED)
+# find_package(H264Encoder 2.0.0 REQUIRED)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -257,11 +257,12 @@ target_link_libraries(filters utils)
 
 add_library(video STATIC
   video/H264Encoder.cpp
+  video/encoder.cpp
 )
 
 target_link_libraries(video
   ${OpenCV_LIBS}
-  H264Encoder
+  x264 avutil avcodec avformat swscale
 )
 
 add_library(control SHARED
