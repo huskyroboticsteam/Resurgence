@@ -91,7 +91,7 @@ motors and sensors over the
 
 Assuming the Ubuntu repository has been set up:
 ```bash
-sudo apt install hindsight-can h264encoder
+sudo apt install hindsight-can
 ```
 
 ### Install OpenCV
@@ -183,7 +183,7 @@ On Ubuntu, make sure you have followed the
 repo](https://huskyroboticsteam.github.io/ubuntu-repo) and then just run:
 
 ```bash
-sudo apt-get install frozen libargparse-dev libavutil-dev
+sudo apt-get install frozen libargparse-dev libavutil-dev libx264-dev
 ```
 
 Done!
