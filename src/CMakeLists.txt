@@ -117,9 +117,6 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 # actually require physical CAN to be present.
 find_package(HindsightCAN 1.3.0 REQUIRED)
 
-# Find the H264 encoder library
-# find_package(H264Encoder 2.0.0 REQUIRED)
-
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
