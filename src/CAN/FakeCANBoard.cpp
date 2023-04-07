@@ -1,8 +1,8 @@
 
+#include "../world_interface/motor/can_motor.h"
 #include "CAN.h"
 #include "CANMotor.h"
 #include "CANUtils.h"
-#include "motor/can_motor.h"
 
 #include <algorithm>
 #include <chrono>
