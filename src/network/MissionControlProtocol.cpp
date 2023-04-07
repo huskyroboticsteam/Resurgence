@@ -412,7 +412,8 @@ void MissionControlProtocol::videoStreamTask() {
 
 					// convert frame to encoded data and send it
 					auto data_vector = encoder->encode_frame(frame);
-					for (auto data_string : data_vector) { // for each encoded peice of data, send it.
+					for (auto data_string :
+						 data_vector) { // for each encoded peice of data, send it.
 						sendCameraStreamReport(cam, data_string);
 					}
 				}
