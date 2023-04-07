@@ -410,10 +410,10 @@ void MissionControlProtocol::videoStreamTask() {
 					this->_open_streams[cam] = new_frame_num;
 					const auto& encoder = this->_camera_encoders[cam];
 
-					// convert frame to nals and send it
-					auto nals_vector = encoder->encode_frame(frame);
-					for (auto nal_string : nals_vector) { // for each nal, send it.
-						sendCameraStreamReport(cam, nal_string);
+					// convert frame to encoded data and send it
+					auto data_vector = encoder->encode_frame(frame);
+					for (auto data_string : data_vector) { // for each encoded peice of data, send it.
+						sendCameraStreamReport(cam, data_string);
 					}
 				}
 			}
