@@ -11,7 +11,7 @@ std::vector<std::basic_string<uint8_t>> H264Encoder::encode_frame(const cv::Mat&
 	}
 	std::vector<std::basic_string<uint8_t>> video_data_units;
 	auto frame_size = encoder->encode(frame.data);
-	for (auto video_data : encoder->nals) {
+	for (auto video_data : encoder->getNals()) {
 		std::basic_string<uint8_t> data(video_data.p_payload, video_data.i_payload);
 		video_data_units.push_back(data);
 	}

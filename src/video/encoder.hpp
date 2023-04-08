@@ -22,10 +22,10 @@ typedef struct x264_nal_t_simple {
 
 class Encoder {
 public:
-	std::vector<x264_nal_t_simple> nals;
 	Encoder(){};
 	Encoder(int, int, int, int, float);
 	int encode(unsigned char*);
+	const std::vector<x264_nal_t_simple>& getNals();
 
 private:
 	std::shared_ptr<EncoderImpl> impl;

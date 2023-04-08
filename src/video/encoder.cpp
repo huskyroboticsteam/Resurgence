@@ -113,4 +113,8 @@ int Encoder::encode(unsigned char* img) {
 	return impl->encode(img);
 }
 
+const std::vector<x264_nal_t_simple>& Encoder::getNals() {
+	return impl->nals_simple;
+}
+
 } // namespace h264encoder
