@@ -32,12 +32,15 @@ enum class TestMode {
 	ScienceServos
 };
 
-std::unordered_set<int> modes = {
-	static_cast<int>(TestMode::ModeSet),	   static_cast<int>(TestMode::PWM),
-	static_cast<int>(TestMode::PID),		   static_cast<int>(TestMode::Encoder),
-	static_cast<int>(TestMode::PIDVel),		   static_cast<int>(TestMode::Encoder),
-	static_cast<int>(TestMode::LimitSwitch),   static_cast<int>(TestMode::ScienceTelemetry),
-	static_cast<int>(TestMode::ScienceMotors), static_cast<int>(TestMode::ScienceServos)};
+std::unordered_set<int> modes = {static_cast<int>(TestMode::ModeSet),
+								 static_cast<int>(TestMode::PWM),
+								 static_cast<int>(TestMode::PID),
+								 static_cast<int>(TestMode::Encoder),
+								 static_cast<int>(TestMode::PIDVel),
+								 static_cast<int>(TestMode::LimitSwitch),
+								 static_cast<int>(TestMode::ScienceTelemetry),
+								 static_cast<int>(TestMode::ScienceMotors),
+								 static_cast<int>(TestMode::ScienceServos)};
 
 int prompt(const char* msg) {
 	std::string str;
@@ -78,6 +81,7 @@ int main() {
 	robot::types::datatime_t startTime;
 	int32_t targetVel;
 	robot::can_motor motor(motorid_t::frontLeftWheel, true, serial, 0.0, 0.0);
+	robot::types::DataPoint<int32_t> initialMotorPos;
 
 	while (true) {
 		if (testMode == TestMode::ModeSet) {
@@ -131,6 +135,9 @@ int main() {
 				motor = robot::can_motor(motorid_t::frontLeftWheel, true, serial, posScale,
 										 negScale);
 
+				// get initial motor position
+				initialMotorPos = motor.getMotorPos();
+
 				// create velocity command
 				targetVel = prompt("Enter the target velocity (in millidegrees per second)\n");
 				motor.setMotorVel(targetVel);
@@ -140,15 +147,15 @@ int main() {
 			// get x data: current time
 			robot::types::datatime_t currTime = robot::types::dataclock::now();
 
-			// get y data: set point (target vel * time since set velocity call)
-			double setPoint = targetVel * fabs((currTime.time_since_epoch().count() -
-												startTime.time_since_epoch().count()));
+			// get y data: set point (target vel * time since set velocity call) + initial pos
+			double setPoint = (targetVel * util::durationToSec(currTime - startTime)) +
+							  initialMotorPos.getData();
 
 			// get y data: motor position
 			robot::types::DataPoint<int32_t> motorPos = motor.getMotorPos();
 
 			// print data
-			std::cout << "current time: " << currTime.time_since_epoch().count()
+			std::cout << "elapsed time: " << util::durationToSec(currTime - startTime)
 					  << ", set point: " << setPoint << ", motor pos: " << motorPos.getData()
 					  << "\n";
 		} else if (testMode == TestMode::Encoder) {
