@@ -78,6 +78,7 @@ void parseCommandLine(int argc, char** argv) {
 			std::unordered_map<std::string, mountedperipheral_t> allowed{
 				{"none", mountedperipheral_t::none},
 				{"arm", mountedperipheral_t::arm},
+				{"arm_servo", mountedperipheral_t::armServo},
 				{"science", mountedperipheral_t::scienceStation},
 				{"lidar", mountedperipheral_t::lidar}};
 
