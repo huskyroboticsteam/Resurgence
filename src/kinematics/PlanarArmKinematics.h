@@ -18,7 +18,17 @@ public:
 		return N;
 	}
 
-	Eigen::Matrix<double, 2, N> getJacobian(const std::array<double, N>& jointPos) const {}
+	Eigen::Matrix<double, 2, N> getJacobian(const std::array<double, N>& jointPos) const {
+		Eigen::Matrix<double, 2, N> jacobian = Eigen::Matrix:Zero();
+		for(int i = 0; i < N; i++){
+			for(int j = 0; j < i; j++){
+				jacobian[i][0] += jointPos[j];	
+			}
+			jacobian[i][1] = segLens[i] * std::cos(jacobian[i][1]);
+			jacobian[i][0] = -1 * segLens[i] * std::sin(jacobian[i][0]);
+		}
+		return jacobian;
+	}
 
 	Eigen::Vector2d jointPosToEEPos(const std::array<double, N>& jointPos) const {
 		Eigen::Vector2d eePos = Eigen::Vector2d::Zero();
@@ -47,6 +57,7 @@ public:
 
 	std::array<double, N> eePosToJointPos(const Eigen::Vector2d& eePos) const {
 		// TODO: implement
+		
 	}
 
 	std::array<double, N> eeVelToJointVel(const Eigen::Vector2d& eePos,
