@@ -80,8 +80,8 @@ void parseCommandLine(int argc, char** argv) {
 				{"arm", mountedperipheral_t::arm},
 				{"arm_servo", mountedperipheral_t::armServo},
 				{"science", mountedperipheral_t::scienceStation},
-				{"lidar", mountedperipheral_t::lidar}};
-
+				{"lidar", mountedperipheral_t::lidar}
+				};
 			if (allowed.find(value) != allowed.end()) {
 				Globals::mountedPeripheral = allowed[value];
 				return value;
