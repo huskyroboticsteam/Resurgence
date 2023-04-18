@@ -82,6 +82,7 @@ int main() {
 	int32_t targetVel;
 	robot::can_motor motor(motorid_t::frontLeftWheel, true, serial, 0.0, 0.0);
 	robot::types::DataPoint<int32_t> initialMotorPos;
+	double vel_timeout;
 
 	while (true) {
 		if (testMode == TestMode::ModeSet) {
@@ -139,6 +140,8 @@ int main() {
 				initialMotorPos = motor.getMotorPos();
 
 				// create velocity command
+				vel_timeout = prompt("Enter the number of seconds you want the command to run "
+									 "for (double value)\n");
 				targetVel = prompt("Enter the target velocity (in millidegrees per second)\n");
 				motor.setMotorVel(targetVel);
 				startTime = robot::types::dataclock::now();
@@ -155,9 +158,14 @@ int main() {
 			robot::types::DataPoint<int32_t> motorPos = motor.getMotorPos();
 
 			// print data
-			std::cout << "elapsed time: " << util::durationToSec(currTime - startTime)
-					  << ", set point: " << setPoint << ", motor pos: " << motorPos.getData()
-					  << "\n";
+			double elapsedTime = util::durationToSec(currTime - startTime);
+			std::cout << "elapsed time: " << elapsedTime << ", set point: " << setPoint
+					  << ", motor pos: " << motorPos.getData() << "\n";
+
+			if (elapsedTime > vel_timeout) {
+				// stop arm movement: set power to 0
+				motor.setMotorPower(0.0);
+			}
 		} else if (testMode == TestMode::Encoder) {
 			if (!mode_has_been_set) {
 				int sensorType;
