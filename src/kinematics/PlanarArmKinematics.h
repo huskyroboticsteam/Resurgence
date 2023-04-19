@@ -4,6 +4,7 @@
 
 #include <array>
 #include <initializer_list>
+#include <numeric>
 
 #include <Eigen/Core>
 
@@ -11,29 +12,32 @@ namespace kinematics {
 
 template <unsigned int N> class PlanarArmKinematics {
 public:
-	explicit PlanarArmKinematics(const std::initializer_list<double>& segLens)
-		: segLens(segLens) {}
+	PlanarArmKinematics(const navtypes::Vectord<N>& segLens) : segLens(segLens) {}
 
 	constexpr unsigned int getNumSegments() const {
 		return N;
 	}
 
-	Eigen::Matrix<double, 2, N> getJacobian(const std::array<double, N>& jointPos) const {
-		Eigen::Matrix<double, 2, N> jacobian = Eigen::Matrix:Zero();
-		for(int i = 0; i < N; i++){
-			for(int j = 0; j < i; j++){
-				jacobian[i][0] += jointPos[j];	
+	navtypes::Matrixd<2, N> getJacobian(const navtypes::Vectord<N>& jointPos) const {
+		Eigen::Matrix<double, 2, N> jacobian = Eigen::Matrix<double, 2, N>::Zero();
+		std::array<double, N> thetaCumSum;
+		thetaCumSum[0] = jointPos[0];
+		for (unsigned int i = 1; i < N; i++) {
+			thetaCumSum[i] = jointPos[i] + thetaCumSum[i - 1];
+		}
+		for (unsigned int i = 0; i < N; i++) {
+			for (unsigned int j = i; j < N; j++) {
+				jacobian(0, i) += -segLens[j] * std::sin(thetaCumSum[j]);
+				jacobian(1, i) += segLens[j] * std::cos(thetaCumSum[j]);
 			}
-			jacobian[i][1] = segLens[i] * std::cos(jacobian[i][1]);
-			jacobian[i][0] = -1 * segLens[i] * std::sin(jacobian[i][0]);
 		}
 		return jacobian;
 	}
 
-	Eigen::Vector2d jointPosToEEPos(const std::array<double, N>& jointPos) const {
+	Eigen::Vector2d jointPosToEEPos(const navtypes::Vectord<N>& jointPos) const {
 		Eigen::Vector2d eePos = Eigen::Vector2d::Zero();
 		double accumAngle = 0;
-		for (int i = 0; i < N; i++) {
+		for (unsigned int i = 0; i < N; i++) {
 			accumAngle += jointPos[i];
 			Eigen::Vector2d segVec{std::cos(accumAngle), std::sin(accumAngle)};
 			eePos += segLens[i] * segVec;
@@ -41,32 +45,25 @@ public:
 		return eePos;
 	}
 
-	Eigen::Vector2d jointVelToEEVel(const std::array<double, N>& jointPos,
-									const std::array<double, N>& jointVel) const {
-		navtypes::Vectord<N> jointVelVec;
-		for (int i = 0; i < N; i++) {
-			jointVelVec[i] = jointVel[i];
-		}
-		return jointVelToEEVel(jointPos, jointVelVec);
-	}
-
-	Eigen::Vector2d jointVelToEEVel(const std::array<double, N>& jointPos,
+	Eigen::Vector2d jointVelToEEVel(const navtypes::Vectord<N>& jointPos,
 									const navtypes::Vectord<N>& jointVel) const {
 		return getJacobian(jointPos) * jointVel;
 	}
 
-	std::array<double, N> eePosToJointPos(const Eigen::Vector2d& eePos) const {
+	navtypes::Vectord<N> eePosToJointPos(const Eigen::Vector2d& eePos) const {
 		// TODO: implement
-		
+		return navtypes::Vectord<N>::Zero();
 	}
 
-	std::array<double, N> eeVelToJointVel(const Eigen::Vector2d& eePos,
-										  const Eigen::Vector2d& eeVel) const {
-		// TODO: implement
+	navtypes::Vectord<N> eeVelToJointVel(const Eigen::Vector2d& eePos,
+										 const Eigen::Vector2d& eeVel) const {
+		navtypes::Vectord<N> jointPos = eePosToJointPos(eePos);
+		navtypes::Matrixd<2, N> jacobian = getJacobian(jointPos);
+		return jacobian.colPivHouseholderQR().solve(eeVel);
 	}
 
 private:
-	std::array<double, N> segLens;
+	navtypes::Vectord<N> segLens;
 };
 
 } // namespace kinematics
