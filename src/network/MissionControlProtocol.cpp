@@ -424,6 +424,7 @@ void MissionControlProtocol::videoStreamTask() {
 				break;
 			}
 		}
+		std::this_thread::yield();
 	}
 }
 
