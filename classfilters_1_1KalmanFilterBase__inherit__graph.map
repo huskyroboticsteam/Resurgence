@@ -1,9 +1,9 @@
 <map id="filters::KalmanFilterBase&lt; stateDim, inputDim &gt;" name="filters::KalmanFilterBase&lt; stateDim, inputDim &gt;">
-<area shape="rect" id="node1" title="Base class for Kalman Filters." alt="" coords="5,169,168,209"/>
-<area shape="rect" id="node2" href="$classfilters_1_1ExtendedKalmanFilter.html" title=" " alt="" coords="243,5,428,45"/>
-<area shape="rect" id="node3" href="$classfilters_1_1KalmanFilter.html" title=" " alt="" coords="269,69,401,109"/>
-<area shape="rect" id="node4" href="$classfilters_1_1MultiSensorEKF.html" title=" " alt="" coords="228,133,443,173"/>
-<area shape="rect" id="node5" href="$classfilters_1_1ExtendedKalmanFilter.html" title="Implements a discrete&#45;time EKF." alt="" coords="216,198,455,253"/>
-<area shape="rect" id="node6" href="$classfilters_1_1KalmanFilter.html" title="Implements a Kalman Filter." alt="" coords="262,277,409,331"/>
-<area shape="rect" id="node7" href="$classfilters_1_1MultiSensorEKF.html" title=" " alt="" coords="227,355,444,410"/>
+<area shape="rect" id="node1" title="Base class for Kalman Filters." alt="" coords="5,172,167,213"/>
+<area shape="rect" id="node2" href="$classfilters_1_1ExtendedKalmanFilter.html" title=" " alt="" coords="242,5,426,46"/>
+<area shape="rect" id="node3" href="$classfilters_1_1KalmanFilter.html" title=" " alt="" coords="268,71,400,111"/>
+<area shape="rect" id="node4" href="$classfilters_1_1MultiSensorEKF.html" title=" " alt="" coords="227,136,441,177"/>
+<area shape="rect" id="node5" href="$classfilters_1_1ExtendedKalmanFilter.html" title="Implements a discrete&#45;time EKF." alt="" coords="215,201,453,256"/>
+<area shape="rect" id="node6" href="$classfilters_1_1KalmanFilter.html" title="Implements a Kalman Filter." alt="" coords="261,281,407,336"/>
+<area shape="rect" id="node7" href="$classfilters_1_1MultiSensorEKF.html" title=" " alt="" coords="226,361,442,416"/>
 </map>

@@ -1,4 +1,4 @@
 <map id="net::websocket::WebSocketProtocol" name="net::websocket::WebSocketProtocol">
-<area shape="rect" id="node1" title="Defines a protocol which will be served at an endpoint of a server." alt="" coords="16,5,199,45"/>
-<area shape="rect" id="node2" href="$classnet_1_1mc_1_1MissionControlProtocol.html" title=" " alt="" coords="5,93,209,119"/>
+<area shape="rect" id="node1" title="Defines a protocol which will be served at an endpoint of a server." alt="" coords="16,5,198,46"/>
+<area shape="rect" id="node2" href="$classnet_1_1mc_1_1MissionControlProtocol.html" title=" " alt="" coords="5,94,209,120"/>
 </map>

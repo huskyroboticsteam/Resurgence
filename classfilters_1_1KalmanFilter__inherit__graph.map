@@ -1,4 +1,4 @@
 <map id="filters::KalmanFilter&lt; stateDim, inputDim, outputDim &gt;" name="filters::KalmanFilter&lt; stateDim, inputDim, outputDim &gt;">
-<area shape="rect" id="node1" title="Implements a Kalman Filter." alt="" coords="13,93,160,148"/>
-<area shape="rect" id="node2" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="5,5,168,45"/>
+<area shape="rect" id="node1" title="Implements a Kalman Filter." alt="" coords="13,94,159,150"/>
+<area shape="rect" id="node2" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="5,5,167,46"/>
 </map>
