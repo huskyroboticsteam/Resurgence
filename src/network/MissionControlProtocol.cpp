@@ -28,7 +28,7 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
-const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -48,6 +48,7 @@ constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
+constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
 
@@ -173,6 +174,33 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	if (it != name_to_jointid.end()) {
 		jointid_t joint_id = it->second;
 		setRequestedJointPower(joint_id, power);
+	}
+}
+
+void MissionControlProtocol::sendRoverPos() {
+	auto heading = robot::readIMUHeading();
+	auto gps = robot::readGPS();
+	if (gps.isValid() && heading.isValid()) {
+		double orientX = 0.0;
+		double orientY = 0.0;
+		double orientZ = std::sin(heading.getData() / 2);
+		double orientW = std::cos(heading.getData() / 2);
+		double posX = gps.getData()[0];
+		double posY = gps.getData()[1];
+		double posZ = 0.0;
+		double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
+		double headingRecency = util::durationToSec(dataclock::now() - heading.getTime());
+		double recency = std::max(gpsRecency, headingRecency);
+		json msg = {{"type", ROVER_POS_REP_TYPE},
+					{"orientW", orientW},
+					{"orientX", orientX},
+					{"orientY", orientY},
+					{"orientZ", orientZ},
+					{"posX", posX},
+					{"posY", posY},
+					{"posZ", posZ},
+					{"recency", recency}};
+		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
 }
 
@@ -330,8 +358,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
 
 	// Joint position reporting
-	this->_joint_report_thread =
-		std::thread(&MissionControlProtocol::jointPosReportTask, this);
+	this->_joint_report_thread = std::thread(&MissionControlProtocol::telemReportTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
@@ -371,7 +398,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 	}
 }
 
-void MissionControlProtocol::jointPosReportTask() {
+void MissionControlProtocol::telemReportTask() {
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
@@ -384,7 +411,9 @@ void MissionControlProtocol::jointPosReportTask() {
 			}
 		}
 
-		pt += JOINT_POS_REPORT_PERIOD;
+		sendRoverPos();
+
+		pt += TELEM_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);
 	}
 }
