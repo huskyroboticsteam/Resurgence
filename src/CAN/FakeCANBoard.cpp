@@ -77,13 +77,6 @@ int main() {
 	}
 	bool mode_has_been_set = false;
 
-	// declare variables for PIDVel testmode
-	robot::types::datatime_t startTime;
-	int32_t targetVel;
-	robot::can_motor motor(motorid_t::frontLeftWheel, true, serial, 0.0, 0.0);
-	robot::types::DataPoint<int32_t> initialMotorPos;
-	double vel_timeout;
-
 	while (true) {
 		if (testMode == TestMode::ModeSet) {
 			serial = prompt("Enter motor serial");
@@ -115,6 +108,12 @@ int main() {
 			int angle_target = prompt("Enter PID target (in 1000ths of degrees)");
 			can::motor::setMotorPIDTarget(serial, angle_target);
 		} else if (testMode == TestMode::PIDVel) {
+			static robot::types::datatime_t startTime;
+			static int32_t targetVel;
+			static std::shared_ptr<robot::can_motor> motor;
+			static robot::types::DataPoint<int32_t> initialMotorPos;
+			static double vel_timeout;
+
 			if (!mode_has_been_set) {
 				// set pid mode
 				can::motor::setMotorMode(serial, motormode_t::pid);
@@ -133,17 +132,22 @@ int main() {
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = robot::can_motor(motorid_t::frontLeftWheel, true, serial, posScale,
-										 negScale);
+				motor = std::make_shared<robot::can_motor>(motorid_t::frontLeftWheel, true,
+														   serial, posScale, negScale);
 
 				// get initial motor position
-				initialMotorPos = motor.getMotorPos();
+				DataPoint<int32_t> dataPoint = motor->getMotorPos();
+				while (!dataPoint.isValid()) {
+					std::this_thread::sleep_for(100ms);
+					dataPoint = motor->getMotorPos();
+				}
+				initialMotorPos = dataPoint.getData();
 
 				// create velocity command
 				vel_timeout = prompt("Enter the number of seconds you want the command to run "
 									 "for (double value)\n");
 				targetVel = prompt("Enter the target velocity (in millidegrees per second)\n");
-				motor.setMotorVel(targetVel);
+				motor->setMotorVel(targetVel);
 				startTime = robot::types::dataclock::now();
 			}
 
@@ -155,7 +159,7 @@ int main() {
 							  initialMotorPos.getData();
 
 			// get y data: motor position
-			robot::types::DataPoint<int32_t> motorPos = motor.getMotorPos();
+			robot::types::DataPoint<int32_t> motorPos = motor->getMotorPos();
 
 			// print data
 			double elapsedTime = util::durationToSec(currTime - startTime);
@@ -164,7 +168,7 @@ int main() {
 
 			if (elapsedTime > vel_timeout) {
 				// stop arm movement: set power to 0
-				motor.setMotorPower(0.0);
+				motor->setMotorPower(0.0);
 			}
 		} else if (testMode == TestMode::Encoder) {
 			if (!mode_has_been_set) {

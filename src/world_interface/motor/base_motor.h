@@ -61,6 +61,20 @@ public:
 	 */
 	virtual void setMotorVel(int32_t targetVel);
 
+	/**
+	 * @brief Delete the copy constructor.
+	 *
+	 * @param base_motor The motor to copy
+	 */
+	base_motor(const base_motor&) = delete;
+
+	/**
+	 * @brief Delete the copy operator.
+	 *
+	 * @param base_motor The motor to copy
+	 */
+	base_motor& operator=(const base_motor&) = delete;
+
 protected:
 	robot::types::motorid_t motor_id;
 	bool posSensor;
