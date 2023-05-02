@@ -12,6 +12,13 @@ filesystem.
 | `50-usb-hokuyo-lidar.rules` | `/etc/udev/rules.d/`  | `udev` rules for making sure we have permissions to access the lidar over USB. |
 | `50-rover-cameras.rules`    | `/etc/udev/rules.d/`  | `udev` rules for making sure cameras have stable IDs.                          |
 
+# Directions
+Run:
+```bash
+./rover-config.sh
+```
+Alternatively, one can manually copy the files over.
+
 ## Notes
 
 To update `udev` rules, either reboot or execute

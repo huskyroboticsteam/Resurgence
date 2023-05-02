@@ -34,7 +34,7 @@ public:
 private:
 	void videoStreamTask();
 	void jointPowerRepeatTask();
-	void jointPosReportTask();
+	void telemReportTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
@@ -64,6 +64,8 @@ private:
 	void sendCameraStreamReport(const CameraID& cam,
 								const std::vector<std::basic_string<uint8_t>>& videoData);
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
+	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
+	void sendRoverPos();
 	void handleConnection();
 	void startPowerRepeat();
 	void stopAndShutdownPowerRepeat();
