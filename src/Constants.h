@@ -118,5 +118,10 @@ constexpr uint32_t RPLIDAR_A1_BAUDRATE = 115200;
 constexpr uint32_t RPLIDAR_S1_BAUDRATE = 256000;
 } // namespace Lidar
 
+// Video encoding
+namespace video {
+   const int H264_RF_CONSTANT = 40;
+}
+
 constexpr double CONTROL_HZ = 10.0;
 } // namespace Constants

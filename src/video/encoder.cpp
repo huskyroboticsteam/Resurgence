@@ -35,7 +35,7 @@ public:
 	EncoderImpl(){};
 
 	// Setup of the encoder instance
-	EncoderImpl(int inW, int inH, int outW, int outH, float fps)
+	EncoderImpl(int inW, int inH, int outW, int outH, float fps, int rf)
 		: in_xres(inW), in_yres(inH), out_xres(outW), out_yres(outH) {
 
 		framecounter = 0;
@@ -45,11 +45,14 @@ public:
 		prms.i_height = out_yres;
 		prms.i_fps_num = fps;
 		prms.i_fps_den = 1;
-		prms.rc.i_qp_constant = 51; // maybe try 0 if it is lagging, max 51
+		prms.rc.i_qp_constant = 51; // Quantization parameter, deprecated compression.
+									// max value of 51.  Higher value means more compression.
 
-		prms.rc.i_rc_method = X264_RC_CRF;
-		prms.rc.f_rf_constant = 25; // maybe try 51 if it is lagging?
-		prms.rc.f_rf_constant_max = 25;
+		prms.rc.i_rc_method = X264_RC_CRF;  // defines the rate control method as RF
+		prms.rc.f_rf_constant = rf; // Rate contorl factor, higher means more compression (max 51).
+									// this value shouldn't be below 21 as quality is essentially
+									// the same as the input.
+		prms.rc.f_rf_constant_max = 25;  // the maximum quality, will not go below this value
 
 		prms.i_csp = X264_CSP_I420;
 		enc = x264_encoder_open(&prms);
@@ -105,8 +108,8 @@ public:
 	}
 };
 
-Encoder::Encoder(int inW, int inH, int outW, int outH, float fps) {
-	impl = std::make_shared<EncoderImpl>(inW, inH, outW, outH, fps);
+Encoder::Encoder(int inW, int inH, int outW, int outH, float fps, int rf) {
+	impl = std::make_shared<EncoderImpl>(inW, inH, outW, outH, fps, rf);
 }
 
 int Encoder::encode(unsigned char* img) {

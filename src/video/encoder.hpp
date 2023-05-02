@@ -23,7 +23,7 @@ typedef struct x264_nal_t_simple {
 class Encoder {
 public:
 	Encoder(){};
-	Encoder(int, int, int, int, float);
+	Encoder(int, int, int, int, float, int);
 	int encode(unsigned char*);
 	const std::vector<x264_nal_t_simple>& getNals();
 

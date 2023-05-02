@@ -1,13 +1,13 @@
 #include "H264Encoder.h"
 
 namespace video {
-H264Encoder::H264Encoder(int fps) : fps(fps) {}
+H264Encoder::H264Encoder(int fps, int rf) : fps(fps), rf(rf) {}
 
 std::vector<std::basic_string<uint8_t>> H264Encoder::encode_frame(const cv::Mat& frame) {
 	if (!encoder) {
 		auto size = frame.size();
 		encoder = std::make_unique<h264encoder::Encoder>(size.width, size.height, size.width,
-														 size.height, fps);
+														 size.height, fps, rf);
 	}
 	std::vector<std::basic_string<uint8_t>> video_data_units;
 	auto frame_size = encoder->encode(frame.data);

@@ -199,7 +199,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		this->_open_streams[cam] = 0;
-		this->_camera_encoders[cam] = std::make_shared<video::H264Encoder>(j["fps"]);
+		this->_camera_encoders[cam] = std::make_shared<video::H264Encoder>(j["fps"], Constants::video::H264_RF_CONSTANT);
 	}
 }
 
@@ -223,7 +223,7 @@ void MissionControlProtocol::sendJointPositionReport(const std::string& jointNam
 }
 
 void MissionControlProtocol::sendCameraStreamReport(
-	const CameraID& cam, const std::basic_string<uint8_t>& videoData) {
+	const CameraID& cam, const std::vector<std::basic_string<uint8_t>>& videoData) {
 	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", videoData}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
@@ -412,10 +412,7 @@ void MissionControlProtocol::videoStreamTask() {
 
 					// convert frame to encoded data and send it
 					auto data_vector = encoder->encode_frame(frame);
-					for (auto data_string :
-						 data_vector) { // for each encoded peice of data, send it.
-						sendCameraStreamReport(cam, data_string);
-					}
+					sendCameraStreamReport(cam, data_vector);
 				}
 			}
 

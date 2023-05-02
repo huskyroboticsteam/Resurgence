@@ -15,7 +15,7 @@ public:
 	/**
 	 * Uses the h264encoder library to encode webcam frames into encoded video data
 	 */
-	H264Encoder(int fps);
+	H264Encoder(int fps, int rf);
 	/**
 	 * First frame will set the resolution and subsequent frames must match the resolution
 	 * @returns A vector of video data units representing the encoded frame
@@ -27,5 +27,7 @@ private:
 	std::unique_ptr<h264encoder::Encoder> encoder;
 	// The frame rate of the video being encoded
 	int fps;
+	// the rf constant for rate control compression
+	int rf;
 };
 } // namespace video
