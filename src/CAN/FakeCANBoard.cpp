@@ -161,11 +161,8 @@ int main() {
 			// get y data: motor position
 			robot::types::DataPoint<int32_t> motorPos = motor->getMotorPos();
 
-			// print data
+			// check if time is up
 			double elapsedTime = util::durationToSec(currTime - startTime);
-			std::cout << "elapsed time: " << elapsedTime << ", set point: " << setPoint
-					  << ", motor pos: " << motorPos.getData() << "\n";
-
 			if (elapsedTime > vel_timeout) {
 				// stop arm movement: set power to 0
 				motor->setMotorPower(0.0);
