@@ -266,6 +266,12 @@ void world_interface_init() {
 	AR::initializeLandmarkDetection();
 }
 
+void emergencyStop() {
+	for (const auto& motor : motorNameMap) {
+		setMotorPower(motor.first, 0.0);
+	}
+}
+
 std::unordered_set<CameraID> getCameras(){
 	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
 	return util::keySet(cameraLastFrameIdxMap);

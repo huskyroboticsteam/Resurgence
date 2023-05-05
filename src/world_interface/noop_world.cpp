@@ -28,6 +28,8 @@ const DiffWristKinematics& wristKinematics() {
 
 void world_interface_init() {}
 
+void emergencyStop() {}
+
 DataPoint<points_t> readLidarScan() {
 	return points_t{};
 }
