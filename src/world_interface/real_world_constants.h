@@ -67,7 +67,7 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		.limitSwitchLow = -90000,
 		.limitSwitchHigh = 90000}},
 	{motorid_t::elbow,
-		{.isInverted = true,
+		{.isInverted = false,
 		.ppjr = 1620 * 1024,
 		.limitSwitchLow = -90000,
 		.limitSwitchHigh = 90000}}
