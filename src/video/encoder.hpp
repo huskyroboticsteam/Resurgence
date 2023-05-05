@@ -1,5 +1,5 @@
-#ifndef ENCODER_HPP_
-#define ENCODER_HPP_
+// This code is partially adapted from https://github.com/cbachhuber/CppVideoStreamer
+#pragma once
 
 #include <memory>
 #include <stdint.h>
@@ -32,5 +32,3 @@ private:
 };
 
 } // namespace h264encoder
-
-#endif /* ENCODER_HPP_ */

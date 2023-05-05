@@ -120,7 +120,7 @@ constexpr uint32_t RPLIDAR_S1_BAUDRATE = 256000;
 
 // Video encoding
 namespace video {
-const int H264_RF_CONSTANT = 40;
+constexpr int H264_RF_CONSTANT = 40;
 }
 
 constexpr double CONTROL_HZ = 10.0;
