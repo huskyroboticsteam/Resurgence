@@ -1,5 +1,6 @@
 #include "MissionControlProtocol.h"
 
+#include "../CAN/CANMotor.h"
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../base64/base64_img.h"
@@ -98,10 +99,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
 		this->stopAndShutdownPowerRepeat();
-		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
-		// use it to send estop packets to all motor controllers.
-		// This will stop the arm and everything else too.
-		// @see can::motor::emergencyStopMotors()
+		can::motor::emergencyStopMotors();
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();
