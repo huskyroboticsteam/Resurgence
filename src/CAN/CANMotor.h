@@ -137,6 +137,15 @@ void setMotorPower(deviceserial_t serial, int16_t power);
 void setMotorPIDTarget(deviceserial_t serial, int32_t target);
 
 /**
+ * @brief Set the angle of the PCA servo
+ *
+ * @param serial The CAN serial number of the motor board.
+ * @param servoNum the servo number.
+ * @param angle the angle of the servo in millidegrees.
+ */
+void setPCAServo(deviceserial_t serial, uint8_t servoNum, int32_t angle);
+
+/**
  * @brief Get the last reported position of a motor.
  *
  * This only reports the cached position, it does not poll the motor board for new data.
