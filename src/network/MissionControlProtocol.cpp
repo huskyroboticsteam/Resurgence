@@ -227,6 +227,8 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		this->_open_streams[cam] = 0;
+		this->_camera_encoders[cam] =
+			std::make_shared<video::H264Encoder>(j["fps"], Constants::video::H264_RF_CONSTANT);
 	}
 }
 
@@ -238,6 +240,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
 	std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 	this->_open_streams.erase(cam);
+	this->_camera_encoders.erase(cam);
 }
 
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
@@ -248,9 +251,9 @@ void MissionControlProtocol::sendJointPositionReport(const std::string& jointNam
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
-void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
-													const std::string& b64_data) {
-	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+void MissionControlProtocol::sendCameraStreamReport(
+	const CameraID& cam, const std::vector<std::basic_string<uint8_t>>& videoData) {
+	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", videoData}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
@@ -428,16 +431,18 @@ void MissionControlProtocol::videoStreamTask() {
 			if (robot::hasNewCameraFrame(cam, frame_num)) {
 				// if there is a new frame, grab it
 				auto camDP = robot::readCamera(cam);
+
 				if (camDP) {
 					auto data = camDP.getData();
 					uint32_t& new_frame_num = data.second;
 					cv::Mat frame = data.first;
 					// update the previous frame number
 					this->_open_streams[cam] = new_frame_num;
+					const auto& encoder = this->_camera_encoders[cam];
 
-					// convert frame to base64 and send it
-					std::string b64_data = base64::encodeMat(frame, ".jpg");
-					sendCameraStreamReport(cam, b64_data);
+					// convert frame to encoded data and send it
+					auto data_vector = encoder->encode_frame(frame);
+					sendCameraStreamReport(cam, data_vector);
 				}
 			}
 
@@ -446,6 +451,7 @@ void MissionControlProtocol::videoStreamTask() {
 				break;
 			}
 		}
+		std::this_thread::yield();
 	}
 }
 
