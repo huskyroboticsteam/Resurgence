@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../navtypes.h"
+#include "FabrikSolver.h"
 
 #include <array>
 #include <initializer_list>
@@ -12,7 +13,12 @@ namespace kinematics {
 
 template <unsigned int N> class PlanarArmKinematics {
 public:
-	PlanarArmKinematics(const navtypes::Vectord<N>& segLens) : segLens(segLens) {}
+	PlanarArmKinematics(const navtypes::Vectord<N>& segLens,
+						const navtypes::Vectord<N>& jointMin,
+						const navtypes::Vectord<N>& jointMax, double solverThreshold,
+						int solverMaxIter)
+		: segLens(segLens), jointMin(jointMin), jointMax(jointMax),
+		  ikSolver(segLens, jointMin, jointMax, solverThreshold, solverMaxIter) {}
 
 	constexpr unsigned int getNumSegments() const {
 		return N;
@@ -50,20 +56,29 @@ public:
 		return getJacobian(jointPos) * jointVel;
 	}
 
-	navtypes::Vectord<N> eePosToJointPos(const Eigen::Vector2d& eePos) const {
-		// TODO: implement
-		return navtypes::Vectord<N>::Zero();
+	navtypes::Vectord<N> eePosToJointPos(const Eigen::Vector2d& eePos,
+										 const navtypes::Vectord<N>& currJointPos) const {
+		bool success;
+		return ikSolver.solve(eePos, currJointPos, success);
 	}
 
-	navtypes::Vectord<N> eeVelToJointVel(const Eigen::Vector2d& eePos,
+	navtypes::Vectord<N> eePosToJointPos(const Eigen::Vector2d& eePos,
+										 const navtypes::Vectord<N>& currJointPos,
+										 bool& success) const {
+		return ikSolver.solve(eePos, currJointPos, success);
+	}
+
+	navtypes::Vectord<N> eeVelToJointVel(const navtypes::Vectord<N>& jointPos,
 										 const Eigen::Vector2d& eeVel) const {
-		navtypes::Vectord<N> jointPos = eePosToJointPos(eePos);
 		navtypes::Matrixd<2, N> jacobian = getJacobian(jointPos);
 		return jacobian.colPivHouseholderQR().solve(eeVel);
 	}
 
 private:
 	navtypes::Vectord<N> segLens;
+	navtypes::Vectord<N> jointMin;
+	navtypes::Vectord<N> jointMax;
+	FabrikSolver2D<N> ikSolver;
 };
 
 } // namespace kinematics

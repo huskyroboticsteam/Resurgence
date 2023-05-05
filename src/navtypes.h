@@ -29,6 +29,9 @@ using Matrixd = Eigen::Matrix<double, rows, cols>;
 template <int dim>
 using Vectord = Eigen::Matrix<double, dim, 1>;
 
+template <int dim, int dim2=1>
+using Arrayd = Eigen::Array<double, dim, dim2>;
+
 using point_t =
 	Eigen::Vector3d; // x, y, 1 (or 0, 0, 0 to represent "no data")
 					 // The 1 at the end makes calculating affine transforms easier.
