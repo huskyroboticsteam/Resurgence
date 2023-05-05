@@ -136,6 +136,10 @@ void world_interface_init() {
 	initMotors();
 }
 
+void emergencyStop() {
+	can::motor::emergencyStopMotors();
+}
+
 std::unordered_set<CameraID> getCameras() {
 	return util::keySet(cameraMap);
 }

@@ -98,14 +98,12 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
 		this->stopAndShutdownPowerRepeat();
-		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
-		// use it to send estop packets to all motor controllers.
-		// This will stop the arm and everything else too.
-		// @see can::motor::emergencyStopMotors()
+		robot::emergencyStop();
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();
 	}
+	// TODO: reinit motors
 	Globals::E_STOP = stop;
 }
 

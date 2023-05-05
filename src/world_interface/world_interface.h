@@ -45,6 +45,13 @@ const kinematics::DiffWristKinematics& wristKinematics();
 void world_interface_init();
 
 /**
+ * @brief Emergency stop all motors.
+ *
+ * After emergency stopping, all motors must be reinitialized.
+ */
+void emergencyStop();
+
+/**
  * @brief Request the robot to drive at the given velocities.
  *
  * @param dtheta The heading velocity.
