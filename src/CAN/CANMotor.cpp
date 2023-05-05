@@ -21,8 +21,8 @@ namespace can::motor {
 
 void emergencyStopMotors() {
 	CANPacket p;
-	AssembleGroupBroadcastingEmergencyStopPacket(
-		&p, static_cast<uint8_t>(devicegroup_t::motor), ESTOP_ERR_GENERAL);
+	AssembleGroupBroadcastingEmergencyStopPacket(&p, static_cast<uint8_t>(0x0),
+												 ESTOP_ERR_GENERAL);
 	can::sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 }
