@@ -143,13 +143,14 @@ void setupCameras() {
 }
 } // namespace
 
-void world_interface_init() {
-	setupCameras();
+void world_interface_init(bool initMotorsT) {
+	if (!initMotorsT) { 
+		setupCameras();
 
-	bool gps_success = gps::usb::startGPSThread();
-	bool lidar_success = lidar::initializeLidar();
-	bool landmark_success = AR::initializeLandmarkDetection();
-
+		bool gps_success = gps::usb::startGPSThread();
+		bool lidar_success = lidar::initializeLidar();
+		bool landmark_success = AR::initializeLandmarkDetection();
+	}
 	can::initCAN();
 	initMotors();
 }
