@@ -85,7 +85,8 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 
 void setPCAServo(deviceserial_t serial, uint8_t servoNum, int32_t angle) {
 	CANPacket p;
-	AssemblePCAServoPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, servoNum, angle);
+	AssemblePCAServoPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, servoNum,
+						   angle);
 	sendCANPacket(p);
 }
 
