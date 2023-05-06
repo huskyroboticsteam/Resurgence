@@ -103,7 +103,7 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
 	{{motorid_t::armBase, {1000, 50, 10000}},
 	 {motorid_t::shoulder, {100, 0, 1000}},
-	 {motorid_t::elbow, {500, 50, 10000}},
+	 {motorid_t::elbow, {15, 7, -2}},
 	 {motorid_t::forearm, {1000, 0, 0}},
 	 {motorid_t::wrist, {1000, 0, 0}},
 	 {motorid_t::activeSuspension, {1000, 0, 0}}});
@@ -116,7 +116,7 @@ constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
 												   {motorid_t::shoulder, 1},
 												   {motorid_t::elbow, -1},
-												   {motorid_t::forearm, 0.65},
+												   {motorid_t::forearm, -0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, -0.7},
@@ -132,7 +132,7 @@ constexpr auto negative_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
 												   {motorid_t::shoulder, 1},
 												   {motorid_t::elbow, -1},
-												   {motorid_t::forearm, 0.65},
+												   {motorid_t::forearm, -0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, -0.7},

@@ -12,6 +12,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <chrono>
+
 #include <sys/time.h>
 
 extern "C" {
@@ -19,6 +21,8 @@ extern "C" {
 }
 
 using namespace robot::types;
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
 template <typename K, typename V> std::map<V, K> reverseMap(const std::map<K, V>& map) {
 	std::map<V, K> reversed;
@@ -53,7 +57,6 @@ void cleanup(int signum) {
 
 int main(int argc, char** argv) {
 	robot::world_interface_init();
-	struct timeval tp0, tp_start;
 
 	// TODO: Before running this script, make sure the PPJR is set correctly for each motor
 	// in real_world_constants.cpp
@@ -86,21 +89,20 @@ int main(int argc, char** argv) {
 	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
 	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
 
-	double timestep = 0.0;
 	double period = 2.0;
 	double amplitude =
-		10 * 1000.0; // in 1000th's of degrees
+		20 * 1000.0; // in 1000th's of degrees
 					 // (doesn't make sense for hand motor, but that doesn't use PID)
 
-	usleep(300 * 1000); // wait for encoder position data to arrive
+	std::this_thread::sleep_for(300ms); // wait for encoder position data to arrive
 	int32_t starting_angle = can::motor::getMotorPosition(serial);
 	int32_t angle_target = starting_angle;
 	double acc_error = 0.0;
 	int total_steps = 0;
 
-	while (total_steps < 60) {
-		gettimeofday(&tp_start, NULL);
-
+	time_point<steady_clock> tp = steady_clock::now();
+	time_point<steady_clock> startTime = tp;
+	while (steady_clock::now() - startTime < 3 * milliseconds((int)(period * 1000))) {
 		int32_t current_angle = can::motor::getMotorPosition(serial);
 		double difference = (current_angle - angle_target) / 1000.0;
 		acc_error += difference * difference;
@@ -108,24 +110,16 @@ int main(int argc, char** argv) {
 			   current_angle);
 		total_steps += 1;
 
-		timestep += 1.0 / Constants::CONTROL_HZ;
+		double time = duration_cast<milliseconds>(steady_clock::now() - startTime).count() / 1000.0;
 		angle_target =
-			(int32_t)round(amplitude * sin(2 * M_PI * timestep / period)) + starting_angle;
+			(int32_t)round(amplitude * sin(2 * M_PI * time / period)) + starting_angle;
 
 		robot::setMotorPos(motor, angle_target);
 
-		gettimeofday(&tp0, NULL);
-		long elapsedUsecs =
-			(tp0.tv_sec - tp_start.tv_sec) * 1000 * 1000 + (tp0.tv_usec - tp_start.tv_usec);
-		long desiredUsecs = 1000 * 1000 / Constants::CONTROL_HZ;
-		if (desiredUsecs - elapsedUsecs > 0) {
-			usleep(desiredUsecs - elapsedUsecs);
-		} else {
-			std::cout << "Can't keep up with control frequency! Desired "
-					  << desiredUsecs / 1000 << " elapsed " << elapsedUsecs / 1000
-					  << std::endl;
-		}
+		tp += 20ms;
+		std::this_thread::sleep_until(tp);
 	}
+	robot::setMotorPower(motor, 0.0);
 	std::cout << "RMSE: " << sqrt(acc_error / total_steps) << std::endl;
 	return 0;
 }
