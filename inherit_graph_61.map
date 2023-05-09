@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structrobot_1_1encparams__t.html" title=" " alt="" coords="5,5,137,31"/>
+<area shape="rect" id="node1" href="$classrobot_1_1base__motor.html" title="An abstract motor class." alt="" coords="5,31,130,56"/>
+<area shape="rect" id="node2" href="$classrobot_1_1can__motor.html" title=" " alt="" coords="178,5,295,31"/>
+<area shape="rect" id="node3" href="$classrobot_1_1sim__motor.html" title=" " alt="" coords="178,55,295,80"/>
 </map>

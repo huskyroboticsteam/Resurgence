@@ -1,0 +1,4 @@
+<map id="robot::sim_motor" name="robot::sim_motor">
+<area shape="rect" id="node1" title=" " alt="" coords="9,79,126,105"/>
+<area shape="rect" id="node2" href="$classrobot_1_1base__motor.html" title="An abstract motor class." alt="" coords="5,5,130,31"/>
+</map>

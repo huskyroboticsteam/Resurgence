@@ -88,7 +88,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Collection of functions that allows interfacing with the hardware and the world.  
+<p>Collection of functions for manipulating a motor.  
 <a href="namespacerobot.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
@@ -99,6 +99,11 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot_1_1base__motor.html">base_motor</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract motor class.  <a href="classrobot_1_1base__motor.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot_1_1can__motor.html">can_motor</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrobot_1_1encparams__t.html">encparams_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrobot_1_1pidcoef__t.html">pidcoef_t</a></td></tr>
@@ -106,6 +111,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrobot_1_1potparams__t.html">potparams_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents parameters defining a potentiometer scale.  <a href="structrobot_1_1potparams__t.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot_1_1sim__motor.html">sim_motor</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
@@ -160,6 +167,9 @@ const <a class="el" href="classkinematics_1_1DiffWristKinematics.html">DiffWrist
 <tr class="memitem:aaf752a16bcc35605b3f364901f949063"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aaf752a16bcc35605b3f364901f949063">world_interface_init</a> ()</td></tr>
 <tr class="memdesc:aaf752a16bcc35605b3f364901f949063"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the world interface.  <br /></td></tr>
 <tr class="separator:aaf752a16bcc35605b3f364901f949063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; <a class="el" href="classrobot_1_1base__motor.html">robot::base_motor</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a61bee8f61b7f31877ad21bbd9077f5a3">getMotor</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor)</td></tr>
+<tr class="memdesc:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to the motor object associated with the motor id.  <br /></td></tr>
+<tr class="separator:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a902b5dd26574990fe0a8a9d3c4e7a97e">emergencyStop</a> ()</td></tr>
 <tr class="memdesc:a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emergency stop all motors.  <br /></td></tr>
 <tr class="separator:a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -190,6 +200,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotorPos</b> (moto
 <tr class="memitem:ae800298bad4e0c54e8112edd16e860b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ae800298bad4e0c54e8112edd16e860b5">getMotorPos</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor)</td></tr>
 <tr class="memdesc:ae800298bad4e0c54e8112edd16e860b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last reported position of the specified motor.  <br /></td></tr>
 <tr class="separator:ae800298bad4e0c54e8112edd16e860b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a724974bfa7bc871d135fee39560fc7ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a724974bfa7bc871d135fee39560fc7ac">setMotorVel</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetVel)</td></tr>
+<tr class="memdesc:a724974bfa7bc871d135fee39560fc7ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the velocity of the given motor.  <br /></td></tr>
+<tr class="separator:a724974bfa7bc871d135fee39560fc7ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3ae6c262d2a799a63437ed2ba481abb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#af3ae6c262d2a799a63437ed2ba481abb">setIndicator</a> (<a class="el" href="namespacerobot_1_1types.html#a2ed6fa6081a4897f2e496d80b140775f">types::indication_t</a> signal)</td></tr>
 <tr class="memdesc:af3ae6c262d2a799a63437ed2ba481abb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the robot indicator to indicate the given signal.  <br /></td></tr>
 <tr class="separator:af3ae6c262d2a799a63437ed2ba481abb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -263,6 +276,9 @@ const <a class="el" href="namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e"
 <tr class="memitem:ad5b3523412c0bfd79035091d88e01624"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">negative_pwm_scales</a></td></tr>
 <tr class="memdesc:ad5b3523412c0bfd79035091d88e01624"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to power scale factors when commanded with negative power.  <br /></td></tr>
 <tr class="separator:ad5b3523412c0bfd79035091d88e01624"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa789172f65d6980744e99a8e0d3ed8d"><td class="memItemLeft" align="right" valign="top"><a id="aaa789172f65d6980744e99a8e0d3ed8d" name="aaa789172f65d6980744e99a8e0d3ed8d"></a>
+<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; <a class="el" href="classrobot_1_1base__motor.html">robot::base_motor</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>motor_ptrs</b></td></tr>
+<tr class="separator:aaa789172f65d6980744e99a8e0d3ed8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae917757337e6e1a1b99392c7c1db4069"><td class="memItemLeft" align="right" valign="top"><a id="ae917757337e6e1a1b99392c7c1db4069" name="ae917757337e6e1a1b99392c7c1db4069"></a>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>WHEEL_BASE</b> = 0.66</td></tr>
 <tr class="separator:ae917757337e6e1a1b99392c7c1db4069"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,7 +296,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <tr class="separator:a6d367fba7bd0a0da7029a57158141a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Collection of functions that allows interfacing with the hardware and the world. </p>
+<div class="textblock"><p>Collection of functions for manipulating a motor. </p>
+<p>Collection of functions that allows interfacing with the hardware and the world. </p>
 </div><h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="a81cb1706e1f0e7c0639e231446ce4c9e" name="a81cb1706e1f0e7c0639e231446ce4c9e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a81cb1706e1f0e7c0639e231446ce4c9e">&#9670;&#160;</a></span>WorldInterface</h2>
@@ -473,6 +490,33 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="structnavtypes_1_1URCLeg.html">navtypes::URCLeg</a> Information for the URC leg of the given index.</dd></dl>
 <dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>This function is probably deprecated, and will be replaced in the future. </dd></dl>
+
+</div>
+</div>
+<a id="a61bee8f61b7f31877ad21bbd9077f5a3" name="a61bee8f61b7f31877ad21bbd9077f5a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61bee8f61b7f31877ad21bbd9077f5a3">&#9670;&#160;</a></span>getMotor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; <a class="el" href="classrobot_1_1base__motor.html">robot::base_motor</a> &gt; robot::getMotor </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>&#160;</td>
+          <td class="paramname"><em>motor</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get a pointer to the motor object associated with the motor id. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">motor</td><td>The motor id to manipulate. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to the motor object </dd></dl>
 
 </div>
 </div>
@@ -929,6 +973,43 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   <table class="params">
     <tr><td class="paramname">motor</td><td>The motor to set the PWM of. </td></tr>
     <tr><td class="paramname">power</td><td>The power command, in the range [-1, 1] </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a724974bfa7bc871d135fee39560fc7ac" name="a724974bfa7bc871d135fee39560fc7ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a724974bfa7bc871d135fee39560fc7ac">&#9670;&#160;</a></span>setMotorVel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void robot::setMotorVel </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a>&#160;</td>
+          <td class="paramname"><em>motor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td>
+          <td class="paramname"><em>targetVel</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the velocity of the given motor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">motor</td><td>The motor to set the target position of. </td></tr>
+    <tr><td class="paramname">targetVel</td><td>The target velocity, in millidegrees per second. </td></tr>
   </table>
   </dd>
 </dl>
