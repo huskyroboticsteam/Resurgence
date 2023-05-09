@@ -171,9 +171,13 @@ double getJointPowerValue(types::jointid_t joint) {
 
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
-
 	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		setMotorPower(jointMotorMap.at(joint), power);
+		// add special case here.
+		if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
+			//  do inverse kinematics to move
+		} else {
+			setMotorPower(jointMotorMap.at(joint), power);
+		}
 	} else {
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());
