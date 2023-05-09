@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, str);
 	int d_coeff = std::stoi(str);
 
+	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
 	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
 
 	double timestep = 0.0;

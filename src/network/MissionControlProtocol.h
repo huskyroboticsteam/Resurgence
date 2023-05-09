@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../video/H264Encoder.h"
 #include "../world_interface/world_interface.h"
 #include "websocket/WebSocketProtocol.h"
 #include "websocket/WebSocketServer.h"
@@ -33,10 +34,11 @@ public:
 private:
 	void videoStreamTask();
 	void jointPowerRepeatTask();
-	void jointPosReportTask();
+	void telemReportTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
 	std::unordered_map<CameraID, uint32_t> _open_streams;
+	std::unordered_map<CameraID, std::shared_ptr<video::H264Encoder>> _camera_encoders;
 	std::atomic<bool> _streaming_running;
 	std::thread _streaming_thread;
 	// for joint position reporting.
@@ -59,8 +61,11 @@ private:
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
 	void handleDriveRequest(const json& j);
+	void sendCameraStreamReport(const CameraID& cam,
+								const std::vector<std::basic_string<uint8_t>>& videoData);
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
 	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
+	void sendRoverPos();
 	void handleConnection();
 	void startPowerRepeat();
 	void stopAndShutdownPowerRepeat();

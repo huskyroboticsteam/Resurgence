@@ -54,6 +54,13 @@ void world_interface_init();
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor);
 
 /**
+ * @brief Emergency stop all motors.
+ *
+ * After emergency stopping, all motors must be reinitialized.
+ */
+void emergencyStop();
+
+/**
  * @brief Request the robot to drive at the given velocities.
  *
  * @param dtheta The heading velocity.

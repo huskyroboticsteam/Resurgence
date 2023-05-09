@@ -167,6 +167,10 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 	}
 }
 
+void emergencyStop() {
+	can::motor::emergencyStopMotors();
+}
+
 std::unordered_set<CameraID> getCameras() {
 	return util::keySet(cameraMap);
 }

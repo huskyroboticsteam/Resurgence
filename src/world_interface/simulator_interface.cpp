@@ -291,7 +291,13 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 	}
 }
 
-std::unordered_set<CameraID> getCameras() {
+void emergencyStop() {
+	for (const auto& motor : motorNameMap) {
+		setMotorPower(motor.first, 0.0);
+	}
+}
+
+std::unordered_set<CameraID> getCameras(){
 	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
 	return util::keySet(cameraLastFrameIdxMap);
 }

@@ -117,9 +117,6 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 # actually require physical CAN to be present.
 find_package(HindsightCAN 1.3.0 REQUIRED)
 
-# Find the H264 encoder library
-find_package(H264Encoder 1.1.1 REQUIRED)
-
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
@@ -257,6 +254,16 @@ add_library(filters SHARED
   filters/pose_graph/factors.cpp
   )
 target_link_libraries(filters utils)
+
+add_library(video STATIC
+  video/H264Encoder.cpp
+  video/encoder.cpp
+)
+
+target_link_libraries(video
+  ${OpenCV_LIBS}
+  x264 avutil avcodec avformat swscale
+)
 
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp

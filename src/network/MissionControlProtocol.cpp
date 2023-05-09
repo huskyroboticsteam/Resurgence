@@ -28,7 +28,7 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
-const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -48,6 +48,7 @@ constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
+constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
 
@@ -97,14 +98,12 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
 		this->stopAndShutdownPowerRepeat();
-		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
-		// use it to send estop packets to all motor controllers.
-		// This will stop the arm and everything else too.
-		// @see can::motor::emergencyStopMotors()
+		robot::emergencyStop();
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();
 	}
+	// TODO: reinit motors
 	Globals::E_STOP = stop;
 }
 
@@ -176,6 +175,33 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	}
 }
 
+void MissionControlProtocol::sendRoverPos() {
+	auto heading = robot::readIMUHeading();
+	auto gps = robot::readGPS();
+	if (gps.isValid() && heading.isValid()) {
+		double orientX = 0.0;
+		double orientY = 0.0;
+		double orientZ = std::sin(heading.getData() / 2);
+		double orientW = std::cos(heading.getData() / 2);
+		double posX = gps.getData()[0];
+		double posY = gps.getData()[1];
+		double posZ = 0.0;
+		double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
+		double headingRecency = util::durationToSec(dataclock::now() - heading.getTime());
+		double recency = std::max(gpsRecency, headingRecency);
+		json msg = {{"type", ROVER_POS_REP_TYPE},
+					{"orientW", orientW},
+					{"orientX", orientX},
+					{"orientY", orientY},
+					{"orientZ", orientZ},
+					{"posX", posX},
+					{"posY", posY},
+					{"posZ", posZ},
+					{"recency", recency}};
+		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
+}
+
 static bool validateJointPositionRequest(const json& j) {
 	return validateJoint(j) && validateKey(j, "position", val_t::number_integer);
 }
@@ -199,6 +225,8 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		this->_open_streams[cam] = 0;
+		this->_camera_encoders[cam] =
+			std::make_shared<video::H264Encoder>(j["fps"], Constants::video::H264_RF_CONSTANT);
 	}
 }
 
@@ -210,6 +238,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
 	std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 	this->_open_streams.erase(cam);
+	this->_camera_encoders.erase(cam);
 }
 
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
@@ -220,9 +249,9 @@ void MissionControlProtocol::sendJointPositionReport(const std::string& jointNam
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
-void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
-													const std::string& b64_data) {
-	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+void MissionControlProtocol::sendCameraStreamReport(
+	const CameraID& cam, const std::vector<std::basic_string<uint8_t>>& videoData) {
+	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", videoData}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
@@ -330,8 +359,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
 
 	// Joint position reporting
-	this->_joint_report_thread =
-		std::thread(&MissionControlProtocol::jointPosReportTask, this);
+	this->_joint_report_thread = std::thread(&MissionControlProtocol::telemReportTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
@@ -371,7 +399,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 	}
 }
 
-void MissionControlProtocol::jointPosReportTask() {
+void MissionControlProtocol::telemReportTask() {
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
@@ -384,7 +412,9 @@ void MissionControlProtocol::jointPosReportTask() {
 			}
 		}
 
-		pt += JOINT_POS_REPORT_PERIOD;
+		sendRoverPos();
+
+		pt += TELEM_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);
 	}
 }
@@ -399,16 +429,18 @@ void MissionControlProtocol::videoStreamTask() {
 			if (robot::hasNewCameraFrame(cam, frame_num)) {
 				// if there is a new frame, grab it
 				auto camDP = robot::readCamera(cam);
+
 				if (camDP) {
 					auto data = camDP.getData();
 					uint32_t& new_frame_num = data.second;
 					cv::Mat frame = data.first;
 					// update the previous frame number
 					this->_open_streams[cam] = new_frame_num;
+					const auto& encoder = this->_camera_encoders[cam];
 
-					// convert frame to base64 and send it
-					std::string b64_data = base64::encodeMat(frame, ".jpg");
-					sendCameraStreamReport(cam, b64_data);
+					// convert frame to encoded data and send it
+					auto data_vector = encoder->encode_frame(frame);
+					sendCameraStreamReport(cam, data_vector);
 				}
 			}
 
@@ -417,6 +449,7 @@ void MissionControlProtocol::videoStreamTask() {
 				break;
 			}
 		}
+		std::this_thread::yield();
 	}
 }
 

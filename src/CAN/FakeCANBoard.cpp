@@ -42,11 +42,22 @@ std::unordered_set<int> modes = {static_cast<int>(TestMode::ModeSet),
 								 static_cast<int>(TestMode::ScienceMotors),
 								 static_cast<int>(TestMode::ScienceServos)};
 
-int prompt(const char* msg) {
+int prompt(std::string_view message) {
 	std::string str;
-	std::cout << msg << " > ";
-	std::getline(std::cin, str);
-	int val = std::stoi(str, nullptr, 0);
+	int val;
+	bool valid_input = false;
+	do {
+		std::cout << message << " > ";
+		std::getline(std::cin, str);
+		try {
+			val = std::stoi(str, nullptr, 0);
+			valid_input = true;
+		} catch (const std::invalid_argument&) {
+			std::cerr << "Input must be a number (any base), try again" << std::endl;
+		} catch (const std::out_of_range&) {
+			std::cerr << "Input too big for int type" << std::endl;
+		}
+	} while (!valid_input);
 	return val;
 }
 
