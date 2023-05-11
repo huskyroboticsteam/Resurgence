@@ -143,7 +143,7 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target);
  * @param servoNum the servo number.
  * @param angle the angle of the servo in millidegrees.
  */
-void setPCAServo(deviceserial_t serial, uint8_t servoNum, int32_t angle);
+void setServoPos(deviceserial_t serial, uint8_t servoNum, int32_t angle);
 
 /**
  * @brief Get the last reported position of a motor.
