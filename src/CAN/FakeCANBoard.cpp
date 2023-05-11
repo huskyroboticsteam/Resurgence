@@ -1,4 +1,5 @@
 
+#include "../world_interface/motor/can_motor.h"
 #include "CAN.h"
 #include "CANMotor.h"
 #include "CANUtils.h"
@@ -23,6 +24,7 @@ enum class TestMode {
 	ModeSet,
 	PWM,
 	PID,
+	PIDVel,
 	Encoder,
 	LimitSwitch,
 	ScienceTelemetry,
@@ -30,11 +32,15 @@ enum class TestMode {
 	ScienceServos
 };
 
-std::unordered_set<int> modes = {
-	static_cast<int>(TestMode::ModeSet),	   static_cast<int>(TestMode::PWM),
-	static_cast<int>(TestMode::PID),		   static_cast<int>(TestMode::Encoder),
-	static_cast<int>(TestMode::LimitSwitch),   static_cast<int>(TestMode::ScienceTelemetry),
-	static_cast<int>(TestMode::ScienceMotors), static_cast<int>(TestMode::ScienceServos)};
+std::unordered_set<int> modes = {static_cast<int>(TestMode::ModeSet),
+								 static_cast<int>(TestMode::PWM),
+								 static_cast<int>(TestMode::PID),
+								 static_cast<int>(TestMode::Encoder),
+								 static_cast<int>(TestMode::PIDVel),
+								 static_cast<int>(TestMode::LimitSwitch),
+								 static_cast<int>(TestMode::ScienceTelemetry),
+								 static_cast<int>(TestMode::ScienceMotors),
+								 static_cast<int>(TestMode::ScienceServos)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -112,6 +118,66 @@ int main() {
 
 			int angle_target = prompt("Enter PID target (in 1000ths of degrees)");
 			can::motor::setMotorPIDTarget(serial, angle_target);
+		} else if (testMode == TestMode::PIDVel) {
+			static robot::types::datatime_t startTime;
+			static int32_t targetVel;
+			static std::shared_ptr<robot::can_motor> motor;
+			static robot::types::DataPoint<int32_t> initialMotorPos;
+			static double vel_timeout;
+
+			if (!mode_has_been_set) {
+				// set pid mode
+				can::motor::setMotorMode(serial, motormode_t::pid);
+				mode_has_been_set = true;
+
+				// get pid coeffs
+				int p_coeff = prompt("P");
+				int i_coeff = prompt("I");
+				int d_coeff = prompt("D");
+
+				// set pid coeffs
+				can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
+
+				// create can motor
+				double posScale =
+					prompt("Enter the positive scale for the motor (double value)\n");
+				double negScale =
+					prompt("Enter the negative scale for the motor (double value)\n");
+				motor = std::make_shared<robot::can_motor>(motorid_t::frontLeftWheel, true,
+														   serial, posScale, negScale);
+
+				// get initial motor position
+				DataPoint<int32_t> dataPoint = motor->getMotorPos();
+				while (!dataPoint.isValid()) {
+					std::this_thread::sleep_for(100ms);
+					dataPoint = motor->getMotorPos();
+				}
+				initialMotorPos = dataPoint.getData();
+
+				// create velocity command
+				vel_timeout = prompt("Enter the number of seconds you want the command to run "
+									 "for (double value)\n");
+				targetVel = prompt("Enter the target velocity (in millidegrees per second)\n");
+				motor->setMotorVel(targetVel);
+				startTime = robot::types::dataclock::now();
+			}
+
+			// get x data: current time
+			robot::types::datatime_t currTime = robot::types::dataclock::now();
+
+			// get y data: set point (target vel * time since set velocity call) + initial pos
+			double setPoint = (targetVel * util::durationToSec(currTime - startTime)) +
+							  initialMotorPos.getData();
+
+			// get y data: motor position
+			robot::types::DataPoint<int32_t> motorPos = motor->getMotorPos();
+
+			// check if time is up
+			double elapsedTime = util::durationToSec(currTime - startTime);
+			if (elapsedTime > vel_timeout) {
+				// stop arm movement: set power to 0
+				motor->setMotorPower(0.0);
+			}
 		} else if (testMode == TestMode::Encoder) {
 			if (!mode_has_been_set) {
 				int sensorType;
@@ -131,7 +197,8 @@ int main() {
 					int posHi = prompt("Pos Hi");
 					int adcLo = prompt("ADC Lo");
 					int adcHi = prompt("ADC Hi");
-					can::motor::initPotentiometer(serial, posLo, posHi, adcLo, adcHi, telemPeriod);
+					can::motor::initPotentiometer(serial, posLo, posHi, adcLo, adcHi,
+												  telemPeriod);
 				}
 				mode_has_been_set = true;
 			}

@@ -4,6 +4,7 @@
 #include "../filters/StateSpaceUtil.h"
 #include "../navtypes.h"
 #include "../utils/math.h"
+#include "../world_interface/data.h"
 
 #include <functional>
 #include <optional>
