@@ -83,6 +83,13 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 	sendCANPacket(p);
 }
 
+void setServoPos(deviceserial_t serial, uint8_t servoNum, int32_t angle) {
+	CANPacket p;
+	AssemblePCAServoPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, servoNum,
+						   angle);
+	sendCANPacket(p);
+}
+
 DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial),
 							  telemtype_t::angle);
