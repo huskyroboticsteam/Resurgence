@@ -357,6 +357,7 @@ if(WITH_TESTS)
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/kinematics/SwerveDriveKinematicsTest.cpp
+    ../tests/kinematics/PlanarArmKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp
