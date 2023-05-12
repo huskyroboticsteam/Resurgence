@@ -70,12 +70,13 @@ TEST_CASE("Test PlanarArmKinematics eePosToJointPos", "[kinematics][planararm]")
 	}
 
 	SECTION("Test joint constraints") {
-		PlanarArmKinematics<2> constrained({0.5, 0.5}, {-PI/8, -PI}, {PI/8, PI}, thresh, 50);
-		Eigen::Vector2d target = {std::sqrt(2)/2, 0};
+		PlanarArmKinematics<2> constrained({0.5, 0.5}, {-PI / 8, -PI}, {PI / 8, PI}, thresh,
+										   50);
+		Eigen::Vector2d target = {std::sqrt(2) / 2, 0};
 		bool success;
-		Eigen::Vector2d jp = constrained.eePosToJointPos(target, {PI/2, PI/2}, success);
+		Eigen::Vector2d jp = constrained.eePosToJointPos(target, {PI / 2, PI / 2}, success);
 		INFO("jp:\n" << jp);
 		REQUIRE_FALSE(success);
-		assertApprox(jp, Eigen::Vector2d{PI/2, PI/2});
+		assertApprox(jp, Eigen::Vector2d{PI / 2, PI / 2});
 	}
 }

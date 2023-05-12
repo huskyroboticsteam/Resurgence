@@ -19,11 +19,31 @@ namespace kinematics {
  */
 template <int N> class FabrikSolver2D {
 public:
+	/**
+	 * @brief Construct an IK solver object.
+	 *
+	 * @param segLens The length of each arm segment.
+	 * @param jointMin The minimum angle of each joint. Set to -pi for no limit.
+	 * @param jointMax The maximum angle of each joint. Set to pi for no limit.
+	 * @param thresh The IK solver will succeed when the EE position is off by at most this
+	 * much.
+	 * @param maxIter The maximum number of iterations to run the solver before failing.
+	 */
 	FabrikSolver2D(const navtypes::Arrayd<N>& segLens, const navtypes::Arrayd<N>& jointMin,
 				   const navtypes::Arrayd<N>& jointMax, double thresh, int maxIter)
 		: segLens(segLens), jointMin(jointMin), jointMax(jointMax), thresh(thresh),
 		  maxIter(maxIter) {}
 
+	/**
+	 * @brief Solve for the joint angles that yield the given EE position.
+	 *
+	 * @param eePos The desired end effector position.
+	 * @param jointAngles The current joint angles. Used as a starting guess for the IK solver.
+	 * @param[out] success Output parameter that signals if the IK solver succeeded. Failure
+	 * may occur if the target is unreachable or the IK solver exceeds the iteration limit.
+	 * @return navtypes::Arrayd<N> The target joint angles that achieve the desired EE
+	 * position.
+	 */
 	navtypes::Arrayd<N> solve(const Eigen::Vector2d& eePos,
 							  const navtypes::Arrayd<N>& jointAngles, bool& success) const {
 		double armLen = segLens.sum();
