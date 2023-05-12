@@ -132,6 +132,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a77e1a69516ed47142f01d7e2394dc44c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#a77e1a69516ed47142f01d7e2394dc44c">setMotorPIDTarget</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> target)</td></tr>
 <tr class="memdesc:a77e1a69516ed47142f01d7e2394dc44c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the position PID target of a motor board.  <br /></td></tr>
 <tr class="separator:a77e1a69516ed47142f01d7e2394dc44c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3d8be6908d1f8cf8e961face650b1d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#af3d8be6908d1f8cf8e961face650b1d8">setServoPos</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a> servoNum, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> angle)</td></tr>
+<tr class="memdesc:af3d8be6908d1f8cf8e961face650b1d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the angle of the PCA servo.  <br /></td></tr>
+<tr class="separator:af3d8be6908d1f8cf8e961face650b1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a566a73312d54f8c5e439e6c414fc7a5f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecan_1_1motor.html#a566a73312d54f8c5e439e6c414fc7a5f">getMotorPosition</a> (<a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a> serial)</td></tr>
 <tr class="memdesc:a566a73312d54f8c5e439e6c414fc7a5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last reported position of a motor.  <br /></td></tr>
 <tr class="separator:a566a73312d54f8c5e439e6c414fc7a5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -695,6 +698,50 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>initPotentiometer</b>
   <table class="params">
     <tr><td class="paramname">serial</td><td>The CAN serial number of the motor board. </td></tr>
     <tr><td class="paramname">power</td><td>The power to set. Any signed 16-bit integer is valid. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af3d8be6908d1f8cf8e961face650b1d8" name="af3d8be6908d1f8cf8e961face650b1d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3d8be6908d1f8cf8e961face650b1d8">&#9670;&#160;</a></span>setServoPos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can::motor::setServoPos </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#a2c998f360a5233d716a05edfc26800a5">deviceserial_t</a>&#160;</td>
+          <td class="paramname"><em>serial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a>&#160;</td>
+          <td class="paramname"><em>servoNum</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a>&#160;</td>
+          <td class="paramname"><em>angle</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the angle of the PCA servo. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">serial</td><td>The CAN serial number of the motor board. </td></tr>
+    <tr><td class="paramname">servoNum</td><td>the servo number. </td></tr>
+    <tr><td class="paramname">angle</td><td>the angle of the servo in millidegrees. </td></tr>
   </table>
   </dd>
 </dl>
