@@ -143,8 +143,8 @@ void setupCameras() {
 }
 } // namespace
 
-void world_interface_init(bool initMotorsT) {
-	if (!initMotorsT) {
+void world_interface_init(bool initOnlyMotors) {
+	if (!initOnlyMotors) {
 		setupCameras();
 		bool gps_success = gps::usb::startGPSThread();
 		bool lidar_success = lidar::initializeLidar();

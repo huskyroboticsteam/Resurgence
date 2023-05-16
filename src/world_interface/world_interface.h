@@ -43,7 +43,7 @@ const kinematics::DiffWristKinematics& wristKinematics();
  * This method should only be called once, and must be called
  * before any other world interface methods.
  */
-void world_interface_init(bool initMotors = false);
+void world_interface_init(bool initOnlyMotors = false);
 
 /**
  * @brief Get a pointer to the motor object associated with the motor id.

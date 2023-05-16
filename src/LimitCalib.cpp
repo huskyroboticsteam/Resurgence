@@ -2,7 +2,7 @@
 #include "world_interface/real_world_constants.h"
 #include "utils/threading.h"
 
-using namespace robot; 
+using namespace robot;
 using robot::types::DataPoint;
 using robot::types::LimitSwitchData;
 
@@ -18,21 +18,21 @@ void callback(motorid_t motor, const types::DataPoint<LimitSwitchData>& data) {
 
 }
 
-// Runs limit switch calibration. 
+// Runs limit switch calibration.
 // Registers limit switch callbacks for the relevant motors.
 // Then begins to run the motors.
 int main() {
 	bool runCalibration = true;
-	// init motors. 
+	// init motors.
 	robot::world_interface_init(runCalibration);
 
-	// limit switch callbacks. 
-	for (const auto& entry : encMotors) { 
+	// limit switch callbacks.
+	for (const auto& entry : encMotors) {
 		robot::addLimitSwitchCallback(entry.first, callback);
 	}
 
 	// run motors to get to limit switch. 
-	for (const auto& runningMotor : encMotors) { 
+	for (const auto& runningMotor : encMotors) {
 		setMotorPower(runningMotor.first, -0.2);
 	}
 
