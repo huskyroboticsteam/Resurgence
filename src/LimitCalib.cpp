@@ -33,7 +33,7 @@ int main() {
 
 	// run motors to get to limit switch.
 	for (const auto& runningMotor : encMotors) {
-		setMotorPower(runningMotor.first, -0.2);
+		setMotorPower(runningMotor.first, runningMotor.second.zeroCalibrationPower);
 	}
 
 	// wait for latch to unlatch.

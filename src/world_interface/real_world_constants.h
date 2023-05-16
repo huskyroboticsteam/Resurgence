@@ -56,6 +56,8 @@ struct encparams_t {
 	int limitSwitchLow;
 	/** Limit switch high, in millidegrees */
 	int limitSwitchHigh;
+	/** Power value set during limit switch calibration */
+	double zeroCalibrationPower;
 };
 
 // TODO: verify limit switch limits
@@ -65,12 +67,14 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		{.isInverted = false,
 		.ppjr = 1620 * 1024,
 		.limitSwitchLow = -90000,
-		.limitSwitchHigh = 90000}},
+		.limitSwitchHigh = 90000,
+		.zeroCalibrationPower = 0.2}},
 	{motorid_t::elbow,
 		{.isInverted = false,
 		.ppjr = 1620 * 1024,
 		.limitSwitchLow = -90000,
-		.limitSwitchHigh = 90000}}
+		.limitSwitchHigh = 90000,
+		.zeroCalibrationPower = -0.2}}
 });
 // clang-format on
 
