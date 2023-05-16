@@ -11,4 +11,5 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer", Constants:
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
+bool inverseKinematicsEnabled = false;
 } // namespace Globals
