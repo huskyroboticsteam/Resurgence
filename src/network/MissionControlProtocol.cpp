@@ -388,7 +388,11 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				}
 				const jointid_t& joint = current_pair.first;
 				const double& power = current_pair.second;
-				robot::setJointPower(joint, power);
+				// no need to repeatedly send 0 power
+				// this is also needed to make the zero calibration script work
+				if (power != 0.0) {
+					robot::setJointPower(joint, power);
+				}
 			}
 			if (this->_last_cmd_vel) {
 				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
