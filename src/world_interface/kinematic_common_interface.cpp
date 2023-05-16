@@ -173,7 +173,7 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
 		// add special case here.
 		if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-			//  do inverse kinematics to move
+			// do inverse kinematics to move
 		} else {
 			setMotorPower(jointMotorMap.at(joint), power);
 		}
