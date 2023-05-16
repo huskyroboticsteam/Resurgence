@@ -1,6 +1,6 @@
 #include "utils/threading.h"
-#include "world_interface/world_interface.h"
 #include "world_interface/real_world_constants.h"
+#include "world_interface/world_interface.h"
 
 using namespace robot;
 using robot::types::DataPoint;
