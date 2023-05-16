@@ -1,6 +1,6 @@
+#include "utils/threading.h"
 #include "world_interface/world_interface.h"
 #include "world_interface/real_world_constants.h"
-#include "utils/threading.h"
 
 using namespace robot;
 using robot::types::DataPoint;
@@ -8,15 +8,15 @@ using robot::types::LimitSwitchData;
 
 namespace {
 
-util::latch latch (encMotors.size());
+util::latch latch(encMotors.size());
 
 void callback(motorid_t motor, const types::DataPoint<LimitSwitchData>& data) {
 	setMotorPower(motor, 0);
-	// call countdown. 
+	// call countdown.
 	latch.count_down();
 };
 
-}
+} // namespace
 
 // Runs limit switch calibration.
 // Registers limit switch callbacks for the relevant motors.
@@ -31,7 +31,7 @@ int main() {
 		robot::addLimitSwitchCallback(entry.first, callback);
 	}
 
-	// run motors to get to limit switch. 
+	// run motors to get to limit switch.
 	for (const auto& runningMotor : encMotors) {
 		setMotorPower(runningMotor.first, -0.2);
 	}
