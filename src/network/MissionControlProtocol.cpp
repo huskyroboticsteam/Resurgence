@@ -36,6 +36,7 @@ const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
 constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
+constexpr const char* ARM_IK_ENABLED_TYPE = "setArmIKEnabled";
 constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
 constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
 constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
@@ -107,6 +108,10 @@ static bool validateDriveRequest(const json& j) {
 		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
+static bool validateArmIKEnable(const json& j) {
+	return validateKey(j, "enabled", val_t::boolean);
+}
+
 void MissionControlProtocol::handleDriveRequest(const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
@@ -119,6 +124,11 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	log(LOG_TRACE, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
 		dtheta, dx);
 	this->setRequestedCmdVel(dtheta, dx);
+}
+
+void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
+	bool enabled = j["enabled"];
+	Globals::armIKEnabled = enabled;
 }
 
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
@@ -313,6 +323,9 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addMessageHandler(DRIVE_REQ_TYPE,
 							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
 							validateDriveRequest);
+	this->addMessageHandler(ARM_IK_ENABLED_TYPE,
+							std::bind(&MissionControlProtocol::handleSetArmIK, this, _1),
+							validateArmIKEnable);
 	this->addMessageHandler(
 		JOINT_POWER_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
