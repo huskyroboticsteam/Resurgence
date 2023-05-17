@@ -26,5 +26,5 @@ extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
-extern bool inverseKinematicsEnabled;
+extern std::atomic<bool> armIKEnabled;
 } // namespace Globals
