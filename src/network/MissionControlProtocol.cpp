@@ -113,6 +113,10 @@ static bool validateArmIKEnable(const json& j) {
 	return util::validateKey(j, "enabled", val_t::boolean);
 }
 
+static bool validateArmIKEnable(const json& j) {
+	return validateKey(j, "enabled", val_t::boolean);
+}
+
 void MissionControlProtocol::handleDriveRequest(const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
@@ -332,6 +336,9 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addMessageHandler(DRIVE_REQ_TYPE,
 							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
 							validateDriveRequest);
+	this->addMessageHandler(ARM_IK_ENABLED_TYPE,
+							std::bind(&MissionControlProtocol::handleSetArmIK, this, _1),
+							validateArmIKEnable);
 	this->addMessageHandler(
 		ARM_IK_ENABLED_TYPE,
 		std::bind(&MissionControlProtocol::handleSetArmIKEnabled, this, _1),
