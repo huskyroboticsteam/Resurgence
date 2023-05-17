@@ -171,9 +171,18 @@ double getJointPowerValue(types::jointid_t joint) {
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
 	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		// add special case here.
 		if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-			// do inverse kinematics to move
+			if (Globals::armIKEnabled) {
+				// do inverse kinematics to move the arm
+			} else {
+				// setMotorPower(jointMotorMap.at(joint), 0.0);
+			}
+		} else if (joint == jointid_t::wrist || joint == jointid_t::shoulder) {
+			if (!Globals::armIKEnabled) {
+				setMotorPower(jointMotorMap.at(joint), power);
+			} else {
+				setMotorPower(jointMotorMap.at(joint), 0.0);
+			}
 		} else {
 			setMotorPower(jointMotorMap.at(joint), power);
 		}
