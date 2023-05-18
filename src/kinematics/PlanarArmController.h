@@ -21,13 +21,29 @@ public:
 	/**
 	 * @brief Construct a new controller object.
 	 *
-	 * @param vel Velocity for end effector {x_velocity, y_velocity}.
+	 * @param target Target position for end effector {int32_t x, int32_t y}.
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
 	 * arm joints).
 	 */
-	PlanarArmController(Eigen::Vector2d vel, PlanarArmKinematics<N> kin_obj)
-		: velocity(vel), kinematics(kin_obj) {
-		velTimestamp = robot::types::dataclock::now();
+	PlanarArmController(Eigen::Vector2d target, PlanarArmKinematics<N> kin_obj)
+		: setpoint(target), kinematics(kin_obj) {}
+
+	/**
+	 * @brief Sets the end effector setpoint / target position.
+	 *
+	 * @param targetJointPos The target joint positions.
+	 */
+	void set_ee_setpoint(const navtypes::Vectord<N>& targetJointPos) {
+		setpoint = kinematics.jointPosToEEPos(targetJointPos);
+	}
+
+	/**
+	 * @brief Gets the end effector setpoint / target position.
+	 *
+	 * @return The current target end effector position.
+	 */
+	Eigen::Vector2d get_ee_setpoint() {
+		return setpoint;
 	}
 
 	/**
@@ -40,7 +56,7 @@ public:
 	 * velocities].
 	 */
 	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
-	set_x_vel(robot::types::datatime_t currTime, int32_t targetVel,
+	set_x_vel(robot::types::datatime_t currTime, double targetVel,
 			  const navtypes::Vectord<N>& currJointPos) {
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
@@ -59,7 +75,7 @@ public:
 	 * velocities].
 	 */
 	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
-	set_y_vel(robot::types::datatime_t currTime, int32_t targetVel,
+	set_y_vel(robot::types::datatime_t currTime, double targetVel,
 			  const navtypes::Vectord<N>& currJointPos) {
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
@@ -79,8 +95,9 @@ public:
 	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
 	getCommand(robot::types::datatime_t currTime, const navtypes::Vectord<N>& currJointPos) {
 		// get current EE position
-		currEEPos = kinematics.jointPosToEEPos(currJointPos);
+		Eigen::Vector2d currEEPos = kinematics.jointPosToEEPos(currJointPos);
 
+		// TODO: what to do with the setpoint??
 		// TODO: bound the current EE position
 
 		// calculate target EE position
@@ -100,8 +117,9 @@ public:
 	}
 
 private:
-	robot::types::datatime_t velTimestamp;
+	Eigen::Vector2d setpoint;
 	Eigen::Vector2d velocity{0.0, 0.0};
+	robot::types::datatime_t velTimestamp;
 	PlanarArmKinematics<N> kinematics;
 };
 } // namespace kinematics
