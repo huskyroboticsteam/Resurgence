@@ -52,11 +52,9 @@ public:
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target x velocity.
 	 * @param currJointPos The current joint positions.
-	 * @return The new command, which is a tuple of [new joint positions, new joint
-	 * velocities].
+	 * @return The new command, which is the new joint positions.
 	 */
-	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
-	set_x_vel(robot::types::datatime_t currTime, double targetVel,
+	navtypes::Vectord<N> set_x_vel(robot::types::datatime_t currTime, double targetVel,
 			  const navtypes::Vectord<N>& currJointPos) {
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
@@ -71,11 +69,9 @@ public:
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target y velocity.
 	 * @param currJointPos The current joint positions.
-	 * @return The new command, which is a tuple of [new joint positions, new joint
-	 * velocities].
+	 * @return The new command, which is the new joint positions.
 	 */
-	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
-	set_y_vel(robot::types::datatime_t currTime, double targetVel,
+	navtypes::Vectord<N> set_y_vel(robot::types::datatime_t currTime, double targetVel,
 			  const navtypes::Vectord<N>& currJointPos) {
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
@@ -89,31 +85,20 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currJointPos The current joint positions.
-	 * @return The new command, which is a tuple of [new joint positions, new joint
-	 * velocities] to get to the new target end effector position.
+	 * @return The new command, which is the new joint positions to get to the new target end effector position.
 	 */
-	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
-	getCommand(robot::types::datatime_t currTime, const navtypes::Vectord<N>& currJointPos) {
-		// get current EE position
-		Eigen::Vector2d currEEPos = kinematics.jointPosToEEPos(currJointPos);
-
-		// TODO: what to do with the setpoint??
-		// TODO: bound the current EE position
-
-		// calculate target EE position
+	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime, const navtypes::Vectord<N>& currJointPos) {
+		// calculate new EE position / setpoint
 		double dt = util::durationToSec(currTime - velTimestamp);
-		Eigen::Vector2d newPose = currEEPos + velocity * dt;
+		Eigen::Vector2d newPose = setpoint + velocity * dt;
 
-		// TODO: bound target EE position
+		// TODO: bounds check 
+			// (new pose + vel vector <= r / sum of joint poses)
+			// if not, shrink vel vector using math shit and get new pose again
+		setpoint = newPose;
 
 		// get new joint positions for target EE
-		navtypes::Vectord<N> joint_pos = kinematics.eePosToJointPos(newPose, currJointPos);
-
-		// get new joint velocities for target EE
-		navtypes::Vectord<N> joint_vel = kinematics.eeVelToJointVel(joint_pos, velocity);
-
-		// return the command
-		return std::make_tuple(joint_pos, joint_vel);
+		return kinematics.eePosToJointPos(newPose, currJointPos);
 	}
 
 private:
