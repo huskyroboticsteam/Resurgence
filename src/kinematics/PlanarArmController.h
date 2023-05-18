@@ -55,7 +55,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	navtypes::Vectord<N> set_x_vel(robot::types::datatime_t currTime, double targetVel,
-			  const navtypes::Vectord<N>& currJointPos) {
+								   const navtypes::Vectord<N>& currJointPos) {
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
 
@@ -72,7 +72,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	navtypes::Vectord<N> set_y_vel(robot::types::datatime_t currTime, double targetVel,
-			  const navtypes::Vectord<N>& currJointPos) {
+								   const navtypes::Vectord<N>& currJointPos) {
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
 
@@ -85,16 +85,18 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param currJointPos The current joint positions.
-	 * @return The new command, which is the new joint positions to get to the new target end effector position.
+	 * @return The new command, which is the new joint positions to get to the new target end
+	 * effector position.
 	 */
-	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime, const navtypes::Vectord<N>& currJointPos) {
+	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
+									const navtypes::Vectord<N>& currJointPos) {
 		// calculate new EE position / setpoint
 		double dt = util::durationToSec(currTime - velTimestamp);
 		Eigen::Vector2d newPose = setpoint + velocity * dt;
 
-		// TODO: bounds check 
-			// (new pose + vel vector <= r / sum of joint poses)
-			// if not, shrink vel vector using math shit and get new pose again
+		// TODO: bounds check
+		// (new pose + vel vector <= r / sum of joint poses)
+		// if not, shrink vel vector using math shit and get new pose again
 		setpoint = newPose;
 
 		// get new joint positions for target EE
