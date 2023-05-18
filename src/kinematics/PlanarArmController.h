@@ -12,88 +12,96 @@
 namespace kinematics {
 
 /**
- * @brief Controller to move planar arm to target position.
+ * @brief Controller to move planar arm to a target end effector position.
  *
- * TODO: GOAL is to move the arm to the target positon (which is the end effector position)
- * Input: target / setpoint (x, y), stuff to make planararmkinematics
- *
- * Steps:
- *  Get current arm joint positions
- *  Use PlanarArmKinematics to get the joint angles and velocities that yield the desired EE
- * position (setpoint) Get the command for moving the arm (bound setpoint target) Return the
- * command
- *
- * Variables:
- *  PlanarArmKinematics
- *  Setpoint (x, y)
- *  Velocities (x, y)
- *
- * Methods:
- *  Constructor
- *  For returning the current command
- *  For changing x and y velocities
- *
- * @tparam N The number of joints.
+ * @tparam N The number of arm joints.
  */
 template <unsigned int N> class PlanarArmController {
 public:
 	/**
 	 * @brief Construct a new controller object.
 	 *
-	 * @param target Setpoint for end effector {double x, double y}
-	 * @param kin_obj PlanarArmKinematics object for the arm
+	 * @param vel Velocity for end effector {x_velocity, y_velocity}.
+	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
+	 * arm joints).
 	 */
-	PlanarArmController(Eigen::Vector2d target PlanarArmKinematics<N> kin_obj)
-		: setpoint(target), kinematics(kin_obj) {}
+	PlanarArmController(Eigen::Vector2d vel, PlanarArmKinematics<N> kin_obj)
+		: velocity(vel), kinematics(kin_obj) {
+		velTimestamp = robot::types::dataclock::now();
+	}
 
-	void set_x_vel(robot::types::datatime_t currTime, int32_t targetVel, const navtypes::Vectord<N>& currPose) {
-		timestamp = currTime;
+	/**
+	 * @brief Sets the x velocity for the end effector and returns the new command.
+	 *
+	 * @param currTime The current timestamp.
+	 * @param targetVel The target x velocity.
+	 * @param currJointPos The current joint positions.
+	 * @return The new command, which is a tuple of [new joint positions, new joint
+	 * velocities].
+	 */
+	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
+	set_x_vel(robot::types::datatime_t currTime, int32_t targetVel,
+			  const navtypes::Vectord<N>& currJointPos) {
 		velocity(0) = targetVel;
-		getCommand(currTime, currPose);
+		velTimestamp = currTime;
+
+		robot::types::datatime_t newTime = robot::types::dataclock::now();
+		return getCommand(newTime, currJointPos);
 	}
 
-	void set_y_vel(robot::types::datatime_t currTime, int32_t targetVel, const navtypes::Vectord<N>& currPose) {
-		timestamp = currTime;
+	/**
+	 * @brief Sets the y velocity for the end effector and returns the new command.
+	 *
+	 * @param currTime The current timestamp.
+	 * @param targetVel The target y velocity.
+	 * @param currJointPos The current joint positions.
+	 * @return The new command, which is a tuple of [new joint positions, new joint
+	 * velocities].
+	 */
+	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
+	set_y_vel(robot::types::datatime_t currTime, int32_t targetVel,
+			  const navtypes::Vectord<N>& currJointPos) {
 		velocity(1) = targetVel;
-		getCommand(currTime, currPose);
+		velTimestamp = currTime;
+
+		robot::types::datatime_t newTime = robot::types::dataclock::now();
+		return getCommand(newTime, currJointPos);
 	}
 
-	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
-									const navtypes::Vectord<N>& currPose) {
-		// create kinematics function
-		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>&
-			kinematicsFunc = [](const navtypes::Vectord<inputDim>& inputVec) {
-				// returns a copy of the input vector
-				return inputVec;
-			};
+	/**
+	 * @brief Get the current command for the arm
+	 *
+	 * @param currTime The current timestamp.
+	 * @param currJointPos The current joint positions.
+	 * @return The new command, which is a tuple of [new joint positions, new joint
+	 * velocities] to get to the new target end effector position.
+	 */
+	std::tuple<navtypes::Vectord<N>, navtypes::Vectord<N>>
+	getCommand(robot::types::datatime_t currTime, const navtypes::Vectord<N>& currJointPos) {
+		// get current EE position
+		currEEPos = kinematics.jointPosToEEPos(currJointPos);
 
-		// get jacobian function
-		navtypes::Matrixd<2, N> jacobianFunc = kinematics.getJacobian(currPose);
+		// TODO: bound the current EE position
 
-		// get target joint angles
-        navtypes::Vectord<N> currTarget = kinematics.eePosToJointPos(setpoint, currPose)
+		// calculate target EE position
+		double dt = util::durationToSec(currTime - velTimestamp);
+		Eigen::Vector2d newPose = currEEPos + velocity * dt;
 
-		// get joint velocity
-        navtypes::Vectord<N> jointVels = kinematics.eeVelToJointVel(currPose, velocity)
+		// TODO: bound target EE position
 
-        // define dimensions
-	    constexpr int32_t inputDim = N;
-	    constexpr int32_t outputDim = N;
+		// get new joint positions for target EE
+		navtypes::Vectord<N> joint_pos = kinematics.eePosToJointPos(newPose, currJointPos);
 
-		// calculate command
-		navtypes::Vectord<outputDim> currPosOutput = kinematicsFunc(currPos);
-		navtypes::Vectord<outputDim> outputPosDiff = currTarget - currPosOutput;
-		navtypes::Matrixd<outputDim, inputDim> jacobian = jacobianFunc(currPos);
-		navtypes::Vectord<inputDim> inputPosDiff =
-			jacobian.colPivHouseholderQr().solve(outputPosDiff);
+		// get new joint velocities for target EE
+		navtypes::Vectord<N> joint_vel = kinematics.eeVelToJointVel(joint_pos, velocity);
 
-		return currPose + inputPosDiff * jointVels;
+		// return the command
+		return std::make_tuple(joint_pos, joint_vel);
 	}
 
 private:
-	Eigen::Vector2d setpoint;
+	robot::types::datatime_t velTimestamp;
 	Eigen::Vector2d velocity{0.0, 0.0};
 	PlanarArmKinematics<N> kinematics;
-	robot::types::datatime_t timestamp;
 };
 } // namespace kinematics
