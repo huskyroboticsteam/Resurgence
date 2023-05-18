@@ -75,6 +75,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	if (stop) {
 		this->stopAndShutdownPowerRepeat();
 		robot::emergencyStop();
+		log(LOG_ERROR, "Emergency stop!\n");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();

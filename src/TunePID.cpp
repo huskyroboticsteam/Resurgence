@@ -1,18 +1,17 @@
 #include "CAN/CAN.h"
 #include "CAN/CANMotor.h"
+#include "Constants.h"
 #include "log.h"
 #include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"
-#include "Constants.h"
 
+#include <chrono>
 #include <csignal>
 #include <ctime>
 #include <iostream>
 #include <map>
 #include <time.h>
 #include <unistd.h>
-
-#include <chrono>
 
 #include <sys/time.h>
 
@@ -89,7 +88,7 @@ int main(int argc, char** argv) {
 	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
 	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
 
-	double period = 2.0;
+	double period = 8.0;
 	double amplitude =
 		20 * 1000.0; // in 1000th's of degrees
 					 // (doesn't make sense for hand motor, but that doesn't use PID)
@@ -110,7 +109,8 @@ int main(int argc, char** argv) {
 			   current_angle);
 		total_steps += 1;
 
-		double time = duration_cast<milliseconds>(steady_clock::now() - startTime).count() / 1000.0;
+		double time =
+			duration_cast<milliseconds>(steady_clock::now() - startTime).count() / 1000.0;
 		angle_target =
 			(int32_t)round(amplitude * sin(2 * M_PI * time / period)) + starting_angle;
 

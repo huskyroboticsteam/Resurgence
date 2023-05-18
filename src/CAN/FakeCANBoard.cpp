@@ -191,7 +191,8 @@ int main() {
 				can::motor::initMotor(serial);
 				if (sensorType == 0) {
 					int ppjr = prompt("Pulses per joint revolution");
-					can::motor::initEncoder(serial, false, true, ppjr, telemPeriod);
+					bool invert = prompt("Invert? 1=yes, 0=no") == 1;
+					can::motor::initEncoder(serial, invert, true, ppjr, telemPeriod);
 				} else if (sensorType == 1) {
 					int posLo = prompt("Pos Lo");
 					int posHi = prompt("Pos Hi");
