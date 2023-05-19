@@ -1058,15 +1058,15 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, encparams_t&gt;({</div>
 <div class="line">    {motorid_t::shoulder,</div>
-<div class="line">        {.isInverted = <span class="keyword">false</span>,</div>
-<div class="line">        .ppjr = 1620 * 1024,</div>
-<div class="line">        .limitSwitchLow = -90000,</div>
-<div class="line">        .limitSwitchHigh = 90000}},</div>
+<div class="line">        {.isInverted = <span class="keyword">true</span>,</div>
+<div class="line">        .ppjr = 4590 * 1024 * 4,</div>
+<div class="line">        .limitSwitchLow = 18200,</div>
+<div class="line">        .limitSwitchHigh = 152500}},</div>
 <div class="line">    {motorid_t::elbow,</div>
 <div class="line">        {.isInverted = <span class="keyword">false</span>,</div>
-<div class="line">        .ppjr = 1620 * 1024,</div>
-<div class="line">        .limitSwitchLow = -90000,</div>
-<div class="line">        .limitSwitchHigh = 90000}}</div>
+<div class="line">        .ppjr = 1620 * 1024 * 4,</div>
+<div class="line">        .limitSwitchLow = -169100,</div>
+<div class="line">        .limitSwitchHigh = 0}}</div>
 <div class="line">})</div>
 </div><!-- fragment -->
 </div>
@@ -1091,12 +1091,7 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;(</div>
-<div class="line">    {{motorid_t::armBase, {1000, 50, 10000}},</div>
-<div class="line">     {motorid_t::shoulder, {100, 0, 1000}},</div>
-<div class="line">     {motorid_t::elbow, {500, 50, 10000}},</div>
-<div class="line">     {motorid_t::forearm, {1000, 0, 0}},</div>
-<div class="line">     {motorid_t::wrist, {1000, 0, 0}},</div>
-<div class="line">     {motorid_t::activeSuspension, {1000, 0, 0}}})</div>
+<div class="line">    {{motorid_t::shoulder, {70, 0, 0}}, {motorid_t::elbow, {15, 7, -2}}})</div>
 </div><!-- fragment -->
 <p>A mapping of PID controlled motors to their pid coefficients. </p>
 
@@ -1159,9 +1154,9 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.75},</div>
-<div class="line">                                                   {motorid_t::shoulder, 1},</div>
+<div class="line">                                                   {motorid_t::shoulder, -1},</div>
 <div class="line">                                                   {motorid_t::elbow, -1},</div>
-<div class="line">                                                   {motorid_t::forearm, 0.65},</div>
+<div class="line">                                                   {motorid_t::forearm, -0.65},</div>
 <div class="line">                                                   {motorid_t::wrist, 0.6},</div>
 <div class="line">                                                   {motorid_t::frontLeftWheel, 0.7},</div>
 <div class="line">                                                   {motorid_t::frontRightWheel, -0.7},</div>
@@ -1194,9 +1189,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;motorid_t&gt;(</div>
-<div class="line">    {motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,</div>
-<div class="line">     motorid_t::wrist, motorid_t::activeSuspension})</div>
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    frozen::make_unordered_set&lt;motorid_t&gt;({motorid_t::shoulder, motorid_t::elbow})</div>
 </div><!-- fragment -->
 <p>The set of motors that are PID controlled. </p>
 
@@ -1223,9 +1217,9 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.75},</div>
-<div class="line">                                                   {motorid_t::shoulder, 1},</div>
+<div class="line">                                                   {motorid_t::shoulder, -1},</div>
 <div class="line">                                                   {motorid_t::elbow, -1},</div>
-<div class="line">                                                   {motorid_t::forearm, 0.65},</div>
+<div class="line">                                                   {motorid_t::forearm, -0.65},</div>
 <div class="line">                                                   {motorid_t::wrist, 0.6},</div>
 <div class="line">                                                   {motorid_t::frontLeftWheel, 0.7},</div>
 <div class="line">                                                   {motorid_t::frontRightWheel, -0.7},</div>
