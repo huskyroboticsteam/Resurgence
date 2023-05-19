@@ -178,8 +178,6 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		} else if (joint == jointid_t::wrist || joint == jointid_t::shoulder) {
 			if (!Globals::armIKEnabled) {
 				setMotorPower(jointMotorMap.at(joint), power);
-			} else {
-				setMotorPower(jointMotorMap.at(joint), 0.0);
 			}
 		} else {
 			setMotorPower(jointMotorMap.at(joint), power);
