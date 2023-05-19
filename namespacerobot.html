@@ -164,9 +164,9 @@ const <a class="el" href="classkinematics_1_1DiffDriveKinematics.html">DiffDrive
 <tr class="memitem:a24579cd764099c89ade1895cc300e638"><td class="memItemLeft" align="right" valign="top"><a id="a24579cd764099c89ade1895cc300e638" name="a24579cd764099c89ade1895cc300e638"></a>
 const <a class="el" href="classkinematics_1_1DiffWristKinematics.html">DiffWristKinematics</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>wristKinematics</b> ()</td></tr>
 <tr class="separator:a24579cd764099c89ade1895cc300e638"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf752a16bcc35605b3f364901f949063"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aaf752a16bcc35605b3f364901f949063">world_interface_init</a> ()</td></tr>
-<tr class="memdesc:aaf752a16bcc35605b3f364901f949063"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the world interface.  <br /></td></tr>
-<tr class="separator:aaf752a16bcc35605b3f364901f949063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65584ffb83e20412a795461b921deb5f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a65584ffb83e20412a795461b921deb5f">world_interface_init</a> (bool initOnlyMotors=false)</td></tr>
+<tr class="memdesc:a65584ffb83e20412a795461b921deb5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the world interface.  <br /></td></tr>
+<tr class="separator:a65584ffb83e20412a795461b921deb5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; <a class="el" href="classrobot_1_1base__motor.html">robot::base_motor</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a61bee8f61b7f31877ad21bbd9077f5a3">getMotor</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor)</td></tr>
 <tr class="memdesc:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to the motor object associated with the motor id.  <br /></td></tr>
 <tr class="separator:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1016,8 +1016,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 
 </div>
 </div>
-<a id="aaf752a16bcc35605b3f364901f949063" name="aaf752a16bcc35605b3f364901f949063"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf752a16bcc35605b3f364901f949063">&#9670;&#160;</a></span>world_interface_init()</h2>
+<a id="a65584ffb83e20412a795461b921deb5f" name="a65584ffb83e20412a795461b921deb5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65584ffb83e20412a795461b921deb5f">&#9670;&#160;</a></span>world_interface_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1025,7 +1025,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
         <tr>
           <td class="memname">void robot::world_interface_init </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>initOnlyMotors</em> = <code>false</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1061,12 +1062,14 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 <div class="line">        {.isInverted = <span class="keyword">true</span>,</div>
 <div class="line">        .ppjr = 4590 * 1024 * 4,</div>
 <div class="line">        .limitSwitchLow = 18200,</div>
-<div class="line">        .limitSwitchHigh = 152500}},</div>
+<div class="line">        .limitSwitchHigh = 152500,</div>
+<div class="line">        .zeroCalibrationPower = 0.4}},</div>
 <div class="line">    {motorid_t::elbow,</div>
 <div class="line">        {.isInverted = <span class="keyword">false</span>,</div>
 <div class="line">        .ppjr = 1620 * 1024 * 4,</div>
 <div class="line">        .limitSwitchLow = -169100,</div>
-<div class="line">        .limitSwitchHigh = 0}}</div>
+<div class="line">        .limitSwitchHigh = 0,</div>
+<div class="line">        .zeroCalibrationPower = -0.15}}</div>
 <div class="line">})</div>
 </div><!-- fragment -->
 </div>
@@ -1154,8 +1157,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.75},</div>
-<div class="line">                                                   {motorid_t::shoulder, -1},</div>
-<div class="line">                                                   {motorid_t::elbow, -1},</div>
+<div class="line">                                                   {motorid_t::shoulder, 1},</div>
+<div class="line">                                                   {motorid_t::elbow, 1},</div>
 <div class="line">                                                   {motorid_t::forearm, -0.65},</div>
 <div class="line">                                                   {motorid_t::wrist, 0.6},</div>
 <div class="line">                                                   {motorid_t::frontLeftWheel, 0.7},</div>
@@ -1217,8 +1220,8 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.75},</div>
-<div class="line">                                                   {motorid_t::shoulder, -1},</div>
-<div class="line">                                                   {motorid_t::elbow, -1},</div>
+<div class="line">                                                   {motorid_t::shoulder, 1},</div>
+<div class="line">                                                   {motorid_t::elbow, 1},</div>
 <div class="line">                                                   {motorid_t::forearm, -0.65},</div>
 <div class="line">                                                   {motorid_t::wrist, 0.6},</div>
 <div class="line">                                                   {motorid_t::frontLeftWheel, 0.7},</div>

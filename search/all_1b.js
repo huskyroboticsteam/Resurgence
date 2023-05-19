@@ -191,7 +191,7 @@ var searchData=
   ['workscale_188',['workScale',['https://docs.opencv.org/4.2.0/d2/d8d/classcv_1_1Stitcher.html#a69f0feb213330d7e4806892867ac4249',1,'cv::Stitcher']]],
   ['workstealing_2eh_189',['workstealing.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00983.html',1,'']]],
   ['world_5finterface_190',['WORLD_INTERFACE',['../namespacerobot.html#ad2a31e2720609dd7619fc2bbafcf441e',1,'robot']]],
-  ['world_5finterface_5finit_191',['world_interface_init',['../namespacerobot.html#aaf752a16bcc35605b3f364901f949063',1,'robot']]],
+  ['world_5finterface_5finit_191',['world_interface_init',['../namespacerobot.html#a65584ffb83e20412a795461b921deb5f',1,'robot']]],
   ['worlddata_192',['WorldData',['../classWorldData.html',1,'']]],
   ['worldinterface_193',['WorldInterface',['../namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e',1,'robot']]],
   ['wostream_194',['wostream',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01479.html#ga9ad6702c06821cdd550e08ef2b70f3b7',1,'wostream()(Global Namespace)'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01479.html#ga9ad6702c06821cdd550e08ef2b70f3b7',1,'std::wostream()']]],
