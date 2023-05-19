@@ -83,6 +83,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	}
 	// TODO: reinit motors
 	Globals::E_STOP = stop;
+	GLobals::armIKEnabled = false;
 }
 
 static bool validateOperationModeRequest(const json& j) {
@@ -246,6 +247,9 @@ void MissionControlProtocol::sendCameraStreamReport(
 }
 
 void MissionControlProtocol::handleConnection() {
+	// Turn off inverse kinematics on connection
+	Globals::armIKEnabled = false;
+
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
 
