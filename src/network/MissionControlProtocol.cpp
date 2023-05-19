@@ -129,6 +129,9 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 	bool enabled = j["enabled"];
 	Globals::armIKEnabled = enabled;
+	if (enabled) {
+		// TODO: reset arm IK controller set point to be current position
+	}
 }
 
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
@@ -299,6 +302,8 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 			this->_joint_repeat_thread.join();
 		}
 	}
+	// Turn off inverse kinematics so that IK state will be in sync with mission control
+	Globals::armIKEnabled = false;
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
