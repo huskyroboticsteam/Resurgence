@@ -59,7 +59,6 @@ struct encparams_t {
 	double zeroCalibrationPower;
 };
 
-// TODO: verify limit switch limits
 // clang-format off
 constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 	{motorid_t::shoulder,
@@ -77,6 +76,7 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 });
 // clang-format on
 
+// TODO: find appropriate bounds
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,
 	  {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},
@@ -101,7 +101,6 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
 
-// TODO: tune pid
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
 	{{motorid_t::shoulder, {70, 0, 0}}, {motorid_t::elbow, {15, 7, -2}}});
