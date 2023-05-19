@@ -55,6 +55,8 @@ struct encparams_t {
 	int limitSwitchLow;
 	/** Limit switch high, in millidegrees */
 	int limitSwitchHigh;
+	/** Power value set during limit switch calibration */
+	double zeroCalibrationPower;
 };
 
 // TODO: verify limit switch limits
@@ -64,12 +66,14 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		{.isInverted = true,
 		.ppjr = 4590 * 1024 * 4,
 		.limitSwitchLow = 18200,
-		.limitSwitchHigh = 152500}},
+		.limitSwitchHigh = 152500,
+		.zeroCalibrationPower = 0.4}},
 	{motorid_t::elbow,
 		{.isInverted = false,
 		.ppjr = 1620 * 1024 * 4,
 		.limitSwitchLow = -169100,
-		.limitSwitchHigh = 0}}
+		.limitSwitchHigh = 0,
+		.zeroCalibrationPower = -0.15}}
 });
 // clang-format on
 
@@ -108,8 +112,8 @@ constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
  */
 constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
-												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
+												   {motorid_t::shoulder, 1},
+												   {motorid_t::elbow, 1},
 												   {motorid_t::forearm, -0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
@@ -124,8 +128,8 @@ constexpr auto positive_pwm_scales =
  */
 constexpr auto negative_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
-												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
+												   {motorid_t::shoulder, 1},
+												   {motorid_t::elbow, 1},
 												   {motorid_t::forearm, -0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},

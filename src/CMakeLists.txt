@@ -389,6 +389,10 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
+add_executable(LimitSwitchCalibration 
+  LimitCalib.cpp)
+target_link_libraries(LimitSwitchCalibration ${real_world_libs})
+
 add_subdirectory(ar)
 add_subdirectory(camera)
 add_subdirectory(CAN)
