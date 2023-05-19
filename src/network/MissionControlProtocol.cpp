@@ -106,7 +106,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	}
 	// TODO: reinit motors
 	Globals::E_STOP = stop;
-	GLobals::armIKEnabled = false;
+	Globals::armIKEnabled = false;
 }
 
 static bool validateOperationModeRequest(const json& j) {
