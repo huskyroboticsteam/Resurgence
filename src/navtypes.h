@@ -14,6 +14,12 @@ struct gpscoords_t {
 	double lon;
 };
 
+struct orientation_t {
+	double roll;
+	double pitch;
+	double yaw;
+};
+
 /* Obstacles are specifed as a list of 2D vertices. Must be convex.
  * Do not repeat the starting vertex at the end. */
 using obstacle_t = Eigen::ArrayX2d;
