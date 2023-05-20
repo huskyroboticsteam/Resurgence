@@ -25,10 +25,11 @@ public:
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
 	 * arm joints).
 	 */
-	PlanarArmController(const navtypes::Vectord<N>& currJointPos, PlanarArmKinematics<N> kin_obj)
+	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
+						PlanarArmKinematics<N> kin_obj)
 		: kinematics(kin_obj) {
-			setpoint = kinematics.jointPosToEEPos(currJointPos);
-		}
+		setpoint = kinematics.jointPosToEEPos(currJointPos);
+	}
 
 	/**
 	 * @brief Sets the end effector setpoint / target position.
