@@ -46,6 +46,15 @@ public:
 	}
 
 	/**
+	 * @brief Get the segment lengths for this arm.
+	 *
+	 * @return The vector of segment lengths
+	 */
+	navtypes::Vectord<N> getSegLens() const {
+		return segLens;
+	}
+
+	/**
 	 * @brief Get the jacobian matrix for the arm at the given joint angles.
 	 *
 	 * @param jointPos The joint angles of the arm.
