@@ -355,6 +355,7 @@ if(WITH_TESTS)
     ../tests/control/TrapezoidalVelocityProfileTest.cpp
     ../tests/control/JacobianControllerTest.cpp
     ../tests/control/PIDControllerTest.cpp
+    ../tests/control/PlanarArmControllerTest.cpp
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/kinematics/SwerveDriveKinematicsTest.cpp

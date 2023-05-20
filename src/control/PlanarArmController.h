@@ -1,15 +1,17 @@
 #pragma once
 
+#include "../kinematics/PlanarArmKinematics.h"
 #include "../navtypes.h"
-#include "PlanarArmKinematics.h"
+#include "../world_interface/data.h"
 
 #include <array>
 #include <initializer_list>
 #include <numeric>
+#include <optional>
 
 #include <Eigen/Core>
 
-namespace kinematics {
+namespace control {
 
 /**
  * @brief Controller to move planar arm to a target end effector position.
@@ -26,10 +28,8 @@ public:
 	 * arm joints).
 	 */
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
-						PlanarArmKinematics<N> kin_obj)
-		: kinematics(kin_obj), velocity({0.0, 0.0}) {
-		setpoint = kinematics.jointPosToEEPos(currJointPos);
-	}
+						kinematics::PlanarArmKinematics<N> kin_obj)
+		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}) {}
 
 	/**
 	 * @brief Sets the end effector setpoint / target position.
@@ -37,7 +37,7 @@ public:
 	 * @param targetJointPos The target joint positions.
 	 */
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
-		setpoint = kinematics.jointPosToEEPos(targetJointPos);
+		setpoint = kin.jointPosToEEPos(targetJointPos);
 	}
 
 	/**
@@ -48,13 +48,14 @@ public:
 	 */
 	Eigen::Vector2d get_setpoint(robot::types::datatime_t currTime) {
 		// calculate current EE setpoint
+		Eigen::Vector2d pos = setpoint;
 		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp);
-			Eigen::Vector2d pos = setpoint + velocity * dt;
+			double dt = util::durationToSec(currTime - velTimestamp.value());
+			pos += velocity * dt;
 		}
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
-		double radius = kinematics.getSegLens().sum();
+		double radius = kin.getSegLens().sum();
 		if (pos.norm() > radius) {
 			// new position is outside of bounds
 			// TODO: will need to eventually shrink velocity vector until it is within radius
@@ -73,8 +74,8 @@ public:
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
 		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp);
-			setpoint += setpoint + velocity * dt;
+			double dt = util::durationToSec(currTime - velTimestamp.value());
+			setpoint += velocity * dt;
 		}
 
 		velocity(0) = targetVel;
@@ -90,8 +91,8 @@ public:
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
 		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp);
-			setpoint += setpoint + velocity * dt;
+			double dt = util::durationToSec(currTime - velTimestamp.value());
+			setpoint += velocity * dt;
 		}
 
 		velocity(1) = targetVel;
@@ -112,13 +113,13 @@ public:
 		setpoint = newPos;
 
 		// get new joint positions for target EE
-		return kinematics.eePosToJointPos(newPos, currJointPos);
+		return kin.eePosToJointPos(newPos, currJointPos);
 	}
 
 private:
+	kinematics::PlanarArmKinematics<N> kin;
 	Eigen::Vector2d setpoint;
 	Eigen::Vector2d velocity;
 	std::optional<robot::types::datatime_t> velTimestamp;
-	PlanarArmKinematics<N> kinematics;
 };
-} // namespace kinematics
+} // namespace control
