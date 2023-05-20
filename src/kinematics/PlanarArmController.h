@@ -41,12 +41,15 @@ public:
 	}
 
 	/**
-	 * @brief Gets the end effector setpoint / target position.
+	 * @brief Gets the current end effector setpoint / target position.
 	 *
-	 * @return The current target end effector position.
+	 * @param currTime The current timestamp.
+	 * @return The target end effector position.
 	 */
-	Eigen::Vector2d get_setpoint() {
-		return setpoint;
+	Eigen::Vector2d get_setpoint(robot::types::datatime_t currTime) {
+		// calculate current EE setpoint
+		double dt = util::durationToSec(currTime - velTimestamp);
+		return (setpoint + velocity * dt);
 	}
 
 	/**
@@ -89,9 +92,7 @@ public:
 	 */
 	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
 									const navtypes::Vectord<N>& currJointPos) {
-		// calculate new EE position / setpoint
-		double dt = util::durationToSec(currTime - velTimestamp);
-		Eigen::Vector2d newPos = setpoint + velocity * dt;
+		Eigen::Vector2d newPos = get_setpoint(robot::types::datatime_t currTime);
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
 		double radius = kinematics.getSegLens().sum();
