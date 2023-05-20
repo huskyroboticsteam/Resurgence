@@ -1,6 +1,7 @@
 #include "../navtypes.h"
 #include "world_interface.h"
 
+#include <memory>
 #include <unistd.h>
 
 // using namespace kinematics;
@@ -13,10 +14,10 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
 
-namespace{
-	DiffDriveKinematics drive_kinematics(1);  //doesn't really matter what we set this to
-	DiffWristKinematics wrist_kinematics;
-}
+namespace {
+DiffDriveKinematics drive_kinematics(1); // doesn't really matter what we set this to
+DiffWristKinematics wrist_kinematics;
+} // namespace
 
 const DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
@@ -26,7 +27,13 @@ const DiffWristKinematics& wristKinematics() {
 	return wrist_kinematics;
 }
 
-void world_interface_init() {}
+void world_interface_init(bool initMotorsOnly) {}
+
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+	return nullptr;
+}
+
+void emergencyStop() {}
 
 DataPoint<points_t> readLidarScan() {
 	return points_t{};
@@ -59,6 +66,8 @@ void setMotorPos(motorid_t motor, int32_t targetPos) {}
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
 	return {};
 }
+
+void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {}
 
 void setIndicator(indication_t signal) {}
 

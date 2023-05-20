@@ -21,8 +21,8 @@ namespace can::motor {
 
 void emergencyStopMotors() {
 	CANPacket p;
-	AssembleGroupBroadcastingEmergencyStopPacket(
-		&p, static_cast<uint8_t>(devicegroup_t::motor), ESTOP_ERR_GENERAL);
+	AssembleGroupBroadcastingEmergencyStopPacket(&p, static_cast<uint8_t>(0x0),
+												 ESTOP_ERR_GENERAL);
 	can::sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 }
@@ -80,6 +80,13 @@ void setMotorPower(deviceserial_t serial, int16_t power) {
 void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 	CANPacket p;
 	AssemblePIDTargetSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, target);
+	sendCANPacket(p);
+}
+
+void setServoPos(deviceserial_t serial, uint8_t servoNum, int32_t angle) {
+	CANPacket p;
+	AssemblePCAServoPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, servoNum,
+						   angle);
 	sendCANPacket(p);
 }
 

@@ -115,10 +115,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Find the CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
-find_package(HindsightCAN 1.3.0 REQUIRED)
-
-# Find the H264 encoder library
-find_package(H264Encoder 1.1.1 REQUIRED)
+find_package(HindsightCAN 1.3.2 REQUIRED)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -148,7 +145,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-variable \
 -Wno-unused-but-set-variable \
 -Wno-unused-result \
--Wno-unused-parameter") # -Wconversion") 
+-Wno-unused-parameter") # -Wconversion")
 
 if(WITH_TESTS)
   enable_testing()
@@ -161,7 +158,7 @@ list(APPEND camera_src
   )
 
 # shared library for utility code
-add_library(utils SHARED 
+add_library(utils SHARED
   log.cpp
   utils/core.cpp
   utils/random.cpp
@@ -169,6 +166,7 @@ add_library(utils SHARED
   utils/transform.cpp
   utils/threading.cpp
   utils/math.cpp
+  utils/json.cpp
   gps/gps_util.cpp
   base64/base64.cpp
   base64/base64_img.cpp
@@ -219,6 +217,7 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
+  world_interface/motor/base_motor.cpp
   ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -235,9 +234,11 @@ add_library(real_world_interface STATIC
   lidar/read_hokuyo_lidar.cpp
   lidar/read_rp_lidar.cpp
   gps/usb_gps/read_usb_gps.cpp
+  world_interface/motor/can_motor.cpp
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
+  world_interface/motor/sim_motor.cpp
   )
 
 target_link_libraries(real_world_interface can_interface world_interface_core)
@@ -254,6 +255,16 @@ add_library(filters SHARED
   filters/pose_graph/factors.cpp
   )
 target_link_libraries(filters utils)
+
+add_library(video STATIC
+  video/H264Encoder.cpp
+  video/encoder.cpp
+)
+
+target_link_libraries(video
+  ${OpenCV_LIBS}
+  x264 avutil avcodec avformat swscale
+)
 
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
@@ -319,7 +330,7 @@ target_link_libraries(Rover ${vision_libs})
 
 if(WITH_CAN)
   add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID 
+  target_link_libraries(TunePID
     ${rover_libs}
     can_interface
 	${real_world_libs}
@@ -347,6 +358,7 @@ if(WITH_TESTS)
     # Autonomy tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/kinematics/SwerveDriveKinematicsTest.cpp
+    ../tests/kinematics/PlanarArmKinematicsTest.cpp
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp
@@ -376,6 +388,10 @@ endif()
 add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
+
+add_executable(LimitSwitchCalibration 
+  LimitCalib.cpp)
+target_link_libraries(LimitSwitchCalibration ${real_world_libs})
 
 add_subdirectory(ar)
 add_subdirectory(camera)

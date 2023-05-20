@@ -6,9 +6,9 @@
 #include "../navtypes.h"
 #include "world_interface.h"
 
+#include <atomic>
 #include <chrono>
 #include <mutex>
-#include <atomic>
 
 using namespace navtypes;
 using namespace robot::types;
@@ -92,7 +92,6 @@ std::pair<double, double> getCmdVel() {
 	return {robotVel(2), robotVel(0)};
 }
 
-
 void setJointPower(robot::types::jointid_t joint, double power) {
 	// make sure power value is normalized
 	if (std::abs(power) > 1) {
@@ -135,7 +134,7 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	}
 }
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
-	if(jointMotorMap.find(joint) != jointMotorMap.end()){
+	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
 		return getMotorPos(jointMotorMap.at(joint));
 	}
 	// FIXME: need to do some extra work for differential - we will have to figure out which
@@ -151,7 +150,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 }
 
 namespace {
-void setJointPowerValue(types::jointid_t joint, double power){
+void setJointPowerValue(types::jointid_t joint, double power) {
 	// make sure power value is normalized
 	if (std::abs(power) > 1) {
 		power /= std::abs(power);

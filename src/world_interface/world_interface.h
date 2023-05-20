@@ -5,6 +5,7 @@
 #include "../kinematics/DiffWristKinematics.h"
 #include "../navtypes.h"
 #include "data.h"
+#include "motor/base_motor.h"
 
 #include <optional>
 #include <unordered_set>
@@ -42,7 +43,22 @@ const kinematics::DiffWristKinematics& wristKinematics();
  * This method should only be called once, and must be called
  * before any other world interface methods.
  */
-void world_interface_init();
+void world_interface_init(bool initOnlyMotors = false);
+
+/**
+ * @brief Get a pointer to the motor object associated with the motor id.
+ *
+ * @param motor The motor id to manipulate.
+ * @return A shared pointer to the motor object
+ */
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor);
+
+/**
+ * @brief Emergency stop all motors.
+ *
+ * After emergency stopping, all motors must be reinitialized.
+ */
+void emergencyStop();
 
 /**
  * @brief Request the robot to drive at the given velocities.
@@ -216,6 +232,14 @@ void setMotorPower(robot::types::motorid_t motor, double power);
  * information.
  */
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
+
+/**
+ * @brief Sets the velocity of the given motor.
+ *
+ * @param motor The motor to set the target position of.
+ * @param targetVel The target velocity, in millidegrees per second.
+ */
+void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
 
 /**
  * @brief Get the last reported position of the specified motor.

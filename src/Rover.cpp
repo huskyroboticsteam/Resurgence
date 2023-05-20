@@ -78,6 +78,7 @@ void parseCommandLine(int argc, char** argv) {
 			std::unordered_map<std::string, mountedperipheral_t> allowed{
 				{"none", mountedperipheral_t::none},
 				{"arm", mountedperipheral_t::arm},
+				{"armServo", mountedperipheral_t::armServo},
 				{"science", mountedperipheral_t::scienceStation},
 				{"lidar", mountedperipheral_t::lidar}};
 
@@ -130,43 +131,15 @@ void parseCommandLine(int argc, char** argv) {
 int main(int argc, char** argv) {
 	parseCommandLine(argc, argv);
 	Globals::AUTONOMOUS = false;
+	robot::world_interface_init();
 	Globals::websocketServer.start();
 	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
 	Globals::websocketServer.addProtocol(std::move(mcProto));
-	robot::world_interface_init();
 	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
 
-	// Target locations for autonomous navigation
-	// FIXME: Eventually this will be set by communication from the base station
-	std::vector<URCLegGPS> urc_legs = parseGPSLegs("../src/gps/simulator_legs.txt");
-	Autonomous autonomous(urc_legs, Constants::CONTROL_HZ);
-	auto roverStart = steady_clock::now();
 	while (true) {
-		auto loopStart = steady_clock::now();
-		long loopStartElapsedUsecs =
-			duration_cast<microseconds>(loopStart - roverStart).count();
-
-		int arm_base_pos = robot::getMotorPos(motorid_t::armBase).getDataOrElse(-1);
-		int shoulder_pos = robot::getMotorPos(motorid_t::shoulder).getDataOrElse(-1);
-		int elbow_pos = robot::getMotorPos(motorid_t::elbow).getDataOrElse(-1);
-		log(LOG_DEBUG, "Time\t %d arm_base\t %d\t shoulder\t %d\t elbow\t %d \r",
-			loopStartElapsedUsecs / 1000, arm_base_pos, shoulder_pos, elbow_pos);
-
-		autonomous.autonomyIter();
-
-		long elapsedUsecs =
-			duration_cast<microseconds>(steady_clock::now() - loopStart).count();
-		long desiredUsecs = 1000 * 1000 / Constants::CONTROL_HZ;
-		if (desiredUsecs - elapsedUsecs > 0) {
-			// We drift by approximately 1ms per second unless we
-			// reduce our sleep time slightly
-			usleep(desiredUsecs - elapsedUsecs - 90);
-		} else {
-			log(LOG_WARN, "Can't keep up with control frequency! Desired %d elapsed %d\n",
-				desiredUsecs / 1000, elapsedUsecs / 1000);
-		}
+		std::this_thread::sleep_for(std::chrono::seconds(60));
 	}
-	return EXIT_SUCCESS;
 }

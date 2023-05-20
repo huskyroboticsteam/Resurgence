@@ -127,22 +127,20 @@ void Camera::captureLoop() {
 	cv::Mat frame;
 	while (*_running) {
 		_capture_lock->lock();
-		_capture->read(frame);
+		bool success = _capture->read(frame);
 		_capture_lock->unlock();
-		_frame_lock->lock();
-		frame.copyTo(*(this->_frame));
-		(*_frame_num)++;
-		*_frame_time = dataclock::now();
-		_frame_lock->unlock();
+		if (success && !frame.empty()) {
+			_frame_lock->lock();
+			frame.copyTo(*(this->_frame));
+			(*_frame_num)++;
+			*_frame_time = dataclock::now();
+			_frame_lock->unlock();
+		}
 	}
 }
 
 bool Camera::isOpen() const {
-	bool open;
-	_capture_lock->lock();
-	open = _capture->isOpened();
-	_capture_lock->unlock();
-	return open;
+	return *_running;
 }
 
 bool Camera::hasNext(uint32_t last_frame_num) const {

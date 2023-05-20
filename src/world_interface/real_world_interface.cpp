@@ -10,6 +10,7 @@
 #include "../lidar/read_hokuyo_lidar.h"
 #include "../log.h"
 #include "../navtypes.h"
+#include "motor/can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
 
@@ -29,9 +30,23 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
+// A mapping of (motor_id, shared pointer to object of the motor)
+std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+
 namespace {
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 kinematics::DiffWristKinematics wrist_kinematics;
+
+void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+	// get scales for motor
+	double posScale = positive_pwm_scales.at(motor);
+	double negScale = negative_pwm_scales.at(motor);
+
+	// create ptr and insert in map
+	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(
+		motor, hasPosSensor, motorSerialIDMap.at(motor), posScale, negScale);
+	motor_ptrs.insert({motor, ptr});
+}
 } // namespace
 
 const kinematics::DiffDriveKinematics& driveKinematics() {
@@ -46,20 +61,8 @@ namespace {
 // map that associates camera id to the camera object
 std::unordered_map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
 
-std::unordered_map<motorid_t, motormode_t> motorModeMap;
-
 callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
-
-void ensureMotorMode(motorid_t motor, motormode_t mode) {
-	auto entry = motorModeMap.find(motor);
-	if (entry == motorModeMap.end()) {
-		motorModeMap.insert(std::make_pair(motor, mode));
-	} else if (entry->second != mode) {
-		entry->second = mode;
-		can::motor::setMotorMode(motorSerialIDMap.at(motor), mode);
-	}
-}
 
 void initMotors() {
 	for (const auto& it : motorSerialIDMap) {
@@ -74,6 +77,9 @@ void initMotors() {
 
 		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
+
+		// initialize motor objects and add them to map
+		addMotorMapping(motor_id, true);
 	}
 
 	for (const auto& enc_motor_pair : robot::encMotors) {
@@ -86,13 +92,25 @@ void initMotors() {
 								TELEM_PERIOD);
 		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
 										 enc_params.limitSwitchHigh);
+
+		// initialize motor objects and add them to map
+		addMotorMapping(motor_id, true);
 	}
+
+	// initialize motor objects and add them to map
+	addMotorMapping(motorid_t::frontLeftWheel, false);
+	addMotorMapping(motorid_t::frontRightWheel, false);
+	addMotorMapping(motorid_t::rearLeftWheel, false);
+	addMotorMapping(motorid_t::rearRightWheel, false);
 
 	for (motorid_t motor : pidMotors) {
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
 	}
+
+	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
+	addMotorMapping(motorid_t::hand, false);
 }
 
 void openCamera(CameraID camID, const char* cameraPath) {
@@ -117,15 +135,32 @@ void setupCameras() {
 }
 } // namespace
 
-void world_interface_init() {
-	setupCameras();
-
-	bool gps_success = gps::usb::startGPSThread();
-	// bool lidar_success = lidar::initializeLidar();
-	// bool landmark_success = AR::initializeLandmarkDetection();
-
+void world_interface_init(bool initOnlyMotors) {
+	if (!initOnlyMotors) {
+		setupCameras();
+		bool gps_success = gps::usb::startGPSThread();
+		bool lidar_success = lidar::initializeLidar();
+		bool landmark_success = AR::initializeLandmarkDetection();
+	}
 	can::initCAN();
 	initMotors();
+}
+
+std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+	auto itr = motor_ptrs.find(motor);
+
+	if (itr == motor_ptrs.end()) {
+		// motor id not in map
+		log(LOG_ERROR, "getMotor(): Unknown motor %d\n", static_cast<int>(motor));
+		return nullptr;
+	} else {
+		// return motor object pointer
+		return itr->second;
+	}
+}
+
+void emergencyStop() {
+	can::motor::emergencyStopMotors();
 }
 
 std::unordered_set<CameraID> getCameras() {
@@ -225,28 +260,27 @@ template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
 }
 
 void setMotorPower(robot::types::motorid_t motor, double power) {
-	can::deviceserial_t serial = motorSerialIDMap.at(motor);
-	auto& scaleMap = power < 0 ? negative_pwm_scales : positive_pwm_scales;
-	auto entry = scaleMap.find(motor);
-	if (entry != scaleMap.end()) {
-		power *= entry->second;
-	}
-	ensureMotorMode(motor, motormode_t::pwm);
-	can::motor::setMotorPower(serial, power);
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorPower(power);
 }
 
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
-	can::deviceserial_t serial = motorSerialIDMap.at(motor);
-	ensureMotorMode(motor, motormode_t::pid);
-	can::motor::setMotorPIDTarget(serial, targetPos);
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorPos(targetPos);
+}
+
+types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	return motor_ptr->getMotorPos();
+}
+
+void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	motor_ptr->setMotorVel(targetVel);
 }
 
 // TODO: implement
 void setIndicator(indication_t signal) {}
-
-types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
-	return can::motor::getMotorPosition(motorSerialIDMap.at(motor));
-}
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,

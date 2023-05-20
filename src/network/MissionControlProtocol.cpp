@@ -4,6 +4,7 @@
 #include "../Globals.h"
 #include "../base64/base64_img.h"
 #include "../log.h"
+#include "../utils/json.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
 
@@ -28,7 +29,7 @@ using websocket::connhandler_t;
 using websocket::msghandler_t;
 using websocket::validator_t;
 
-const std::chrono::milliseconds JOINT_POS_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -48,33 +49,9 @@ constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
 constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
+constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
-
-/**
-   Check if the given json object has the given key.
- */
-static bool hasKey(const json& j, const std::string& key);
-/**
-   Check if the given json object has the given key with the given type.
- */
-static bool validateKey(const json& j, const std::string& key, const val_t& type);
-/**
-   Check if the given json object has the given key, with a type in the given set of types.
- */
-static bool validateKey(const json& j, const std::string& key,
-						const std::unordered_set<val_t>& types);
-/**
-   Check if the value in the given json object at the given key is a string in the given set of
-   allowed values.
- */
-static bool validateOneOf(const json& j, const std::string& key,
-						  const std::unordered_set<std::string>& vals);
-/**
-   Check if the value in the given json object at the given key is a floating-point number
-   between min and max, inclusive.
- */
-static bool validateRange(const json& j, const std::string& key, double min, double max);
 
 /**
    Set power for all joints to zero.
@@ -90,27 +67,26 @@ static void stopAllJoints();
 */
 
 static bool validateEmergencyStopRequest(const json& j) {
-	return validateKey(j, "stop", val_t::boolean);
+	return util::validateKey(j, "stop", val_t::boolean);
 }
 
 void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
 		this->stopAndShutdownPowerRepeat();
-		// TODO: do e-stop properly. Add emergencyStop() method to world interface,
-		// use it to send estop packets to all motor controllers.
-		// This will stop the arm and everything else too.
-		// @see can::motor::emergencyStopMotors()
+		robot::emergencyStop();
+		log(LOG_ERROR, "Emergency stop!\n");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();
 	}
+	// TODO: reinit motors
 	Globals::E_STOP = stop;
 }
 
 static bool validateOperationModeRequest(const json& j) {
-	return validateKey(j, "mode", val_t::string) &&
-		   validateOneOf(j, "mode", {"teleoperation", "autonomous"});
+	return util::validateKey(j, "mode", val_t::string) &&
+		   util::validateOneOf(j, "mode", {"teleoperation", "autonomous"});
 }
 
 void MissionControlProtocol::handleOperationModeRequest(const json& j) {
@@ -127,8 +103,8 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 
 static bool validateDriveRequest(const json& j) {
 	std::string msg = j.dump();
-	return hasKey(j, "straight") && validateRange(j, "straight", -1, 1) &&
-		   hasKey(j, "steer") && validateRange(j, "steer", -1, 1);
+	return util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
+		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
@@ -154,13 +130,13 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 }
 
 static bool validateJoint(const json& j) {
-	return validateKey(j, "joint", val_t::string) &&
-		   validateOneOf(j, "joint",
-						 {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand"});
+	return util::validateKey(j, "joint", val_t::string) &&
+		   util::validateOneOf(j, "joint",
+							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand"});
 }
 
 static bool validateJointPowerRequest(const json& j) {
-	return validateJoint(j) && validateRange(j, "power", -1, 1);
+	return validateJoint(j) && util::validateRange(j, "power", -1, 1);
 }
 
 void MissionControlProtocol::handleJointPowerRequest(const json& j) {
@@ -176,8 +152,35 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	}
 }
 
+void MissionControlProtocol::sendRoverPos() {
+	auto heading = robot::readIMUHeading();
+	auto gps = robot::readGPS();
+	if (gps.isValid() && heading.isValid()) {
+		double orientX = 0.0;
+		double orientY = 0.0;
+		double orientZ = std::sin(heading.getData() / 2);
+		double orientW = std::cos(heading.getData() / 2);
+		double posX = gps.getData()[0];
+		double posY = gps.getData()[1];
+		double posZ = 0.0;
+		double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
+		double headingRecency = util::durationToSec(dataclock::now() - heading.getTime());
+		double recency = std::max(gpsRecency, headingRecency);
+		json msg = {{"type", ROVER_POS_REP_TYPE},
+					{"orientW", orientW},
+					{"orientX", orientX},
+					{"orientY", orientY},
+					{"orientZ", orientZ},
+					{"posX", posX},
+					{"posY", posY},
+					{"posZ", posZ},
+					{"recency", recency}};
+		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
+}
+
 static bool validateJointPositionRequest(const json& j) {
-	return validateJoint(j) && validateKey(j, "position", val_t::number_integer);
+	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
 }
 
 static void handleJointPositionRequest(const json& j) {
@@ -190,7 +193,7 @@ static void handleJointPositionRequest(const json& j) {
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "camera", val_t::string);
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
@@ -199,17 +202,20 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		this->_open_streams[cam] = 0;
+		this->_camera_encoders[cam] =
+			std::make_shared<video::H264Encoder>(j["fps"], Constants::video::H264_RF_CONSTANT);
 	}
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "camera", val_t::string);
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
 	std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 	this->_open_streams.erase(cam);
+	this->_camera_encoders.erase(cam);
 }
 
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
@@ -220,9 +226,9 @@ void MissionControlProtocol::sendJointPositionReport(const std::string& jointNam
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
-void MissionControlProtocol::sendCameraStreamReport(const CameraID& cam,
-													const std::string& b64_data) {
-	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+void MissionControlProtocol::sendCameraStreamReport(
+	const CameraID& cam, const std::vector<std::basic_string<uint8_t>>& videoData) {
+	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", videoData}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
@@ -330,8 +336,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
 
 	// Joint position reporting
-	this->_joint_report_thread =
-		std::thread(&MissionControlProtocol::jointPosReportTask, this);
+	this->_joint_report_thread = std::thread(&MissionControlProtocol::telemReportTask, this);
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
@@ -360,7 +365,11 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				}
 				const jointid_t& joint = current_pair.first;
 				const double& power = current_pair.second;
-				robot::setJointPower(joint, power);
+				// no need to repeatedly send 0 power
+				// this is also needed to make the zero calibration script work
+				if (power != 0.0) {
+					robot::setJointPower(joint, power);
+				}
 			}
 			if (this->_last_cmd_vel) {
 				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
@@ -371,7 +380,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 	}
 }
 
-void MissionControlProtocol::jointPosReportTask() {
+void MissionControlProtocol::telemReportTask() {
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
@@ -384,7 +393,9 @@ void MissionControlProtocol::jointPosReportTask() {
 			}
 		}
 
-		pt += JOINT_POS_REPORT_PERIOD;
+		sendRoverPos();
+
+		pt += TELEM_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);
 	}
 }
@@ -399,16 +410,18 @@ void MissionControlProtocol::videoStreamTask() {
 			if (robot::hasNewCameraFrame(cam, frame_num)) {
 				// if there is a new frame, grab it
 				auto camDP = robot::readCamera(cam);
+
 				if (camDP) {
 					auto data = camDP.getData();
 					uint32_t& new_frame_num = data.second;
 					cv::Mat frame = data.first;
 					// update the previous frame number
 					this->_open_streams[cam] = new_frame_num;
+					const auto& encoder = this->_camera_encoders[cam];
 
-					// convert frame to base64 and send it
-					std::string b64_data = base64::encodeMat(frame, ".jpg");
-					sendCameraStreamReport(cam, b64_data);
+					// convert frame to encoded data and send it
+					auto data_vector = encoder->encode_frame(frame);
+					sendCameraStreamReport(cam, data_vector);
 				}
 			}
 
@@ -417,39 +430,11 @@ void MissionControlProtocol::videoStreamTask() {
 				break;
 			}
 		}
+		std::this_thread::yield();
 	}
 }
 
 ///// UTILITY FUNCTIONS //////
-
-static bool hasKey(const json& j, const std::string& key) {
-	return j.contains(key);
-}
-
-static bool validateKey(const json& j, const std::string& key, const val_t& type) {
-	return hasKey(j, key) && j.at(key).type() == type;
-}
-
-static bool validateKey(const json& j, const std::string& key,
-						const std::unordered_set<val_t>& types) {
-	return hasKey(j, key) && types.find(j.at(key).type()) != types.end();
-}
-
-static bool validateOneOf(const json& j, const std::string& key,
-						  const std::unordered_set<std::string>& vals) {
-	// TODO convert this to use Frozen sets
-	return validateKey(j, key, val_t::string) &&
-		   vals.find(static_cast<std::string>(j[key])) != vals.end();
-}
-
-static bool validateRange(const json& j, const std::string& key, double min, double max) {
-	if (validateKey(j, key,
-					{val_t::number_float, val_t::number_unsigned, val_t::number_integer})) {
-		double d = j[key];
-		return min <= d && d <= max;
-	}
-	return false;
-}
 
 static void stopAllJoints() {
 	for (jointid_t current : robot::types::all_jointid_t) {
