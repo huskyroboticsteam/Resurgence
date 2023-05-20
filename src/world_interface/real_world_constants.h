@@ -25,9 +25,8 @@ struct pidcoef_t {
 constexpr std::chrono::milliseconds TELEM_PERIOD(50);
 
 /** @brief The set of motors that are PID controlled. */
-constexpr auto pidMotors = frozen::make_unordered_set<motorid_t>(
-	{motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm,
-	 motorid_t::wrist, motorid_t::activeSuspension});
+constexpr auto pidMotors =
+	frozen::make_unordered_set<motorid_t>({motorid_t::shoulder, motorid_t::elbow});
 
 /**
  * @brief Represents parameters defining a potentiometer scale.
@@ -56,24 +55,28 @@ struct encparams_t {
 	int limitSwitchLow;
 	/** Limit switch high, in millidegrees */
 	int limitSwitchHigh;
+	/** Power value set during limit switch calibration */
+	double zeroCalibrationPower;
 };
 
-// TODO: verify limit switch limits
 // clang-format off
 constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 	{motorid_t::shoulder,
-		{.isInverted = false,
-		.ppjr = 1620 * 1024,
-		.limitSwitchLow = -90000,
-		.limitSwitchHigh = 90000}},
+		{.isInverted = true,
+		.ppjr = 4590 * 1024 * 4,
+		.limitSwitchLow = 18200,
+		.limitSwitchHigh = 152500,
+		.zeroCalibrationPower = 0.4}},
 	{motorid_t::elbow,
 		{.isInverted = false,
-		.ppjr = 1620 * 1024,
-		.limitSwitchLow = -90000,
-		.limitSwitchHigh = 90000}}
+		.ppjr = 1620 * 1024 * 4,
+		.limitSwitchLow = -169100,
+		.limitSwitchHigh = 0,
+		.zeroCalibrationPower = -0.15}}
 });
 // clang-format on
 
+// TODO: find appropriate bounds
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,
 	  {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},
@@ -98,15 +101,9 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
 
-// TODO: tune pid
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
-	{{motorid_t::armBase, {1000, 50, 10000}},
-	 {motorid_t::shoulder, {100, 0, 1000}},
-	 {motorid_t::elbow, {500, 50, 10000}},
-	 {motorid_t::forearm, {1000, 0, 0}},
-	 {motorid_t::wrist, {1000, 0, 0}},
-	 {motorid_t::activeSuspension, {1000, 0, 0}}});
+	{{motorid_t::shoulder, {70, 0, 0}}, {motorid_t::elbow, {15, 7, -2}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
@@ -115,8 +112,8 @@ constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
 constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
 												   {motorid_t::shoulder, 1},
-												   {motorid_t::elbow, -1},
-												   {motorid_t::forearm, 0.65},
+												   {motorid_t::elbow, 1},
+												   {motorid_t::forearm, -0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, -0.7},
@@ -131,8 +128,8 @@ constexpr auto positive_pwm_scales =
 constexpr auto negative_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
 												   {motorid_t::shoulder, 1},
-												   {motorid_t::elbow, -1},
-												   {motorid_t::forearm, 0.65},
+												   {motorid_t::elbow, 1},
+												   {motorid_t::forearm, -0.65},
 												   {motorid_t::wrist, 0.6},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, -0.7},

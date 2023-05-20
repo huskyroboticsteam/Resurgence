@@ -270,7 +270,7 @@ const DiffWristKinematics& wristKinematics() {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 
-void world_interface_init() {
+void world_interface_init(bool initOnlyMotors) {
 	initSimServer();
 	initCameras();
 	initMotors();

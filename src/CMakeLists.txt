@@ -145,7 +145,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
 -Wno-unused-variable \
 -Wno-unused-but-set-variable \
 -Wno-unused-result \
--Wno-unused-parameter") # -Wconversion") 
+-Wno-unused-parameter") # -Wconversion")
 
 if(WITH_TESTS)
   enable_testing()
@@ -158,7 +158,7 @@ list(APPEND camera_src
   )
 
 # shared library for utility code
-add_library(utils SHARED 
+add_library(utils SHARED
   log.cpp
   utils/core.cpp
   utils/random.cpp
@@ -166,6 +166,7 @@ add_library(utils SHARED
   utils/transform.cpp
   utils/threading.cpp
   utils/math.cpp
+  utils/json.cpp
   gps/gps_util.cpp
   base64/base64.cpp
   base64/base64_img.cpp
@@ -329,7 +330,7 @@ target_link_libraries(Rover ${vision_libs})
 
 if(WITH_CAN)
   add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID 
+  target_link_libraries(TunePID
     ${rover_libs}
     can_interface
 	${real_world_libs}
@@ -387,6 +388,10 @@ endif()
 add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
+
+add_executable(LimitSwitchCalibration 
+  LimitCalib.cpp)
+target_link_libraries(LimitSwitchCalibration ${real_world_libs})
 
 add_subdirectory(ar)
 add_subdirectory(camera)
