@@ -49,7 +49,17 @@ public:
 	Eigen::Vector2d get_setpoint(robot::types::datatime_t currTime) {
 		// calculate current EE setpoint
 		double dt = util::durationToSec(currTime - velTimestamp);
-		return (setpoint + velocity * dt);
+		Eigen::Vector2d pos = setpoint + velocity * dt;
+
+		// bounds check (new pos + vel vector <= sum of joint lengths)
+		double radius = kinematics.getSegLens().sum();
+		if (pos.norm() > radius) {
+			// new position is outside of bounds
+			// TODO: will need to eventually shrink velocity vector until it is within radius
+			// instead of just normalizing it
+			pos.normalize();
+		}
+		return pos;
 	}
 
 	/**
@@ -92,16 +102,7 @@ public:
 	 */
 	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
 									const navtypes::Vectord<N>& currJointPos) {
-		Eigen::Vector2d newPos = get_setpoint(robot::types::datatime_t currTime);
-
-		// bounds check (new pos + vel vector <= sum of joint lengths)
-		double radius = kinematics.getSegLens().sum();
-		if (newPos.norm() > radius) {
-			// new position is outside of bounds
-			// TODO: will need to eventually shrink velocity vector until it is within radius
-			// instead of just normalizing it
-			newPos.normalize();
-		}
+		Eigen::Vector2d newPos = get_setpoint(currTime);
 		setpoint = newPos;
 
 		// get new joint positions for target EE
