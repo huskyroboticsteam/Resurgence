@@ -27,7 +27,7 @@ public:
 	 */
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
 						PlanarArmKinematics<N> kin_obj)
-		: kinematics(kin_obj) {
+		: kinematics(kin_obj), velocity({0.0, 0.0}) {
 		setpoint = kinematics.jointPosToEEPos(currJointPos);
 	}
 
@@ -70,8 +70,10 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
-		double dt = util::durationToSec(currTime - velTimestamp);
-		setpoint += setpoint + velocity * dt;
+		if (velTimestamp) {
+			double dt = util::durationToSec(currTime - velTimestamp);
+			setpoint += setpoint + velocity * dt;
+		}
 
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
@@ -85,8 +87,10 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
-		double dt = util::durationToSec(currTime - velTimestamp);
-		setpoint += setpoint + velocity * dt;
+		if (velTimestamp) {
+			double dt = util::durationToSec(currTime - velTimestamp);
+			setpoint += setpoint + velocity * dt;
+		}
 
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
@@ -111,8 +115,8 @@ public:
 
 private:
 	Eigen::Vector2d setpoint;
-	Eigen::Vector2d velocity{0.0, 0.0};
-	robot::types::datatime_t velTimestamp;
+	Eigen::Vector2d velocity;
+	std::optional<robot::types::datatime_t> velTimestamp;
 	PlanarArmKinematics<N> kinematics;
 };
 } // namespace kinematics
