@@ -48,8 +48,10 @@ public:
 	 */
 	Eigen::Vector2d get_setpoint(robot::types::datatime_t currTime) {
 		// calculate current EE setpoint
-		double dt = util::durationToSec(currTime - velTimestamp);
-		Eigen::Vector2d pos = setpoint + velocity * dt;
+		if (velTimestamp.has_value()) {
+			double dt = util::durationToSec(currTime - velTimestamp);
+			Eigen::Vector2d pos = setpoint + velocity * dt;
+		}
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
 		double radius = kinematics.getSegLens().sum();
@@ -70,7 +72,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
-		if (velTimestamp) {
+		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp);
 			setpoint += setpoint + velocity * dt;
 		}
@@ -87,7 +89,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
-		if (velTimestamp) {
+		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp);
 			setpoint += setpoint + velocity * dt;
 		}
