@@ -243,11 +243,27 @@ int main() {
 				std::this_thread::sleep_for(20ms);
 			}
 		} else if (testMode == TestMode::ScienceTelemetry) {
-			// Serial 0 seems to work. Nothing else (up to 17, the largest I tried)
-			serial = prompt("Enter serial");
-			uint8_t sensor_code = 42; // Nonsense for now, just testing CAN connection
-			AssembleTelemetryPullPacket(&p, science_group, (uint8_t)serial, sensor_code);
-			can::sendCANPacket(p);
+			if (!mode_has_been_set) {
+				serial = 0x01;
+				can::deviceid_t id = std::make_pair(can::devicegroup_t::science, serial);
+				can::addDeviceTelemetryCallback(
+					id, can::telemtype_t::limit_switch,
+					[](can::deviceid_t id, can::telemtype_t telemType,
+					   DataPoint<can::telemetry_t> data) {
+						std::cout << "Science: serial=" << std::hex
+								  << static_cast<int>(id.second) << ", type=" << std::hex
+								  << static_cast<int>(telemType) << ", data=" << std::dec
+								  << data.getDataOrElse(0) << std::endl;
+					});
+				mode_has_been_set = true;
+			}
+			auto reqType = prompt("Enter telemetry type");
+			int telemPeriod = prompt("Telemetry timing (ms)");
+			CANPacket packet;
+			AssembleTelemetryTimingPacket(&packet,
+										  static_cast<uint8_t>(can::devicegroup_t::science),
+										  serial, reqType, telemPeriod);
+			can::sendCANPacket(packet);
 		} else if (testMode == TestMode::ScienceMotors) {
 			// CAREFUL, there are no safety checks / limit switches
 			// 0: drill up/down (down is positive, ~500 PWM)
