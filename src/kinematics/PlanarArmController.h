@@ -21,7 +21,7 @@ public:
 	/**
 	 * @brief Construct a new controller object.
 	 *
-	 * @param target Target position for end effector {int32_t x, int32_t y}.
+	 * @param target Target position for end effector {x, y}.
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
 	 * arm joints).
 	 */
@@ -94,9 +94,25 @@ public:
 		double dt = util::durationToSec(currTime - velTimestamp);
 		Eigen::Vector2d newPose = setpoint + velocity * dt;
 
-		// TODO: bounds check
-		// (new pose + vel vector <= r / sum of joint poses)
-		// if not, shrink vel vector using math shit and get new pose again
+		// bounds check (new pose + vel vector <= sum of joint poses)
+		double radius;
+		for (int32_t i = 0; i < N; i++) {
+			radius += currJointPos[i];
+		}
+		if ((newPose(0) < 0 || newPose(0) > radius) ||
+			(newPose(1) < 0 || newPose(1) > radius)) {
+			// new position is outside of bounds
+			// TODO: will need to eventually shrink velocity vector until it is within radius
+			// instead of just normalizing it between 0 to 1
+			auto min_val = std::min_element(velocity.begin(), velocity.end());
+			auto max_val = std::max_element(velocity.begin(), velocity.end());
+
+			for (auto& element : velocity) {
+				element -= min_val;
+				element /= (max_val - min_val);
+			}
+			newPose = setpoint + velocity * dt;
+		}
 		setpoint = newPose;
 
 		// get new joint positions for target EE
