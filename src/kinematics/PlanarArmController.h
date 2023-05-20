@@ -21,12 +21,14 @@ public:
 	/**
 	 * @brief Construct a new controller object.
 	 *
-	 * @param target Target position for end effector {x, y}.
+	 * @param currJointPos The current joint positions of the arm.
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
 	 * arm joints).
 	 */
-	PlanarArmController(Eigen::Vector2d target, PlanarArmKinematics<N> kin_obj)
-		: setpoint(target), kinematics(kin_obj) {}
+	PlanarArmController(const navtypes::Vectord<N>& currJointPos, PlanarArmKinematics<N> kin_obj)
+		: kinematics(kin_obj) {
+			setpoint = kinematics.jointPosToEEPos(currJointPos);
+		}
 
 	/**
 	 * @brief Sets the end effector setpoint / target position.
@@ -55,7 +57,7 @@ public:
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
 		double dt = util::durationToSec(currTime - velTimestamp);
-		setpoint = setpoint + velocity * dt;
+		setpoint += setpoint + velocity * dt;
 
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
@@ -70,7 +72,7 @@ public:
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
 		double dt = util::durationToSec(currTime - velTimestamp);
-		setpoint = setpoint + velocity * dt;
+		setpoint += setpoint + velocity * dt;
 
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
@@ -91,13 +93,12 @@ public:
 		Eigen::Vector2d newPos = setpoint + velocity * dt;
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
-		double radius = kinematics.getSegLens.sum();
+		double radius = kinematics.getSegLens().sum();
 		if (newPos.norm() > radius) {
 			// new position is outside of bounds
 			// TODO: will need to eventually shrink velocity vector until it is within radius
 			// instead of just normalizing it
 			newPos.normalize();
-			newPos = newPos + velocity * dt;
 		}
 		setpoint = newPos;
 
