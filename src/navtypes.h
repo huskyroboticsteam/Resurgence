@@ -14,7 +14,7 @@ struct gpscoords_t {
 	double lon;
 };
 
-struct orientation_t {
+struct eulerangles_t {
 	double roll;
 	double pitch;
 	double yaw;

@@ -10,6 +10,7 @@
 namespace net {
 namespace ardupilot {
 
+using json = nlohmann::json;
 using val_t = json::value_t;
 using namespace robot::types;
 using namespace navtypes;
@@ -35,12 +36,6 @@ void ArduPilotProtocol::initArduPilotServer() {
 		std::bind(&ArduPilotProtocol::clientDisconnected, this));
 
 	Globals::websocketServer.addProtocol(std::move(ardupilot_protocol));
-
-	{
-		log(LOG_INFO, "Waiting for ArduPilot to connect...\n");
-		std::unique_lock<std::mutex> lock(_connectionMutex);
-		_connectionCV.wait(lock, [this] { return _arduPilotProtocolConnected; });
-	}
 }
 
 void ArduPilotProtocol::clientConnected() {
@@ -53,7 +48,7 @@ void ArduPilotProtocol::clientConnected() {
 }
 
 void ArduPilotProtocol::clientDisconnected() {
-	log(LOG_INFO, "ArduPilot disconnected.");
+	log(LOG_WARN, "ArduPilot disconnected.\n");
 	{
 		std::lock_guard<std::mutex> lock(_connectionMutex);
 		_arduPilotProtocolConnected = false;
@@ -85,10 +80,7 @@ void ArduPilotProtocol::handleIMURequest(const json& j) {
 	double roll = j["roll"];
 	double pitch = j["pitch"];
 	double yaw = j["yaw"];
-	{
-		std::lock_guard<std::mutex> lock(_lastOrientationMutex);
-		_lastOrientation = orientation_t{roll, pitch, yaw};
-	}
+	_lastOrientation = eulerangles_t{roll, pitch, yaw};
 }
 
 bool ArduPilotProtocol::validateHeadingRequest(const json& j) {
@@ -97,21 +89,21 @@ bool ArduPilotProtocol::validateHeadingRequest(const json& j) {
 
 void ArduPilotProtocol::handleHeadingRequest(const json& j) {
 	int heading = j["heading"];
-	{
-		std::lock_guard<std::mutex> lock(_lastHeadingMutex);
-		_lastHeading = heading;
-	}
+	_lastHeading = heading;
 }
 
 DataPoint<gpscoords_t> ArduPilotProtocol::getGPS() {
+	std::unique_lock<std::mutex> lock(_lastGPSMutex);
 	return _lastGPS;
 }
 
-DataPoint<orientation_t> ArduPilotProtocol::getIMU() {
+DataPoint<eulerangles_t> ArduPilotProtocol::getIMU() {
+	std::unique_lock<std::mutex> lock(_lastOrientationMutex);
 	return _lastOrientation;
 }
 
 DataPoint<int> ArduPilotProtocol::getHeading() {
+	std::unique_lock<std::mutex> lock(_lastHeadingMutex);
 	return _lastHeading;
 }
 

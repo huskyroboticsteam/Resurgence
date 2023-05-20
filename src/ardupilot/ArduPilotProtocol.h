@@ -5,8 +5,6 @@
 #include <condition_variable>
 #include <mutex>
 
-using json = nlohmann::json;
-
 namespace net {
 namespace ardupilot {
 
@@ -29,11 +27,13 @@ public:
 	 * @return Last reported GPS position
 	 */
 	robot::types::DataPoint<navtypes::gpscoords_t> getGPS();
+
 	/* Gets the last reported IMU readings (roll, pitch, yaw)
 	 *
 	 * @return Last reported IMU readings
 	 */
-	robot::types::DataPoint<navtypes::orientation_t> getIMU();
+	robot::types::DataPoint<navtypes::eulerangles_t> getIMU();
+
 	/* Gets the last reported heading (degrees)
 	 *
 	 * @return Last reported heading
@@ -46,36 +46,41 @@ public:
 	 *
 	 * @return True if message is valid, false otherwise
 	 */
-	static bool validateGPSRequest(const json& j);
+	static bool validateGPSRequest(const nlohmann::json& j);
+
 	/* Validates IMU request
 	 *
 	 * @param json message
 	 *
 	 * @return True if message is valid, false otherwise
 	 */
-	static bool validateIMURequest(const json& j);
+	static bool validateIMURequest(const nlohmann::json& j);
+
 	/* Validates heading request
 	 *
 	 * @param json message
 	 *
 	 * @return True if message is valid, false otherwise
 	 */
-	static bool validateHeadingRequest(const json& j);
+	static bool validateHeadingRequest(const nlohmann::json& j);
+
 	/* Destructures GPS json message and updates last reported GPS values
 	 *
 	 * @param json message
 	 */
-	void handleGPSRequest(const json& j);
+	void handleGPSRequest(const nlohmann::json& j);
+
 	/* Destructures IMU json message and updates last reported GPS values
 	 *
 	 * @param json message
 	 */
-	void handleIMURequest(const json& j);
+	void handleIMURequest(const nlohmann::json& j);
+
 	/* Destructures heading json message and updates last reported GPS values
 	 *
 	 * @param json message
 	 */
-	void handleHeadingRequest(const json& j);
+	void handleHeadingRequest(const nlohmann::json& j);
 
 private:
 	std::condition_variable _connectionCV;
@@ -89,7 +94,7 @@ private:
 	robot::types::DataPoint<navtypes::gpscoords_t> _lastGPS;
 
 	std::mutex _lastOrientationMutex;
-	robot::types::DataPoint<navtypes::orientation_t> _lastOrientation;
+	robot::types::DataPoint<navtypes::eulerangles_t> _lastOrientation;
 };
 
 } // namespace ardupilot
