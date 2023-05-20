@@ -27,7 +27,7 @@ const DiffWristKinematics& wristKinematics() {
 	return wrist_kinematics;
 }
 
-void world_interface_init() {}
+void world_interface_init(bool initMotorsOnly) {}
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 	return nullptr;

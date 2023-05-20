@@ -4,6 +4,7 @@
 #include "../Globals.h"
 #include "../base64/base64_img.h"
 #include "../log.h"
+#include "../utils/json.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
 
@@ -53,31 +54,6 @@ constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
 // autonomousPlannedPathReport, poseConfidenceReport
 
 /**
-   Check if the given json object has the given key.
- */
-static bool hasKey(const json& j, const std::string& key);
-/**
-   Check if the given json object has the given key with the given type.
- */
-static bool validateKey(const json& j, const std::string& key, const val_t& type);
-/**
-   Check if the given json object has the given key, with a type in the given set of types.
- */
-static bool validateKey(const json& j, const std::string& key,
-						const std::unordered_set<val_t>& types);
-/**
-   Check if the value in the given json object at the given key is a string in the given set of
-   allowed values.
- */
-static bool validateOneOf(const json& j, const std::string& key,
-						  const std::unordered_set<std::string>& vals);
-/**
-   Check if the value in the given json object at the given key is a floating-point number
-   between min and max, inclusive.
- */
-static bool validateRange(const json& j, const std::string& key, double min, double max);
-
-/**
    Set power for all joints to zero.
  */
 static void stopAllJoints();
@@ -91,7 +67,7 @@ static void stopAllJoints();
 */
 
 static bool validateEmergencyStopRequest(const json& j) {
-	return validateKey(j, "stop", val_t::boolean);
+	return util::validateKey(j, "stop", val_t::boolean);
 }
 
 void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
@@ -99,6 +75,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	if (stop) {
 		this->stopAndShutdownPowerRepeat();
 		robot::emergencyStop();
+		log(LOG_ERROR, "Emergency stop!\n");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();
@@ -108,8 +85,8 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 }
 
 static bool validateOperationModeRequest(const json& j) {
-	return validateKey(j, "mode", val_t::string) &&
-		   validateOneOf(j, "mode", {"teleoperation", "autonomous"});
+	return util::validateKey(j, "mode", val_t::string) &&
+		   util::validateOneOf(j, "mode", {"teleoperation", "autonomous"});
 }
 
 void MissionControlProtocol::handleOperationModeRequest(const json& j) {
@@ -126,8 +103,8 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 
 static bool validateDriveRequest(const json& j) {
 	std::string msg = j.dump();
-	return hasKey(j, "straight") && validateRange(j, "straight", -1, 1) &&
-		   hasKey(j, "steer") && validateRange(j, "steer", -1, 1);
+	return util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
+		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
@@ -153,13 +130,13 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 }
 
 static bool validateJoint(const json& j) {
-	return validateKey(j, "joint", val_t::string) &&
-		   validateOneOf(j, "joint",
-						 {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand"});
+	return util::validateKey(j, "joint", val_t::string) &&
+		   util::validateOneOf(j, "joint",
+							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand"});
 }
 
 static bool validateJointPowerRequest(const json& j) {
-	return validateJoint(j) && validateRange(j, "power", -1, 1);
+	return validateJoint(j) && util::validateRange(j, "power", -1, 1);
 }
 
 void MissionControlProtocol::handleJointPowerRequest(const json& j) {
@@ -203,7 +180,7 @@ void MissionControlProtocol::sendRoverPos() {
 }
 
 static bool validateJointPositionRequest(const json& j) {
-	return validateJoint(j) && validateKey(j, "position", val_t::number_integer);
+	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
 }
 
 static void handleJointPositionRequest(const json& j) {
@@ -216,7 +193,7 @@ static void handleJointPositionRequest(const json& j) {
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "camera", val_t::string);
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
@@ -231,7 +208,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "camera", val_t::string);
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
@@ -388,7 +365,11 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				}
 				const jointid_t& joint = current_pair.first;
 				const double& power = current_pair.second;
-				robot::setJointPower(joint, power);
+				// no need to repeatedly send 0 power
+				// this is also needed to make the zero calibration script work
+				if (power != 0.0) {
+					robot::setJointPower(joint, power);
+				}
 			}
 			if (this->_last_cmd_vel) {
 				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
@@ -454,35 +435,6 @@ void MissionControlProtocol::videoStreamTask() {
 }
 
 ///// UTILITY FUNCTIONS //////
-
-static bool hasKey(const json& j, const std::string& key) {
-	return j.contains(key);
-}
-
-static bool validateKey(const json& j, const std::string& key, const val_t& type) {
-	return hasKey(j, key) && j.at(key).type() == type;
-}
-
-static bool validateKey(const json& j, const std::string& key,
-						const std::unordered_set<val_t>& types) {
-	return hasKey(j, key) && types.find(j.at(key).type()) != types.end();
-}
-
-static bool validateOneOf(const json& j, const std::string& key,
-						  const std::unordered_set<std::string>& vals) {
-	// TODO convert this to use Frozen sets
-	return validateKey(j, key, val_t::string) &&
-		   vals.find(static_cast<std::string>(j[key])) != vals.end();
-}
-
-static bool validateRange(const json& j, const std::string& key, double min, double max) {
-	if (validateKey(j, key,
-					{val_t::number_float, val_t::number_unsigned, val_t::number_integer})) {
-		double d = j[key];
-		return min <= d && d <= max;
-	}
-	return false;
-}
 
 static void stopAllJoints() {
 	for (jointid_t current : robot::types::all_jointid_t) {
