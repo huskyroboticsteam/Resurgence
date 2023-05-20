@@ -1,4 +1,5 @@
 <map id="commands::CommandBase" name="commands::CommandBase">
-<area shape="rect" id="node1" title=" " alt="" coords="10,5,190,31"/>
-<area shape="rect" id="node2" href="$classcommands_1_1DriveToWaypointCommand.html" title="Provides robot drive velocity commands to navigate the robot to a given waypoint given the velocity p..." alt="" coords="5,79,195,120"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="10,5,190,31"/>
+<area shape="rect" id="Node000002" href="$classcommands_1_1DriveToWaypointCommand.html" title="Provides robot drive velocity commands to navigate the robot to a given waypoint given the velocity p..." alt="" coords="5,79,195,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,46,103,79,97,79,97,46"/>
 </map>

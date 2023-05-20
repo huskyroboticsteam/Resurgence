@@ -1,4 +1,5 @@
 <map id="filters::Output" name="filters::Output">
-<area shape="rect" id="node1" title="Represent an output for a system." alt="" coords="43,109,140,135"/>
-<area shape="rect" id="node2" href="$classfilters_1_1statespace_1_1NoiseCovMat_3-1_00_01-1_00_01-1_01_4.html" title="Represents a square noise covariance matrix." alt="" coords="5,5,178,46"/>
+<area shape="rect" id="Node000001" title="Represent an output for a system." alt="" coords="43,109,140,135"/>
+<area shape="rect" id="Node000002" href="$classfilters_1_1statespace_1_1NoiseCovMat_3-1_00_01-1_00_01-1_01_4.html" title="Represents a square noise covariance matrix." alt="" coords="5,5,178,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,61,94,109,89,109,89,61"/>
 </map>

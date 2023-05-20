@@ -1,4 +1,5 @@
 <map id="filters::MultiSensorEKF&lt; stateDim, inputDim, processNoiseDim, numOutputs &gt;" name="filters::MultiSensorEKF&lt; stateDim, inputDim, processNoiseDim, numOutputs &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="5,94,222,150"/>
-<area shape="rect" id="node2" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="33,5,194,46"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,222,150"/>
+<area shape="rect" id="Node000002" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="33,5,194,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,61,116,93,111,93,111,61"/>
 </map>

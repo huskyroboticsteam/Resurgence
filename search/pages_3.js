@@ -6,7 +6,7 @@ var searchData=
   ['camera_20calibration_20and_203d_20reconstruction_20_28calib3d_20module_29_3',['Camera calibration and 3D reconstruction (calib3d module)',['https://docs.opencv.org/4.2.0/d6/d55/tutorial_table_of_content_calib3d.html',1,'']]],
   ['camera_20calibration_20with_20opencv_4',['Camera calibration With OpenCV',['https://docs.opencv.org/4.2.0/d4/d94/tutorial_camera_calibration.html',1,'']]],
   ['camera_20calibration_20with_20square_20chessboard_5',['Camera calibration with square chessboard',['https://docs.opencv.org/4.2.0/dc/d43/tutorial_camera_calibration_square_chess.html',1,'']]],
-  ['camera_20configuration_6',['Camera Configuration',['../cameraconfig.html',1,'']]],
+  ['camera_20configuration_6',['Camera Configuration',['../md_src_2camera_2CameraConfig.html',1,'']]],
   ['camera_20motion_20estimation_7',['Camera Motion Estimation',['https://docs.opencv.org/4.2.0/d5/dab/tutorial_sfm_trajectory_estimation.html',1,'']]],
   ['canny_20edge_20detection_8',['Canny Edge Detection',['https://docs.opencv.org/4.2.0/d7/de1/tutorial_js_canny.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/da/d22/tutorial_py_canny.html',1,'(Global Namespace)']]],
   ['canny_20edge_20detector_9',['Canny Edge Detector',['https://docs.opencv.org/4.2.0/da/d5c/tutorial_canny_detector.html',1,'']]],

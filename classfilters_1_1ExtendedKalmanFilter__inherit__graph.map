@@ -1,4 +1,5 @@
 <map id="filters::ExtendedKalmanFilter&lt; stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim &gt;" name="filters::ExtendedKalmanFilter&lt; stateDim, inputDim, outputDim, processNoiseDim, outputNoiseDim &gt;">
-<area shape="rect" id="node1" title="Implements a discrete&#45;time EKF." alt="" coords="5,94,244,150"/>
-<area shape="rect" id="node2" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="44,5,205,46"/>
+<area shape="rect" id="Node000001" title="Implements a discrete&#45;time EKF." alt="" coords="5,94,244,150"/>
+<area shape="rect" id="Node000002" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="44,5,205,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,61,127,93,122,93,122,61"/>
 </map>
