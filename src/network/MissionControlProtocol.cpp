@@ -110,7 +110,7 @@ static bool validateDriveRequest(const json& j) {
 }
 
 static bool validateArmIKEnable(const json& j) {
-	return validateKey(j, "enabled", val_t::boolean);
+	return util::validateKey(j, "enabled", val_t::boolean);
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
