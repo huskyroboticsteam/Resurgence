@@ -33,7 +33,7 @@ public:
 	 *
 	 * @param targetJointPos The target joint positions.
 	 */
-	void set_ee_setpoint(const navtypes::Vectord<N>& targetJointPos) {
+	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
 		setpoint = kinematics.jointPosToEEPos(targetJointPos);
 	}
 
@@ -42,7 +42,7 @@ public:
 	 *
 	 * @return The current target end effector position.
 	 */
-	Eigen::Vector2d get_ee_setpoint() {
+	Eigen::Vector2d get_setpoint() {
 		return setpoint;
 	}
 
@@ -51,16 +51,14 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target x velocity.
-	 * @param currJointPos The current joint positions.
 	 * @return The new command, which is the new joint positions.
 	 */
-	navtypes::Vectord<N> set_x_vel(robot::types::datatime_t currTime, double targetVel,
-								   const navtypes::Vectord<N>& currJointPos) {
+	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
+		double dt = util::durationToSec(currTime - velTimestamp);
+		setpoint = setpoint + velocity * dt;
+
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
-
-		robot::types::datatime_t newTime = robot::types::dataclock::now();
-		return getCommand(newTime, currJointPos);
 	}
 
 	/**
@@ -68,16 +66,14 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target y velocity.
-	 * @param currJointPos The current joint positions.
 	 * @return The new command, which is the new joint positions.
 	 */
-	navtypes::Vectord<N> set_y_vel(robot::types::datatime_t currTime, double targetVel,
-								   const navtypes::Vectord<N>& currJointPos) {
+	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
+		double dt = util::durationToSec(currTime - velTimestamp);
+		setpoint = setpoint + velocity * dt;
+
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
-
-		robot::types::datatime_t newTime = robot::types::dataclock::now();
-		return getCommand(newTime, currJointPos);
 	}
 
 	/**
@@ -92,31 +88,21 @@ public:
 									const navtypes::Vectord<N>& currJointPos) {
 		// calculate new EE position / setpoint
 		double dt = util::durationToSec(currTime - velTimestamp);
-		Eigen::Vector2d newPose = setpoint + velocity * dt;
+		Eigen::Vector2d newPos = setpoint + velocity * dt;
 
-		// bounds check (new pose + vel vector <= sum of joint poses)
-		double radius;
-		for (int32_t i = 0; i < N; i++) {
-			radius += currJointPos[i];
-		}
-		if ((newPose(0) < 0 || newPose(0) > radius) ||
-			(newPose(1) < 0 || newPose(1) > radius)) {
+		// bounds check (new pos + vel vector <= sum of joint lengths)
+		double radius = kinematics.getSegLens.sum();
+		if (newPos.norm() > radius) {
 			// new position is outside of bounds
 			// TODO: will need to eventually shrink velocity vector until it is within radius
-			// instead of just normalizing it between 0 to 1
-			auto min_val = std::min_element(velocity.begin(), velocity.end());
-			auto max_val = std::max_element(velocity.begin(), velocity.end());
-
-			for (auto& element : velocity) {
-				element -= min_val;
-				element /= (max_val - min_val);
-			}
-			newPose = setpoint + velocity * dt;
+			// instead of just normalizing it
+			newPos.normalize();
+			newPos = newPos + velocity * dt;
 		}
-		setpoint = newPose;
+		setpoint = newPos;
 
 		// get new joint positions for target EE
-		return kinematics.eePosToJointPos(newPose, currJointPos);
+		return kinematics.eePosToJointPos(newPos, currJointPos);
 	}
 
 private:
