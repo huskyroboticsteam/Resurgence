@@ -2,6 +2,7 @@
 
 #include "world_interface/data.h"
 #include "network/websocket/WebSocketServer.h"
+#include "control/PlanarArmController.h"
 
 #include <vector>
 #include <atomic>
@@ -26,4 +27,6 @@ extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
+extern kinematics::PlanarArmKinematics<2> planarArmKinematics;
+extern control::PlanarArmController<2> planarArmController;
 } // namespace Globals

@@ -7,6 +7,9 @@
 #include <cmath>
 #include <string>
 
+#include <frozen/string.h>
+#include <frozen/unordered_map.h>
+
 using namespace kinematics;
 
 namespace Constants {
@@ -121,7 +124,17 @@ constexpr uint32_t RPLIDAR_S1_BAUDRATE = 256000;
 // Video encoding
 namespace video {
 constexpr int H264_RF_CONSTANT = 40;
-}
+} // namespace video
+
+// Arm inverse kinematics
+namespace arm {
+// two forzen maps one mapping motor id's to pair sof doubles (min, max) second is motor id's
+// to doubles (segment lengths)
+constexpr frozen::unordered_map<frozen::string, std::pair<int, int>, 2> JOINT_LIMITS{
+	{"shoulder", {18200, 152500}}, {"elbow", {-169100, 0}}};
+constexpr frozen::unordered_map<frozen::string, double, 2> SEGMENT_LENGTHS{{"shoulder", 0.0},
+																		   {"elbow", 0.0}};
+} // namespace arm
 
 constexpr double CONTROL_HZ = 10.0;
 } // namespace Constants
