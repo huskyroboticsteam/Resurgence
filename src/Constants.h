@@ -132,8 +132,8 @@ namespace arm {
 // to doubles (segment lengths)
 constexpr frozen::unordered_map<frozen::string, std::pair<int, int>, 2> JOINT_LIMITS{
 	{"shoulder", {18200, 152500}}, {"elbow", {-169100, 0}}};
-constexpr frozen::unordered_map<frozen::string, double, 2> SEGMENT_LENGTHS{{"shoulder", 0.0},
-																		   {"elbow", 0.0}};
+constexpr frozen::unordered_map<frozen::string, double, 2> SEGMENT_LENGTHS{{"shoulder", 15.152},
+																		   {"elbow", 18.16}};
 } // namespace arm
 
 constexpr double CONTROL_HZ = 10.0;
