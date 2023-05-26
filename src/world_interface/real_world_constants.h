@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../CAN/CANUtils.h"
+#include "../Constants.h"
 #include "data.h"
 
 #include <chrono>
