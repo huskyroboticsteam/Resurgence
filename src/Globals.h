@@ -1,11 +1,11 @@
 #pragma once
 
-#include "world_interface/data.h"
-#include "network/websocket/WebSocketServer.h"
 #include "control/PlanarArmController.h"
+#include "network/websocket/WebSocketServer.h"
+#include "world_interface/data.h"
 
-#include <vector>
 #include <atomic>
+#include <vector>
 
 /**
    @deprecated
