@@ -20,7 +20,8 @@ kinematics::PlanarArmKinematics<2> planarArmKinematics =
 										Constants::arm::JOINT_LIMITS.at("elbow").first},
 									   {Constants::arm::JOINT_LIMITS.at("shoulder").second,
 										Constants::arm::JOINT_LIMITS.at("elbow").second},
-									   0.0, 0);  // convert the values to radians for the joint limits
-control::PlanarArmController<2> planarArmController =
-	control::PlanarArmController<2>{{0, 0}, planarArmKinematics};  // get the current joint positions
+									   0.0, 0);
+// TODO: convert the values to radians for the joint limits
+control::PlanarArmController<2> planarArmController = control::PlanarArmController<2>{
+	{0, 0}, planarArmKinematics}; // TODO: get the current joint positions
 } // namespace Globals
