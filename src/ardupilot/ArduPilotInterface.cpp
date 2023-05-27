@@ -10,13 +10,12 @@ net::ardupilot::ArduPilotProtocol ardupilot_protocol;
 
 namespace gps {
 DataPoint<gpscoords_t> readGPSCoords() {
-    return ardupilot_protocol.getGPS();
+	return ardupilot_protocol.getGPS();
 }
 } // namespace gps
 
 namespace robot {
 DataPoint<double> readIMUHeading() {
-    return ardupilot_protocol.getIMU().getData().yaw;
+	return ardupilot_protocol.getIMU().getData().yaw;
 }
 } // namespace robot
-
