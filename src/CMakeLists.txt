@@ -171,6 +171,10 @@ add_library(utils SHARED
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
+add_library(ardupilot SHARED
+    ardupilot/ArduPilotProtocol.cpp)
+target_link_libraries(ardupilot utils)
+
 ## ====== CAN Interfaces =======
 # Stub CAN interface is used for the tests (and for the Rover if
 # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
