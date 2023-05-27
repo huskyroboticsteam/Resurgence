@@ -98,7 +98,7 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
  */
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
 /**
-   Websocket server endpoint for Pixhawk protocol
+   Websocket server endpoint for ArduPilot protocol
  */
 constexpr const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 

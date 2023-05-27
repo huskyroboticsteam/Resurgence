@@ -2,12 +2,12 @@
 #include "../network/websocket/WebSocketServer.h"
 #include "../world_interface/data.h"
 
-#include <condition_variable>
 #include <mutex>
 
 namespace net {
 namespace ardupilot {
 
+/* @brief A protocol in order to handle messages from an ArduPilot enabled device */
 class ArduPilotProtocol {
 public:
 	ArduPilotProtocol();
@@ -15,32 +15,25 @@ public:
 	ArduPilotProtocol(const ArduPilotProtocol& other) = delete;
 	ArduPilotProtocol& operator=(const ArduPilotProtocol& other) = delete;
 
-	// Registers the protocol with the websocket server
-	void initArduPilotServer();
-	// Connection handler for websocket server
-	void clientConnected();
-	// Disconnect handler for websocket server
-	void clientDisconnected();
-
-	/* Gets the last reported GPS position (lat, lon)
+	/* @brief Gets the last reported GPS position (lat, lon)
 	 *
 	 * @return Last reported GPS position
 	 */
 	robot::types::DataPoint<navtypes::gpscoords_t> getGPS();
 
-	/* Gets the last reported IMU readings (roll, pitch, yaw)
+	/* @brief Gets the last reported IMU readings (roll, pitch, yaw)
 	 *
 	 * @return Last reported IMU readings
 	 */
 	robot::types::DataPoint<navtypes::eulerangles_t> getIMU();
 
-	/* Gets the last reported heading (degrees)
+	/* @brief Gets the last reported heading (degrees)
 	 *
 	 * @return Last reported heading
 	 */
 	robot::types::DataPoint<int> getHeading();
 
-	/* Validates GPS request
+	/* @brief Validates GPS request
 	 *
 	 * @param json message
 	 *
@@ -48,7 +41,7 @@ public:
 	 */
 	static bool validateGPSRequest(const nlohmann::json& j);
 
-	/* Validates IMU request
+	/* @brief Validates IMU request
 	 *
 	 * @param json message
 	 *
@@ -56,7 +49,7 @@ public:
 	 */
 	static bool validateIMURequest(const nlohmann::json& j);
 
-	/* Validates heading request
+	/* @brief Validates heading request
 	 *
 	 * @param json message
 	 *
@@ -64,26 +57,43 @@ public:
 	 */
 	static bool validateHeadingRequest(const nlohmann::json& j);
 
-	/* Destructures GPS json message and updates last reported GPS values
+	/* @brief Destructures GPS json message and updates last reported GPS values
 	 *
 	 * @param json message
 	 */
 	void handleGPSRequest(const nlohmann::json& j);
 
-	/* Destructures IMU json message and updates last reported GPS values
+	/* @brief Destructures IMU json message and updates last reported GPS values
 	 *
 	 * @param json message
 	 */
 	void handleIMURequest(const nlohmann::json& j);
 
-	/* Destructures heading json message and updates last reported GPS values
+	/* @brief Destructures heading json message and updates last reported GPS values
 	 *
 	 * @param json message
 	 */
 	void handleHeadingRequest(const nlohmann::json& j);
 
+	/* @brief Checks if the ArduPilotProtocol is connected
+	 *
+	 * @return True if connected, false if not connected
+	 */
+	bool isArduPilotConnected();
+
 private:
-	std::condition_variable _connectionCV;
+	/* @brief Registers the protocol with the websocket server
+	 *
+	 * @param websocket server of which to add protocol
+	 */
+	void initArduPilotServer(net::websocket::SingleClientWSServer& websocketServer);
+
+	/* @brief Connection handler for websocket server */
+	void clientConnected();
+
+	/* @brief Disconnect handler for websocket server */
+	void clientDisconnected();
+
 	std::mutex _connectionMutex;
 	bool _arduPilotProtocolConnected;
 

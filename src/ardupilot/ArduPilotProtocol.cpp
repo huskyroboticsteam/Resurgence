@@ -16,9 +16,12 @@ using namespace robot::types;
 using namespace navtypes;
 using std::placeholders::_1;
 
-ArduPilotProtocol::ArduPilotProtocol() {}
+ArduPilotProtocol::ArduPilotProtocol() {
+	initArduPilotServer(Globals::websocketServer);
+}
 
-void ArduPilotProtocol::initArduPilotServer() {
+void ArduPilotProtocol::initArduPilotServer(
+	net::websocket::SingleClientWSServer& websocketServer) {
 	auto ardupilot_protocol = std::make_unique<net::websocket::WebSocketProtocol>(
 		Constants::ARDUPILOT_PROTOCOL_NAME);
 	ardupilot_protocol->addMessageHandler(
@@ -35,7 +38,7 @@ void ArduPilotProtocol::initArduPilotServer() {
 	ardupilot_protocol->addDisconnectionHandler(
 		std::bind(&ArduPilotProtocol::clientDisconnected, this));
 
-	Globals::websocketServer.addProtocol(std::move(ardupilot_protocol));
+	websocketServer.addProtocol(std::move(ardupilot_protocol));
 }
 
 void ArduPilotProtocol::clientConnected() {
@@ -44,7 +47,6 @@ void ArduPilotProtocol::clientConnected() {
 		std::lock_guard<std::mutex> lock(_connectionMutex);
 		_arduPilotProtocolConnected = true;
 	}
-	_connectionCV.notify_one();
 }
 
 void ArduPilotProtocol::clientDisconnected() {
@@ -53,7 +55,6 @@ void ArduPilotProtocol::clientDisconnected() {
 		std::lock_guard<std::mutex> lock(_connectionMutex);
 		_arduPilotProtocolConnected = false;
 	}
-	_connectionCV.notify_one();
 }
 
 bool ArduPilotProtocol::validateGPSRequest(const json& j) {
@@ -105,6 +106,10 @@ DataPoint<eulerangles_t> ArduPilotProtocol::getIMU() {
 DataPoint<int> ArduPilotProtocol::getHeading() {
 	std::unique_lock<std::mutex> lock(_lastHeadingMutex);
 	return _lastHeading;
+}
+
+bool ArduPilotProtocol::isArduPilotConnected() {
+	return _arduPilotProtocolConnected;
 }
 
 } // namespace ardupilot
