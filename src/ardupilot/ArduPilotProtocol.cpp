@@ -109,6 +109,7 @@ DataPoint<int> ArduPilotProtocol::getHeading() {
 }
 
 bool ArduPilotProtocol::isArduPilotConnected() {
+	std::unique_lock<std::mutex> lock(_connectionMutex);
 	return _arduPilotProtocolConnected;
 }
 
