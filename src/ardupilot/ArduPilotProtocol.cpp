@@ -15,13 +15,13 @@ using val_t = json::value_t;
 using namespace robot::types;
 using namespace navtypes;
 using std::placeholders::_1;
+using namespace net::websocket;
 
 ArduPilotProtocol::ArduPilotProtocol() {
 	initArduPilotServer(Globals::websocketServer);
 }
 
-void ArduPilotProtocol::initArduPilotServer(
-	net::websocket::SingleClientWSServer& websocketServer) {
+void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServer) {
 	auto ardupilot_protocol = std::make_unique<net::websocket::WebSocketProtocol>(
 		Constants::ARDUPILOT_PROTOCOL_NAME);
 	ardupilot_protocol->addMessageHandler(
