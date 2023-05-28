@@ -172,7 +172,10 @@ add_library(utils SHARED
 target_link_libraries(utils ${OpenCV_LIBS})
 
 add_library(ardupilot SHARED
-    ardupilot/ArduPilotProtocol.cpp)
+    ardupilot/ArduPilotProtocol.cpp
+    ardupilot/ArduPilotInterface.cpp
+    network/websocket/WebSocketServer.cpp
+    network/websocket/WebSocketProtocol.cpp)
 target_link_libraries(ardupilot utils)
 
 ## ====== CAN Interfaces =======
@@ -243,6 +246,7 @@ add_library(real_world_interface STATIC
   lidar/read_hokuyo_lidar.cpp
   lidar/read_rp_lidar.cpp
   world_interface/motor/can_motor.cpp
+  Globals.cpp
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
