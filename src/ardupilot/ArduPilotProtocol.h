@@ -10,7 +10,7 @@ namespace ardupilot {
 /* @brief A protocol in order to handle messages from an ArduPilot enabled device */
 class ArduPilotProtocol {
 public:
-	ArduPilotProtocol();
+	ArduPilotProtocol(net::websocket::SingleClientWSServer& websocketServer);
 	~ArduPilotProtocol();
 	ArduPilotProtocol(const ArduPilotProtocol& other) = delete;
 	ArduPilotProtocol& operator=(const ArduPilotProtocol& other) = delete;
@@ -33,6 +33,7 @@ public:
 	 */
 	robot::types::DataPoint<int> getHeading();
 
+private:
 	/* @brief Validates GPS request
 	 *
 	 * @param json message
@@ -81,7 +82,6 @@ public:
 	 */
 	bool isArduPilotConnected();
 
-private:
 	/* @brief Registers the protocol with the websocket server
 	 *
 	 * @param websocket server of which to add protocol

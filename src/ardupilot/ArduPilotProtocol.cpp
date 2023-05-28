@@ -17,9 +17,11 @@ using namespace navtypes;
 using std::placeholders::_1;
 using namespace net::websocket;
 
-ArduPilotProtocol::ArduPilotProtocol() {
-	initArduPilotServer(Globals::websocketServer);
+ArduPilotProtocol::ArduPilotProtocol(net::websocket::SingleClientWSServer& websocketServer) {
+	initArduPilotServer(websocketServer);
 }
+
+ArduPilotProtocol::~ArduPilotProtocol() {}
 
 void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServer) {
 	auto ardupilot_protocol = std::make_unique<net::websocket::WebSocketProtocol>(
