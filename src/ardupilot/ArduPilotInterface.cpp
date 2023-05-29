@@ -14,7 +14,7 @@ std::unique_ptr<net::ardupilot::ArduPilotProtocol> ardupilot_protocol;
 
 namespace ardupilot {
 void initArduPilotProtocol(net::websocket::SingleClientWSServer& websocketServer) {
-	std::make_unique<net::ardupilot::ArduPilotProtocol>(websocketServer);
+	ardupilot_protocol = std::make_unique<net::ardupilot::ArduPilotProtocol>(websocketServer);
 }
 } // namespace ardupilot
 
@@ -28,7 +28,7 @@ namespace robot {
 DataPoint<double> readIMUHeading() {
 	auto imu_heading = ardupilot_protocol->getIMU();
 	if (imu_heading.isValid()) {
-		return imu_heading.getData().yaw;
+		return DataPoint<double>(imu_heading.getTime(), imu_heading.getData().yaw);
 	}
 	return DataPoint<double>();
 }
