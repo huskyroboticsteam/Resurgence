@@ -44,8 +44,8 @@ endif()
 # it, so this is a way to do that.
 set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
 systems.")
-set(GPS "USB" CACHE STRING "GPS interface to use.")
-set(AVAILABLE_GPS "USB" "NONE")
+set(GPS "ARDUPILOT" CACHE STRING "GPS interface to use.")
+set(AVAILABLE_GPS "USB" "ARDUPILOT" "NONE")
 set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
 set(WITH_LIDAR ON CACHE BOOL "Enable/Disable the USB LiDAR interface.")
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
@@ -171,13 +171,6 @@ add_library(utils SHARED
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
-add_library(ardupilot SHARED
-    ardupilot/ArduPilotProtocol.cpp
-    ardupilot/ArduPilotInterface.cpp
-    network/websocket/WebSocketServer.cpp
-    network/websocket/WebSocketProtocol.cpp)
-target_link_libraries(ardupilot utils)
-
 ## ====== CAN Interfaces =======
 # Stub CAN interface is used for the tests (and for the Rover if
 # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
@@ -215,6 +208,11 @@ add_library(gps_interface STATIC)
 if(GPS STREQUAL "USB")
   target_sources(gps_interface PUBLIC gps/usb_gps/read_usb_gps.cpp)
   target_link_libraries(gps_interface ${libgps_LIBRARIES})
+elseif(GPS STREQUAL "ARDUPILOT")
+  target_sources(gps_interface PUBLIC
+      ardupilot/ArduPilotProtocol.cpp
+      ardupilot/ArduPilotInterface.cpp)
+  target_link_libraries(gps_interface utils websocket_utils)
 else()
   target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
 endif()
