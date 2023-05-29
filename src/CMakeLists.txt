@@ -37,14 +37,6 @@ else()
   set(WITH_CAN_DEFAULT OFF)
 endif()
 
-# GPS should be disabled on Windows (at least for now) since we haven't (yet) successfully
-# gotten libgps to compile on Windows under MSYS2
-if(WIN32)
-  set(WITH_GPS_DEFAULT OFF)
-else()
-  set(WITH_GPS_DEFAULT ON)
-endif()
-
 ##====== Module settings ======
 # These variables control whether various modules are enabled or disabled. The goal is to allow
 # a user to selectively exclude modules that they do not need (and/or cannot compile on their
@@ -52,8 +44,9 @@ endif()
 # it, so this is a way to do that.
 set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
 systems.")
-set(WITH_GPS ${WITH_GPS_DEFAULT} CACHE BOOL "Enable/Disable the USB GPS interface. Disabled on
-Windows systems.")
+set(GPS "USB" CACHE STRING "GPS interface to use.")
+set(AVAILABLE_GPS "USB" "NONE")
+set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
 set(WITH_LIDAR ON CACHE BOOL "Enable/Disable the USB LiDAR interface.")
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
@@ -65,6 +58,11 @@ if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
 Valid values are ${AVAILABLE_WORLD_INTERFACES}")
 endif()
 
+if(NOT GPS IN_LIST AVAILABLE_GPS)
+  message(FATAL_ERROR "Invalid value for GPS: ${GPS}\n\
+Valid values are ${AVAILABLE_GPS}")
+endif()
+
 message("========================================\n\
 Module settings:")
 if(NOT WITH_CAN_DEFAULT)
@@ -72,11 +70,7 @@ if(NOT WITH_CAN_DEFAULT)
 else()
   message("  CAN Networking:\t${WITH_CAN}")
 endif()
-if(NOT WITH_GPS_DEFAULT)
-  message("  USB GPS code:\t\t${WITH_GPS} (WINDOWS system - disabled by default)")
-else()
-  message("  USB GPS code:\t\t${WITH_GPS}")
-endif()
+message("  GPS:\t\t\t${GPS}")
 message("  USB LiDAR code:\t${WITH_LIDAR}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
@@ -127,11 +121,12 @@ endif()
 # Libraries needed to interface with real-life sensors. If we aren't using the real world
 # interface, these aren't needed.
 if(WORLD_INTERFACE STREQUAL "REAL")
-  # Find pkg-config (needed for libgps, as it doesn't have CMake configuration)
-  find_package(PkgConfig REQUIRED)
-  # Find the libgps USB GPS library.
-  # TODO: Remove this when interface with Electronics' IMU board is implemented.
-  pkg_check_modules(libgps REQUIRED libgps)
+  if(GPS STREQUAL "USB")
+    # Find pkg-config (needed for libgps, as it doesn't have CMake configuration)
+    find_package(PkgConfig REQUIRED)
+    # Find the libgps USB GPS library.
+    pkg_check_modules(libgps REQUIRED libgps)
+  endif()
   if(WITH_LIDAR)
 	  # Find the URGLidar library.
 	  # TODO: Decide if we want to use those RPLidars we found
@@ -207,6 +202,16 @@ target_link_libraries(can_interface PUBLIC
   utils
 )
 
+## GPS Implementations
+
+add_library(gps_interface STATIC)
+if(GPS STREQUAL "USB")
+  target_sources(gps_interface PUBLIC gps/usb_gps/read_usb_gps.cpp)
+  target_link_libraries(gps_interface ${libgps_LIBRARIES})
+else()
+  target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
+endif()
+
 ## ====== World Interfaces =======
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
@@ -233,7 +238,6 @@ add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
   lidar/read_hokuyo_lidar.cpp
   lidar/read_rp_lidar.cpp
-  gps/usb_gps/read_usb_gps.cpp
   world_interface/motor/can_motor.cpp
   )
 add_library(simulator_interface STATIC
@@ -241,7 +245,7 @@ add_library(simulator_interface STATIC
   world_interface/motor/sim_motor.cpp
   )
 
-target_link_libraries(real_world_interface can_interface world_interface_core)
+target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
 target_link_libraries(simulator_interface world_interface_core)
 target_link_libraries(stub_world_interface world_interface_core)
 
@@ -280,7 +284,6 @@ endif()
 
 list(APPEND real_world_libs
   real_world_interface
-  ${libgps_LIBRARIES}
   lidar_interface
   URGLidar::urg_c
   RPLidar::RPLidar)
@@ -390,9 +393,11 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
-add_executable(LimitSwitchCalibration 
-  LimitCalib.cpp)
-target_link_libraries(LimitSwitchCalibration ${real_world_libs})
+if (WORLD_INTERFACE STREQUAL "REAL")
+  add_executable(LimitSwitchCalibration
+    LimitCalib.cpp)
+  target_link_libraries(LimitSwitchCalibration ${real_world_libs})
+endif()
 
 add_subdirectory(ar)
 add_subdirectory(camera)
