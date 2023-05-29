@@ -238,7 +238,7 @@ The simulator does not have its own executable. Instead, you must configure the 
 
 ```bash
 cd build
-cmake ../src -DWITH_CAN=OFF -DWITH_GPS=OFF -DWITH_LIDAR=OFF -DWITH_TESTS=OFF -DWORLD_INTERFACE=SIMULATOR
+cmake ../src -DWITH_CAN=OFF -DGPS=NONE -DWITH_LIDAR=OFF -DWITH_TESTS=OFF -DWORLD_INTERFACE=SIMULATOR
 make -j Rover
 ```
 
