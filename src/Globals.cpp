@@ -23,9 +23,9 @@ navtypes::Vectord<IK_MOTORS.size()> getJointLimits(bool getLow) {
 	navtypes::Vectord<IK_MOTORS.size()> ret;
 	for (std::size_t i = 0; i < IK_MOTORS.size(); i++) {
 		const auto& limits = JOINT_LIMITS.at(IK_MOTORS[i]);
-		ret[i] = getLow ? (limits.first * .001) * (M_PI / 180.0)
-						: (limits.second * .001) * (M_PI / 180.0);
+		ret[i] = getLow ? limits.first : limits.second;
 	}
+	ret *= M_PI / 180.0 / 1000.0;
 	return ret;
 }
 
@@ -41,7 +41,6 @@ robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperip
 const kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
 	planarArmKinematics(getSegLens(), getJointLimits(true), getJointLimits(false),
 						IK_SOLVER_THRESH, IK_SOLVER_MAX_ITER);
-// TODO: convert the values to radians for the joint limits
-control::PlanarArmController<2> planarArmController = control::PlanarArmController<2>{
-	{0, 0}, planarArmKinematics}; // TODO: get the current joint positions
+control::PlanarArmController<2> planarArmController =
+	control::PlanarArmController<2>{{0, 0}, planarArmKinematics};
 } // namespace Globals

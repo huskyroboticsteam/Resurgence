@@ -153,7 +153,6 @@ constexpr frozen::unordered_map<robot::types::motorid_t, std::pair<int, int>, IK
 constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size()>
 	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.3848608},
 					{robot::types::motorid_t::elbow, 0.461264}};
-// TODO: convert to meters
 } // namespace arm
 
 constexpr double CONTROL_HZ = 10.0;
