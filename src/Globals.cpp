@@ -23,7 +23,8 @@ navtypes::Vectord<IK_MOTORS.size()> getJointLimits(bool getLow) {
 	navtypes::Vectord<IK_MOTORS.size()> ret;
 	for (std::size_t i = 0; i < IK_MOTORS.size(); i++) {
 		const auto& limits = JOINT_LIMITS.at(IK_MOTORS[i]);
-		ret[i] = getLow ? (limits.first  * .001) * (M_PI / 180.0) : (limits.second * .001) * (M_PI / 180.0);
+		ret[i] = getLow ? (limits.first * .001) * (M_PI / 180.0)
+						: (limits.second * .001) * (M_PI / 180.0);
 	}
 	return ret;
 }
