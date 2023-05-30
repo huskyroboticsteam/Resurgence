@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../network/websocket/WebSocketProtocol.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "../world_interface/data.h"

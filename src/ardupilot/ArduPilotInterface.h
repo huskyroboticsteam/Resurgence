@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ArduPilotProtocol.h"
 
 namespace ardupilot {
