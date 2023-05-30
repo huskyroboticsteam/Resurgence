@@ -27,6 +27,6 @@ extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
-extern kinematics::PlanarArmKinematics<2> planarArmKinematics;
+extern const kinematics::PlanarArmKinematics<2> planarArmKinematics;
 extern control::PlanarArmController<2> planarArmController;
 } // namespace Globals

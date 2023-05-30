@@ -38,7 +38,7 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
-kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
+const kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
 	planarArmKinematics(getSegLens(), getJointLimits(true), getJointLimits(false),
 						IK_SOLVER_THRESH, IK_SOLVER_MAX_ITER);
 // TODO: convert the values to radians for the joint limits
