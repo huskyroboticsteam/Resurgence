@@ -139,7 +139,6 @@ void setupCameras() {
 void world_interface_init(bool initOnlyMotors) {
 	if (!initOnlyMotors) {
 		setupCameras();
-		bool gps_success = gps::usb::startGPSThread();
 		bool lidar_success = lidar::initializeLidar();
 		bool landmark_success = AR::initializeLandmarkDetection();
 	}
@@ -242,10 +241,6 @@ landmarks_t readLandmarks() {
 
 DataPoint<points_t> readLidarScan() {
 	return lidar::readLidar();
-}
-
-DataPoint<double> readIMUHeading() {
-	return {}; // TODO: interface with IMU
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
