@@ -3,11 +3,11 @@
 #include "kinematics/DiffDriveKinematics.h"
 #include "world_interface/data.h"
 
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <string>
 
-#include <frozen/string.h>
 #include <frozen/unordered_map.h>
 
 using namespace kinematics;
@@ -128,12 +128,32 @@ constexpr int H264_RF_CONSTANT = 40;
 
 // Arm inverse kinematics
 namespace arm {
-// two forzen maps one mapping motor id's to pair sof doubles (min, max) second is motor id's
-// to doubles (segment lengths)
-constexpr frozen::unordered_map<frozen::string, std::pair<int, int>, 2> JOINT_LIMITS{
-	{"shoulder", {18200, 152500}}, {"elbow", {-169100, 0}}};
-constexpr frozen::unordered_map<frozen::string, double, 2> SEGMENT_LENGTHS{
-	{"shoulder", 15.152}, {"elbow", 18.16}};
+
+constexpr double IK_SOLVER_THRESH = 0.001;
+
+constexpr int IK_SOLVER_MAX_ITER = 50;
+
+/**
+ * The motors used in IK. The ordering in this array is the canonical ordering of these motors
+ * for IK purposes.
+ */
+constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = {
+	robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow};
+
+/**
+ * Map from motor ids to min and max joint limits
+ */
+constexpr frozen::unordered_map<robot::types::motorid_t, std::pair<int, int>, IK_MOTORS.size()>
+	JOINT_LIMITS{{robot::types::motorid_t::shoulder, {18200, 152500}},
+				 {robot::types::motorid_t::elbow, {-169100, 0}}};
+
+/**
+ * Map from motor ids to segment length
+ */
+constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size()>
+	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 15.152},
+					{robot::types::motorid_t::elbow, 18.16}};
+// TODO: convert to meters
 } // namespace arm
 
 constexpr double CONTROL_HZ = 10.0;

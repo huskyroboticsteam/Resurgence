@@ -6,6 +6,31 @@
 #include <atomic>
 #include <vector>
 
+using robot::types::motorid_t;
+using namespace Constants::arm;
+
+namespace {
+
+navtypes::Vectord<IK_MOTORS.size()> getSegLens() {
+	navtypes::Vectord<IK_MOTORS.size()> ret;
+	for (std::size_t i = 0; i < IK_MOTORS.size(); i++) {
+		ret[i] = SEGMENT_LENGTHS.at(IK_MOTORS[i]);
+	}
+	return ret;
+}
+
+navtypes::Vectord<IK_MOTORS.size()> getJointLimits(bool getLow) {
+	navtypes::Vectord<IK_MOTORS.size()> ret;
+	for (std::size_t i = 0; i < IK_MOTORS.size(); i++) {
+		const auto& limits = JOINT_LIMITS.at(IK_MOTORS[i]);
+		// TODO: convert to radians
+		ret[i] = getLow ? limits.first : limits.second;
+	}
+	return ret;
+}
+
+} // namespace
+
 namespace Globals {
 RoverState curr_state;
 net::websocket::SingleClientWSServer websocketServer("DefaultServer",
@@ -13,14 +38,9 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
-kinematics::PlanarArmKinematics<2> planarArmKinematics =
-	kinematics::PlanarArmKinematics<2>({Constants::arm::SEGMENT_LENGTHS.at("shoulder"),
-										Constants::arm::SEGMENT_LENGTHS.at("elbow")},
-									   {Constants::arm::JOINT_LIMITS.at("shoulder").first,
-										Constants::arm::JOINT_LIMITS.at("elbow").first},
-									   {Constants::arm::JOINT_LIMITS.at("shoulder").second,
-										Constants::arm::JOINT_LIMITS.at("elbow").second},
-									   0.0, 0);
+kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
+	planarArmKinematics(getSegLens(), getJointLimits(true), getJointLimits(false),
+						IK_SOLVER_THRESH, IK_SOLVER_MAX_ITER);
 // TODO: convert the values to radians for the joint limits
 control::PlanarArmController<2> planarArmController = control::PlanarArmController<2>{
 	{0, 0}, planarArmKinematics}; // TODO: get the current joint positions
