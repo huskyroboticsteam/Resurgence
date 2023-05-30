@@ -141,10 +141,10 @@ void world_interface_init(bool initOnlyMotors) {
 		setupCameras();
 		bool lidar_success = lidar::initializeLidar();
 		bool landmark_success = AR::initializeLandmarkDetection();
+		ardupilot::initArduPilotProtocol(Globals::websocketServer);
 	}
 	can::initCAN();
 	initMotors();
-	ardupilot::initArduPilotProtocol(Globals::websocketServer);
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
