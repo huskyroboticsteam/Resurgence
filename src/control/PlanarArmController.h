@@ -6,9 +6,9 @@
 
 #include <array>
 #include <initializer_list>
+#include <mutex>
 #include <numeric>
 #include <optional>
-#include <mutex>
 
 #include <Eigen/Core>
 
@@ -41,7 +41,7 @@ public:
 	 */
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
 		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
-		std::lock_guard<std::recursive_mutex> lock(mutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		setpoint = newSetPoint;
 	}
 
@@ -54,7 +54,7 @@ public:
 	Eigen::Vector2d get_setpoint(robot::types::datatime_t currTime) {
 		Eigen::Vector2d pos;
 		{
-			std::lock_guard<std::recursive_mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			// calculate current EE setpoint
 			pos = setpoint;
 			if (velTimestamp.has_value()) {
@@ -82,7 +82,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
-		std::lock_guard<std::recursive_mutex> lock(mutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
 			setpoint += velocity * dt;
@@ -100,7 +100,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
-		std::lock_guard<std::recursive_mutex> lock(mutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
 			setpoint += velocity * dt;
@@ -120,8 +120,9 @@ public:
 	 */
 	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
 									const navtypes::Vectord<N>& currJointPos) {
-		std::lock_guard<std::recursive_mutex> lock(mutex);
 		Eigen::Vector2d newPos = get_setpoint(currTime);
+		// lock after calling get_setpoint since that internally locks the mutex
+		std::lock_guard<std::mutex> lock(mutex);
 		setpoint = newPos;
 
 		// get new joint positions for target EE
@@ -129,7 +130,7 @@ public:
 	}
 
 private:
-	std::recursive_mutex mutex;
+	std::mutex mutex;
 	const kinematics::PlanarArmKinematics<N> kin;
 	Eigen::Vector2d setpoint;
 	Eigen::Vector2d velocity;
