@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../CAN/CANUtils.h"
+#include "../Constants.h"
 #include "data.h"
 
 #include <chrono>
@@ -64,14 +65,14 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 	{motorid_t::shoulder,
 		{.isInverted = true,
 		.ppjr = 4590 * 1024 * 4,
-		.limitSwitchLow = 18200,
-		.limitSwitchHigh = 152500,
+		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
+		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
 		.zeroCalibrationPower = 0.4}},
 	{motorid_t::elbow,
 		{.isInverted = false,
 		.ppjr = 1620 * 1024 * 4,
-		.limitSwitchLow = -169100,
-		.limitSwitchHigh = 0,
+		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::elbow).first,
+		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::elbow).second,
 		.zeroCalibrationPower = -0.15}}
 });
 // clang-format on
