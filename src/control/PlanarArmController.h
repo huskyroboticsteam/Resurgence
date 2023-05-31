@@ -6,6 +6,7 @@
 
 #include <array>
 #include <initializer_list>
+#include <mutex>
 #include <numeric>
 #include <optional>
 
@@ -15,6 +16,8 @@ namespace control {
 
 /**
  * @brief Controller to move planar arm to a target end effector position.
+ *
+ * This class is thread-safe.
  *
  * @tparam N The number of arm joints.
  */
@@ -37,7 +40,9 @@ public:
 	 * @param targetJointPos The target joint positions.
 	 */
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
-		setpoint = kin.jointPosToEEPos(targetJointPos);
+		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
+		std::lock_guard<std::mutex> lock(mutex);
+		setpoint = newSetPoint;
 	}
 
 	/**
@@ -47,11 +52,15 @@ public:
 	 * @return The target end effector position.
 	 */
 	Eigen::Vector2d get_setpoint(robot::types::datatime_t currTime) {
-		// calculate current EE setpoint
-		Eigen::Vector2d pos = setpoint;
-		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
-			pos += velocity * dt;
+		Eigen::Vector2d pos;
+		{
+			std::lock_guard<std::mutex> lock(mutex);
+			// calculate current EE setpoint
+			pos = setpoint;
+			if (velTimestamp.has_value()) {
+				double dt = util::durationToSec(currTime - velTimestamp.value());
+				pos += velocity * dt;
+			}
 		}
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
@@ -73,6 +82,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
+		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
 			setpoint += velocity * dt;
@@ -90,6 +100,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
+		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
 			setpoint += velocity * dt;
@@ -110,6 +121,8 @@ public:
 	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
 									const navtypes::Vectord<N>& currJointPos) {
 		Eigen::Vector2d newPos = get_setpoint(currTime);
+		// lock after calling get_setpoint since that internally locks the mutex
+		std::lock_guard<std::mutex> lock(mutex);
 		setpoint = newPos;
 
 		// get new joint positions for target EE
@@ -117,7 +130,8 @@ public:
 	}
 
 private:
-	kinematics::PlanarArmKinematics<N> kin;
+	std::mutex mutex;
+	const kinematics::PlanarArmKinematics<N> kin;
 	Eigen::Vector2d setpoint;
 	Eigen::Vector2d velocity;
 	std::optional<robot::types::datatime_t> velTimestamp;
