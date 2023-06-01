@@ -132,6 +132,17 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 	Globals::armIKEnabled = enabled;
 	if (enabled) {
 		// TODO: reset arm IK controller set point to be current position
+		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> armJointPositions;
+		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
+			double position = robot::getMotorPos(Constants::arm::IK_MOTORS[i]) * 1.0;
+			position *= M_PI / 180.0 / 1000.0;
+			armJointPositions(i) = position;
+		}
+		auto currentEEPos = Globals::planarArmKinematics.jointPosToEEPos(armJointPositions);
+		Globals::planarArmController.set_setpoint(currentEEPos);
+		// enable ik thread
+	} else {
+		// disable ik thread
 	}
 }
 
@@ -271,6 +282,8 @@ void MissionControlProtocol::startPowerRepeat() {
 	// note: take care to lock mutexes in a consistent order
 	std::lock_guard<std::mutex> flagLock(_joint_repeat_running_mutex);
 	std::lock_guard<std::mutex> threadLock(_joint_repeat_thread_mutex);
+	this->_arm_ik_update_thread =
+		std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
 	if (!this->_joint_repeat_running) {
 		this->_joint_repeat_running = true;
 		this->_joint_repeat_thread =
@@ -404,6 +417,15 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 		}
 		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
 								  [this] { return !_joint_repeat_running; });
+	}
+}
+
+void MissionControlProtocol::updateArmIKRepeatTask() {
+	dataclock::time_point next_update_time = dataclock::now();
+	while (Globals::armIKEnabled) {
+		// TODO: do the arm controller updates here
+		next_update_time += Constants::ARM_IK_UPDATE_PERIOD;
+		std::this_thread::sleep_until(next_update_time);
 	}
 }
 
