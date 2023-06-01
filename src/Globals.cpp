@@ -42,6 +42,5 @@ const kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
 	planarArmKinematics(getSegLens(), getJointLimits(true), getJointLimits(false),
 						IK_SOLVER_THRESH, IK_SOLVER_MAX_ITER);
 control::PlanarArmController<2> planarArmController({0, 0}, planarArmKinematics);
-bool inverseKinematicsEnabled = false;
 std::atomic<bool> armIKEnabled = false;
 } // namespace Globals

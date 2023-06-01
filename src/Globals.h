@@ -29,6 +29,5 @@ extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
 extern const kinematics::PlanarArmKinematics<2> planarArmKinematics;
 extern control::PlanarArmController<2> planarArmController;
-extern bool inverseKinematicsEnabled;
 extern std::atomic<bool> armIKEnabled;
 } // namespace Globals
