@@ -442,7 +442,7 @@ void MissionControlProtocol::updateArmIKRepeatTask() {
 		}
 		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> finalEEPositions =
 			Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
-		finalEEPositions /= M_PI / 180.0 / 1000.0;  // convert from radians to millidegrees
+		finalEEPositions /= M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
 		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
 			robot::setMotorPos(Constants::arm::IK_MOTORS[i],
 							   static_cast<int32_t>(finalEEPositions(i)));
