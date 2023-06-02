@@ -55,8 +55,8 @@ private:
 	// protects _joint_repeat_thread
 	std::mutex _joint_repeat_thread_mutex;
 	std::thread _joint_repeat_thread;
-	std::thread _arm_ik_update_thread;
 	std::condition_variable _power_repeat_cv;
+	std::thread _arm_ik_repeat_thread;
 	void handleEmergencyStopRequest(const json& j);
 	void handleOperationModeRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);

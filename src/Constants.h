@@ -99,7 +99,7 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
 
 constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
-constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(67);
+constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(100);
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
