@@ -132,6 +132,9 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 	Globals::armIKEnabled = enabled;
 	if (enabled) {
 		Globals::armIKEnabled = false;
+		if (_arm_ik_repeat_thread.joinable()) {
+			_arm_ik_repeat_thread.join();
+		}
 		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> armJointPositions;
 		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
 			auto positionDataPoint = robot::getMotorPos(Constants::arm::IK_MOTORS[i]);
@@ -140,15 +143,10 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 			position *= M_PI / 180.0 / 1000.0;
 			armJointPositions(i) = position;
 		}
-		Eigen::Vector2d currentEEPos =
-			Globals::planarArmKinematics.jointPosToEEPos(armJointPositions);
-		Globals::planarArmController.set_setpoint(currentEEPos);
-		if (_arm_ik_repeat_thread.joinable()) {
-			_arm_ik_repeat_thread.join();
-		}
+		Globals::planarArmController.set_setpoint(armJointPositions);
+		Globals::armIKEnabled = true;
 		_arm_ik_repeat_thread =
 			std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
-		Globals::armIKEnabled = true;
 	} else {
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
@@ -167,7 +165,7 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 static bool validateJoint(const json& j) {
 	return util::validateKey(j, "joint", val_t::string) &&
 		   util::validateOneOf(j, "joint",
-							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand"});
+							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand", "ikUp", "ikForward"});
 }
 
 static bool validateJointPowerRequest(const json& j) {
@@ -440,12 +438,12 @@ void MissionControlProtocol::updateArmIKRepeatTask() {
 			position *= M_PI / 180.0 / 1000.0;
 			armJointPositions(i) = position;
 		}
-		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> finalEEPositions =
+		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
 			Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
-		finalEEPositions /= M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
+		targetJointPositions /= M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
 		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
 			robot::setMotorPos(Constants::arm::IK_MOTORS[i],
-							   static_cast<int32_t>(finalEEPositions(i)));
+							   static_cast<int32_t>(targetJointPositions(i)));
 		}
 		next_update_time += Constants::ARM_IK_UPDATE_PERIOD;
 		std::this_thread::sleep_until(next_update_time);

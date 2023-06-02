@@ -129,7 +129,7 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 		// FIXME: this should ideally never happen, but we don't have support for all joints
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
-		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
+		log(LOG_WARN, "setJointPos called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());
 	}
 }
@@ -143,7 +143,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		// FIXME: this should ideally never happen, but we don't have support for all joints
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
-		log(LOG_WARN, "getJointPower called for currently unsupported joint %s\n",
+		log(LOG_WARN, "getJointPos called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());
 		return {};
 	}
@@ -171,20 +171,21 @@ double getJointPowerValue(types::jointid_t joint) {
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
 	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-			if (Globals::armIKEnabled) {
-				if (joint == jointid_t::ikForward) {
-					Globals::planarArmController.set_x_vel(dataclock::now(), power);
-				} else {
-					Globals::planarArmController.set_y_vel(dataclock::now(), power);
-				}
-			}
-		} else if (joint == jointid_t::wrist || joint == jointid_t::shoulder) {
+		// TODO: check if associated motor is in IK_MOTORS, don't check specifically these ones
+		if (joint == jointid_t::elbow || joint == jointid_t::shoulder) {
 			if (!Globals::armIKEnabled) {
 				setMotorPower(jointMotorMap.at(joint), power);
 			}
 		} else {
 			setMotorPower(jointMotorMap.at(joint), power);
+		}
+	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
+		if (Globals::armIKEnabled) {
+			if (joint == jointid_t::ikForward) {
+				Globals::planarArmController.set_x_vel(dataclock::now(), power);
+			} else {
+				Globals::planarArmController.set_y_vel(dataclock::now(), power);
+			}
 		}
 	} else {
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
