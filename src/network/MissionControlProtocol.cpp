@@ -135,12 +135,13 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> armJointPositions;
 		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
 			auto positionDataPoint = robot::getMotorPos(Constants::arm::IK_MOTORS[i]);
-			assert(positionDataPoint.isValid());  // crash if data is not valid
+			assert(positionDataPoint.isValid()); // crash if data is not valid
 			double position = static_cast<double>(positionDataPoint.getData());
 			position *= M_PI / 180.0 / 1000.0;
 			armJointPositions(i) = position;
 		}
-		Eigen::Vector2d currentEEPos = Globals::planarArmKinematics.jointPosToEEPos(armJointPositions);
+		Eigen::Vector2d currentEEPos =
+			Globals::planarArmKinematics.jointPosToEEPos(armJointPositions);
 		Globals::planarArmController.set_setpoint(currentEEPos);
 		// enable ik thread
 	} else {
