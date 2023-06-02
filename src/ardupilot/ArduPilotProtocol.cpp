@@ -27,13 +27,13 @@ void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServe
 	auto ardupilot_protocol = std::make_unique<net::websocket::WebSocketProtocol>(
 		Constants::ARDUPILOT_PROTOCOL_NAME);
 	ardupilot_protocol->addMessageHandler(
-		"arduPilotGPSReport", std::bind(&ArduPilotProtocol::handleGPSRequest, this, _1),
+		"gps", std::bind(&ArduPilotProtocol::handleGPSRequest, this, _1),
 		validateGPSRequest);
 	ardupilot_protocol->addMessageHandler(
-		"arduPilotIMUReport", std::bind(&ArduPilotProtocol::handleIMURequest, this, _1),
+		"orientation", std::bind(&ArduPilotProtocol::handleIMURequest, this, _1),
 		validateIMURequest);
 	ardupilot_protocol->addMessageHandler(
-		"arduPilotHeadingReport",
+		"heading",
 		std::bind(&ArduPilotProtocol::handleHeadingRequest, this, _1), validateHeadingRequest);
 	ardupilot_protocol->addConnectionHandler(
 		std::bind(&ArduPilotProtocol::clientConnected, this));
@@ -87,7 +87,7 @@ void ArduPilotProtocol::handleIMURequest(const json& j) {
 }
 
 bool ArduPilotProtocol::validateHeadingRequest(const json& j) {
-	return util::validateKey(j, "heading", val_t::number_integer);
+	return util::validateKey(j, "heading", val_t::number_float);
 }
 
 void ArduPilotProtocol::handleHeadingRequest(const json& j) {
