@@ -165,7 +165,8 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 static bool validateJoint(const json& j) {
 	return util::validateKey(j, "joint", val_t::string) &&
 		   util::validateOneOf(j, "joint",
-							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand", "ikUp", "ikForward"});
+							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand",
+								"ikUp", "ikForward"});
 }
 
 static bool validateJointPowerRequest(const json& j) {
