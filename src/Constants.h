@@ -130,6 +130,7 @@ constexpr int H264_RF_CONSTANT = 40;
 // Arm inverse kinematics
 namespace arm {
 
+constexpr double MAX_EE_VEL = 0.3; // m/s
 constexpr double IK_SOLVER_THRESH = 0.001;
 
 constexpr int IK_SOLVER_MAX_ITER = 50;

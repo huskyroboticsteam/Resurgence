@@ -172,6 +172,7 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
 	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
 		// TODO: check if associated motor is in IK_MOTORS, don't check specifically these ones
+		Constants::arm::IK_MOTORS;
 		if (joint == jointid_t::elbow || joint == jointid_t::shoulder) {
 			if (!Globals::armIKEnabled) {
 				setMotorPower(jointMotorMap.at(joint), power);
@@ -182,9 +183,11 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
 		if (Globals::armIKEnabled) {
 			if (joint == jointid_t::ikForward) {
-				Globals::planarArmController.set_x_vel(dataclock::now(), power);
+				Globals::planarArmController.set_x_vel(dataclock::now(),
+													   power * Constants::arm::MAX_EE_VEL);
 			} else {
-				Globals::planarArmController.set_y_vel(dataclock::now(), power);
+				Globals::planarArmController.set_y_vel(dataclock::now(),
+													   power * Constants::arm::MAX_EE_VEL);
 			}
 		}
 	} else {
