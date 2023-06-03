@@ -27,14 +27,13 @@ void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServe
 	auto ardupilot_protocol = std::make_unique<net::websocket::WebSocketProtocol>(
 		Constants::ARDUPILOT_PROTOCOL_NAME);
 	ardupilot_protocol->addMessageHandler(
-		"gps", std::bind(&ArduPilotProtocol::handleGPSRequest, this, _1),
-		validateGPSRequest);
+		"gps", std::bind(&ArduPilotProtocol::handleGPSRequest, this, _1), validateGPSRequest);
 	ardupilot_protocol->addMessageHandler(
 		"orientation", std::bind(&ArduPilotProtocol::handleIMURequest, this, _1),
 		validateIMURequest);
 	ardupilot_protocol->addMessageHandler(
-		"heading",
-		std::bind(&ArduPilotProtocol::handleHeadingRequest, this, _1), validateHeadingRequest);
+		"heading", std::bind(&ArduPilotProtocol::handleHeadingRequest, this, _1),
+		validateHeadingRequest);
 	ardupilot_protocol->addConnectionHandler(
 		std::bind(&ArduPilotProtocol::clientConnected, this));
 	ardupilot_protocol->addDisconnectionHandler(
