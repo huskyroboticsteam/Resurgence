@@ -135,12 +135,30 @@ constexpr double IK_SOLVER_THRESH = 0.001;
 
 constexpr int IK_SOLVER_MAX_ITER = 50;
 
+constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t, 7>
+	JOINT_MOTOR_MAP{{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
+					{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
+					{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
+					{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
+					{robot::types::jointid_t::wrist, robot::types::motorid_t::wrist},
+					{robot::types::jointid_t::hand, robot::types::motorid_t::hand},
+					{robot::types::jointid_t::activeSuspension,
+					 robot::types::motorid_t::activeSuspension}};
+
+constexpr std::array<robot::types::jointid_t, 2> IK_MOTOR_JOINTS = {
+	robot::types::jointid_t::shoulder, robot::types::jointid_t::elbow};
+
 /**
  * The motors used in IK. The ordering in this array is the canonical ordering of these motors
  * for IK purposes.
  */
-constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = {
-	robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow};
+constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = []() constexpr {
+	std::array<robot::types::motorid_t, IK_MOTOR_JOINTS.size()> ret{};
+	for (size_t i = 0; i < IK_MOTOR_JOINTS.size(); i++) {
+		ret[i] = JOINT_MOTOR_MAP.at(IK_MOTOR_JOINTS[i]);
+	}
+	return ret;
+}();
 
 /**
  * Map from motor ids to min and max joint limits in millidegrees

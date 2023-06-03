@@ -32,14 +32,6 @@ void setCmdVelToIntegrate(const wheelvel_t& wheelVels) {
 }
 
 void setJointMotorPower(robot::types::jointid_t joint, double power);
-const std::unordered_map<robot::types::jointid_t, robot::types::motorid_t> jointMotorMap{
-	{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
-	{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
-	{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
-	{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
-	{robot::types::jointid_t::wrist, robot::types::motorid_t::wrist},
-	{robot::types::jointid_t::hand, robot::types::motorid_t::hand},
-	{robot::types::jointid_t::activeSuspension, robot::types::motorid_t::activeSuspension}};
 
 std::unordered_map<types::jointid_t, double> jointPowerValues{};
 std::mutex jointPowerValuesMutex;
@@ -106,8 +98,8 @@ void setJointPower(robot::types::jointid_t joint, double power) {
 
 void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	using robot::types::jointid_t;
-	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		setMotorPos(jointMotorMap.at(joint), targetPos);
+	if (Constants::arm::JOINT_MOTOR_MAP.find(joint) != Constants::arm::JOINT_MOTOR_MAP.end()) {
+		setMotorPos(Constants::arm::JOINT_MOTOR_MAP.at(joint), targetPos);
 	}
 	// FIXME: need to do some extra control (probably implementing our own PID control) for the
 	// differential position, since the potentiometers are giving us joint position instead of
@@ -134,8 +126,8 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	}
 }
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
-	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		return getMotorPos(jointMotorMap.at(joint));
+	if (Constants::arm::JOINT_MOTOR_MAP.find(joint) != Constants::arm::JOINT_MOTOR_MAP.end()) {
+		return getMotorPos(Constants::arm::JOINT_MOTOR_MAP.at(joint));
 	}
 	// FIXME: need to do some extra work for differential - we will have to figure out which
 	// motor boards the potentiometers are plugged into and query those for "motor position"
@@ -170,15 +162,12 @@ double getJointPowerValue(types::jointid_t joint) {
 
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
-	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
+	if (Constants::arm::JOINT_MOTOR_MAP.find(joint) != Constants::arm::JOINT_MOTOR_MAP.end()) {
 		// TODO: check if associated motor is in IK_MOTORS, don't check specifically these ones
-		Constants::arm::IK_MOTORS;
-		if (joint == jointid_t::elbow || joint == jointid_t::shoulder) {
-			if (!Globals::armIKEnabled) {
-				setMotorPower(jointMotorMap.at(joint), power);
-			}
-		} else {
-			setMotorPower(jointMotorMap.at(joint), power);
+		if (!Globals::armIKEnabled ||
+			!std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
+					   Constants::arm::IK_MOTOR_JOINTS.end(), joint)) {
+			setMotorPower(Constants::arm::JOINT_MOTOR_MAP.at(joint), power);
 		}
 	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
 		if (Globals::armIKEnabled) {
