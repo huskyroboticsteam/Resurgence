@@ -129,7 +129,6 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 
 void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 	bool enabled = j["enabled"];
-	Globals::armIKEnabled = enabled;
 	if (enabled) {
 		Globals::armIKEnabled = false;
 		if (_arm_ik_repeat_thread.joinable()) {
@@ -148,6 +147,7 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		_arm_ik_repeat_thread =
 			std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
 	} else {
+		Globals::armIKEnabled = false;
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
 		}

@@ -98,8 +98,8 @@ void setJointPower(robot::types::jointid_t joint, double power) {
 
 void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	using robot::types::jointid_t;
-	if (Constants::arm::JOINT_MOTOR_MAP.find(joint) != Constants::arm::JOINT_MOTOR_MAP.end()) {
-		setMotorPos(Constants::arm::JOINT_MOTOR_MAP.at(joint), targetPos);
+	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
+		setMotorPos(Constants::JOINT_MOTOR_MAP.at(joint), targetPos);
 	}
 	// FIXME: need to do some extra control (probably implementing our own PID control) for the
 	// differential position, since the potentiometers are giving us joint position instead of
@@ -126,8 +126,8 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	}
 }
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
-	if (Constants::arm::JOINT_MOTOR_MAP.find(joint) != Constants::arm::JOINT_MOTOR_MAP.end()) {
-		return getMotorPos(Constants::arm::JOINT_MOTOR_MAP.at(joint));
+	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
+		return getMotorPos(Constants::JOINT_MOTOR_MAP.at(joint));
 	}
 	// FIXME: need to do some extra work for differential - we will have to figure out which
 	// motor boards the potentiometers are plugged into and query those for "motor position"
@@ -162,12 +162,11 @@ double getJointPowerValue(types::jointid_t joint) {
 
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
-	if (Constants::arm::JOINT_MOTOR_MAP.find(joint) != Constants::arm::JOINT_MOTOR_MAP.end()) {
-		// TODO: check if associated motor is in IK_MOTORS, don't check specifically these ones
-		if (!Globals::armIKEnabled ||
-			!std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
-					   Constants::arm::IK_MOTOR_JOINTS.end(), joint)) {
-			setMotorPower(Constants::arm::JOINT_MOTOR_MAP.at(joint), power);
+	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
+		bool isIKMotor = std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
+								   Constants::arm::IK_MOTOR_JOINTS.end(), joint);
+		if (!Globals::armIKEnabled || !isIKMotor) {
+			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
 		}
 	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
 		if (Globals::armIKEnabled) {

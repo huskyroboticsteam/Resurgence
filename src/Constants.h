@@ -131,14 +131,9 @@ namespace video {
 constexpr int H264_RF_CONSTANT = 40;
 } // namespace video
 
-// Arm inverse kinematics
-namespace arm {
-
-constexpr double MAX_EE_VEL = 0.3; // m/s
-constexpr double IK_SOLVER_THRESH = 0.001;
-
-constexpr int IK_SOLVER_MAX_ITER = 50;
-
+/**
+ * A map that pairs each of the joints to its corresponding motor.
+ */
 constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t, 7>
 	JOINT_MOTOR_MAP{{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
 					{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
@@ -149,12 +144,27 @@ constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t
 					{robot::types::jointid_t::activeSuspension,
 					 robot::types::motorid_t::activeSuspension}};
 
+// Arm inverse kinematics
+namespace arm {
+
+/**
+ * Maximum commanded end-effector velocity, in m/s
+ */
+constexpr double MAX_EE_VEL = 0.3;
+constexpr double IK_SOLVER_THRESH = 0.001;
+
+constexpr int IK_SOLVER_MAX_ITER = 50;
+
+/**
+ * The joints corresponding to the motors used for IK in the arm. The ordering in this array is
+ * the canonical ordering of these joints for IK purposes.
+ */
 constexpr std::array<robot::types::jointid_t, 2> IK_MOTOR_JOINTS = {
 	robot::types::jointid_t::shoulder, robot::types::jointid_t::elbow};
 
 /**
- * The motors used in IK. The ordering in this array is the canonical ordering of these motors
- * for IK purposes.
+ * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
+ * element of `IK_MOTOR_JOINTS`
  */
 constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = []() constexpr {
 	std::array<robot::types::motorid_t, IK_MOTOR_JOINTS.size()> ret{};
