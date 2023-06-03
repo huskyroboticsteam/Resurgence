@@ -30,6 +30,7 @@ using namespace navtypes;
 using namespace robot::types;
 
 void closeRover(int signum) {
+	robot::emergencyStop();
 	rospub::shutdown();
 	Globals::websocketServer.stop();
 	raise(SIGTERM);
