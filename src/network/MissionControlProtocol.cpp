@@ -464,8 +464,7 @@ void MissionControlProtocol::telemReportTask() {
 			}
 		}
 
-		// TODO: this crashes the thread, debug sendRoverPos()!
-		// sendRoverPos();
+		sendRoverPos();
 
 		pt += TELEM_REPORT_PERIOD;
 		std::this_thread::sleep_until(pt);

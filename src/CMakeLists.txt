@@ -44,8 +44,8 @@ endif()
 # it, so this is a way to do that.
 set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
 systems.")
-set(GPS "USB" CACHE STRING "GPS interface to use.")
-set(AVAILABLE_GPS "USB" "NONE")
+set(GPS "ARDUPILOT" CACHE STRING "GPS interface to use.")
+set(AVAILABLE_GPS "USB" "ARDUPILOT" "NONE")
 set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
 set(WITH_LIDAR ON CACHE BOOL "Enable/Disable the USB LiDAR interface.")
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
@@ -208,6 +208,11 @@ add_library(gps_interface STATIC)
 if(GPS STREQUAL "USB")
   target_sources(gps_interface PUBLIC gps/usb_gps/read_usb_gps.cpp)
   target_link_libraries(gps_interface ${libgps_LIBRARIES})
+elseif(GPS STREQUAL "ARDUPILOT")
+  target_sources(gps_interface PUBLIC
+      ardupilot/ArduPilotProtocol.cpp
+      ardupilot/ArduPilotInterface.cpp)
+  target_link_libraries(gps_interface utils websocket_utils)
 else()
   target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
 endif()
@@ -239,6 +244,7 @@ add_library(real_world_interface STATIC
   lidar/read_hokuyo_lidar.cpp
   lidar/read_rp_lidar.cpp
   world_interface/motor/can_motor.cpp
+  Globals.cpp
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp

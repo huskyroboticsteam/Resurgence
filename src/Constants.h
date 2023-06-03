@@ -97,6 +97,10 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
    WebSocket server endpoint for the DGPS protocol.
  */
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
+/**
+   Websocket server endpoint for ArduPilot protocol
+ */
+constexpr const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 
 constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);

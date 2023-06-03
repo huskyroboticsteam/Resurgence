@@ -14,6 +14,17 @@ struct gpscoords_t {
 	double lon;
 };
 
+/* @brief Euler angles to represent orientation. Rotation ordering is XYZ extrinsic
+ *        rotations.
+ *
+ * @see https://en.wikipedia.org/wiki/Euler_angles#Tait%E2%80%93Bryan_angles
+ */
+struct eulerangles_t {
+	double roll;
+	double pitch;
+	double yaw;
+};
+
 /* Obstacles are specifed as a list of 2D vertices. Must be convex.
  * Do not repeat the starting vertex at the end. */
 using obstacle_t = Eigen::ArrayX2d;
