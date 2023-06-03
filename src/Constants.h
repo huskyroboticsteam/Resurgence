@@ -99,7 +99,7 @@ constexpr const char* SIM_PROTOCOL_NAME = "/simulator";
 constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
 
 constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
-constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(100);
+constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
@@ -143,14 +143,14 @@ constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = {
 	robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow};
 
 /**
- * Map from motor ids to min and max joint limits
+ * Map from motor ids to min and max joint limits in millidegrees
  */
 constexpr frozen::unordered_map<robot::types::motorid_t, std::pair<int, int>, IK_MOTORS.size()>
 	JOINT_LIMITS{{robot::types::motorid_t::shoulder, {18200, 152500}},
 				 {robot::types::motorid_t::elbow, {-169100, 0}}};
 
 /**
- * Map from motor ids to segment length
+ * Map from motor ids to segment length in meters
  */
 constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size()>
 	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.3848608},
