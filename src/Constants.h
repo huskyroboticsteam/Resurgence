@@ -158,7 +158,8 @@ constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = []() constexpr {
 		ret[i] = JOINT_MOTOR_MAP.at(IK_MOTOR_JOINTS[i]);
 	}
 	return ret;
-}();
+}
+();
 
 /**
  * Map from motor ids to min and max joint limits in millidegrees
