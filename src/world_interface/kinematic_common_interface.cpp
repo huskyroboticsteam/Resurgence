@@ -163,8 +163,9 @@ double getJointPowerValue(types::jointid_t joint) {
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
-		bool isIKMotor = std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
-								   Constants::arm::IK_MOTOR_JOINTS.end(), joint);
+		bool isIKMotor =
+			std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
+					  Constants::arm::IK_MOTOR_JOINTS.end(), joint) != Constants::arm::IK_MOTOR_JOINTS.end();
 		if (!Globals::armIKEnabled || !isIKMotor) {
 			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
 		}
