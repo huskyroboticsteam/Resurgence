@@ -166,14 +166,13 @@ constexpr std::array<robot::types::jointid_t, 2> IK_MOTOR_JOINTS = {
  * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
  * element of `IK_MOTOR_JOINTS`
  */
-constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = []() constexpr {
+constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() constexpr {
 	std::array<robot::types::motorid_t, IK_MOTOR_JOINTS.size()> ret{};
 	for (size_t i = 0; i < IK_MOTOR_JOINTS.size(); i++) {
 		ret[i] = JOINT_MOTOR_MAP.at(IK_MOTOR_JOINTS[i]);
 	}
 	return ret;
-}
-();
+})();
 
 /**
  * Map from motor ids to min and max joint limits in millidegrees
