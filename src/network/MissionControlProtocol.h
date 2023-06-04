@@ -34,6 +34,7 @@ public:
 private:
 	void videoStreamTask();
 	void jointPowerRepeatTask();
+	void updateArmIKRepeatTask();
 	void telemReportTask();
 	SingleClientWSServer& _server;
 	std::shared_mutex _stream_mutex;
@@ -55,16 +56,17 @@ private:
 	std::mutex _joint_repeat_thread_mutex;
 	std::thread _joint_repeat_thread;
 	std::condition_variable _power_repeat_cv;
+	std::thread _arm_ik_repeat_thread;
 	void handleEmergencyStopRequest(const json& j);
 	void handleOperationModeRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
 	void handleDriveRequest(const json& j);
+	void handleSetArmIKEnabled(const json& j);
 	void sendCameraStreamReport(const CameraID& cam,
 								const std::vector<std::basic_string<uint8_t>>& videoData);
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
-	void sendCameraStreamReport(const CameraID& cam, const std::string& b64_data);
 	void sendRoverPos();
 	void handleConnection();
 	void startPowerRepeat();

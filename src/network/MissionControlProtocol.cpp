@@ -36,6 +36,7 @@ const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
 constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
+constexpr const char* ARM_IK_ENABLED_TYPE = "setArmIKEnabled";
 constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
 constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
 constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
@@ -82,6 +83,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	}
 	// TODO: reinit motors
 	Globals::E_STOP = stop;
+	Globals::armIKEnabled = false;
 }
 
 static bool validateOperationModeRequest(const json& j) {
@@ -107,6 +109,10 @@ static bool validateDriveRequest(const json& j) {
 		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
+static bool validateArmIKEnable(const json& j) {
+	return util::validateKey(j, "enabled", val_t::boolean);
+}
+
 void MissionControlProtocol::handleDriveRequest(const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
@@ -121,6 +127,33 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	this->setRequestedCmdVel(dtheta, dx);
 }
 
+void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
+	bool enabled = j["enabled"];
+	if (enabled) {
+		Globals::armIKEnabled = false;
+		if (_arm_ik_repeat_thread.joinable()) {
+			_arm_ik_repeat_thread.join();
+		}
+		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> armJointPositions;
+		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
+			auto positionDataPoint = robot::getMotorPos(Constants::arm::IK_MOTORS[i]);
+			assert(positionDataPoint.isValid()); // crash if data is not valid
+			double position = static_cast<double>(positionDataPoint.getData());
+			position *= M_PI / 180.0 / 1000.0;
+			armJointPositions(i) = position;
+		}
+		Globals::planarArmController.set_setpoint(armJointPositions);
+		Globals::armIKEnabled = true;
+		_arm_ik_repeat_thread =
+			std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+	} else {
+		Globals::armIKEnabled = false;
+		if (_arm_ik_repeat_thread.joinable()) {
+			_arm_ik_repeat_thread.join();
+		}
+	}
+}
+
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 	{
 		std::lock_guard<std::mutex> power_lock(this->_joint_power_mutex);
@@ -132,7 +165,8 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 static bool validateJoint(const json& j) {
 	return util::validateKey(j, "joint", val_t::string) &&
 		   util::validateOneOf(j, "joint",
-							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand"});
+							   {"armBase", "shoulder", "elbow", "forearm", "wrist", "hand",
+								"ikUp", "ikForward"});
 }
 
 static bool validateJointPowerRequest(const json& j) {
@@ -233,6 +267,9 @@ void MissionControlProtocol::sendCameraStreamReport(
 }
 
 void MissionControlProtocol::handleConnection() {
+	// Turn off inverse kinematics on connection
+	Globals::armIKEnabled = false;
+
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
 
@@ -289,6 +326,8 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 			this->_joint_repeat_thread.join();
 		}
 	}
+	// Turn off inverse kinematics so that IK state will be in sync with mission control
+	Globals::armIKEnabled = false;
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
@@ -313,6 +352,14 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addMessageHandler(DRIVE_REQ_TYPE,
 							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
 							validateDriveRequest);
+	this->addMessageHandler(
+		ARM_IK_ENABLED_TYPE,
+		std::bind(&MissionControlProtocol::handleSetArmIKEnabled, this, _1),
+		validateArmIKEnable);
+	this->addMessageHandler(
+		ARM_IK_ENABLED_TYPE,
+		std::bind(&MissionControlProtocol::handleSetArmIKEnabled, this, _1),
+		validateArmIKEnable);
 	this->addMessageHandler(
 		JOINT_POWER_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
@@ -377,6 +424,30 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 		}
 		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
 								  [this] { return !_joint_repeat_running; });
+	}
+}
+
+void MissionControlProtocol::updateArmIKRepeatTask() {
+	dataclock::time_point next_update_time = dataclock::now();
+	while (Globals::armIKEnabled) {
+		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> armJointPositions;
+		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
+			DataPoint<int32_t> positionDataPoint =
+				robot::getMotorPos(Constants::arm::IK_MOTORS[i]);
+			assert(positionDataPoint.isValid()); // crash if data is not valid
+			double position = static_cast<double>(positionDataPoint.getData());
+			position *= M_PI / 180.0 / 1000.0;
+			armJointPositions(i) = position;
+		}
+		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
+			Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
+		targetJointPositions /= M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
+		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
+			robot::setMotorPos(Constants::arm::IK_MOTORS[i],
+							   static_cast<int32_t>(targetJointPositions(i)));
+		}
+		next_update_time += Constants::ARM_IK_UPDATE_PERIOD;
+		std::this_thread::sleep_until(next_update_time);
 	}
 }
 

@@ -32,14 +32,6 @@ void setCmdVelToIntegrate(const wheelvel_t& wheelVels) {
 }
 
 void setJointMotorPower(robot::types::jointid_t joint, double power);
-const std::unordered_map<robot::types::jointid_t, robot::types::motorid_t> jointMotorMap{
-	{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
-	{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
-	{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
-	{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
-	{robot::types::jointid_t::wrist, robot::types::motorid_t::wrist},
-	{robot::types::jointid_t::hand, robot::types::motorid_t::hand},
-	{robot::types::jointid_t::activeSuspension, robot::types::motorid_t::activeSuspension}};
 
 std::unordered_map<types::jointid_t, double> jointPowerValues{};
 std::mutex jointPowerValuesMutex;
@@ -106,8 +98,8 @@ void setJointPower(robot::types::jointid_t joint, double power) {
 
 void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	using robot::types::jointid_t;
-	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		setMotorPos(jointMotorMap.at(joint), targetPos);
+	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
+		setMotorPos(Constants::JOINT_MOTOR_MAP.at(joint), targetPos);
 	}
 	// FIXME: need to do some extra control (probably implementing our own PID control) for the
 	// differential position, since the potentiometers are giving us joint position instead of
@@ -129,13 +121,13 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 		// FIXME: this should ideally never happen, but we don't have support for all joints
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
-		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
+		log(LOG_WARN, "setJointPos called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());
 	}
 }
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
-	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		return getMotorPos(jointMotorMap.at(joint));
+	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
+		return getMotorPos(Constants::JOINT_MOTOR_MAP.at(joint));
 	}
 	// FIXME: need to do some extra work for differential - we will have to figure out which
 	// motor boards the potentiometers are plugged into and query those for "motor position"
@@ -143,7 +135,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		// FIXME: this should ideally never happen, but we don't have support for all joints
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
-		log(LOG_WARN, "getJointPower called for currently unsupported joint %s\n",
+		log(LOG_WARN, "getJointPos called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());
 		return {};
 	}
@@ -170,9 +162,23 @@ double getJointPowerValue(types::jointid_t joint) {
 
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
-
-	if (jointMotorMap.find(joint) != jointMotorMap.end()) {
-		setMotorPower(jointMotorMap.at(joint), power);
+	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
+		bool isIKMotor = std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
+								   Constants::arm::IK_MOTOR_JOINTS.end(),
+								   joint) != Constants::arm::IK_MOTOR_JOINTS.end();
+		if (!Globals::armIKEnabled || !isIKMotor) {
+			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
+		}
+	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
+		if (Globals::armIKEnabled) {
+			if (joint == jointid_t::ikForward) {
+				Globals::planarArmController.set_x_vel(dataclock::now(),
+													   power * Constants::arm::MAX_EE_VEL);
+			} else {
+				Globals::planarArmController.set_y_vel(dataclock::now(),
+													   power * Constants::arm::MAX_EE_VEL);
+			}
+		}
 	} else {
 		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());

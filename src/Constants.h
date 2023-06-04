@@ -103,6 +103,7 @@ constexpr const char* DGPS_PROTOCOL_NAME = "/dgps";
 constexpr const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 
 constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
+constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
@@ -130,29 +131,58 @@ namespace video {
 constexpr int H264_RF_CONSTANT = 40;
 } // namespace video
 
+/**
+ * A map that pairs each of the joints to its corresponding motor.
+ */
+constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t, 7>
+	JOINT_MOTOR_MAP{{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
+					{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
+					{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
+					{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
+					{robot::types::jointid_t::wrist, robot::types::motorid_t::wrist},
+					{robot::types::jointid_t::hand, robot::types::motorid_t::hand},
+					{robot::types::jointid_t::activeSuspension,
+					 robot::types::motorid_t::activeSuspension}};
+
 // Arm inverse kinematics
 namespace arm {
 
+/**
+ * Maximum commanded end-effector velocity, in m/s
+ */
+constexpr double MAX_EE_VEL = 0.3;
 constexpr double IK_SOLVER_THRESH = 0.001;
 
 constexpr int IK_SOLVER_MAX_ITER = 50;
 
 /**
- * The motors used in IK. The ordering in this array is the canonical ordering of these motors
- * for IK purposes.
+ * The joints corresponding to the motors used for IK in the arm. The ordering in this array is
+ * the canonical ordering of these joints for IK purposes.
  */
-constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = {
-	robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow};
+constexpr std::array<robot::types::jointid_t, 2> IK_MOTOR_JOINTS = {
+	robot::types::jointid_t::shoulder, robot::types::jointid_t::elbow};
 
 /**
- * Map from motor ids to min and max joint limits
+ * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
+ * element of `IK_MOTOR_JOINTS`
+ */
+constexpr std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() constexpr {
+	std::array<robot::types::motorid_t, IK_MOTOR_JOINTS.size()> ret{};
+	for (size_t i = 0; i < IK_MOTOR_JOINTS.size(); i++) {
+		ret[i] = JOINT_MOTOR_MAP.at(IK_MOTOR_JOINTS[i]);
+	}
+	return ret;
+})();
+
+/**
+ * Map from motor ids to min and max joint limits in millidegrees
  */
 constexpr frozen::unordered_map<robot::types::motorid_t, std::pair<int, int>, IK_MOTORS.size()>
 	JOINT_LIMITS{{robot::types::motorid_t::shoulder, {18200, 152500}},
 				 {robot::types::motorid_t::elbow, {-169100, 0}}};
 
 /**
- * Map from motor ids to segment length
+ * Map from motor ids to segment length in meters
  */
 constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size()>
 	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.3848608},

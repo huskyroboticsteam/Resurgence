@@ -46,6 +46,10 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "drillArm";
 		case jointid_t::activeSuspension:
 			return "activeSuspension";
+		case jointid_t::ikUp:
+			return "ikUp";
+		case jointid_t::ikForward:
+			return "ikForward";
 		default:
 			// should never happen
 			return "<unknown>";
