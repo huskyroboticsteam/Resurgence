@@ -294,7 +294,6 @@ types::DataPoint<navtypes::Vectord<N>>
 getMotorPositionsRad(const std::array<types::motorid_t, N>& motors) {
 	navtypes::Vectord<N> motorPositions;
 	std::optional<types::datatime_t> timestamp;
-	bool valid = true;
 	for (size_t i = 0; i < motors.size(); i++) {
 		types::DataPoint<int32_t> positionDataPoint = robot::getMotorPos(motors[i]);
 		if (positionDataPoint.isValid()) {
@@ -305,15 +304,10 @@ getMotorPositionsRad(const std::array<types::motorid_t, N>& motors) {
 			position *= M_PI / 180.0 / 1000.0;
 			motorPositions(i) = position;
 		} else {
-			valid = false;
-			break;
+			return {};
 		}
 	}
-	if (valid) {
-		return types::DataPoint<navtypes::Vectord<N>>(timestamp.value(), motorPositions);
-	} else {
-		return {};
-	}
+	return types::DataPoint<navtypes::Vectord<N>>(timestamp.value(), motorPositions);
 }
 
 // TODO: document
