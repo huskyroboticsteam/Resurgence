@@ -134,15 +134,13 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
 		}
-		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> armJointPositions;
-		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
-			auto positionDataPoint = robot::getMotorPos(Constants::arm::IK_MOTORS[i]);
-			assert(positionDataPoint.isValid()); // crash if data is not valid
-			double position = static_cast<double>(positionDataPoint.getData());
-			position *= M_PI / 180.0 / 1000.0;
-			armJointPositions(i) = position;
-		}
-		Globals::planarArmController.set_setpoint(armJointPositions);
+		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
+			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+		// TODO: there should be a better way of handling invalid data than crashing.
+		// It should somehow just not enable IK, but then it needs to communicate back to MC
+		// that IK wasn't enabled?
+		assert(armJointPositions.isValid());
+		Globals::planarArmController.set_setpoint(armJointPositions.getData());
 		Globals::armIKEnabled = true;
 		_arm_ik_repeat_thread =
 			std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
@@ -430,21 +428,17 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 void MissionControlProtocol::updateArmIKRepeatTask() {
 	dataclock::time_point next_update_time = dataclock::now();
 	while (Globals::armIKEnabled) {
-		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> armJointPositions;
-		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
-			DataPoint<int32_t> positionDataPoint =
-				robot::getMotorPos(Constants::arm::IK_MOTORS[i]);
-			assert(positionDataPoint.isValid()); // crash if data is not valid
-			double position = static_cast<double>(positionDataPoint.getData());
-			position *= M_PI / 180.0 / 1000.0;
-			armJointPositions(i) = position;
-		}
-		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
-			Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
-		targetJointPositions /= M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
-		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
-			robot::setMotorPos(Constants::arm::IK_MOTORS[i],
-							   static_cast<int32_t>(targetJointPositions(i)));
+		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
+			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+		if (armJointPositions.isValid()) {
+			navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
+				Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
+			targetJointPositions /=
+				M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
+			for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
+				robot::setMotorPos(Constants::arm::IK_MOTORS[i],
+								   static_cast<int32_t>(targetJointPositions(i)));
+			}
 		}
 		next_update_time += Constants::ARM_IK_UPDATE_PERIOD;
 		std::this_thread::sleep_until(next_update_time);
