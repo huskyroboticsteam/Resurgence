@@ -150,7 +150,7 @@ namespace arm {
 /**
  * Maximum commanded end-effector velocity, in m/s
  */
-constexpr double MAX_EE_VEL = 0.3;
+constexpr double MAX_EE_VEL = 0.1;
 constexpr double IK_SOLVER_THRESH = 0.001;
 
 constexpr int IK_SOLVER_MAX_ITER = 50;
