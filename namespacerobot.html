@@ -247,6 +247,10 @@ template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a3b58b5557c06caa8eb3d64c510042a26"><td class="memItemLeft" align="right" valign="top"><a id="a3b58b5557c06caa8eb3d64c510042a26" name="a3b58b5557c06caa8eb3d64c510042a26"></a>
 callbackid_t&#160;</td><td class="memItemRight" valign="bottom"><b>addLimitSwitchCallback</b> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, const std::function&lt; void(<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="el" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a>&lt; <a class="el" href="classrobot_1_1types_1_1LimitSwitchData.html">robot::types::LimitSwitchData</a> &gt; limitSwitchData)&gt; &amp;callback)</td></tr>
 <tr class="separator:a3b58b5557c06caa8eb3d64c510042a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bb1735860af6a75595a33930d2ca6d9"><td class="memTemplParams" colspan="2">template&lt;unsigned long int N&gt; </td></tr>
+<tr class="memitem:a6bb1735860af6a75595a33930d2ca6d9"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a6bb1735860af6a75595a33930d2ca6d9">getMotorPositionsRad</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01703.html">std::array</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">types::motorid_t</a>, N &gt; &amp;motors)</td></tr>
+<tr class="memdesc:a6bb1735860af6a75595a33930d2ca6d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the positions in radians of multiple motors at the same time.  <br /></td></tr>
+<tr class="separator:a6bb1735860af6a75595a33930d2ca6d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb6c5baa7bd1bf5c795ea0e100a5ef30"><td class="memItemLeft" align="right" valign="top"><a id="adb6c5baa7bd1bf5c795ea0e100a5ef30" name="adb6c5baa7bd1bf5c795ea0e100a5ef30"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>zeroJoint</b> (robot::types::jointid_t joint)</td></tr>
 <tr class="separator:adb6c5baa7bd1bf5c795ea0e100a5ef30"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -544,6 +548,42 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>types::DataPoint&lt;int32_t&gt; The last reported position of the motor in millidegrees, if it exists. If the motor has not reported a position (because it hasn't been received yet or if it doesn't have an encoder) then an empty data point is returned. </dd></dl>
+
+</div>
+</div>
+<a id="a6bb1735860af6a75595a33930d2ca6d9" name="a6bb1735860af6a75595a33930d2ca6d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bb1735860af6a75595a33930d2ca6d9">&#9670;&#160;</a></span>getMotorPositionsRad()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned long int N&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &gt; robot::getMotorPositionsRad </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01703.html">std::array</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">types::motorid_t</a>, N &gt; &amp;&#160;</td>
+          <td class="paramname"><em>motors</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the positions in radians of multiple motors at the same time. </p>
+<p>This is useful for kinematics classes which expect motor positions as a vector.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">N</td><td>Number of motors. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">motors</td><td>The motors to get the positions of. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>types::DataPoint&lt;navtypes::Vectord&lt;N&gt;&gt; The joint positions. This will be an empty data point if any of the requested motors do not have any associated data. The timestamp of this data point is the oldest timestamp of the requested motors. </dd></dl>
 
 </div>
 </div>
