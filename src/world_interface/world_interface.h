@@ -7,6 +7,7 @@
 #include "data.h"
 #include "motor/base_motor.h"
 
+#include <array>
 #include <optional>
 #include <unordered_set>
 
@@ -276,6 +277,39 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos);
  * in millidegrees.
  */
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint);
+
+/**
+ * @brief Get the positions in radians of multiple motors at the same time.
+ *
+ * This is useful for kinematics classes which expect motor positions as a vector.
+ *
+ * @tparam N Number of motors.
+ * @param motors The motors to get the positions of.
+ * @return types::DataPoint<navtypes::Vectord<N>> The joint positions. This will be an empty
+ * data point if any of the requested motors do not have any associated data. The timestamp of
+ * this data point is the oldest timestamp of the requested motors.
+ */
+template <unsigned long int N>
+types::DataPoint<navtypes::Vectord<N>>
+getMotorPositionsRad(const std::array<types::motorid_t, N>& motors) {
+	navtypes::Vectord<N> motorPositions;
+	std::optional<types::datatime_t> timestamp;
+	for (size_t i = 0; i < motors.size(); i++) {
+		types::DataPoint<int32_t> positionDataPoint = robot::getMotorPos(motors[i]);
+		if (positionDataPoint.isValid()) {
+			if (!timestamp.has_value() || timestamp > positionDataPoint.getTime()) {
+				timestamp = positionDataPoint.getTime();
+			}
+			double position = static_cast<double>(positionDataPoint.getData());
+			position *= M_PI / 180.0 / 1000.0;
+			motorPositions(i) = position;
+		} else {
+			return {};
+		}
+	}
+	return types::DataPoint<navtypes::Vectord<N>>(timestamp.value(), motorPositions);
+}
+
 // TODO: document
 void zeroJoint(robot::types::jointid_t joint);
 } // namespace robot
