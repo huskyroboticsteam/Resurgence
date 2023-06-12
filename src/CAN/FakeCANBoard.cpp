@@ -27,20 +27,17 @@ enum class TestMode {
 	PIDVel,
 	Encoder,
 	LimitSwitch,
-	ScienceTelemetry,
+	Telemetry,
 	ScienceMotors,
 	ScienceServos
 };
 
-std::unordered_set<int> modes = {static_cast<int>(TestMode::ModeSet),
-								 static_cast<int>(TestMode::PWM),
-								 static_cast<int>(TestMode::PID),
-								 static_cast<int>(TestMode::Encoder),
-								 static_cast<int>(TestMode::PIDVel),
-								 static_cast<int>(TestMode::LimitSwitch),
-								 static_cast<int>(TestMode::ScienceTelemetry),
-								 static_cast<int>(TestMode::ScienceMotors),
-								 static_cast<int>(TestMode::ScienceServos)};
+std::unordered_set<int> modes = {
+	static_cast<int>(TestMode::ModeSet),	  static_cast<int>(TestMode::PWM),
+	static_cast<int>(TestMode::PID),		  static_cast<int>(TestMode::Encoder),
+	static_cast<int>(TestMode::PIDVel),		  static_cast<int>(TestMode::LimitSwitch),
+	static_cast<int>(TestMode::Telemetry),	  static_cast<int>(TestMode::ScienceMotors),
+	static_cast<int>(TestMode::ScienceServos)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -72,37 +69,32 @@ int main() {
 	ss << static_cast<int>(TestMode::PID) << " for PID\n";
 	ss << static_cast<int>(TestMode::Encoder) << " for ENCODER\n";
 	ss << static_cast<int>(TestMode::LimitSwitch) << " for LIMIT SWITCH\n";
-	ss << static_cast<int>(TestMode::ScienceTelemetry) << " for SCIENCE TELEMETRY\n";
+	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceMotors) << " for SCIENCE MOTORS\n";
-	ss << static_cast<int>(TestMode::ScienceTelemetry) << " for SCIENCE SERVOS\n";
+	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
 		std::exit(1);
 	}
 	TestMode testMode = static_cast<TestMode>(test_type);
-	int serial = 0;
-	if (testMode == TestMode::PWM || testMode == TestMode::PID ||
-		testMode == TestMode::Encoder || testMode == TestMode::LimitSwitch) {
-		serial = prompt("Enter motor serial");
-	}
 	bool mode_has_been_set = false;
 
 	while (true) {
 		if (testMode == TestMode::ModeSet) {
-			serial = prompt("Enter motor serial");
+			int serial = prompt("Enter motor serial");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
 			std::cout << "got " << serial << " and " << mode << std::endl;
 			can::motor::setMotorMode(serial, mode == 0 ? motormode_t::pwm : motormode_t::pid);
 		} else if (testMode == TestMode::PWM) {
+			int serial = prompt("Enter motor serial");
 			int pwm = prompt("Enter PWM");
 			can::motor::setMotorMode(serial, motormode_t::pwm);
 			can::motor::setMotorPower(serial, static_cast<int16_t>(pwm));
 		} else if (testMode == TestMode::PID) {
-			// Don't send all five packets at once. On some motor boards, the CAN buffer
-			// only fits four packets.
-
+			static int serial;
 			if (!mode_has_been_set) {
+				serial = prompt("Enter motor serial");
 				// AVR board firmware resets the angle target every time it receives a
 				// mode set packet, so we only want to send this once.
 				// TODO: do we need to set the PPJR?
@@ -126,6 +118,8 @@ int main() {
 			static double vel_timeout;
 
 			if (!mode_has_been_set) {
+				int serial = prompt("Enter motor serial");
+
 				// set pid mode
 				can::motor::setMotorMode(serial, motormode_t::pid);
 				mode_has_been_set = true;
@@ -179,7 +173,10 @@ int main() {
 				motor->setMotorPower(0.0);
 			}
 		} else if (testMode == TestMode::Encoder) {
+			static int serial;
 			if (!mode_has_been_set) {
+				serial = prompt("Enter motor serial");
+
 				int sensorType;
 				do {
 					sensorType =
@@ -212,7 +209,9 @@ int main() {
 			std::this_thread::sleep_for(20ms);
 		} else if (testMode == TestMode::LimitSwitch) {
 			static bool testLimits = false;
+			static int serial;
 			if (!mode_has_been_set) {
+				serial = prompt("Enter motor serial");
 				testLimits = static_cast<bool>(prompt("Set limits? 1=yes,0=no"));
 				if (testLimits) {
 					int lo = prompt("Low position");
@@ -242,28 +241,39 @@ int main() {
 				std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
 				std::this_thread::sleep_for(20ms);
 			}
-		} else if (testMode == TestMode::ScienceTelemetry) {
+		} else if (testMode == TestMode::Telemetry) {
 			if (!mode_has_been_set) {
-				serial = 0x01;
-				can::deviceid_t id = std::make_pair(can::devicegroup_t::science, serial);
+				auto group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
+				int serial = prompt("Enter serial");
+				can::deviceid_t deviceID = std::make_pair(group, serial);
+				auto telemType = static_cast<can::telemtype_t>(prompt("Enter telemetry type"));
 				can::addDeviceTelemetryCallback(
-					id, can::telemtype_t::limit_switch,
+					deviceID, telemType,
 					[](can::deviceid_t id, can::telemtype_t telemType,
 					   DataPoint<can::telemetry_t> data) {
-						std::cout << "Science: serial=" << std::hex
+						std::cout << "Telemetry: group=" << std::hex
+								  << static_cast<int>(id.first) << ", serial=" << std::hex
 								  << static_cast<int>(id.second) << ", type=" << std::hex
 								  << static_cast<int>(telemType) << ", data=" << std::dec
 								  << data.getDataOrElse(0) << std::endl;
 					});
+				int telemPeriod = prompt("Telemetry timing (ms)");
+				bool useTimingPacket =
+					static_cast<bool>(prompt("What telemetry method?\n0 for pull packets\n1 "
+											 "for telemetry timing packet"));
+				if (useTimingPacket) {
+					CANPacket packet;
+					AssembleTelemetryTimingPacket(
+						&packet, static_cast<uint8_t>(deviceID.first), deviceID.second,
+						static_cast<uint8_t>(telemType), telemPeriod);
+					can::sendCANPacket(packet);
+				} else {
+					can::scheduleTelemetryPull(deviceID, telemType,
+											   std::chrono::milliseconds(telemPeriod));
+				}
 				mode_has_been_set = true;
 			}
-			auto reqType = prompt("Enter telemetry type");
-			int telemPeriod = prompt("Telemetry timing (ms)");
-			CANPacket packet;
-			AssembleTelemetryTimingPacket(&packet,
-										  static_cast<uint8_t>(can::devicegroup_t::science),
-										  serial, reqType, telemPeriod);
-			can::sendCANPacket(packet);
+			std::this_thread::sleep_for(1s);
 		} else if (testMode == TestMode::ScienceMotors) {
 			// CAREFUL, there are no safety checks / limit switches
 			// 0: drill up/down (down is positive, ~500 PWM)

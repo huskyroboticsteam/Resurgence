@@ -48,8 +48,9 @@ enum class telemtype_t {
 	gyro_x = PACKET_TELEMETRY_GYRO_X,
 	gyro_y = PACKET_TELEMETRY_GYRO_Y,
 	gyro_z = PACKET_TELEMETRY_GYRO_Z,
-	limit_switch = PACKET_TELEMETRY_LIM_SW_STATE
-	// TODO: add further telemetry types if required
+	limit_switch = PACKET_TELEMETRY_LIM_SW_STATE,
+	adc_raw = PACKET_TELEMETRY_ADC_RAW
+	// add further telemetry types if required
 };
 
 /**
