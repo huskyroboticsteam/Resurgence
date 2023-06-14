@@ -70,7 +70,8 @@ const std::unordered_map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
 	{PACKET_TELEMETRY_GYRO_X, telemtype_t::gyro_x},
 	{PACKET_TELEMETRY_GYRO_Y, telemtype_t::gyro_y},
 	{PACKET_TELEMETRY_GYRO_Z, telemtype_t::gyro_z},
-	{PACKET_TELEMETRY_LIM_SW_STATE, telemtype_t::limit_switch}};
+	{PACKET_TELEMETRY_LIM_SW_STATE, telemtype_t::limit_switch},
+	{PACKET_TELEMETRY_ADC_RAW, telemtype_t::adc_raw}};
 
 // the telemetry map will store telemetry code instead of telem enum
 // this means unrecognized telemetry types won't cause UB
