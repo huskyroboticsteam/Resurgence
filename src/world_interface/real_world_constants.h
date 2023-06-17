@@ -82,11 +82,11 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
 	{{motorid_t::armBase,
 	  {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},
 	 {motorid_t::forearm,
-	  {.adc_lo = 123, .mdeg_lo = -360 * 1000, .adc_hi = 456, .mdeg_hi = 360 * 1000}},
+	  {.adc_lo = 1208, .mdeg_lo = -180 * 1000, .adc_hi = 841, .mdeg_hi = 180 * 1000}},
 	 {motorid_t::wrist,
 	  {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}},
 	 {motorid_t::activeSuspension,
-	  {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}}});
+	  {.adc_lo = 251, .mdeg_lo = -19 * 1000, .adc_hi = 1645, .mdeg_hi = 31 * 1000}}});
 
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
