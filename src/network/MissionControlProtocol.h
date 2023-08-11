@@ -69,6 +69,7 @@ private:
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
 	void sendRoverPos();
 	void handleConnection();
+	void handleHeartbeatTimeout();
 	void startPowerRepeat();
 	void stopAndShutdownPowerRepeat();
 	void setRequestedJointPower(jointid_t joint, double power);

@@ -46,6 +46,10 @@ void WebSocketProtocol::addDisconnectionHandler(const connhandler_t& handler) {
 	disconnectionHandlers.push_back(handler);
 }
 
+void WebSocketProtocol::setPongTimeoutHandler(std::chrono::milliseconds timeout, const pongtimeouthandler_t& handler) {
+	pongInfo = {timeout, handler};
+}
+
 void WebSocketProtocol::clientConnected() {
 	for (const auto& f : connectionHandlers) {
 		f();

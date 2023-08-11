@@ -1,7 +1,9 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <map>
+#include <optional>
 #include <string>
 
 #include <nlohmann/json.hpp>
@@ -14,6 +16,7 @@ using nlohmann::json;
 typedef std::function<void(const json&)> msghandler_t;
 typedef std::function<bool(const json&)> validator_t;
 typedef std::function<void()> connhandler_t;
+typedef std::function<void()> pongtimeouthandler_t;
 
 /**
  * @brief Defines a protocol which will be served at an endpoint of a server.
@@ -85,14 +88,7 @@ public:
 
 	void addDisconnectionHandler(const connhandler_t& handler);
 
-	/**
-	 * @brief Process the given JSON object that was sent to this protocol's endpoint.
-	 * Generally, this shouldn't be used by client code.
-	 *
-	 * @param obj The JSON object to be processed by this protocol. It is expected to have a
-	 * "type" key.
-	 */
-	void processMessage(const json& obj) const;
+	void setPongTimeoutHandler(std::chrono::milliseconds timeout, const pongtimeouthandler_t& handler);
 
 	/**
 	 * @brief Invoke all connection handlers for this protocol.
@@ -114,11 +110,22 @@ public:
 	std::string getProtocolPath() const;
 
 private:
+	friend class SingleClientWSServer;
 	std::string protocolPath;
 	std::map<std::string, msghandler_t> handlerMap;
 	std::map<std::string, validator_t> validatorMap;
 	std::vector<connhandler_t> connectionHandlers;
 	std::vector<connhandler_t> disconnectionHandlers;
+	std::optional<std::pair<std::chrono::milliseconds, pongtimeouthandler_t>> pongInfo;
+
+	/**
+	 * @brief Process the given JSON object that was sent to this protocol's endpoint.
+	 * Generally, this shouldn't be used by client code.
+	 *
+	 * @param obj The JSON object to be processed by this protocol. It is expected to have a
+	 * "type" key.
+	 */
+	void processMessage(const json& obj) const;
 };
 
 } // namespace websocket

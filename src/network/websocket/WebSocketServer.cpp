@@ -26,6 +26,8 @@ SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16
 	server.set_validate_handler([&](connection_hdl hdl) { return this->validate(hdl); });
 	server.set_message_handler(
 		[&](connection_hdl hdl, message_t msg) { this->onMessage(hdl, msg); });
+	server.set_pong_timeout_handler(
+		[&](connection_hdl hdl, std::string payload) { this->onPongTimeout(hdl, payload); });
 }
 
 SingleClientWSServer::~SingleClientWSServer() {
@@ -80,6 +82,16 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 	std::string path = protocol->getProtocolPath();
 	if (protocolMap.find(path) == protocolMap.end()) {
 		protocolMap.emplace(path, std::move(protocol));
+		const auto& pongInfo = protocolMap.at(path).protocol->pongInfo;
+		if (pongInfo.has_value()) {
+			auto eventID = pingScheduler.scheduleEvent(pongInfo->first / 2, [this, path]() {
+				const auto& pd = this->protocolMap.at(path);
+				if (pd.client.has_value()) {
+					server.ping(pd.client.value(), path);
+				}
+			});
+			protocolMap.at(path).pingEventID = eventID;
+		}
 		return true;
 	} else {
 		return false;
@@ -148,6 +160,10 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 
 	auto& protocolData = protocolMap.at(path);
 	protocolData.client.reset();
+	if (protocolData.pingEventID.has_value()) {
+		pingScheduler.removeEvent(protocolData.pingEventID.value());
+		protocolData.pingEventID.reset();
+	}
 	protocolData.protocol->clientDisconnected();
 }
 
@@ -161,6 +177,18 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	log(LOG_TRACE, "Message on %s: %s\n", path.c_str(), jsonStr.c_str());
 	json obj = json::parse(jsonStr);
 	protocolMap.at(path).protocol->processMessage(obj);
+}
+
+void SingleClientWSServer::onPongTimeout(connection_hdl hdl, const std::string& payload) {
+	auto conn = server.get_con_from_hdl(hdl);
+
+	assert(protocolMap.find(payload) != protocolMap.end());
+
+	log(LOG_ERROR, "Pong timeout on %s\n", payload.c_str());
+	auto& pongInfo = protocolMap.at(payload).protocol->pongInfo;
+	if (pongInfo.has_value()) {
+		pongInfo->second();
+	}
 }
 } // namespace websocket
 } // namespace net

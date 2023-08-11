@@ -30,6 +30,7 @@ using websocket::msghandler_t;
 using websocket::validator_t;
 
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 1000ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -264,6 +265,14 @@ void MissionControlProtocol::sendCameraStreamReport(
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
+void MissionControlProtocol::handleHeartbeatTimeout() {
+	this->stopAndShutdownPowerRepeat();
+	robot::emergencyStop();
+	log(LOG_ERROR, "Heartbeat timed out! Emergency stopping.\n");
+	Globals::E_STOP = true;
+	Globals::armIKEnabled = false;
+}
+
 void MissionControlProtocol::handleConnection() {
 	// Turn off inverse kinematics on connection
 	Globals::armIKEnabled = false;
@@ -376,6 +385,8 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this));
+	
+	this->setPongTimeoutHandler(HEARTBEAT_TIMEOUT_PERIOD, std::bind(&MissionControlProtocol::handleHeartbeatTimeout, this));
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
