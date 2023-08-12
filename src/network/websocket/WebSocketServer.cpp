@@ -198,18 +198,19 @@ void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload
 }
 
 void SingleClientWSServer::onPongTimeout(connection_hdl hdl, const std::string& payload) {
-	auto conn = server.get_con_from_hdl(hdl);
+	static bool alreadyTimedOut = false;
+	if (!alreadyTimedOut) {
+		alreadyTimedOut = true;
+		auto conn = server.get_con_from_hdl(hdl);
 
-	assert(protocolMap.find(payload) != protocolMap.end());
+		assert(protocolMap.find(payload) != protocolMap.end());
 
-	log(LOG_ERROR, "Pong timeout on %s\n", payload.c_str());
-	auto &pd = protocolMap.at(payload);
-	if (pd.pongTimeoutEventID.has_value()) {
-		pongTimeoutScheduler.removeEvent(pd.pongTimeoutEventID.value());
-	}
-	auto& pongInfo = pd.protocol->pongInfo;
-	if (pongInfo.has_value()) {
-		pongInfo->second();
+		log(LOG_ERROR, "Pong timeout on %s\n", payload.c_str());
+		auto &pd = protocolMap.at(payload);
+		auto& pongInfo = pd.protocol->pongInfo;
+		if (pongInfo.has_value()) {
+			pongInfo->second();
+		}
 	}
 }
 } // namespace websocket
