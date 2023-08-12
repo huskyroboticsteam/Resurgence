@@ -28,8 +28,7 @@ SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16
 		[&](connection_hdl hdl, message_t msg) { this->onMessage(hdl, msg); });
 	server.set_pong_timeout_handler(
 		[&](connection_hdl hdl, std::string payload) { this->onPongTimeout(hdl, payload); });
-	server.set_pong_handler([](connection_hdl, std::string s) { log(LOG_INFO, "Pong from %s\n", s.c_str());});
-	server.set_pong_timeout(1000);
+	server.set_pong_handler([&](connection_hdl hdl, std::string payload) { this->onPong(hdl, payload); });
 }
 
 SingleClientWSServer::~SingleClientWSServer() {
@@ -89,7 +88,7 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 			auto eventID = pingScheduler.scheduleEvent(pongInfo->first / 2, [this, path]() {
 				const auto& pd = this->protocolMap.at(path);
 				if (pd.client.has_value()) {
-					log(LOG_INFO, "Ping!\n");
+					log(LOG_DEBUG, "Ping!\n");
 					server.ping(pd.client.value(), path);
 				}
 			});
@@ -182,13 +181,32 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	protocolMap.at(path).protocol->processMessage(obj);
 }
 
+void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload) {
+	log(LOG_DEBUG, "Pong from %s\n", payload.c_str());
+	auto conn = server.get_con_from_hdl(hdl);
+
+	assert(protocolMap.find(payload) != protocolMap.end());
+
+	auto &pd = protocolMap.at(payload);
+	if (pd.pongTimeoutEventID.has_value()) {
+		pongTimeoutScheduler.removeEvent(pd.pongTimeoutEventID.value());
+	}
+	pd.pongTimeoutEventID = pongTimeoutScheduler.scheduleEvent(std::chrono::milliseconds(1000), [this, hdl, payload]() {
+		this->onPongTimeout(hdl, payload);
+	});
+}
+
 void SingleClientWSServer::onPongTimeout(connection_hdl hdl, const std::string& payload) {
 	auto conn = server.get_con_from_hdl(hdl);
 
 	assert(protocolMap.find(payload) != protocolMap.end());
 
 	log(LOG_ERROR, "Pong timeout on %s\n", payload.c_str());
-	auto& pongInfo = protocolMap.at(payload).protocol->pongInfo;
+	auto &pd = protocolMap.at(payload);
+	if (pd.pongTimeoutEventID.has_value()) {
+		pongTimeoutScheduler.removeEvent(pd.pongTimeoutEventID.value());
+	}
+	auto& pongInfo = pd.protocol->pongInfo;
 	if (pongInfo.has_value()) {
 		pongInfo->second();
 	}

@@ -100,6 +100,7 @@ private:
 		std::unique_ptr<WebSocketProtocol> protocol;
 		std::optional<connection_hdl> client;
 		std::optional<util::PeriodicScheduler<>::eventid_t> pingEventID;
+		std::optional<util::PeriodicScheduler<>::eventid_t> pongTimeoutEventID;
 	};
 
 	std::string serverName;
@@ -109,11 +110,13 @@ private:
 	std::map<std::string, ProtocolData> protocolMap;
 	std::thread serverThread;
 	util::PeriodicScheduler<> pingScheduler;
+	util::PeriodicScheduler<> pongTimeoutScheduler;
 
 	bool validate(connection_hdl hdl);
 	void onOpen(connection_hdl hdl);
 	void onClose(connection_hdl hdl);
 	void onMessage(connection_hdl hdl, message_t message);
+	void onPong(connection_hdl hdl, const std::string& payload);
 	void onPongTimeout(connection_hdl hdl, const std::string& payload);
 	void serverTask();
 };
