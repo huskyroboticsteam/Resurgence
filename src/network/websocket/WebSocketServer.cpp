@@ -29,6 +29,7 @@ SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16
 	server.set_pong_timeout_handler(
 		[&](connection_hdl hdl, std::string payload) { this->onPongTimeout(hdl, payload); });
 	server.set_pong_handler([](connection_hdl, std::string s) { log(LOG_INFO, "Pong from %s\n", s.c_str());});
+	server.set_pong_timeout(1000);
 }
 
 SingleClientWSServer::~SingleClientWSServer() {
