@@ -191,7 +191,8 @@ void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload
 	if (pd.pongTimeoutEventID.has_value()) {
 		pongTimeoutScheduler.removeEvent(pd.pongTimeoutEventID.value());
 	}
-	pd.pongTimeoutEventID = pongTimeoutScheduler.scheduleEvent(std::chrono::milliseconds(1000), [this, hdl, payload]() {
+	// TODO: circ hack. this is bad, make it better
+	pd.pongTimeoutEventID = pongTimeoutScheduler.scheduleEvent(std::chrono::milliseconds(4000), [this, hdl, payload]() {
 		this->onPongTimeout(hdl, payload);
 	});
 }
