@@ -188,6 +188,7 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 void MissionControlProtocol::sendRoverPos() {
 	auto heading = robot::readIMUHeading();
 	auto gps = robot::readGPS();
+	log(LOG_DEBUG, "imu=%d, gps=%d\n", heading.isValid(), gps.isValid());
 	if (gps.isValid() && heading.isValid()) {
 		double orientX = 0.0;
 		double orientY = 0.0;
