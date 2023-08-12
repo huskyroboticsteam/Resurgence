@@ -28,6 +28,7 @@ SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16
 		[&](connection_hdl hdl, message_t msg) { this->onMessage(hdl, msg); });
 	server.set_pong_timeout_handler(
 		[&](connection_hdl hdl, std::string payload) { this->onPongTimeout(hdl, payload); });
+	server.set_pong_handler([](connection_hdl, std::string s) { log(LOG_INFO, "Pong from %s\n", s.c_str());});
 }
 
 SingleClientWSServer::~SingleClientWSServer() {
@@ -87,6 +88,7 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 			auto eventID = pingScheduler.scheduleEvent(pongInfo->first / 2, [this, path]() {
 				const auto& pd = this->protocolMap.at(path);
 				if (pd.client.has_value()) {
+					log(LOG_INFO, "Ping!\n");
 					server.ping(pd.client.value(), path);
 				}
 			});
