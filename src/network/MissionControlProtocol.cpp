@@ -187,19 +187,30 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 
 void MissionControlProtocol::sendRoverPos() {
 	auto heading = robot::readIMUHeading();
-	auto gps = robot::readGPS();
+	auto imu = robot::readIMU();
+	auto gps = gps::readGPSCoords();
 	log(LOG_DEBUG, "imu=%d, gps=%d\n", heading.isValid(), gps.isValid());
-	if (gps.isValid() && heading.isValid()) {
-		double orientX = 0.0;
-		double orientY = 0.0;
-		double orientZ = std::sin(heading.getData() / 2);
-		double orientW = std::cos(heading.getData() / 2);
-		double posX = gps.getData()[0];
-		double posY = gps.getData()[1];
+	if (heading.isValid()) {
+		auto rpy = imu.getData();
+		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
+								Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
+								Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitZ()));
+		double orientX = quat.x();
+		double orientY = quat.y();
+		double orientZ = quat.z();
+		double orientW = quat.w();
+		double posX = 0, posY = 0;
+		if (gps.isValid()) {
+			posX = gps.getData().lon;
+			posY = gps.getData().lat;
+		}
 		double posZ = 0.0;
-		double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
 		double headingRecency = util::durationToSec(dataclock::now() - heading.getTime());
-		double recency = std::max(gpsRecency, headingRecency);
+		double recency = headingRecency;
+		if (gps.isValid()) {
+			double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
+			recency = std::max(recency, gpsRecency);
+		}
 		json msg = {{"type", ROVER_POS_REP_TYPE},
 					{"orientW", orientW},
 					{"orientX", orientX},
@@ -386,8 +397,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this));
-	
-	this->setPongTimeoutHandler(HEARTBEAT_TIMEOUT_PERIOD, std::bind(&MissionControlProtocol::handleHeartbeatTimeout, this));
+
+	this->setPongTimeoutHandler(
+		HEARTBEAT_TIMEOUT_PERIOD,
+		std::bind(&MissionControlProtocol::handleHeartbeatTimeout, this));
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);

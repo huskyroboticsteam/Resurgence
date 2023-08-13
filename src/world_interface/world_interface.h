@@ -165,6 +165,9 @@ types::DataPoint<navtypes::point_t> readGPS();
  */
 types::DataPoint<double> readIMUHeading();
 
+// TODO: circ hack. add impls for sim and noop
+types::DataPoint<navtypes::eulerangles_t> readIMU();
+
 /**
  * @brief Get the ground truth pose, if available. This is only available in simulation.
  *
