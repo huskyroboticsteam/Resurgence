@@ -499,6 +499,13 @@ void MissionControlProtocol::videoStreamTask() {
 					// convert frame to encoded data and send it
 					auto data_vector = encoder->encode_frame(frame);
 					sendCameraStreamReport(cam, data_vector);
+					if (cam == Constants::AR_CAMERA_ID) {
+						static auto ts = dataclock::now();
+						auto now = dataclock::now();
+						auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - ts);
+						log(LOG_DEBUG, "Cam=%s, elapsed=%d\n", cam.c_str(), elapsed.count());
+						ts = now;
+					}
 				}
 			}
 
