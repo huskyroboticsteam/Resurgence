@@ -11,9 +11,13 @@ void latch::wait() const {
 
 void latch::count_down(std::size_t n) {
 	std::unique_lock lock(mutex);
-	count -= n;
-	if (count <= 0) {
-		cv.notify_one();
+	if (n > count) {
+		count = 0;
+	} else {
+		count -= n;
+	}
+	if (count == 0) {
+		cv.notify_all();
 	}
 }
 

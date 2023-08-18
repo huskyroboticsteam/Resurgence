@@ -10,11 +10,15 @@
 
 namespace util {
 
-template <typename Clock> class PeriodicScheduler;
-
 namespace impl {
-template <typename Clock> void notifyScheduler(PeriodicScheduler<Clock>& scheduler);
-}
+
+class Notifiable {
+public:
+	virtual void notify() = 0;
+};
+
+template <typename T> void notifyScheduler(T& scheduler);
+} // namespace impl
 
 /**
  * @brief Uses a single thread to periodically invoke callbacks at a given frequency.
@@ -24,7 +28,8 @@ template <typename Clock> void notifyScheduler(PeriodicScheduler<Clock>& schedul
  *
  * @tparam Clock The clock to use for scheduling.
  */
-template <typename Clock = std::chrono::steady_clock> class PeriodicScheduler {
+template <typename Clock = std::chrono::steady_clock>
+class PeriodicScheduler : private impl::Notifiable {
 public:
 	/**
 	 * @brief The type of event ids.
@@ -108,6 +113,10 @@ public:
 private:
 	friend void util::impl::notifyScheduler<>(PeriodicScheduler&);
 
+	void notify() override {
+		scheduleCV.notify_all();
+	}
+
 	/**
 	 * @brief Method executed by the scheduler thread.
 	 */
@@ -166,6 +175,72 @@ private:
 	std::unordered_set<eventid_t> toRemove;
 };
 
+template <typename Clock = std::chrono::steady_clock>
+class Watchdog : private impl::Notifiable {
+public:
+	explicit Watchdog(std::chrono::milliseconds duration,
+					  const std::function<void()>& callback, bool keepCallingOnDeath = false)
+		: duration(duration), callback(callback), keepCallingOnDeath(keepCallingOnDeath),
+		  fed(false), quitting(false), thread(std::bind(&Watchdog::threadFn, this)) {}
+
+	Watchdog(const Watchdog&) = delete;
+
+	~Watchdog() {
+		{
+			std::lock_guard lock(mutex);
+			quitting = true;
+			// wake up the thread with the cv so it can quit
+			fed = true;
+		}
+		cv.notify_all();
+		thread.join();
+	}
+
+	Watchdog& operator=(const Watchdog&) = delete;
+
+	void feed() {
+		{
+			std::lock_guard lock(mutex);
+			fed = true;
+		}
+		cv.notify_one();
+	}
+
+private:
+	friend void util::impl::notifyScheduler<>(Watchdog&);
+
+	std::chrono::milliseconds duration;
+	std::function<void()> callback;
+	const bool keepCallingOnDeath;
+	bool fed;
+	bool quitting;
+	std::mutex mutex;
+	std::condition_variable cv;
+	std::thread thread;
+
+	void notify() override {
+		cv.notify_all();
+	}
+
+	void threadFn() {
+		std::unique_lock lock(mutex);
+		while (!quitting) {
+			std::chrono::time_point<Clock> wakeTime = Clock::now() + duration;
+			if (cv.wait_until(lock, wakeTime, [&]() { return fed || quitting; })) {
+				if (quitting) {
+					break;
+				}
+				fed = false;
+			} else {
+				callback();
+				if (!keepCallingOnDeath) {
+					cv.wait(lock, [&]() { return fed || quitting; });
+				}
+			}
+		}
+	}
+};
+
 namespace impl {
 
 /**
@@ -174,13 +249,14 @@ namespace impl {
  * This is useful to trigger the scheduler to continue if the clock has been changed
  * and the scheduler hasn't woken up. Overusing this method can degrade performance.
  *
- * @tparam Clock The clock of the scheduler.
+ * @tparam T The type of the scheduler.
  * @param scheduler The scheduler to notify.
  *
  * @warning Client code should NOT use this.
  */
-template <typename Clock> void notifyScheduler(PeriodicScheduler<Clock>& scheduler) {
-	scheduler.scheduleCV.notify_all();
+template <typename T> void notifyScheduler(T& scheduler) {
+	Notifiable& n = scheduler;
+	n.notify();
 }
 
 } // namespace impl

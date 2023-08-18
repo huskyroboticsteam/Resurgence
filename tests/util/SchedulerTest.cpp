@@ -38,8 +38,9 @@ private:
 	static inline time_point now_;
 };
 
+template <typename T>
 void advanceFakeClock(std::chrono::milliseconds dur, std::chrono::milliseconds inc,
-					  PeriodicScheduler<fake_clock>& scheduler) {
+					  T& scheduler) {
 	for (int i = 0; i < dur / inc; i++) {
 		fake_clock::advance(inc);
 		util::impl::notifyScheduler(scheduler);
@@ -86,4 +87,63 @@ TEST_CASE("Test PeriodicScheduler Remove", "[util][scheduler]") {
 	i = std::make_shared<latch>(1);
 	advanceFakeClock(100ms, 5ms, sched);
 	REQUIRE_FALSE(i->wait_for(100ms));
+}
+
+TEST_CASE("Test Watchdog", "[util][scheduler]") {
+	// NOTE: after feeding the thread must wait for the watchdog thread to wake up and register
+	// it. Doing feed() -> advanceTime() -> checkStarved() doesn't work. It should be feed() ->
+	// checkFed() -> advanceTime() -> checkStarved().
+	SECTION("Test regular") {
+		auto l = std::make_shared<latch>(1);
+		Watchdog<fake_clock> wd(100ms, [&]() { l->count_down(); });
+		for (int i = 0; i < 5; i++) {
+			REQUIRE_FALSE(l->wait_for(10ms));
+			advanceFakeClock(50ms, 5ms, wd);
+			REQUIRE_FALSE(l->wait_for(10ms));
+			wd.feed();
+		}
+		REQUIRE_FALSE(l->wait_for(10ms));
+		advanceFakeClock(200ms, 5ms, wd);
+		REQUIRE(l->wait_for(10ms));
+
+		// check that callback is not called again while starved
+		l = std::make_shared<latch>(1);
+		advanceFakeClock(200ms, 5ms, wd);
+		REQUIRE_FALSE(l->wait_for(10ms));
+
+		// check that callback is called after feeding and starving again
+		wd.feed();
+		REQUIRE_FALSE(l->wait_for(10ms));
+		advanceFakeClock(100ms, 5ms, wd);
+		REQUIRE(l->wait_for(10ms));
+	}
+
+	SECTION("Test keep calling while starved") {
+		auto l = std::make_shared<latch>(1);
+		Watchdog<fake_clock> wd(
+			100ms, [&]() { l->count_down(); }, true);
+		for (int i = 0; i < 5; i++) {
+			REQUIRE_FALSE(l->wait_for(10ms));
+			advanceFakeClock(50ms, 5ms, wd);
+			REQUIRE_FALSE(l->wait_for(10ms));
+			wd.feed();
+		}
+		REQUIRE_FALSE(l->wait_for(10ms));
+		advanceFakeClock(100ms, 5ms, wd);
+		REQUIRE(l->wait_for(10ms));
+
+		// check that callback is repeatedly called while starved
+		for (int i = 0; i < 3; i++) {
+			l = std::make_shared<latch>(1);
+			advanceFakeClock(100ms, 5ms, wd);
+			REQUIRE(l->wait_for(10ms));
+		}
+
+		// check that callback is called after feeding and starving again
+		l = std::make_shared<latch>(1);
+		wd.feed();
+		REQUIRE_FALSE(l->wait_for(10ms));
+		advanceFakeClock(100ms, 5ms, wd);
+		REQUIRE(l->wait_for(10ms));
+	}
 }
