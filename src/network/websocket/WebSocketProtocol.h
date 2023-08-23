@@ -1,12 +1,14 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <map>
+#include <optional>
 #include <string>
 
 #include <nlohmann/json.hpp>
 
-namespace net{
+namespace net {
 namespace websocket {
 
 using nlohmann::json;
@@ -14,6 +16,7 @@ using nlohmann::json;
 typedef std::function<void(const json&)> msghandler_t;
 typedef std::function<bool(const json&)> validator_t;
 typedef std::function<void()> connhandler_t;
+typedef std::function<void()> heartbeattimeouthandler_t;
 
 /**
  * @brief Defines a protocol which will be served at an endpoint of a server.
@@ -86,25 +89,16 @@ public:
 	void addDisconnectionHandler(const connhandler_t& handler);
 
 	/**
-	 * @brief Process the given JSON object that was sent to this protocol's endpoint.
-	 * Generally, this shouldn't be used by client code.
+	 * @brief Set the handler that's called when the heartbeat times out.
 	 *
-	 * @param obj The JSON object to be processed by this protocol. It is expected to have a
-	 * "type" key.
+	 * If the heartbeat is reestablished after timing out, and then times out again, this
+	 * handler will be called again.
+	 *
+	 * @param timeout The heartbeat timeout.
+	 * @param handler The handler to call when timed out.
 	 */
-	void processMessage(const json& obj) const;
-
-	/**
-	 * @brief Invoke all connection handlers for this protocol.
-	 * Generally, this shouldn't be used by client code.
-	 */
-	void clientConnected();
-
-	/**
-	 * @brief Invoke all disconnection handlers for this protocol.
-	 * Generally, this shouldn't be used by client code.
-	 */
-	void clientDisconnected();
+	void setHeartbeatTimedOutHandler(std::chrono::milliseconds timeout,
+									 const heartbeattimeouthandler_t& handler);
 
 	/**
 	 * @brief Get the protocol path of the endpoint this protocol is served on.
@@ -114,11 +108,38 @@ public:
 	std::string getProtocolPath() const;
 
 private:
+	friend class SingleClientWSServer;
+
 	std::string protocolPath;
 	std::map<std::string, msghandler_t> handlerMap;
 	std::map<std::string, validator_t> validatorMap;
 	std::vector<connhandler_t> connectionHandlers;
 	std::vector<connhandler_t> disconnectionHandlers;
+	std::optional<std::pair<std::chrono::milliseconds, heartbeattimeouthandler_t>>
+		heartbeatInfo;
+
+	/**
+	 * @brief Process the given JSON object that was sent to this protocol's endpoint.
+	 *
+	 * @param obj The JSON object to be processed by this protocol. It is expected to have a
+	 * "type" key.
+	 */
+	void processMessage(const json& obj) const;
+
+	/**
+	 * @brief Invoke all connection handlers for this protocol.
+	 */
+	void clientConnected();
+
+	/**
+	 * @brief Invoke all disconnection handlers for this protocol.
+	 */
+	void clientDisconnected();
+
+	/**
+	 * @brief Invoke the heartbeat timeout handlers for this protocol.
+	 */
+	void heartbeatTimedOut();
 };
 
 } // namespace websocket

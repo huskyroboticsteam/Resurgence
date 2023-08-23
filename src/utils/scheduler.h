@@ -175,9 +175,30 @@ private:
 	std::unordered_set<eventid_t> toRemove;
 };
 
+/**
+ * @brief Implements a thread-safe watchdog.
+ *
+ * A watchdog is a timer that is periodically reset (fed) by the client code. If the client
+ * fails to feed the watchdog for some duration, then the watchdog is "starved", and the
+ * callback is invoked. This is useful for implementing things such as heartbeats.
+ *
+ * @tparam Clock The clock to use for timing.
+ *
+ * @see https://en.wikipedia.org/wiki/Watchdog_timer
+ */
 template <typename Clock = std::chrono::steady_clock>
 class Watchdog : private impl::Notifiable {
 public:
+	/**
+	 * @brief Construct a new Watchdog.
+	 *
+	 * @param duration The timeout duration. If not fed for at least this long, then the
+	 * callback is invoked.
+	 * @param callback The callback to invoke when the watchdog starves.
+	 * @param keepCallingOnDeath If true, keep invoking @p callback every @p duration
+	 * milliseconds until fed again. Otherwise, only call @p callback when starved, and do not
+	 * call again until being reset and subsequently starved again.
+	 */
 	explicit Watchdog(std::chrono::milliseconds duration,
 					  const std::function<void()>& callback, bool keepCallingOnDeath = false)
 		: duration(duration), callback(callback), keepCallingOnDeath(keepCallingOnDeath),
@@ -189,8 +210,6 @@ public:
 		{
 			std::lock_guard lock(mutex);
 			quitting = true;
-			// wake up the thread with the cv so it can quit
-			fed = true;
 		}
 		cv.notify_all();
 		thread.join();
@@ -198,6 +217,11 @@ public:
 
 	Watchdog& operator=(const Watchdog&) = delete;
 
+	/**
+	 * @brief Feed the watchdog.
+	 *
+	 * Call at least once per period, or the watchdog starves.
+	 */
 	void feed() {
 		{
 			std::lock_guard lock(mutex);

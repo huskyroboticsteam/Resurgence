@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../utils/scheduler.h"
 #include "WebSocketProtocol.h"
 
 #include <functional>
@@ -96,8 +97,11 @@ private:
 	class ProtocolData {
 	public:
 		ProtocolData(std::unique_ptr<WebSocketProtocol> protocol);
-		std::unique_ptr<WebSocketProtocol> protocol;
+		const std::unique_ptr<WebSocketProtocol> protocol;
 		std::optional<connection_hdl> client;
+		std::optional<std::pair<util::PeriodicScheduler<>::eventid_t, util::Watchdog<>>>
+			heartbeatInfo;
+		std::mutex mutex;
 	};
 
 	std::string serverName;
@@ -106,11 +110,13 @@ private:
 	bool isRunning;
 	std::map<std::string, ProtocolData> protocolMap;
 	std::thread serverThread;
+	util::PeriodicScheduler<> pingScheduler;
 
 	bool validate(connection_hdl hdl);
 	void onOpen(connection_hdl hdl);
 	void onClose(connection_hdl hdl);
 	void onMessage(connection_hdl hdl, message_t message);
+	void onPong(connection_hdl hdl, const std::string& payload);
 	void serverTask();
 };
 } // namespace websocket

@@ -2,6 +2,7 @@
 
 #include "../../Constants.h"
 #include "../../log.h"
+#include "../../utils/core.h"
 
 #include <string>
 namespace net {
@@ -26,6 +27,8 @@ SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16
 	server.set_validate_handler([&](connection_hdl hdl) { return this->validate(hdl); });
 	server.set_message_handler(
 		[&](connection_hdl hdl, message_t msg) { this->onMessage(hdl, msg); });
+	server.set_pong_handler(
+		[&](connection_hdl hdl, std::string payload) { this->onPong(hdl, payload); });
 }
 
 SingleClientWSServer::~SingleClientWSServer() {
@@ -80,6 +83,27 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 	std::string path = protocol->getProtocolPath();
 	if (protocolMap.find(path) == protocolMap.end()) {
 		protocolMap.emplace(path, std::move(protocol));
+		auto& protocolData = protocolMap.at(path);
+		const auto& heartbeatInfo = protocolData.protocol->heartbeatInfo;
+		if (heartbeatInfo.has_value()) {
+			auto eventID =
+				pingScheduler.scheduleEvent(heartbeatInfo->first / 2, [this, path]() {
+					auto& pd = this->protocolMap.at(path);
+					std::lock_guard lock(pd.mutex);
+					if (pd.client.has_value()) {
+						log(LOG_DEBUG, "Ping!\n");
+						server.ping(pd.client.value(), path);
+					}
+				});
+			std::lock_guard l(protocolData.mutex);
+			// util::Watchdog is non-copyable and non-movable, so we must create in-place
+			// Since we want to create a member field of the pair in-place, it gets complicated
+			// so we have to use piecewise_construct to allow us to separately initialize all
+			// pair fields in-place
+			protocolData.heartbeatInfo.emplace(std::piecewise_construct,
+											   std::tuple<decltype(eventID)>{eventID},
+											   util::pairToTuple(heartbeatInfo.value()));
+		}
 		return true;
 	} else {
 		return false;
@@ -147,8 +171,15 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 		serverName.c_str(), path.c_str(), client.c_str());
 
 	auto& protocolData = protocolMap.at(path);
-	protocolData.client.reset();
-	protocolData.protocol->clientDisconnected();
+	{
+		std::lock_guard lock(protocolData.mutex);
+		protocolData.client.reset();
+		if (protocolData.heartbeatInfo.has_value()) {
+			pingScheduler.removeEvent(protocolData.heartbeatInfo->first);
+			protocolData.heartbeatInfo.reset();
+		}
+		protocolData.protocol->clientDisconnected();
+	}
 }
 
 void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
@@ -161,6 +192,19 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	log(LOG_TRACE, "Message on %s: %s\n", path.c_str(), jsonStr.c_str());
 	json obj = json::parse(jsonStr);
 	protocolMap.at(path).protocol->processMessage(obj);
+}
+
+void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload) {
+	log(LOG_DEBUG, "Pong from %s\n", payload.c_str());
+	auto conn = server.get_con_from_hdl(hdl);
+
+	assert(protocolMap.find(payload) != protocolMap.end());
+
+	auto& pd = protocolMap.at(payload);
+	std::lock_guard lock(pd.mutex);
+	if (pd.heartbeatInfo.has_value()) {
+		pd.heartbeatInfo->second.feed();
+	}
 }
 } // namespace websocket
 } // namespace net
