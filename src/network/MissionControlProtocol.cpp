@@ -185,24 +185,31 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 }
 
 void MissionControlProtocol::sendRoverPos() {
-	auto heading = robot::readIMUHeading();
-	auto gps = robot::readGPS();
-	if (gps.isValid() && heading.isValid()) {
-		double orientX = 0.0;
-		double orientY = 0.0;
-		double orientZ = std::sin(heading.getData() / 2);
-		double orientW = std::cos(heading.getData() / 2);
-		double posX = gps.getData()[0];
-		double posY = gps.getData()[1];
+	auto imu = robot::readIMU();
+	auto gps = gps::readGPSCoords();
+	log(LOG_DEBUG, "imu=%d, gps=%d\n", imu.isValid(), gps.isValid());
+	if (imu.isValid()) {
+		auto rpy = imu.getData();
+		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
+								Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
+								Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()));
+		double posX = 0, posY = 0;
+		if (gps.isValid()) {
+			posX = gps.getData().lon;
+			posY = gps.getData().lat;
+		}
 		double posZ = 0.0;
-		double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
-		double headingRecency = util::durationToSec(dataclock::now() - heading.getTime());
-		double recency = std::max(gpsRecency, headingRecency);
+		double imuRecency = util::durationToSec(dataclock::now() - imu.getTime());
+		double recency = imuRecency;
+		if (gps.isValid()) {
+			double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
+			recency = std::max(recency, gpsRecency);
+		}
 		json msg = {{"type", ROVER_POS_REP_TYPE},
-					{"orientW", orientW},
-					{"orientX", orientX},
-					{"orientY", orientY},
-					{"orientZ", orientZ},
+					{"orientW", quat.w()},
+					{"orientX", quat.x()},
+					{"orientY", quat.y()},
+					{"orientZ", quat.z()},
 					{"posX", posX},
 					{"posY", posY},
 					{"posZ", posZ},

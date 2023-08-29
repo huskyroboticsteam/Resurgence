@@ -43,7 +43,7 @@ landmarks_t readLandmarks() {
 	return landmarks_t{};
 }
 
-DataPoint<double> readIMUHeading() {
+types::DataPoint<navtypes::eulerangles_t> readIMU() {
 	return {};
 }
 
