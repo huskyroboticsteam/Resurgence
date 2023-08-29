@@ -12,7 +12,7 @@
 #include <vector>
 
 extern "C" {
-#include "../HindsightCAN/CANScience.h"
+#include <HindsightCAN/CANScience.h>
 }
 
 using namespace std::chrono_literals;

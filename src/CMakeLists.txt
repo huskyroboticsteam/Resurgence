@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
+include(FetchContent)
+
 # If a build type was not explicitly specified, default to "RelWithDebInfo" (Same optimization
 # as the "Release" configuration but with debugging symbols).
 #
@@ -109,7 +111,12 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Find the CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
-find_package(HindsightCAN 1.4.0 REQUIRED)
+FetchContent_Declare(
+    HindsightCAN
+    GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
+    GIT_TAG 09d0b2785ccd27536ca0381146b822205f2fad47 # TODO: update after pr is merged
+)
+FetchContent_MakeAvailable(HindsightCAN)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -197,7 +204,7 @@ else()
     CAN/CANStubs.cpp)
 endif()
 target_link_libraries(can_interface PUBLIC
-  HindsightCAN::HindsightCAN
+  HindsightCAN
   Threads::Threads
   utils
 )
