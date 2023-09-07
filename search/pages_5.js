@@ -1,12 +1,8 @@
 var searchData=
 [
-  ['eigen_20and_20multi_2dthreading_0',['Eigen and multi-threading',['https://eigen.tuxfamily.org/dox/TopicMultiThreading.html',1,'']]],
-  ['epipolar_20geometry_1',['Epipolar Geometry',['https://docs.opencv.org/4.2.0/da/de9/tutorial_py_epipolar_geometry.html',1,'']]],
-  ['eroding_20and_20dilating_2',['Eroding and Dilating',['https://docs.opencv.org/4.2.0/db/df6/tutorial_erosion_dilatation.html',1,'']]],
-  ['experimental_20parts_20of_20eigen_3',['Experimental parts of Eigen',['https://eigen.tuxfamily.org/dox/Experimental.html',1,'']]],
-  ['exporting_20a_20template_20parameter_20file_4',['Exporting a template parameter file',['https://docs.opencv.org/4.2.0/df/dc0/tutorial_qds_export_parameters.html',1,'']]],
-  ['expression_20templates_20in_20eigen_5',['Expression templates in Eigen',['https://eigen.tuxfamily.org/dox/TopicEigenExpressionTemplates.html',1,'']]],
-  ['extending_20matrixbase_20_28and_20other_20classes_29_6',['Extending MatrixBase (and other classes)',['https://eigen.tuxfamily.org/dox/TopicCustomizing_Plugins.html',1,'']]],
-  ['extending_2fcustomizing_20eigen_7',['Extending/Customizing Eigen',['https://eigen.tuxfamily.org/dox/UserManual_CustomizingEigen.html',1,'']]],
-  ['extract_20horizontal_20and_20vertical_20lines_20by_20using_20morphological_20operations_8',['Extract horizontal and vertical lines by using morphological operations',['https://docs.opencv.org/4.2.0/dd/dd7/tutorial_morph_lines_detection.html',1,'']]]
+  ['_3a_202d_20histograms_0',['Histograms - 3 : 2D Histograms',['https://docs.opencv.org/4.2.0/dd/d0d/tutorial_py_2d_histogram.html',1,'']]],
+  ['_3a_20find_20plot_20analyze_1',[': find plot analyze',['https://docs.opencv.org/4.2.0/d1/db7/tutorial_py_histogram_begins.html',1,'Histograms - 1 : Find, Plot, Analyze !!!'],['https://docs.opencv.org/4.2.0/d7/d32/tutorial_js_histogram_begins.html',1,'Histograms - 1 : Find, Plot, Analyze !!!']]],
+  ['_3a_20getting_20started_2',[': getting started',['https://docs.opencv.org/4.2.0/d4/d73/tutorial_py_contours_begin.html',1,'Contours : Getting Started'],['https://docs.opencv.org/4.2.0/d5/daa/tutorial_js_contours_begin.html',1,'Contours : Getting Started']]],
+  ['_3a_20histogram_20backprojection_3',[': histogram backprojection',['https://docs.opencv.org/4.2.0/dd/d4d/tutorial_js_histogram_backprojection.html',1,'Histogram - 3 : Histogram Backprojection'],['https://docs.opencv.org/4.2.0/dc/df6/tutorial_py_histogram_backprojection.html',1,'Histogram - 4 : Histogram Backprojection']]],
+  ['_3a_20more_20functions_4',[': more functions',['https://docs.opencv.org/4.2.0/d5/d45/tutorial_py_contours_more_functions.html',1,'Contours : More Functions'],['https://docs.opencv.org/4.2.0/d8/d1c/tutorial_js_contours_more_functions.html',1,'Contours : More Functions']]]
 ];

@@ -1,13 +1,10 @@
 var searchData=
 [
-  ['back_20projection_0',['Back Projection',['https://docs.opencv.org/4.2.0/da/d7f/tutorial_back_projection.html',1,'']]],
-  ['background_20subtraction_1',['Background Subtraction',['https://docs.opencv.org/4.2.0/d8/d38/tutorial_bgsegm_bg_subtraction.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/de/df4/tutorial_js_bg_subtraction.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/db/d5c/tutorial_py_bg_subtraction.html',1,'(Global Namespace)']]],
-  ['basic_20concepts_20of_20the_20homography_20explained_20with_20code_2',['Basic concepts of the homography explained with code',['https://docs.opencv.org/4.2.0/d9/dab/tutorial_homography.html',1,'']]],
-  ['basic_20drawing_3',['Basic Drawing',['https://docs.opencv.org/4.2.0/d3/d96/tutorial_basic_geometric_drawing.html',1,'']]],
-  ['basic_20operations_20on_20images_4',['Basic Operations on Images',['https://docs.opencv.org/4.2.0/de/d06/tutorial_js_basic_ops.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d3/df2/tutorial_py_basic_ops.html',1,'(Global Namespace)']]],
-  ['basic_20thresholding_20operations_5',['Basic Thresholding Operations',['https://docs.opencv.org/4.2.0/db/d8e/tutorial_threshold.html',1,'']]],
-  ['bioinspired_20module_20retina_20introduction_6',['Bioinspired Module Retina Introduction',['https://docs.opencv.org/4.2.0/d2/d94/bioinspired_retina.html',1,'']]],
-  ['brief_20_28binary_20robust_20independent_20elementary_20features_29_7',['BRIEF (Binary Robust Independent Elementary Features)',['https://docs.opencv.org/4.2.0/dc/d7d/tutorial_py_brief.html',1,'']]],
-  ['build_20opencv_2ejs_8',['Build OpenCV.js',['https://docs.opencv.org/4.2.0/d4/da1/tutorial_js_setup.html',1,'']]],
-  ['building_20opencv_20for_20tegra_20with_20cuda_9',['Building OpenCV for Tegra with CUDA',['https://docs.opencv.org/4.2.0/d6/d15/tutorial_building_tegra_cuda.html',1,'']]]
+  ['3_209_201_0',['Tesseract (master) installation by using git-bash (version&gt;=2.14.1) and cmake (version &gt;=3.9.1)',['https://docs.opencv.org/4.2.0/db/d4c/tutorial_install_tesseract.html',1,'']]],
+  ['3_20_3a_202d_20histograms_1',['Histograms - 3 : 2D Histograms',['https://docs.opencv.org/4.2.0/dd/d0d/tutorial_py_2d_histogram.html',1,'']]],
+  ['3_20_3a_20histogram_20backprojection_2',['Histogram - 3 : Histogram Backprojection',['https://docs.opencv.org/4.2.0/dd/d4d/tutorial_js_histogram_backprojection.html',1,'']]],
+  ['3d_20histogram_3',['Creating a 3D histogram',['https://docs.opencv.org/4.2.0/d1/d1d/tutorial_histo3D.html',1,'']]],
+  ['3d_20object_20classification_20and_20pose_20estimation_4',['CNN for 3D Object Classification and Pose Estimation',['https://docs.opencv.org/4.2.0/d2/d42/tutorial_table_of_content_cnn_3dobj.html',1,'']]],
+  ['3d_20reconstruction_5',['Camera Calibration and 3D Reconstruction',['https://docs.opencv.org/4.2.0/d9/db7/tutorial_py_table_of_contents_calib3d.html',1,'']]],
+  ['3d_20reconstruction_20calib3d_20module_6',['Camera calibration and 3D reconstruction (calib3d module)',['https://docs.opencv.org/4.2.0/d6/d55/tutorial_table_of_content_calib3d.html',1,'']]]
 ];

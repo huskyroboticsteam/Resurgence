@@ -18,7 +18,6 @@ var searchData=
   ['quaternionbase_3c_20map_3c_20const_20quaternion_3c_20_5fscalar_20_3e_2c_20_5foptions_20_3e_20_3e_15',['QuaternionBase&lt; Map&lt; const Quaternion&lt; _Scalar &gt;, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
   ['quaternionbase_3c_20map_3c_20quaternion_3c_20_5fscalar_20_3e_2c_20_5foptions_20_3e_20_3e_16',['QuaternionBase&lt; Map&lt; Quaternion&lt; _Scalar &gt;, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
   ['quaternionbase_3c_20quaternion_3c_20_5fscalar_2c_20_5foptions_20_3e_20_3e_17',['QuaternionBase&lt; Quaternion&lt; _Scalar, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
-  ['queue_18',['Queue',['https://docs.opencv.org/4.2.0/dd/dc0/classcv_1_1ocl_1_1Queue.html',1,'cv::ocl']]],
-  ['queue_19',['queue',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07807.html',1,'std']]],
-  ['quicksort_5ftag_20',['quicksort_tag',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09755.html',1,'__gnu_parallel']]]
+  ['queue_18',['queue',['https://docs.opencv.org/4.2.0/dd/dc0/classcv_1_1ocl_1_1Queue.html',1,'cv::ocl::Queue'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07807.html',1,'std::queue&lt; _Tp, _Sequence &gt;']]],
+  ['quicksort_5ftag_19',['quicksort_tag',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09755.html',1,'__gnu_parallel']]]
 ];

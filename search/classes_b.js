@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['kalmanfilter_0',['KalmanFilter',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html',1,'cv::KalmanFilter'],['../classfilters_1_1KalmanFilter.html',1,'filters::KalmanFilter&lt; stateDim, inputDim, outputDim &gt;']]],
+  ['kalmanfilter_0',['kalmanfilter',['../classfilters_1_1KalmanFilter.html',1,'filters::KalmanFilter&lt; stateDim, inputDim, outputDim &gt;'],['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html',1,'cv::KalmanFilter']]],
   ['kalmanfilter_3c_203_2c_203_2c_203_20_3e_1',['KalmanFilter&lt; 3, 3, 3 &gt;',['../classfilters_1_1KalmanFilter.html',1,'filters']]],
   ['kalmanfilterbase_2',['KalmanFilterBase',['../classfilters_1_1KalmanFilterBase.html',1,'filters']]],
   ['kaze_3',['KAZE',['https://docs.opencv.org/4.2.0/d3/d61/classcv_1_1KAZE.html',1,'cv']]],
   ['keep_5fdiag_4',['keep_diag',['https://eigen.tuxfamily.org/dox/structEigen_1_1IncompleteLUT_1_1keep__diag.html',1,'Eigen::IncompleteLUT&lt; class, class &gt;::keep_diag'],['https://eigen.tuxfamily.org/dox/structEigen_1_1SimplicialCholeskyBase_1_1keep__diag.html',1,'Eigen::SimplicialCholeskyBase::keep_diag']]],
-  ['kernel_5',['Kernel',['https://docs.opencv.org/4.2.0/d7/db8/classcv_1_1ml_1_1SVM_1_1Kernel.html',1,'cv::ml::SVM::Kernel'],['https://docs.opencv.org/4.2.0/dd/d4c/classcv_1_1ocl_1_1Kernel.html',1,'cv::ocl::Kernel']]],
+  ['kernel_5',['kernel',['https://docs.opencv.org/4.2.0/d7/db8/classcv_1_1ml_1_1SVM_1_1Kernel.html',1,'cv::ml::SVM::Kernel'],['https://docs.opencv.org/4.2.0/dd/d4c/classcv_1_1ocl_1_1Kernel.html',1,'cv::ocl::Kernel']]],
   ['kernelarg_6',['KernelArg',['https://docs.opencv.org/4.2.0/d3/d17/classcv_1_1ocl_1_1KernelArg.html',1,'cv::ocl']]],
   ['kerneltag_7',['KernelTag',['https://docs.opencv.org/4.2.0/d4/d88/structcv_1_1detail_1_1KernelTag.html',1,'cv::detail']]],
   ['kerneltypemedium_8',['KernelTypeMedium',['https://docs.opencv.org/4.2.0/d9/d05/structcv_1_1detail_1_1KernelTypeMedium.html',1,'cv::detail']]],

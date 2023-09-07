@@ -114,7 +114,7 @@ var searchData=
   ['gr_5fchalearnobj_111',['GR_chalearnObj',['https://docs.opencv.org/4.2.0/d3/dad/structcv_1_1datasets_1_1GR__chalearnObj.html',1,'cv::datasets']]],
   ['gr_5fskig_112',['GR_skig',['https://docs.opencv.org/4.2.0/d0/deb/classcv_1_1datasets_1_1GR__skig.html',1,'cv::datasets']]],
   ['gr_5fskigobj_113',['GR_skigObj',['https://docs.opencv.org/4.2.0/d6/d4b/structcv_1_1datasets_1_1GR__skigObj.html',1,'cv::datasets']]],
-  ['graph_114',['Graph',['https://docs.opencv.org/4.2.0/dc/d4c/classcv_1_1detail_1_1Graph.html',1,'cv::detail::Graph'],['../classfilters_1_1pose__graph_1_1Graph.html',1,'filters::pose_graph::Graph']]],
+  ['graph_114',['graph',['https://docs.opencv.org/4.2.0/dc/d4c/classcv_1_1detail_1_1Graph.html',1,'cv::detail::Graph'],['../classfilters_1_1pose__graph_1_1Graph.html',1,'filters::pose_graph::Graph']]],
   ['graph_5fdump_5fpath_115',['graph_dump_path',['https://docs.opencv.org/4.2.0/d9/d2e/structcv_1_1graph__dump__path.html',1,'cv']]],
   ['graphcutseamfinder_116',['GraphCutSeamFinder',['https://docs.opencv.org/4.2.0/db/dda/classcv_1_1detail_1_1GraphCutSeamFinder.html',1,'cv::detail']]],
   ['graphcutseamfinderbase_117',['GraphCutSeamFinderBase',['https://docs.opencv.org/4.2.0/d0/d03/classcv_1_1detail_1_1GraphCutSeamFinderBase.html',1,'cv::detail']]],
