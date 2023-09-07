@@ -129,7 +129,7 @@ void openCamera(CameraID camID, const char* cameraPath) {
 }
 
 void setupCameras() {
-	// openCamera(Constants::AR_CAMERA_ID, Constants::AR_CAMERA_CONFIG_PATH);
+	openCamera(Constants::AR_CAMERA_ID, Constants::AR_CAMERA_CONFIG_PATH);
 	openCamera(Constants::HAND_CAMERA_ID, Constants::HAND_CAMERA_CONFIG_PATH);
 }
 } // namespace
