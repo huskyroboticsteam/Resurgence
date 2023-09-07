@@ -4,6 +4,7 @@
 #include "../Globals.h"
 #include "../base64/base64_img.h"
 #include "../log.h"
+#include "../utils/core.h"
 #include "../utils/json.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
@@ -187,7 +188,8 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 void MissionControlProtocol::sendRoverPos() {
 	auto imu = robot::readIMU();
 	auto gps = gps::readGPSCoords();
-	log(LOG_DEBUG, "imu=%d, gps=%d\n", imu.isValid(), gps.isValid());
+	log(LOG_DEBUG, "imu_valid=%d, gps_valid=%d\n", util::to_string(imu.isValid()),
+		util::to_string(gps.isValid()));
 	if (imu.isValid()) {
 		auto rpy = imu.getData();
 		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *

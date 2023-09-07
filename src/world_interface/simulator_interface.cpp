@@ -368,7 +368,7 @@ DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
 
-types::DataPoint<navtypes::eulerangles_t> readIMU() {
+DataPoint<navtypes::eulerangles_t> readIMU() {
 	std::lock_guard<std::mutex> guard(attitudeMutex);
 	return lastAttitude;
 }
