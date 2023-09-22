@@ -212,7 +212,9 @@ public:
 			quitting = true;
 		}
 		cv.notify_all();
-		thread.join();
+		if (thread.joinable()) {
+			thread.join();
+		}
 	}
 
 	Watchdog& operator=(const Watchdog&) = delete;
