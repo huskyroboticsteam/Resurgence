@@ -21,5 +21,8 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 
 	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
 	foo.set_setpoint({10.0, 0.0});
-	REQUIRE(foo.get_setpoint(robot::types::dataclock::now()).norm() == 1.0);
+	REQUIRE(foo.get_setpoint(robot::types::dataclock::now()).norm() == 9.5);
+
+	foo.set_setpoint({9.0, 0.0});
+	REQUIRE(foo.get_setpoint(robot::types::dataclock::now()).norm() == 9.5);
 }
