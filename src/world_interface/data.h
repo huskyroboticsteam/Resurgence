@@ -6,6 +6,7 @@
 #include <bitset>
 #include <chrono>
 #include <optional>
+#include <type_traits>
 #include <vector>
 
 #include <frozen/string.h>
@@ -29,7 +30,8 @@ using dataclock = std::chrono::steady_clock;
 /** @brief A point in time as measured by dataclock */
 using datatime_t = std::chrono::time_point<dataclock>;
 
-template <typename T> class DataPoint;
+template <typename T>
+class DataPoint;
 
 /**
  * @brief A data structure that represents when each landmark was seen.
@@ -108,7 +110,8 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
  *
  * @tparam T The type of data measured from the sensor.
  */
-template <typename T> class DataPoint {
+template <typename T>
+class DataPoint {
 public:
 	/**
 	 * @brief Construct an invalid DataPoint, holding no data
@@ -198,6 +201,24 @@ public:
 	 */
 	T getDataOrElse(T defaultData) {
 		return isValid() ? getData() : defaultData;
+	}
+
+	/**
+	 * @brief Transforms the data in this datapoint by the given function.
+	 *
+	 * @tparam F A callable type that accepts @p T and outputs some other type.
+	 * @param f The function that transforms data.
+	 * @return DataPoint<std::invoke_result_t<F, T>> A new datapoint that holds
+	 * the output of `f(getData())` and has the same timestamp as this datapoint
+	 * if it's valid, otherwise an empty datapoint.
+	 */
+	template <typename F>
+	DataPoint<std::invoke_result_t<F, T>> transform(const F& f) {
+		if (isValid()) {
+			return DataPoint<std::invoke_result_t<F, T>>(getTime(), f(getData()));
+		} else {
+			return {};
+		}
 	}
 
 private:

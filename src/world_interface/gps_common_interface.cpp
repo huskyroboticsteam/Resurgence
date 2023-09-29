@@ -10,6 +10,10 @@ static std::optional<GPSToMetersConverter> converter;
 
 namespace robot {
 
+DataPoint<double> readIMUHeading() {
+	return readIMU().transform([](const navtypes::eulerangles_t& e) { return e.yaw; });
+}
+
 DataPoint<point_t> readGPS() {
 	DataPoint<gpscoords_t> coords = gps::readGPSCoords();
 	if (!coords) {
