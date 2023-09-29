@@ -34,7 +34,9 @@ public:
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
 						kinematics::PlanarArmKinematics<N> kin_obj,
 						const double safetyFactor)
-		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {}
+		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {
+		assert(safetyFactor > 0.0 && safetyFactor < 1.0);		
+	}
 
 	/**
 	 * @brief Sets the end effector setpoint / target position.
