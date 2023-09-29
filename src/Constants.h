@@ -56,17 +56,6 @@ constexpr double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_
 const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 							  .wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
-// Joint limits
-// TODO: make sure these are still accurate with the new arm.
-constexpr double ARM_BASE_MIN = -M_PI / 2;
-constexpr double ARM_BASE_MAX = M_PI / 2;
-// constexpr double SHOULDER_MIN = M_PI / 2; // TODO mechanical problem with the moon gear.
-//                                             Use this value during actual rover operation.
-constexpr double SHOULDER_MIN = 0.0;
-constexpr double SHOULDER_MAX = M_PI * 5. / 6.; // Can't quite lie flat
-constexpr double ELBOW_MIN = 0.0;
-constexpr double ELBOW_MAX = M_PI * 29. / 30.; // I think this should prevent self-collisions
-
 // TODO: We need to recalibrate the camera, since we replaced it with a different one.
 // TODO: rename cameras (in MC as well) as appropriate
 constexpr const char* AR_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
@@ -146,6 +135,10 @@ constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t
 
 // Arm inverse kinematics
 namespace arm {
+/** 
+ * Percentage of fully extended overall arm length to limit arm extension within.
+ */
+constexpr double SAFETY_FACTOR = 0.95;
 
 /**
  * Maximum commanded end-effector velocity, in m/s
