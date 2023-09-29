@@ -68,12 +68,13 @@ public:
 		}
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
-		double radius = kin.getSegLens().sum();
-		if (pos.norm() > safetyFactor * radius) {
+		double radius = kin.getSegLens().sum() * safetyFactor;
+		if (pos.norm() > radius) {
 			// new position is outside of bounds
 			// TODO: will need to eventually shrink velocity vector until it is within radius
 			// instead of just normalizing it
 			pos.normalize();
+			pos *= radius;
 		}
 		return pos;
 	}
