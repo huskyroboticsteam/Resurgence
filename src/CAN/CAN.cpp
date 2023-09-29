@@ -23,7 +23,7 @@
 #include <sys/types.h>
 
 extern "C" {
-#include "../HindsightCAN/CANCommon.h"
+#include <HindsightCAN/CANCommon.h>
 }
 
 using robot::types::DataPoint;
