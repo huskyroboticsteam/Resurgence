@@ -1,8 +1,8 @@
 #include "../log.h"
 #include "CAN.h"
 extern "C" {
-#include "../HindsightCAN/CANCommon.h"
-#include "../HindsightCAN/CANSerialNumbers.h"
+#include <HindsightCAN/CANCommon.h>
+#include <HindsightCAN/CANSerialNumbers.h>
 }
 
 #include <chrono>
