@@ -29,10 +29,12 @@ public:
 	 * @param currJointPos The current joint positions of the arm.
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
 	 * arm joints).
+	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to prevent singularity lock.
 	 */
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
-						kinematics::PlanarArmKinematics<N> kin_obj)
-		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}) {}
+						kinematics::PlanarArmKinematics<N> kin_obj,
+						const double safetyFactor)
+		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {}
 
 	/**
 	 * @brief Sets the end effector setpoint / target position.
@@ -65,7 +67,7 @@ public:
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
 		double radius = kin.getSegLens().sum();
-		if (pos.norm() > radius) {
+		if (pos.norm() > safetyFactor * radius) {
 			// new position is outside of bounds
 			// TODO: will need to eventually shrink velocity vector until it is within radius
 			// instead of just normalizing it
@@ -135,5 +137,6 @@ private:
 	Eigen::Vector2d setpoint;
 	Eigen::Vector2d velocity;
 	std::optional<robot::types::datatime_t> velTimestamp;
+	const double safetyFactor;
 };
 } // namespace control

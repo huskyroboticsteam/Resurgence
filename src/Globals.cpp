@@ -41,6 +41,6 @@ robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperip
 const kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
 	planarArmKinematics(getSegLens(), getJointLimits(true), getJointLimits(false),
 						IK_SOLVER_THRESH, IK_SOLVER_MAX_ITER);
-control::PlanarArmController<2> planarArmController({0, 0}, planarArmKinematics);
+control::PlanarArmController<2> planarArmController({0, 0}, planarArmKinematics, 0.95);
 std::atomic<bool> armIKEnabled = false;
 } // namespace Globals
