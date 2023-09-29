@@ -1,4 +1,5 @@
 #include "../../src/control/PlanarArmController.h"
+#include "../../src/Constants.h"
 
 #include <catch2/catch.hpp>
 
@@ -9,5 +10,10 @@ using namespace std::chrono_literals;
 TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
 	navtypes::Vectord<2> vec({0, 0});
 	kinematics::PlanarArmKinematics<2> kin_obj(vec, vec, vec, 0.0, 0);
-	PlanarArmController<2> foo({0, 0}, kin_obj);
+	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
+}
+
+TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
+	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
+	
 }
