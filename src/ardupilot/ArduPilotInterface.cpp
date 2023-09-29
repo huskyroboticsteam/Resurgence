@@ -25,11 +25,7 @@ DataPoint<gpscoords_t> readGPSCoords() {
 } // namespace gps
 
 namespace robot {
-DataPoint<double> readIMUHeading() {
-	auto imu_heading = ardupilot_protocol->getIMU();
-	if (imu_heading.isValid()) {
-		return DataPoint<double>(imu_heading.getTime(), imu_heading.getData().yaw);
-	}
-	return DataPoint<double>();
+DataPoint<eulerangles_t> readIMU() {
+	return ardupilot_protocol->getIMU();
 }
 } // namespace robot
