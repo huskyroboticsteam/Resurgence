@@ -17,7 +17,8 @@ public:
 	virtual void notify() = 0;
 };
 
-template <typename T> void notifyScheduler(T& scheduler);
+template <typename T>
+void notifyScheduler(T& scheduler);
 } // namespace impl
 
 /**
@@ -280,7 +281,8 @@ namespace impl {
  *
  * @warning Client code should NOT use this.
  */
-template <typename T> void notifyScheduler(T& scheduler) {
+template <typename T>
+void notifyScheduler(T& scheduler) {
 	Notifiable& n = scheduler;
 	n.notify();
 }

@@ -73,7 +73,8 @@ frozen::string freezeStr(const std::string& str);
  * @param pair The pair to convert to a tuple.
  * @return std::tuple<T, U> The converted tuple.
  */
-template <typename T, typename U> std::tuple<T, U> pairToTuple(const std::pair<T, U>& pair) {
+template <typename T, typename U>
+std::tuple<T, U> pairToTuple(const std::pair<T, U>& pair) {
 	return std::tuple<T, U>(pair.first, pair.second);
 }
 
