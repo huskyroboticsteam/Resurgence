@@ -1,7 +1,7 @@
 <map id="filters::pose_graph::OdomFactor2D" name="filters::pose_graph::OdomFactor2D">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,183,131,223"/>
 <area shape="rect" id="Node000002" href="$classfilters_1_1pose__graph_1_1Factor.html" title=" " alt="" coords="5,94,131,135"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,149,71,182,65,182,65,149"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,150,71,182,65,182,65,150"/>
 <area shape="rect" id="Node000003" href="$classfilters_1_1pose__graph_1_1AbstractFactor.html" title=" " alt="" coords="5,5,131,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,61,71,94,65,94,65,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,62,71,94,65,94,65,62"/>
 </map>

@@ -126,6 +126,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9eb4f657f3e8e37011d6c27dbcc160b1" id="r_a9eb4f657f3e8e37011d6c27dbcc160b1"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot_1_1types_1_1DataPoint.html#a9eb4f657f3e8e37011d6c27dbcc160b1">getDataOrElse</a> (T defaultData)</td></tr>
 <tr class="memdesc:a9eb4f657f3e8e37011d6c27dbcc160b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of this data point, defaulting to a given value if this data point is invalid.  <br /></td></tr>
 <tr class="separator:a9eb4f657f3e8e37011d6c27dbcc160b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8650e0e36ef570694b8cddd666c12b9e" id="r_a8650e0e36ef570694b8cddd666c12b9e"><td class="memTemplParams" colspan="2">template&lt;typename F &gt; </td></tr>
+<tr class="memitem:a8650e0e36ef570694b8cddd666c12b9e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; std::invoke_result_t&lt; F, T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrobot_1_1types_1_1DataPoint.html#a8650e0e36ef570694b8cddd666c12b9e">transform</a> (const F &amp;f)</td></tr>
+<tr class="memdesc:a8650e0e36ef570694b8cddd666c12b9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the data in this datapoint by the given function.  <br /></td></tr>
+<tr class="separator:a8650e0e36ef570694b8cddd666c12b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
@@ -446,6 +450,51 @@ template&lt;typename T &gt; </div>
 <p>Implicitly convert to the required data type. </p>
 <p>UB if datapoint is invalid. Equivalent to <a class="el" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9" title="Get the value of this data point.">getData()</a>.</p>
 <dl class="section return"><dt>Returns</dt><dd>T The value of this datapoint. </dd></dl>
+
+</div>
+</div>
+<a id="a8650e0e36ef570694b8cddd666c12b9e" name="a8650e0e36ef570694b8cddd666c12b9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8650e0e36ef570694b8cddd666c12b9e">&#9670;&#160;</a></span>transform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<div class="memtemplate">
+template&lt;typename F &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; std::invoke_result_t&lt; F, T &gt; &gt; <a class="el" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a>&lt; T &gt;::transform </td>
+          <td>(</td>
+          <td class="paramtype">const F &amp;&#160;</td>
+          <td class="paramname"><em>f</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Transforms the data in this datapoint by the given function. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">F</td><td>A callable type that accepts <code>T</code> and outputs some other type. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">f</td><td>The function that transforms data. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c" title="Construct an invalid DataPoint, holding no data.">DataPoint&lt;std::invoke_result_t&lt;F, T&gt;&gt;</a> A new datapoint that holds the output of <code>f(getData())</code> and has the same timestamp as this datapoint if it's valid, otherwise an empty datapoint. </dd></dl>
 
 </div>
 </div>

@@ -133,6 +133,9 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a3f8fc5debdefdeabfc112aeb31ca114c" id="r_a3f8fc5debdefdeabfc112aeb31ca114c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="el" href="structnavtypes_1_1eulerangles__t.html">eulerangles_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a3f8fc5debdefdeabfc112aeb31ca114c">readIMU</a> ()</td></tr>
+<tr class="memdesc:a3f8fc5debdefdeabfc112aeb31ca114c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the rover attitude from the IMU.  <br /></td></tr>
+<tr class="separator:a3f8fc5debdefdeabfc112aeb31ca114c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa11e482ffaef27ea65955d70d7eaa6a9" id="r_aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#aa11e482ffaef27ea65955d70d7eaa6a9">readIMUHeading</a> ()</td></tr>
 <tr class="memdesc:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the current heading in the global map frame based on an IMU measurement.  <br /></td></tr>
 <tr class="separator:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -739,6 +742,28 @@ template&lt;unsigned long int N&gt; </div>
 <p>Get the current position in the global map frame based on a GPS measurement. </p>
 <p>Note that these values are NOT lat/long. Note that for the map frame, +x=+lat,+y=-lon.</p>
 <dl class="section return"><dt>Returns</dt><dd>DataPoint&lt;point_t&gt; The last GPS reading, in the map space. </dd></dl>
+
+</div>
+</div>
+<a id="a3f8fc5debdefdeabfc112aeb31ca114c" name="a3f8fc5debdefdeabfc112aeb31ca114c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f8fc5debdefdeabfc112aeb31ca114c">&#9670;&#160;</a></span>readIMU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="el" href="structnavtypes_1_1eulerangles__t.html">navtypes::eulerangles_t</a> &gt; robot::readIMU </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read the rover attitude from the IMU. </p>
+<p>Euler angles are in radians, in RPY format (i.e. XYZ extrinsic)</p>
+<dl class="section see"><dt>See also</dt><dd><a href="https://en.wikipedia.org/wiki/Euler_angles#Tait%E2%80%93Bryan_angles">https://en.wikipedia.org/wiki/Euler_angles#Tait%E2%80%93Bryan_angles</a></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>types::DataPoint&lt;navtypes::eulerangles_t&gt; </dd></dl>
 
 </div>
 </div>
