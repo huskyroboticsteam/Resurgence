@@ -109,7 +109,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Find the CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
-find_package(HindsightCAN 1.3.2 REQUIRED)
+find_package(HindsightCAN 1.4.0 REQUIRED)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)

@@ -125,16 +125,25 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 			util::to_string(joint).c_str());
 	}
 }
+
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
 		return getMotorPos(Constants::JOINT_MOTOR_MAP.at(joint));
-	}
-	// FIXME: need to do some extra work for differential - we will have to figure out which
-	// motor boards the potentiometers are plugged into and query those for "motor position"
-	else {
-		// FIXME: this should ideally never happen, but we don't have support for all joints
-		// yet because we don't know anything about the drill arm (and need to do extra work
-		// for the differential)
+	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
+		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
+			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+		if (armJointPositions.isValid()) {
+			Eigen::Vector2d eePos =
+				Globals::planarArmKinematics.jointPosToEEPos(armJointPositions.getData());
+			Eigen::Vector2i eePosInt = (1000 * eePos).array().round().cast<int>();
+			return DataPoint<int32_t>(armJointPositions.getTime(),
+									  joint == jointid_t::ikForward ? eePosInt.x()
+																	: eePosInt.y());
+		} else {
+			return {};
+		}
+	} else {
+		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		log(LOG_WARN, "getJointPos called for currently unsupported joint %s\n",
 			util::to_string(joint).c_str());
 		return {};
