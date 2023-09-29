@@ -23,6 +23,6 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	foo.set_setpoint({10.0, 0.0});
 	REQUIRE(foo.get_setpoint(robot::types::dataclock::now()).norm() == 9.5);
 
-	foo.set_setpoint({9.0, 0.0});
-	REQUIRE(foo.get_setpoint(robot::types::dataclock::now()).norm() == 9.5);
+	foo.set_setpoint({2.0, 3.0});
+	REQUIRE(fabs(foo.get_setpoint(robot::types::dataclock::now()).norm() - 2.1166861277) < 1e-6);
 }
