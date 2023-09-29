@@ -65,7 +65,7 @@ bool ArduPilotProtocol::validateGPSRequest(const json& j) {
 
 void ArduPilotProtocol::handleGPSRequest(const json& j) {
 	double lat = j["lat"];
-	double lon = j["lat"];
+	double lon = j["lon"];
 	{
 		std::lock_guard<std::mutex> lock(_lastGPSMutex);
 		_lastGPS = gpscoords_t{lat, lon};

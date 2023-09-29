@@ -44,9 +44,19 @@ std::unordered_set<K> keySet(const std::unordered_map<K, V>& input) {
  * @return A string representation of that value, as a std::string. The exact representation of
  * the value is up to the implementation.
  */
-template <typename T> std::string to_string(const T& val) {
+template <typename T>
+std::string to_string(const T& val) {
 	return std::to_string(val);
 }
+
+/**
+ * @brief Converts a boolean to a string.
+ *
+ * @param val The value to get the string representation of.
+ * @return "true" iff val, otherwise "false".
+ */
+template <>
+std::string to_string<bool>(const bool& val);
 
 /**
  * @brief Convert the given std::string to a frozen::string.

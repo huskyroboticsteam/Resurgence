@@ -17,3 +17,4 @@ IncludeCategories:
     Priority:	3
 IndentCaseLabels: true
 PointerAlignment: Left
+AlwaysBreakTemplateDeclarations: Yes

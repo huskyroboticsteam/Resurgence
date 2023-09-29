@@ -6,6 +6,11 @@ bool almostEqual(double a, double b, double threshold) {
 	return std::abs(a - b) < threshold;
 }
 
+template <>
+std::string to_string<bool>(const bool& val) {
+	return val ? "true" : "false";
+}
+
 frozen::string freezeStr(const std::string& str) {
 	return frozen::string(str.c_str(), str.size());
 }
