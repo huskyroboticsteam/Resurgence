@@ -135,7 +135,7 @@ constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t
 
 // Arm inverse kinematics
 namespace arm {
-/** 
+/**
  * Percentage of fully extended overall arm length to limit arm extension within.
  */
 constexpr double SAFETY_FACTOR = 0.95;

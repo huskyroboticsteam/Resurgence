@@ -29,13 +29,14 @@ public:
 	 * @param currJointPos The current joint positions of the arm.
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
 	 * arm joints).
-	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to prevent singularity lock.
+	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
+	 * prevent singularity lock.
 	 */
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
-						kinematics::PlanarArmKinematics<N> kin_obj,
-						const double safetyFactor)
-		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {
-		assert(safetyFactor > 0.0 && safetyFactor < 1.0);		
+						kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
+		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}),
+		  safetyFactor(safetyFactor) {
+		assert(safetyFactor > 0.0 && safetyFactor < 1.0);
 	}
 
 	/**
