@@ -72,8 +72,7 @@ public:
 		double radius = kin.getSegLens().sum() * safetyFactor;
 		if (pos.norm() > radius) {
 			// new position is outside of bounds
-			// TODO: will need to eventually shrink velocity vector until it is within radius
-			// instead of just normalizing it
+			// shrink velocity vector until it is within radius.
 			pos.normalize();
 			pos *= radius;
 		}
