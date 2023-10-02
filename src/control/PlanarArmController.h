@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <mutex>
 #include <numeric>
+#include <cmath>
 #include <optional>
 
 #include <Eigen/Core>
@@ -65,13 +66,20 @@ public:
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
 		double radius = kin.getSegLens().sum();
+		Eigen::Vector2d constrainedPos = pos;
 		if (pos.norm() > radius) {
-			// new position is outside of bounds
-			// TODO: will need to eventually shrink velocity vector until it is within radius
-			// instead of just normalizing it
-			pos.normalize();
+			// new position is outside of bounds. Shrink the velocity vector until it is within
+			// radius setpoint = setpoint inside circle pos = new setpoint outside circle
+			double diffDotProd = (pos - setpoint).dot(setpoint);
+			double differenceNorm = (pos - setpoint).squaredNorm();
+			double a =
+				-1 * diffDotProd +
+				std::sqrt(std::pow(diffDotProd, 2) -
+						  differenceNorm * (setpoint.squaredNorm() - std::pow(radius, 2))) /
+					differenceNorm;
+			constrainedPos = (1 - a) * setpoint + a * pos;
 		}
-		return pos;
+		return constrainedPos;
 	}
 
 	/**
