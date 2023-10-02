@@ -5,10 +5,10 @@
 #include "../world_interface/data.h"
 
 #include <array>
+#include <cmath>
 #include <initializer_list>
 #include <mutex>
 #include <numeric>
-#include <cmath>
 #include <optional>
 
 #include <Eigen/Core>
