@@ -64,7 +64,7 @@ private:
 	void handleJointPowerRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
-	void sendArmIKEnabledReport(const bool& isEnabled);
+	void sendArmIKEnabledReport();
 	void sendCameraStreamReport(const CameraID& cam,
 								const std::vector<std::basic_string<uint8_t>>& videoData);
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
