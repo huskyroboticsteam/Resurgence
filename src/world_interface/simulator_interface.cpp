@@ -48,9 +48,6 @@ std::mutex attitudeMutex;
 DataPoint<gpscoords_t> lastGPS;
 std::mutex gpsMutex;
 
-DataPoint<points_t> lastLidar;
-std::mutex lidarMutex;
-
 DataPoint<pose_t> lastTruePose;
 std::mutex truePoseMutex;
 
@@ -128,19 +125,6 @@ void handleGPS(json msg) {
 	gpscoords_t coords{msg["latitude"], msg["longitude"]};
 	std::lock_guard<std::mutex> guard(gpsMutex);
 	lastGPS = {coords};
-}
-
-void handleLidar(json msg) {
-	points_t lidar;
-	datatime_t now = dataclock::now();
-	const auto& arr = msg["points"];
-	for (const auto& point : arr) {
-		double r = point["r"];
-		double theta = point["theta"];
-		lidar.push_back({r * std::cos(theta), r * std::sin(theta), 1});
-	}
-	std::lock_guard<std::mutex> guard(lidarMutex);
-	lastLidar = {now, lidar};
 }
 
 void handleIMU(json msg) {
@@ -237,7 +221,8 @@ void clientDisconnected() {
 void initSimServer() {
 	auto protocol = std::make_unique<net::websocket::WebSocketProtocol>(PROTOCOL_PATH);
 	protocol->addMessageHandler("simImuOrientationReport", handleIMU);
-	protocol->addMessageHandler("simLidarReport", handleLidar);
+	// TODO: remove lidar report
+	protocol->addMessageHandler("simLidarReport", [](const nlohmann::json&) {});
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
@@ -358,11 +343,6 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 
 landmarks_t readLandmarks() {
 	return AR::readLandmarks();
-}
-
-DataPoint<points_t> readLidarScan() {
-	std::lock_guard<std::mutex> guard(lidarMutex);
-	return lastLidar;
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
