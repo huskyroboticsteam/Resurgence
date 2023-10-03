@@ -38,7 +38,7 @@ const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
 constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
-constexpr const char* ARM_IK_ENABLED_TYPE = "setArmIKEnabled";
+constexpr const char* ARM_IK_ENABLED_TYPE = "requestArmIKEnabled";
 constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
 constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
 constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
@@ -129,7 +129,7 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	this->setRequestedCmdVel(dtheta, dx);
 }
 
-void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
+void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 	bool enabled = j["enabled"];
 	if (enabled) {
 		Globals::armIKEnabled = false;
@@ -141,7 +141,10 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		// TODO: there should be a better way of handling invalid data than crashing.
 		// It should somehow just not enable IK, but then it needs to communicate back to MC
 		// that IK wasn't enabled?
-		CHECK_F(armJointPositions.isValid());
+		// FIX: Change setArmIKOn to requestArmIkOn.
+		// Create new packet: confirmIKOn packet
+		// Rover responds with confirmIKOn after requestArmIKOn is processed
+		assert(armJointPositions.isValid());
 		Globals::planarArmController.set_setpoint(armJointPositions.getData());
 		Globals::armIKEnabled = true;
 		_arm_ik_repeat_thread =
@@ -365,11 +368,11 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 							validateDriveRequest);
 	this->addMessageHandler(
 		ARM_IK_ENABLED_TYPE,
-		std::bind(&MissionControlProtocol::handleSetArmIKEnabled, this, _1),
+		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
 		validateArmIKEnable);
 	this->addMessageHandler(
 		ARM_IK_ENABLED_TYPE,
-		std::bind(&MissionControlProtocol::handleSetArmIKEnabled, this, _1),
+		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
 		validateArmIKEnable);
 	this->addMessageHandler(
 		JOINT_POWER_REQ_TYPE,
