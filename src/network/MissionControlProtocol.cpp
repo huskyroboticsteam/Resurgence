@@ -52,6 +52,7 @@ constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
 constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
+constexpr const char* ARM_IK_ENABLED_REP_TYPE = "armIKEnabledReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
 
@@ -140,20 +141,24 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 		// TODO: there should be a better way of handling invalid data than crashing.
 		// It should somehow just not enable IK, but then it needs to communicate back to MC
 		// that IK wasn't enabled?
-		// FIX: Change setArmIKOn to requestArmIkOn.
-		// Create new packet: confirmIKOn packet
-		// Rover responds with confirmIKOn after requestArmIKOn is processed
-		assert(armJointPositions.isValid());
-		Globals::planarArmController.set_setpoint(armJointPositions.getData());
-		Globals::armIKEnabled = true;
-		_arm_ik_repeat_thread =
-			std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+		// FIX: Change setArmIKOn to requestArmIKEnable.
+		// Create new packet: armIKEnabledReport packet
+		// Rover responds with armIKEnabledReport after requestArmIKEnable is processed
+		// On Mission Control side, if armIKEnabledReport is false after trying to enable,
+		// give an alert stating that IK was unable to activated.
+		if (armJointPositions.isValid()) {
+			Globals::planarArmController.set_setpoint(armJointPositions.getData());
+			Globals::armIKEnabled = true;
+			_arm_ik_repeat_thread =
+				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+		}
 	} else {
 		Globals::armIKEnabled = false;
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
 		}
 	}
+	sendArmIKEnabledReport(Globals::armIKEnabled);
 }
 
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
@@ -260,6 +265,12 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 	this->_open_streams.erase(cam);
 	this->_camera_encoders.erase(cam);
+}
+
+void MissionControlProtocol::sendArmIKEnabledReport() {
+	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE},
+				{"enabled", Globals::armIKEnabled}};
+	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
