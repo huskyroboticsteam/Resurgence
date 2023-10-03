@@ -47,7 +47,8 @@ public:
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
 		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
 		std::lock_guard<std::mutex> lock(mutex);
-		setpoint = newSetPoint;
+		double radius = kin.getSegLens().sum() * safetyFactor;
+		setpoint = normalizeVectorWithinRadius(newSetPoint, radius);
 	}
 
 	/**
