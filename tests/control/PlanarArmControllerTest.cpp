@@ -25,6 +25,9 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	REQUIRE(foo.get_setpoint(robot::types::dataclock::now()).norm() == 9.5);
 
 	foo.set_setpoint({2.0, 3.0});
-	REQUIRE(std::abs(foo.get_setpoint(robot::types::dataclock::now()).norm() - 2.1166861277) <
+	Eigen::Vector2d origSetPoint = kin_obj.jointPosToEEPos({2.0, 3.0});
+	double expectedNorm = origSetPoint.norm();
+
+	REQUIRE(std::abs(foo.get_setpoint(robot::types::dataclock::now()).norm() - expectedNorm) <
 			1e-6);
 }
