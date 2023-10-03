@@ -2,11 +2,39 @@
 
 #include "../../src/Constants.h"
 
+#include <iostream>
+
 #include <catch2/catch.hpp>
 
 using namespace Catch::literals;
 using namespace control;
 using namespace std::chrono_literals;
+
+constexpr double PI = M_PI;
+
+std::string toString(const Eigen::Vector2d& pose) {
+	std::stringstream ss;
+	ss << "(" << pose(0) << ", " << pose(1) << ")";
+	return ss.str();
+}
+
+void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double dist = 1e-5,
+				  double angle = 1e-5) {
+	Eigen::Vector2d diff = p1 - p2;
+	bool distEqual = diff.norm() <= dist;
+	double thetaDiff = std::fmod(abs(diff(1)), 2 * PI);
+	// change domain from [0, 2pi) to (-pi, pi]
+	if (thetaDiff > PI) {
+		thetaDiff -= 2 * PI;
+	}
+	bool angleEqual = abs(thetaDiff) <= angle;
+	if (distEqual && angleEqual) {
+		SUCCEED();
+	} else {
+		std::cout << "Expected: " << toString(p1) << ", Actual: " << toString(p2) << std::endl;
+		FAIL();
+	}
+}
 
 TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
 	navtypes::Vectord<2> vec({0, 0});
@@ -28,6 +56,5 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	Eigen::Vector2d origSetPoint = kin_obj.jointPosToEEPos({2.0, 3.0});
 	double expectedNorm = origSetPoint.norm();
 
-	REQUIRE(std::abs(foo.get_setpoint(robot::types::dataclock::now()).norm() - expectedNorm) <
-			1e-6);
+	assertApprox(origSetPoint, foo.get_setpoint(robot::types::dataclock::now()));
 }
