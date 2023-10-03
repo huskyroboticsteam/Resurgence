@@ -138,22 +138,22 @@ private:
 	const double safetyFactor;
 
 	/**
-	 * @brief Normalize the input vector to have a set radius,
+	 * @brief Normalize the input vector (end-effector position) to have a set radius,
 	 *  	  while maintaining the same direction it did before if it exceeds that set radius.
 	 *
-	 * @param input The input vector to normalize.
-	 * @param radius The radius to normalize the vector to.
+	 * @param eePos The end-effector position to normalize.
+	 * @param radius The radius to normalize the end-effector to.
 	 */
-	Eigen::Vector2d normalizeVectorWithinRadius(Eigen::Vector2d input, double radius) {
-		if (input.norm() > radius) {
+	Eigen::Vector2d normalizeVectorWithinRadius(Eigen::Vector2d eePos, double radius) {
+		if (eePos.norm() > radius) {
 			// TODO: will need to eventually shrink velocity vector until it is within radius
 			// instead of just normalizing it.
 
-			input.normalize();
-			input *= radius;
+			eePos.normalize();
+			eePos *= radius;
 		}
 
-		return input;
+		return eePos;
 	}
 };
 } // namespace control
