@@ -49,7 +49,7 @@ var searchData=
   ['affinemapptr_46',['AffineMapPtr',['https://docs.opencv.org/4.2.0/d0/d2a/structcv_1_1cudev_1_1AffineMapPtr.html',1,'cv::cudev']]],
   ['affinemapptrsz_47',['AffineMapPtrSz',['https://docs.opencv.org/4.2.0/dc/dd4/structcv_1_1cudev_1_1AffineMapPtrSz.html',1,'cv::cudev']]],
   ['affinetransformer_48',['AffineTransformer',['https://docs.opencv.org/4.2.0/dc/d83/classcv_1_1AffineTransformer.html',1,'cv']]],
-  ['affinewarper_49',['affinewarper',['https://docs.opencv.org/4.2.0/dd/d76/classcv_1_1detail_1_1AffineWarper.html',1,'cv::detail::AffineWarper'],['https://docs.opencv.org/4.2.0/d4/dd7/classcv_1_1AffineWarper.html',1,'cv::AffineWarper']]],
+  ['affinewarper_49',['affinewarper',['https://docs.opencv.org/4.2.0/d4/dd7/classcv_1_1AffineWarper.html',1,'cv::AffineWarper'],['https://docs.opencv.org/4.2.0/dd/d76/classcv_1_1detail_1_1AffineWarper.html',1,'cv::detail::AffineWarper']]],
   ['agastfeaturedetector_50',['AgastFeatureDetector',['https://docs.opencv.org/4.2.0/d7/d19/classcv_1_1AgastFeatureDetector.html',1,'cv']]],
   ['akaze_51',['AKAZE',['https://docs.opencv.org/4.2.0/d8/d30/classcv_1_1AKAZE.html',1,'cv']]],
   ['algorithm_52',['Algorithm',['https://docs.opencv.org/4.2.0/d3/d46/classcv_1_1Algorithm.html',1,'cv']]],
@@ -78,7 +78,7 @@ var searchData=
   ['angleaxis_75',['AngleAxis',['https://eigen.tuxfamily.org/dox/classEigen_1_1AngleAxis.html',1,'Eigen']]],
   ['ann_5fmlp_76',['ANN_MLP',['https://docs.opencv.org/4.2.0/d0/dce/classcv_1_1ml_1_1ANN__MLP.html',1,'cv::ml']]],
   ['annotate_5fbase_77',['annotate_base',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a10679.html',1,'__gnu_cxx']]],
-  ['any_78',['any',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09963.html',1,'std::experimental::fundamentals_v1::any'],['https://docs.opencv.org/4.2.0/d9/dc4/classcv_1_1util_1_1any.html',1,'cv::util::any']]],
+  ['any_78',['any',['https://docs.opencv.org/4.2.0/d9/dc4/classcv_1_1util_1_1any.html',1,'cv::util::any'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09963.html',1,'std::experimental::fundamentals_v1::any']]],
   ['ar_5fhmdb_79',['AR_hmdb',['https://docs.opencv.org/4.2.0/de/d42/classcv_1_1datasets_1_1AR__hmdb.html',1,'cv::datasets']]],
   ['ar_5fhmdbobj_80',['AR_hmdbObj',['https://docs.opencv.org/4.2.0/d1/da9/structcv_1_1datasets_1_1AR__hmdbObj.html',1,'cv::datasets']]],
   ['ar_5fsports_81',['AR_sports',['https://docs.opencv.org/4.2.0/d5/d36/classcv_1_1datasets_1_1AR__sports.html',1,'cv::datasets']]],
@@ -173,10 +173,9 @@ var searchData=
   ['autobuffer_3c_20double_2c_201_20_3e_170',['AutoBuffer&lt; double, 1 &gt;',['https://docs.opencv.org/4.2.0/d8/dd0/classcv_1_1AutoBuffer.html',1,'']]],
   ['autobuffer_3c_20int64_2c_201_20_3e_171',['AutoBuffer&lt; int64, 1 &gt;',['https://docs.opencv.org/4.2.0/d8/dd0/classcv_1_1AutoBuffer.html',1,'']]],
   ['autobuffer_3c_20string_2c_201_20_3e_172',['AutoBuffer&lt; String, 1 &gt;',['https://docs.opencv.org/4.2.0/d8/dd0/classcv_1_1AutoBuffer.html',1,'']]],
-  ['autonomous_173',['Autonomous',['../classAutonomous.html',1,'']]],
-  ['avcapturevideodataoutputsamplebufferdelegate_2dp_2dp_174',['AVCaptureVideoDataOutputSampleBufferDelegate-p-p',['https://docs.opencv.org/4.2.0/d7/dc6/classAVCaptureVideoDataOutputSampleBufferDelegate-p.html',1,'']]],
-  ['averagehash_175',['AverageHash',['https://docs.opencv.org/4.2.0/db/d25/classcv_1_1img__hash_1_1AverageHash.html',1,'cv::img_hash']]],
-  ['avg_176',['Avg',['https://docs.opencv.org/4.2.0/da/dad/structcv_1_1cudev_1_1Avg.html',1,'cv::cudev']]],
-  ['avireadcontainer_177',['AVIReadContainer',['https://docs.opencv.org/4.2.0/d6/d8c/classcv_1_1AVIReadContainer.html',1,'cv']]],
-  ['aviwritecontainer_178',['AVIWriteContainer',['https://docs.opencv.org/4.2.0/d7/d13/classcv_1_1AVIWriteContainer.html',1,'cv']]]
+  ['avcapturevideodataoutputsamplebufferdelegate_2dp_2dp_173',['AVCaptureVideoDataOutputSampleBufferDelegate-p-p',['https://docs.opencv.org/4.2.0/d7/dc6/classAVCaptureVideoDataOutputSampleBufferDelegate-p.html',1,'']]],
+  ['averagehash_174',['AverageHash',['https://docs.opencv.org/4.2.0/db/d25/classcv_1_1img__hash_1_1AverageHash.html',1,'cv::img_hash']]],
+  ['avg_175',['Avg',['https://docs.opencv.org/4.2.0/da/dad/structcv_1_1cudev_1_1Avg.html',1,'cv::cudev']]],
+  ['avireadcontainer_176',['AVIReadContainer',['https://docs.opencv.org/4.2.0/d6/d8c/classcv_1_1AVIReadContainer.html',1,'cv']]],
+  ['aviwritecontainer_177',['AVIWriteContainer',['https://docs.opencv.org/4.2.0/d7/d13/classcv_1_1AVIWriteContainer.html',1,'cv']]]
 ];

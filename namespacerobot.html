@@ -179,9 +179,6 @@ const <a class="el" href="classkinematics_1_1DiffWristKinematics.html">DiffWrist
 <tr class="memitem:a902b5dd26574990fe0a8a9d3c4e7a97e" id="r_a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a902b5dd26574990fe0a8a9d3c4e7a97e">emergencyStop</a> ()</td></tr>
 <tr class="memdesc:a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emergency stop all motors.  <br /></td></tr>
 <tr class="separator:a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a128a6cb4047cf1e3164ea3afc4de4224" id="r_a128a6cb4047cf1e3164ea3afc4de4224"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#a128a6cb4047cf1e3164ea3afc4de4224">readLidarScan</a> ()</td></tr>
-<tr class="memdesc:a128a6cb4047cf1e3164ea3afc4de4224"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last measurement from the lidar.  <br /></td></tr>
-<tr class="separator:a128a6cb4047cf1e3164ea3afc4de4224"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdba67256ee6b98d21f683ecf1acc9f0" id="r_acdba67256ee6b98d21f683ecf1acc9f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacerobot_1_1types.html#a59f80e8ea8d9eaeb27b959ecf74a1d9b">landmarks_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerobot.html#acdba67256ee6b98d21f683ecf1acc9f0">readLandmarks</a> ()</td></tr>
 <tr class="memdesc:acdba67256ee6b98d21f683ecf1acc9f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read measurement from the CV system.  <br /></td></tr>
 <tr class="separator:acdba67256ee6b98d21f683ecf1acc9f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -806,27 +803,6 @@ template&lt;unsigned long int N&gt; </div>
 <p>Read measurement from the CV system. </p>
 <p>As of now, returns a vector of fixed length, one for each post in the competition.</p>
 <dl class="section return"><dt>Returns</dt><dd>DataPoint&lt;points_t&gt; A vector of fixed lengths. Non-visible markers are denoted with {0,0,0}, while all nonzero points are visible marker. The index of a landmark in this vector is its id. </dd></dl>
-
-</div>
-</div>
-<a id="a128a6cb4047cf1e3164ea3afc4de4224" name="a128a6cb4047cf1e3164ea3afc4de4224"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a128a6cb4047cf1e3164ea3afc4de4224">&#9670;&#160;</a></span>readLidarScan()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">navtypes::points_t</a> &gt; robot::readLidarScan </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the last measurement from the lidar. </p>
-<p>The returned points are in the robot's reference frame.</p>
-<dl class="section return"><dt>Returns</dt><dd>types::DataPoint&lt;navtypes::points_t&gt; The lidar scan, if available. </dd></dl>
 
 </div>
 </div>

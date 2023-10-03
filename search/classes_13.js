@@ -127,10 +127,10 @@ var searchData=
   ['shared_5fptr_3c_20priv_20_3e_124',['shared_ptr&lt; Priv &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
   ['shared_5fptr_3c_20quadtree_20_3e_125',['shared_ptr&lt; QuadTree &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
   ['shared_5fptr_3c_20separatedetectionwork_20_3e_126',['shared_ptr&lt; SeparateDetectionWork &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
-  ['shared_5fptr_3c_20std_3a_3achrono_3a_3atime_5fpoint_20_3e_127',['shared_ptr&lt; std::chrono::time_point &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
-  ['shared_5fptr_3c_20std_3a_3adeque_3c_20int_20_3e_20_3e_128',['shared_ptr&lt; std::deque&lt; int &gt; &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
-  ['shared_5fptr_3c_20std_3a_3amutex_20_3e_129',['shared_ptr&lt; std::mutex &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'']]],
-  ['shared_5fptr_3c_20std_3a_3athread_20_3e_130',['shared_ptr&lt; std::thread &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
+  ['shared_5fptr_3c_20std_3a_3adeque_3c_20int_20_3e_20_3e_127',['shared_ptr&lt; std::deque&lt; int &gt; &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
+  ['shared_5fptr_3c_20std_3a_3amutex_20_3e_128',['shared_ptr&lt; std::mutex &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'']]],
+  ['shared_5fptr_3c_20std_3a_3athread_20_3e_129',['shared_ptr&lt; std::thread &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
+  ['shared_5fptr_3c_20time_5fpoint_3c_20dataclock_20_3e_20_3e_130',['shared_ptr&lt; time_point&lt; dataclock &gt; &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
   ['shared_5fptr_3c_20uint32_5ft_20_3e_131',['shared_ptr&lt; uint32_t &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
   ['shared_5fptr_3c_20videoinputstream_20_3e_132',['shared_ptr&lt; VideoInputStream &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html',1,'std']]],
   ['shared_5ftimed_5fmutex_133',['shared_timed_mutex',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02779.html',1,'std']]],
@@ -351,8 +351,7 @@ var searchData=
   ['symbolvalue_348',['SymbolValue',['https://eigen.tuxfamily.org/dox/classEigen_1_1symbolic_1_1SymbolValue.html',1,'Eigen::symbolic']]],
   ['symetriccensus_349',['SymetricCensus',['https://docs.opencv.org/4.2.0/dd/d24/classcv_1_1stereo_1_1SymetricCensus.html',1,'cv::stereo']]],
   ['synth_5faccess_5ftraits_350',['synth_access_traits',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a11955.html',1,'__gnu_pbds::detail']]],
-  ['syntheticlidar_351',['SyntheticLidar',['../classSyntheticLidar.html',1,'']]],
-  ['syntheticsequencegenerator_352',['SyntheticSequenceGenerator',['https://docs.opencv.org/4.2.0/d1/dda/classcv_1_1bgsegm_1_1SyntheticSequenceGenerator.html',1,'cv::bgsegm']]],
-  ['system_5fclock_353',['system_clock',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01911.html',1,'std::chrono::_V2']]],
-  ['system_5ferror_354',['system_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02855.html',1,'std']]]
+  ['syntheticsequencegenerator_351',['SyntheticSequenceGenerator',['https://docs.opencv.org/4.2.0/d1/dda/classcv_1_1bgsegm_1_1SyntheticSequenceGenerator.html',1,'cv::bgsegm']]],
+  ['system_5fclock_352',['system_clock',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01911.html',1,'std::chrono::_V2']]],
+  ['system_5ferror_353',['system_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02855.html',1,'std']]]
 ];

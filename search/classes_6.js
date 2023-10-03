@@ -22,7 +22,7 @@ var searchData=
   ['fastmarchingmethod_19',['FastMarchingMethod',['https://docs.opencv.org/4.2.0/d3/dea/classcv_1_1videostab_1_1FastMarchingMethod.html',1,'cv::videostab']]],
   ['fastopticalflowbm_20',['FastOpticalFlowBM',['https://docs.opencv.org/4.2.0/df/db2/classcv_1_1cuda_1_1FastOpticalFlowBM.html',1,'cv::cuda']]],
   ['featherblender_21',['FeatherBlender',['https://docs.opencv.org/4.2.0/d4/d69/classcv_1_1detail_1_1FeatherBlender.html',1,'cv::detail']]],
-  ['feature_22',['feature',['https://docs.opencv.org/4.2.0/de/d11/classcv_1_1CvHOGEvaluator_1_1Feature.html',1,'cv::CvHOGEvaluator::Feature'],['https://docs.opencv.org/4.2.0/d9/db9/structcv_1_1linemod_1_1Feature.html',1,'cv::linemod::Feature'],['https://docs.opencv.org/4.2.0/d7/d3c/classcv_1_1CvLBPEvaluator_1_1Feature.html',1,'cv::CvLBPEvaluator::Feature']]],
+  ['feature_22',['feature',['https://docs.opencv.org/4.2.0/d7/d3c/classcv_1_1CvLBPEvaluator_1_1Feature.html',1,'cv::CvLBPEvaluator::Feature'],['https://docs.opencv.org/4.2.0/d9/db9/structcv_1_1linemod_1_1Feature.html',1,'cv::linemod::Feature'],['https://docs.opencv.org/4.2.0/de/d11/classcv_1_1CvHOGEvaluator_1_1Feature.html',1,'cv::CvHOGEvaluator::Feature']]],
   ['feature2d_23',['Feature2D',['https://docs.opencv.org/4.2.0/d0/d13/classcv_1_1Feature2D.html',1,'cv']]],
   ['feature2dasync_24',['Feature2DAsync',['https://docs.opencv.org/4.2.0/df/db9/classcv_1_1cuda_1_1Feature2DAsync.html',1,'cv::cuda']]],
   ['featurehaar_25',['FeatureHaar',['https://docs.opencv.org/4.2.0/d3/d52/classcv_1_1CvHaarEvaluator_1_1FeatureHaar.html',1,'cv::CvHaarEvaluator']]],
@@ -40,7 +40,7 @@ var searchData=
   ['fisher_5ff_5fdistribution_37',['fisher_f_distribution',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06411.html',1,'std']]],
   ['fisherfacerecognizer_38',['FisherFaceRecognizer',['https://docs.opencv.org/4.2.0/d2/de9/classcv_1_1face_1_1FisherFaceRecognizer.html',1,'cv::face']]],
   ['fisheyeprojector_39',['FisheyeProjector',['https://docs.opencv.org/4.2.0/d9/de9/structcv_1_1detail_1_1FisheyeProjector.html',1,'cv::detail']]],
-  ['fisheyewarper_40',['fisheyewarper',['https://docs.opencv.org/4.2.0/d9/dac/classcv_1_1detail_1_1FisheyeWarper.html',1,'cv::detail::FisheyeWarper'],['https://docs.opencv.org/4.2.0/d5/d30/classcv_1_1FisheyeWarper.html',1,'cv::FisheyeWarper']]],
+  ['fisheyewarper_40',['fisheyewarper',['https://docs.opencv.org/4.2.0/d5/d30/classcv_1_1FisheyeWarper.html',1,'cv::FisheyeWarper'],['https://docs.opencv.org/4.2.0/d9/dac/classcv_1_1detail_1_1FisheyeWarper.html',1,'cv::detail::FisheyeWarper']]],
   ['flannbasedmatcher_41',['FlannBasedMatcher',['https://docs.opencv.org/4.2.0/dc/de2/classcv_1_1FlannBasedMatcher.html',1,'cv']]],
   ['flatten_5fg_42',['flatten_g',['https://docs.opencv.org/4.2.0/dd/d3b/structcv_1_1detail_1_1flatten__g.html',1,'cv::detail']]],
   ['flatten_5fg_3c_20cv_3a_3agmat_20_3e_43',['flatten_g&lt; cv::GMat &gt;',['https://docs.opencv.org/4.2.0/df/de8/structcv_1_1detail_1_1flatten__g_3_01cv_1_1GMat_01_4.html',1,'cv::detail']]],
@@ -82,8 +82,6 @@ var searchData=
   ['function_3c_20_5fres_28_5fargtypes_2e_2e_2e_29_3e_79',['function&lt; _Res(_ArgTypes...)&gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07175.html',1,'std']]],
   ['future_80',['future',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02239.html',1,'std']]],
   ['future_3c_20_5fres_20_26_20_3e_81',['future&lt; _Res &amp; &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02351.html',1,'std']]],
-  ['future_3c_20eigen_3a_3amatrix_20_3e_82',['future&lt; Eigen::Matrix &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02239.html',1,'std']]],
-  ['future_3c_20navtypes_3a_3atransform_5ft_20_3e_83',['future&lt; navtypes::transform_t &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02239.html',1,'std']]],
-  ['future_3c_20void_20_3e_84',['future&lt; void &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02355.html',1,'std']]],
-  ['future_5ferror_85',['future_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02235.html',1,'std']]]
+  ['future_3c_20void_20_3e_82',['future&lt; void &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02355.html',1,'std']]],
+  ['future_5ferror_83',['future_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02235.html',1,'std']]]
 ];
