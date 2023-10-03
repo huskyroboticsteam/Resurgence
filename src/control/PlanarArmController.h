@@ -51,6 +51,18 @@ public:
 	}
 
 	/**
+	 * @brief Normalize the input vector to have a set radius,
+	 *  	  while maintaining the same direction it did before.
+	 * 
+	 * @param input The input vector to normalize.
+	 * @param radius The radius to normalize the vector to.
+	 */
+	void normalizeVectorWithinRadius(Eigen::Vector2d input, double radius) {
+		input.normalize();
+		input *= radius;
+	}
+
+	/**
 	 * @brief Gets the current end effector setpoint / target position.
 	 *
 	 * @param currTime The current timestamp.
@@ -71,10 +83,10 @@ public:
 		// bounds check (new pos + vel vector <= sum of joint lengths)
 		double radius = kin.getSegLens().sum() * safetyFactor;
 		if (pos.norm() > radius) {
-			// new position is outside of bounds
-			// shrink velocity vector until it is within radius.
-			pos.normalize();
-			pos *= radius;
+			// TODO: will need to eventually shrink velocity vector until it is within radius
+			// instead of just normalizing it.
+
+			normalizeVectorWithinRadius(pos, radius);
 		}
 		return pos;
 	}
