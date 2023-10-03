@@ -80,15 +80,6 @@ double setCmdVel(double dtheta, double dx);
 std::pair<double, double> getCmdVel();
 
 /**
- * @brief Get the last measurement from the lidar.
- *
- * The returned points are in the robot's reference frame.
- *
- * @return types::DataPoint<navtypes::points_t> The lidar scan, if available.
- */
-types::DataPoint<navtypes::points_t> readLidarScan();
-
-/**
  * @brief Get the IDs of the currently supported cameras.
  *
  * @return The IDs of all cameras currently supported by the world interface, as a @ref

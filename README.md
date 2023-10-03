@@ -238,11 +238,9 @@ The simulator does not have its own executable. Instead, you must configure the 
 
 ```bash
 cd build
-cmake ../src -DWITH_CAN=OFF -DGPS=NONE -DWITH_LIDAR=OFF -DWITH_TESTS=OFF -DWORLD_INTERFACE=SIMULATOR
+cmake ../src -DWORLD_INTERFACE=SIMULATOR
 make -j Rover
 ```
-
-Note that (for now) unit tests cannot be run when configured to build the simulator rover code.
 
 ### Launching the simulator
 
@@ -260,7 +258,6 @@ Since the `Rover` target now builds the simulator rover code instead of the real
 
 ```bash
 cd build
-rm -r *
-cmake ../src
+cmake ../src -DWORLD_INTERFACE=REAL
 make -j Rover
 ```
