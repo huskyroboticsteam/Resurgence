@@ -186,24 +186,30 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string path = conn->get_resource();
 
-	assert(protocolMap.find(path) != protocolMap.end());
-
-	std::string jsonStr = message->get_payload();
-	log(LOG_TRACE, "Message on %s: %s\n", path.c_str(), jsonStr.c_str());
-	json obj = json::parse(jsonStr);
-	protocolMap.at(path).protocol->processMessage(obj);
+	auto it = protocolMap.find(path);
+	if (it != protocolMap.end()) {
+		std::string jsonStr = message->get_payload();
+		log(LOG_TRACE, "Message on %s: %s\n", path.c_str(), jsonStr.c_str());
+		json obj = json::parse(jsonStr);
+		it->second.protocol->processMessage(obj);
+	} else {
+		log(LOG_WARN, "Received message on unknown protocol path %s\n", path.c_str());
+	}
 }
 
 void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload) {
 	log(LOG_DEBUG, "Pong from %s\n", payload.c_str());
 	auto conn = server.get_con_from_hdl(hdl);
 
-	assert(protocolMap.find(payload) != protocolMap.end());
-
-	auto& pd = protocolMap.at(payload);
-	std::lock_guard lock(pd.mutex);
-	if (pd.heartbeatInfo.has_value()) {
-		pd.heartbeatInfo->second.feed();
+	auto it = protocolMap.find(payload);
+	if (it != protocolMap.end()) {
+		auto& pd = it->second;
+		std::lock_guard lock(pd.mutex);
+		if (pd.heartbeatInfo.has_value()) {
+			pd.heartbeatInfo->second.feed();
+		}
+	} else {
+		log(LOG_WARN, "Received pong on unknown protocol path %s\n", payload.c_str());
 	}
 }
 } // namespace websocket

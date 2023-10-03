@@ -94,7 +94,7 @@ public:
 	 * If the heartbeat is reestablished after timing out, and then times out again, this
 	 * handler will be called again.
 	 *
-	 * @param timeout The heartbeat timeout.
+	 * @param timeout The duration after which the heartbeat times out.
 	 * @param handler The handler to call when timed out.
 	 */
 	void setHeartbeatTimedOutHandler(std::chrono::milliseconds timeout,
