@@ -158,7 +158,7 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			_arm_ik_repeat_thread.join();
 		}
 	}
-	sendArmIKEnabledReport(Globals::armIKEnabled);
+	sendArmIKEnabledReport();
 }
 
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
@@ -268,7 +268,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport() {
-	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", Globals::armIKEnabled}};
+	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", Globals::armIKEnabled.load()}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
