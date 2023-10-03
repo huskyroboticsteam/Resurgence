@@ -268,8 +268,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport() {
-	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE},
-				{"enabled", Globals::armIKEnabled}};
+	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", Globals::armIKEnabled}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
