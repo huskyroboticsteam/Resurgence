@@ -48,7 +48,7 @@ public:
 		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
 		std::lock_guard<std::mutex> lock(mutex);
 		double radius = kin.getSegLens().sum() * safetyFactor;
-		setpoint = normalizeVectorWithinRadius(newSetPoint, radius);
+		setpoint = normalizeEEWithinRadius(newSetPoint, radius);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public:
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
 		double radius = kin.getSegLens().sum() * safetyFactor;
-		return normalizeVectorWithinRadius(pos, radius);
+		return normalizeEEWithinRadius(pos, radius);
 	}
 
 	/**
@@ -144,7 +144,7 @@ private:
 	 * @param eePos The end-effector position to normalize.
 	 * @param radius The radius to normalize the end-effector to.
 	 */
-	Eigen::Vector2d normalizeVectorWithinRadius(Eigen::Vector2d eePos, double radius) {
+	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos, double radius) {
 		if (eePos.norm() > radius) {
 			// TODO: will need to eventually shrink velocity vector until it is within radius
 			// instead of just normalizing it.
