@@ -57,7 +57,7 @@ public:
 	 * @param input The input vector to normalize.
 	 * @param radius The radius to normalize the vector to.
 	 */
-	void normalizeVectorWithinRadius(Eigen::Vector2d input, double radius) {
+	Eigen::Vector2d normalizeVectorWithinRadius(Eigen::Vector2d input, double radius) {
 		if (input.norm() > radius) {
 			// TODO: will need to eventually shrink velocity vector until it is within radius
 			// instead of just normalizing it.
@@ -65,6 +65,8 @@ public:
 			input.normalize();
 			input *= radius;
 		}
+
+		return input;
 	}
 
 	/**
@@ -87,8 +89,7 @@ public:
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
 		double radius = kin.getSegLens().sum() * safetyFactor;
-		normalizeVectorWithinRadius(pos, radius);
-		return pos;
+		return normalizeVectorWithinRadius(pos, radius);
 	}
 
 	/**
