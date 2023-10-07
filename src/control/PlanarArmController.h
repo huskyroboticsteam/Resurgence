@@ -47,8 +47,7 @@ public:
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
 		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
 		std::lock_guard<std::mutex> lock(mutex);
-		double radius = kin.getSegLens().sum() * safetyFactor;
-		setpoint = normalizeEEWithinRadius(newSetPoint, radius);
+		setpoint = normalizeEEWithinRadius(newSetPoint);
 	}
 
 	/**
@@ -70,8 +69,7 @@ public:
 		}
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
-		double radius = kin.getSegLens().sum() * safetyFactor;
-		return normalizeEEWithinRadius(pos, radius);
+		return normalizeEEWithinRadius(pos);
 	}
 
 	/**
@@ -142,9 +140,10 @@ private:
 	 *  	  while maintaining the same direction it did before if it exceeds that set radius.
 	 *
 	 * @param eePos The end-effector position to normalize.
-	 * @param radius The radius to normalize the end-effector to.
 	 */
-	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos, double radius) {
+	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos) {
+		double radius = kin.getSegLens().sum() * safetyFactor;
+
 		if (eePos.norm() > radius) {
 			// TODO: will need to eventually shrink velocity vector until it is within radius
 			// instead of just normalizing it.
