@@ -41,7 +41,7 @@ public:
 	template <typename Rep, typename Period>
 	bool wait_for(const std::chrono::duration<Rep, Period>& dur) const {
 		std::unique_lock lock(mutex);
-		return cv.wait_for(lock, dur, [&]() { return count <= 0; });
+		return cv.wait_for(lock, dur, [&]() { return count == 0; });
 	}
 
 	/**
@@ -53,7 +53,7 @@ public:
 	template <typename Clock, typename Duration>
 	bool wait_until(const std::chrono::time_point<Clock, Duration>& tp) const {
 		std::unique_lock lock(mutex);
-		return cv.wait_until(lock, tp, [&]() { return count <= 0; });
+		return cv.wait_until(lock, tp, [&]() { return count == 0; });
 	}
 
 	/**

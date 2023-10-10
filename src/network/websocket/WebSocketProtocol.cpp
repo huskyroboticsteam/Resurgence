@@ -46,6 +46,11 @@ void WebSocketProtocol::addDisconnectionHandler(const connhandler_t& handler) {
 	disconnectionHandlers.push_back(handler);
 }
 
+void WebSocketProtocol::setHeartbeatTimedOutHandler(std::chrono::milliseconds timeout,
+													const heartbeattimeouthandler_t& handler) {
+	heartbeatInfo = {timeout, handler};
+}
+
 void WebSocketProtocol::clientConnected() {
 	for (const auto& f : connectionHandlers) {
 		f();
@@ -55,6 +60,12 @@ void WebSocketProtocol::clientConnected() {
 void WebSocketProtocol::clientDisconnected() {
 	for (const auto& f : disconnectionHandlers) {
 		f();
+	}
+}
+
+void WebSocketProtocol::heartbeatTimedOut() {
+	if (heartbeatInfo.has_value()) {
+		heartbeatInfo->second();
 	}
 }
 
