@@ -139,14 +139,7 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 		}
 		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-		// TODO: there should be a better way of handling invalid data than crashing.
-		// It should somehow just not enable IK, but then it needs to communicate back to MC
-		// that IK wasn't enabled?
-		// FIX: Change setArmIKOn to requestArmIKEnable.
-		// Create new packet: armIKEnabledReport packet
 		// Rover responds with armIKEnabledReport after requestArmIKEnable is processed
-		// On Mission Control side, if armIKEnabledReport is false after trying to enable,
-		// give an alert stating that IK was unable to activated.
 		if (armJointPositions.isValid()) {
 			Globals::planarArmController.set_setpoint(armJointPositions.getData());
 			Globals::armIKEnabled = true;
