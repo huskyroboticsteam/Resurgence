@@ -161,15 +161,16 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordtype">void</span> sendJointPositionReport(<span class="keyword">const</span> <a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&amp; jointName, <a class="code hl_typedefRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> position);</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">void</span> sendRoverPos();</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keywordtype">void</span> handleConnection();</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="keywordtype">void</span> startPowerRepeat();</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keywordtype">void</span> stopAndShutdownPowerRepeat();</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordtype">void</span> setRequestedJointPower(jointid_t joint, <span class="keywordtype">double</span> <a class="code hl_functionRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a>);</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="keywordtype">void</span> setRequestedCmdVel(<span class="keywordtype">double</span> dtheta, <span class="keywordtype">double</span> dx);</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>};</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="keywordtype">void</span> handleHeartbeatTimedOut();</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keywordtype">void</span> startPowerRepeat();</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordtype">void</span> stopAndShutdownPowerRepeat();</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="keywordtype">void</span> setRequestedJointPower(jointid_t joint, <span class="keywordtype">double</span> <a class="code hl_functionRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a>);</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordtype">void</span> setRequestedCmdVel(<span class="keywordtype">double</span> dtheta, <span class="keywordtype">double</span> dx);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>};</div>
 </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>}; <span class="comment">// namespace mc</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>} <span class="comment">// namespace net</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>}; <span class="comment">// namespace mc</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>} <span class="comment">// namespace net</span></div>
 <div class="ttc" id="aa00044_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00044.html">atomic</a></div></div>
 <div class="ttc" id="aa00059_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00059.html">condition_variable</a></div></div>
 <div class="ttc" id="aa00107_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00107.html">memory</a></div></div>
@@ -189,8 +190,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="aa08047_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08047.html">std::unordered_map</a></div></div>
 <div class="ttc" id="aa08055_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a08055.html">std::unordered_set</a></div></div>
 <div class="ttc" id="aclassnet_1_1mc_1_1MissionControlProtocol_html"><div class="ttname"><a href="classnet_1_1mc_1_1MissionControlProtocol.html">net::mc::MissionControlProtocol</a></div><div class="ttdef"><b>Definition</b> MissionControlProtocol.h:26</div></div>
-<div class="ttc" id="aclassnet_1_1websocket_1_1SingleClientWSServer_html"><div class="ttname"><a href="classnet_1_1websocket_1_1SingleClientWSServer.html">net::websocket::SingleClientWSServer</a></div><div class="ttdoc">A WebSocket server class that only accepts a single client at a time to each endpoint served by this ...</div><div class="ttdef"><b>Definition</b> WebSocketServer.h:34</div></div>
-<div class="ttc" id="aclassnet_1_1websocket_1_1WebSocketProtocol_html"><div class="ttname"><a href="classnet_1_1websocket_1_1WebSocketProtocol.html">net::websocket::WebSocketProtocol</a></div><div class="ttdoc">Defines a protocol which will be served at an endpoint of a server.</div><div class="ttdef"><b>Definition</b> WebSocketProtocol.h:27</div></div>
+<div class="ttc" id="aclassnet_1_1websocket_1_1SingleClientWSServer_html"><div class="ttname"><a href="classnet_1_1websocket_1_1SingleClientWSServer.html">net::websocket::SingleClientWSServer</a></div><div class="ttdoc">A WebSocket server class that only accepts a single client at a time to each endpoint served by this ...</div><div class="ttdef"><b>Definition</b> WebSocketServer.h:35</div></div>
+<div class="ttc" id="aclassnet_1_1websocket_1_1WebSocketProtocol_html"><div class="ttname"><a href="classnet_1_1websocket_1_1WebSocketProtocol.html">net::websocket::WebSocketProtocol</a></div><div class="ttdoc">Defines a protocol which will be served at an endpoint of a server.</div><div class="ttdef"><b>Definition</b> WebSocketProtocol.h:30</div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div></div>
 <div class="ttc" id="anamespacecam_html"><div class="ttname"><a href="namespacecam.html">cam</a></div><div class="ttdoc">Namespace for camera access system.</div><div class="ttdef"><b>Definition</b> Camera.cpp:13</div></div>
 <div class="ttc" id="anamespacecv_html_ad5ed0491058a71efd30a0f28ad1d3f05"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a></div><div class="ttdeci">::int32_t int32_t</div></div>

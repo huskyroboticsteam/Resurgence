@@ -1,0 +1,5 @@
+<map id="util::PeriodicScheduler&lt; Clock &gt;" name="util::PeriodicScheduler&lt; Clock &gt;">
+<area shape="rect" id="Node000001" title="Uses a single thread to periodically invoke callbacks at a given frequency." alt="" coords="5,79,155,120"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="16,5,144,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,46,83,79,77,79,77,46"/>
+</map>

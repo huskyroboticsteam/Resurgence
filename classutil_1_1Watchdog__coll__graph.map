@@ -1,0 +1,5 @@
+<map id="util::Watchdog&lt; Clock &gt;" name="util::Watchdog&lt; Clock &gt;">
+<area shape="rect" id="Node000001" title="Implements a thread&#45;safe watchdog." alt="" coords="5,79,163,105"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="20,5,148,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,46,87,79,81,79,81,46"/>
+</map>

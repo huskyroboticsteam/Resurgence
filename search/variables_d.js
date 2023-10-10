@@ -88,7 +88,7 @@ var searchData=
   ['masks_5f_85',['masks_',['https://docs.opencv.org/4.2.0/dd/d00/classcv_1_1detail_1_1PairwiseSeamFinder.html#a3db4bcfb73c963e7eeb92ecffdda5db6',1,'cv::detail::PairwiseSeamFinder']]],
   ['masksource_5f_86',['maskSource_',['https://docs.opencv.org/4.2.0/d2/d6c/classcv_1_1videostab_1_1StabilizerBase.html#a7d8e382c7286c16bc44ed07160ecf6c0',1,'cv::videostab::StabilizerBase']]],
   ['masksum_87',['maskSum',['https://docs.opencv.org/4.2.0/db/d06/classcv_1_1cuda_1_1SURF__CUDA.html#a45223b25f9b1dbf54b2afb84db4970e1',1,'cv::cuda::SURF_CUDA']]],
-  ['mat_88',['mat',['https://docs.opencv.org/4.2.0/d9/dff/structcv_1_1datasets_1_1IR__affineObj.html#a64e3005ee9661a9a8b67bc8a35afc902',1,'cv::datasets::IR_affineObj::mat'],['https://docs.opencv.org/4.2.0/d4/d32/classcv_1_1__InputArray.html#a0f6bead7579fcd0e30b15a5d6bf5b53ba78b5339efc1a4718ab6a1b688ccffc1c',1,'cv::_InputArray::MAT']]],
+  ['mat_88',['mat',['https://docs.opencv.org/4.2.0/d4/d32/classcv_1_1__InputArray.html#a0f6bead7579fcd0e30b15a5d6bf5b53ba78b5339efc1a4718ab6a1b688ccffc1c',1,'cv::_InputArray::MAT'],['https://docs.opencv.org/4.2.0/d9/dff/structcv_1_1datasets_1_1IR__affineObj.html#a64e3005ee9661a9a8b67bc8a35afc902',1,'cv::datasets::IR_affineObj::mat']]],
   ['mat1_89',['mat1',['https://docs.opencv.org/4.2.0/d3/d99/structcv_1_1datasets_1_1cameraParam.html#ae5c8c96e9d4f371b590ea554d96405d1',1,'cv::datasets::cameraParam']]],
   ['mat2_90',['mat2',['https://docs.opencv.org/4.2.0/d3/d99/structcv_1_1datasets_1_1cameraParam.html#a79533c441eb4c06bff212f8652f1f5a7',1,'cv::datasets::cameraParam']]],
   ['mat3_91',['mat3',['https://docs.opencv.org/4.2.0/d3/d99/structcv_1_1datasets_1_1cameraParam.html#a806a1c2e37b570d2212307a16be4e2cf',1,'cv::datasets::cameraParam']]],

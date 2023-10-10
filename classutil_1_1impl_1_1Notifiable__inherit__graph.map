@@ -1,0 +1,7 @@
+<map id="util::impl::Notifiable" name="util::impl::Notifiable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="104,5,232,31"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1PeriodicScheduler.html" title="Uses a single thread to periodically invoke callbacks at a given frequency." alt="" coords="5,79,155,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,44,103,81,100,77,141,40"/>
+<area shape="rect" id="Node000003" href="$classutil_1_1Watchdog.html" title="Implements a thread&#45;safe watchdog." alt="" coords="179,87,336,112"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,40,245,84,242,88,191,44"/>
+</map>

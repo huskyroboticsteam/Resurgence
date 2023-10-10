@@ -100,6 +100,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1ScopedTimer.html">ScopedTimer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A utility class that helps with timing.  <a href="classutil_1_1ScopedTimer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1Watchdog.html">Watchdog</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements a thread-safe watchdog.  <a href="classutil_1_1Watchdog.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -138,6 +141,10 @@ frozen::string&#160;</td><td class="memItemRight" valign="bottom"><b>freezeStr</
 <tr class="memitem:a6b20b0142e53d95a9c4831635f657cb1"><td class="memTemplItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceutil.html#a6b20b0142e53d95a9c4831635f657cb1">to_string&lt; bool &gt;</a> (const bool &amp;val)</td></tr>
 <tr class="memdesc:a6b20b0142e53d95a9c4831635f657cb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a boolean to a string.  <br /></td></tr>
 <tr class="separator:a6b20b0142e53d95a9c4831635f657cb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a965e5c3ac37ea1fff5df67e8a4f2fe62" id="r_a965e5c3ac37ea1fff5df67e8a4f2fe62"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U &gt; </td></tr>
+<tr class="memitem:a965e5c3ac37ea1fff5df67e8a4f2fe62"><td class="memTemplItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02895.html">std::tuple</a>&lt; T, U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceutil.html#a965e5c3ac37ea1fff5df67e8a4f2fe62">pairToTuple</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a>&lt; T, U &gt; &amp;pair)</td></tr>
+<tr class="memdesc:a965e5c3ac37ea1fff5df67e8a4f2fe62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a pair to a tuple.  <br /></td></tr>
+<tr class="separator:a965e5c3ac37ea1fff5df67e8a4f2fe62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab570e599e6aa85b419b583ae53b607f1" id="r_ab570e599e6aa85b419b583ae53b607f1"><td class="memItemLeft" align="right" valign="top"><a id="ab570e599e6aa85b419b583ae53b607f1" name="ab570e599e6aa85b419b583ae53b607f1"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>hasKey</b> (const <a class="elRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">json</a> &amp;j, const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;key)</td></tr>
 <tr class="memdesc:ab570e599e6aa85b419b583ae53b607f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the given json object has the given key. <br /></td></tr>
@@ -477,6 +484,43 @@ template&lt;typename K , typename V &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Eigen::MatrixXd An n-by-m matrix where n is the output dimension and m is the input dimension of <code>func</code>. </dd></dl>
+
+</div>
+</div>
+<a id="a965e5c3ac37ea1fff5df67e8a4f2fe62" name="a965e5c3ac37ea1fff5df67e8a4f2fe62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a965e5c3ac37ea1fff5df67e8a4f2fe62">&#9670;&#160;</a></span>pairToTuple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename U &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02895.html">std::tuple</a>&lt; T, U &gt; util::pairToTuple </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a>&lt; T, U &gt; &amp;&#160;</td>
+          <td class="paramname"><em>pair</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Converts a pair to a tuple. </p>
+<p>Elements are copied to the returned tuple.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The type of the first element. </td></tr>
+    <tr><td class="paramname">U</td><td>The type of the second element. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pair</td><td>The pair to convert to a tuple. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;T, U&gt; The converted tuple. </dd></dl>
 
 </div>
 </div>

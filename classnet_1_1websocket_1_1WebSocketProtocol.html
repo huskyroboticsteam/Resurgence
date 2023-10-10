@@ -83,6 +83,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classnet_1_1websocket_1_1WebSocketProtocol-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">net::websocket::WebSocketProtocol Class Reference</div></div>
 </div><!--header-->
@@ -126,18 +127,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>addConnectionHandler<
 <tr class="memitem:aaeb4cd7b7c7e9f9a75e3efeedf59efbb" id="r_aaeb4cd7b7c7e9f9a75e3efeedf59efbb"><td class="memItemLeft" align="right" valign="top"><a id="aaeb4cd7b7c7e9f9a75e3efeedf59efbb" name="aaeb4cd7b7c7e9f9a75e3efeedf59efbb"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addDisconnectionHandler</b> (const connhandler_t &amp;handler)</td></tr>
 <tr class="separator:aaeb4cd7b7c7e9f9a75e3efeedf59efbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a450a055ac66fc2708b805dcf3f0488d3" id="r_a450a055ac66fc2708b805dcf3f0488d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html#a450a055ac66fc2708b805dcf3f0488d3">processMessage</a> (const <a class="elRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">json</a> &amp;obj) const</td></tr>
-<tr class="memdesc:a450a055ac66fc2708b805dcf3f0488d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the given JSON object that was sent to this protocol's endpoint.  <br /></td></tr>
-<tr class="separator:a450a055ac66fc2708b805dcf3f0488d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaaa9d4742de54c2f19941ff23ab1db38" id="r_aaaa9d4742de54c2f19941ff23ab1db38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html#aaaa9d4742de54c2f19941ff23ab1db38">clientConnected</a> ()</td></tr>
-<tr class="memdesc:aaaa9d4742de54c2f19941ff23ab1db38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke all connection handlers for this protocol.  <br /></td></tr>
-<tr class="separator:aaaa9d4742de54c2f19941ff23ab1db38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4eab4e23d631cba5728edf56c8e3035" id="r_aa4eab4e23d631cba5728edf56c8e3035"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html#aa4eab4e23d631cba5728edf56c8e3035">clientDisconnected</a> ()</td></tr>
-<tr class="memdesc:aa4eab4e23d631cba5728edf56c8e3035"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke all disconnection handlers for this protocol.  <br /></td></tr>
-<tr class="separator:aa4eab4e23d631cba5728edf56c8e3035"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7ab0bf75c4a72f14330f5c8c3c3ff43" id="r_ae7ab0bf75c4a72f14330f5c8c3c3ff43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html#ae7ab0bf75c4a72f14330f5c8c3c3ff43">setHeartbeatTimedOutHandler</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01477.html#gad3ce465ffb10e354aa30c4ce93b68beea90272dda245ae1fb3cf197e91a8689dc">timeout</a>, const heartbeattimeouthandler_t &amp;handler)</td></tr>
+<tr class="memdesc:ae7ab0bf75c4a72f14330f5c8c3c3ff43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the handler that's called when the heartbeat times out.  <br /></td></tr>
+<tr class="separator:ae7ab0bf75c4a72f14330f5c8c3c3ff43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3631c6a42909a6b7108b276b4dc791b3" id="r_a3631c6a42909a6b7108b276b4dc791b3"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html#a3631c6a42909a6b7108b276b4dc791b3">getProtocolPath</a> () const</td></tr>
 <tr class="memdesc:a3631c6a42909a6b7108b276b4dc791b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the protocol path of the endpoint this protocol is served on.  <br /></td></tr>
 <tr class="separator:a3631c6a42909a6b7108b276b4dc791b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a3ad00aff121c659b69d0b88dc30ea33d" id="r_a3ad00aff121c659b69d0b88dc30ea33d"><td class="memItemLeft" align="right" valign="top"><a id="a3ad00aff121c659b69d0b88dc30ea33d" name="a3ad00aff121c659b69d0b88dc30ea33d"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SingleClientWSServer</b></td></tr>
+<tr class="separator:a3ad00aff121c659b69d0b88dc30ea33d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Defines a protocol which will be served at an endpoint of a server. </p>
@@ -257,46 +258,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>addDisconnectionHandl
 
 </div>
 </div>
-<a id="aaaa9d4742de54c2f19941ff23ab1db38" name="aaaa9d4742de54c2f19941ff23ab1db38"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaaa9d4742de54c2f19941ff23ab1db38">&#9670;&#160;</a></span>clientConnected()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void net::websocket::WebSocketProtocol::clientConnected </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Invoke all connection handlers for this protocol. </p>
-<p>Generally, this shouldn't be used by client code. </p>
-
-</div>
-</div>
-<a id="aa4eab4e23d631cba5728edf56c8e3035" name="aa4eab4e23d631cba5728edf56c8e3035"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa4eab4e23d631cba5728edf56c8e3035">&#9670;&#160;</a></span>clientDisconnected()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void net::websocket::WebSocketProtocol::clientDisconnected </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Invoke all disconnection handlers for this protocol. </p>
-<p>Generally, this shouldn't be used by client code. </p>
-
-</div>
-</div>
 <a id="a3631c6a42909a6b7108b276b4dc791b3" name="a3631c6a42909a6b7108b276b4dc791b3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3631c6a42909a6b7108b276b4dc791b3">&#9670;&#160;</a></span>getProtocolPath()</h2>
 
@@ -344,33 +305,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>addDisconnectionHandl
 
 </div>
 </div>
-<a id="a450a055ac66fc2708b805dcf3f0488d3" name="a450a055ac66fc2708b805dcf3f0488d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a450a055ac66fc2708b805dcf3f0488d3">&#9670;&#160;</a></span>processMessage()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void net::websocket::WebSocketProtocol::processMessage </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="elRef" href="https://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json.html">json</a> &amp;&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Process the given JSON object that was sent to this protocol's endpoint. </p>
-<p>Generally, this shouldn't be used by client code.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">obj</td><td>The JSON object to be processed by this protocol. It is expected to have a "type" key. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a1cc6dd0a89dee979b539ad3afd250500" name="a1cc6dd0a89dee979b539ad3afd250500"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1cc6dd0a89dee979b539ad3afd250500">&#9670;&#160;</a></span>removeMessageHandler()</h2>
 
@@ -395,6 +329,44 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>addDisconnectionHandl
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if a handler existed for this message type and was removed, false otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="ae7ab0bf75c4a72f14330f5c8c3c3ff43" name="ae7ab0bf75c4a72f14330f5c8c3c3ff43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7ab0bf75c4a72f14330f5c8c3c3ff43">&#9670;&#160;</a></span>setHeartbeatTimedOutHandler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::websocket::WebSocketProtocol::setHeartbeatTimedOutHandler </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a>&#160;</td>
+          <td class="paramname"><em>timeout</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const heartbeattimeouthandler_t &amp;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the handler that's called when the heartbeat times out. </p>
+<p>If the heartbeat is reestablished after timing out, and then times out again, this handler will be called again.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timeout</td><td>The duration after which the heartbeat times out. </td></tr>
+    <tr><td class="paramname">handler</td><td>The handler to call when timed out. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
