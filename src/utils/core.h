@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
 #include <frozen/string.h>
 
@@ -62,5 +64,18 @@ std::string to_string<bool>(const bool& val);
  * @brief Convert the given std::string to a frozen::string.
  */
 frozen::string freezeStr(const std::string& str);
+
+/**
+ * @brief Converts a pair to a tuple. Elements are copied to the returned tuple.
+ *
+ * @tparam T The type of the first element.
+ * @tparam U The type of the second element.
+ * @param pair The pair to convert to a tuple.
+ * @return std::tuple<T, U> The converted tuple.
+ */
+template <typename T, typename U>
+std::tuple<T, U> pairToTuple(const std::pair<T, U>& pair) {
+	return std::tuple<T, U>(pair.first, pair.second);
+}
 
 } // namespace util
