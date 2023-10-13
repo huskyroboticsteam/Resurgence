@@ -50,7 +50,6 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 
 	foo.set_setpoint({2.0, 3.0});
 	Eigen::Vector2d origSetPoint = kin_obj.jointPosToEEPos({2.0, 3.0});
-	double expectedNorm = origSetPoint.norm();
 
 	assertApprox(origSetPoint, foo.get_setpoint(robot::types::dataclock::now()));
 }
