@@ -292,6 +292,7 @@ void MissionControlProtocol::handleConnection() {
 	}
 
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
+	sendArmIKEnabledReport();
 
 	if (!Globals::AUTONOMOUS) {
 		// start power repeat thread (if not already running)
