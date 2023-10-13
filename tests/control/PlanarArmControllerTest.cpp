@@ -22,18 +22,14 @@ void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double d
 				  double angle = 1e-5) {
 	Eigen::Vector2d diff = p1 - p2;
 	bool distEqual = diff.norm() <= dist;
-	double thetaDiff = std::fmod(abs(diff(1)), 2 * PI);
-	// change domain from [0, 2pi) to (-pi, pi]
-	if (thetaDiff > PI) {
-		thetaDiff -= 2 * PI;
+
+	if (!distEqual) {
+		std::stringstream ss;
+		ss << "Expected: " << toString(p1) << ", Actual: " << toString(p2);
+		INFO(ss.str());
 	}
-	bool angleEqual = abs(thetaDiff) <= angle;
-	if (distEqual && angleEqual) {
-		SUCCEED();
-	} else {
-		std::cout << "Expected: " << toString(p1) << ", Actual: " << toString(p2) << std::endl;
-		FAIL();
-	}
+
+	REQUIRE(distEqual);
 }
 
 TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
