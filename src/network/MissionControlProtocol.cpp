@@ -145,6 +145,9 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			Globals::armIKEnabled = true;
 			_arm_ik_repeat_thread =
 				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+		} else {
+			// unable to enable IK
+			log(LOG_WARN, "Unable to enable IK");
 		}
 	} else {
 		Globals::armIKEnabled = false;
