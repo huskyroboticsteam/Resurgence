@@ -1,4 +1,3 @@
-#include "Autonomous.h"
 #include "Constants.h"
 #include "Globals.h"
 #include "Util.h"
@@ -132,8 +131,8 @@ void parseCommandLine(int argc, char** argv) {
 int main(int argc, char** argv) {
 	parseCommandLine(argc, argv);
 	Globals::AUTONOMOUS = false;
-	robot::world_interface_init();
 	Globals::websocketServer.start();
+	robot::world_interface_init();
 	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
 	Globals::websocketServer.addProtocol(std::move(mcProto));
 	rospub::init();

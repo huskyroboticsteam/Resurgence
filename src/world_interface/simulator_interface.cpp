@@ -39,16 +39,14 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::elbow, "elbow"},
 	{motorid_t::forearm, "forearm"},
 	{motorid_t::wrist, "wrist"},
-	{motorid_t::hand, "hand"}};
+	{motorid_t::hand, "hand"},
+	{motorid_t::activeSuspension, "activeSuspension"}};
 
-DataPoint<double> lastHeading;
-std::mutex headingMutex;
+DataPoint<navtypes::eulerangles_t> lastAttitude;
+std::mutex attitudeMutex;
 
 DataPoint<gpscoords_t> lastGPS;
 std::mutex gpsMutex;
-
-DataPoint<points_t> lastLidar;
-std::mutex lidarMutex;
 
 DataPoint<pose_t> lastTruePose;
 std::mutex truePoseMutex;
@@ -129,19 +127,6 @@ void handleGPS(json msg) {
 	lastGPS = {coords};
 }
 
-void handleLidar(json msg) {
-	points_t lidar;
-	datatime_t now = dataclock::now();
-	const auto& arr = msg["points"];
-	for (const auto& point : arr) {
-		double r = point["r"];
-		double theta = point["theta"];
-		lidar.push_back({r * std::cos(theta), r * std::sin(theta), 1});
-	}
-	std::lock_guard<std::mutex> guard(lidarMutex);
-	lastLidar = {now, lidar};
-}
-
 void handleIMU(json msg) {
 	double qx = msg["x"];
 	double qy = msg["y"];
@@ -149,8 +134,12 @@ void handleIMU(json msg) {
 	double qw = msg["w"];
 
 	double heading = util::quatToHeading(qw, qx, qy, qz);
-	std::lock_guard<std::mutex> guard(headingMutex);
-	lastHeading = {heading};
+	Eigen::Quaterniond q(qw, qx, qy, qz);
+	q.normalize();
+	Eigen::Vector3d euler = q.toRotationMatrix().eulerAngles(0, 1, 2);
+	std::lock_guard<std::mutex> guard(attitudeMutex);
+	lastAttitude =
+		navtypes::eulerangles_t{.roll = euler(0), .pitch = euler(1), .yaw = euler(2)};
 }
 
 void handleCamFrame(json msg) {
@@ -232,7 +221,8 @@ void clientDisconnected() {
 void initSimServer() {
 	auto protocol = std::make_unique<net::websocket::WebSocketProtocol>(PROTOCOL_PATH);
 	protocol->addMessageHandler("simImuOrientationReport", handleIMU);
-	protocol->addMessageHandler("simLidarReport", handleLidar);
+	// TODO: remove lidar report
+	protocol->addMessageHandler("simLidarReport", [](const nlohmann::json&) {});
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
@@ -355,18 +345,13 @@ landmarks_t readLandmarks() {
 	return AR::readLandmarks();
 }
 
-DataPoint<points_t> readLidarScan() {
-	std::lock_guard<std::mutex> guard(lidarMutex);
-	return lastLidar;
-}
-
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
 
-DataPoint<double> readIMUHeading() {
-	std::lock_guard<std::mutex> guard(headingMutex);
-	return lastHeading;
+DataPoint<navtypes::eulerangles_t> readIMU() {
+	std::lock_guard<std::mutex> guard(attitudeMutex);
+	return lastAttitude;
 }
 
 DataPoint<pose_t> getTruePose() {

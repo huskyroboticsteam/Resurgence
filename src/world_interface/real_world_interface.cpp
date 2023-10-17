@@ -235,10 +235,6 @@ landmarks_t readLandmarks() {
 	return {};
 }
 
-DataPoint<points_t> readLidarScan() {
-	return {};
-}
-
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }

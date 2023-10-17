@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Rover LANGUAGES CXX C)
 
+include(FetchContent)
+
 # If a build type was not explicitly specified, default to "RelWithDebInfo" (Same optimization
 # as the "Release" configuration but with debugging symbols).
 #
@@ -29,25 +31,12 @@ if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
   during generation." FORCE)
 endif()
 
-# CAN should be disabled by default if we are not on a Linux system, since it depends on Linux
-# kernel-specific header files.
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(WITH_CAN_DEFAULT ON)
-else()
-  set(WITH_CAN_DEFAULT OFF)
-endif()
-
 ##====== Module settings ======
 # These variables control whether various modules are enabled or disabled. The goal is to allow
-# a user to selectively exclude modules that they do not need (and/or cannot compile on their
-# system); for example, we need a way to disable CAN on non-Linux systems that don't support
-# it, so this is a way to do that.
-set(WITH_CAN ${WITH_CAN_DEFAULT} CACHE BOOL "Enable/Disable the CAN code. Disabled on non-Linux
-systems.")
+# a user to selectively exclude modules that they do not need.
 set(GPS "ARDUPILOT" CACHE STRING "GPS interface to use.")
 set(AVAILABLE_GPS "USB" "ARDUPILOT" "NONE")
 set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
-set(WITH_LIDAR ON CACHE BOOL "Enable/Disable the USB LiDAR interface.")
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
 set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
@@ -65,20 +54,13 @@ endif()
 
 message("========================================\n\
 Module settings:")
-if(NOT WITH_CAN_DEFAULT)
-  message("  CAN Networking:\t${WITH_CAN} (non-Linux system - disabled by default)")
-else()
-  message("  CAN Networking:\t${WITH_CAN}")
-endif()
 message("  GPS:\t\t\t${GPS}")
-message("  USB LiDAR code:\t${WITH_LIDAR}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
 message("========================================")
 
 ##====== Dependencies ======
-# Some of these are optional depending on module settings above. For example, the lidar
-# libraries are not needed if using the simulator world interface.
+# Some of these are optional depending on module settings above.
 
 # Get the Eigen linear algebra library. Eigen's CMake config includes its headers as user
 # headers instead of system headers by default, so explicitly force them to be system includes
@@ -109,7 +91,12 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Find the CAN library; contains packet and protocol definitions and does not
 # actually require physical CAN to be present.
-find_package(HindsightCAN 1.4.0 REQUIRED)
+FetchContent_Declare(
+    HindsightCAN
+    GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
+    GIT_TAG 7397787fbb04687bf03c8fbac9a1db56f245fc9a
+)
+FetchContent_MakeAvailable(HindsightCAN)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -127,12 +114,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     # Find the libgps USB GPS library.
     pkg_check_modules(libgps REQUIRED libgps)
   endif()
-  if(WITH_LIDAR)
-	  # Find the URGLidar library.
-	  # TODO: Decide if we want to use those RPLidars we found
-    find_package(RPLidar REQUIRED)
-	  find_package(URGLidar REQUIRED)
-  endif()
 endif()
 
 # Enable all warnings except a few (unused variable/parameter/result)
@@ -146,11 +127,12 @@ if(WITH_TESTS)
   enable_testing()
 endif()
 
-list(APPEND camera_src
+add_library(camera SHARED
   camera/Camera.cpp
   camera/CameraParams.cpp
   camera/CameraConfig.cpp
-  )
+)
+target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
 
 # shared library for utility code
 add_library(utils SHARED
@@ -189,15 +171,10 @@ target_sources(can_interface PRIVATE
 )
 
 # Hardware specific source files
-if(WITH_CAN)
-  target_sources(can_interface PRIVATE
-    CAN/CAN.cpp)
-else()
-  target_sources(can_interface PRIVATE
-    CAN/CANStubs.cpp)
-endif()
+target_sources(can_interface PRIVATE
+  CAN/CAN.cpp)
 target_link_libraries(can_interface PUBLIC
-  HindsightCAN::HindsightCAN
+  HindsightCAN
   Threads::Threads
   utils
 )
@@ -228,10 +205,9 @@ add_library(world_interface_core STATIC
   ar/Tag.cpp
   ar/read_landmarks.cpp
   world_interface/motor/base_motor.cpp
-  ${camera_src}
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils)
+target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
 
 # CAN library (above) requires some utilities from this
 target_link_libraries(can_interface PUBLIC utils)
@@ -241,8 +217,6 @@ add_library(stub_world_interface STATIC
 
 add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
-  lidar/read_hokuyo_lidar.cpp
-  lidar/read_rp_lidar.cpp
   world_interface/motor/can_motor.cpp
   Globals.cpp
   )
@@ -284,26 +258,13 @@ target_link_libraries(control utils)
 add_library(commands STATIC
   commands/DriveToWaypointCommand.cpp)
 
-if(WITH_LIDAR)
-  add_subdirectory(lidar)
-endif()
-
-list(APPEND real_world_libs
-  real_world_interface
-  lidar_interface
-  URGLidar::urg_c
-  RPLidar::RPLidar)
-
 list(APPEND simulator_libs
   simulator_interface)
 
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
-  Autonomous.cpp
   Globals.cpp
   rospub.cpp
-  filters/PoseEstimator.cpp
-  filters/PoseEstimatorLinear.cpp
   network/websocket/WebSocketServer.cpp
   network/websocket/WebSocketProtocol.cpp
   worldmap/GlobalMap.cpp
@@ -328,29 +289,26 @@ target_link_libraries(Rover
   ${rover_libs})
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  target_link_libraries(Rover ${real_world_libs})
+  target_link_libraries(Rover real_world_interface)
 elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
   target_link_libraries(Rover ${simulator_libs})
 else()
-  target_link_libraries(Rover ${real_world_libs}) # TODO: support other interfaces
+  target_link_libraries(Rover real_world_interface) # TODO: support other interfaces
 endif()
 
 target_link_libraries(Rover ${vision_libs})
 
-if(WITH_CAN)
-  add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID
-    ${rover_libs}
-    can_interface
-	${real_world_libs}
-	)
-  target_link_libraries(TunePID ${vision_libs} ${sfml_libs})
-endif()
+add_executable(TunePID TunePID.cpp)
+target_link_libraries(TunePID
+  ${rover_libs}
+  can_interface
+  real_world_interface
+)
+target_link_libraries(TunePID ${vision_libs})
 
 if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
-    Autonomous.cpp
     rospub_test.cpp
     # AR Detection tests
     ar/DetectorTests.cpp
@@ -387,7 +345,7 @@ if(WITH_TESTS)
 
   target_link_libraries(tests
     ${rover_libs}
-    ${real_world_libs}
+    stub_world_interface
     ${OpenCV_LIBS})
   include(CTest)
   include(Catch)
@@ -402,7 +360,7 @@ target_link_libraries(gpsd_test gps)
 if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration
     LimitCalib.cpp)
-  target_link_libraries(LimitSwitchCalibration ${real_world_libs})
+  target_link_libraries(LimitSwitchCalibration real_world_interface)
 endif()
 
 add_subdirectory(ar)

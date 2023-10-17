@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
 #include <frozen/string.h>
 
@@ -44,13 +46,36 @@ std::unordered_set<K> keySet(const std::unordered_map<K, V>& input) {
  * @return A string representation of that value, as a std::string. The exact representation of
  * the value is up to the implementation.
  */
-template <typename T> std::string to_string(const T& val) {
+template <typename T>
+std::string to_string(const T& val) {
 	return std::to_string(val);
 }
+
+/**
+ * @brief Converts a boolean to a string.
+ *
+ * @param val The value to get the string representation of.
+ * @return "true" iff val, otherwise "false".
+ */
+template <>
+std::string to_string<bool>(const bool& val);
 
 /**
  * @brief Convert the given std::string to a frozen::string.
  */
 frozen::string freezeStr(const std::string& str);
+
+/**
+ * @brief Converts a pair to a tuple. Elements are copied to the returned tuple.
+ *
+ * @tparam T The type of the first element.
+ * @tparam U The type of the second element.
+ * @param pair The pair to convert to a tuple.
+ * @return std::tuple<T, U> The converted tuple.
+ */
+template <typename T, typename U>
+std::tuple<T, U> pairToTuple(const std::pair<T, U>& pair) {
+	return std::tuple<T, U>(pair.first, pair.second);
+}
 
 } // namespace util

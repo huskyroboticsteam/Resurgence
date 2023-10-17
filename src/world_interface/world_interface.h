@@ -80,15 +80,6 @@ double setCmdVel(double dtheta, double dx);
 std::pair<double, double> getCmdVel();
 
 /**
- * @brief Get the last measurement from the lidar.
- *
- * The returned points are in the robot's reference frame.
- *
- * @return types::DataPoint<navtypes::points_t> The lidar scan, if available.
- */
-types::DataPoint<navtypes::points_t> readLidarScan();
-
-/**
  * @brief Get the IDs of the currently supported cameras.
  *
  * @return The IDs of all cameras currently supported by the world interface, as a @ref
@@ -164,6 +155,17 @@ types::DataPoint<navtypes::point_t> readGPS();
  * @return DataPoint<double> The last heading reading, or none if measurement not available.
  */
 types::DataPoint<double> readIMUHeading();
+
+/**
+ * @brief Read the rover attitude from the IMU.
+ *
+ * Euler angles are in radians, in RPY format (i.e. XYZ extrinsic)
+ *
+ * @see https://en.wikipedia.org/wiki/Euler_angles#Tait%E2%80%93Bryan_angles
+ *
+ * @return types::DataPoint<navtypes::eulerangles_t>
+ */
+types::DataPoint<navtypes::eulerangles_t> readIMU();
 
 /**
  * @brief Get the ground truth pose, if available. This is only available in simulation.

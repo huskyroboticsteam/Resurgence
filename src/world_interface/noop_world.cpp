@@ -35,15 +35,11 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 void emergencyStop() {}
 
-DataPoint<points_t> readLidarScan() {
-	return points_t{};
-}
-
 landmarks_t readLandmarks() {
 	return landmarks_t{};
 }
 
-DataPoint<double> readIMUHeading() {
+DataPoint<navtypes::eulerangles_t> readIMU() {
 	return {};
 }
 

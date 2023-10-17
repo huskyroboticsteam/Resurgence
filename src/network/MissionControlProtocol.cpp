@@ -4,6 +4,7 @@
 #include "../Globals.h"
 #include "../base64/base64_img.h"
 #include "../log.h"
+#include "../utils/core.h"
 #include "../utils/json.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
@@ -30,6 +31,7 @@ using websocket::msghandler_t;
 using websocket::validator_t;
 
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
+const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
 // request keys
@@ -185,24 +187,32 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 }
 
 void MissionControlProtocol::sendRoverPos() {
-	auto heading = robot::readIMUHeading();
-	auto gps = robot::readGPS();
-	if (gps.isValid() && heading.isValid()) {
-		double orientX = 0.0;
-		double orientY = 0.0;
-		double orientZ = std::sin(heading.getData() / 2);
-		double orientW = std::cos(heading.getData() / 2);
-		double posX = gps.getData()[0];
-		double posY = gps.getData()[1];
+	auto imu = robot::readIMU();
+	auto gps = gps::readGPSCoords();
+	log(LOG_DEBUG, "imu_valid=%d, gps_valid=%d\n", util::to_string(imu.isValid()),
+		util::to_string(gps.isValid()));
+	if (imu.isValid()) {
+		auto rpy = imu.getData();
+		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
+								Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
+								Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()));
+		double posX = 0, posY = 0;
+		if (gps.isValid()) {
+			posX = gps.getData().lon;
+			posY = gps.getData().lat;
+		}
 		double posZ = 0.0;
-		double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
-		double headingRecency = util::durationToSec(dataclock::now() - heading.getTime());
-		double recency = std::max(gpsRecency, headingRecency);
+		double imuRecency = util::durationToSec(dataclock::now() - imu.getTime());
+		double recency = imuRecency;
+		if (gps.isValid()) {
+			double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
+			recency = std::max(recency, gpsRecency);
+		}
 		json msg = {{"type", ROVER_POS_REP_TYPE},
-					{"orientW", orientW},
-					{"orientX", orientX},
-					{"orientY", orientY},
-					{"orientZ", orientZ},
+					{"orientW", quat.w()},
+					{"orientX", quat.x()},
+					{"orientY", quat.y()},
+					{"orientZ", quat.z()},
 					{"posX", posX},
 					{"posY", posY},
 					{"posZ", posZ},
@@ -283,6 +293,14 @@ void MissionControlProtocol::handleConnection() {
 		// start power repeat thread (if not already running)
 		this->startPowerRepeat();
 	}
+}
+
+void MissionControlProtocol::handleHeartbeatTimedOut() {
+	this->stopAndShutdownPowerRepeat();
+	robot::emergencyStop();
+	log(LOG_ERROR, "Heartbeat timed out! Emergency stopping.\n");
+	Globals::E_STOP = true;
+	Globals::armIKEnabled = false;
 }
 
 void MissionControlProtocol::startPowerRepeat() {
@@ -376,6 +394,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this));
+
+	this->setHeartbeatTimedOutHandler(
+		HEARTBEAT_TIMEOUT_PERIOD,
+		std::bind(&MissionControlProtocol::handleHeartbeatTimedOut, this));
 
 	this->_streaming_running = true;
 	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
