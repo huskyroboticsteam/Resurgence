@@ -48,8 +48,8 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	// Instantiate PlanarArmController.
 	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
 
-	// Attempt to straighten out the end effector all the way, violating max length safety
-	// factor. This should cause the EE to be repositioned to fit the length constraint.
+	// Attempt to straighten out end-effector all the way, exceeding max length.
+	// This should cause the EE to be repositioned to fit the length constraint.
 	foo.set_setpoint({0.0, 0.0});
 	assertApprox({9.5, 0.0}, foo.get_setpoint(robot::types::dataclock::now()));
 
