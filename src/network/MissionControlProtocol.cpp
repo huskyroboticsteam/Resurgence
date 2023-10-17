@@ -86,10 +86,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	}
 	// TODO: reinit motors
 	Globals::E_STOP = stop;
-	Globals::armIKEnabled = false;
-
-	// inform MC that Ik has been disabled
-	sendArmIKEnabledReport();
+	this->setArmIKEnabled();
 }
 
 static bool validateOperationModeRequest(const json& j) {
@@ -136,29 +133,29 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 	bool enabled = j["enabled"];
 	if (enabled) {
-		Globals::armIKEnabled = false;
-		if (_arm_ik_repeat_thread.joinable()) {
-			_arm_ik_repeat_thread.join();
-		}
-		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-		// Rover responds with armIKEnabledReport after requestArmIKEnable is processed
-		if (armJointPositions.isValid()) {
-			Globals::planarArmController.set_setpoint(armJointPositions.getData());
-			Globals::armIKEnabled = true;
-			_arm_ik_repeat_thread =
-				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
-		} else {
-			// unable to enable IK
-			log(LOG_WARN, "Unable to enable IK");
+		if (!Globals::armIKEnabled) {
+			if (_arm_ik_repeat_thread.joinable()) {
+				_arm_ik_repeat_thread.join();
+			}
+			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
+				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+			// Rover responds with armIKEnabledReport after requestArmIKEnable is processed
+			if (armJointPositions.isValid()) {
+				Globals::planarArmController.set_setpoint(armJointPositions.getData());
+				this->setArmIKEnabled(true);
+				_arm_ik_repeat_thread =
+					std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+			} else {
+				// unable to enable IK
+				log(LOG_WARN, "Unable to enable IK");
+			}
 		}
 	} else {
-		Globals::armIKEnabled = false;
+		this->setArmIKEnabled(false);
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
 		}
 	}
-	sendArmIKEnabledReport();
 }
 
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
@@ -283,7 +280,7 @@ void MissionControlProtocol::sendCameraStreamReport(
 
 void MissionControlProtocol::handleConnection() {
 	// Turn off inverse kinematics on connection
-	Globals::armIKEnabled = false;
+	this->setArmIKEnabled(false);
 
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
@@ -295,7 +292,6 @@ void MissionControlProtocol::handleConnection() {
 	}
 
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
-	sendArmIKEnabledReport();
 
 	if (!Globals::AUTONOMOUS) {
 		// start power repeat thread (if not already running)
@@ -308,7 +304,6 @@ void MissionControlProtocol::handleHeartbeatTimedOut() {
 	this->stopAndShutdownPowerRepeat();
 	robot::emergencyStop();
 	Globals::E_STOP = true;
-	Globals::armIKEnabled = false;
 }
 
 void MissionControlProtocol::startPowerRepeat() {
@@ -351,7 +346,7 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 		}
 	}
 	// Turn off inverse kinematics so that IK state will be in sync with mission control
-	Globals::armIKEnabled = false;
+	this->setArmIKEnabled(false);
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
@@ -421,6 +416,11 @@ MissionControlProtocol::~MissionControlProtocol() {
 	if (this->_streaming_thread.joinable()) {
 		this->_streaming_thread.join();
 	}
+}
+
+void MissionControlProtocol::setArmIKEnabled(const bool enabled) {
+	Globals::armIKEnabled = enabled;
+	this->sendArmIKEnabledReport();
 }
 
 void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {

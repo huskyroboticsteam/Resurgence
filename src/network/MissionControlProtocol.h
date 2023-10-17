@@ -73,6 +73,7 @@ private:
 	void handleHeartbeatTimedOut();
 	void startPowerRepeat();
 	void stopAndShutdownPowerRepeat();
+	void setArmIKEnabled(const bool enabled);
 	void setRequestedJointPower(jointid_t joint, double power);
 	void setRequestedCmdVel(double dtheta, double dx);
 };
