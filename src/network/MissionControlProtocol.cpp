@@ -87,6 +87,9 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	// TODO: reinit motors
 	Globals::E_STOP = stop;
 	Globals::armIKEnabled = false;
+
+	// inform MC that Ik has been disabled
+	sendArmIKEnabledReport();
 }
 
 static bool validateOperationModeRequest(const json& j) {
