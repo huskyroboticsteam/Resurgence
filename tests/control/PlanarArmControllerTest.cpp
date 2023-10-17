@@ -39,17 +39,23 @@ TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
 }
 
 TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
-	navtypes::Vectord<2> segLens({4.0, 6.0});
+	// Set lengths and relative orientation bounds of robot joint segments.
+	navtypes::Vectord<2> segLens({6.0, 4.0});
 	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
 	navtypes::Vectord<2> maxAngles({M_PI, M_PI});
 	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
 
+	// Instantiate PlanarArmController.
 	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
-	foo.set_setpoint({10.0, 0.0});
-	REQUIRE(foo.get_setpoint(robot::types::dataclock::now()).norm() == 9.5);
 
-	foo.set_setpoint({2.0, 3.0});
-	Eigen::Vector2d origSetPoint = kin_obj.jointPosToEEPos({2.0, 3.0});
+	// Attempt to straighten out the EE all the way, violating max length safety factor.
+	foo.set_setpoint({0.0, 0.0});
+	navtypes::Vectord<2> limitedSetpoint = foo.get_setpoint(robot::types::dataclock::now());
+	assertApprox({9.5, 0.0}, limitedSetpoint);
 
-	assertApprox(origSetPoint, foo.get_setpoint(robot::types::dataclock::now()));
+	// Try setting the joints to be orthogonal but within max length, such that:
+	// - End effector position is (6,4), which implies that:
+	// - Max length = sqrt(6^2 + 4^2) = sqrt(36 + 16) < 7.22 < 9.5 (max length)
+	foo.set_setpoint({0.0, M_PI_2});
+	assertApprox({6.0, 4.0}, foo.get_setpoint(robot::types::dataclock::now()));
 }
