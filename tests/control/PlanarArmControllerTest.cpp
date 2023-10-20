@@ -23,11 +23,9 @@ void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double d
 	Eigen::Vector2d diff = p1 - p2;
 	bool distEqual = diff.norm() <= dist;
 
-	if (!distEqual) {
-		std::stringstream ss;
-		ss << "Expected: " << toString(p1) << ", Actual: " << toString(p2);
-		INFO(ss.str());
-	}
+	std::stringstream ss;
+	ss << "Expected: " << toString(p1) << ", Actual: " << toString(p2);
+	INFO(ss.str());
 
 	REQUIRE(distEqual);
 }
