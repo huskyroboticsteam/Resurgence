@@ -34,8 +34,10 @@ public:
 	 */
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
 						kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
-		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}),
-		  safetyFactor(safetyFactor) {
+		: kin(kin_obj), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {
+		// NOTE: currJointPos could extend beyond the safetyFactor, so safety factor
+		//       normalization logic is performed.
+		set_setpoint(currJointPos);
 		assert(safetyFactor > 0.0 && safetyFactor < 1.0);
 	}
 
