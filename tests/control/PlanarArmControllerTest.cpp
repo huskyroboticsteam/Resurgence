@@ -18,14 +18,12 @@ std::string toString(const Eigen::Vector2d& pose) {
 
 void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double dist = 1e-5,
 				  double angle = 1e-5) {
-	Eigen::Vector2d diff = p1 - p2;
-	bool distEqual = diff.norm() <= dist;
-
 	std::stringstream ss;
 	ss << "Expected: " << toString(p1) << ", Actual: " << toString(p2);
 	INFO(ss.str());
 
-	REQUIRE(distEqual);
+	Eigen::Vector2d diff = p1 - p2;
+	REQUIRE(diff.norm() <= dist);
 }
 
 TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
