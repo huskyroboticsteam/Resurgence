@@ -10,8 +10,6 @@ using namespace Catch::literals;
 using namespace control;
 using namespace std::chrono_literals;
 
-constexpr double PI = M_PI;
-
 std::string toString(const Eigen::Vector2d& pose) {
 	std::stringstream ss;
 	ss << "(" << pose(0) << ", " << pose(1) << ")";
