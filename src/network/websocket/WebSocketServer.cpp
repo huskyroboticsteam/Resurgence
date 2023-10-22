@@ -83,27 +83,6 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 	std::string path = protocol->getProtocolPath();
 	if (protocolMap.find(path) == protocolMap.end()) {
 		protocolMap.emplace(path, std::move(protocol));
-		auto& protocolData = protocolMap.at(path);
-		const auto& heartbeatInfo = protocolData.protocol->heartbeatInfo;
-		if (heartbeatInfo.has_value()) {
-			auto eventID =
-				pingScheduler.scheduleEvent(heartbeatInfo->first / 2, [this, path]() {
-					auto& pd = this->protocolMap.at(path);
-					std::lock_guard lock(pd.mutex);
-					if (pd.client.has_value()) {
-						log(LOG_DEBUG, "Ping!\n");
-						server.ping(pd.client.value(), path);
-					}
-				});
-			std::lock_guard l(protocolData.mutex);
-			// util::Watchdog is non-copyable and non-movable, so we must create in-place
-			// Since we want to create a member field of the pair in-place, it gets complicated
-			// so we have to use piecewise_construct to allow us to separately initialize all
-			// pair fields in-place
-			protocolData.heartbeatInfo.emplace(std::piecewise_construct,
-											   std::tuple<decltype(eventID)>{eventID},
-											   util::pairToTuple(heartbeatInfo.value()));
-		}
 		return true;
 	} else {
 		return false;
@@ -159,8 +138,31 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 		path.c_str(), client.c_str());
 
 	auto& protocolData = protocolMap.at(path);
-	protocolData.client = hdl;
-	protocolData.protocol->clientConnected();
+	{
+		std::lock_guard lock(protocolData.mutex);
+		protocolData.client = hdl;
+		const auto& heartbeatInfo = protocolData.protocol->heartbeatInfo;
+		if (heartbeatInfo.has_value()) {
+			auto eventID =
+				pingScheduler.scheduleEvent(heartbeatInfo->first / 2, [this, path]() {
+					auto& pd = this->protocolMap.at(path);
+					std::lock_guard lock(pd.mutex);
+					if (pd.client.has_value()) {
+						log(LOG_DEBUG, "Ping!\n");
+						server.ping(pd.client.value(), path);
+					}
+				});
+			// util::Watchdog is non-copyable and non-movable, so we must create in-place
+			// Since we want to create a member field of the pair in-place, it gets complicated
+			// so we have to use piecewise_construct to allow us to separately initialize all
+			// pair fields in-place
+			protocolData.heartbeatInfo.emplace(std::piecewise_construct,
+											   std::tuple<decltype(eventID)>{eventID},
+											   util::pairToTuple(heartbeatInfo.value()));
+		}
+
+		protocolData.protocol->clientConnected();
+	}
 }
 
 void SingleClientWSServer::onClose(connection_hdl hdl) {
