@@ -29,10 +29,17 @@ public:
 	 * @param currJointPos The current joint positions of the arm.
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
 	 * arm joints).
+	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
+	 * prevent singularity lock.
 	 */
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
-						kinematics::PlanarArmKinematics<N> kin_obj)
-		: kin(kin_obj), setpoint(kin.jointPosToEEPos(currJointPos)), velocity({0.0, 0.0}) {}
+						kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
+		: kin(kin_obj), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {
+		// NOTE: currJointPos could extend beyond the safetyFactor, so safety factor
+		//       normalization logic is performed.
+		set_setpoint(currJointPos);
+		assert(safetyFactor > 0.0 && safetyFactor < 1.0);
+	}
 
 	/**
 	 * @brief Sets the end effector setpoint / target position.
@@ -42,7 +49,7 @@ public:
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
 		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
 		std::lock_guard<std::mutex> lock(mutex);
-		setpoint = newSetPoint;
+		setpoint = normalizeEEWithinRadius(newSetPoint);
 	}
 
 	/**
@@ -64,14 +71,7 @@ public:
 		}
 
 		// bounds check (new pos + vel vector <= sum of joint lengths)
-		double radius = kin.getSegLens().sum();
-		if (pos.norm() > radius) {
-			// new position is outside of bounds
-			// TODO: will need to eventually shrink velocity vector until it is within radius
-			// instead of just normalizing it
-			pos.normalize();
-		}
-		return pos;
+		return normalizeEEWithinRadius(pos);
 	}
 
 	/**
@@ -135,5 +135,26 @@ private:
 	Eigen::Vector2d setpoint;
 	Eigen::Vector2d velocity;
 	std::optional<robot::types::datatime_t> velTimestamp;
+	const double safetyFactor;
+
+	/**
+	 * @brief Normalize the input vector (end-effector position) to have a set radius,
+	 *  	  while maintaining the same direction it did before if it exceeds that set radius.
+	 *
+	 * @param eePos The end-effector position to normalize.
+	 */
+	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos) {
+		double radius = kin.getSegLens().sum() * safetyFactor;
+
+		if (eePos.norm() > radius) {
+			// TODO: will need to eventually shrink velocity vector until it is within radius
+			// instead of just normalizing it.
+
+			eePos.normalize();
+			eePos *= radius;
+		}
+
+		return eePos;
+	}
 };
 } // namespace control
