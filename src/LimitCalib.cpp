@@ -6,7 +6,6 @@
 
 #include <chrono>
 #include <csignal>
-//#include <Eigen/core>
 #include <iostream>
 
 using namespace Eigen;
@@ -69,9 +68,11 @@ int main() {
 	navtypes::Vectord<2> targetPosVec; 
 	std::array<robot::types::motorid_t, 2> motorNames;
 
-	for (int i = 0; i < encMotors.size(); i++) {
-		motorNames[i] = encMotors.at(i)->first;
-		targetPosVec[i] = encMotors.at(i)->second.stdPos;
+	int i = 0;
+	for (const auto& runningMotor : encMotors) {
+		motorNames[i] = runningMotor.first;
+		targetPosVec[i] = runningMotor.second.stdPos;
+		i++;
 	}
 	
 	// mess with putting the std Pos's in a vector to begin with 
@@ -87,9 +88,10 @@ int main() {
 	navtypes::Vectord<2> targetVel = profile.getCommand(currTime);
 	double d;
 	navtypes::Vectord<2>  targetPos = controller.getCommand(currTime, targetVel, d);
-	int i = 0;
+	i = 0;
 	for (const auto& element : sortedKeys) {
 		robot::setMotorPos(element, targetPos[i]);	
 		i++;
 	}
+
 }
