@@ -58,23 +58,26 @@ struct encparams_t {
 	int limitSwitchHigh;
 	/** Power value set during limit switch calibration */
 	double zeroCalibrationPower;
+	/** Standard position to return motors to after calibration */
+	double stdPos;
 };
 
 // clang-format off
-constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
-	{motorid_t::shoulder,
+constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>(
+	{{motorid_t::shoulder,
 		{.isInverted = true,
 		.ppjr = 4590 * 1024 * 4,
 		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
-		.zeroCalibrationPower = 0.4}},
+		.zeroCalibrationPower = 0.4,
+		.stdPos = 2*(M_PI/3)}},
 	{motorid_t::elbow,
 		{.isInverted = false,
 		.ppjr = 1620 * 1024 * 4,
 		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::elbow).first,
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::elbow).second,
-		.zeroCalibrationPower = -0.15}}
-});
+		.zeroCalibrationPower = -0.15,
+		.stdPos = 0.5*(M_PI)}}});
 // clang-format on
 
 // TODO: find appropriate bounds
