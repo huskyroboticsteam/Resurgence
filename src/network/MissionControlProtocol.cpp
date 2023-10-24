@@ -196,12 +196,11 @@ void MissionControlProtocol::sendRoverPos() {
 		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
 								Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
 								Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()));
-		double posX = 0, posY = 0;
+		double lon = 0, lat = 0;
 		if (gps.isValid()) {
-			posX = gps.getData().lon;
-			posY = gps.getData().lat;
+			lon = gps.getData().lon;
+			lat = gps.getData().lat;
 		}
-		double posZ = 0.0;
 		double imuRecency = util::durationToSec(dataclock::now() - imu.getTime());
 		double recency = imuRecency;
 		if (gps.isValid()) {
@@ -213,9 +212,8 @@ void MissionControlProtocol::sendRoverPos() {
 					{"orientX", quat.x()},
 					{"orientY", quat.y()},
 					{"orientZ", quat.z()},
-					{"posX", posX},
-					{"posY", posY},
-					{"posZ", posZ},
+					{"lon", lon},
+					{"lat", lat},
 					{"recency", recency}};
 		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
