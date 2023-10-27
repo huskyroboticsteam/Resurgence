@@ -32,6 +32,10 @@ void cleanup(int signum) {
 
 } // namespace
 
+bool customVecComparator(const navtypes::Vectord<2>& a, const navtypes::Vectord<2>& b) {
+	return a[0] < b[0];
+}
+
 // Runs limit switch calibration.
 // Registers limit switch callbacks for the relevant motors.
 // Then begins to run the motors.
@@ -77,7 +81,7 @@ int main() {
 	
 	// mess with putting the std Pos's in a vector to begin with 
 	// and then sort afterwards.
-	std::sort(targetPosVec.begin(), targetPosVec.end());
+	std::sort(targetPosVec.begin(), targetPosVec.end(), customVecComparator);
 
 	robot::types::datatime_t currTime(0s);
 
