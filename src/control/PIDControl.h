@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../world_interface/data.h"
 #include "../utils/time.h"
+#include "../world_interface/data.h"
 
 #include <chrono>
 #include <functional>
@@ -27,9 +27,11 @@ struct PIDGains {
  * @tparam dim The number of dimensions to control.
  * @see https://en.wikipedia.org/wiki/PID_controller
  */
-template <int dim> class PIDController {
+template <int dim>
+class PIDController {
 public:
-	template <int d> using Arrayd = Eigen::Array<double, d, 1>;
+	template <int d>
+	using Arrayd = Eigen::Array<double, d, 1>;
 
 	/**
 	 * @brief Construct a new PIDController.

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../utils/time.h"
 #include "../filters/StateSpaceUtil.h"
 #include "../navtypes.h"
 #include "../utils/math.h"
+#include "../utils/time.h"
 #include "../world_interface/data.h"
 
 #include <functional>
@@ -19,7 +19,8 @@
  * @tparam inputDim The dimension of the input vector of the kinematic function.
  * @see https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant
  */
-template <int outputDim, int inputDim> class JacobianVelController {
+template <int outputDim, int inputDim>
+class JacobianVelController {
 public:
 	/**
 	 * @brief Construct a new controller.

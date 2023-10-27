@@ -1,7 +1,7 @@
 #include "PoseEstimator.h"
 
-#include "../utils/transform.h"
 #include "../navtypes.h"
+#include "../utils/transform.h"
 
 using namespace navtypes;
 using namespace kinematics;

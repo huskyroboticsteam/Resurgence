@@ -2,9 +2,9 @@
 #include "plan.h"
 
 #include "../Constants.h"
-#include "../utils/transform.h"
-#include "../utils/ScopedTimer.h"
 #include "../log.h"
+#include "../utils/ScopedTimer.h"
+#include "../utils/transform.h"
 
 #include <iostream>
 #include <queue>
