@@ -2,8 +2,6 @@
 
 #include <chrono>
 
-#include "../../src/Util.h"
-
 using namespace Catch::literals;
 using namespace util;
 using namespace std::chrono_literals;

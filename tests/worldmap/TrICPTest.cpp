@@ -1,5 +1,4 @@
 #include "../../src/worldmap/TrICP.h"
-#include "../../src/Util.h"
 
 #include <Eigen/LU>
 #include <iostream>

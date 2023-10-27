@@ -3,6 +3,7 @@
 #include "../navtypes.h"
 #include "../world_interface/data.h"
 #include "CommandBase.h"
+#include "../utils/time.h"
 
 #include <chrono>
 #include <optional>

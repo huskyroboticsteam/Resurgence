@@ -1,6 +1,5 @@
 #include "Constants.h"
 #include "Globals.h"
-#include "Util.h"
 #include "log.h"
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"

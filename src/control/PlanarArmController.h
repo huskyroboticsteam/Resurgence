@@ -3,6 +3,7 @@
 #include "../kinematics/PlanarArmKinematics.h"
 #include "../navtypes.h"
 #include "../world_interface/data.h"
+#include "../utils/time.h"
 
 #include <array>
 #include <initializer_list>

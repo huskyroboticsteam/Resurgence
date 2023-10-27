@@ -2,7 +2,8 @@
 #include "plan.h"
 
 #include "../Constants.h"
-#include "../Util.h"
+#include "../utils/transform.h"
+#include "../utils/ScopedTimer.h"
 #include "../log.h"
 
 #include <iostream>

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Util.h"
 #include "../navtypes.h"
 #include "../world_interface/data.h"
+#include "../utils/time.h"
 
 #include <array>
 #include <cmath>

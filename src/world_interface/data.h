@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Util.h"
 #include "../navtypes.h"
 
 #include <bitset>
