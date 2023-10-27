@@ -1,5 +1,6 @@
 #include "../../src/worldmap/GlobalMap.h"
 #include "../../src/navtypes.h"
+#include "../../src/utils/transform.h"
 
 #include <iostream>
 #include <cmath>

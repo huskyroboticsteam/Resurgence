@@ -1,4 +1,5 @@
 #include <catch2/catch.hpp>
+#include "../../src/utils/time.h"
 
 #include <chrono>
 

@@ -8,6 +8,7 @@
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../log.h"
 #include "../navtypes.h"
+#include "../utils/core.h"
 #include "motor/can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
