@@ -189,8 +189,8 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 void MissionControlProtocol::sendRoverPos() {
 	auto imu = robot::readIMU();
 	auto gps = gps::readGPSCoords();
-	log(LOG_DEBUG, "imu_valid=%d, gps_valid=%d\n", util::to_string(imu.isValid()),
-		util::to_string(gps.isValid()));
+	log(LOG_DEBUG, "imu_valid=%s, gps_valid=%s\n", util::to_string(imu.isValid()).c_str(),
+		util::to_string(gps.isValid()).c_str());
 	if (imu.isValid()) {
 		auto rpy = imu.getData();
 		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *

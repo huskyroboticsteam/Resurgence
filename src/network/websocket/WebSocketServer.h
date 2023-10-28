@@ -99,6 +99,7 @@ private:
 		ProtocolData(std::unique_ptr<WebSocketProtocol> protocol);
 		const std::unique_ptr<WebSocketProtocol> protocol;
 		std::optional<connection_hdl> client;
+		// holds the periodically scheduled ping event and the watchdog
 		std::optional<std::pair<util::PeriodicScheduler<>::eventid_t, util::Watchdog<>>>
 			heartbeatInfo;
 		std::mutex mutex;
@@ -108,14 +109,20 @@ private:
 	uint16_t port;
 	websocketpp::server<websocketpp::config::asio> server;
 	bool isRunning;
+	// maps path prefix to ProtocolData for each protocol
 	std::map<std::string, ProtocolData> protocolMap;
 	std::thread serverThread;
 	util::PeriodicScheduler<> pingScheduler;
 
+	// called when connection is received and being validated.
+	// return true to accept, false to reject
 	bool validate(connection_hdl hdl);
+	// called when connection is opened
 	void onOpen(connection_hdl hdl);
+	// called when connection is closed
 	void onClose(connection_hdl hdl);
 	void onMessage(connection_hdl hdl, message_t message);
+	// called when pong message received from WS client
 	void onPong(connection_hdl hdl, const std::string& payload);
 	void serverTask();
 };

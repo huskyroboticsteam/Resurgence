@@ -1,25 +1,23 @@
 #include "../../src/worldmap/GlobalMap.h"
-#include "../../src/navtypes.h"
-#include "../../src/Util.h"
 
-#include <iostream>
-#include <cmath>
+#include "../../src/navtypes.h"
+#include "../../src/utils/transform.h"
+
 #include <cfloat>
+#include <cmath>
+#include <iostream>
 
 #include <catch2/catch.hpp>
 
 using namespace navtypes;
 using namespace util;
 
-namespace
-{
-double rand(double low, double high)
-{
+namespace {
+double rand(double low, double high) {
 	return low + (::rand() / (RAND_MAX / (high - low))); // NOLINT(cert-msc50-cpp)
 }
 
-transform_t randTransform(double centerX, double centerY)
-{
+transform_t randTransform(double centerX, double centerY) {
 	// move back to the origin, rotate around the origin, then move back.
 	transform_t toOrigin = toTransformRotateFirst(centerX, centerY, 0);
 	transform_t fromOrigin = toTransformRotateFirst(-centerX, -centerY, 0);
@@ -28,12 +26,10 @@ transform_t randTransform(double centerX, double centerY)
 	return fromOrigin * trf * toOrigin;
 }
 
-double calculateMSE(const points_t &p1, const points_t &p2)
-{
+double calculateMSE(const points_t& p1, const points_t& p2) {
 	double mse = 0;
 	REQUIRE(p2.size() >= p1.size());
-	for (size_t i = 0; i < p1.size(); i++)
-	{
+	for (size_t i = 0; i < p1.size(); i++) {
 		point_t truth = p1[i];
 		point_t p = p2[i];
 		mse += pow((p - truth).norm(), 2);
@@ -44,8 +40,7 @@ double calculateMSE(const points_t &p1, const points_t &p2)
 }
 } // namespace
 
-TEST_CASE("Global Map - ScanStride", "[GlobalMap]")
-{
+TEST_CASE("Global Map - ScanStride", "[GlobalMap]") {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 
 	for (int i = 1; i <= 3; i++) {
@@ -62,8 +57,7 @@ TEST_CASE("Global Map - ScanStride", "[GlobalMap]")
 	}
 }
 
-TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
-{
+TEST_CASE("Global Map - GetClosest", "[GlobalMap]") {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 
 	GlobalMap map(1000);
@@ -72,8 +66,7 @@ TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
 	constexpr int areaMin = -5;
 	constexpr int areaMax = 5;
 
-	for (int i = 0; i < 100; i++)
-	{
+	for (int i = 0; i < 100; i++) {
 		double x = rand(areaMin, areaMax);
 		double y = rand(areaMin, areaMax);
 		point_t p = {x, y, 1};
@@ -89,11 +82,9 @@ TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
 		// manually compute the nearest neighbor to check against
 		point_t closest = {0, 0, 0};
 		double minDist = std::numeric_limits<double>::infinity();
-		for (const point_t &p : points)
-		{
+		for (const point_t& p : points) {
 			double dist = (p - point).topRows<2>().norm();
-			if (dist < minDist)
-			{
+			if (dist < minDist) {
 				minDist = dist;
 				closest = p;
 			}
@@ -111,20 +102,17 @@ TEST_CASE("Global Map - GetClosest", "[GlobalMap]")
 	}
 }
 
-TEST_CASE("Global Map", "[GlobalMap]")
-{
+TEST_CASE("Global Map", "[GlobalMap]") {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 
 	GlobalMap map(1000);
 	points_t allPoints;
 	// create 5 groups of points for aligning with each other, all in same area
-	for (int i = 0; i < 5; i++)
-	{
+	for (int i = 0; i < 5; i++) {
 		points_t sample;
 		// first sample should be in axes reference frame, so we can check performance easily
 		transform_t trf = i > 0 ? randTransform(0, 0) : transform_t::Identity();
-		for (int j = 0; j < 150; j++)
-		{
+		for (int j = 0; j < 150; j++) {
 			double x1 = rand(-3, 3);
 			double y1 = pow(x1, 3);
 			point_t p = {x1, y1, 1};
@@ -137,7 +125,7 @@ TEST_CASE("Global Map", "[GlobalMap]")
 	points_t mapPoints = map.getPoints();
 
 	// we need to sort because iteration order is not consistent
-	auto comp = [](const point_t &a, const point_t &b) { return a(0) < b(0); };
+	auto comp = [](const point_t& a, const point_t& b) { return a(0) < b(0); };
 	std::sort(allPoints.begin(), allPoints.end(), comp);
 	std::sort(mapPoints.begin(), mapPoints.end(), comp);
 
@@ -147,8 +135,7 @@ TEST_CASE("Global Map", "[GlobalMap]")
 	REQUIRE(mse == Approx(0).margin(0.5));
 }
 
-TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
-{
+TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]") {
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
 	// we'll be getting points along the sin function
 	std::function<double(double)> func = [](double x) { return sin(x); };
@@ -156,8 +143,7 @@ TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
 	GlobalMap map(1000);
 	points_t truths;
 	// create 5 groups of points for aligning, each partially overlapping with the last
-	for (int i = -2; i <= 2; i++)
-	{
+	for (int i = -2; i <= 2; i++) {
 		// the area is 3 wide, and the center moves right by 1.5 each time
 		double center = i * 1.5;
 		double min = center - 1.5;
@@ -166,8 +152,7 @@ TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
 		// last sample should be in axes reference frame, so we can check performance easily
 		transform_t trf =
 			i != 2 ? randTransform(center, func(center)) : transform_t::Identity();
-		for (int j = 0; j < 100; j++)
-		{
+		for (int j = 0; j < 100; j++) {
 			double x = rand(min, max);
 			double y = func(x);
 			point_t p = {x, y, 1};
@@ -181,7 +166,7 @@ TEST_CASE("Global Map 0.5 Overlap", "[GlobalMap]")
 	points_t mapPoints = map.getPoints();
 
 	// we need to sort because iteration order is not consistent
-	auto comp = [](const point_t &a, const point_t &b) { return a(0) < b(0); };
+	auto comp = [](const point_t& a, const point_t& b) { return a(0) < b(0); };
 	std::sort(truths.begin(), truths.end(), comp);
 	std::sort(mapPoints.begin(), mapPoints.end(), comp);
 
