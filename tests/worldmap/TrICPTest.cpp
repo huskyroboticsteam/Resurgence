@@ -1,33 +1,29 @@
 #include "../../src/worldmap/TrICP.h"
-#include "../../src/Util.h"
 
-#include <Eigen/LU>
+#include "../../src/utils/transform.h"
+#include "../../src/worldmap/GlobalMap.h"
+
 #include <iostream>
 
+#include <Eigen/LU>
 #include <catch2/catch.hpp>
-
-#include "../../src/worldmap/GlobalMap.h"
 
 using namespace navtypes;
 using namespace util;
 
-namespace
-{
-double rand(double low, double high)
-{
+namespace {
+double rand(double low, double high) {
 	return low + (::rand() / (RAND_MAX / (high - low))); // NOLINT(cert-msc50-cpp)
 }
 } // namespace
 
-TEST_CASE("Trimmed ICP")
-{
+TEST_CASE("Trimmed ICP") {
 	points_t map;
 	points_t sample;
 	points_t truths;
 	transform_t trf = toTransformRotateFirst(0.1, -0.25, M_PI / 24);
 	srand(time(nullptr)); // NOLINT(cert-msc51-cpp)
-	for (int i = 0; i < 150; i++)
-	{
+	for (int i = 0; i < 150; i++) {
 		double x1 = rand(-6, 2);
 		double y1 = pow(x1, 3);
 		map.push_back({x1, y1, 1});

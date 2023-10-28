@@ -1,8 +1,8 @@
-#include <catch2/catch.hpp>
+#include "../../src/utils/time.h"
 
 #include <chrono>
 
-#include "../../src/Util.h"
+#include <catch2/catch.hpp>
 
 using namespace Catch::literals;
 using namespace util;
