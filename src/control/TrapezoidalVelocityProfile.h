@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Util.h"
 #include "../navtypes.h"
+#include "../utils/time.h"
 #include "../world_interface/data.h"
 
 #include <array>
@@ -19,7 +19,8 @@ namespace control {
  *
  * @tparam dim The number of dimensions that are controlled by this profile.
  */
-template <int dim> class TrapezoidalVelocityProfile {
+template <int dim>
+class TrapezoidalVelocityProfile {
 public:
 	/**
 	 * @brief Construct a new velocity profile object.
