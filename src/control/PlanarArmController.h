@@ -2,6 +2,7 @@
 
 #include "../kinematics/PlanarArmKinematics.h"
 #include "../navtypes.h"
+#include "../utils/time.h"
 #include "../world_interface/data.h"
 
 #include <array>
@@ -21,7 +22,8 @@ namespace control {
  *
  * @tparam N The number of arm joints.
  */
-template <unsigned int N> class PlanarArmController {
+template <unsigned int N>
+class PlanarArmController {
 public:
 	/**
 	 * @brief Construct a new controller object.
