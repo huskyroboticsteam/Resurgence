@@ -148,13 +148,19 @@ private:
 		double radius = kin.getSegLens().sum() * safetyFactor;
 
 		if (eePos.norm() > radius) {
-			// TODO: will need to eventually shrink velocity vector until it is within radius
-			// instead of just normalizing it.
-
-			eePos.normalize();
-			eePos *= radius;
+			double radius = kin.getSegLens().sum();
+			// new position is outside of bounds. Set new EE setpoint so it will follow the velocity
+			// vector instead of drifting along the radius.
+			// setpoint = setpoint inside circle
+			// eePos = new setpoint outside circle
+			double diffDotProd = (eePos - setpoint).dot(setpoint);
+			double differenceNorm = (eePos - setpoint).squaredNorm();
+			double discriminant =
+				std::pow(diffDotProd, 2) -
+				differenceNorm * (setpoint.squaredNorm() - std::pow(radius, 2));
+			double a = -diffDotProd + std::sqrt(discriminant) / differenceNorm;
+			eePos = (1 - a) * setpoint + a * eePos;
 		}
-
 		return eePos;
 	}
 };
