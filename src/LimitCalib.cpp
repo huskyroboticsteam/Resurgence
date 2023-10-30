@@ -32,10 +32,6 @@ void cleanup(int signum) {
 
 } // namespace
 
-bool customVecComparator(const navtypes::Vectord<2>& a, const navtypes::Vectord<2>& b) {
-	return a[0] < b[0];
-}
-
 // Runs limit switch calibration.
 // Registers limit switch callbacks for the relevant motors.
 // Then begins to run the motors.
@@ -79,18 +75,15 @@ int main() {
 		i++;
 	}
 	
-	// mess with putting the std Pos's in a vector to begin with 
-	// and then sort afterwards.
-	std::sort(targetPosVec.begin(), targetPosVec.end(), customVecComparator);
+	// std::sort(targetPosVec.begin(), targetPosVec.end(), customVecComparator);
 
 	robot::types::datatime_t currTime(0s);
-
 	profile.setTarget(currTime, getMotorPositionsRad(motorNames), targetPosVec);
 
 	JacobianVelController<2,2> controller([](Eigen::VectorXd x) { return x; }, {});
 	
-	navtypes::Vectord<2> targetVel = profile.getCommand(currTime);
 	double d;
+	navtypes::Vectord<2> targetVel = profile.getCommand(currTime);
 	navtypes::Vectord<2>  targetPos = controller.getCommand(currTime, targetVel, d);
 	i = 0;
 	for (const auto& element : sortedKeys) {
