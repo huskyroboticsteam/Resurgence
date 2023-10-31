@@ -63,8 +63,8 @@ int main() {
 	std::sort(sortedKeys.begin(), sortedKeys.end());
 
 	control::TrapezoidalVelocityProfile<encMotors.size()> profile(0.4, 0.6);
-	//std::vector<double, 2> targetPosVec;
-	navtypes::Vectord<2> targetPosVec; 
+	// std::vector<double, 2> targetPosVec;
+	navtypes::Vectord<2> targetPosVec;
 	std::array<robot::types::motorid_t, 2> motorNames;
 
 	int i = 0;
@@ -73,7 +73,7 @@ int main() {
 		targetPosVec[i] = runningMotor.second.stdPos;
 		i++;
 	}
-	
+
 	// std::sort(targetPosVec.begin(), targetPosVec.end(), customVecComparator);
 
 	robot::types::datatime_t currTime(0s);
