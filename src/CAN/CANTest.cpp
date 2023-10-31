@@ -1,8 +1,8 @@
 #include "CAN.h"
 
-#include "../log.h"
 #include "CANMotor.h"
 
+#include <loguru.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +14,12 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
-enum class testmode_t { automatic = 0, autoSend = 1, manualSend = 2, fullManual = 3 };
+enum class testmode_t {
+	automatic = 0,
+	autoSend = 1,
+	manualSend = 2,
+	fullManual = 3
+};
 
 constexpr uint8_t serial = 0xA;
 constexpr int16_t pwm = 10000;
@@ -150,7 +155,7 @@ int main(int argc, char* argv[]) {
 		mode = static_cast<testmode_t>(i);
 	}
 
-	log(LOG_INFO, "Mode=%d\n", static_cast<int>(mode));
+	LOG_F(INFO, "Mode=%d\n", static_cast<int>(mode));
 
 	switch (mode) {
 		case testmode_t::automatic:

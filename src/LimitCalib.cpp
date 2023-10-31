@@ -1,10 +1,10 @@
-#include "log.h"
 #include "utils/threading.h"
 #include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"
 
 #include <chrono>
 #include <csignal>
+#include <loguru.hpp>
 
 using namespace robot;
 using namespace std::chrono;
@@ -22,7 +22,7 @@ void callback(motorid_t motor, const types::DataPoint<LimitSwitchData>& data) {
 };
 
 void cleanup(int signum) {
-	log(LOG_ERROR, "Interrupted!\n");
+	LOG_F(ERROR, "Interrupted!\n");
 	robot::emergencyStop();
 	exit(0);
 }
@@ -43,7 +43,7 @@ int main() {
 		robot::addLimitSwitchCallback(entry.first, callback);
 	}
 
-	log(LOG_INFO, "Zero calibrating...\n");
+	LOG_F(INFO, "Zero calibrating...\n");
 
 	// run motors until latch unlatches
 	do {
@@ -52,5 +52,5 @@ int main() {
 		}
 	} while (!latch.wait_for(500ms));
 
-	log(LOG_INFO, "Done\n");
+	LOG_F(INFO, "Done\n");
 }

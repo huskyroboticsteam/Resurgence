@@ -2,11 +2,11 @@
 #include "plan.h"
 
 #include "../Constants.h"
-#include "../log.h"
 #include "../utils/ScopedTimer.h"
 #include "../utils/transform.h"
 
 #include <iostream>
+#include <loguru.hpp>
 #include <queue>
 #include <set>
 
@@ -106,7 +106,7 @@ bool is_valid(const Node* n, const collides_predicate_t& collides) {
 
 plan_t getPlan(const collides_predicate_t& collides, const point_t& goal, double goal_radius) {
 	util::ScopedTimer timer;
-	log(LOG_DEBUG, "Planning... ");
+	LOG_F(2, "Planning... ");
 	action_t action = action_t::Zero();
 	std::vector<Node*> allocated_nodes;
 	Node* start = new Node(nullptr, action, goal);
@@ -156,8 +156,8 @@ plan_t getPlan(const collides_predicate_t& collides, const point_t& goal, double
 	std::chrono::milliseconds endTime = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::system_clock::now().time_since_epoch());
 
-	log(LOG_DEBUG, "finished in %d iterations (%d visited nodes), Time: %dms\n", counter,
-		allocated_nodes.size(), timer.elapsedTime().count() / 1000);
+	LOG_F(2, "finished in %d iterations (%ld visited nodes), Time: %ldms\n", counter,
+		  allocated_nodes.size(), timer.elapsedTime().count() / 1000);
 	for (Node* p : allocated_nodes) {
 		free(p);
 	}

@@ -2,9 +2,9 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../log.h"
 #include "../utils/json.h"
 
+#include <loguru.hpp>
 #include <mutex>
 
 namespace net {
@@ -43,7 +43,7 @@ void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServe
 }
 
 void ArduPilotProtocol::clientConnected() {
-	log(LOG_INFO, "ArduPilot connected.\n");
+	LOG_F(INFO, "ArduPilot connected.\n");
 	{
 		std::lock_guard<std::mutex> lock(_connectionMutex);
 		_arduPilotProtocolConnected = true;
@@ -51,7 +51,7 @@ void ArduPilotProtocol::clientConnected() {
 }
 
 void ArduPilotProtocol::clientDisconnected() {
-	log(LOG_WARN, "ArduPilot disconnected.\n");
+	LOG_F(WARNING, "ArduPilot disconnected.\n");
 	{
 		std::lock_guard<std::mutex> lock(_connectionMutex);
 		_arduPilotProtocolConnected = false;

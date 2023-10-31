@@ -1,6 +1,5 @@
 #include "Constants.h"
 #include "Globals.h"
-#include "log.h"
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"
 #include "rospub.h"
@@ -11,6 +10,7 @@
 #include <csignal>
 #include <ctime>
 #include <fstream>
+#include <loguru.cpp>
 #include <sstream>
 #include <thread>
 #include <time.h>
@@ -53,14 +53,14 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 			// we assume that gps already has a fix
 			gpscoords_t gps = {lat, lon};
 			URCLegGPS leg = {left_post_id, right_post_id, gps};
-			log(LOG_INFO, "Got urc leg at lat=%f lon=%f\n", lat, lon);
+			LOG_F(INFO, "Got urc leg at lat=%f lon=%f\n", lat, lon);
 			urc_legs.push_back(leg);
 		}
 	}
-	log(LOG_INFO, "Got %d urc legs\n", urc_legs.size());
+	LOG_F(INFO, "Got %ld urc legs\n", urc_legs.size());
 
 	if (urc_legs.size() == 0) {
-		log(LOG_ERROR, "could not get URC legs\n");
+		LOG_F(ERROR, "could not get URC legs\n");
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -94,15 +94,16 @@ void parseCommandLine(int argc, char** argv) {
 			  "LOG_WARN, LOG_ERROR)")
 		.default_value(std::string("LOG_INFO"))
 		.action([](const std::string& value) {
-			std::unordered_map<std::string, int> allowed{{"LOG_TRACE", LOG_TRACE},
-														 {"LOG_DEBUG", LOG_DEBUG},
-														 {"LOG_INFO", LOG_INFO},
-														 {"LOG_WARN", LOG_WARN},
-														 {"LOG_ERROR", LOG_ERROR}};
+			std::unordered_map<std::string, int> allowed{
+				{"LOG_ERROR", loguru::Verbosity_ERROR},
+				{"LOG_WARN", loguru::Verbosity_WARNING},
+				{"LOG_INFO", loguru::Verbosity_INFO},
+				{"LOG_DEBUG", 2},
+				{"LOG_TRACE", 1},
+			};
 
 			if (allowed.find(value) != allowed.end()) {
-				setLogLevel(allowed[value]);
-				return value;
+				loguru::g_stderr_verbosity = allowed[value];
 			}
 
 			throw std::runtime_error("Invalid log level " + value);
@@ -110,16 +111,16 @@ void parseCommandLine(int argc, char** argv) {
 
 	program.add_argument("-nc", "--no-colors")
 		.help("disables colors in console logging")
-		.action([&](const auto&) { setColorsEnabled(false); })
+		.action([&](const auto&) { loguru::g_colorlogtostderr = false; })
 		.nargs(0);
 
 	try {
 		program.parse_args(argc, argv);
-		log(LOG_INFO,
-			"parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: "
-			"\"%s\"\n",
-			program.get<std::string>("peripheral").c_str(),
-			program.get<std::string>("loglevel").c_str());
+		LOG_F(INFO,
+			  "parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: "
+			  "\"%s\"\n",
+			  program.get<std::string>("peripheral").c_str(),
+			  program.get<std::string>("loglevel").c_str());
 	} catch (const std::runtime_error& err) {
 		std::cerr << err.what() << std::endl;
 		std::cerr << program;
