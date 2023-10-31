@@ -154,19 +154,19 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 
 static bool validateWaypointNavRequest(const json& j) {
 	return util::validateKey(j, "latitude", val_t::string) &&
-		   util::validateKey(j, "longitude", val_t::string) &&
-		   util::validateKey(j, "isApproximate", val_t::boolean) &&
-		   util::validateKey(j, "isGate", val_t::boolean);
+		   util::validateKey(j, "longitude", val_t::string);
+	util::validateKey(j, "isApproximate", val_t::boolean) &&
+		util::validateKey(j, "isGate", val_t::boolean);
 }
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
-	double latitude = j["latitude"];
-	double longitude = j["longitude"];
+	std::string latitude = j["latitude"];
+	std::string longitude = j["longitude"];
 	bool isApproximate = j["isApproximate"];
 	bool isGate = j["isGate"];
 
-	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
-		navtypes::point_t waypointCoords(latitude, longitude, 1);
+	if (Globals::AUTONOMOUS) { // && !isApproximate && !isGate) {
+		navtypes::point_t waypointCoords(std::stod(latitude), std::stod(longitude), 1);
 		_autonomous_task.start(waypointCoords);
 	}
 }
