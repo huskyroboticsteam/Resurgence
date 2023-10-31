@@ -79,7 +79,7 @@ int main() {
 	robot::types::datatime_t currTime(0s);
 	profile.setTarget(currTime, getMotorPositionsRad(motorNames), targetPosVec);
 
-	JacobianVelController<2,2> controller([](Eigen::VectorXd x) { return x; }, {});
+	JacobianVelController<2, 2> controller([](Eigen::VectorXd x) { return x; }, {});
 
 	double d;
 	navtypes::Vectord<2> targetVel = profile.getCommand(currTime);
