@@ -1,8 +1,8 @@
+#include "control/TrapezoidalVelocityProfile.h"
 #include "log.h"
 #include "utils/threading.h"
 #include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"
-#include "control/TrapezoidalVelocityProfile.h"
 
 #include <chrono>
 #include <csignal>
@@ -58,11 +58,10 @@ int main() {
 	log(LOG_INFO, "Done\n");
 
 	constexpr std::array<robot::types::motorid_t, 2> sortedKeys = {
-		{robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow}
-	};
+		{robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow}};
 
 	std::sort(sortedKeys.begin(), sortedKeys.end());
-	
+
 	control::TrapezoidalVelocityProfile<encMotors.size()> profile(0.4, 0.6);
 	//std::vector<double, 2> targetPosVec;
 	navtypes::Vectord<2> targetPosVec; 
@@ -81,14 +80,13 @@ int main() {
 	profile.setTarget(currTime, getMotorPositionsRad(motorNames), targetPosVec);
 
 	JacobianVelController<2,2> controller([](Eigen::VectorXd x) { return x; }, {});
-	
+
 	double d;
 	navtypes::Vectord<2> targetVel = profile.getCommand(currTime);
-	navtypes::Vectord<2>  targetPos = controller.getCommand(currTime, targetVel, d);
+	navtypes::Vectord<2> targetPos = controller.getCommand(currTime, targetVel, d);
 	i = 0;
 	for (const auto& element : sortedKeys) {
-		robot::setMotorPos(element, targetPos[i]);	
+		robot::setMotorPos(element, targetPos[i]);
 		i++;
 	}
-
 }
