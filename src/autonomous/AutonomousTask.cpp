@@ -38,7 +38,7 @@ void AutonomousTask::navigate() {
 
 		if (latestGPS.isFresh(2000ms) && latestHeading.isFresh(2000ms)) {
 			auto gpsData = latestGPS.getData();
-			navtypes::pose_t latestPos(gpsData.x(), gpsData.y(), latestHeading);
+			navtypes::pose_t latestPos(gpsData.x(), gpsData.y(), latestHeading.getData());
 			cmd.setState(latestPos, robot::types::dataclock::now());
 			commands::command_t output = cmd.getOutput();
 			robot::setCmdVel(output.thetaVel, output.xVel);
