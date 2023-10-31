@@ -1,7 +1,6 @@
 #include "CAN/CAN.h"
 #include "CAN/CANMotor.h"
 #include "Constants.h"
-#include "log.h"
 #include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"
 
@@ -23,7 +22,8 @@ using namespace robot::types;
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-template <typename K, typename V> std::map<V, K> reverseMap(const std::map<K, V>& map) {
+template <typename K, typename V>
+std::map<V, K> reverseMap(const std::map<K, V>& map) {
 	std::map<V, K> reversed;
 	for (const auto& [k, v] : map) {
 		reversed.emplace(v, k);

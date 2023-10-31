@@ -98,6 +98,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(HindsightCAN)
 
+FetchContent_Declare(LoguruGitRepo
+	GIT_REPOSITORY "https://github.com/emilk/loguru"
+	GIT_TAG        "master"
+)
+# set any loguru compile-time flags before calling MakeAvailable()
+set(LOGURU_WITH_STREAMS TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+FetchContent_MakeAvailable(LoguruGitRepo) # defines target 'loguru::loguru'
+link_libraries(loguru::loguru)
+
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
@@ -136,7 +146,6 @@ target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
 
 # shared library for utility code
 add_library(utils SHARED
-  log.cpp
   utils/core.cpp
   utils/random.cpp
   utils/ScopedTimer.cpp

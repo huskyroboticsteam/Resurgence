@@ -1,13 +1,13 @@
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../kinematics/DiffDriveKinematics.h"
-#include "../log.h"
 #include "../navtypes.h"
 #include "../utils/transform.h"
 #include "world_interface.h"
 
 #include <atomic>
 #include <chrono>
+#include <loguru.hpp>
 #include <mutex>
 
 using namespace navtypes;
@@ -121,8 +121,8 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 		// FIXME: this should ideally never happen, but we don't have support for all joints
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
-		log(LOG_WARN, "setJointPos called for currently unsupported joint %s\n",
-			util::to_string(joint).c_str());
+		LOG_F(WARNING, "setJointPos called for currently unsupported joint %s\n",
+			  util::to_string(joint).c_str());
 	}
 }
 
@@ -144,8 +144,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		}
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
-		log(LOG_WARN, "getJointPos called for currently unsupported joint %s\n",
-			util::to_string(joint).c_str());
+		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s\n",
+			  util::to_string(joint).c_str());
 		return {};
 	}
 }
@@ -189,8 +189,8 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			}
 		}
 	} else {
-		log(LOG_WARN, "setJointPower called for currently unsupported joint %s\n",
-			util::to_string(joint).c_str());
+		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s\n",
+			  util::to_string(joint).c_str());
 	}
 }
 } // namespace
