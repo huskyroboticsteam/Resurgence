@@ -107,6 +107,7 @@ set(LOGURU_WITH_STREAMS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 FetchContent_MakeAvailable(LoguruGitRepo) # defines target 'loguru::loguru'
 link_libraries(loguru::loguru)
+link_libraries(-ldl)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
