@@ -57,8 +57,8 @@ int main() {
 
 	log(LOG_INFO, "Done\n");
 
-	constexpr std::array<robot::types::motorid_t, 2> sortedKeys = {
-		{robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow}};
+	std::array<robot::types::motorid_t, 2> sortedKeys = 
+		{robot::types::motorid_t::shoulder, robot::types::motorid_t::elbow};
 
 	std::sort(sortedKeys.begin(), sortedKeys.end());
 
