@@ -40,7 +40,7 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
 
 	// Instantiate PlanarArmController.
-	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
+	PlanarArmController<2> foo({0, M_PI_2}, kin_obj, Constants::arm::SAFETY_FACTOR);
 
 	// Attempt to straighten out end-effector all the way, exceeding max length.
 	// This should cause the EE to be repositioned to fit the length constraint.
