@@ -142,10 +142,11 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		// It should somehow just not enable IK, but then it needs to communicate back to MC
 		// that IK wasn't enabled?
 		assert(armJointPositions.isValid());
-		Globals::planarArmController.set_setpoint(armJointPositions.getData());
-		Globals::armIKEnabled = true;
-		_arm_ik_repeat_thread =
-			std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+		if (Globals::planarArmController.set_setpoint(armJointPositions.getData())) {
+			Globals::armIKEnabled = true;
+			_arm_ik_repeat_thread =
+				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+		}
 	} else {
 		Globals::armIKEnabled = false;
 		if (_arm_ik_repeat_thread.joinable()) {
