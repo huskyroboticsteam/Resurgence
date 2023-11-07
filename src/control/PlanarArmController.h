@@ -13,6 +13,7 @@
 #include <optional>
 
 #include <Eigen/Core>
+#include <iostream>
 
 namespace control {
 
@@ -148,9 +149,7 @@ private:
 	 */
 	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos) {
 		double radius = kin.getSegLens().sum() * safetyFactor;
-
-		if (eePos.norm() > (radius + 0.5)) {
-			double radius = kin.getSegLens().sum();
+		if (eePos.norm() > (radius + 1e-4)) {
 			// new position is outside of bounds. Set new EE setpoint so it will follow the
 			// velocity vector instead of drifting along the radius. setpoint = setpoint inside
 			// circle eePos = new setpoint outside circle
