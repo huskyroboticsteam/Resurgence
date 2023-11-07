@@ -105,9 +105,9 @@ static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d =
 }
 
 void initCameras() {
-	auto cfg = cam::readConfigFromFile(Constants::AR_CAMERA_CONFIG_PATH);
-	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
-	// openCamera(Constants::AR_CAMERA_ID);
+	auto cfg = cam::readConfigFromFile(Constants::MAST_CAMERA_CONFIG_PATH);
+	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
+	// openCamera(Constants::MAST_CAMERA_ID);
 	openCamera("front", cfg.intrinsicParams->getIntrinsicList());
 	openCamera("rear", cfg.intrinsicParams->getIntrinsicList());
 	openCamera("upperArm", cfg.intrinsicParams->getIntrinsicList());
