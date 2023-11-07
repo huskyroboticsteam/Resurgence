@@ -115,6 +115,15 @@ void parseCommandLine(int argc, char** argv) {
 		.nargs(0);
 
 	try {
+		loguru::init(argc, argv);
+
+		const auto now = std::chrono::system_clock::now();
+		const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
+		std::string logFileName = std::ctime(&t_c);
+		logFileName += ".log";
+		loguru::add_file(logFileName.c_str(), loguru::Append, loguru::g_stderr_verbosity);
+		LOG_F(INFO, "Logging to %s", logFileName.c_str());
+
 		program.parse_args(argc, argv);
 		LOG_F(INFO,
 			  "parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: "
