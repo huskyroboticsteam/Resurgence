@@ -138,10 +138,12 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		}
 		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+
 		// TODO: there should be a better way of handling invalid data than crashing.
 		// It should somehow just not enable IK, but then it needs to communicate back to MC
 		// that IK wasn't enabled?
 		assert(armJointPositions.isValid());
+		
 		if (Globals::planarArmController.set_setpoint(armJointPositions.getData())) {
 			Globals::armIKEnabled = true;
 			_arm_ik_repeat_thread =
