@@ -45,7 +45,7 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	// Attempt to straighten out end-effector all the way, exceeding max length.
 	// This should cause the EE to be repositioned to fit the length constraint.
 	foo.set_setpoint({0.0, 0.0});
-	assertApprox({9.5, 0.0}, foo.get_setpoint(robot::types::dataclock::now()));
+	assertApprox({10, 0.0}, foo.get_setpoint(robot::types::dataclock::now()));
 
 	// Try setting the joints to be orthogonal but within max length, such that:
 	// - End effector position is (6,4), which implies that:

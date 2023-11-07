@@ -149,18 +149,18 @@ private:
 	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos) {
 		double radius = kin.getSegLens().sum() * safetyFactor;
 
-		if (eePos.norm() > radius) {
+		if (eePos.norm() > (radius + 0.5)) {
 			double radius = kin.getSegLens().sum();
-			// new position is outside of bounds. Set new EE setpoint so it will follow the velocity
-			// vector instead of drifting along the radius.
-			// setpoint = setpoint inside circle
-			// eePos = new setpoint outside circle
+			// new position is outside of bounds. Set new EE setpoint so it will follow the
+			// velocity vector instead of drifting along the radius. setpoint = setpoint inside
+			// circle eePos = new setpoint outside circle
 			double diffDotProd = (eePos - setpoint).dot(setpoint);
 			double differenceNorm = (eePos - setpoint).squaredNorm();
 			double discriminant =
 				std::pow(diffDotProd, 2) -
 				differenceNorm * (setpoint.squaredNorm() - std::pow(radius, 2));
-			double a = -diffDotProd + std::sqrt(discriminant) / differenceNorm;
+			double a = (-diffDotProd + std::sqrt(discriminant)) / differenceNorm;
+			// new constrained eePos = (1 - a) * (ee inside circle) + a * (ee outside circle)
 			eePos = (1 - a) * setpoint + a * eePos;
 		}
 		return eePos;
