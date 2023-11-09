@@ -141,7 +141,7 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		// TODO: there should be a better way of handling invalid data than crashing.
 		// It should somehow just not enable IK, but then it needs to communicate back to MC
 		// that IK wasn't enabled?
-		assert(armJointPositions.isValid());
+		CHECK_F(armJointPositions.isValid());
 		Globals::planarArmController.set_setpoint(armJointPositions.getData());
 		Globals::armIKEnabled = true;
 		_arm_ik_repeat_thread =

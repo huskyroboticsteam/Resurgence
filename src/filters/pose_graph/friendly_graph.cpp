@@ -6,6 +6,7 @@
 #include "../../utils/transform.h"
 
 #include <iostream>
+#include <loguru.hpp>
 #include <vector>
 
 #include <Eigen/Core>
@@ -69,7 +70,7 @@ int FriendlyGraph::poseIdx(int pose_id) {
 }
 
 int FriendlyGraph::landmarkIdx(int lm_id) {
-	assert(lm_id < _num_landmarks);
+	CHECK_LT_F(lm_id, _num_landmarks);
 	return lm_id * LM_SIZE;
 }
 
@@ -97,7 +98,7 @@ void FriendlyGraph::trimToMaxNumPoses() {
 }
 
 pose_t FriendlyGraph::getPoseEstimate(int pose_id) {
-	assert("bad pose id" && pose_id >= _min_pose_id && pose_id < _max_pose_id);
+	CHECK_F("bad pose id" && pose_id >= _min_pose_id && pose_id < _max_pose_id);
 	pose_t p = _current_guess.block(poseIdx(pose_id), 0, POSE_SIZE, 1);
 	return p;
 }

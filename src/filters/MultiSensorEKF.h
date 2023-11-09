@@ -7,6 +7,7 @@
 
 #include <array>
 #include <functional>
+#include <loguru.hpp>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -36,15 +37,16 @@ public:
 	 * @param outputNoiseDim The dimension of the noise applied to the output.
 	 * @param outputFunc The output function that takes a state vector and output noise vector
 	 * and produces an output vector.
-	 * @param covMat The covariance matrix of the output noise vector. The state dimension must be @p statedim,
-	 * the parameter size must @p outputDim and the size must be @p outputnoiseDim
+	 * @param covMat The covariance matrix of the output noise vector. The state dimension must
+	 * be @p statedim, the parameter size must @p outputDim and the size must be @p
+	 * outputnoiseDim
 	 */
 	Output(int stateDim, int outputDim, int outputNoiseDim, const outputfunc_t& outputFunc,
 		   const statespace::NoiseCovMatX& covMat)
 		: stateDim(stateDim), outputDim(outputDim), outputNoiseDim(outputNoiseDim),
 		  outputFunc(outputFunc), covMat(covMat) {
-		assert(covMat.stateDim == stateDim && covMat.size == outputNoiseDim &&
-			   covMat.paramDim == outputDim);
+		CHECK_F(covMat.stateDim == stateDim && covMat.size == outputNoiseDim &&
+				covMat.paramDim == outputDim);
 	}
 
 	/**
@@ -57,7 +59,7 @@ public:
 	 * @return Eigen::MatrixXd The outputDim x stateDim jacobian matrix.
 	 */
 	Eigen::MatrixXd outputFuncJacobianX(const Eigen::VectorXd& state) {
-		assert(state.size() == stateDim);
+		CHECK_EQ_F(state.size(), stateDim);
 		Eigen::VectorXd outputNoise = Eigen::VectorXd::Zero(outputNoiseDim);
 		if (outFuncJacobianX) {
 			return this->outFuncJacobianX(state, outputNoise);
@@ -77,7 +79,7 @@ public:
 	 * @return Eigen::MatrixXd The outputDim x processNoiseDim jacobian matrix.
 	 */
 	Eigen::MatrixXd outputFuncJacobianV(const Eigen::VectorXd& state) {
-		assert(state.size() == stateDim);
+		CHECK_EQ_F(state.size(), stateDim);
 		if (outFuncJacobianV) {
 			Eigen::VectorXd outputNoise = Eigen::VectorXd::Zero(outputNoiseDim);
 			return this->outFuncJacobianV(state, outputNoise);
@@ -97,7 +99,7 @@ public:
 	 * @return Eigen::VectorXd An output vector of dimension outputDim.
 	 */
 	Eigen::VectorXd getOutput(const Eigen::VectorXd& state) {
-		assert(state.size() == stateDim);
+		CHECK_EQ_F(state.size(), stateDim);
 		Eigen::VectorXd outputNoise = Eigen::VectorXd::Zero(outputNoiseDim);
 		return outputFunc(state, outputNoise);
 	}
@@ -111,7 +113,7 @@ public:
 	 * @param jacobianV The analytic solution to dh/dx.
 	 * The jacobian function takes a state vector and an output
 	 * noise vector and returns a outputDim x stateDim jacobian matrix.
-	 * 
+	 *
 	 * @warning Behavior is undefined if the supplied functions
 	 * do not accept or return vectors/matrices of the correct dimensions.
 	 */
@@ -130,7 +132,7 @@ public:
 	 * @param jacobianV The analytic solution to dh/dv. The jacobian function takes
 	 * a state vector and an output noise vector and returns a
 	 * outputDim x outputNoiseDim jacobian matrix.
-	 * 
+	 *
 	 * @warning Behavior is undefined if the supplied functions
 	 * do not accept or return vectors/matrices of the correct dimensions.
 	 */
@@ -169,8 +171,7 @@ public:
 		navtypes::Matrixd<processNoiseDim, processNoiseDim> processNoise =
 			Q.get(this->xHat, input);
 
-		navtypes::Matrixd<stateDim, processNoiseDim> L =
-			stateFuncJacobianW(this->xHat, input);
+		navtypes::Matrixd<stateDim, processNoiseDim> L = stateFuncJacobianW(this->xHat, input);
 
 		this->xHat = stateFunc(this->xHat, input, processnoise_t::Zero());
 		this->P = F * this->P * F.transpose() + L * processNoise * L.transpose();
@@ -195,8 +196,9 @@ public:
 		this->xHat = this->xHat + K * y;
 		this->P = (Eigen::Matrix<double, stateDim, stateDim>::Identity() - K * H) * this->P;
 	}
-	
-	template <int outputIdx> void correct(const Eigen::VectorXd& measurement) {
+
+	template <int outputIdx>
+	void correct(const Eigen::VectorXd& measurement) {
 		static_assert(0 <= outputIdx && outputIdx < numOutputs);
 		correct(outputIdx, measurement);
 	}
@@ -214,7 +216,7 @@ public:
 	}
 
 	navtypes::Matrixd<stateDim, stateDim> stateFuncJacobianX(const state_t& x,
-															   const input_t& u) {
+															 const input_t& u) {
 		processnoise_t w = processnoise_t::Zero();
 		if (stateFuncJacobianXSol) {
 			return stateFuncJacobianXSol(x, u, w);
@@ -225,7 +227,7 @@ public:
 	}
 
 	navtypes::Matrixd<stateDim, processNoiseDim> stateFuncJacobianW(const state_t& x,
-																	  const input_t& u) {
+																	const input_t& u) {
 		processnoise_t w = processnoise_t::Zero();
 		if (stateFuncJacobianWSol) {
 			return stateFuncJacobianWSol(x, u, w);
@@ -242,11 +244,11 @@ private:
 	std::array<Output, numOutputs> outputs;
 
 	std::function<navtypes::Matrixd<stateDim, stateDim>(const state_t&, const input_t&,
-														  const processnoise_t&)>
+														const processnoise_t&)>
 		stateFuncJacobianXSol;
 
-	std::function<navtypes::Matrixd<stateDim, processNoiseDim>(
-		const state_t&, const input_t&, const processnoise_t&)>
+	std::function<navtypes::Matrixd<stateDim, processNoiseDim>(const state_t&, const input_t&,
+															   const processnoise_t&)>
 		stateFuncJacobianWSol;
 };
 

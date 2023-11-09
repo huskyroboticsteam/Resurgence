@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <loguru.hpp>
 #include <memory>
 
 #include <opencv2/core.hpp>
@@ -15,14 +16,13 @@ MarkerPattern::MarkerPattern(uint8_t data_region_size, uint8_t border_size, cv::
 							 int id)
 	: data_region_size(data_region_size), border_size(border_size), id(id),
 	  data_bits(cv::Ptr<cv::Mat>(new cv::Mat(bits))) {
-	assert(data_region_size > 0);
-	assert(border_size > 0);
-	assert(bits.rows == data_region_size);
-	assert(bits.cols == data_region_size);
+	CHECK_GT_F(data_region_size, 0);
+	CHECK_GT_F(border_size, 0);
+	CHECK_EQ_F(bits.rows, data_region_size);
+	CHECK_EQ_F(bits.cols, data_region_size);
 }
 
-MarkerPattern::MarkerPattern() {
-}
+MarkerPattern::MarkerPattern() {}
 
 bool MarkerPattern::empty() const {
 	return this->data_bits.empty();

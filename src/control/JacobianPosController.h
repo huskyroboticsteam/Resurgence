@@ -8,6 +8,7 @@
 
 #include <array>
 #include <functional>
+#include <loguru.hpp>
 #include <optional>
 
 #include <Eigen/Core>
@@ -24,7 +25,8 @@ namespace control {
  * @tparam inputDim The dimension of the input vector of the kinematic function.
  * @see https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant
  */
-template <int outputDim, int inputDim> class JacobianPosController {
+template <int outputDim, int inputDim>
+class JacobianPosController {
 public:
 	/**
 	 * @brief Construct a new controller.
@@ -47,8 +49,8 @@ public:
 									: std::bind(util::numericalJacobian, kinematicsFunc,
 												std::placeholders::_1, outputDim)),
 		  velocityProfile(maxVel, maxAccel) {
-		assert(this->kinematicsFunc);
-		assert(this->jacobianFunc);
+		CHECK_NOTNULL_F(this->kinematicsFunc);
+		CHECK_NOTNULL_F(this->jacobianFunc);
 	}
 
 	/**

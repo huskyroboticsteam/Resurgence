@@ -1,6 +1,7 @@
 #include "QuadTree.h"
 
 #include <algorithm>
+#include <loguru.hpp>
 #include <stack>
 
 using namespace navtypes;
@@ -21,11 +22,10 @@ bool boundsIntersect(const point_t& center1, double size1, const point_t& center
 
 QuadTree::QuadTree(point_t center, double width, int nodeCapacity)
 	: center(std::move(center)), width(width), points({}), nodeCapacity(nodeCapacity),
-	  size(0) {
-}
+	  size(0) {}
 
-QuadTree::QuadTree(double width, int nodeCapacity) : QuadTree({0, 0, 1}, width, nodeCapacity) {
-}
+QuadTree::QuadTree(double width, int nodeCapacity)
+	: QuadTree({0, 0, 1}, width, nodeCapacity) {}
 
 size_t QuadTree::getSize() const {
 	return size;
@@ -164,10 +164,10 @@ point_t QuadTree::getClosest(const point_t& point) const {
 
 	// if there are no points in this tree, return {0,0,0}
 	if (tree->empty()) {
-		assert(size == 0); // this should only happen if the tree is empty
+		CHECK_EQ_F(size, 0); // this should only happen if the tree is empty
 		return {0, 0, 0};
 	} else {
-		assert(!tree->empty()); // should be guaranteed
+		CHECK_F(!tree->empty()); // should be guaranteed
 		// choose an arbitrary point
 		point_t p = tree->getArbitraryPoint();
 		// Search area is square, so using the distance guarantees that the closest is found
