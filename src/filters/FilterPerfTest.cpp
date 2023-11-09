@@ -30,7 +30,8 @@ void usage(const char* name);
 template <typename K, typename V>
 constexpr std::unordered_map<V, K> reverseMap(const std::unordered_map<K, V>& map);
 
-enum class FilterType {
+enum class FilterType
+{
 	EKF,
 	PoseGraph
 };

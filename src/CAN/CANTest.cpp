@@ -14,7 +14,8 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
-enum class testmode_t {
+enum class testmode_t
+{
 	automatic = 0,
 	autoSend = 1,
 	manualSend = 2,
