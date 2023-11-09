@@ -24,10 +24,10 @@ constexpr can::telemtype_t IMU_DATA_TYPES[] = {
 void telemCallback(can::deviceid_t id, can::telemtype_t telemType,
 				   DataPoint<can::telemetry_t> data) {
 	if (data) {
-		LOG_F(INFO, "Telemetry: TelemType=%x, Data=%d\n", static_cast<int>(telemType),
+		LOG_F(INFO, "Telemetry: TelemType=%x, Data=%d", static_cast<int>(telemType),
 			  data.getData());
 	} else {
-		LOG_F(INFO, "Telemetry: TelemType=%x, Data=null\n", static_cast<int>(telemType));
+		LOG_F(INFO, "Telemetry: TelemType=%x, Data=null", static_cast<int>(telemType));
 	}
 }
 

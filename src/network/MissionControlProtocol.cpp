@@ -78,7 +78,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	if (stop) {
 		this->stopAndShutdownPowerRepeat();
 		robot::emergencyStop();
-		LOG_F(ERROR, "Emergency stop!\n");
+		LOG_F(ERROR, "Emergency stop!");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();
@@ -124,7 +124,7 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
-	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer, dtheta,
+	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
 		  dx);
 	this->setRequestedCmdVel(dtheta, dx);
 }
@@ -189,7 +189,7 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 void MissionControlProtocol::sendRoverPos() {
 	auto imu = robot::readIMU();
 	auto gps = gps::readGPSCoords();
-	LOG_F(2, "imu_valid=%s, gps_valid=%s\n", util::to_string(imu.isValid()).c_str(),
+	LOG_F(2, "imu_valid=%s, gps_valid=%s", util::to_string(imu.isValid()).c_str(),
 		  util::to_string(gps.isValid()).c_str());
 	if (imu.isValid()) {
 		auto rpy = imu.getData();
@@ -296,7 +296,7 @@ void MissionControlProtocol::handleConnection() {
 void MissionControlProtocol::handleHeartbeatTimedOut() {
 	this->stopAndShutdownPowerRepeat();
 	robot::emergencyStop();
-	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.\n");
+	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.");
 	Globals::E_STOP = true;
 	Globals::armIKEnabled = false;
 }

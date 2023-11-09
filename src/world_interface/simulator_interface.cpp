@@ -207,7 +207,7 @@ void handleTruePose(json msg) {
 }
 
 void clientConnected() {
-	LOG_F(INFO, "Simulator connected!\n");
+	LOG_F(INFO, "Simulator connected!");
 	{
 		std::lock_guard<std::mutex> lock(connectionMutex);
 		simConnected = true;
@@ -216,7 +216,7 @@ void clientConnected() {
 }
 
 void clientDisconnected() {
-	LOG_F(ERROR, "ERROR: Simulator disconnected! World Interface disconnected!\n");
+	LOG_F(ERROR, "ERROR: Simulator disconnected! World Interface disconnected!");
 }
 
 void initSimServer() {
@@ -236,7 +236,7 @@ void initSimServer() {
 
 	{
 		// wait for simulator to connect
-		LOG_F(INFO, "Waiting for simulator connection...\n");
+		LOG_F(INFO, "Waiting for simulator connection...");
 		std::unique_lock<std::mutex> lock(connectionMutex);
 		connectionCV.wait(lock, [] { return simConnected; });
 	}
@@ -274,7 +274,7 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 	if (itr == motor_ptrs.end()) {
 		// motor id not in map
-		LOG_F(ERROR, "getMotor(): Unknown motor %d\n", static_cast<int>(motor));
+		LOG_F(ERROR, "getMotor(): Unknown motor %d", static_cast<int>(motor));
 		return nullptr;
 	} else {
 		// return motor object pointer
@@ -427,7 +427,7 @@ void removeLimitSwitchCallback(callbackid_t id) {
 
 void setIndicator(indication_t signal) {
 	if (signal == indication_t::arrivedAtDest) {
-		LOG_F(INFO, "Robot arrived at destination!\n");
+		LOG_F(INFO, "Robot arrived at destination!");
 	}
 }
 

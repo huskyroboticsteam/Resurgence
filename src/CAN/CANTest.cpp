@@ -14,8 +14,7 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
-enum class testmode_t
-{
+enum class testmode_t {
 	automatic = 0,
 	autoSend = 1,
 	manualSend = 2,
@@ -156,7 +155,7 @@ int main(int argc, char* argv[]) {
 		mode = static_cast<testmode_t>(i);
 	}
 
-	LOG_F(INFO, "Mode=%d\n", static_cast<int>(mode));
+	LOG_F(INFO, "Mode=%d", static_cast<int>(mode));
 
 	switch (mode) {
 		case testmode_t::automatic:

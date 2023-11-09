@@ -22,7 +22,7 @@ void callback(motorid_t motor, const types::DataPoint<LimitSwitchData>& data) {
 };
 
 void cleanup(int signum) {
-	LOG_F(ERROR, "Interrupted!\n");
+	LOG_F(ERROR, "Interrupted!");
 	robot::emergencyStop();
 	exit(0);
 }
@@ -43,7 +43,7 @@ int main() {
 		robot::addLimitSwitchCallback(entry.first, callback);
 	}
 
-	LOG_F(INFO, "Zero calibrating...\n");
+	LOG_F(INFO, "Zero calibrating...");
 
 	// run motors until latch unlatches
 	do {
@@ -52,5 +52,5 @@ int main() {
 		}
 	} while (!latch.wait_for(500ms));
 
-	LOG_F(INFO, "Done\n");
+	LOG_F(INFO, "Done");
 }

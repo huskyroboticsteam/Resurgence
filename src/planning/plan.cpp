@@ -156,7 +156,7 @@ plan_t getPlan(const collides_predicate_t& collides, const point_t& goal, double
 	std::chrono::milliseconds endTime = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::system_clock::now().time_since_epoch());
 
-	LOG_F(2, "finished in %d iterations (%ld visited nodes), Time: %ldms\n", counter,
+	LOG_F(2, "finished in %d iterations (%ld visited nodes), Time: %ldms", counter,
 		  allocated_nodes.size(), timer.elapsedTime().count() / 1000);
 	for (Node* p : allocated_nodes) {
 		free(p);

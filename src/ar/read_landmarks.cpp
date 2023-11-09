@@ -43,7 +43,7 @@ void detectLandmarksLoop() {
 			last_frame_no = camFrame.second;
 
 			std::vector<AR::Tag> tags = ar_detector.detectTags(frame);
-			LOG_F(2, "readLandmarks(): %ld tags spotted\n", tags.size());
+			LOG_F(2, "readLandmarks(): %ld tags spotted", tags.size());
 
 			// build up map with first tag of each ID spotted.
 			landmarks_t output(NUM_LANDMARKS);
@@ -104,12 +104,12 @@ bool initializeLandmarkDetection() {
 		landmark_thread = std::thread(&detectLandmarksLoop);
 	} else {
 		LOG_F(ERROR, "Camera does not have intrinsic parameters! AR tag detection "
-					 "cannot be performed.\n");
+					 "cannot be performed.");
 		return false;
 	}
 	if (!robot::getCameraExtrinsicParams(Constants::AR_CAMERA_ID)) {
 		LOG_F(WARNING, "Camera does not have extrinsic parameters! Coordinates returned "
-					   "for AR tags will be relative to camera\n");
+					   "for AR tags will be relative to camera");
 	}
 	initialized = true;
 	return true;

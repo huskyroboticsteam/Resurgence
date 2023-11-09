@@ -43,7 +43,7 @@ void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServe
 }
 
 void ArduPilotProtocol::clientConnected() {
-	LOG_F(INFO, "ArduPilot connected.\n");
+	LOG_F(INFO, "ArduPilot connected.");
 	{
 		std::lock_guard<std::mutex> lock(_connectionMutex);
 		_arduPilotProtocolConnected = true;
@@ -51,7 +51,7 @@ void ArduPilotProtocol::clientConnected() {
 }
 
 void ArduPilotProtocol::clientDisconnected() {
-	LOG_F(WARNING, "ArduPilot disconnected.\n");
+	LOG_F(WARNING, "ArduPilot disconnected.");
 	{
 		std::lock_guard<std::mutex> lock(_connectionMutex);
 		_arduPilotProtocolConnected = false;

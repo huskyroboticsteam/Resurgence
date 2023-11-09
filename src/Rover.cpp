@@ -53,14 +53,14 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 			// we assume that gps already has a fix
 			gpscoords_t gps = {lat, lon};
 			URCLegGPS leg = {left_post_id, right_post_id, gps};
-			LOG_F(INFO, "Got urc leg at lat=%f lon=%f\n", lat, lon);
+			LOG_F(INFO, "Got urc leg at lat=%f lon=%f", lat, lon);
 			urc_legs.push_back(leg);
 		}
 	}
 	LOG_F(INFO, "Got %ld urc legs\n", urc_legs.size());
 
 	if (urc_legs.size() == 0) {
-		LOG_F(ERROR, "could not get URC legs\n");
+		LOG_F(ERROR, "could not get URC legs");
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -127,7 +127,7 @@ void parseCommandLine(int argc, char** argv) {
 		program.parse_args(argc, argv);
 		LOG_F(INFO,
 			  "parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: "
-			  "\"%s\"\n",
+			  "\"%s\"",
 			  program.get<std::string>("peripheral").c_str(),
 			  program.get<std::string>("loglevel").c_str());
 	} catch (const std::runtime_error& err) {

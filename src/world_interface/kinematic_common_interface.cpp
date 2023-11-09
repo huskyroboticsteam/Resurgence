@@ -121,7 +121,7 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 		// FIXME: this should ideally never happen, but we don't have support for all joints
 		// yet because we don't know anything about the drill arm (and need to do extra work
 		// for the differential)
-		LOG_F(WARNING, "setJointPos called for currently unsupported joint %s\n",
+		LOG_F(WARNING, "setJointPos called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
 	}
 }
@@ -144,7 +144,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		}
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
-		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s\n",
+		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
 		return {};
 	}
@@ -189,7 +189,7 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			}
 		}
 	} else {
-		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s\n",
+		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
 	}
 }

@@ -182,7 +182,7 @@ int createCANSocket(std::optional<can::deviceid_t> id) {
 			std::perror("Failed to get virtual CAN interface index");
 			return -1;
 		}
-		LOG_F(INFO, "Found virtual CAN interface index.\n");
+		LOG_F(INFO, "Found virtual CAN interface index.");
 	}
 
 	struct sockaddr_can addr;
@@ -216,7 +216,7 @@ void receiveThreadFn() {
 	// create dedicated CAN socket for reading
 	int recvFD = createCANSocket({{devicegroup_t::master, DEVICE_SERIAL_JETSON}});
 	if (recvFD < 0) {
-		LOG_F(ERROR, "Unable to open CAN connection!\n");
+		LOG_F(ERROR, "Unable to open CAN connection!");
 		return;
 	}
 
@@ -238,7 +238,7 @@ void receiveThreadFn() {
 					break;
 
 				default:
-					LOG_F(WARNING, "Unrecognized CAN packet type: %x\n", packetType);
+					LOG_F(WARNING, "Unrecognized CAN packet type: %x", packetType);
 					break;
 			}
 		} else {
@@ -253,7 +253,7 @@ void initCAN() {
 	std::lock_guard lock(socketMutex);
 	can_fd = createCANSocket({});
 	if (can_fd < 0) {
-		LOG_F(ERROR, "Unable to open CAN connection!\n");
+		LOG_F(ERROR, "Unable to open CAN connection!");
 	}
 
 	// start thread for recieving CAN packets
