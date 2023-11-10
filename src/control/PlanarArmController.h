@@ -150,8 +150,10 @@ private:
 		double radius = kin.getSegLens().sum() * safetyFactor;
 		if (eePos.norm() > (radius + 1e-4)) {
 			// new position is outside of bounds. Set new EE setpoint so it will follow the
-			// velocity vector instead of drifting along the radius. setpoint = setpoint inside
-			// circle eePos = new setpoint outside circle
+			// velocity vector instead of drifting along the radius.
+			// setpoint = setpoint inside circle 
+			// eePos = new setpoint outside circle
+			// radius = ||setpoint + a*(eePos - setpoint)||  solve for a
 			double diffDotProd = (eePos - setpoint).dot(setpoint);
 			double differenceNorm = (eePos - setpoint).squaredNorm();
 			double discriminant =
