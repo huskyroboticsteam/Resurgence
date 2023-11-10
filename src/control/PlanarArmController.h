@@ -13,7 +13,6 @@
 #include <optional>
 
 #include <Eigen/Core>
-#include <iostream>
 
 namespace control {
 
