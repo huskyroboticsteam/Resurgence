@@ -151,7 +151,7 @@ private:
 		if (eePos.norm() > (radius + 1e-4)) {
 			// new position is outside of bounds. Set new EE setpoint so it will follow the
 			// velocity vector instead of drifting along the radius.
-			// setpoint = setpoint inside circle 
+			// setpoint = setpoint inside circle
 			// eePos = new setpoint outside circle
 			// radius = ||setpoint + a*(eePos - setpoint)||  solve for a
 			double diffDotProd = (eePos - setpoint).dot(setpoint);
