@@ -117,10 +117,12 @@ bool SingleClientWSServer::validate(connection_hdl hdl) {
 		if (!entry->second.client.has_value()) {
 			return true;
 		} else {
+			auto existingConn = server.get_con_from_hdl(entry->second.client.value());
 			log(LOG_INFO,
 				"Server=%s, Endpoint=%s : Rejected connection from %s - A client is already "
-				"connected!\n",
-				serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str());
+				"connected: %s\n",
+				serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str(),
+				existingConn->get_remote_endpoint().c_str());
 			return false;
 		}
 	} else {
