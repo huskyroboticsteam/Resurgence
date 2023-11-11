@@ -117,13 +117,52 @@ void parseCommandLine(int argc, char** argv) {
 	try {
 		loguru::init(argc, argv);
 
+		const int LOG_LIFESPAN = 604800; // 7 days
+		try {
+			for (const auto& entry :
+				 std::filesystem::directory_iterator(std::filesystem::current_path())) {
+				std::cout << entry.path().filename().extension();
+				if (entry.path().filename().extension() == ".log" &&
+					entry.path().filename().stem() != "latest") {
+					std::string dateString = entry.path().filename().stem();
+
+					// Extract components from the date string
+					int year, month, day, hour, minute, second;
+					sscanf(dateString.c_str(), "%4d%2d%2d_%2d%2d%2d", &year, &month, &day,
+						   &hour, &minute, &second);
+
+					// Create a tm structure
+					std::tm tm_struct = {};
+					tm_struct.tm_year = year - 1900;
+					tm_struct.tm_mon = month - 1;
+					tm_struct.tm_mday = day;
+					tm_struct.tm_hour = hour;
+					tm_struct.tm_min = minute;
+					tm_struct.tm_sec = second;
+
+					// Current time
+					std::time_t unixTime = std::mktime(&tm_struct);
+
+					// Delete log if it's older than LOG_LIFESPAN
+					if (std::chrono::system_clock::to_time_t(
+							std::chrono::system_clock::now()) -
+							unixTime >
+						LOG_LIFESPAN) {
+						std::filesystem::remove(entry.path());
+					}
+				}
+			}
+		} catch (const std::filesystem::filesystem_error& e) {
+			std::cerr << "Error accessing current directory!" << e.what() << std::endl;
+		}
+
 		const auto now = std::chrono::system_clock::now();
 		const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
 		std::stringstream ss;
 		ss << std::put_time(std::localtime(&t_c), "%Y%m%d_%H%M%S.log");
 		std::string logFileName = ss.str();
-		loguru::add_file("latest.log", loguru::Truncate, loguru::g_stderr_verbosity);
-		loguru::add_file(logFileName.c_str(), loguru::Append, loguru::g_stderr_verbosity);
+		loguru::add_file("latest.log", loguru::Truncate, loguru::Verbosity_INFO);
+		loguru::add_file(logFileName.c_str(), loguru::Append, loguru::Verbosity_INFO);
 		LOG_F(INFO, "Logging to %s", logFileName.c_str());
 
 		program.parse_args(argc, argv);
