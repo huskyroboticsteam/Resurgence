@@ -9,10 +9,10 @@
 #include <chrono>
 #include <csignal>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <loguru.cpp>
 #include <sstream>
-#include <filesystem>
 #include <thread>
 #include <time.h>
 #include <unistd.h>
@@ -121,11 +121,9 @@ void parseCommandLine(int argc, char** argv) {
 
 		const int LOG_LIFESPAN = 604800; // 7 days
 		try {
-			for (const auto& entry :
-				 fs::directory_iterator(fs::current_path())) {
+			for (const auto& entry : fs::directory_iterator(fs::current_path())) {
 				std::cout << entry.path().extension();
-				if (entry.path().extension() == ".log" &&
-					entry.path().stem() != "latest") {
+				if (entry.path().extension() == ".log" && entry.path().stem() != "latest") {
 					std::string dateString = entry.path().stem();
 
 					// Extract components from the date string
