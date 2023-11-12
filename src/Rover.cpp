@@ -12,6 +12,7 @@
 #include <fstream>
 #include <loguru.cpp>
 #include <sstream>
+#include <filesystem>
 #include <thread>
 #include <time.h>
 #include <unistd.h>
@@ -116,15 +117,16 @@ void parseCommandLine(int argc, char** argv) {
 
 	try {
 		loguru::init(argc, argv);
+		namespace fs = std::filesystem;
 
 		const int LOG_LIFESPAN = 604800; // 7 days
 		try {
 			for (const auto& entry :
-				 std::filesystem::directory_iterator(std::filesystem::current_path())) {
-				std::cout << entry.path().filename().extension();
-				if (entry.path().filename().extension() == ".log" &&
-					entry.path().filename().stem() != "latest") {
-					std::string dateString = entry.path().filename().stem();
+				 fs::directory_iterator(fs::current_path())) {
+				std::cout << entry.path().extension();
+				if (entry.path().extension() == ".log" &&
+					entry.path().stem() != "latest") {
+					std::string dateString = entry.path().stem();
 
 					// Extract components from the date string
 					int year, month, day, hour, minute, second;
@@ -148,11 +150,11 @@ void parseCommandLine(int argc, char** argv) {
 							std::chrono::system_clock::now()) -
 							unixTime >
 						LOG_LIFESPAN) {
-						std::filesystem::remove(entry.path());
+						fs::remove(entry.path());
 					}
 				}
 			}
-		} catch (const std::filesystem::filesystem_error& e) {
+		} catch (const fs::filesystem_error& e) {
 			std::cerr << "Error accessing current directory!" << e.what() << std::endl;
 		}
 
