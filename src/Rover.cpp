@@ -119,7 +119,8 @@ void parseCommandLine(int argc, char** argv) {
 		loguru::init(argc, argv);
 		namespace fs = std::filesystem;
 
-		const int LOG_LIFESPAN = 604800; // 7 days
+		const auto LOG_LIFESPAN = std::chrono::duration_cast<std::chrono::seconds>(
+			std::chrono::hours(24 * 7)); // std::chrono::days only supported in C++ >20.0
 		try {
 			for (const auto& entry : fs::directory_iterator(fs::current_path())) {
 				std::cout << entry.path().extension();
@@ -130,6 +131,14 @@ void parseCommandLine(int argc, char** argv) {
 					int year, month, day, hour, minute, second;
 					sscanf(dateString.c_str(), "%4d%2d%2d_%2d%2d%2d", &year, &month, &day,
 						   &hour, &minute, &second);
+
+					// Ensure scan outputs are correct
+					CHECK_EQ_F(std::stoi(dateString.substr(0, 4)), year);
+					CHECK_EQ_F(std::stoi(dateString.substr(4, 2)), month);
+					CHECK_EQ_F(std::stoi(dateString.substr(6, 2)), day);
+					CHECK_EQ_F(std::stoi(dateString.substr(9, 2)), hour);
+					CHECK_EQ_F(std::stoi(dateString.substr(11, 2)), minute);
+					CHECK_EQ_F(std::stoi(dateString.substr(13, 2)), second);
 
 					// Create a tm structure
 					std::tm tm_struct = {};
@@ -143,11 +152,12 @@ void parseCommandLine(int argc, char** argv) {
 					// Current time
 					std::time_t unixTime = std::mktime(&tm_struct);
 
+					// Calculate duration
+					auto duration = std::chrono::system_clock::now() -
+									std::chrono::system_clock::from_time_t(unixTime);
+
 					// Delete log if it's older than LOG_LIFESPAN
-					if (std::chrono::system_clock::to_time_t(
-							std::chrono::system_clock::now()) -
-							unixTime >
-						LOG_LIFESPAN) {
+					if (duration > LOG_LIFESPAN) {
 						fs::remove(entry.path());
 					}
 				}
