@@ -122,7 +122,6 @@ void parseCommandLine(int argc, char** argv) {
 		const auto LOG_LIFESPAN = std::chrono::hours(24 * 7);
 		try {
 			for (const auto& entry : fs::directory_iterator(fs::current_path())) {
-				std::cout << entry.path().extension();
 				if (entry.path().extension() == ".log" && entry.path().stem() != "latest") {
 					std::string dateString = entry.path().stem();
 
@@ -162,7 +161,7 @@ void parseCommandLine(int argc, char** argv) {
 				}
 			}
 		} catch (const fs::filesystem_error& e) {
-			std::cerr << "Error accessing current directory!" << e.what() << std::endl;
+			LOG_F(ERROR, "Error accessing current directory! %s", e.what());
 		}
 
 		const auto now = std::chrono::system_clock::now();
