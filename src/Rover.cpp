@@ -119,8 +119,7 @@ void parseCommandLine(int argc, char** argv) {
 		loguru::init(argc, argv);
 		namespace fs = std::filesystem;
 
-		const auto LOG_LIFESPAN = std::chrono::duration_cast<std::chrono::seconds>(
-			std::chrono::hours(24 * 7)); // std::chrono::days only supported in C++ >20.0
+		const auto LOG_LIFESPAN = std::chrono::hours(24 * 7);
 		try {
 			for (const auto& entry : fs::directory_iterator(fs::current_path())) {
 				std::cout << entry.path().extension();
@@ -173,7 +172,6 @@ void parseCommandLine(int argc, char** argv) {
 		std::string logFileName = ss.str();
 		loguru::add_file("latest.log", loguru::Truncate, loguru::Verbosity_INFO);
 		loguru::add_file(logFileName.c_str(), loguru::Append, loguru::Verbosity_INFO);
-		LOG_F(INFO, "Logging to %s", logFileName.c_str());
 
 		program.parse_args(argc, argv);
 		LOG_F(INFO,
