@@ -25,7 +25,7 @@ DataPoint<gpscoords_t> readGPSCoords() {
 } // namespace gps
 
 namespace robot {
-DataPoint<eulerangles_t> readIMU() {
+DataPoint<Eigen::Quaterniond> readIMU() {
 	return ardupilot_protocol->getIMU();
 }
 } // namespace robot
