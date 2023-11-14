@@ -63,7 +63,7 @@ void detectLandmarksLoop() {
 					cv::Vec3d coords = ids_to_camera_coords[id];
 					// if we have extrinsic parameters, multiply coordinates by them to do
 					// appropriate transformation.
-					auto extrinsic = 
+					auto extrinsic =
 						robot::getCameraExtrinsicParams(Constants::MAST_CAMERA_ID);
 					if (extrinsic) {
 						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
