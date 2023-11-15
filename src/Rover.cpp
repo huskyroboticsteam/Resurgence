@@ -128,16 +128,11 @@ void parseCommandLine(int argc, char** argv) {
 
 					// Extract components from the date string
 					int year, month, day, hour, minute, second;
-					sscanf(dateString.c_str(), "%4d%2d%2d_%2d%2d%2d", &year, &month, &day,
-						   &hour, &minute, &second);
+					int scan_count = sscanf(dateString.c_str(), "%4d%2d%2d_%2d%2d%2d", &year,
+											&month, &day, &hour, &minute, &second);
 
-					// Ensure scan outputs are correct
-					CHECK_EQ_F(std::stoi(dateString.substr(0, 4)), year);
-					CHECK_EQ_F(std::stoi(dateString.substr(4, 2)), month);
-					CHECK_EQ_F(std::stoi(dateString.substr(6, 2)), day);
-					CHECK_EQ_F(std::stoi(dateString.substr(9, 2)), hour);
-					CHECK_EQ_F(std::stoi(dateString.substr(11, 2)), minute);
-					CHECK_EQ_F(std::stoi(dateString.substr(13, 2)), second);
+					// Ensure scan output count is 6
+					CHECK_EQ_F(scan_count, 6);
 
 					// Create a tm structure
 					std::tm tm_struct = {};
