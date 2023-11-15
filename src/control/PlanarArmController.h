@@ -7,6 +7,7 @@
 
 #include <array>
 #include <initializer_list>
+#include <loguru.hpp>
 #include <mutex>
 #include <numeric>
 #include <optional>
@@ -40,7 +41,7 @@ public:
 		// NOTE: currJointPos could extend beyond the safetyFactor, so safety factor
 		//       normalization logic is performed.
 		set_setpoint(currJointPos);
-		assert(safetyFactor > 0.0 && safetyFactor < 1.0);
+		CHECK_F(safetyFactor > 0.0 && safetyFactor < 1.0);
 	}
 
 	/**

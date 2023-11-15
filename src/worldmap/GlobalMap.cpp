@@ -2,6 +2,8 @@
 
 #include "../navtypes.h"
 
+#include <loguru.hpp>
+
 #include <Eigen/LU>
 
 using namespace navtypes;
@@ -44,7 +46,7 @@ void GlobalMap::addPoints(const transform_t& robotTrf, const points_t& toAdd, do
 
 	// add to global map
 	for (const point_t& p : transformed) {
-		assert(tree.add(p));
+		CHECK_F(tree.add(p));
 	}
 }
 

@@ -1,6 +1,5 @@
 #include "Constants.h"
 #include "Globals.h"
-#include "log.h"
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"
 #include "rospub.h"
@@ -10,7 +9,9 @@
 #include <chrono>
 #include <csignal>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
+#include <loguru.cpp>
 #include <sstream>
 #include <thread>
 #include <time.h>
@@ -53,14 +54,14 @@ std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
 			// we assume that gps already has a fix
 			gpscoords_t gps = {lat, lon};
 			URCLegGPS leg = {left_post_id, right_post_id, gps};
-			log(LOG_INFO, "Got urc leg at lat=%f lon=%f\n", lat, lon);
+			LOG_F(INFO, "Got urc leg at lat=%f lon=%f", lat, lon);
 			urc_legs.push_back(leg);
 		}
 	}
-	log(LOG_INFO, "Got %d urc legs\n", urc_legs.size());
+	LOG_F(INFO, "Got %ld urc legs\n", urc_legs.size());
 
 	if (urc_legs.size() == 0) {
-		log(LOG_ERROR, "could not get URC legs\n");
+		LOG_F(ERROR, "could not get URC legs");
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -94,15 +95,16 @@ void parseCommandLine(int argc, char** argv) {
 			  "LOG_WARN, LOG_ERROR)")
 		.default_value(std::string("LOG_INFO"))
 		.action([](const std::string& value) {
-			std::unordered_map<std::string, int> allowed{{"LOG_TRACE", LOG_TRACE},
-														 {"LOG_DEBUG", LOG_DEBUG},
-														 {"LOG_INFO", LOG_INFO},
-														 {"LOG_WARN", LOG_WARN},
-														 {"LOG_ERROR", LOG_ERROR}};
+			std::unordered_map<std::string, int> allowed{
+				{"LOG_ERROR", loguru::Verbosity_ERROR},
+				{"LOG_WARN", loguru::Verbosity_WARNING},
+				{"LOG_INFO", loguru::Verbosity_INFO},
+				{"LOG_DEBUG", 2},
+				{"LOG_TRACE", 1},
+			};
 
 			if (allowed.find(value) != allowed.end()) {
-				setLogLevel(allowed[value]);
-				return value;
+				loguru::g_stderr_verbosity = allowed[value];
 			}
 
 			throw std::runtime_error("Invalid log level " + value);
@@ -110,16 +112,68 @@ void parseCommandLine(int argc, char** argv) {
 
 	program.add_argument("-nc", "--no-colors")
 		.help("disables colors in console logging")
-		.action([&](const auto&) { setColorsEnabled(false); })
+		.action([&](const auto&) { loguru::g_colorlogtostderr = false; })
 		.nargs(0);
 
 	try {
+		loguru::init(argc, argv);
+		namespace fs = std::filesystem;
+
+		const auto LOG_LIFESPAN = std::chrono::hours(24 * 7);
+		try {
+			for (const auto& entry : fs::directory_iterator(fs::current_path())) {
+				if (entry.path().extension() == ".log" && entry.path().stem() != "latest") {
+					// Format of dateString: YYYYMMDD_HHMMSS
+					std::string dateString = entry.path().stem();
+
+					// Extract components from the date string
+					int year, month, day, hour, minute, second;
+					int scan_count = sscanf(dateString.c_str(), "%4d%2d%2d_%2d%2d%2d", &year,
+											&month, &day, &hour, &minute, &second);
+
+					// Ensure scan output count is 6
+					CHECK_EQ_F(scan_count, 6);
+
+					// Create a tm structure
+					std::tm tm_struct = {};
+					tm_struct.tm_year = year - 1900;
+					tm_struct.tm_mon = month - 1;
+					tm_struct.tm_mday = day;
+					tm_struct.tm_hour = hour;
+					tm_struct.tm_min = minute;
+					tm_struct.tm_sec = second;
+
+					// Current time
+					std::time_t unixTime = std::mktime(&tm_struct);
+
+					// Calculate duration
+					auto duration = std::chrono::system_clock::now() -
+									std::chrono::system_clock::from_time_t(unixTime);
+
+					// Delete log if it's older than LOG_LIFESPAN
+					if (duration > LOG_LIFESPAN) {
+						fs::remove(entry.path());
+					}
+				}
+			}
+		} catch (const fs::filesystem_error& e) {
+			LOG_F(ERROR, "Error accessing current directory! %s", e.what());
+		}
+
+		const auto now = std::chrono::system_clock::now();
+		const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
+		std::stringstream ss;
+		ss << std::put_time(std::localtime(&t_c), "%Y%m%d_%H%M%S.log");
+		std::string logFileName = ss.str();
+		loguru::add_file("latest.log", loguru::Truncate, loguru::Verbosity_INFO);
+		loguru::add_file(logFileName.c_str(), loguru::Append, loguru::Verbosity_INFO);
+
 		program.parse_args(argc, argv);
-		log(LOG_INFO,
-			"parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: "
-			"\"%s\"\n",
-			program.get<std::string>("peripheral").c_str(),
-			program.get<std::string>("loglevel").c_str());
+		LOG_F(INFO,
+			  "parseCommandLine got peripheral specified as: \"%s\", logLevel specified as: "
+			  "\"%s\"",
+			  program.get<std::string>("peripheral").c_str(),
+			  program.get<std::string>("loglevel").c_str());
 	} catch (const std::runtime_error& err) {
 		std::cerr << err.what() << std::endl;
 		std::cerr << program;

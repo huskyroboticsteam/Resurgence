@@ -1,5 +1,6 @@
 #include "DriveToWaypointCommand.h"
-#include "../log.h"
+
+#include <loguru.hpp>
 
 using namespace navtypes;
 using namespace robot::types;
@@ -9,13 +10,13 @@ namespace commands {
 
 DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double thetaKP,
 											   double driveVel, double slowDriveVel,
-											   double doneThresh, 
+											   double doneThresh,
 											   util::dseconds closeToTargetDur)
 	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
-	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), 
-	  setStateCalledBeforeOutput(false), closeToTargetDur(closeToTargetDur) {}
+	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), setStateCalledBeforeOutput(false),
+	  closeToTargetDur(closeToTargetDur) {}
 
-void DriveToWaypointCommand::setState(const navtypes::pose_t& pose, 
+void DriveToWaypointCommand::setState(const navtypes::pose_t& pose,
 									  robot::types::datatime_t time) {
 	this->pose = pose;
 	this->setStateCalledBeforeOutput = true;
@@ -24,22 +25,21 @@ void DriveToWaypointCommand::setState(const navtypes::pose_t& pose,
 
 command_t DriveToWaypointCommand::getOutput() {
 	if (!this->setStateCalledBeforeOutput) {
-		log(LOG_WARN, "DriveToWaypointCommand: getOutput() called before getState() call!");
+		LOG_F(WARNING, "DriveToWaypointCommand: getOutput() called before getState() call!");
 	}
 
 	this->setStateCalledBeforeOutput = false;
 	Eigen::Vector2d toTarget = target.topRows<2>() - pose.topRows<2>();
 	double targetAngle = std::atan2(toTarget(1), toTarget(0));
 	double angleDelta = targetAngle - pose(2);
-	double thetaErr =
-		std::atan2(std::sin(angleDelta), std::cos(angleDelta));
+	double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
 
 	double thetaVel = thetaKP * thetaErr;
 
-    double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
-    double xVel = dist <= 2 * doneThresh ? slowDriveVel : driveVel;
+	double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
+	double xVel = dist <= 2 * doneThresh ? slowDriveVel : driveVel;
 
-    return {.thetaVel = thetaVel, .xVel = xVel};
+	return {.thetaVel = thetaVel, .xVel = xVel};
 }
 
 bool DriveToWaypointCommand::isDone() {
@@ -53,8 +53,7 @@ bool DriveToWaypointCommand::isDone() {
 			closeToTargetStartTime = lastRecordedTime;
 		}
 
-		return lastRecordedTime.value() - closeToTargetStartTime.value() >= 
-			   closeToTargetDur;
+		return lastRecordedTime.value() - closeToTargetStartTime.value() >= closeToTargetDur;
 	} else {
 		closeToTargetStartTime.reset();
 	}

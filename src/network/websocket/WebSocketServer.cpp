@@ -1,9 +1,9 @@
 #include "WebSocketServer.h"
 
 #include "../../Constants.h"
-#include "../../log.h"
 #include "../../utils/core.h"
 
+#include <loguru.hpp>
 #include <string>
 namespace net {
 namespace websocket {
@@ -51,8 +51,8 @@ void SingleClientWSServer::serverTask() {
 		server.start_accept();
 		server.run();
 	} catch (const websocketpp::exception& e) {
-		log(LOG_ERROR, "Server=%s - An error occurred while starting: %s\n",
-			serverName.c_str(), e.what());
+		LOG_F(ERROR, "Server=%s - An error occurred while starting: %s", serverName.c_str(),
+			  e.what());
 	}
 }
 
@@ -67,8 +67,8 @@ void SingleClientWSServer::stop() {
 								 websocketpp::close::status::going_away,
 								 "Server shutting down");
 				} catch (const websocketpp::exception& e) {
-					log(LOG_ERROR, "Server=%s : An error occurred while shutting down: %s",
-						serverName.c_str(), e.what());
+					LOG_F(ERROR, "Server=%s : An error occurred while shutting down: %s",
+						  serverName.c_str(), e.what());
 				}
 				entry.second.client.reset();
 			}
@@ -100,8 +100,8 @@ void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 			conn->send(str, websocketpp::frame::opcode::text);
 		}
 	} else {
-		log(LOG_WARN, "Server=%s : Can't send message to nonexistent endpoint: %s\n",
-			serverName.c_str(), protocolPath.c_str());
+		LOG_F(WARNING, "Server=%s : Can't send message to nonexistent endpoint: %s",
+			  serverName.c_str(), protocolPath.c_str());
 	}
 }
 
@@ -118,16 +118,16 @@ bool SingleClientWSServer::validate(connection_hdl hdl) {
 			return true;
 		} else {
 			auto existingConn = server.get_con_from_hdl(entry->second.client.value());
-			log(LOG_INFO,
-				"Server=%s, Endpoint=%s : Rejected connection from %s - A client is already "
-				"connected: %s\n",
-				serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str(),
-				existingConn->get_remote_endpoint().c_str());
+			LOG_F(INFO,
+				  "Server=%s, Endpoint=%s : Rejected connection from %s - A client is already "
+				  "connected: %s\n",
+				  serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str(),
+				  existingConn->get_remote_endpoint().c_str());
 			return false;
 		}
 	} else {
-		log(LOG_INFO, "Server=%s : Rejected connection to unrecognized endpoint %s from %s\n",
-			serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str());
+		LOG_F(INFO, "Server=%s : Rejected connection to unrecognized endpoint %s from %s",
+			  serverName.c_str(), path.c_str(), conn->get_remote_endpoint().c_str());
 		return false;
 	}
 }
@@ -136,8 +136,8 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string client = conn->get_remote_endpoint();
 	std::string path = conn->get_resource();
-	log(LOG_INFO, "Server=%s, Endpoint=%s : Connection opened from %s\n", serverName.c_str(),
-		path.c_str(), client.c_str());
+	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection opened from %s", serverName.c_str(),
+		  path.c_str(), client.c_str());
 
 	auto& protocolData = protocolMap.at(path);
 	{
@@ -150,7 +150,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 					auto& pd = this->protocolMap.at(path);
 					std::lock_guard lock(pd.mutex);
 					if (pd.client.has_value()) {
-						log(LOG_DEBUG, "Ping!\n");
+						LOG_F(2, "Ping!");
 						server.ping(pd.client.value(), path);
 					}
 				});
@@ -171,8 +171,8 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string client = conn->get_remote_endpoint();
 	std::string path = conn->get_resource();
-	log(LOG_INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s\n",
-		serverName.c_str(), path.c_str(), client.c_str());
+	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s", serverName.c_str(),
+		  path.c_str(), client.c_str());
 
 	auto& protocolData = protocolMap.at(path);
 	{
@@ -193,16 +193,16 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	auto it = protocolMap.find(path);
 	if (it != protocolMap.end()) {
 		std::string jsonStr = message->get_payload();
-		log(LOG_TRACE, "Message on %s: %s\n", path.c_str(), jsonStr.c_str());
+		LOG_F(1, "Message on %s: %s", path.c_str(), jsonStr.c_str());
 		json obj = json::parse(jsonStr);
 		it->second.protocol->processMessage(obj);
 	} else {
-		log(LOG_WARN, "Received message on unknown protocol path %s\n", path.c_str());
+		LOG_F(WARNING, "Received message on unknown protocol path %s", path.c_str());
 	}
 }
 
 void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload) {
-	log(LOG_DEBUG, "Pong from %s\n", payload.c_str());
+	LOG_F(2, "Pong from %s", payload.c_str());
 	auto conn = server.get_con_from_hdl(hdl);
 
 	auto it = protocolMap.find(payload);
@@ -213,7 +213,7 @@ void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload
 			pd.heartbeatInfo->second.feed();
 		}
 	} else {
-		log(LOG_WARN, "Received pong on unknown protocol path %s\n", payload.c_str());
+		LOG_F(WARNING, "Received pong on unknown protocol path %s", payload.c_str());
 	}
 }
 } // namespace websocket
