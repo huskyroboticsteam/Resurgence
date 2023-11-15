@@ -157,15 +157,11 @@ types::DataPoint<navtypes::point_t> readGPS();
 types::DataPoint<double> readIMUHeading();
 
 /**
- * @brief Read the rover attitude from the IMU.
+ * @brief Read the rover orientation from the IMU.
  *
- * Euler angles are in radians, in RPY format (i.e. XYZ extrinsic)
- *
- * @see https://en.wikipedia.org/wiki/Euler_angles#Tait%E2%80%93Bryan_angles
- *
- * @return types::DataPoint<navtypes::eulerangles_t>
+ * @return types::DataPoint<Eigen::Quaterniond>
  */
-types::DataPoint<navtypes::eulerangles_t> readIMU();
+types::DataPoint<Eigen::Quaterniond> readIMU();
 
 /**
  * @brief Get the ground truth pose, if available. This is only available in simulation.

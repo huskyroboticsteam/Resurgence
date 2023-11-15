@@ -192,10 +192,7 @@ void MissionControlProtocol::sendRoverPos() {
 	LOG_F(2, "imu_valid=%s, gps_valid=%s", util::to_string(imu.isValid()).c_str(),
 		  util::to_string(gps.isValid()).c_str());
 	if (imu.isValid()) {
-		auto rpy = imu.getData();
-		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
-								Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
-								Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()));
+		Eigen::Quaterniond quat = imu.getData();
 		double lon = 0, lat = 0;
 		if (gps.isValid()) {
 			lon = gps.getData().lon;

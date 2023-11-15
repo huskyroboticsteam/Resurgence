@@ -43,8 +43,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::hand, "hand"},
 	{motorid_t::activeSuspension, "activeSuspension"}};
 
-DataPoint<navtypes::eulerangles_t> lastAttitude;
-std::mutex attitudeMutex;
+DataPoint<Eigen::Quaterniond> lastOrientation;
+std::mutex orientationMutex;
 
 DataPoint<gpscoords_t> lastGPS;
 std::mutex gpsMutex;
@@ -134,13 +134,10 @@ void handleIMU(json msg) {
 	double qz = msg["z"];
 	double qw = msg["w"];
 
-	double heading = util::quatToHeading(qw, qx, qy, qz);
 	Eigen::Quaterniond q(qw, qx, qy, qz);
 	q.normalize();
-	Eigen::Vector3d euler = q.toRotationMatrix().eulerAngles(0, 1, 2);
-	std::lock_guard<std::mutex> guard(attitudeMutex);
-	lastAttitude =
-		navtypes::eulerangles_t{.roll = euler(0), .pitch = euler(1), .yaw = euler(2)};
+	std::lock_guard<std::mutex> guard(orientationMutex);
+	lastOrientation = q;
 }
 
 void handleCamFrame(json msg) {
@@ -350,9 +347,9 @@ DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
 
-DataPoint<navtypes::eulerangles_t> readIMU() {
-	std::lock_guard<std::mutex> guard(attitudeMutex);
-	return lastAttitude;
+DataPoint<Eigen::Quaterniond> readIMU() {
+	std::lock_guard<std::mutex> guard(orientationMutex);
+	return lastOrientation;
 }
 
 DataPoint<pose_t> getTruePose() {
