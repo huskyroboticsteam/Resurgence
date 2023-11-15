@@ -6,6 +6,8 @@
 
 #include <mutex>
 
+#include <Eigen/Geometry>
+
 namespace net {
 namespace ardupilot {
 
@@ -23,11 +25,11 @@ public:
 	 */
 	robot::types::DataPoint<navtypes::gpscoords_t> getGPS();
 
-	/* @brief Gets the last reported IMU readings (roll, pitch, yaw)
+	/* @brief Gets the last reported orientation from the IMU
 	 *
-	 * @return Last reported IMU readings
+	 * @return Last reported orientation
 	 */
-	robot::types::DataPoint<navtypes::eulerangles_t> getIMU();
+	robot::types::DataPoint<Eigen::Quaterniond> getIMU();
 
 	/* @brief Gets the last reported heading (degrees)
 	 *
@@ -106,7 +108,7 @@ private:
 	robot::types::DataPoint<navtypes::gpscoords_t> _lastGPS;
 
 	std::mutex _lastOrientationMutex;
-	robot::types::DataPoint<navtypes::eulerangles_t> _lastOrientation;
+	robot::types::DataPoint<Eigen::Quaterniond> _lastOrientation;
 };
 
 } // namespace ardupilot

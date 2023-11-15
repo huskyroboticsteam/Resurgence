@@ -4,6 +4,7 @@
 #include "../Globals.h"
 #include "../log.h"
 #include "../utils/json.h"
+#include "../utils/transform.h"
 
 #include <mutex>
 
@@ -82,7 +83,10 @@ void ArduPilotProtocol::handleIMURequest(const json& j) {
 	double roll = j["roll"];
 	double pitch = j["pitch"];
 	double yaw = j["yaw"];
-	_lastOrientation = eulerangles_t{roll, pitch, yaw};
+	eulerangles_t rpy{roll, pitch, yaw};
+
+	std::lock_guard lock(_lastOrientationMutex);
+	_lastOrientation = util::eulerAnglesToQuat(rpy);
 }
 
 bool ArduPilotProtocol::validateHeadingRequest(const json& j) {
@@ -91,6 +95,7 @@ bool ArduPilotProtocol::validateHeadingRequest(const json& j) {
 
 void ArduPilotProtocol::handleHeadingRequest(const json& j) {
 	int heading = j["heading"];
+	std::lock_guard lock(_lastHeadingMutex);
 	_lastHeading = heading;
 }
 
@@ -99,7 +104,7 @@ DataPoint<gpscoords_t> ArduPilotProtocol::getGPS() {
 	return _lastGPS;
 }
 
-DataPoint<eulerangles_t> ArduPilotProtocol::getIMU() {
+DataPoint<Eigen::Quaterniond> ArduPilotProtocol::getIMU() {
 	std::unique_lock<std::mutex> lock(_lastOrientationMutex);
 	return _lastOrientation;
 }

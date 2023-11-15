@@ -11,15 +11,21 @@ double quatToHeading(double qw, double qx, double qy, double qz) {
 	return quatToHeading(quat);
 }
 
-double quatToHeading(Eigen::Quaterniond quat) {
-	quat.normalize();
-	Eigen::Matrix3d rotMat = quat.toRotationMatrix();
+double quatToHeading(const Eigen::Quaterniond& quat) {
+	Eigen::Matrix3d rotMat = quat.normalized().toRotationMatrix();
 	Eigen::Vector3d transformedX = rotMat * Eigen::Vector3d::UnitX();
 	// flatten to xy-plane
 	transformedX(2) = 0;
 	// recover heading
 	double heading = std::atan2(transformedX(1), transformedX(0));
 	return heading;
+}
+
+Eigen::Quaterniond eulerAnglesToQuat(const navtypes::eulerangles_t& rpy) {
+	Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
+							Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
+							Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()));
+	return quat;
 }
 
 points_t transformReadings(const points_t& ps, const transform_t& tf) {
@@ -80,4 +86,4 @@ transform_t toTransform(const pose_t& pose) {
 	return toTransformRotateFirst(0, 0, pose(2)) * toTransformRotateFirst(pose(0), pose(1), 0);
 }
 
-}
+} // namespace util
