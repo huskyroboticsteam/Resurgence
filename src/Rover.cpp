@@ -123,6 +123,7 @@ void parseCommandLine(int argc, char** argv) {
 		try {
 			for (const auto& entry : fs::directory_iterator(fs::current_path())) {
 				if (entry.path().extension() == ".log" && entry.path().stem() != "latest") {
+					// Format of dateString: YYYYMMDD_HHMMSS
 					std::string dateString = entry.path().stem();
 
 					// Extract components from the date string
