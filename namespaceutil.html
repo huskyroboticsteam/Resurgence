@@ -184,9 +184,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>validateRange</b> (co
 <tr class="memitem:a2ddfab6615abd54e40db44dff188c139" id="r_a2ddfab6615abd54e40db44dff188c139"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutil.html#a2ddfab6615abd54e40db44dff188c139">quatToHeading</a> (double qw, double qx, double qy, double qz)</td></tr>
 <tr class="memdesc:a2ddfab6615abd54e40db44dff188c139"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the heading from a quaternion.  <br /></td></tr>
 <tr class="separator:a2ddfab6615abd54e40db44dff188c139"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa476a4545bbd6cf55da364fc62c9fa01" id="r_aa476a4545bbd6cf55da364fc62c9fa01"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutil.html#aa476a4545bbd6cf55da364fc62c9fa01">quatToHeading</a> (<a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a> quat)</td></tr>
-<tr class="memdesc:aa476a4545bbd6cf55da364fc62c9fa01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the heading from a quaternion.  <br /></td></tr>
-<tr class="separator:aa476a4545bbd6cf55da364fc62c9fa01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3359ae5dac1ea4f9186c133f3e7186d" id="r_ac3359ae5dac1ea4f9186c133f3e7186d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutil.html#ac3359ae5dac1ea4f9186c133f3e7186d">quatToHeading</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a> &amp;quat)</td></tr>
+<tr class="memdesc:ac3359ae5dac1ea4f9186c133f3e7186d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the heading from a quaternion.  <br /></td></tr>
+<tr class="separator:ac3359ae5dac1ea4f9186c133f3e7186d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe82846305c20a7bcdcb348b11b68ad4" id="r_afe82846305c20a7bcdcb348b11b68ad4"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutil.html#afe82846305c20a7bcdcb348b11b68ad4">eulerAnglesToQuat</a> (const <a class="el" href="structnavtypes_1_1eulerangles__t.html">navtypes::eulerangles_t</a> &amp;rpy)</td></tr>
+<tr class="memdesc:afe82846305c20a7bcdcb348b11b68ad4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert euler angles to a quaternion representation.  <br /></td></tr>
+<tr class="separator:afe82846305c20a7bcdcb348b11b68ad4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae9ae4acf4ddb63d9633bb398b0616ee" id="r_aae9ae4acf4ddb63d9633bb398b0616ee"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">points_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutil.html#aae9ae4acf4ddb63d9633bb398b0616ee">transformReadings</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">navtypes::points_t</a> &amp;ps, const navtypes::transform_t &amp;tf)</td></tr>
 <tr class="memdesc:aae9ae4acf4ddb63d9633bb398b0616ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a set of points to a different reference frame.  <br /></td></tr>
 <tr class="separator:aae9ae4acf4ddb63d9633bb398b0616ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -393,6 +396,33 @@ template&lt;typename Rep , typename Period &gt; </div>
 
 </div>
 </div>
+<a id="afe82846305c20a7bcdcb348b11b68ad4" name="afe82846305c20a7bcdcb348b11b68ad4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe82846305c20a7bcdcb348b11b68ad4">&#9670;&#160;</a></span>eulerAnglesToQuat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a> util::eulerAnglesToQuat </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structnavtypes_1_1eulerangles__t.html">navtypes::eulerangles_t</a> &amp;&#160;</td>
+          <td class="paramname"><em>rpy</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert euler angles to a quaternion representation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rpy</td><td>The euler angles to convert. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a> The same orientation represented as a quaternion. </dd></dl>
+
+</div>
+</div>
 <a id="aef644ff86939b8fb6d59d0fce202e8fd" name="aef644ff86939b8fb6d59d0fce202e8fd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aef644ff86939b8fb6d59d0fce202e8fd">&#9670;&#160;</a></span>getNormalSeed()</h2>
 
@@ -524,8 +554,36 @@ template&lt;typename T , typename U &gt; </div>
 
 </div>
 </div>
+<a id="ac3359ae5dac1ea4f9186c133f3e7186d" name="ac3359ae5dac1ea4f9186c133f3e7186d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3359ae5dac1ea4f9186c133f3e7186d">&#9670;&#160;</a></span>quatToHeading() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double util::quatToHeading </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a> &amp;&#160;</td>
+          <td class="paramname"><em>quat</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract the heading from a quaternion. </p>
+<p>Given a quaternion defined by out coordinate system, extract the CCW heading, in radians.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">quat</td><td>The quaternion to extract the heading from. This does not need to be normalized. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>double The CCW heading, in radians. </dd></dl>
+
+</div>
+</div>
 <a id="a2ddfab6615abd54e40db44dff188c139" name="a2ddfab6615abd54e40db44dff188c139"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ddfab6615abd54e40db44dff188c139">&#9670;&#160;</a></span>quatToHeading() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ddfab6615abd54e40db44dff188c139">&#9670;&#160;</a></span>quatToHeading() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -570,34 +628,6 @@ template&lt;typename T , typename U &gt; </div>
     <tr><td class="paramname">qx</td><td>The x component of the quaternion. </td></tr>
     <tr><td class="paramname">qy</td><td>The y component of the quaternion. </td></tr>
     <tr><td class="paramname">qz</td><td>The z component of the quaternion. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>double The CCW heading, in radians. </dd></dl>
-
-</div>
-</div>
-<a id="aa476a4545bbd6cf55da364fc62c9fa01" name="aa476a4545bbd6cf55da364fc62c9fa01"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa476a4545bbd6cf55da364fc62c9fa01">&#9670;&#160;</a></span>quatToHeading() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double util::quatToHeading </td>
-          <td>(</td>
-          <td class="paramtype"><a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a>&#160;</td>
-          <td class="paramname"><em>quat</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Extract the heading from a quaternion. </p>
-<p>Given a quaternion defined by out coordinate system, extract the CCW heading, in radians.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">quat</td><td>The quaternion to extract the heading from. This does not need to be normalized. </td></tr>
   </table>
   </dd>
 </dl>
