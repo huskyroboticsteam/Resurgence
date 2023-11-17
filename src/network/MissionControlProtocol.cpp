@@ -12,6 +12,7 @@
 #include <chrono>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <shared_mutex>
 #include <thread>
 #include <unordered_map>
@@ -144,7 +145,12 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		// that IK wasn't enabled?
 		assert(armJointPositions.isValid());
 
-		if (Globals::planarArmController.set_setpoint(armJointPositions.getData())) {
+		// TODO: Update
+		Globals::planarArmController.emplace(navtypes::Vectord<2>(0, 0),
+											 Globals::planarArmKinematics,
+											 Constants::arm::SAFETY_FACTOR);
+
+		if (Globals::planarArmController.value().set_setpoint(armJointPositions.getData())) {
 			Globals::armIKEnabled = true;
 			_arm_ik_repeat_thread =
 				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
@@ -455,7 +461,8 @@ void MissionControlProtocol::updateArmIKRepeatTask() {
 			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 		if (armJointPositions.isValid()) {
 			navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
-				Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
+				Globals::planarArmController.value().getCommand(dataclock::now(),
+																armJointPositions);
 			targetJointPositions /=
 				M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
 			for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
