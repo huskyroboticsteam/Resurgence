@@ -60,6 +60,7 @@ void SingleClientWSServer::stop() {
 	if (isRunning) {
 		isRunning = false;
 		server.stop_listening();
+		std::lock_guard lock(protocolMapMutex);
 		for (auto& entry : protocolMap) {
 			if (entry.second.client) {
 				try {
@@ -81,6 +82,7 @@ void SingleClientWSServer::stop() {
 
 bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protocol) {
 	std::string path = protocol->getProtocolPath();
+	std::lock_guard lock(protocolMapMutex);
 	if (protocolMap.find(path) == protocolMap.end()) {
 		protocolMap.emplace(path, std::move(protocol));
 		return true;
@@ -91,6 +93,7 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 
 void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 										 const std::string& str) {
+	std::lock_guard lock(protocolMapMutex);
 	auto entry = protocolMap.find(protocolPath);
 	if (entry != protocolMap.end()) {
 		auto& protocolData = entry->second;
@@ -112,6 +115,7 @@ void SingleClientWSServer::sendJSON(const std::string& protocolPath, const json&
 bool SingleClientWSServer::validate(connection_hdl hdl) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string path = conn->get_resource();
+	std::lock_guard lock(protocolMapMutex);
 	auto entry = protocolMap.find(path);
 	if (entry != protocolMap.end()) {
 		if (!entry->second.client.has_value()) {
@@ -139,6 +143,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection opened from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
+	std::lock_guard lock(protocolMapMutex);
 	auto& protocolData = protocolMap.at(path);
 	{
 		std::lock_guard lock(protocolData.mutex);
@@ -174,6 +179,7 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
+	std::lock_guard lock(protocolMapMutex);
 	auto& protocolData = protocolMap.at(path);
 	{
 		std::lock_guard lock(protocolData.mutex);
@@ -190,6 +196,7 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string path = conn->get_resource();
 
+	std::lock_guard lock(protocolMapMutex);
 	auto it = protocolMap.find(path);
 	if (it != protocolMap.end()) {
 		std::string jsonStr = message->get_payload();
@@ -205,6 +212,7 @@ void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload
 	LOG_F(2, "Pong from %s", payload.c_str());
 	auto conn = server.get_con_from_hdl(hdl);
 
+	std::lock_guard lock(protocolMapMutex);
 	auto it = protocolMap.find(payload);
 	if (it != protocolMap.end()) {
 		auto& pd = it->second;

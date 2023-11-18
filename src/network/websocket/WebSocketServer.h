@@ -110,6 +110,7 @@ private:
 	websocketpp::server<websocketpp::config::asio> server;
 	bool isRunning;
 	// maps path prefix to ProtocolData for each protocol
+	std::mutex protocolMapMutex;
 	std::map<std::string, ProtocolData> protocolMap;
 	std::thread serverThread;
 	util::PeriodicScheduler<> pingScheduler;
