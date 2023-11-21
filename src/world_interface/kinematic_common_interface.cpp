@@ -59,6 +59,11 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
+	navtypes::pose_t scaledVelocities = driveKinematics().ensureWithinWheelSpeedLimit(
+		DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, dx, dtheta,
+		Constants::MAX_WHEEL_VEL);
+	dx = scaledVelocities.x();
+	dtheta = scaledVelocities.z();
 	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;

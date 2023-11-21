@@ -1,6 +1,8 @@
 #include "DiffDriveKinematics.h"
 
 #include "../utils/transform.h"
+
+#include <loguru.hpp>
 using namespace navtypes;
 using util::toTransformRotateFirst;
 
@@ -49,4 +51,34 @@ pose_t DiffDriveKinematics::getNextPose(const wheelvel_t& wheelVel, const pose_t
 										double dt) const {
 	return pose + getPoseUpdate(wheelVel, pose(2), dt);
 }
+
+pose_t DiffDriveKinematics::ensureWithinWheelSpeedLimit(
+	PreferredVelPreservation preferredVelPreservation, double xVel, double thetaVel,
+	double maxWheelSpeed) const {
+	auto wheelVels = robotVelToWheelVel(xVel, thetaVel);
+	double calculatedMaxWheelVel = std::max(wheelVels.lVel, wheelVels.rVel);
+	if (calculatedMaxWheelVel > maxWheelSpeed) {
+		double scaleFactor = maxWheelSpeed / calculatedMaxWheelVel;
+		switch (preferredVelPreservation) {
+			case PreferredVelPreservation::Proportional:
+				xVel *= scaleFactor;
+				thetaVel *= scaleFactor;
+				break;
+			case PreferredVelPreservation::PreferXVel:
+				thetaVel *= (0.5 * scaleFactor);
+				break;
+			case PreferredVelPreservation::PreferThetaVel:
+				xVel *= (0.5 * scaleFactor);
+				break;
+		}
+		// wheelVels = robotVelToWheelVel(xVel, thetaVel);
+		// double oldMaxWheelVel = calculatedMaxWheelVel;
+		// calculatedMaxWheelVel = std::max(wheelVels.lVel, wheelVels.rVel);
+		// LOG_F(INFO, "Scale Factor: %lf MaxWheelSpeed: %lf OldMaxWheelVel: %lf
+		// NewMaxWheelVel: %lf\n", scaleFactor, maxWheelSpeed, oldMaxWheelVel,
+		// calculatedMaxWheelVel);
+	}
+	return {xVel, 0, thetaVel};
+}
+
 } // namespace kinematics

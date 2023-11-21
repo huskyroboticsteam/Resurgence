@@ -78,6 +78,16 @@ public:
 	navtypes::pose_t getNextPose(const wheelvel_t& wheelVel, const navtypes::pose_t& pose,
 								 double dt) const;
 
+	enum PreferredVelPreservation {
+		Proportional,
+		PreferXVel,
+		PreferThetaVel,
+	};
+
+	navtypes::pose_t ensureWithinWheelSpeedLimit(PreferredVelPreservation preferred,
+												 double xVel, double thetaVel,
+												 double maxWheelSpeed) const;
+
 private:
 	double wheelBaseWidth;
 };
