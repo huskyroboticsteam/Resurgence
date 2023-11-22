@@ -109,8 +109,9 @@ private:
 	uint16_t port;
 	websocketpp::server<websocketpp::config::asio> server;
 	bool isRunning;
-	// maps path prefix to ProtocolData for each protocol
+	// protects against race conditions modifying protocolMap
 	std::mutex protocolMapMutex;
+	// maps path prefix to ProtocolData for each protocol
 	std::map<std::string, ProtocolData> protocolMap;
 	std::thread serverThread;
 	util::PeriodicScheduler<> pingScheduler;
