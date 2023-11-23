@@ -143,8 +143,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection opened from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
-	std::lock_guard lock(protocolMapMutex);
-	auto& protocolData = protocolMap.at(path);
+	auto& protocolData = this->getProtocol(path);
 	{
 		std::lock_guard lock(protocolData.mutex);
 		protocolData.client = hdl;
@@ -152,7 +151,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 		if (heartbeatInfo.has_value()) {
 			auto eventID =
 				pingScheduler.scheduleEvent(heartbeatInfo->first / 2, [this, path]() {
-					auto& pd = this->protocolMap.at(path);
+					auto& pd = this->getProtocol(path);
 					std::lock_guard lock(pd.mutex);
 					if (pd.client.has_value()) {
 						LOG_F(2, "Ping!");
@@ -179,8 +178,7 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
-	std::lock_guard lock(protocolMapMutex);
-	auto& protocolData = protocolMap.at(path);
+	auto& protocolData = this->getProtocol(path);
 	{
 		std::lock_guard lock(protocolData.mutex);
 		protocolData.client.reset();
@@ -223,6 +221,12 @@ void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload
 	} else {
 		LOG_F(WARNING, "Received pong on unknown protocol path %s", payload.c_str());
 	}
+}
+
+SingleClientWSServer::ProtocolData&
+SingleClientWSServer::getProtocol(const std::string& protocolPath) {
+	std::lock_guard lock(protocolMapMutex);
+	return protocolMap.at(protocolPath);
 }
 } // namespace websocket
 } // namespace net
