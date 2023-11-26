@@ -62,6 +62,7 @@ void SingleClientWSServer::stop() {
 		server.stop_listening();
 		std::lock_guard lock(protocolMapMutex);
 		for (auto& entry : protocolMap) {
+			std::lock_guard lock(entry.second.mutex);
 			if (entry.second.client) {
 				try {
 					server.close(entry.second.client.value(),
@@ -97,6 +98,7 @@ void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 	auto protocolDataOpt = this->getProtocol(protocolPath);
 	if (protocolDataOpt.has_value()) {
 		auto& protocolData = protocolDataOpt.value().get();
+		std::lock_guard lock(protocolData.mutex);
 		if (protocolData.client) {
 			connection_hdl hdl = protocolData.client.value();
 			auto conn = server.get_con_from_hdl(hdl);
@@ -118,6 +120,7 @@ bool SingleClientWSServer::validate(connection_hdl hdl) {
 	std::lock_guard lock(protocolMapMutex);
 	auto entry = protocolMap.find(path);
 	if (entry != protocolMap.end()) {
+		std::lock_guard lock(entry.second.mutex);
 		if (!entry->second.client.has_value()) {
 			return true;
 		} else {
