@@ -97,7 +97,7 @@ void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 	std::lock_guard lock(protocolMapMutex);
 	auto protocolDataOpt = this->getProtocol(protocolPath);
 	if (protocolDataOpt.has_value()) {
-		auto& protocolData = protocolDataOpt.value().get();
+		ProtocolData& protocolData = protocolDataOpt.value();
 		std::lock_guard lock(protocolData.mutex);
 		if (protocolData.client) {
 			connection_hdl hdl = protocolData.client.value();
@@ -146,7 +146,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection opened from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
-	auto& protocolData = this->getProtocol(path).value().get();
+	ProtocolData& protocolData = this->getProtocol(path).value();
 	{
 		std::lock_guard lock(protocolData.mutex);
 		protocolData.client = hdl;
@@ -154,7 +154,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 		if (heartbeatInfo.has_value()) {
 			auto eventID =
 				pingScheduler.scheduleEvent(heartbeatInfo->first / 2, [this, path]() {
-					auto& pd = this->getProtocol(path).value().get();
+					ProtocolData& pd = this->getProtocol(path).value();
 					std::lock_guard lock(pd.mutex);
 					if (pd.client.has_value()) {
 						LOG_F(2, "Ping!");
@@ -181,7 +181,7 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
-	auto& protocolData = this->getProtocol(path).value().get();
+	ProtocolData& protocolData = this->getProtocol(path).value();
 	{
 		std::lock_guard lock(protocolData.mutex);
 		protocolData.client.reset();
