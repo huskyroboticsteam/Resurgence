@@ -120,7 +120,7 @@ bool SingleClientWSServer::validate(connection_hdl hdl) {
 	std::lock_guard lock(protocolMapMutex);
 	auto entry = protocolMap.find(path);
 	if (entry != protocolMap.end()) {
-		std::lock_guard lock(entry.second.mutex);
+		std::lock_guard lock(entry->second.mutex);
 		if (!entry->second.client.has_value()) {
 			return true;
 		} else {
