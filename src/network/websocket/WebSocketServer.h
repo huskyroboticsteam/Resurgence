@@ -128,7 +128,8 @@ private:
 	void onPong(connection_hdl hdl, const std::string& payload);
 	void serverTask();
 	// Thread-safe access of the protocolMap
-	ProtocolData& getProtocol(const std::string& protocolPath);
+	std::optional<std::reference_wrapper<SingleClientWSServer::ProtocolData>>
+	getProtocol(const std::string& protocolPath);
 };
 } // namespace websocket
 } // namespace net
