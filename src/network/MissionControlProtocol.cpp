@@ -145,16 +145,16 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		// that IK wasn't enabled?
 		assert(armJointPositions.isValid());
 
+		if (!Globals::planarArmController.has_value()) {
+			Globals::planarArmController.emplace(navtypes::Vectord<2>(0, 0),
+												 Globals::planarArmKinematics,
+												 Constants::arm::SAFETY_FACTOR);
+		}
+
 		if (Globals::planarArmController.value().set_setpoint(armJointPositions.getData())) {
 			Globals::armIKEnabled = true;
 			_arm_ik_repeat_thread =
 				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
-
-			if (!Globals::planarArmController.has_value()) {
-				Globals::planarArmController.emplace(navtypes::Vectord<2>(0, 0),
-													 Globals::planarArmKinematics,
-													 Constants::arm::SAFETY_FACTOR);
-			}
 		}
 	} else {
 		Globals::armIKEnabled = false;
