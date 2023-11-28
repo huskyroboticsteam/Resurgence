@@ -94,11 +94,9 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 
 void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 										 const std::string& str) {
-	std::lock_guard lock(protocolMapMutex);
 	auto protocolDataOpt = this->getProtocol(protocolPath);
 	if (protocolDataOpt.has_value()) {
 		ProtocolData& protocolData = protocolDataOpt.value();
-		std::lock_guard lock(protocolData.mutex);
 		if (protocolData.client) {
 			connection_hdl hdl = protocolData.client.value();
 			auto conn = server.get_con_from_hdl(hdl);
