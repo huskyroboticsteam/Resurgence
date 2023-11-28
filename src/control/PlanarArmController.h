@@ -47,13 +47,11 @@ public:
 	 * @brief Sets the end effector setpoint / target position.
 	 *
 	 * @param targetJointPos The target joint positions.
-	 * @return true iff end effector is within safety radius.
 	 */
-	bool set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
+	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
 		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
 		std::lock_guard<std::mutex> lock(mutex);
 		setpoint = normalizeEEWithinRadius(newSetPoint);
-		return newSetPoint.norm() <= kin.getSegLens().sum() * safetyFactor;
 	}
 
 	/**
