@@ -291,9 +291,9 @@ void MissionControlProtocol::handleConnection() {
 }
 
 void MissionControlProtocol::handleHeartbeatTimedOut() {
+	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.");
 	this->stopAndShutdownPowerRepeat();
 	robot::emergencyStop();
-	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.");
 	Globals::E_STOP = true;
 	Globals::armIKEnabled = false;
 }
