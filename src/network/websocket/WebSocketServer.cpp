@@ -58,21 +58,23 @@ void SingleClientWSServer::serverTask() {
 
 void SingleClientWSServer::stop() {
 	if (isRunning) {
-		std::lock_guard lock(protocolMapMutex);
-		isRunning = false;
-		server.stop_listening();
-		for (auto& entry : protocolMap) {
-			std::lock_guard lock(entry.second.mutex);
-			if (entry.second.client) {
-				try {
-					server.close(entry.second.client.value(),
-								 websocketpp::close::status::going_away,
-								 "Server shutting down");
-				} catch (const websocketpp::exception& e) {
-					LOG_F(ERROR, "Server=%s : An error occurred while shutting down: %s",
-						  serverName.c_str(), e.what());
+		{
+			std::lock_guard lock(protocolMapMutex);
+			isRunning = false;
+			server.stop_listening();
+			for (auto& entry : protocolMap) {
+				std::lock_guard lock(entry.second.mutex);
+				if (entry.second.client) {
+					try {
+						server.close(entry.second.client.value(),
+									 websocketpp::close::status::going_away,
+									 "Server shutting down");
+					} catch (const websocketpp::exception& e) {
+						LOG_F(ERROR, "Server=%s : An error occurred while shutting down: %s",
+							  serverName.c_str(), e.what());
+					}
+					entry.second.client.reset();
 				}
-				entry.second.client.reset();
 			}
 		}
 		if (serverThread.joinable()) {
@@ -97,6 +99,7 @@ void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 	auto protocolDataOpt = this->getProtocol(protocolPath);
 	if (protocolDataOpt.has_value()) {
 		ProtocolData& protocolData = protocolDataOpt.value();
+		std::lock_guard lock(protocolData.mutex);
 		if (protocolData.client) {
 			connection_hdl hdl = protocolData.client.value();
 			auto conn = server.get_con_from_hdl(hdl);
@@ -167,9 +170,8 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 											   std::tuple<decltype(eventID)>{eventID},
 											   util::pairToTuple(heartbeatInfo.value()));
 		}
-
-		protocolData.protocol->clientConnected();
 	}
+	protocolData.protocol->clientConnected();
 }
 
 void SingleClientWSServer::onClose(connection_hdl hdl) {
@@ -198,7 +200,6 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	auto protocolDataOpt = this->getProtocol(path);
 	if (protocolDataOpt.has_value()) {
 		ProtocolData& pd = protocolDataOpt.value();
-		std::lock_guard lock(pd.mutex);
 		std::string jsonStr = message->get_payload();
 		LOG_F(1, "Message on %s: %s", path.c_str(), jsonStr.c_str());
 		json obj = json::parse(jsonStr);
