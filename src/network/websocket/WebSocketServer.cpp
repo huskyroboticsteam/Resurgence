@@ -195,12 +195,14 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string path = conn->get_resource();
 
-	auto it = protocolMap.find(path);
-	if (it != protocolMap.end()) {
+	auto protocolDataOpt = this->getProtocol(path);
+	if (protocolDataOpt.has_value()) {
+		ProtocolData& pd = protocolDataOpt.value();
+		std::lock_guard lock(pd.mutex);
 		std::string jsonStr = message->get_payload();
 		LOG_F(1, "Message on %s: %s", path.c_str(), jsonStr.c_str());
 		json obj = json::parse(jsonStr);
-		it->second.protocol->processMessage(obj);
+		pd.protocol->processMessage(obj);
 	} else {
 		LOG_F(WARNING, "Received message on unknown protocol path %s", path.c_str());
 	}
