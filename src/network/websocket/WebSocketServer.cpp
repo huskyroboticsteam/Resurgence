@@ -199,6 +199,7 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 
 	auto protocolDataOpt = this->getProtocol(path);
 	if (protocolDataOpt.has_value()) {
+		// No need to lock this pd because we only access the protocol, which is constant
 		ProtocolData& pd = protocolDataOpt.value();
 		std::string jsonStr = message->get_payload();
 		LOG_F(1, "Message on %s: %s", path.c_str(), jsonStr.c_str());
