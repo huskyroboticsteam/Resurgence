@@ -118,14 +118,14 @@ void SingleClientWSServer::sendJSON(const std::string& protocolPath, const json&
 bool SingleClientWSServer::validate(connection_hdl hdl) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string path = conn->get_resource();
-	std::lock_guard lock(protocolMapMutex);
-	auto entry = protocolMap.find(path);
-	if (entry != protocolMap.end()) {
-		std::lock_guard lock(entry->second.mutex);
-		if (!entry->second.client.has_value()) {
+	auto protocolDataOpt = this->getProtocol(path);
+	if (protocolDataOpt.has_value()) {
+		ProtocolData& pd = protocolDataOpt.value();
+		std::lock_guard lock(pd.mutex);
+		if (!pd.client.has_value()) {
 			return true;
 		} else {
-			auto existingConn = server.get_con_from_hdl(entry->second.client.value());
+			auto existingConn = server.get_con_from_hdl(pd.client.value());
 			LOG_F(INFO,
 				  "Server=%s, Endpoint=%s : Rejected connection from %s - A client is already "
 				  "connected: %s\n",
@@ -214,10 +214,9 @@ void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload
 	LOG_F(2, "Pong from %s", payload.c_str());
 	auto conn = server.get_con_from_hdl(hdl);
 
-	std::lock_guard lock(protocolMapMutex);
-	auto it = protocolMap.find(payload);
-	if (it != protocolMap.end()) {
-		auto& pd = it->second;
+	auto protocolDataOpt = this->getProtocol(payload);
+	if (protocolDataOpt.has_value()) {
+		ProtocolData& pd = protocolDataOpt.value();
 		std::lock_guard lock(pd.mutex);
 		if (pd.heartbeatInfo.has_value()) {
 			pd.heartbeatInfo->second.feed();
