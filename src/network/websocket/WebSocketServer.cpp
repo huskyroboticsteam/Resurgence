@@ -58,19 +58,23 @@ void SingleClientWSServer::serverTask() {
 
 void SingleClientWSServer::stop() {
 	if (isRunning) {
-		isRunning = false;
-		server.stop_listening();
-		for (auto& entry : protocolMap) {
-			if (entry.second.client) {
-				try {
-					server.close(entry.second.client.value(),
-								 websocketpp::close::status::going_away,
-								 "Server shutting down");
-				} catch (const websocketpp::exception& e) {
-					LOG_F(ERROR, "Server=%s : An error occurred while shutting down: %s",
-						  serverName.c_str(), e.what());
+		{
+			std::lock_guard lock(protocolMapMutex);
+			isRunning = false;
+			server.stop_listening();
+			for (auto& entry : protocolMap) {
+				std::lock_guard lock(entry.second.mutex);
+				if (entry.second.client) {
+					try {
+						server.close(entry.second.client.value(),
+									 websocketpp::close::status::going_away,
+									 "Server shutting down");
+					} catch (const websocketpp::exception& e) {
+						LOG_F(ERROR, "Server=%s : An error occurred while shutting down: %s",
+							  serverName.c_str(), e.what());
+					}
+					entry.second.client.reset();
 				}
-				entry.second.client.reset();
 			}
 		}
 		if (serverThread.joinable()) {
@@ -81,6 +85,7 @@ void SingleClientWSServer::stop() {
 
 bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protocol) {
 	std::string path = protocol->getProtocolPath();
+	std::lock_guard lock(protocolMapMutex);
 	if (protocolMap.find(path) == protocolMap.end()) {
 		protocolMap.emplace(path, std::move(protocol));
 		return true;
@@ -91,9 +96,10 @@ bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protoc
 
 void SingleClientWSServer::sendRawString(const std::string& protocolPath,
 										 const std::string& str) {
-	auto entry = protocolMap.find(protocolPath);
-	if (entry != protocolMap.end()) {
-		auto& protocolData = entry->second;
+	auto protocolDataOpt = this->getProtocol(protocolPath);
+	if (protocolDataOpt.has_value()) {
+		ProtocolData& protocolData = protocolDataOpt.value();
+		std::lock_guard lock(protocolData.mutex);
 		if (protocolData.client) {
 			connection_hdl hdl = protocolData.client.value();
 			auto conn = server.get_con_from_hdl(hdl);
@@ -112,12 +118,14 @@ void SingleClientWSServer::sendJSON(const std::string& protocolPath, const json&
 bool SingleClientWSServer::validate(connection_hdl hdl) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string path = conn->get_resource();
-	auto entry = protocolMap.find(path);
-	if (entry != protocolMap.end()) {
-		if (!entry->second.client.has_value()) {
+	auto protocolDataOpt = this->getProtocol(path);
+	if (protocolDataOpt.has_value()) {
+		ProtocolData& pd = protocolDataOpt.value();
+		std::lock_guard lock(pd.mutex);
+		if (!pd.client.has_value()) {
 			return true;
 		} else {
-			auto existingConn = server.get_con_from_hdl(entry->second.client.value());
+			auto existingConn = server.get_con_from_hdl(pd.client.value());
 			LOG_F(INFO,
 				  "Server=%s, Endpoint=%s : Rejected connection from %s - A client is already "
 				  "connected: %s\n",
@@ -139,7 +147,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection opened from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
-	auto& protocolData = protocolMap.at(path);
+	ProtocolData& protocolData = this->getProtocol(path).value();
 	{
 		std::lock_guard lock(protocolData.mutex);
 		protocolData.client = hdl;
@@ -147,7 +155,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 		if (heartbeatInfo.has_value()) {
 			auto eventID =
 				pingScheduler.scheduleEvent(heartbeatInfo->first / 2, [this, path]() {
-					auto& pd = this->protocolMap.at(path);
+					ProtocolData& pd = this->getProtocol(path).value();
 					std::lock_guard lock(pd.mutex);
 					if (pd.client.has_value()) {
 						LOG_F(2, "Ping!");
@@ -162,9 +170,8 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 											   std::tuple<decltype(eventID)>{eventID},
 											   util::pairToTuple(heartbeatInfo.value()));
 		}
-
-		protocolData.protocol->clientConnected();
 	}
+	protocolData.protocol->clientConnected();
 }
 
 void SingleClientWSServer::onClose(connection_hdl hdl) {
@@ -174,7 +181,7 @@ void SingleClientWSServer::onClose(connection_hdl hdl) {
 	LOG_F(INFO, "Server=%s, Endpoint=%s : Connection disconnected from %s", serverName.c_str(),
 		  path.c_str(), client.c_str());
 
-	auto& protocolData = protocolMap.at(path);
+	ProtocolData& protocolData = this->getProtocol(path).value();
 	{
 		std::lock_guard lock(protocolData.mutex);
 		protocolData.client.reset();
@@ -190,12 +197,14 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 	auto conn = server.get_con_from_hdl(hdl);
 	std::string path = conn->get_resource();
 
-	auto it = protocolMap.find(path);
-	if (it != protocolMap.end()) {
+	auto protocolDataOpt = this->getProtocol(path);
+	if (protocolDataOpt.has_value()) {
+		// No need to lock this pd because we only access the protocol, which is constant
+		ProtocolData& pd = protocolDataOpt.value();
 		std::string jsonStr = message->get_payload();
 		LOG_F(1, "Message on %s: %s", path.c_str(), jsonStr.c_str());
 		json obj = json::parse(jsonStr);
-		it->second.protocol->processMessage(obj);
+		pd.protocol->processMessage(obj);
 	} else {
 		LOG_F(WARNING, "Received message on unknown protocol path %s", path.c_str());
 	}
@@ -205,15 +214,27 @@ void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload
 	LOG_F(2, "Pong from %s", payload.c_str());
 	auto conn = server.get_con_from_hdl(hdl);
 
-	auto it = protocolMap.find(payload);
-	if (it != protocolMap.end()) {
-		auto& pd = it->second;
+	auto protocolDataOpt = this->getProtocol(payload);
+	if (protocolDataOpt.has_value()) {
+		ProtocolData& pd = protocolDataOpt.value();
 		std::lock_guard lock(pd.mutex);
 		if (pd.heartbeatInfo.has_value()) {
 			pd.heartbeatInfo->second.feed();
 		}
 	} else {
 		LOG_F(WARNING, "Received pong on unknown protocol path %s", payload.c_str());
+	}
+}
+
+std::optional<std::reference_wrapper<SingleClientWSServer::ProtocolData>>
+SingleClientWSServer::getProtocol(const std::string& protocolPath) {
+	std::lock_guard lock(protocolMapMutex);
+
+	auto it = protocolMap.find(protocolPath);
+	if (it != protocolMap.end()) {
+		return std::ref(it->second);
+	} else {
+		return std::nullopt;
 	}
 }
 } // namespace websocket
