@@ -1,7 +1,9 @@
 #include "DiffDriveKinematics.h"
 
+#include "../Constants.h"
 #include "../utils/transform.h"
 
+#include <cmath>
 #include <loguru.hpp>
 using namespace navtypes;
 using util::toTransformRotateFirst;
@@ -55,28 +57,58 @@ pose_t DiffDriveKinematics::getNextPose(const wheelvel_t& wheelVel, const pose_t
 pose_t DiffDriveKinematics::ensureWithinWheelSpeedLimit(
 	PreferredVelPreservation preferredVelPreservation, double xVel, double thetaVel,
 	double maxWheelSpeed) const {
-	auto wheelVels = robotVelToWheelVel(xVel, thetaVel);
-	double calculatedMaxWheelVel = std::max(wheelVels.lVel, wheelVels.rVel);
+	auto [lVel, rVel] = robotVelToWheelVel(xVel, thetaVel);
+	double calculatedMaxWheelVel = std::max(abs(lVel), abs(rVel));
 	if (calculatedMaxWheelVel > maxWheelSpeed) {
-		double scaleFactor = maxWheelSpeed / calculatedMaxWheelVel;
 		switch (preferredVelPreservation) {
-			case PreferredVelPreservation::Proportional:
-				xVel *= scaleFactor;
-				thetaVel *= scaleFactor;
+			case PreferredVelPreservation::Proportional: {
+				double lPWM = lVel / Constants::MAX_WHEEL_VEL;
+				double rPWM = rVel / Constants::MAX_WHEEL_VEL;
+				double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
+				if (maxAbsPWM > 1) {
+					lPWM /= maxAbsPWM;
+					rPWM /= maxAbsPWM;
+				}
+				auto newRobotVel = wheelVelToRobotVel(lPWM, rPWM);
+				xVel = newRobotVel.x();
+				thetaVel = newRobotVel.z();
 				break;
-			case PreferredVelPreservation::PreferXVel:
-				thetaVel *= (0.5 * scaleFactor);
+			}
+			case PreferredVelPreservation::PreferXVel: {
+				if (abs(xVel) > maxWheelSpeed) {
+					return {std::copysign(maxWheelSpeed, xVel), 0, 0};
+				}
+				// Bring lVel up to -maxWheelSpeed
+				if (lVel < -maxWheelSpeed) {
+					thetaVel = (-maxWheelSpeed - xVel) * -2.0 / wheelBaseWidth;
+				}
+				// Bring lVel down to maxWheelSpeed
+				if (lVel > maxWheelSpeed) {
+					thetaVel = (maxWheelSpeed - xVel) * -2.0 / wheelBaseWidth;
+				}
+				// Bring rVel up to -maxWheelSpeed
+				if (rVel < -maxWheelSpeed) {
+					thetaVel = (-maxWheelSpeed - xVel) * 2.0 / wheelBaseWidth;
+				}
+				// Bring rVel down to maxWheelSpeed
+				if (rVel > maxWheelSpeed) {
+					thetaVel = (maxWheelSpeed - xVel) * 2.0 / wheelBaseWidth;
+				}
 				break;
-			case PreferredVelPreservation::PreferThetaVel:
-				xVel *= (0.5 * scaleFactor);
+			}
+			case PreferredVelPreservation::PreferThetaVel: {
+				if (abs(wheelBaseWidth / 2 * thetaVel) > maxWheelSpeed) {
+					return {0, 0, std::copysign(maxWheelSpeed * 2 / wheelBaseWidth, thetaVel)};
+				}
+				if (std::max(lVel, rVel) > maxWheelSpeed) {
+					xVel -= std::max(lVel, rVel) - maxWheelSpeed;
+				}
+				if (std::min(lVel, rVel) < -maxWheelSpeed) {
+					xVel += -maxWheelSpeed - std::min(lVel, rVel);
+				}
 				break;
+			}
 		}
-		// wheelVels = robotVelToWheelVel(xVel, thetaVel);
-		// double oldMaxWheelVel = calculatedMaxWheelVel;
-		// calculatedMaxWheelVel = std::max(wheelVels.lVel, wheelVels.rVel);
-		// LOG_F(INFO, "Scale Factor: %lf MaxWheelSpeed: %lf OldMaxWheelVel: %lf
-		// NewMaxWheelVel: %lf\n", scaleFactor, maxWheelSpeed, oldMaxWheelVel,
-		// calculatedMaxWheelVel);
 	}
 	return {xVel, 0, thetaVel};
 }

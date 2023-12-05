@@ -1,4 +1,6 @@
 #include "../../src/kinematics/DiffDriveKinematics.h"
+
+#include "../../src/Constants.h"
 #include "../../src/navtypes.h"
 
 #include <iostream>
@@ -60,4 +62,31 @@ TEST_CASE("Differential Drive Kinematics Test")
 	// drive CW in a full circle with radius 1
 	assertApprox({0, 0, 0},
 				 kinematics.getNextPose(wheelVel(3 * PI / 4, PI / 4), {0, 0, 0}, 4));
+
+	assertApprox({Constants::MAX_WHEEL_VEL, 0, 0},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
+					 1.0, 1.0, Constants::MAX_WHEEL_VEL));
+	assertApprox({-Constants::MAX_WHEEL_VEL, 0, 0},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
+					 -1.0, 0.5, Constants::MAX_WHEEL_VEL));
+	// FIXME: Make these tests actually check for all the possible cases of below/above min/max
+	// wheel speed.
+	assertApprox({0, 0, 0},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
+					 0.5, 0.5, Constants::MAX_WHEEL_VEL));
+	assertApprox({0, 0, 0},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
+					 0.5, 0.5, Constants::MAX_WHEEL_VEL));
+	assertApprox({0, 0, 0},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
+					 0.5, 0.5, Constants::MAX_WHEEL_VEL));
+	assertApprox({0, 0, 0},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
+					 0.5, 0.5, Constants::MAX_WHEEL_VEL));
 }
