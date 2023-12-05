@@ -20,7 +20,7 @@ public:
 	enum class PreferredVelPreservation {
 		Proportional,
 		PreferXVel,
-		PreferThetaVel
+		PreferThetaVel,
 	};
 
 	/**
