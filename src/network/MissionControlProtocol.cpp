@@ -434,7 +434,9 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				}
 			}
 			if (this->_last_cmd_vel) {
-				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
+				if (this->_last_cmd_vel->first != 0.0 || this->_last_cmd_vel->second != 0.0) {
+					robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
+				}
 			}
 		}
 		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
