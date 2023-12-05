@@ -4,7 +4,6 @@
 #include "world_interface/data.h"
 
 #include <atomic>
-#include <optional>
 #include <vector>
 
 using robot::types::motorid_t;
