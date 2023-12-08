@@ -13,4 +13,4 @@ SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9230", KER
 # SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9601", KERNELS=="1-2.1", SYMLINK+="video30"
 
 # Hand camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9230", KERNELS=="1-2.1", SYMLINK+="video40"
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9230", KERNELS=="1-2.4.4", SYMLINK+="video40"
