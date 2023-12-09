@@ -3,8 +3,11 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
+#include <loguru.hpp>
 #include <mutex>
+#include <optional>
 #include <queue>
+#include <string>
 #include <thread>
 #include <unordered_set>
 
@@ -39,9 +42,11 @@ public:
 
 	/**
 	 * @brief Create a new PeriodicScheduler.
+	 *
+	 * @param name The name of this scheduler, for logging purposes.
 	 */
-	PeriodicScheduler()
-		: newEventAdded(false), quitting(false), nextID(0),
+	explicit PeriodicScheduler(const std::optional<std::string>& name = std::nullopt)
+		: name(name), newEventAdded(false), quitting(false), nextID(0),
 		  thread(std::bind(&PeriodicScheduler::threadFn, this)) {}
 
 	PeriodicScheduler(const PeriodicScheduler&) = delete;
@@ -122,6 +127,9 @@ private:
 	 * @brief Method executed by the scheduler thread.
 	 */
 	void threadFn() {
+		if (name.has_value()) {
+			loguru::set_thread_name(name->c_str());
+		}
 		std::unique_lock lock(scheduleMutex);
 		while (!quitting) {
 			if (schedule.empty()) {
@@ -164,6 +172,7 @@ private:
 		}
 	};
 
+	std::optional<std::string> name;
 	bool newEventAdded;
 	bool quitting;
 	eventid_t nextID = 0;
@@ -193,6 +202,7 @@ public:
 	/**
 	 * @brief Construct a new Watchdog.
 	 *
+	 * @param name The name of this Watchdog, for logging purposes.
 	 * @param duration The timeout duration. If not fed for at least this long, then the
 	 * callback is invoked.
 	 * @param callback The callback to invoke when the watchdog starves.
@@ -200,10 +210,27 @@ public:
 	 * milliseconds until fed again. Otherwise, only call @p callback when starved, and do not
 	 * call again until being reset and subsequently starved again.
 	 */
-	explicit Watchdog(std::chrono::milliseconds duration,
-					  const std::function<void()>& callback, bool keepCallingOnDeath = false)
-		: duration(duration), callback(callback), keepCallingOnDeath(keepCallingOnDeath),
-		  fed(false), quitting(false), thread(std::bind(&Watchdog::threadFn, this)) {}
+	Watchdog(const std::string& name, std::chrono::milliseconds duration,
+			 const std::function<void()>& callback, bool keepCallingOnDeath = false)
+		: name(name), duration(duration), callback(callback),
+		  keepCallingOnDeath(keepCallingOnDeath), fed(false), quitting(false),
+		  thread(std::bind(&Watchdog::threadFn, this)) {}
+
+	/**
+	 * @brief Construct a new Watchdog.
+	 *
+	 * @param duration The timeout duration. If not fed for at least this long, then the
+	 * callback is invoked.
+	 * @param callback The callback to invoke when the watchdog starves.
+	 * @param keepCallingOnDeath If true, keep invoking @p callback every @p duration
+	 * milliseconds until fed again. Otherwise, only call @p callback when starved, and do not
+	 * call again until being reset and subsequently starved again.
+	 */
+	Watchdog(std::chrono::milliseconds duration, const std::function<void()>& callback,
+			 bool keepCallingOnDeath = false)
+		: name(std::nullopt), duration(duration), callback(callback),
+		  keepCallingOnDeath(keepCallingOnDeath), fed(false), quitting(false),
+		  thread(std::bind(&Watchdog::threadFn, this)) {}
 
 	Watchdog(const Watchdog&) = delete;
 
@@ -236,6 +263,7 @@ public:
 private:
 	friend void util::impl::notifyScheduler<>(Watchdog&);
 
+	std::optional<std::string> name;
 	std::chrono::milliseconds duration;
 	std::function<void()> callback;
 	const bool keepCallingOnDeath;
@@ -250,6 +278,9 @@ private:
 	}
 
 	void threadFn() {
+		if (name.has_value()) {
+			loguru::set_thread_name(name->c_str());
+		}
 		std::unique_lock lock(mutex);
 		while (!quitting) {
 			std::chrono::time_point<Clock> wakeTime = Clock::now() + duration;

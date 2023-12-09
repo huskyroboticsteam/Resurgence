@@ -15,7 +15,7 @@ SingleClientWSServer::ProtocolData::ProtocolData(std::unique_ptr<WebSocketProtoc
 
 SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16_t port)
 	: serverName(serverName), port(port), server(), isRunning(false), protocolMap(),
-	  serverThread() {
+	  serverThread(), pingScheduler(serverName + "_PingSched") {
 	// disable websocket logging
 	server.set_access_channels(websocketpp::log::alevel::none);
 	server.set_error_channels(websocketpp::log::elevel::none);
@@ -47,6 +47,7 @@ bool SingleClientWSServer::start() {
 
 void SingleClientWSServer::serverTask() {
 	try {
+		loguru::set_thread_name(serverName.c_str());
 		server.listen(port);
 		server.start_accept();
 		server.run();
@@ -162,13 +163,16 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 						server.ping(pd.client.value(), path);
 					}
 				});
+			std::string watchdogName = protocolData.protocol->protocolPath + "_Watchdog";
+			auto watchdogArgs = std::tuple_cat(std::tuple<std::string>(watchdogName),
+											   util::pairToTuple(heartbeatInfo.value()));
 			// util::Watchdog is non-copyable and non-movable, so we must create in-place
 			// Since we want to create a member field of the pair in-place, it gets complicated
 			// so we have to use piecewise_construct to allow us to separately initialize all
 			// pair fields in-place
 			protocolData.heartbeatInfo.emplace(std::piecewise_construct,
 											   std::tuple<decltype(eventID)>{eventID},
-											   util::pairToTuple(heartbeatInfo.value()));
+											   watchdogArgs);
 		}
 	}
 	protocolData.protocol->clientConnected();

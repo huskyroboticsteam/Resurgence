@@ -212,6 +212,7 @@ int createCANSocket(std::optional<can::deviceid_t> id) {
 }
 
 void receiveThreadFn() {
+	loguru::set_thread_name("CAN_Receive");
 	CANPacket packet;
 	// create dedicated CAN socket for reading
 	int recvFD = createCANSocket({{devicegroup_t::master, DEVICE_SERIAL_JETSON}});
@@ -311,7 +312,7 @@ void pullDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
 void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
 						   std::chrono::milliseconds period) {
 	if (!telemScheduler) {
-		telemScheduler = std::make_shared<util::PeriodicScheduler<>>();
+		telemScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_TelemPullSched");
 	}
 
 	auto mapKey = std::make_pair(id, telemType);
