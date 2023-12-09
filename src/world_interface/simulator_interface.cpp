@@ -1,6 +1,5 @@
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
@@ -262,8 +261,6 @@ void world_interface_init(bool initOnlyMotors) {
 	initSimServer();
 	initCameras();
 	initMotors();
-
-	AR::initializeLandmarkDetection();
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
@@ -340,7 +337,7 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 }
 
 landmarks_t readLandmarks() {
-	return AR::readLandmarks();
+	return {};
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
