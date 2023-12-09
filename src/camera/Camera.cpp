@@ -2,7 +2,7 @@
 
 #include "CameraConfig.h"
 
-#include <iostream>
+#include <loguru.hpp>
 
 using cv::Mat;
 using cv::Size;
@@ -23,10 +23,9 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 		return false;
 	}
 	_capture_lock->lock();
-	std::cout << "Opening camera " << camera_id << "... ";
 	bool result = this->_capture->open(camera_id);
-	std::cout << (result ? "success" : "failed") << std::endl;
 	_capture_lock->unlock();
+	LOG_F(INFO, "Opening camera %d... %s", camera_id, result ? "success" : "failed");
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
 	return result;
@@ -75,7 +74,7 @@ void Camera::init(const Mat& extrinsic_params) {
 	this->_thread = std::shared_ptr<std::thread>(
 		new std::thread(&Camera::captureLoop, this), [this](std::thread* p) {
 			if (*(this->_running)) {
-				std::cout << "shutting down camera thread" << std::endl;
+				LOG_F(INFO, "Shutting down camera thread");
 				*(this->_running) = false;
 				p->join();
 			}
@@ -115,6 +114,7 @@ bool Camera::openFromConfigFile(std::string filename) {
 }
 
 void Camera::captureLoop() {
+	loguru::set_thread_name(_name.c_str());
 	cv::Size image_size(640, 480);
 	if (!_intrinsic_params.empty()) {
 		image_size = _intrinsic_params.getImageSize();
