@@ -19,7 +19,7 @@ jobs:
       run: |
         cd ${{ github.workspace }}
         git reset --soft $(git merge-base HEAD origin/master)
-        diff=$(git clang-format-11 --diff)
+        diff=$(git clang-format-11 -style=file --diff)
         if [ $(echo "${diff}" | wc -l) != 1 ]; then
           echo "Formatting errors detected! Suggested changes:" >&2
           echo "${diff}" >&2
