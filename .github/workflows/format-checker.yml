@@ -17,6 +17,7 @@ jobs:
         sudo ./llvm.sh 18
         sudo apt install -y git clang-format-18
         sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-18 100
+        sudo update-alternatives --set clang-format /usr/bin/clang-format-18
     - name: Check Formatting
       run: |
         cd ${{ github.workspace }}
