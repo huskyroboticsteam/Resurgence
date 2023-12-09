@@ -2,7 +2,6 @@
 #include "Globals.h"
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"
-#include "rospub.h"
 #include "world_interface/world_interface.h"
 
 #include <array>
@@ -30,7 +29,6 @@ using namespace robot::types;
 
 void closeRover(int signum) {
 	robot::emergencyStop();
-	rospub::shutdown();
 	Globals::websocketServer.stop();
 	raise(SIGTERM);
 }
@@ -188,7 +186,6 @@ int main(int argc, char** argv) {
 	robot::world_interface_init();
 	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
 	Globals::websocketServer.addProtocol(std::move(mcProto));
-	rospub::init();
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
 
