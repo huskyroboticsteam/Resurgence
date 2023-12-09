@@ -30,14 +30,11 @@ void usage(const char* name);
 template <typename K, typename V>
 constexpr std::unordered_map<V, K> reverseMap(const std::unordered_map<K, V>& map);
 
-enum class FilterType
-{
-	EKF,
-	PoseGraph
+enum class FilterType {
+	EKF
 };
 
-const std::unordered_map<std::string, FilterType> filterNameToType{
-	{"EKF", FilterType::EKF}, {"PoseGraph", FilterType::PoseGraph}};
+const std::unordered_map<std::string, FilterType> filterNameToType{{"EKF", FilterType::EKF}};
 
 const std::unordered_map<FilterType, std::string> filterTypeToName =
 	reverseMap(filterNameToType);
@@ -119,8 +116,6 @@ int main(int argc, const char* argv[]) {
 					<< ms << "," << pose(0) << "," << pose(1) << "," << pose(2) << "\n";
 
 				fpe.predict(thetaVel, xVel);
-			} else if (filterType == FilterType::PoseGraph) {
-				CHECK_F(false); // TODO: add pose graph support
 			} else {
 				CHECK_F(false);
 			}
