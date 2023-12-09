@@ -125,10 +125,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>eventid_t</b> = <a c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a82f72644d7d726f1a6a723a77486ac7b" id="r_a82f72644d7d726f1a6a723a77486ac7b"><td class="memItemLeft" align="right" valign="top"><a id="a82f72644d7d726f1a6a723a77486ac7b" name="a82f72644d7d726f1a6a723a77486ac7b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>PeriodicScheduler</b> ()</td></tr>
-<tr class="memdesc:a82f72644d7d726f1a6a723a77486ac7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classutil_1_1PeriodicScheduler.html" title="Uses a single thread to periodically invoke callbacks at a given frequency.">PeriodicScheduler</a>. <br /></td></tr>
-<tr class="separator:a82f72644d7d726f1a6a723a77486ac7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d7b387f9a7743b601aca004c7524d08" id="r_a6d7b387f9a7743b601aca004c7524d08"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1PeriodicScheduler.html#a6d7b387f9a7743b601aca004c7524d08">PeriodicScheduler</a> (const std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &gt; &amp;name=std::nullopt)</td></tr>
+<tr class="memdesc:a6d7b387f9a7743b601aca004c7524d08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classutil_1_1PeriodicScheduler.html" title="Uses a single thread to periodically invoke callbacks at a given frequency.">PeriodicScheduler</a>.  <br /></td></tr>
+<tr class="separator:a6d7b387f9a7743b601aca004c7524d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63b03b0cf5e65e24d75cb458eeb0e66c" id="r_a63b03b0cf5e65e24d75cb458eeb0e66c"><td class="memItemLeft" align="right" valign="top"><a id="a63b03b0cf5e65e24d75cb458eeb0e66c" name="a63b03b0cf5e65e24d75cb458eeb0e66c"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>PeriodicScheduler</b> (const <a class="el" href="classutil_1_1PeriodicScheduler.html">PeriodicScheduler</a> &amp;)=delete</td></tr>
 <tr class="separator:a63b03b0cf5e65e24d75cb458eeb0e66c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,7 +164,44 @@ class util::PeriodicScheduler&lt; Clock &gt;</div><p>Uses a single thread to per
   </table>
   </dd>
 </dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a6d7b387f9a7743b601aca004c7524d08" name="a6d7b387f9a7743b601aca004c7524d08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d7b387f9a7743b601aca004c7524d08">&#9670;&#160;</a></span>PeriodicScheduler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Clock  = std::chrono::steady_clock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classutil_1_1PeriodicScheduler.html">util::PeriodicScheduler</a>&lt; Clock &gt;::PeriodicScheduler </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>name</em> = <code>std::nullopt</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a new <a class="el" href="classutil_1_1PeriodicScheduler.html" title="Uses a single thread to periodically invoke callbacks at a given frequency.">PeriodicScheduler</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name of this scheduler, for logging purposes. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ac657af10208f7e1c9b31abc17988b316" name="ac657af10208f7e1c9b31abc17988b316"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac657af10208f7e1c9b31abc17988b316">&#9670;&#160;</a></span>clear()</h2>
 

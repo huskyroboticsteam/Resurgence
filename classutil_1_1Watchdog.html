@@ -116,6 +116,9 @@ Collaboration diagram for util::Watchdog&lt; Clock &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:affa979a1b52b624dd8faa484d70a720d" id="r_affa979a1b52b624dd8faa484d70a720d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1Watchdog.html#affa979a1b52b624dd8faa484d70a720d">Watchdog</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;name, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> duration, const std::function&lt; void()&gt; &amp;callback, bool keepCallingOnDeath=false)</td></tr>
+<tr class="memdesc:affa979a1b52b624dd8faa484d70a720d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classutil_1_1Watchdog.html" title="Implements a thread-safe watchdog.">Watchdog</a>.  <br /></td></tr>
+<tr class="separator:affa979a1b52b624dd8faa484d70a720d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd37ee03af44ca1c545ad489cd70395e" id="r_abd37ee03af44ca1c545ad489cd70395e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1Watchdog.html#abd37ee03af44ca1c545ad489cd70395e">Watchdog</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> duration, const std::function&lt; void()&gt; &amp;callback, bool keepCallingOnDeath=false)</td></tr>
 <tr class="memdesc:abd37ee03af44ca1c545ad489cd70395e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classutil_1_1Watchdog.html" title="Implements a thread-safe watchdog.">Watchdog</a>.  <br /></td></tr>
 <tr class="separator:abd37ee03af44ca1c545ad489cd70395e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,8 +150,69 @@ class util::Watchdog&lt; Clock &gt;</div><p>Implements a thread-safe watchdog. <
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://en.wikipedia.org/wiki/Watchdog_timer">https://en.wikipedia.org/wiki/Watchdog_timer</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="affa979a1b52b624dd8faa484d70a720d" name="affa979a1b52b624dd8faa484d70a720d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affa979a1b52b624dd8faa484d70a720d">&#9670;&#160;</a></span>Watchdog() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Clock  = std::chrono::steady_clock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classutil_1_1Watchdog.html">util::Watchdog</a>&lt; Clock &gt;::Watchdog </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a>&#160;</td>
+          <td class="paramname"><em>duration</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::function&lt; void()&gt; &amp;&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>keepCallingOnDeath</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct a new <a class="el" href="classutil_1_1Watchdog.html" title="Implements a thread-safe watchdog.">Watchdog</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name of this <a class="el" href="classutil_1_1Watchdog.html" title="Implements a thread-safe watchdog.">Watchdog</a>, for logging purposes. </td></tr>
+    <tr><td class="paramname">duration</td><td>The timeout duration. If not fed for at least this long, then the callback is invoked. </td></tr>
+    <tr><td class="paramname">callback</td><td>The callback to invoke when the watchdog starves. </td></tr>
+    <tr><td class="paramname">keepCallingOnDeath</td><td>If true, keep invoking <code>callback</code> every <code>duration</code> milliseconds until fed again. Otherwise, only call <code>callback</code> when starved, and do not call again until being reset and subsequently starved again. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="abd37ee03af44ca1c545ad489cd70395e" name="abd37ee03af44ca1c545ad489cd70395e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd37ee03af44ca1c545ad489cd70395e">&#9670;&#160;</a></span>Watchdog()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abd37ee03af44ca1c545ad489cd70395e">&#9670;&#160;</a></span>Watchdog() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -184,7 +248,7 @@ template&lt;typename Clock  = std::chrono::steady_clock&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
