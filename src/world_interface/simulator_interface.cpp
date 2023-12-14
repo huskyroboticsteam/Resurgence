@@ -218,8 +218,6 @@ void clientDisconnected() {
 void initSimServer() {
 	auto protocol = std::make_unique<net::websocket::WebSocketProtocol>(PROTOCOL_PATH);
 	protocol->addMessageHandler("simImuOrientationReport", handleIMU);
-	// TODO: remove lidar report
-	protocol->addMessageHandler("simLidarReport", [](const nlohmann::json&) {});
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
