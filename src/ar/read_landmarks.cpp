@@ -30,6 +30,7 @@ std::thread landmark_thread;
 bool initialized = false;
 
 void detectLandmarksLoop() {
+	loguru::set_thread_name("LandmarkDetection");
 	cv::Mat frame;
 	uint32_t last_frame_no = 0;
 	while (true) {

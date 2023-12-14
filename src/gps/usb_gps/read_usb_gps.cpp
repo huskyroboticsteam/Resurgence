@@ -42,6 +42,7 @@ bool gpsHasFix() {
 
 void gps_loop() {
 	struct gps_data_t* newdata;
+	loguru::set_thread_name("USB_GPS");
 
 	while (true) {
 		if (!gps_rec.waiting(5000000)) {

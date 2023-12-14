@@ -243,9 +243,6 @@ add_library(filters SHARED
   filters/PoseEstimatorLinear.cpp
   filters/StateSpaceUtil.cpp
   filters/FullPoseEstimator.cpp
-  filters/pose_graph/graph.cpp
-  filters/pose_graph/friendly_graph.cpp
-  filters/pose_graph/factors.cpp
   )
 target_link_libraries(filters utils)
 
@@ -273,13 +270,8 @@ list(APPEND simulator_libs
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
   Globals.cpp
-  rospub.cpp
   network/websocket/WebSocketServer.cpp
   network/websocket/WebSocketProtocol.cpp
-  worldmap/GlobalMap.cpp
-  worldmap/TrICP.cpp
-  worldmap/QuadTree.cpp
-  planning/plan.cpp
   )
 target_link_libraries(rover_common
   utils
@@ -318,7 +310,6 @@ target_link_libraries(TunePID ${vision_libs})
 if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
-    rospub_test.cpp
     # AR Detection tests
     ar/DetectorTests.cpp
     ar/MarkerSetTests.cpp
@@ -341,9 +332,6 @@ if(WITH_TESTS)
     ../tests/filters/MultiSensorEKFTest.cpp
     ../tests/filters/StateSpaceUtilsTest.cpp
     ../tests/filters/FullPoseEstimatorTest.cpp
-    ../tests/worldmap/TrICPTest.cpp
-    ../tests/worldmap/GlobalMapTest.cpp
-    ../tests/worldmap/QuadTreeTest.cpp
     # Command tests
     ../tests/commands/DriveToWaypointCommandTest.cpp
     # Util tests

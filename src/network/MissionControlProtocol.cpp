@@ -417,6 +417,7 @@ void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double powe
 }
 
 void MissionControlProtocol::jointPowerRepeatTask() {
+	loguru::set_thread_name("MCP_PowerRepeat");
 	std::unique_lock<std::mutex> joint_repeat_lock(this->_joint_repeat_running_mutex);
 	while (this->_joint_repeat_running) {
 		{
@@ -445,6 +446,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 }
 
 void MissionControlProtocol::updateArmIKRepeatTask() {
+	loguru::set_thread_name("MCP_ArmIK");
 	dataclock::time_point next_update_time = dataclock::now();
 	while (Globals::armIKEnabled) {
 		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
@@ -465,6 +467,7 @@ void MissionControlProtocol::updateArmIKRepeatTask() {
 }
 
 void MissionControlProtocol::telemReportTask() {
+	loguru::set_thread_name("MCP_Telem");
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
@@ -485,6 +488,7 @@ void MissionControlProtocol::telemReportTask() {
 }
 
 void MissionControlProtocol::videoStreamTask() {
+	loguru::set_thread_name("MCP_Video");
 	while (this->_streaming_running) {
 		std::shared_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		// for all open streams, check if there is a new frame

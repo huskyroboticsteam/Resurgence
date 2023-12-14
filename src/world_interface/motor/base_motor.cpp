@@ -8,7 +8,7 @@ base_motor::base_motor(robot::types::motorid_t motor, bool hasPosSensor)
 	// create scheduler if needed
 	std::lock_guard<std::mutex> lg(schedulerMutex);
 	if (!pSched) {
-		pSched.emplace();
+		pSched.emplace("MotorVelSched");
 	}
 }
 
