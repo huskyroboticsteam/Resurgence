@@ -14,8 +14,16 @@ struct wheelvel_t {
 class DiffDriveKinematics {
 public:
 	/**
-	 * Choose whether the velocity should be scaled proportionally, with respect to x velocity,
-	 * or with respect to theta velocity.
+	 * Proportional: The xVel and thetaVel are scaled an equal amount. This keeps the linear
+	 * and theta velocity at equal proportions to their original values but their output wheel
+	 * speed is below the max allowed.
+	 *
+	 * PreferXVel: The theta velocity is scaled and the x velocity is maintained. This
+	 * preserves linear velocity over theta velocity meaning we lose turning ability.
+	 *
+	 * PreferThetaVel: The x velocity is scaled and the theta velocity is maintained. This
+	 * preserves the ability to rotate the rover by scaling down the linear velocity so that
+	 * the calculated max wheel speed is below the set max wheel speed allowed.
 	 */
 	enum class PreferredVelPreservation {
 		Proportional,

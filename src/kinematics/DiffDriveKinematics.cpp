@@ -1,10 +1,8 @@
 #include "DiffDriveKinematics.h"
 
-#include "../Constants.h"
 #include "../utils/transform.h"
 
 #include <cmath>
-#include <loguru.hpp>
 using namespace navtypes;
 using util::toTransformRotateFirst;
 
@@ -62,20 +60,14 @@ pose_t DiffDriveKinematics::ensureWithinWheelSpeedLimit(
 	if (calculatedMaxWheelVel > maxWheelSpeed) {
 		switch (preferredVelPreservation) {
 			case PreferredVelPreservation::Proportional: {
-				double lPWM = lVel / Constants::MAX_WHEEL_VEL;
-				double rPWM = rVel / Constants::MAX_WHEEL_VEL;
-				double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
-				if (maxAbsPWM > 1) {
-					lPWM /= maxAbsPWM;
-					rPWM /= maxAbsPWM;
+				double maxAbsWheelVel = std::max(std::abs(lVel), std::abs(rVel));
+				if (maxAbsWheelVel > maxWheelSpeed) {
+					xVel *= maxWheelSpeed / maxAbsWheelVel;
+					thetaVel *= maxWheelSpeed / maxAbsWheelVel;
 				}
-				auto newRobotVel = wheelVelToRobotVel(lPWM, rPWM);
-				xVel = newRobotVel.x();
-				thetaVel = newRobotVel.z();
-				break;
 			}
 			case PreferredVelPreservation::PreferXVel: {
-				if (abs(xVel) > maxWheelSpeed) {
+				if (std::abs(xVel) > maxWheelSpeed) {
 					return {std::copysign(maxWheelSpeed, xVel), 0, 0};
 				}
 				// Bring lVel up to -maxWheelSpeed
