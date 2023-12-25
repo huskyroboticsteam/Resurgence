@@ -55,7 +55,7 @@ TEST_CASE("Differential Drive Kinematics Test") {
 	assertApprox({0, 0, 0},
 				 kinematics.getNextPose(wheelVel(3 * PI / 4, PI / 4), {0, 0, 0}, 4));
 
-	double max_wheel_vel = 0.75;
+	constexpr double max_wheel_vel = 0.75;
 
 	// Proportional Preservation Tests
 	assertApprox({0.5, 0, 0.5},
@@ -64,18 +64,33 @@ TEST_CASE("Differential Drive Kinematics Test") {
 					 1.0, 1.0, max_wheel_vel));
 
 	// xVel Preservation Tests
+	// Test #1: Test the xVel alone being too fast, therefore xVel should become the max and
+	// theta should
+	//          be zeroed
 	assertApprox({-max_wheel_vel, 0, 0},
 				 kinematics.ensureWithinWheelSpeedLimit(
 					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
 					 -1.0, 0.5, max_wheel_vel));
-	assertApprox({0.5, 0, 0.5},
+	// Test #2: lVel < -max_wheel_vel
+	assertApprox({-0.4, 0, 0.7},
 				 kinematics.ensureWithinWheelSpeedLimit(
 					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
-					 0.5, 0.5, max_wheel_vel));
-	assertApprox({0, 0, 0},
+					 -0.4, 1.6, max_wheel_vel));
+	// Test #3: lVel > max_wheel_vel: lVel = 1.0 rVel = 0.2
+	assertApprox({0.6, 0, -0.3},
 				 kinematics.ensureWithinWheelSpeedLimit(
 					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
-					 0.5, 0.5, max_wheel_vel));
+					 0.6, -0.5714, max_wheel_vel));
+	// Test #4: rVel < -max_wheel_vel: lVel = 0.2 rVel = -0.9
+	assertApprox({-0.35, 0, -0.8},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
+					 -0.35, -1.1, max_wheel_vel));
+	// Test #5: rVel > max_wheel_vel: lVel = 0.2 rVel = 0.9
+	assertApprox({0.55, 0, 0.4},
+				 kinematics.ensureWithinWheelSpeedLimit(
+					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferXVel,
+					 0.55, 0.7, max_wheel_vel));
 
 	// thetaVel Preservation Tests
 	assertApprox({0, 0, 0},
