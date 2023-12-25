@@ -93,12 +93,14 @@ TEST_CASE("Differential Drive Kinematics Test") {
 					 0.55, 0.7, max_wheel_vel));
 
 	// thetaVel Preservation Tests
-	assertApprox({0, 0, 0},
+	// Test #1: std::max(lVel, rVel) > maxWheelSpeed: lVel = 0.9 r_vel = 0.35
+	assertApprox({0.475, 0, -0.55},
 				 kinematics.ensureWithinWheelSpeedLimit(
 					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
-					 0.5, 0.5, max_wheel_vel));
-	assertApprox({0, 0, 0},
+					 0.625, -0.55, max_wheel_vel));
+	// Test #2: std::min(lVel, rVel) < -maxWheelSpeed: lVel = -0.9 rVel = -0.2
+	assertApprox({-0.4, 0, 0.7},
 				 kinematics.ensureWithinWheelSpeedLimit(
 					 kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
-					 0.5, 0.5, max_wheel_vel));
+					 -0.55, 0.7, max_wheel_vel));
 }
