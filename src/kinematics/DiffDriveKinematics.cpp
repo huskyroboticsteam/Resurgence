@@ -2,7 +2,6 @@
 
 #include "../utils/transform.h"
 
-#include <cmath>
 using namespace navtypes;
 using util::toTransformRotateFirst;
 
