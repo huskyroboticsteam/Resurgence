@@ -55,15 +55,12 @@ pose_t DiffDriveKinematics::ensureWithinWheelSpeedLimit(
 	PreferredVelPreservation preferredVelPreservation, double xVel, double thetaVel,
 	double maxWheelSpeed) const {
 	auto [lVel, rVel] = robotVelToWheelVel(xVel, thetaVel);
-	double calculatedMaxWheelVel = std::max(abs(lVel), abs(rVel));
+	double calculatedMaxWheelVel = std::max(std::abs(lVel), std::abs(rVel));
 	if (calculatedMaxWheelVel > maxWheelSpeed) {
 		switch (preferredVelPreservation) {
 			case PreferredVelPreservation::Proportional: {
-				double maxAbsWheelVel = std::max(std::abs(lVel), std::abs(rVel));
-				if (maxAbsWheelVel > maxWheelSpeed) {
-					xVel *= maxWheelSpeed / maxAbsWheelVel;
-					thetaVel *= maxWheelSpeed / maxAbsWheelVel;
-				}
+				xVel *= maxWheelSpeed / calculatedMaxWheelVel;
+				thetaVel *= maxWheelSpeed / calculatedMaxWheelVel;
 			}
 			case PreferredVelPreservation::PreferXVel: {
 				if (std::abs(xVel) > maxWheelSpeed) {
@@ -88,7 +85,7 @@ pose_t DiffDriveKinematics::ensureWithinWheelSpeedLimit(
 				break;
 			}
 			case PreferredVelPreservation::PreferThetaVel: {
-				if (abs(wheelBaseWidth / 2 * thetaVel) > maxWheelSpeed) {
+				if (std::abs(wheelBaseWidth / 2 * thetaVel) > maxWheelSpeed) {
 					return {0, 0, std::copysign(maxWheelSpeed * 2 / wheelBaseWidth, thetaVel)};
 				}
 				if (std::max(lVel, rVel) > maxWheelSpeed) {
