@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['warping_0',['warping',['https://docs.opencv.org/4.2.0/db/d29/group__cudawarping.html',1,'Image Warping'],['https://docs.opencv.org/4.2.0/d0/dfa/group__stitching__warp.html',1,'Images Warping']]],
+  ['warping_0',['Warping',['https://docs.opencv.org/4.2.0/db/d29/group__cudawarping.html',1,'Image Warping'],['https://docs.opencv.org/4.2.0/d0/dfa/group__stitching__warp.html',1,'Images Warping']]],
   ['weighted_20sum_1',['Element-wise weighted sum',['https://docs.opencv.org/4.2.0/da/d9b/group__core__hal__interface__addWeighted.html',1,'']]],
   ['widget_2',['Widget',['https://docs.opencv.org/4.2.0/dc/d5c/group__viz__widget.html',1,'']]],
   ['winrt_20glue_20for_20video_20i_20o_3',['WinRT glue for video I/O',['https://docs.opencv.org/4.2.0/dd/d01/group__videoio__winrt.html',1,'']]],

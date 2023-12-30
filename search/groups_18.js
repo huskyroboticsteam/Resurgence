@@ -10,8 +10,12 @@ var searchData=
   ['used_20for_20super_20resolution_7',['DNN used for super resolution',['https://docs.opencv.org/4.2.0/d9/de0/group__dnn__superres.html',1,'']]],
   ['using_20stl_20containers_20with_20eigen_8',['Using STL Containers with Eigen',['https://eigen.tuxfamily.org/dox/group__TopicStlContainers.html',1,'']]],
   ['utf_208_20strings_20with_20freetype_20harfbuzz_9',['Drawing UTF-8 strings with freetype/harfbuzz',['https://docs.opencv.org/4.2.0/d4/dfc/group__freetype.html',1,'']]],
-  ['utilities_10',['utilities',['https://docs.opencv.org/4.2.0/d8/d45/group__core__utils__neon.html',1,'NEON utilities'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01547.html',1,'Random Number Utilities'],['https://docs.opencv.org/4.2.0/d6/d06/group__core__utils__sse.html',1,'SSE utilities'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01486.html',1,'Utilities'],['https://docs.opencv.org/4.2.0/d3/d50/group__core__utils__vsx.html',1,'VSX utilities']]],
-  ['utilities_20for_20new_20layers_20registration_11',['Utilities for New Layers Registration',['https://docs.opencv.org/4.2.0/df/dc1/group__dnnLayerFactory.html',1,'']]],
-  ['utility_20and_20system_20functions_20and_20macros_12',['Utility and system functions and macros',['https://docs.opencv.org/4.2.0/db/de0/group__core__utils.html',1,'']]],
-  ['utility_20functions_20for_20opencv_20samples_13',['Utility functions for OpenCV samples',['https://docs.opencv.org/4.2.0/d6/dba/group__core__utils__samples.html',1,'']]]
+  ['utilities_10',['NEON utilities',['https://docs.opencv.org/4.2.0/d8/d45/group__core__utils__neon.html',1,'']]],
+  ['utilities_11',['Random Number Utilities',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01547.html',1,'']]],
+  ['utilities_12',['SSE utilities',['https://docs.opencv.org/4.2.0/d6/d06/group__core__utils__sse.html',1,'']]],
+  ['utilities_13',['Utilities',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01486.html',1,'']]],
+  ['utilities_14',['VSX utilities',['https://docs.opencv.org/4.2.0/d3/d50/group__core__utils__vsx.html',1,'']]],
+  ['utilities_20for_20new_20layers_20registration_15',['Utilities for New Layers Registration',['https://docs.opencv.org/4.2.0/df/dc1/group__dnnLayerFactory.html',1,'']]],
+  ['utility_20and_20system_20functions_20and_20macros_16',['Utility and system functions and macros',['https://docs.opencv.org/4.2.0/db/de0/group__core__utils.html',1,'']]],
+  ['utility_20functions_20for_20opencv_20samples_17',['Utility functions for OpenCV samples',['https://docs.opencv.org/4.2.0/d6/dba/group__core__utils__samples.html',1,'']]]
 ];

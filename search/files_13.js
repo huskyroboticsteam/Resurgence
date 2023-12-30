@@ -42,7 +42,7 @@ var searchData=
   ['phase_5funwrapping_2ehpp_39',['phase_unwrapping.hpp',['https://docs.opencv.org/4.2.0/d3/d22/phase__unwrapping_2phase__unwrapping_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/dd/dee/phase__unwrapping_8hpp.html',1,'(Global Namespace)']]],
   ['phase_5funwrapping_2emarkdown_40',['phase_unwrapping.markdown',['https://docs.opencv.org/4.2.0/d9/dac/phase__unwrapping_8markdown.html',1,'']]],
   ['phash_2ehpp_41',['phash.hpp',['https://docs.opencv.org/4.2.0/d1/d9c/phash_8hpp.html',1,'']]],
-  ['photo_2ehpp_42',['photo.hpp',['https://docs.opencv.org/4.2.0/dc/d81/photo_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d1/d1f/photo_2photo_8hpp.html',1,'(Global Namespace)']]],
+  ['photo_2ehpp_42',['photo.hpp',['https://docs.opencv.org/4.2.0/d1/d1f/photo_2photo_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/dc/d81/photo_8hpp.html',1,'(Global Namespace)']]],
   ['plaidml_2ehpp_43',['plaidml.hpp',['https://docs.opencv.org/4.2.0/dc/dd8/plaidml_8hpp.html',1,'']]],
   ['plot_2ehpp_44',['plot.hpp',['https://docs.opencv.org/4.2.0/dc/dc0/plot_8hpp.html',1,'']]],
   ['pod_5fchar_5ftraits_2eh_45',['pod_char_traits.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01067.html',1,'']]],

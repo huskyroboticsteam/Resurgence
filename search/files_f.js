@@ -18,7 +18,7 @@ var searchData=
   ['left_5fchild_5fnext_5fsibling_5fheap_5f_2ftrace_5ffn_5fimps_2ehpp_15',['left_child_next_sibling_heap_/trace_fn_imps.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a17291.html',1,'']]],
   ['lfts_5fconfig_2eh_16',['lfts_config.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01001.html',1,'']]],
   ['limits_17',['limits',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00095.html',1,'']]],
-  ['limits_2ehpp_18',['limits.hpp',['https://docs.opencv.org/4.2.0/dc/d46/contrib_2modules_2cudev_2include_2opencv2_2cudev_2util_2limits_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d7/d42/modules_2core_2include_2opencv2_2core_2cuda_2limits_8hpp.html',1,'(Global Namespace)']]],
+  ['limits_2ehpp_18',['limits.hpp',['https://docs.opencv.org/4.2.0/d7/d42/modules_2core_2include_2opencv2_2core_2cuda_2limits_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/dc/d46/contrib_2modules_2cudev_2include_2opencv2_2cudev_2util_2limits_8hpp.html',1,'(Global Namespace)']]],
   ['line_5fdescriptor_2ehpp_19',['line_descriptor.hpp',['https://docs.opencv.org/4.2.0/df/d4a/line__descriptor_8hpp.html',1,'']]],
   ['linear_5findex_2eh_20',['linear_index.h',['https://docs.opencv.org/4.2.0/dd/d0d/linear__index_8h.html',1,'']]],
   ['linear_5fprobe_5ffn_5fimp_2ehpp_21',['linear_probe_fn_imp.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01316.html',1,'']]],

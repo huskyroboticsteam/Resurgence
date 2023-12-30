@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['nearest_20neighbour_0',['nearest neighbour',['https://docs.opencv.org/4.2.0/d0/d72/tutorial_py_knn_index.html',1,'K-Nearest Neighbour'],['https://docs.opencv.org/4.2.0/d5/d26/tutorial_py_knn_understanding.html',1,'Understanding k-Nearest Neighbour']]],
-  ['neighbour_1',['neighbour',['https://docs.opencv.org/4.2.0/d0/d72/tutorial_py_knn_index.html',1,'K-Nearest Neighbour'],['https://docs.opencv.org/4.2.0/d5/d26/tutorial_py_knn_understanding.html',1,'Understanding k-Nearest Neighbour']]],
+  ['nearest_20neighbour_0',['Nearest Neighbour',['https://docs.opencv.org/4.2.0/d0/d72/tutorial_py_knn_index.html',1,'K-Nearest Neighbour'],['https://docs.opencv.org/4.2.0/d5/d26/tutorial_py_knn_understanding.html',1,'Understanding k-Nearest Neighbour']]],
+  ['neighbour_1',['Neighbour',['https://docs.opencv.org/4.2.0/d0/d72/tutorial_py_knn_index.html',1,'K-Nearest Neighbour'],['https://docs.opencv.org/4.2.0/d5/d26/tutorial_py_knn_understanding.html',1,'Understanding k-Nearest Neighbour']]],
   ['network_20for_20halide_20backend_2',['How to schedule your network for Halide backend',['https://docs.opencv.org/4.2.0/de/d5d/tutorial_dnn_halide_scheduling.html',1,'']]],
   ['networks_20dnn_20module_3',['Deep Neural Networks (dnn module)',['https://docs.opencv.org/4.2.0/d2/d58/tutorial_table_of_content_dnn.html',1,'']]],
   ['networks_20in_20browser_4',['How to run deep networks in browser',['https://docs.opencv.org/4.2.0/d5/d86/tutorial_dnn_javascript.html',1,'']]],

@@ -19,7 +19,7 @@ var searchData=
   ['level_20stitching_20api_20stitcher_20class_16',['High level stitching API (Stitcher class)',['https://docs.opencv.org/4.2.0/d8/d19/tutorial_stitcher.html',1,'']]],
   ['light_20tutorials_17',['Structured Light tutorials',['https://docs.opencv.org/4.2.0/d3/d81/tutorial_structured_light.html',1,'']]],
   ['line_20features_20tutorial_18',['Line Features Tutorial',['https://docs.opencv.org/4.2.0/df/dfa/tutorial_line_descriptor_main.html',1,'']]],
-  ['line_20transform_19',['line transform',['https://docs.opencv.org/4.2.0/d9/db0/tutorial_hough_lines.html',1,'Hough Line Transform'],['https://docs.opencv.org/4.2.0/d6/d10/tutorial_py_houghlines.html',1,'Hough Line Transform'],['https://docs.opencv.org/4.2.0/d3/de6/tutorial_js_houghlines.html',1,'Hough Line Transform']]],
+  ['line_20transform_19',['Line Transform',['https://docs.opencv.org/4.2.0/d9/db0/tutorial_hough_lines.html',1,'Hough Line Transform'],['https://docs.opencv.org/4.2.0/d6/d10/tutorial_py_houghlines.html',1,'Hough Line Transform'],['https://docs.opencv.org/4.2.0/d3/de6/tutorial_js_houghlines.html',1,'Hough Line Transform']]],
   ['linear_20filters_20',['Making your own linear filters!',['https://docs.opencv.org/4.2.0/d4/dbd/tutorial_filter_2d.html',1,'']]],
   ['linearly_20separable_20data_21',['Support Vector Machines for Non-Linearly Separable Data',['https://docs.opencv.org/4.2.0/d0/dcc/tutorial_non_linear_svms.html',1,'']]],
   ['lines_20by_20using_20morphological_20operations_22',['Extract horizontal and vertical lines by using morphological operations',['https://docs.opencv.org/4.2.0/dd/dd7/tutorial_morph_lines_detection.html',1,'']]],

@@ -2,7 +2,7 @@ var searchData=
 [
   ['radial_5fvariance_5fhash_2ehpp_0',['radial_variance_hash.hpp',['https://docs.opencv.org/4.2.0/d2/d76/radial__variance__hash_8hpp.html',1,'']]],
   ['random_1',['random',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00122.html',1,'']]],
-  ['random_2eh_2',['random.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00455.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d1/d79/random_8h.html',1,'(Global Namespace)']]],
+  ['random_2eh_2',['random.h',['https://docs.opencv.org/4.2.0/d1/d79/random_8h.html',1,'(Global Namespace)'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00455.html',1,'(Global Namespace)']]],
   ['random_5fgenerator_5fand_5ftext_2emarkdown_3',['random_generator_and_text.markdown',['https://docs.opencv.org/4.2.0/d7/d1c/random__generator__and__text_8markdown.html',1,'']]],
   ['random_5fnumber_2eh_4',['random_number.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00956.html',1,'']]],
   ['random_5fshuffle_2eh_5',['random_shuffle.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00959.html',1,'']]],
@@ -57,7 +57,7 @@ var searchData=
   ['registry_2ehpp_54',['registry.hpp',['https://docs.opencv.org/4.2.0/d1/da2/registry_8hpp.html',1,'']]],
   ['remap_2ehpp_55',['remap.hpp',['https://docs.opencv.org/4.2.0/d1/d59/remap_8hpp.html',1,'']]],
   ['remap_2emarkdown_56',['remap.markdown',['https://docs.opencv.org/4.2.0/df/ded/remap_8markdown.html',1,'']]],
-  ['render_2ehpp_57',['render.hpp',['https://docs.opencv.org/4.2.0/d6/d4b/render_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d1/dda/render_2render_8hpp.html',1,'(Global Namespace)']]],
+  ['render_2ehpp_57',['render.hpp',['https://docs.opencv.org/4.2.0/d1/dda/render_2render_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d6/d4b/render_8hpp.html',1,'(Global Namespace)']]],
   ['resize_2ehpp_58',['resize.hpp',['https://docs.opencv.org/4.2.0/dc/d12/resize_8hpp.html',1,'']]],
   ['resize_5fpolicy_2ehpp_59',['resize_policy.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01202.html',1,'']]],
   ['result_5fset_2eh_60',['result_set.h',['https://docs.opencv.org/4.2.0/da/d34/result__set_8h.html',1,'']]],

@@ -1,7 +1,7 @@
 var searchData=
 [
   ['o4a_5fsdk_2emarkdown_0',['O4A_SDK.markdown',['https://docs.opencv.org/4.2.0/dc/d7c/O4A__SDK_8markdown.html',1,'']]],
-  ['objdetect_2ehpp_1',['objdetect.hpp',['https://docs.opencv.org/4.2.0/d8/da3/objdetect_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d7/df0/objdetect_2objdetect_8hpp.html',1,'(Global Namespace)']]],
+  ['objdetect_2ehpp_1',['objdetect.hpp',['https://docs.opencv.org/4.2.0/d7/df0/objdetect_2objdetect_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d8/da3/objdetect_8hpp.html',1,'(Global Namespace)']]],
   ['object_5ffactory_2eh_2',['object_factory.h',['https://docs.opencv.org/4.2.0/de/d9f/object__factory_8h.html',1,'']]],
   ['ocl_2ehpp_3',['ocl.hpp',['https://docs.opencv.org/4.2.0/da/d74/ocl_8hpp.html',1,'']]],
   ['ocl_5fdefs_2ehpp_4',['ocl_defs.hpp',['https://docs.opencv.org/4.2.0/d1/d08/ocl__defs_8hpp.html',1,'']]],
@@ -24,7 +24,7 @@ var searchData=
   ['operators_2ehpp_21',['operators.hpp',['https://docs.opencv.org/4.2.0/dd/dcd/operators_8hpp.html',1,'']]],
   ['opt_5frandom_2eh_22',['opt_random.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00713.html',1,'']]],
   ['optflow_2ehpp_23',['optflow.hpp',['https://docs.opencv.org/4.2.0/de/d67/optflow_8hpp.html',1,'']]],
-  ['optical_5fflow_2ehpp_24',['optical_flow.hpp',['https://docs.opencv.org/4.2.0/dd/d49/videostab_2include_2opencv2_2videostab_2optical__flow_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d2/dc3/superres_2include_2opencv2_2superres_2optical__flow_8hpp.html',1,'(Global Namespace)']]],
+  ['optical_5fflow_2ehpp_24',['optical_flow.hpp',['https://docs.opencv.org/4.2.0/d2/dc3/superres_2include_2opencv2_2superres_2optical__flow_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/dd/d49/videostab_2include_2opencv2_2videostab_2optical__flow_8hpp.html',1,'(Global Namespace)']]],
   ['optical_5fflow_2emarkdown_25',['optical_flow.markdown',['https://docs.opencv.org/4.2.0/db/d50/optical__flow_8markdown.html',1,'']]],
   ['optim_2ehpp_26',['optim.hpp',['https://docs.opencv.org/4.2.0/d3/d46/optim_8hpp.html',1,'']]],
   ['optional_27',['optional',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01016.html',1,'']]],

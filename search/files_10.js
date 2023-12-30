@@ -20,7 +20,7 @@ var searchData=
   ['mask_2ehpp_17',['mask.hpp',['https://docs.opencv.org/4.2.0/d3/dbb/mask_8hpp.html',1,'']]],
   ['mask_5farray_2eh_18',['mask_array.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00419.html',1,'']]],
   ['mask_5fbased_5frange_5fhashing_2ehpp_19',['mask_based_range_hashing.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01319.html',1,'']]],
-  ['mat_2ehpp_20',['mat.hpp',['https://docs.opencv.org/4.2.0/d7/d69/gapi_2include_2opencv2_2gapi_2own_2mat_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d3/d82/core_2include_2opencv2_2core_2mat_8hpp.html',1,'(Global Namespace)']]],
+  ['mat_2ehpp_20',['mat.hpp',['https://docs.opencv.org/4.2.0/d3/d82/core_2include_2opencv2_2core_2mat_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d7/d69/gapi_2include_2opencv2_2gapi_2own_2mat_8hpp.html',1,'(Global Namespace)']]],
   ['mat_5fmask_5foperations_2emarkdown_21',['mat_mask_operations.markdown',['https://docs.opencv.org/4.2.0/d6/d41/mat__mask__operations_8markdown.html',1,'']]],
   ['mat_5foperations_2emarkdown_22',['mat_operations.markdown',['https://docs.opencv.org/4.2.0/d8/d36/mat__operations_8markdown.html',1,'']]],
   ['mat_5fthe_5fbasic_5fimage_5fcontainer_2emarkdown_23',['mat_the_basic_image_container.markdown',['https://docs.opencv.org/4.2.0/dc/d90/mat__the__basic__image__container_8markdown.html',1,'']]],

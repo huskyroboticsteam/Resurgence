@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['tags_0',['tags',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01514.html',1,'Iterator Tags'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01537.html',1,'Tags']]],
+  ['tags_0',['Tags',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01514.html',1,'Iterator Tags'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01537.html',1,'Tags']]],
   ['text_20detection_1',['Scene Text Detection',['https://docs.opencv.org/4.2.0/da/d56/group__text__detect.html',1,'']]],
   ['text_20detection_20and_20recognition_2',['Scene Text Detection and Recognition',['https://docs.opencv.org/4.2.0/d4/d61/group__text.html',1,'']]],
-  ['text_20recognition_3',['text recognition',['https://docs.opencv.org/4.2.0/d8/df2/group__text__recognize.html',1,'Scene Text Recognition'],['https://docs.opencv.org/4.2.0/db/d7b/group__datasets__tr.html',1,'Text Recognition']]],
+  ['text_20recognition_3',['Text Recognition',['https://docs.opencv.org/4.2.0/d8/df2/group__text__recognize.html',1,'Scene Text Recognition'],['https://docs.opencv.org/4.2.0/db/d7b/group__datasets__tr.html',1,'Text Recognition']]],
   ['the_20array_20class_20and_20coefficient_20wise_20operations_4',['The Array class and coefficient-wise operations',['https://eigen.tuxfamily.org/dox/group__TutorialArrayClass.html',1,'']]],
   ['the_20assertion_20on_20unaligned_20arrays_5',['Explanation of the assertion on unaligned arrays',['https://eigen.tuxfamily.org/dox/group__TopicUnalignedArrayAssert.html',1,'']]],
   ['the_20map_20class_6',['Interfacing with raw buffers: the Map class',['https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html',1,'']]],
@@ -15,16 +15,18 @@ var searchData=
   ['to_20functions_12',['to functions',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01510.html',1,'Adaptors for pointers to functions'],['https://eigen.tuxfamily.org/dox/group__TopicPassingByValue.html',1,'Passing Eigen objects by value to functions']]],
   ['to_20members_13',['Adaptors for pointers to members',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01511.html',1,'']]],
   ['tools_14',['Biologically inspired vision models and derivated tools',['https://docs.opencv.org/4.2.0/dd/deb/group__bioinspired.html',1,'']]],
-  ['tracking_15',['tracking',['https://docs.opencv.org/4.2.0/d7/df3/group__imgproc__motion.html',1,'Motion Analysis and Object Tracking'],['https://docs.opencv.org/4.2.0/dc/d6b/group__video__track.html',1,'Object Tracking'],['https://docs.opencv.org/4.2.0/db/dc1/group__datasets__track.html',1,'Tracking']]],
+  ['tracking_15',['Tracking',['https://docs.opencv.org/4.2.0/d7/df3/group__imgproc__motion.html',1,'Motion Analysis and Object Tracking'],['https://docs.opencv.org/4.2.0/dc/d6b/group__video__track.html',1,'Object Tracking'],['https://docs.opencv.org/4.2.0/db/dc1/group__datasets__track.html',1,'Tracking']]],
   ['tracking_20api_16',['Tracking API',['https://docs.opencv.org/4.2.0/d9/df8/group__tracking.html',1,'']]],
   ['traits_17',['Traits',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01540.html',1,'']]],
   ['transform_18',['Hough Transform',['https://docs.opencv.org/4.2.0/d2/d15/group__cudaimgproc__hough.html',1,'']]],
   ['transform_20support_19',['transform support',['https://docs.opencv.org/4.2.0/d5/d8e/group__f0__math.html',1,'Math with F0-transform support'],['https://docs.opencv.org/4.2.0/d6/df0/group__f1__math.html',1,'Math with F1-transform support']]],
-  ['transformations_20',['transformations',['https://docs.opencv.org/4.2.0/da/d54/group__imgproc__transform.html',1,'Geometric Image Transformations'],['https://docs.opencv.org/4.2.0/d7/d1b/group__imgproc__misc.html',1,'Miscellaneous Image Transformations'],['https://eigen.tuxfamily.org/dox/group__TutorialGeometry.html',1,'Space transformations']]],
-  ['triangulation_21',['Triangulation',['https://docs.opencv.org/4.2.0/d0/dbd/group__triangulation.html',1,'']]],
-  ['ts_22',['Filesystem TS',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01521.html',1,'']]],
-  ['type_23',['Data Structure Type',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01539.html',1,'']]],
-  ['type_20safe_20container_20of_20any_20type_24',['Type-safe container of any type',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01522.html',1,'']]],
-  ['typedefs_25',['typedefs',['https://eigen.tuxfamily.org/dox/group__alignedboxtypedefs.html',1,'Global aligned box typedefs'],['https://eigen.tuxfamily.org/dox/group__arraytypedefs.html',1,'Global array typedefs'],['https://eigen.tuxfamily.org/dox/group__matrixtypedefs.html',1,'Global matrix typedefs']]],
-  ['types_26',['G-API Data Types',['https://docs.opencv.org/4.2.0/db/df1/group__gapi__data__objects.html',1,'']]]
+  ['transformations_20',['Transformations',['https://docs.opencv.org/4.2.0/da/d54/group__imgproc__transform.html',1,'Geometric Image Transformations'],['https://docs.opencv.org/4.2.0/d7/d1b/group__imgproc__misc.html',1,'Miscellaneous Image Transformations']]],
+  ['transformations_21',['Space transformations',['https://eigen.tuxfamily.org/dox/group__TutorialGeometry.html',1,'']]],
+  ['triangulation_22',['Triangulation',['https://docs.opencv.org/4.2.0/d0/dbd/group__triangulation.html',1,'']]],
+  ['ts_23',['Filesystem TS',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01521.html',1,'']]],
+  ['type_24',['Data Structure Type',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01539.html',1,'']]],
+  ['type_25',['Type-safe container of any type',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01522.html',1,'']]],
+  ['type_20safe_20container_20of_20any_20type_26',['Type-safe container of any type',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01522.html',1,'']]],
+  ['typedefs_27',['typedefs',['https://eigen.tuxfamily.org/dox/group__alignedboxtypedefs.html',1,'Global aligned box typedefs'],['https://eigen.tuxfamily.org/dox/group__arraytypedefs.html',1,'Global array typedefs'],['https://eigen.tuxfamily.org/dox/group__matrixtypedefs.html',1,'Global matrix typedefs']]],
+  ['types_28',['G-API Data Types',['https://docs.opencv.org/4.2.0/db/df1/group__gapi__data__objects.html',1,'']]]
 ];

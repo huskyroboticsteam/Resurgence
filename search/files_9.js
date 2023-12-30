@@ -28,7 +28,7 @@ var searchData=
   ['feature_5fflann_5fmatcher_2emarkdown_25',['feature_flann_matcher.markdown',['https://docs.opencv.org/4.2.0/d9/d22/feature__flann__matcher_8markdown.html',1,'']]],
   ['feature_5fhomography_2emarkdown_26',['feature_homography.markdown',['https://docs.opencv.org/4.2.0/d3/d0b/feature__homography_8markdown.html',1,'']]],
   ['features_2eh_27',['features.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00893.html',1,'']]],
-  ['features2d_2ehpp_28',['features2d.hpp',['https://docs.opencv.org/4.2.0/d5/d0d/features2d_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d5/def/features2d_2features2d_8hpp.html',1,'(Global Namespace)']]],
+  ['features2d_2ehpp_28',['features2d.hpp',['https://docs.opencv.org/4.2.0/d5/def/features2d_2features2d_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d5/d0d/features2d_8hpp.html',1,'(Global Namespace)']]],
   ['fenv_2eh_29',['fenv.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00005.html',1,'']]],
   ['file_5finput_5foutput_5fwith_5fxml_5fyml_2emarkdown_30',['file_input_output_with_xml_yml.markdown',['https://docs.opencv.org/4.2.0/db/db0/file__input__output__with__xml__yml_8markdown.html',1,'']]],
   ['filesystem_31',['filesystem',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01010.html',1,'']]],

@@ -160,13 +160,14 @@ var searchData=
   ['vectraits_3c_20ushort2_20_3e_157',['VecTraits&lt; ushort2 &gt;',['https://docs.opencv.org/4.2.0/d0/d40/structcv_1_1cudev_1_1VecTraits_3_01ushort2_01_4.html',1,'cv::cudev']]],
   ['vectraits_3c_20ushort3_20_3e_158',['VecTraits&lt; ushort3 &gt;',['https://docs.opencv.org/4.2.0/d4/dd7/structcv_1_1cudev_1_1VecTraits_3_01ushort3_01_4.html',1,'cv::cudev']]],
   ['vectraits_3c_20ushort4_20_3e_159',['VecTraits&lt; ushort4 &gt;',['https://docs.opencv.org/4.2.0/d3/d14/structcv_1_1cudev_1_1VecTraits_3_01ushort4_01_4.html',1,'cv::cudev']]],
-  ['vertex_160',['vertex',['https://docs.opencv.org/4.2.0/d7/de9/structcv_1_1Subdiv2D_1_1Vertex.html',1,'cv::Subdiv2D::Vertex'],['https://docs.opencv.org/4.2.0/d1/db5/structcv_1_1multicalib_1_1MultiCameraCalibration_1_1vertex.html',1,'cv::multicalib::MultiCameraCalibration::vertex']]],
-  ['vgg_161',['VGG',['https://docs.opencv.org/4.2.0/d6/d00/classcv_1_1xfeatures2d_1_1VGG.html',1,'cv::xfeatures2d']]],
-  ['videocapture_162',['VideoCapture',['https://docs.opencv.org/4.2.0/d8/dfe/classcv_1_1VideoCapture.html',1,'cv']]],
-  ['videofilesource_163',['VideoFileSource',['https://docs.opencv.org/4.2.0/da/d0b/classcv_1_1videostab_1_1VideoFileSource.html',1,'cv::videostab']]],
-  ['videoreader_164',['VideoReader',['https://docs.opencv.org/4.2.0/db/ded/classcv_1_1cudacodec_1_1VideoReader.html',1,'cv::cudacodec']]],
-  ['videowriter_165',['videowriter',['https://docs.opencv.org/4.2.0/df/dde/classcv_1_1cudacodec_1_1VideoWriter.html',1,'cv::cudacodec::VideoWriter'],['https://docs.opencv.org/4.2.0/dd/d9e/classcv_1_1VideoWriter.html',1,'cv::VideoWriter']]],
-  ['view_166',['View',['https://docs.opencv.org/4.2.0/d2/da0/classcv_1_1gapi_1_1fluid_1_1View.html',1,'cv::gapi::fluid']]],
-  ['viz3d_167',['Viz3d',['https://docs.opencv.org/4.2.0/d6/d32/classcv_1_1viz_1_1Viz3d.html',1,'cv::viz']]],
-  ['voronoiseamfinder_168',['VoronoiSeamFinder',['https://docs.opencv.org/4.2.0/db/d24/classcv_1_1detail_1_1VoronoiSeamFinder.html',1,'cv::detail']]]
+  ['vertex_160',['vertex',['https://docs.opencv.org/4.2.0/d1/db5/structcv_1_1multicalib_1_1MultiCameraCalibration_1_1vertex.html',1,'cv::multicalib::MultiCameraCalibration']]],
+  ['vertex_161',['Vertex',['https://docs.opencv.org/4.2.0/d7/de9/structcv_1_1Subdiv2D_1_1Vertex.html',1,'cv::Subdiv2D']]],
+  ['vgg_162',['VGG',['https://docs.opencv.org/4.2.0/d6/d00/classcv_1_1xfeatures2d_1_1VGG.html',1,'cv::xfeatures2d']]],
+  ['videocapture_163',['VideoCapture',['https://docs.opencv.org/4.2.0/d8/dfe/classcv_1_1VideoCapture.html',1,'cv']]],
+  ['videofilesource_164',['VideoFileSource',['https://docs.opencv.org/4.2.0/da/d0b/classcv_1_1videostab_1_1VideoFileSource.html',1,'cv::videostab']]],
+  ['videoreader_165',['VideoReader',['https://docs.opencv.org/4.2.0/db/ded/classcv_1_1cudacodec_1_1VideoReader.html',1,'cv::cudacodec']]],
+  ['videowriter_166',['VideoWriter',['https://docs.opencv.org/4.2.0/df/dde/classcv_1_1cudacodec_1_1VideoWriter.html',1,'cv::cudacodec::VideoWriter'],['https://docs.opencv.org/4.2.0/dd/d9e/classcv_1_1VideoWriter.html',1,'cv::VideoWriter']]],
+  ['view_167',['View',['https://docs.opencv.org/4.2.0/d2/da0/classcv_1_1gapi_1_1fluid_1_1View.html',1,'cv::gapi::fluid']]],
+  ['viz3d_168',['Viz3d',['https://docs.opencv.org/4.2.0/d6/d32/classcv_1_1viz_1_1Viz3d.html',1,'cv::viz']]],
+  ['voronoiseamfinder_169',['VoronoiSeamFinder',['https://docs.opencv.org/4.2.0/db/d24/classcv_1_1detail_1_1VoronoiSeamFinder.html',1,'cv::detail']]]
 ];

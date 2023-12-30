@@ -21,7 +21,7 @@ var searchData=
   ['global_20matrix_20typedefs_18',['Global matrix typedefs',['https://eigen.tuxfamily.org/dox/group__matrixtypedefs.html',1,'']]],
   ['global_20motion_20estimation_19',['Global Motion Estimation',['https://docs.opencv.org/4.2.0/d4/d2c/group__videostab__motion.html',1,'']]],
   ['glue_20',['iOS glue',['https://docs.opencv.org/4.2.0/d2/d92/group__imgcodecs__ios.html',1,'']]],
-  ['glue_20for_20video_20i_20o_21',['glue for video i o',['https://docs.opencv.org/4.2.0/d5/d26/group__videoio__ios.html',1,'iOS glue for video I/O'],['https://docs.opencv.org/4.2.0/dd/d01/group__videoio__winrt.html',1,'WinRT glue for video I/O']]],
+  ['glue_20for_20video_20i_20o_21',['glue for video I O',['https://docs.opencv.org/4.2.0/d5/d26/group__videoio__ios.html',1,'iOS glue for video I/O'],['https://docs.opencv.org/4.2.0/dd/d01/group__videoio__winrt.html',1,'WinRT glue for video I/O']]],
   ['graph_20api_3a_20converting_20image_20from_20one_20color_20space_20to_20another_22',['Graph API: Converting image from one color space to another',['https://docs.opencv.org/4.2.0/dc/d38/group__gapi__colorconvert.html',1,'']]],
   ['graph_20api_3a_20image_20and_20channel_20composition_20functions_23',['Graph API: Image and channel composition functions',['https://docs.opencv.org/4.2.0/d6/d91/group__gapi__transform.html',1,'']]],
   ['graph_20api_3a_20image_20filters_24',['Graph API: Image filters',['https://docs.opencv.org/4.2.0/da/dc5/group__gapi__filters.html',1,'']]],

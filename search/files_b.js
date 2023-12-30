@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['hal_2ehpp_0',['hal.hpp',['https://docs.opencv.org/4.2.0/d4/d44/imgproc_2include_2opencv2_2imgproc_2hal_2hal_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/de/d0c/core_2include_2opencv2_2core_2hal_2hal_8hpp.html',1,'(Global Namespace)']]],
-  ['hal_5freplacement_2ehpp_1',['hal_replacement.hpp',['https://docs.opencv.org/4.2.0/d2/dd9/features2d_2src_2hal__replacement_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/df/d91/imgproc_2src_2hal__replacement_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/db/ddd/core_2src_2hal__replacement_8hpp.html',1,'(Global Namespace)']]],
+  ['hal_2ehpp_0',['hal.hpp',['https://docs.opencv.org/4.2.0/de/d0c/core_2include_2opencv2_2core_2hal_2hal_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d4/d44/imgproc_2include_2opencv2_2imgproc_2hal_2hal_8hpp.html',1,'(Global Namespace)']]],
+  ['hal_5freplacement_2ehpp_1',['hal_replacement.hpp',['https://docs.opencv.org/4.2.0/db/ddd/core_2src_2hal__replacement_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/df/d91/imgproc_2src_2hal__replacement_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d2/dd9/features2d_2src_2hal__replacement_8hpp.html',1,'(Global Namespace)']]],
   ['harris_5fdetector_2emarkdown_2',['harris_detector.markdown',['https://docs.opencv.org/4.2.0/db/d48/harris__detector_8markdown.html',1,'']]],
   ['hash_5fbytes_2eh_3',['hash_bytes.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00371.html',1,'']]],
   ['hash_5feq_5ffn_2ehpp_4',['hash_eq_fn.hpp',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01298.html',1,'']]],
@@ -24,7 +24,7 @@ var searchData=
   ['helper_5ffunctions_2eh_21',['helper_functions.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00761.html',1,'']]],
   ['hfs_2ehpp_22',['hfs.hpp',['https://docs.opencv.org/4.2.0/de/d29/hfs_8hpp.html',1,'']]],
   ['hierarchical_5fclustering_5findex_2eh_23',['hierarchical_clustering_index.h',['https://docs.opencv.org/4.2.0/de/d1d/hierarchical__clustering__index_8h.html',1,'']]],
-  ['highgui_2ehpp_24',['highgui.hpp',['https://docs.opencv.org/4.2.0/d4/dd5/highgui_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d0/dce/highgui_2highgui_8hpp.html',1,'(Global Namespace)']]],
+  ['highgui_2ehpp_24',['highgui.hpp',['https://docs.opencv.org/4.2.0/d0/dce/highgui_2highgui_8hpp.html',1,'(Global Namespace)'],['https://docs.opencv.org/4.2.0/d4/dd5/highgui_8hpp.html',1,'(Global Namespace)']]],
   ['highgui_5fwinrt_2ehpp_25',['highgui_winrt.hpp',['https://docs.opencv.org/4.2.0/d9/d22/highgui__winrt_8hpp.html',1,'']]],
   ['hist_5fcost_2ehpp_26',['hist_cost.hpp',['https://docs.opencv.org/4.2.0/df/d08/hist__cost_8hpp.html',1,'']]],
   ['histo3d_2emarkdown_27',['histo3D.markdown',['https://docs.opencv.org/4.2.0/df/dd7/histo3D_8markdown.html',1,'']]],

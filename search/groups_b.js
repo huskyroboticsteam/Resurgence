@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['hardware_20acceleration_20layer_0',['hardware acceleration layer',['https://docs.opencv.org/4.2.0/de/d85/group__core__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d3/df3/group__imgproc__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d8/d45/group__feature2d__hal.html',1,'Hardware Acceleration Layer']]],
+  ['hardware_20acceleration_20layer_0',['Hardware Acceleration Layer',['https://docs.opencv.org/4.2.0/de/d85/group__core__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d3/df3/group__imgproc__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d8/d45/group__feature2d__hal.html',1,'Hardware Acceleration Layer']]],
   ['harfbuzz_1',['Drawing UTF-8 strings with freetype/harfbuzz',['https://docs.opencv.org/4.2.0/d4/dfc/group__freetype.html',1,'']]],
   ['hash_20based_2',['Hash-Based',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01528.html',1,'']]],
   ['hashes_3',['Hashes',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01496.html',1,'']]],
