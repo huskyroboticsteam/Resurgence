@@ -1,7 +1,6 @@
 #include "AutonomousTask.h"
 
 #include "../Constants.h"
-#include "../Globals.h"
 #include "../commands/DriveToWaypointCommand.h"
 #include "../world_interface/world_interface.h"
 
@@ -31,6 +30,8 @@ void AutonomousTask::navigate() {
 	commands::DriveToWaypointCommand cmd(_waypoint_coords, THETA_KP, DRIVE_VEL, SLOW_DRIVE_VEL,
 										 DONE_THRESHOLD, CLOSE_TO_TARGET_DUR_VAL);
 
+    DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
+
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
 		auto latestGPS = robot::readGPS();
@@ -41,7 +42,8 @@ void AutonomousTask::navigate() {
 			navtypes::pose_t latestPos(gpsData.x(), gpsData.y(), latestHeading.getData());
 			cmd.setState(latestPos, robot::types::dataclock::now());
 			commands::command_t output = cmd.getOutput();
-			robot::setCmdVel(output.thetaVel, output.xVel);
+            auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
+			robot::setCmdVel(scaledVels(2), scaledVels(0));
 		}
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
