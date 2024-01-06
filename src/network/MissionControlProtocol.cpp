@@ -155,15 +155,16 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 static bool validateWaypointNavRequest(const json& j) {
 	return util::validateKey(j, "latitude", val_t::string) &&
 		   util::validateKey(j, "longitude", val_t::string);
-	util::validateKey(j, "isApproximate", val_t::boolean) &&
-		util::validateKey(j, "isGate", val_t::boolean);
+    // FIXME: Add these back in
+//	util::validateKey(j, "isApproximate", val_t::boolean) &&
+//		util::validateKey(j, "isGate", val_t::boolean);
 }
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	std::string latitude = j["latitude"];
 	std::string longitude = j["longitude"];
-	bool isApproximate = j["isApproximate"];
-	bool isGate = j["isGate"];
+	//bool isApproximate = j["isApproximate"];
+	//bool isGate = j["isGate"];
 
 	if (Globals::AUTONOMOUS) { // && !isApproximate && !isGate) {
 		navtypes::point_t waypointCoords(std::stod(latitude), std::stod(longitude), 1);
@@ -292,8 +293,9 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateCameraStreamCloseRequest);
 	this->addMessageHandler(
 		WAYPOINT_NAV_REQ_TYPE,
-		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
-		validateWaypointNavRequest);
+		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1));
+        // TODO: Add this back in
+		//validateWaypointNavRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this, false));
