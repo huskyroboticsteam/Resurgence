@@ -156,7 +156,7 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 
 		if (eeRadius <= maxRadius) {
 			if (!Globals::planarArmController.has_value()) {
-				Globals::planarArmController.emplace(navtypes::Vectord<2>(0, 0),
+				Globals::planarArmController.emplace(armJointPositions,
 													 Globals::planarArmKinematics,
 													 Constants::arm::SAFETY_FACTOR);
 			}
