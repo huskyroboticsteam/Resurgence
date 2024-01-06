@@ -472,7 +472,7 @@ void MissionControlProtocol::updateArmIKRepeatTask() {
 			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 		if (armJointPositions.isValid()) {
 			navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
-				Globals::planarArmController.value().getCommand(dataclock::now(),
+				Globals::planarArmController->getCommand(dataclock::now(),
 																armJointPositions);
 			targetJointPositions /=
 				M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
