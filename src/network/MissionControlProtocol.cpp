@@ -161,7 +161,7 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 													 Constants::arm::SAFETY_FACTOR);
 			}
 
-			Globals::planarArmController.value().set_setpoint(armJointPositions.getData());
+			Globals::planarArmController->set_setpoint(armJointPositions.getData());
 			Globals::armIKEnabled = true;
 			_arm_ik_repeat_thread =
 				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
