@@ -419,7 +419,7 @@ MissionControlProtocol::~MissionControlProtocol() {
 	}
 }
 
-void MissionControlProtocol::setArmIKEnabled(const bool enabled) {
+void MissionControlProtocol::setArmIKEnabled(bool enabled) {
 	Globals::armIKEnabled = enabled;
 	this->sendArmIKEnabledReport();
 }
