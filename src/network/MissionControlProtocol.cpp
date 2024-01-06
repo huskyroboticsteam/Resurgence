@@ -148,7 +148,7 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			} else {
 				// unable to enable IK
 				LOG_F(WARNING, "Unable to enable IK");
-				this->sendArmIKEnabledReport();
+				this->setArmIKEnabled(false);
 			}
 		}
 	} else {
