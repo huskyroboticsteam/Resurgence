@@ -377,10 +377,6 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
 		validateArmIKEnable);
 	this->addMessageHandler(
-		ARM_IK_ENABLED_TYPE,
-		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
-		validateArmIKEnable);
-	this->addMessageHandler(
 		JOINT_POWER_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
 		validateJointPowerRequest);
