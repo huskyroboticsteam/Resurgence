@@ -44,6 +44,20 @@ public:
 	}
 
 	/**
+	 * @brief Returns whether the target joint positions are within the arm controller's radius limit.
+	 *
+	 * @param targetJointPos The target joint positions.
+	 * @return whether the target joint positions are within the arm controller's radius limit.
+	 */
+	bool is_setpoint_valid(const navtypes::Vectord<N>& targetJointPos) {
+		// Compute the new EE position to determine if it is within 
+		// safety factor * length of fully extended arm.
+		double eeRadius = kin.jointPosToEEPos(targetJointPos).norm();
+		double maxRadius = kin.getSegLens().sum() * safetyFactor;
+		return eeRadius <= maxRadius;
+	}
+
+	/**
 	 * @brief Sets the end effector setpoint / target position.
 	 *
 	 * @param targetJointPos The target joint positions.

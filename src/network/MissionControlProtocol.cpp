@@ -149,19 +149,17 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		// Compute the new EE position to determine if it is within safety factor.
 		// If so, then enable IK by emplacing Globals::planarArmController and setting the
 		// setpoint. Otherwise, is a no-op.
-		double eeRadius =
-			Globals::planarArmKinematics.jointPosToEEPos(armJointPositions.getData()).norm();
-		double maxRadius =
-			Globals::planarArmKinematics.getSegLens().sum() * Constants::arm::SAFETY_FACTOR;
+		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> jointPosData = 
+			armJointPositions.getData();
 
-		if (eeRadius <= maxRadius) {
-			if (!Globals::planarArmController.has_value()) {
-				Globals::planarArmController.emplace(armJointPositions,
-													 Globals::planarArmKinematics,
-													 Constants::arm::SAFETY_FACTOR);
-			}
+		if (!Globals::planarArmController.has_value()) {
+			Globals::planarArmController.emplace(armJointPositions,
+												 Globals::planarArmKinematics,
+												 Constants::arm::SAFETY_FACTOR);
+		}
 
-			Globals::planarArmController->set_setpoint(armJointPositions.getData());
+		if (Globals::planarArmController->is_setpoint_valid(jointPosData)) {
+			Globals::planarArmController->set_setpoint(jointPosData);
 			Globals::armIKEnabled = true;
 			_arm_ik_repeat_thread =
 				std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
