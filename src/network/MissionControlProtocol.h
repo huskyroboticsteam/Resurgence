@@ -63,7 +63,8 @@ private:
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
 	void handleDriveRequest(const json& j);
-	void handleSetArmIKEnabled(const json& j);
+	void handleRequestArmIKEnabled(const json& j);
+	void sendArmIKEnabledReport();
 	void sendCameraStreamReport(const CameraID& cam,
 								const std::vector<std::basic_string<uint8_t>>& videoData);
 	void sendJointPositionReport(const std::string& jointName, int32_t position);
@@ -71,7 +72,8 @@ private:
 	void handleConnection();
 	void handleHeartbeatTimedOut();
 	void startPowerRepeat();
-	void stopAndShutdownPowerRepeat();
+	void stopAndShutdownPowerRepeat(bool sendDisableIK);
+	void setArmIKEnabled(bool enabled);
 	void setRequestedJointPower(jointid_t joint, double power);
 	void setRequestedCmdVel(double dtheta, double dx);
 };
