@@ -72,7 +72,7 @@ private:
 	void handleConnection();
 	void handleHeartbeatTimedOut();
 	void startPowerRepeat();
-	void stopAndShutdownPowerRepeat();
+	void stopAndShutdownPowerRepeat(bool sendDisableIK);
 	void setArmIKEnabled(bool enabled);
 	void setRequestedJointPower(jointid_t joint, double power);
 	void setRequestedCmdVel(double dtheta, double dx);

@@ -77,7 +77,7 @@ static bool validateEmergencyStopRequest(const json& j) {
 void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
-		this->stopAndShutdownPowerRepeat();
+		this->stopAndShutdownPowerRepeat(true);
 		robot::emergencyStop();
 		LOG_F(ERROR, "Emergency stop!");
 	} else if (!Globals::AUTONOMOUS) {
@@ -99,7 +99,7 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	Globals::AUTONOMOUS = (mode == "autonomous");
 	if (Globals::AUTONOMOUS) {
 		// if we have entered autonomous mode, we need to stop all the power repeater stuff.
-		this->stopAndShutdownPowerRepeat();
+		this->stopAndShutdownPowerRepeat(true);
 	} else {
 		// if we have left autonomous mode, we need to start the power repeater again.
 		this->startPowerRepeat();
@@ -302,7 +302,7 @@ void MissionControlProtocol::handleConnection() {
 
 void MissionControlProtocol::handleHeartbeatTimedOut() {
 	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.");
-	this->stopAndShutdownPowerRepeat();
+	this->stopAndShutdownPowerRepeat(true);
 	robot::emergencyStop();
 	Globals::E_STOP = true;
 }
@@ -318,7 +318,7 @@ void MissionControlProtocol::startPowerRepeat() {
 	}
 }
 
-void MissionControlProtocol::stopAndShutdownPowerRepeat() {
+void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 	// check to make sure the thread is actually running first (so we don't stop everything
 	// unnecessarily if it isn't; this could be bad in the case where we receive a spurious
 	// operation mode request while already in autonomous and shut down all the motors)
@@ -347,7 +347,11 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 		}
 	}
 	// Turn off inverse kinematics so that IK state will be in sync with mission control
-	this->setArmIKEnabled(false);
+	if (sendDisableIK) {
+		this->setArmIKEnabled(false);
+	} else {
+		Globals::armIKEnabled = false;
+	}
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
@@ -393,7 +397,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateCameraStreamCloseRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
-		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this));
+		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this, false));
 
 	this->setHeartbeatTimedOutHandler(
 		HEARTBEAT_TIMEOUT_PERIOD,
@@ -407,7 +411,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
-	this->stopAndShutdownPowerRepeat();
+	this->stopAndShutdownPowerRepeat(true);
 
 	this->_streaming_running = false;
 	if (this->_streaming_thread.joinable()) {

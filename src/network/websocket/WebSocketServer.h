@@ -102,7 +102,7 @@ private:
 		// holds the periodically scheduled ping event and the watchdog
 		std::optional<std::pair<util::PeriodicScheduler<>::eventid_t, util::Watchdog<>>>
 			heartbeatInfo;
-		std::recursive_mutex mutex;
+		std::mutex mutex;
 	};
 
 	std::string serverName;
