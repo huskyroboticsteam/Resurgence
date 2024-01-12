@@ -30,7 +30,7 @@ void AutonomousTask::navigate() {
 	commands::DriveToWaypointCommand cmd(_waypoint_coords, THETA_KP, DRIVE_VEL, SLOW_DRIVE_VEL,
 										 DONE_THRESHOLD, CLOSE_TO_TARGET_DUR_VAL);
 
-    DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
+	DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
 
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
@@ -42,7 +42,9 @@ void AutonomousTask::navigate() {
 			navtypes::pose_t latestPos(gpsData.x(), gpsData.y(), latestHeading.getData());
 			cmd.setState(latestPos, robot::types::dataclock::now());
 			commands::command_t output = cmd.getOutput();
-            auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
+			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
+				DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel,
+				output.thetaVel, Constants::MAX_WHEEL_VEL);
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
 		}
 
