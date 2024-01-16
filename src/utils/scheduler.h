@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core.h"
+
 #include <chrono>
 #include <condition_variable>
 #include <functional>
@@ -454,12 +456,8 @@ private:
 			loguru::set_thread_name(name->c_str());
 		}
 		std::unique_lock<std::mutex> lock(mutex);
-		// dummy variable to use RAII to assign clear flags when exiting
-		auto p = std::shared_ptr<int>(new int(0), [&](int* i) {
-			running = false;
-			quitting = false;
-			delete i;
-		});
+		// clear flags when exiting
+		RAIIHelper r([&]() { running = quitting = false; });
 		task(lock);
 	}
 };
