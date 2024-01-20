@@ -354,10 +354,10 @@ if (WORLD_INTERFACE STREQUAL "REAL")
 endif()
 
 add_compile_options(
+  -Wno-dev
   -Wall
   -Wextra
-  -Wconversion
-  -Wpedantic
+  # -Wconversion
 )
 
 add_subdirectory(ar)
