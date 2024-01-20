@@ -228,8 +228,8 @@ static bool validateJointPositionRequest(const json& j) {
 static void handleJointPositionRequest(const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
 	std::string motor = j["joint"];
-	double position_deg = j["position"];
-	int32_t position_mdeg = std::round(position_deg * 1000);
+	__attribute__((unused)) double position_deg = j["position"];
+	__attribute__((unused)) int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO: actually implement joint position requests
 	// setMotorPos(motor, position_mdeg);
 }

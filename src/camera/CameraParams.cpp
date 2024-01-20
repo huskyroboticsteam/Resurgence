@@ -1,17 +1,17 @@
 #include "CameraParams.h"
-#include "../../src/camera/CameraConfig.h"
 
 #include "../../src/Constants.h"
-#include <opencv2/core.hpp>
+#include "../../src/camera/CameraConfig.h"
 
 #include <vector>
+
+#include <opencv2/core.hpp>
 
 namespace cam {
 
 ////////////// CONSTRUCTORS //////////////
 
-CameraParams::CameraParams() {
-}
+CameraParams::CameraParams() {}
 
 void CameraParams::init(const cv::Mat& camera_matrix, const cv::Mat& dist_coeff,
 						cv::Size image_size) {
@@ -66,11 +66,11 @@ cv::Size CameraParams::getImageSize() const {
 	return _image_size;
 }
 
-std::vector<double> CameraParams::getIntrinsicList(){
+std::vector<double> CameraParams::getIntrinsicList() {
 	std::vector<double> intrinsic_list1D;
-	for (int i = 0; i < 3; i++){
-		for (int j = 0; j < 3; j++){
-			double x = _camera_matrix.at<double>(i,j);
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			double x = _camera_matrix.at<double>(i, j);
 			intrinsic_list1D.push_back(x);
 		}
 	}
@@ -99,7 +99,8 @@ void CameraParams::writeToFileStorage(cv::FileStorage& file_storage) const {
 	file_storage << "}";
 }
 
-void read(const cv::FileNode& node, cam::CameraParams& params, const cam::CameraParams& default_value) {
+void read(const cv::FileNode& node, cam::CameraParams& params,
+		  const cam::CameraParams& default_value) {
 	if (node.empty()) {
 		params = default_value;
 	} else {
@@ -107,7 +108,8 @@ void read(const cv::FileNode& node, cam::CameraParams& params, const cam::Camera
 	}
 }
 
-void write(cv::FileStorage& fs, const std::string& name, const cam::CameraParams& params) {
+void write(cv::FileStorage& fs, __attribute__((unused)) const std::string& name,
+		   const cam::CameraParams& params) {
 	params.writeToFileStorage(fs);
 }
 
