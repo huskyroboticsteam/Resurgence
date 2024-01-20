@@ -155,15 +155,15 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 static bool validateWaypointNavRequest(const json& j) {
 	return util::validateKey(j, "latitude", val_t::number_unsigned) &&
 		   util::validateKey(j, "longitude", val_t::number_unsigned) &&
-		   util::validateKey(j, "approximate", val_t::boolean) &&
-		   util::validateKey(j, "gated", val_t::boolean);
+		   util::validateKey(j, "isApproximate", val_t::boolean) &&
+		   util::validateKey(j, "isGate", val_t::boolean);
 }
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	float latitude = j["latitude"];
 	float longitude = j["longitude"];
-	bool isApproximate = j["approximate"];
-	bool isGate = j["gated"];
+	bool isApproximate = j["isApproximate"];
+	bool isGate = j["isGate"];
 
 	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
 		navtypes::point_t waypointCoords(latitude, longitude, 1);
