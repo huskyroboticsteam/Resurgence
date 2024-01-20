@@ -327,6 +327,9 @@ public:
 
 	virtual ~AsyncTask() {
 		stop();
+		if (thread.joinable()) {
+			thread.join();
+		}
 	}
 
 	AsyncTask& operator=(const AsyncTask&) = delete;
@@ -339,6 +342,7 @@ public:
 	virtual void start() {
 		std::lock_guard lock(mutex);
 		if (!running) {
+			std::lock_guard threadLock(threadMutex);
 			if (thread.joinable()) {
 				thread.join();
 			}
@@ -364,6 +368,7 @@ public:
 		}
 		if (isRunning) {
 			cv.notify_one();
+			std::lock_guard threadLock(threadMutex);
 			if (thread.joinable()) {
 				thread.join();
 			}
@@ -383,6 +388,8 @@ public:
 protected:
 	/**
 	 * @brief The long-running task, overridden by client code.
+	 *
+	 * If a task wants to stop itself, it can just return.
 	 *
 	 * @param lock The lock on the private internal state of the AsyncTask. Client code should
 	 * generally not use this except for the wait_until_xxx methods.
@@ -422,7 +429,7 @@ protected:
 	template <typename Rep, typename Period>
 	bool wait_for(std::unique_lock<std::mutex>& lock,
 				  const std::chrono::duration<Rep, Period>& dur) {
-		return cv.wait_for(lock, dur, [&]() { return quitting; });
+		return wait_until(lock, Clock::now() + dur);
 	}
 
 	/**
@@ -445,9 +452,12 @@ private:
 	std::optional<std::string> name;
 	bool running;
 	bool quitting;
-	std::thread thread;
-	std::mutex mutex;
 	std::condition_variable cv;
+	std::thread thread;
+
+	// If acquiring both mutexes, acquire mutex first then threadMutex.
+	std::mutex mutex;		// protects everything except thread
+	std::mutex threadMutex; // protects only thread
 
 	friend void util::impl::notifyScheduler<>(AsyncTask&);
 
