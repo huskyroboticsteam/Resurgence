@@ -13,10 +13,11 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <loguru.hpp>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <optional>
 #include <vector>
 
 using namespace robot::types;
@@ -29,10 +30,11 @@ void usage(const char* name);
 template <typename K, typename V>
 constexpr std::unordered_map<V, K> reverseMap(const std::unordered_map<K, V>& map);
 
-enum class FilterType { EKF, PoseGraph };
+enum class FilterType {
+	EKF
+};
 
-const std::unordered_map<std::string, FilterType> filterNameToType{
-	{"EKF", FilterType::EKF}, {"PoseGraph", FilterType::PoseGraph}};
+const std::unordered_map<std::string, FilterType> filterNameToType{{"EKF", FilterType::EKF}};
 
 const std::unordered_map<FilterType, std::string> filterTypeToName =
 	reverseMap(filterNameToType);
@@ -95,9 +97,10 @@ int main(int argc, const char* argv[]) {
 			}
 			pose_t truePose = truePoseDP.getData();
 			truePoseStream << duration_cast<std::chrono::milliseconds>(truePoseDP.getTime() -
-																	startTime)
-								.count() << ","
-						<< truePose(0) << "," << truePose(1) << "," << truePose(2) << "\n";
+																	   startTime)
+								  .count()
+						   << "," << truePose(0) << "," << truePose(1) << "," << truePose(2)
+						   << "\n";
 		}
 		for (auto filterType : filters) {
 			if (filterType == FilterType::EKF) {
@@ -109,13 +112,12 @@ int main(int argc, const char* argv[]) {
 				}
 				pose_t pose = fpe.getPose();
 				auto ms = duration_cast<std::chrono::milliseconds>(now - startTime).count();
-				filterStreamMap.at(filterType) << ms << "," << pose(0) << "," << pose(1) << "," << pose(2) << "\n";
+				filterStreamMap.at(filterType)
+					<< ms << "," << pose(0) << "," << pose(1) << "," << pose(2) << "\n";
 
 				fpe.predict(thetaVel, xVel);
-			} else if (filterType == FilterType::PoseGraph) {
-				assert(false); // TODO: add pose graph support
 			} else {
-				assert(false);
+				CHECK_F(false);
 			}
 		}
 		std::this_thread::sleep_until(now + 100ms);

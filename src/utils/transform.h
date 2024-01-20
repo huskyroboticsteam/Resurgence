@@ -27,7 +27,15 @@ double quatToHeading(double qw, double qx, double qy, double qz);
  * @param quat The quaternion to extract the heading from. This does not need to be normalized.
  * @return double The CCW heading, in radians.
  */
-double quatToHeading(Eigen::Quaterniond quat);
+double quatToHeading(const Eigen::Quaterniond& quat);
+
+/**
+ * @brief Convert euler angles to a quaternion representation.
+ *
+ * @param rpy The euler angles to convert.
+ * @return Eigen::Quaterniond The same orientation represented as a quaternion.
+ */
+Eigen::Quaterniond eulerAnglesToQuat(const navtypes::eulerangles_t& rpy);
 
 /**
  * @brief Convert a set of points to a different reference frame.
@@ -123,4 +131,4 @@ double closestHeading(double theta, double prev_theta);
  */
 navtypes::transform_t toTransform(const navtypes::pose_t& pose);
 
-}
+} // namespace util

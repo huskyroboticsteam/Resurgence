@@ -14,6 +14,24 @@ struct wheelvel_t {
 class DiffDriveKinematics {
 public:
 	/**
+	 * Proportional: The xVel and thetaVel are scaled an equal amount. This keeps the linear
+	 * and theta velocity at equal proportions to their original values but their output wheel
+	 * speed is below the max allowed.
+	 *
+	 * PreferXVel: The theta velocity is scaled and the x velocity is maintained. This
+	 * preserves linear velocity over theta velocity meaning we lose turning ability.
+	 *
+	 * PreferThetaVel: The x velocity is scaled and the theta velocity is maintained. This
+	 * preserves the ability to rotate the rover by scaling down the linear velocity so that
+	 * the calculated max wheel speed is below the set max wheel speed allowed.
+	 */
+	enum class PreferredVelPreservation {
+		Proportional,
+		PreferXVel,
+		PreferThetaVel,
+	};
+
+	/**
 	 * Create a new DiffDriveKinematics with the given wheel base width.
 	 *
 	 * @param wheelBaseWidth The width of the wheelbase. The units themselves don't matter, as
@@ -77,6 +95,22 @@ public:
 	 */
 	navtypes::pose_t getNextPose(const wheelvel_t& wheelVel, const navtypes::pose_t& pose,
 								 double dt) const;
+
+	/**
+	 * Ensure that the given xVel and thetaVel translate to a wheel speed less than or equal
+	 * to the max wheel speed. Scales them if they do not.
+	 *
+	 * @param preferred Choose proportional if x velocity and theta velocity should be
+	 *                  scaled proportionally to each other, choose PreferXVel if linear
+	 * velocity is preferred, or choose PreferThetaVel if turning is preferred.
+	 * @param xVel The xVel used to calculate the wheel speed
+	 * @param thetaVel The theta veloicty used to calculate the wheel speed.
+	 * @param maxWheelSpeed The current max possible wheel speed. This is the value
+	 *                      that the calculated velocity will be checked against.
+	 */
+	navtypes::pose_t ensureWithinWheelSpeedLimit(PreferredVelPreservation preferred,
+												 double xVel, double thetaVel,
+												 double maxWheelSpeed) const;
 
 private:
 	double wheelBaseWidth;
