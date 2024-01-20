@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
 	cam_config.release();
 
 	cv::Mat frame;
-	__attribute__((unused)) uint32_t fnum = 0;
+	[[maybe_unused]] uint32_t fnum = 0;
 
 	std::cout << "Opening camera..." << std::endl;
 	bool open_success = false;

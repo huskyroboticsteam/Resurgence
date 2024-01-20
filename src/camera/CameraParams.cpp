@@ -108,7 +108,7 @@ void read(const cv::FileNode& node, cam::CameraParams& params,
 	}
 }
 
-void write(cv::FileStorage& fs, __attribute__((unused)) const std::string& name,
+void write(cv::FileStorage& fs, [[maybe_unused]] const std::string& name,
 		   const cam::CameraParams& params) {
 	params.writeToFileStorage(fs);
 }
