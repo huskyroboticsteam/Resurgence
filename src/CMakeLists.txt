@@ -14,7 +14,7 @@ include(FetchContent)
 #To change, you can pass - DCMAKE_BUILD_TYPE = ... where... is the configuration you would like
 #to use.For example, if you want to do a full debug build(little to no optimization, with
 #debugging symbols),                                                                          \
-	add - DCMAKE_BUILD_TYPE = Debug to your `cmake` command.You may want to do
+#	add - DCMAKE_BUILD_TYPE = Debug to your `cmake` command.You may want to do
 #a full debug build if code you want to debug gets optimized out by the compiler.
 set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "The type of build to perform.")
 set(AVAILABLE_BUILD_TYPES "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
