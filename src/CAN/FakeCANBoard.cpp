@@ -161,13 +161,12 @@ int main() {
 			robot::types::datatime_t currTime = robot::types::dataclock::now();
 
 			// get y data: set point (target vel * time since set velocity call) + initial pos
-			__attribute__((unused)) double setPoint =
+			[[maybe_unused]] double setPoint =
 				(targetVel * util::durationToSec(currTime - startTime)) +
 				initialMotorPos.getData();
 
 			// get y data: motor position
-			__attribute__((unused)) robot::types::DataPoint<int32_t> motorPos =
-				motor->getMotorPos();
+			[[maybe_unused]] robot::types::DataPoint<int32_t> motorPos = motor->getMotorPos();
 
 			// check if time is up
 			double elapsedTime = util::durationToSec(currTime - startTime);
@@ -227,8 +226,7 @@ int main() {
 					can::deviceid_t id = std::make_pair(can::devicegroup_t::motor, serial);
 					can::addDeviceTelemetryCallback(
 						id, can::telemtype_t::limit_switch,
-						[](can::deviceid_t id,
-						   __attribute__((unused)) can::telemtype_t telemType,
+						[](can::deviceid_t id, [[maybe_unused]] can::telemtype_t telemType,
 						   DataPoint<can::telemetry_t> data) {
 							std::cout << "Motor Limit: serial=" << std::hex
 									  << static_cast<int>(id.second)
