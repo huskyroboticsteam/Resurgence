@@ -146,22 +146,14 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		assert(armJointPositions.isValid());
 
 		if (!Globals::planarArmController.has_value()) {
-			Globals::planarArmController.emplace(armJointPositions,
-												 Globals::planarArmKinematics,
-												 Constants::arm::SAFETY_FACTOR);
+			Globals::planarArmController = 
+				control::PlanarArmController<2>::makeController
+					(armJointPositions, Globals::planarArmKinematics, Constants::arm::SAFETY_FACTOR);											 
 		}
 
 		if (Globals::planarArmController.has_value()) {
-			// Reject enabling IK if EE outside of safety radius.
-			navtypes::Vectord<Constants::arm::IK_MOTORS.size()> jointPosData = 
-				armJointPositions.getData();
-
-			if (Globals::planarArmController->is_setpoint_valid(jointPosData)) {
-				Globals::planarArmController->set_setpoint(jointPosData);
-				Globals::armIKEnabled = true;
-				_arm_ik_repeat_thread =
-					std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
-			}
+			Globals::armIKEnabled = true;
+			_arm_ik_repeat_thread = std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
 		}
 	} else {
 		Globals::armIKEnabled = false;
