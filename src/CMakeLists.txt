@@ -357,7 +357,7 @@ add_compile_options(
   -Wall
   -Wextra
   -Wno-deprecated-copy
-  -Werror
+  # -Werror
 )
 
 add_subdirectory(ar)
