@@ -120,8 +120,7 @@ TEST_CASE("Test Watchdog", "[util][scheduler]") {
 
 	SECTION("Test keep calling while starved") {
 		auto l = std::make_shared<latch>(1);
-		Watchdog<fake_clock> wd(
-			100ms, [&]() { l->count_down(); }, true);
+		Watchdog<fake_clock> wd(100ms, [&]() { l->count_down(); }, true);
 		for (int i = 0; i < 5; i++) {
 			REQUIRE_FALSE(l->wait_for(50ms));
 			advanceFakeClock(50ms, 5ms, wd);
@@ -182,17 +181,19 @@ TEST_CASE("Test PeriodicTask", "[util][scheduler]") {
 	REQUIRE(l->wait_for(50ms));
 }
 
-TEST_CASE("Test AsyncTask" "[util][scheduler]") {
+TEST_CASE("Test AsyncTask", "[util][scheduler]") {
 	// since PeriodicTask uses AsyncTask, a lot of the functionality is already tested.
 	SECTION("Test AsyncTask with task that terminates") {
 		class ExitingAsyncTask : public AsyncTask<fake_clock> {
 		public:
 			ExitingAsyncTask(latch& l) : l_(l) {}
+
 		protected:
 			void task(std::unique_lock<std::mutex>& lock) override {
 				wait_for(lock, 100ms);
 				l_.count_down();
 			}
+
 		private:
 			latch& l_;
 		};
@@ -212,11 +213,13 @@ TEST_CASE("Test AsyncTask" "[util][scheduler]") {
 		class WaitingAsyncTask : public AsyncTask<fake_clock> {
 		public:
 			WaitingAsyncTask(latch& l) : l_(l) {}
+
 		protected:
 			void task(std::unique_lock<std::mutex>& lock) override {
 				wait_for(lock, 100ms);
 				l_.count_down();
 			}
+
 		private:
 			latch& l_;
 		};
