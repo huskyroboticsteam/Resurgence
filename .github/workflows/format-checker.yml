@@ -26,7 +26,7 @@ jobs:
         if [ $(echo "${diff}" | wc -l) != 1 ]; then
           echo "Formatting errors detected! Suggested changes:"
           echo "${diff}"
-          exit 1
+          exit 5
         else
           echo "No formatting errors detected!"
           exit 0
