@@ -76,6 +76,16 @@ std::vector<double> CameraParams::getIntrinsicList() {
 	}
 	return intrinsic_list1D;
 }
+
+CameraParams& CameraParams::operator=(const CameraParams& other) {
+	if (this != &other) {
+		// Copy members from 'other' to 'this'
+		this->_camera_matrix = other._camera_matrix.clone();
+		this->_dist_coeff = other._dist_coeff.clone();
+		this->_image_size = other._image_size;
+	}
+	return *this;
+}
 ////////////// SERIALIZATION //////////////
 
 void CameraParams::readFromFileNode(const cv::FileNode& file_node) {

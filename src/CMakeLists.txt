@@ -356,7 +356,6 @@ endif()
 add_compile_options(
   -Wall
   -Wextra
-  -Wno-deprecated-copy
   -Werror
 )
 

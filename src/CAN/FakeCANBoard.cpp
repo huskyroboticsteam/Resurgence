@@ -20,7 +20,8 @@ using namespace std::chrono_literals;
 using can::motor::motormode_t;
 using namespace robot::types;
 
-enum class TestMode {
+enum class TestMode
+{
 	ModeSet,
 	PWM,
 	PID,
@@ -163,9 +164,11 @@ int main() {
 			[[maybe_unused]] double setPoint =
 				(targetVel * util::durationToSec(currTime - startTime)) +
 				initialMotorPos.getData();
+			LOG_F(INFO, "Set point: %f", setPoint);
 
 			// get y data: motor position
 			[[maybe_unused]] robot::types::DataPoint<int32_t> motorPos = motor->getMotorPos();
+			LOG_F(INFO, "Motor position: %d", motorPos.getData());
 
 			// check if time is up
 			double elapsedTime = util::durationToSec(currTime - startTime);
