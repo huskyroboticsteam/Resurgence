@@ -24,8 +24,8 @@ jobs:
         git reset --soft $(git merge-base HEAD origin/master)
         diff=$(git clang-format-18 --style=file --diff)
         if [ $(echo "${diff}" | wc -l) != 1 ]; then
-          echo "Formatting errors detected! Suggested changes:" >&2
-          echo "${diff}" >&2
+          echo "Formatting errors detected! Suggested changes:"
+          echo "${diff}"
           exit 1
         else
           echo "No formatting errors detected!"
