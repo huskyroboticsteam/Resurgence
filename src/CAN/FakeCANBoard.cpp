@@ -160,13 +160,12 @@ int main() {
 			robot::types::datatime_t currTime = robot::types::dataclock::now();
 
 			// get y data: set point (target vel * time since set velocity call) + initial pos
-			[[maybe_unused]] double setPoint =
-				(targetVel * util::durationToSec(currTime - startTime)) +
-				initialMotorPos.getData();
+			double setPoint = (targetVel * util::durationToSec(currTime - startTime)) +
+							  initialMotorPos.getData();
 			LOG_F(INFO, "Set point: %f", setPoint);
 
 			// get y data: motor position
-			[[maybe_unused]] robot::types::DataPoint<int32_t> motorPos = motor->getMotorPos();
+			robot::types::DataPoint<int32_t> motorPos = motor->getMotorPos();
 			LOG_F(INFO, "Motor position: %d", motorPos.getData());
 
 			// check if time is up
