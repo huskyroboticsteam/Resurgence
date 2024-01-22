@@ -1,7 +1,8 @@
 #pragma once
 
-#include <opencv2/core.hpp>
 #include <vector>
+
+#include <opencv2/core.hpp>
 
 namespace cam {
 
@@ -112,6 +113,12 @@ public:
 	 @brief Gets the camera intrinsics as a 1d list.
 	*/
 	std::vector<double> getIntrinsicList();
+
+	/**
+	 @brief Define a copy assignment operator
+	 */
+	CameraParams& operator=(const CameraParams& other);
+
 	/**
 	   @brief Reads the data for this CameraParams object from the given cv::FileNode object.
 
@@ -147,6 +154,6 @@ void write(cv::FileStorage& fs, const std::string& name, const CameraParams& par
 
 /** @} */
 
-}
+} // namespace cam
 
 // namespace cam
