@@ -12,31 +12,18 @@ jobs:
         submodules: true
     - name: Install dependencies from APT
       run: |
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh 18
-        sudo apt install -y git clang-format-18
-        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-18 100
-        sudo update-alternatives --set clang-format /usr/bin/clang-format-18
+        sudo apt install -y git clang-format-11
+        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-11 100 \
+          --slave /usr/share/man/man1/clang-format.1.gz clang-format.1.gz /usr/share/man/man1/clang-format-11.1.gz
     - name: Check Formatting
       run: |
-        echo "Start of script"
         cd ${{ github.workspace }}
-        echo "Pre-git reset"
         git reset --soft $(git merge-base HEAD origin/master)
-        echo "Pre-find diff"
-        diff=$(git clang-format-18 --style=file --diff 2>&1)
-        if [ $? -ne 0 ]; then
-          # The command failed
-          echo "Error running git clang-format-18:"
-          echo "${diff}"
-          exit 1
-        fi
-        echo "Pre-diff check"
+        diff=$(git clang-format-11 --diff)
         if [ $(echo "${diff}" | wc -l) != 1 ]; then
-          echo "Formatting errors detected! Suggested changes:"
-          echo "${diff}"
-          exit 5
+          echo "Formatting errors detected! Suggested changes:" >&2
+          echo "${diff}" >&2
+          exit 1
         else
           echo "No formatting errors detected!"
           exit 0
