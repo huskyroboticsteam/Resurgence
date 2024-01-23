@@ -25,6 +25,12 @@ jobs:
         echo "Pre-git reset"
         git reset --soft $(git merge-base HEAD origin/master)
         echo "Pre-find diff"
+        if [ $? -ne 0 ]; then
+          # The command failed
+          echo "Error running git clang-format-18:"
+          echo "${diff}"
+          exit 1
+        fi
         diff=$(git clang-format-18 --style=file --diff 2>&1)
         echo "Pre-diff check"
         if [ $(echo "${diff}" | wc -l) != 1 ]; then
