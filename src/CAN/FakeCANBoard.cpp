@@ -20,7 +20,7 @@ using namespace std::chrono_literals;
 using can::motor::motormode_t;
 using namespace robot::types;
 
-enum class TestMode { // 11 should fail on this enum
+enum class TestMode { // 14 should not fail on this enum
 	ModeSet,
 	PWM,
 	PID,
