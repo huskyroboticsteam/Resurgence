@@ -27,7 +27,7 @@ jobs:
         echo "Pre-find diff"
         diff=$(git clang-format-18 --style=file --diff)
         echo "Pre-diff check"
-        if [ $(echo "${diff}" | wc -l) -gt 0 ]; then
+        if [ $(echo "${diff}" | wc -l) != 1 ]; then
           echo "Formatting errors detected! Suggested changes:"
           echo "${diff}"
           exit 5
