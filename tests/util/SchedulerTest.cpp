@@ -133,8 +133,7 @@ TEST_CASE("Test Watchdog", "[util][scheduler]") {
 		REQUIRE(l->wait_for(10ms));
 
 		// check that callback is repeatedly called while starved
-		for (int i = 0; i < 3; i++) 
-		{
+		for (int i = 0; i < 3; i++) {
 			l = std::make_shared<latch>(1);
 			advanceFakeClock(100ms, 5ms, wd);
 			REQUIRE(l->wait_for(10ms));

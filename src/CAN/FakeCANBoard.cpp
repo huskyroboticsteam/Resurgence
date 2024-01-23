@@ -20,7 +20,8 @@ using namespace std::chrono_literals;
 using can::motor::motormode_t;
 using namespace robot::types;
 
-enum class TestMode {
+enum class TestMode
+{
 	ModeSet,
 	PWM,
 	PID,
