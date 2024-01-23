@@ -356,7 +356,7 @@ endif()
 add_compile_options(
   -Wall
   -Wextra
-  # -Werror
+  -Werror
 )
 
 add_subdirectory(ar)
