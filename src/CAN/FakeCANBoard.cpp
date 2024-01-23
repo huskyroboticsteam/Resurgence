@@ -15,14 +15,12 @@ extern "C" {
 #include <HindsightCAN/CANScience.h>
 }
 
-// Dummy comment to have this file indexed
-
 using namespace std::chrono_literals;
 
 using can::motor::motormode_t;
 using namespace robot::types;
 
-enum class TestMode {
+enum class TestMode { // 11 should fail on this enum
 	ModeSet,
 	PWM,
 	PID,
