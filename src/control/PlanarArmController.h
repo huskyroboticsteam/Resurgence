@@ -43,6 +43,14 @@ public:
 		assert(safetyFactor > 0.0 && safetyFactor < 1.0);
 	}
 
+	PlanarArmController(PlanarArmController&& other)
+    	: kin(std::move(other.kin)), safetyFactor(other.safetyFactor) {
+		std::lock_guard<std::mutex> lock(other.mutex);
+		setpoint = std::move(other.setpoint);
+		velocity = std::move(other.velocity);
+		velTimestamp = std::move(other.velTimestamp);
+	}
+
 	static std::optional<PlanarArmController> 
 	makeController(const navtypes::Vectord<N>& currJointPos,
 				   kinematics::PlanarArmKinematics<N> kin_obj, double safetyFactor) {
