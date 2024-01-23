@@ -20,8 +20,11 @@ jobs:
         sudo update-alternatives --set clang-format /usr/bin/clang-format-18
     - name: Check Formatting
       run: |
+        echo "Start of script"
         cd ${{ github.workspace }}
+        echo "Pre-git reset"
         git reset --soft $(git merge-base HEAD origin/master)
+        echo "Pre-find diff"
         diff=$(git clang-format-18 --style=file --diff)
         echo "Pre-diff check"
         if [ $(echo "${diff}" | wc -l) -gt 0 ]; then
