@@ -12,6 +12,7 @@ jobs:
         submodules: true
     - name: Install dependencies from APT
       run: |
+        set -e  # Add this line
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
         sudo ./llvm.sh 18
@@ -20,13 +21,14 @@ jobs:
         sudo update-alternatives --set clang-format /usr/bin/clang-format-18
     - name: Check Formatting
       run: |
+        set -e  # Add this line
         cd ${{ github.workspace }}
         git reset --soft $(git merge-base HEAD origin/master)
         diff=$(git clang-format-18 --style=file --diff)
-        if [ $(echo "${diff}" | wc -l) != 1 ]; then
-          echo "Formatting errors detected! Suggested changes:" >&2
-          echo "${diff}" >&2
-          exit 1
+        if [ $(echo "${diff}" | wc -l) -gt 0 ]; then
+          echo "Formatting errors detected! Suggested changes:"
+          echo "${diff}"
+          exit 5
         else
           echo "No formatting errors detected!"
           exit 0
