@@ -43,6 +43,11 @@ public:
 		assert(safetyFactor > 0.0 && safetyFactor < 1.0);
 	}
 
+	/**
+	 * @brief Constructs a copy of an existing PlanarArmController object.
+	 *
+	 * @param other The existing PlanarArmController to copy.
+	 */
 	PlanarArmController(PlanarArmController&& other)
     	: kin(std::move(other.kin)), safetyFactor(other.safetyFactor) {
 		std::lock_guard<std::mutex> lock(other.mutex);
