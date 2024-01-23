@@ -145,10 +145,10 @@ void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
 		// that IK wasn't enabled?
 		assert(armJointPositions.isValid());
 
-		if (!Globals::planarArmController.has_value()) {
-			Globals::planarArmController = 
-				control::PlanarArmController<2>::makeController
-					(armJointPositions, Globals::planarArmKinematics, Constants::arm::SAFETY_FACTOR);											 
+		auto o = control::PlanarArmController<2>::makeController(armJointPositions,
+					Globals::planarArmKinematics, Constants::arm::SAFETY_FACTOR);
+		if (o) {
+			Globals::planarArmController.emplace(std::move(*o));
 		}
 
 		if (Globals::planarArmController.has_value()) {
