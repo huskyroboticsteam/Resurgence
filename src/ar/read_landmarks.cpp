@@ -2,11 +2,11 @@
 
 #include "../Constants.h"
 #include "../camera/Camera.h"
-#include "../log.h"
 #include "../world_interface/world_interface.h"
 #include "Detector.h"
 
 #include <atomic>
+#include <loguru.hpp>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -30,19 +30,21 @@ std::thread landmark_thread;
 bool initialized = false;
 
 void detectLandmarksLoop() {
+	loguru::set_thread_name("LandmarkDetection");
 	cv::Mat frame;
 	uint32_t last_frame_no = 0;
 	while (true) {
 		if (robot::hasNewCameraFrame(Constants::AR_CAMERA_ID, last_frame_no)) {
 			auto camData = robot::readCamera(Constants::AR_CAMERA_ID);
-			if (!camData) continue;
+			if (!camData)
+				continue;
 			auto camFrame = camData.getData();
 			datatime_t frameTime = camData.getTime();
 			frame = camFrame.first;
 			last_frame_no = camFrame.second;
 
 			std::vector<AR::Tag> tags = ar_detector.detectTags(frame);
-			log(LOG_DEBUG, "readLandmarks(): %d tags spotted\n", tags.size());
+			LOG_F(2, "readLandmarks(): %ld tags spotted", tags.size());
 
 			// build up map with first tag of each ID spotted.
 			landmarks_t output(NUM_LANDMARKS);
@@ -67,8 +69,9 @@ void detectLandmarksLoop() {
 					if (extrinsic) {
 						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
 						cv::Mat transformed = extrinsic.value() * cv::Mat(coords_homogeneous);
-						output[i] = {frameTime, {transformed.at<double>(0, 0),
-									 transformed.at<double>(1, 0), 1.0}};
+						output[i] = {
+							frameTime,
+							{transformed.at<double>(0, 0), transformed.at<double>(1, 0), 1.0}};
 					} else {
 						// just account for coordinate axis change; rover frame has +x front,
 						// +y left, +z up while camera has +x right, +y down, +z front.
@@ -82,8 +85,10 @@ void detectLandmarksLoop() {
 			landmark_lock.lock();
 			for (size_t i = 0; i < NUM_LANDMARKS; i++) {
 				// only overwrite data if the new data is valid or the previous data is expired
-				// detection is a bit spotty, so we don't want to overwrite good data witih false negatives
-				if (output[i].isValid() || !current_landmarks[i].isFresh(LANDMARK_FRESH_PERIOD)) {
+				// detection is a bit spotty, so we don't want to overwrite good data witih
+				// false negatives
+				if (output[i].isValid() ||
+					!current_landmarks[i].isFresh(LANDMARK_FRESH_PERIOD)) {
 					current_landmarks[i] = output[i];
 				}
 			}
@@ -99,13 +104,13 @@ bool initializeLandmarkDetection() {
 		ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
 		landmark_thread = std::thread(&detectLandmarksLoop);
 	} else {
-		log(LOG_ERROR, "Camera does not have intrinsic parameters! AR tag detection "
-						"cannot be performed.\n");
+		LOG_F(ERROR, "Camera does not have intrinsic parameters! AR tag detection "
+					 "cannot be performed.");
 		return false;
 	}
 	if (!robot::getCameraExtrinsicParams(Constants::AR_CAMERA_ID)) {
-		log(LOG_WARN, "Camera does not have extrinsic parameters! Coordinates returned "
-						"for AR tags will be relative to camera\n");
+		LOG_F(WARNING, "Camera does not have extrinsic parameters! Coordinates returned "
+					   "for AR tags will be relative to camera");
 	}
 	initialized = true;
 	return true;

@@ -1,7 +1,8 @@
 #include "WebSocketProtocol.h"
 
 #include "../../Constants.h"
-#include "../../log.h"
+
+#include <loguru.hpp>
 namespace net {
 namespace websocket {
 
@@ -76,20 +77,20 @@ void WebSocketProtocol::processMessage(const json& obj) const {
 		if (validatorEntry != validatorMap.end()) {
 			if (validatorEntry->second(obj)) {
 				if (protocolPath == Constants::MC_PROTOCOL_NAME) {
-					log(LOG_INFO, "MC->R: %s\n", obj.dump().c_str());
+					LOG_F(INFO, "MC->R: %s", obj.dump().c_str());
 				}
 				handlerMap.at(messageType)(obj);
 			} else {
-				log(LOG_WARN, "Endpoint=%s : Invalid message received of type=%s: %s\n",
-					protocolPath.c_str(), messageType.c_str(), obj.dump().c_str());
+				LOG_F(WARNING, "Endpoint=%s : Invalid message received of type=%s: %s",
+					  protocolPath.c_str(), messageType.c_str(), obj.dump().c_str());
 			}
 		} else {
-			log(LOG_WARN, "Endpoint=%s : Unrecognized message type: %s\n",
-				protocolPath.c_str(), messageType.c_str());
+			LOG_F(WARNING, "Endpoint=%s : Unrecognized message type: %s", protocolPath.c_str(),
+				  messageType.c_str());
 		}
 	} else {
-		log(LOG_WARN, "Endpoint=%s : Malformed message without type key: %s\n",
-			protocolPath.c_str(), obj.dump().c_str());
+		LOG_F(WARNING, "Endpoint=%s : Malformed message without type key: %s",
+			  protocolPath.c_str(), obj.dump().c_str());
 	}
 }
 

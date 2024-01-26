@@ -3,7 +3,6 @@
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../base64/base64_img.h"
-#include "../log.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
 #include "../world_interface/data.h"
@@ -11,6 +10,7 @@
 
 #include <chrono>
 #include <functional>
+#include <loguru.hpp>
 #include <mutex>
 #include <optional>
 #include <shared_mutex>
@@ -39,7 +39,7 @@ const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
 constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
-constexpr const char* ARM_IK_ENABLED_TYPE = "setArmIKEnabled";
+constexpr const char* ARM_IK_ENABLED_TYPE = "requestArmIKEnabled";
 constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
 constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
 constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
@@ -54,6 +54,7 @@ constexpr const char* LIDAR_REP_TYPE = "lidarReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
 constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
+constexpr const char* ARM_IK_ENABLED_REP_TYPE = "armIKEnabledReport";
 // TODO: add support for missing report types
 // autonomousPlannedPathReport, poseConfidenceReport
 
@@ -77,16 +78,16 @@ static bool validateEmergencyStopRequest(const json& j) {
 void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
-		this->stopAndShutdownPowerRepeat();
+		this->stopAndShutdownPowerRepeat(true);
 		robot::emergencyStop();
-		log(LOG_ERROR, "Emergency stop!\n");
+		LOG_F(ERROR, "Emergency stop!");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
 		this->startPowerRepeat();
 	}
 	// TODO: reinit motors
 	Globals::E_STOP = stop;
-	Globals::armIKEnabled = false;
+	this->setArmIKEnabled(false);
 }
 
 static bool validateOperationModeRequest(const json& j) {
@@ -99,7 +100,7 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	Globals::AUTONOMOUS = (mode == "autonomous");
 	if (Globals::AUTONOMOUS) {
 		// if we have entered autonomous mode, we need to stop all the power repeater stuff.
-		this->stopAndShutdownPowerRepeat();
+		this->stopAndShutdownPowerRepeat(true);
 	} else {
 		// if we have left autonomous mode, we need to start the power repeater again.
 		this->startPowerRepeat();
@@ -125,38 +126,34 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
-	log(LOG_TRACE, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)\n", straight, steer,
-		dtheta, dx);
+	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
+		  dx);
 	this->setRequestedCmdVel(dtheta, dx);
 }
 
-void MissionControlProtocol::handleSetArmIKEnabled(const json& j) {
+void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 	bool enabled = j["enabled"];
 	if (enabled) {
-		Globals::armIKEnabled = false;
-		if (_arm_ik_repeat_thread.joinable()) {
-			_arm_ik_repeat_thread.join();
-		}
-		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-
-		// TODO: there should be a better way of handling invalid data than crashing.
-		// It should somehow just not enable IK, but then it needs to communicate back to MC
-		// that IK wasn't enabled?
-		assert(armJointPositions.isValid());
-
-		auto o = control::PlanarArmController<2>::makeController(armJointPositions,
-					Globals::planarArmKinematics, Constants::arm::SAFETY_FACTOR);
-		if (o) {
-			Globals::planarArmController.emplace(std::move(*o));
-		}
-
-		if (Globals::planarArmController.has_value()) {
-			Globals::armIKEnabled = true;
-			_arm_ik_repeat_thread = std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+		if (!Globals::armIKEnabled) {
+			if (_arm_ik_repeat_thread.joinable()) {
+				_arm_ik_repeat_thread.join();
+			}
+			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
+				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+			// Rover responds with armIKEnabledReport after requestArmIKEnable is processed
+			if (armJointPositions.isValid()) {
+				Globals::planarArmController.set_setpoint(armJointPositions.getData());
+				this->setArmIKEnabled(true);
+				_arm_ik_repeat_thread =
+					std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+			} else {
+				// unable to enable IK
+				LOG_F(WARNING, "Unable to enable IK");
+				this->setArmIKEnabled(false);
+			}
 		}
 	} else {
-		Globals::armIKEnabled = false;
+		this->setArmIKEnabled(false);
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
 		}
@@ -198,13 +195,10 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 void MissionControlProtocol::sendRoverPos() {
 	auto imu = robot::readIMU();
 	auto gps = gps::readGPSCoords();
-	log(LOG_DEBUG, "imu_valid=%s, gps_valid=%s\n", util::to_string(imu.isValid()).c_str(),
-		util::to_string(gps.isValid()).c_str());
+	LOG_F(2, "imu_valid=%s, gps_valid=%s", util::to_string(imu.isValid()).c_str(),
+		  util::to_string(gps.isValid()).c_str());
 	if (imu.isValid()) {
-		auto rpy = imu.getData();
-		Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
-								Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
-								Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()));
+		Eigen::Quaterniond quat = imu.getData();
 		double lon = 0, lat = 0;
 		if (gps.isValid()) {
 			lon = gps.getData().lon;
@@ -232,11 +226,11 @@ static bool validateJointPositionRequest(const json& j) {
 	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
 }
 
-static void handleJointPositionRequest(const json& j) {
+static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
-	std::string motor = j["joint"];
-	double position_deg = j["position"];
-	int32_t position_mdeg = std::round(position_deg * 1000);
+	// std::string motor = j["joint"];
+	// double position_deg = j["position"];
+	// int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO: actually implement joint position requests
 	// setMotorPos(motor, position_mdeg);
 }
@@ -267,6 +261,11 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	this->_camera_encoders.erase(cam);
 }
 
+void MissionControlProtocol::sendArmIKEnabledReport() {
+	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", Globals::armIKEnabled.load()}};
+	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+}
+
 void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
 													 int32_t jointPos) {
 	json msg = {{"type", JOINT_POSITION_REP_TYPE},
@@ -283,7 +282,7 @@ void MissionControlProtocol::sendCameraStreamReport(
 
 void MissionControlProtocol::handleConnection() {
 	// Turn off inverse kinematics on connection
-	Globals::armIKEnabled = false;
+	this->setArmIKEnabled(false);
 
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
@@ -303,11 +302,10 @@ void MissionControlProtocol::handleConnection() {
 }
 
 void MissionControlProtocol::handleHeartbeatTimedOut() {
-	this->stopAndShutdownPowerRepeat();
+	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.");
+	this->stopAndShutdownPowerRepeat(true);
 	robot::emergencyStop();
-	log(LOG_ERROR, "Heartbeat timed out! Emergency stopping.\n");
 	Globals::E_STOP = true;
-	Globals::armIKEnabled = false;
 }
 
 void MissionControlProtocol::startPowerRepeat() {
@@ -321,7 +319,7 @@ void MissionControlProtocol::startPowerRepeat() {
 	}
 }
 
-void MissionControlProtocol::stopAndShutdownPowerRepeat() {
+void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 	// check to make sure the thread is actually running first (so we don't stop everything
 	// unnecessarily if it isn't; this could be bad in the case where we receive a spurious
 	// operation mode request while already in autonomous and shut down all the motors)
@@ -350,7 +348,11 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat() {
 		}
 	}
 	// Turn off inverse kinematics so that IK state will be in sync with mission control
-	Globals::armIKEnabled = false;
+	if (sendDisableIK) {
+		this->setArmIKEnabled(false);
+	} else {
+		Globals::armIKEnabled = false;
+	}
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
@@ -377,11 +379,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 							validateDriveRequest);
 	this->addMessageHandler(
 		ARM_IK_ENABLED_TYPE,
-		std::bind(&MissionControlProtocol::handleSetArmIKEnabled, this, _1),
-		validateArmIKEnable);
-	this->addMessageHandler(
-		ARM_IK_ENABLED_TYPE,
-		std::bind(&MissionControlProtocol::handleSetArmIKEnabled, this, _1),
+		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
 		validateArmIKEnable);
 	this->addMessageHandler(
 		JOINT_POWER_REQ_TYPE,
@@ -400,7 +398,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateCameraStreamCloseRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
-		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this));
+		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this, false));
 
 	this->setHeartbeatTimedOutHandler(
 		HEARTBEAT_TIMEOUT_PERIOD,
@@ -414,12 +412,17 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
-	this->stopAndShutdownPowerRepeat();
+	this->stopAndShutdownPowerRepeat(true);
 
 	this->_streaming_running = false;
 	if (this->_streaming_thread.joinable()) {
 		this->_streaming_thread.join();
 	}
+}
+
+void MissionControlProtocol::setArmIKEnabled(bool enabled) {
+	Globals::armIKEnabled = enabled;
+	this->sendArmIKEnabledReport();
 }
 
 void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {
@@ -429,6 +432,7 @@ void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double powe
 }
 
 void MissionControlProtocol::jointPowerRepeatTask() {
+	loguru::set_thread_name("MCP_PowerRepeat");
 	std::unique_lock<std::mutex> joint_repeat_lock(this->_joint_repeat_running_mutex);
 	while (this->_joint_repeat_running) {
 		{
@@ -446,7 +450,9 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 				}
 			}
 			if (this->_last_cmd_vel) {
-				robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
+				if (this->_last_cmd_vel->first != 0.0 || this->_last_cmd_vel->second != 0.0) {
+					robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
+				}
 			}
 		}
 		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
@@ -455,6 +461,7 @@ void MissionControlProtocol::jointPowerRepeatTask() {
 }
 
 void MissionControlProtocol::updateArmIKRepeatTask() {
+	loguru::set_thread_name("MCP_ArmIK");
 	dataclock::time_point next_update_time = dataclock::now();
 	while (Globals::armIKEnabled) {
 		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
@@ -476,6 +483,7 @@ void MissionControlProtocol::updateArmIKRepeatTask() {
 }
 
 void MissionControlProtocol::telemReportTask() {
+	loguru::set_thread_name("MCP_Telem");
 	dataclock::time_point pt = dataclock::now();
 
 	while (true) {
@@ -496,6 +504,7 @@ void MissionControlProtocol::telemReportTask() {
 }
 
 void MissionControlProtocol::videoStreamTask() {
+	loguru::set_thread_name("MCP_Video");
 	while (this->_streaming_running) {
 		std::shared_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
 		// for all open streams, check if there is a new frame

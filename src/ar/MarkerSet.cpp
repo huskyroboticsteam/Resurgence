@@ -1,5 +1,6 @@
 #include "MarkerSet.h"
 
+#include <loguru.hpp>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -22,15 +23,15 @@ MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physic
 
 MarkerSet::MarkerSet(uint8_t data_region_size, uint8_t border_size, float physical_size,
 					 ar_dict_ptr markerDictPtr) {
-	assert(markerDictPtr);
+	CHECK_NOTNULL_F(markerDictPtr);
 	init(data_region_size, border_size, physical_size, markerDictPtr);
 }
 
 void MarkerSet::init(uint8_t data_region_size, uint8_t border_size, float physical_size,
 					 ar_dict_ptr markerDict) {
-	assert(data_region_size > 0);
-	assert(border_size > 0);
-	assert(physical_size > 0);
+	CHECK_GT_F(data_region_size, 0);
+	CHECK_GT_F(border_size, 0);
+	CHECK_GT_F(physical_size, 0);
 	this->data_region_size = data_region_size;
 	this->border_size = border_size;
 	this->physical_size = physical_size;
@@ -111,7 +112,6 @@ constexpr size_t ARUCO_BIT_SIZE = 4;
 constexpr size_t ARUCO_BORDER_SIZE = 1;
 /** The physical size (in mm) of an ARUco marker. */
 constexpr float ARUCO_PHYS_SIZE = 0.15; // we don't know this yet, change later
-
 
 /**
    Constructs the URC marker set

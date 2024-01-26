@@ -7,6 +7,7 @@
 #include "../world_interface/data.h"
 
 #include <functional>
+#include <loguru.hpp>
 #include <optional>
 
 #include <Eigen/Core>
@@ -39,8 +40,8 @@ public:
 		  jacobianFunc(jacobianFunc ? jacobianFunc
 									: std::bind(util::numericalJacobian, kinematicsFunc,
 												std::placeholders::_1, outputDim)) {
-		assert(this->kinematicsFunc);
-		assert(this->jacobianFunc);
+		CHECK_NOTNULL_F(this->kinematicsFunc);
+		CHECK_NOTNULL_F(this->jacobianFunc);
 	}
 
 	/**

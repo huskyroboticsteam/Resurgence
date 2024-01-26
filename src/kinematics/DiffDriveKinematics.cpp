@@ -1,6 +1,7 @@
 #include "DiffDriveKinematics.h"
 
 #include "../utils/transform.h"
+
 using namespace navtypes;
 using util::toTransformRotateFirst;
 
@@ -49,4 +50,56 @@ pose_t DiffDriveKinematics::getNextPose(const wheelvel_t& wheelVel, const pose_t
 										double dt) const {
 	return pose + getPoseUpdate(wheelVel, pose(2), dt);
 }
+
+pose_t DiffDriveKinematics::ensureWithinWheelSpeedLimit(
+	PreferredVelPreservation preferredVelPreservation, double xVel, double thetaVel,
+	double maxWheelSpeed) const {
+	const auto [lVel, rVel] = robotVelToWheelVel(xVel, thetaVel);
+	const double calculatedMaxWheelVel = std::max(std::abs(lVel), std::abs(rVel));
+	if (calculatedMaxWheelVel > maxWheelSpeed) {
+		switch (preferredVelPreservation) {
+			case PreferredVelPreservation::Proportional: {
+				xVel *= maxWheelSpeed / calculatedMaxWheelVel;
+				thetaVel *= maxWheelSpeed / calculatedMaxWheelVel;
+				break;
+			}
+			case PreferredVelPreservation::PreferXVel: {
+				if (std::abs(xVel) > maxWheelSpeed) {
+					return {std::copysign(maxWheelSpeed, xVel), 0, 0};
+				}
+				// Bring lVel up to -maxWheelSpeed
+				if (lVel < -maxWheelSpeed) {
+					thetaVel = (-maxWheelSpeed - xVel) * -2.0 / wheelBaseWidth;
+				}
+				// Bring lVel down to maxWheelSpeed
+				if (lVel > maxWheelSpeed) {
+					thetaVel = (maxWheelSpeed - xVel) * -2.0 / wheelBaseWidth;
+				}
+				// Bring rVel up to -maxWheelSpeed
+				if (rVel < -maxWheelSpeed) {
+					thetaVel = (-maxWheelSpeed - xVel) * 2.0 / wheelBaseWidth;
+				}
+				// Bring rVel down to maxWheelSpeed
+				if (rVel > maxWheelSpeed) {
+					thetaVel = (maxWheelSpeed - xVel) * 2.0 / wheelBaseWidth;
+				}
+				break;
+			}
+			case PreferredVelPreservation::PreferThetaVel: {
+				if (std::abs(wheelBaseWidth / 2 * thetaVel) > maxWheelSpeed) {
+					return {0, 0, std::copysign(maxWheelSpeed * 2 / wheelBaseWidth, thetaVel)};
+				}
+				if (std::max(lVel, rVel) > maxWheelSpeed) {
+					xVel -= std::max(lVel, rVel) - maxWheelSpeed;
+				}
+				if (std::min(lVel, rVel) < -maxWheelSpeed) {
+					xVel += -maxWheelSpeed - std::min(lVel, rVel);
+				}
+				break;
+			}
+		}
+	}
+	return {xVel, 0, thetaVel};
+}
+
 } // namespace kinematics
