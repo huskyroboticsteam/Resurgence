@@ -126,10 +126,18 @@ public:
 		Eigen::Vector2d newPos = get_setpoint(currTime);
 		// lock after calling get_setpoint since that internally locks the mutex
 		std::lock_guard<std::mutex> lock(mutex);
-		setpoint = newPos;
 
 		// get new joint positions for target EE
-		return kin.eePosToJointPos(newPos, currJointPos);
+		bool success = false;
+		navtypes::Vectord<N> jp = kin.eePosToJointPos(newPos, currJointPos, success);
+		velTimestamp = currTime;
+		if (!success) {
+			LOG_F(WARNING, "IK Failure!");
+			velocity.setZero();
+		} else {
+			setpoint = newPos;
+		}
+		return jp;
 	}
 
 private:
