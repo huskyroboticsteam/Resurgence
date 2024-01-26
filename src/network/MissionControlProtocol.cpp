@@ -140,12 +140,17 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			}
 			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-			// Rover responds with armIKEnabledReport after requestArmIKEnable is processed
-			if (armJointPositions.isValid()) {
-				Globals::planarArmController.set_setpoint(armJointPositions.getData());
+
+			auto o = control::PlanarArmController<2>::makeController(armJointPositions,
+					Globals::planarArmKinematics, Constants::arm::SAFETY_FACTOR);
+
+			if (o) {
+				Globals::planarArmController.emplace(std::move(*o));
+			}
+
+			if (Globals::planarArmController.has_value()) {
 				this->setArmIKEnabled(true);
-				_arm_ik_repeat_thread =
-					std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
+				_arm_ik_repeat_thread = std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
 			} else {
 				// unable to enable IK
 				LOG_F(WARNING, "Unable to enable IK");
