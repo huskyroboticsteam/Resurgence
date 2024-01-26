@@ -50,14 +50,14 @@ public:
 	 * @param other The existing PlanarArmController to copy.
 	 */
 	PlanarArmController(PlanarArmController&& other)
-    	: kin(std::move(other.kin)), safetyFactor(other.safetyFactor) {
+		: kin(std::move(other.kin)), safetyFactor(other.safetyFactor) {
 		std::lock_guard<std::mutex> lock(other.mutex);
 		setpoint = std::move(other.setpoint);
 		velocity = std::move(other.velocity);
 		velTimestamp = std::move(other.velTimestamp);
 	}
 
-	static std::optional<PlanarArmController> 
+	static std::optional<PlanarArmController>
 	makeController(const navtypes::Vectord<N>& currJointPos,
 				   kinematics::PlanarArmKinematics<N> kin_obj, double safetyFactor) {
 		if (is_setpoint_valid(currJointPos, kin_obj, safetyFactor)) {
@@ -68,15 +68,16 @@ public:
 	}
 
 	/**
-	 * @brief Returns whether the target joint positions are within the arm controller's radius limit.
+	 * @brief Returns whether the target joint positions are within the arm controller's radius
+	 * limit.
 	 *
 	 * @param targetJointPos The target joint positions.
 	 * @return whether the target joint positions are within the arm controller's radius limit.
 	 */
-	static bool is_setpoint_valid(const navtypes::Vectord<N>& targetJointPos, 
-								  kinematics::PlanarArmKinematics<N> kin_obj, 
+	static bool is_setpoint_valid(const navtypes::Vectord<N>& targetJointPos,
+								  kinematics::PlanarArmKinematics<N> kin_obj,
 								  const double safetyFactor) {
-		// Compute the new EE position to determine if it is within 
+		// Compute the new EE position to determine if it is within
 		// safety factor * length of fully extended arm.
 		double eeRadius = kin_obj.jointPosToEEPos(targetJointPos).norm();
 		double maxRadius = kin_obj.getSegLens().sum() * safetyFactor;
