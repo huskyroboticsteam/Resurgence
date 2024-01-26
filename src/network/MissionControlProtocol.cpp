@@ -12,7 +12,6 @@
 #include <functional>
 #include <loguru.hpp>
 #include <mutex>
-#include <optional>
 #include <shared_mutex>
 #include <thread>
 #include <unordered_map>
