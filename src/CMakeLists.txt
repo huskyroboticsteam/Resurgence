@@ -126,13 +126,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   endif()
 endif()
 
-# Enable all warnings except a few (unused variable/parameter/result)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
--Wno-unused-variable \
--Wno-unused-but-set-variable \
--Wno-unused-result \
--Wno-unused-parameter") # -Wconversion")
-
 if(WITH_TESTS)
   enable_testing()
 endif()
@@ -361,6 +354,12 @@ if (WORLD_INTERFACE STREQUAL "REAL")
     LimitCalib.cpp)
   target_link_libraries(LimitSwitchCalibration real_world_interface)
 endif()
+
+add_compile_options(
+  -Wall
+  -Wextra
+  -Werror
+)
 
 add_subdirectory(ar)
 add_subdirectory(camera)
