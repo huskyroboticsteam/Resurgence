@@ -79,7 +79,7 @@ TEST_CASE("Serialization works", "[camera][camera_params]") {
 TEST_CASE("List Conversation Works"){
 	std::unordered_map<robot::types::CameraID, cam::CameraConfig> cameraConfigMap;
 	auto cfg = cam::readConfigFromFile("../camera-config/global.yml");
-	cameraConfigMap[Constants::AR_CAMERA_ID] = cfg;
+	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
 	std::vector<double> x1 = cfg.intrinsicParams->getIntrinsicList();
 	std::vector<double> x1test {8.2342295124138286e+02, 0., 3.0932599345522056e+02, 0.,
           8.2343518498999936e+02, 2.5535163960018482e+02, 0., 0., 1.};

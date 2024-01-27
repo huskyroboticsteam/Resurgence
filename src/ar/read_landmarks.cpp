@@ -34,8 +34,8 @@ void detectLandmarksLoop() {
 	cv::Mat frame;
 	uint32_t last_frame_no = 0;
 	while (true) {
-		if (robot::hasNewCameraFrame(Constants::AR_CAMERA_ID, last_frame_no)) {
-			auto camData = robot::readCamera(Constants::AR_CAMERA_ID);
+		if (robot::hasNewCameraFrame(Constants::MAST_CAMERA_ID, last_frame_no)) {
+			auto camData = robot::readCamera(Constants::MAST_CAMERA_ID);
 			if (!camData)
 				continue;
 			auto camFrame = camData.getData();
@@ -65,7 +65,8 @@ void detectLandmarksLoop() {
 					cv::Vec3d coords = ids_to_camera_coords[id];
 					// if we have extrinsic parameters, multiply coordinates by them to do
 					// appropriate transformation.
-					auto extrinsic = robot::getCameraExtrinsicParams(Constants::AR_CAMERA_ID);
+					auto extrinsic =
+						robot::getCameraExtrinsicParams(Constants::MAST_CAMERA_ID);
 					if (extrinsic) {
 						cv::Vec4d coords_homogeneous = {coords[0], coords[1], coords[2], 1};
 						cv::Mat transformed = extrinsic.value() * cv::Mat(coords_homogeneous);
@@ -99,7 +100,7 @@ void detectLandmarksLoop() {
 }
 
 bool initializeLandmarkDetection() {
-	auto intrinsic = robot::getCameraIntrinsicParams(Constants::AR_CAMERA_ID);
+	auto intrinsic = robot::getCameraIntrinsicParams(Constants::MAST_CAMERA_ID);
 	if (intrinsic) {
 		ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
 		landmark_thread = std::thread(&detectLandmarksLoop);
@@ -108,7 +109,7 @@ bool initializeLandmarkDetection() {
 					 "cannot be performed.");
 		return false;
 	}
-	if (!robot::getCameraExtrinsicParams(Constants::AR_CAMERA_ID)) {
+	if (!robot::getCameraExtrinsicParams(Constants::MAST_CAMERA_ID)) {
 		LOG_F(WARNING, "Camera does not have extrinsic parameters! Coordinates returned "
 					   "for AR tags will be relative to camera");
 	}
