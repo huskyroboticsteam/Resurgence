@@ -1,11 +1,11 @@
 #include "read_usb_gps.h"
 
-#include "../../log.h"
 #include "../../navtypes.h"
 #include "../../world_interface/world_interface.h"
 #include "../gps_util.h"
 
 #include <libgpsmm.h>
+#include <loguru.hpp>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -42,24 +42,25 @@ bool gpsHasFix() {
 
 void gps_loop() {
 	struct gps_data_t* newdata;
+	loguru::set_thread_name("USB_GPS");
 
 	while (true) {
 		if (!gps_rec.waiting(5000000)) {
-			log(LOG_ERROR, "Lost connection to GPS hardware!\n");
+			LOG_F(ERROR, "Lost connection to GPS hardware!");
 			continue;
 		}
 
 		if ((newdata = gps_rec.read()) == NULL) {
-			log(LOG_ERROR, "GPS read error.\n");
+			LOG_F(ERROR, "GPS read error.");
 			continue;
 		} else if (newdata->set & STATUS_SET) {
 			if (!(newdata->set & LATLON_SET) || std::isnan(newdata->fix.latitude)) {
-				log(LOG_WARN, "No GPS fix.\n");
+				LOG_F(WARN, "No GPS fix.");
 				continue;
 			} else {
 				double lat = newdata->fix.latitude;
 				double lon = newdata->fix.longitude;
-				log(LOG_DEBUG, "Received fresh GPS data: (lat %.6f, lon %.6f).\n", lat, lon);
+				LOG_F(2, "Received fresh GPS data: (lat %.6f, lon %.6f).", lat, lon);
 				gps_mutex.lock();
 				if (!has_fix) {
 					// This is our first fix
@@ -71,7 +72,7 @@ void gps_loop() {
 				gps_mutex.unlock();
 			}
 		} else {
-			log(LOG_WARN, "Got packet with no STATUS_SET.\n");
+			LOG_F(WARNING, "Got packet with no STATUS_SET.");
 		}
 	}
 }
@@ -84,7 +85,7 @@ bool detectHardware() {
 		if (!gps_rec.waiting(5000000)) {
 			return false;
 		} else if ((packet = gps_rec.read()) == NULL) {
-			log(LOG_ERROR, "GPS read error.\n");
+			LOG_F(ERROR, "GPS read error.");
 		} else if (packet->set & STATUS_SET) {
 			return true;
 		}
@@ -95,12 +96,12 @@ bool detectHardware() {
 
 bool startGPSThread() {
 	if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
-		log(LOG_ERROR, "No GPSD running.\n");
+		LOG_F(ERROR, "No GPSD running.");
 		return false;
 	}
 	if (!detectHardware()) {
-		log(LOG_ERROR, "No GPS hardware detected. (If not using GPS, please re-run "
-					   "enable_CAN_and_GPS.sh to stop gpsd.)\n");
+		LOG_F(ERROR, "No GPS hardware detected. (If not using GPS, please re-run "
+					 "enable_CAN_and_GPS.sh to stop gpsd.)");
 		return false;
 	}
 	gps_thread = std::thread(gps_loop);

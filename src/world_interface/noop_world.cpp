@@ -39,7 +39,7 @@ landmarks_t readLandmarks() {
 	return landmarks_t{};
 }
 
-DataPoint<navtypes::eulerangles_t> readIMU() {
+DataPoint<Eigen::Quaterniond> readIMU() {
 	return {};
 }
 

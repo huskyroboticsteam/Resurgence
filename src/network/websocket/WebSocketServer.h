@@ -109,6 +109,8 @@ private:
 	uint16_t port;
 	websocketpp::server<websocketpp::config::asio> server;
 	bool isRunning;
+	// protects against race conditions modifying protocolMap
+	std::mutex protocolMapMutex;
 	// maps path prefix to ProtocolData for each protocol
 	std::map<std::string, ProtocolData> protocolMap;
 	std::thread serverThread;
@@ -125,6 +127,9 @@ private:
 	// called when pong message received from WS client
 	void onPong(connection_hdl hdl, const std::string& payload);
 	void serverTask();
+	// Thread-safe access of the protocolMap
+	std::optional<std::reference_wrapper<SingleClientWSServer::ProtocolData>>
+	getProtocol(const std::string& protocolPath);
 };
 } // namespace websocket
 } // namespace net

@@ -1,11 +1,9 @@
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../ar/read_landmarks.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
 #include "../kinematics/DiffDriveKinematics.h"
-#include "../log.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketProtocol.h"
 #include "../utils/core.h"
@@ -15,6 +13,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <loguru.hpp>
 #include <mutex>
 #include <shared_mutex>
 #include <string>
@@ -43,8 +42,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::hand, "hand"},
 	{motorid_t::activeSuspension, "activeSuspension"}};
 
-DataPoint<navtypes::eulerangles_t> lastAttitude;
-std::mutex attitudeMutex;
+DataPoint<Eigen::Quaterniond> lastOrientation;
+std::mutex orientationMutex;
 
 DataPoint<gpscoords_t> lastGPS;
 std::mutex gpsMutex;
@@ -134,13 +133,10 @@ void handleIMU(json msg) {
 	double qz = msg["z"];
 	double qw = msg["w"];
 
-	double heading = util::quatToHeading(qw, qx, qy, qz);
 	Eigen::Quaterniond q(qw, qx, qy, qz);
 	q.normalize();
-	Eigen::Vector3d euler = q.toRotationMatrix().eulerAngles(0, 1, 2);
-	std::lock_guard<std::mutex> guard(attitudeMutex);
-	lastAttitude =
-		navtypes::eulerangles_t{.roll = euler(0), .pitch = euler(1), .yaw = euler(2)};
+	std::lock_guard<std::mutex> guard(orientationMutex);
+	lastOrientation = q;
 }
 
 void handleCamFrame(json msg) {
@@ -207,7 +203,7 @@ void handleTruePose(json msg) {
 }
 
 void clientConnected() {
-	log(LOG_INFO, "Simulator connected!\n");
+	LOG_F(INFO, "Simulator connected!");
 	{
 		std::lock_guard<std::mutex> lock(connectionMutex);
 		simConnected = true;
@@ -216,14 +212,12 @@ void clientConnected() {
 }
 
 void clientDisconnected() {
-	log(LOG_ERROR, "ERROR: Simulator disconnected! World Interface disconnected!\n");
+	LOG_F(ERROR, "ERROR: Simulator disconnected! World Interface disconnected!");
 }
 
 void initSimServer() {
 	auto protocol = std::make_unique<net::websocket::WebSocketProtocol>(PROTOCOL_PATH);
 	protocol->addMessageHandler("simImuOrientationReport", handleIMU);
-	// TODO: remove lidar report
-	protocol->addMessageHandler("simLidarReport", [](const nlohmann::json&) {});
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
@@ -236,7 +230,7 @@ void initSimServer() {
 
 	{
 		// wait for simulator to connect
-		log(LOG_INFO, "Waiting for simulator connection...\n");
+		LOG_F(INFO, "Waiting for simulator connection...");
 		std::unique_lock<std::mutex> lock(connectionMutex);
 		connectionCV.wait(lock, [] { return simConnected; });
 	}
@@ -265,8 +259,6 @@ void world_interface_init(bool initOnlyMotors) {
 	initSimServer();
 	initCameras();
 	initMotors();
-
-	AR::initializeLandmarkDetection();
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
@@ -274,7 +266,7 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 	if (itr == motor_ptrs.end()) {
 		// motor id not in map
-		log(LOG_ERROR, "getMotor(): Unknown motor %d\n", static_cast<int>(motor));
+		LOG_F(ERROR, "getMotor(): Unknown motor %d", static_cast<int>(motor));
 		return nullptr;
 	} else {
 		// return motor object pointer
@@ -343,16 +335,16 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 }
 
 landmarks_t readLandmarks() {
-	return AR::readLandmarks();
+	return {};
 }
 
 DataPoint<pose_t> readVisualOdomVel() {
 	return DataPoint<pose_t>{};
 }
 
-DataPoint<navtypes::eulerangles_t> readIMU() {
-	std::lock_guard<std::mutex> guard(attitudeMutex);
-	return lastAttitude;
+DataPoint<Eigen::Quaterniond> readIMU() {
+	std::lock_guard<std::mutex> guard(orientationMutex);
+	return lastOrientation;
 }
 
 DataPoint<pose_t> getTruePose() {
@@ -427,7 +419,7 @@ void removeLimitSwitchCallback(callbackid_t id) {
 
 void setIndicator(indication_t signal) {
 	if (signal == indication_t::arrivedAtDest) {
-		log(LOG_INFO, "Robot arrived at destination!\n");
+		LOG_F(INFO, "Robot arrived at destination!");
 	}
 }
 

@@ -8,7 +8,6 @@ filesystem.
 
 | **File/Directory**          | **Location on Rover** | **Description**                                                                |
 | -----------------           | --------------------  | --------------                                                                 |
-| `.motion/`                  | `/home/$USER/`        | Configuration files for Motion (currently handles our video streaming.)        |
 | `50-usb-hokuyo-lidar.rules` | `/etc/udev/rules.d/`  | `udev` rules for making sure we have permissions to access the lidar over USB. |
 | `50-rover-cameras.rules`    | `/etc/udev/rules.d/`  | `udev` rules for making sure cameras have stable IDs.                          |
 

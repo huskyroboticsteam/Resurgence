@@ -1,5 +1,7 @@
 #include "StateSpaceUtil.h"
 
+#include <loguru.hpp>
+
 namespace filters::statespace {
 
 NoiseCovMat<-1, -1, -1>::NoiseCovMat(const Eigen::VectorXd& stdDevs, int stateDim,
@@ -12,7 +14,7 @@ NoiseCovMat<-1, -1, -1>::NoiseCovMat(const Eigen::VectorXd& stdDevs, int stateDi
 
 NoiseCovMat<-1, -1, -1>::NoiseCovMat(const Eigen::MatrixXd& mat, int stateDim, int paramSize)
 	: stateDim(stateDim), size(mat.rows()), paramDim(paramSize) {
-	assert(mat.rows() == mat.cols());
+	CHECK_EQ_F(mat.rows(), mat.cols());
 	func = [=](const Eigen::VectorXd& x, const Eigen::VectorXd& param) { return mat; };
 }
 
@@ -23,7 +25,7 @@ NoiseCovMat<-1, -1, -1>::NoiseCovMat(
 
 Eigen::MatrixXd NoiseCovMat<-1, -1, -1>::get(const Eigen::VectorXd& x,
 											 const Eigen::VectorXd& param) const {
-	assert(x.size() == stateDim && param.size() == paramDim);
+	CHECK_F(x.size() == stateDim && param.size() == paramDim);
 	return func(x, param);
 }
 } // namespace filters::statespace

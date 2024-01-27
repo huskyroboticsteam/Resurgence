@@ -98,6 +98,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(HindsightCAN)
 
+FetchContent_Declare(LoguruGitRepo
+	GIT_REPOSITORY "https://github.com/emilk/loguru"
+	GIT_TAG        "master"
+)
+# set any loguru compile-time flags before calling MakeAvailable()
+set(LOGURU_WITH_STREAMS TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+FetchContent_MakeAvailable(LoguruGitRepo) # defines target 'loguru::loguru'
+link_libraries(loguru::loguru -ldl)
+
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
@@ -116,13 +126,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   endif()
 endif()
 
-# Enable all warnings except a few (unused variable/parameter/result)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall \
--Wno-unused-variable \
--Wno-unused-but-set-variable \
--Wno-unused-result \
--Wno-unused-parameter") # -Wconversion")
-
 if(WITH_TESTS)
   enable_testing()
 endif()
@@ -136,7 +139,6 @@ target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
 
 # shared library for utility code
 add_library(utils SHARED
-  log.cpp
   utils/core.cpp
   utils/random.cpp
   utils/ScopedTimer.cpp
@@ -234,9 +236,6 @@ add_library(filters SHARED
   filters/PoseEstimatorLinear.cpp
   filters/StateSpaceUtil.cpp
   filters/FullPoseEstimator.cpp
-  filters/pose_graph/graph.cpp
-  filters/pose_graph/friendly_graph.cpp
-  filters/pose_graph/factors.cpp
   )
 target_link_libraries(filters utils)
 
@@ -264,13 +263,8 @@ list(APPEND simulator_libs
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
   Globals.cpp
-  rospub.cpp
   network/websocket/WebSocketServer.cpp
   network/websocket/WebSocketProtocol.cpp
-  worldmap/GlobalMap.cpp
-  worldmap/TrICP.cpp
-  worldmap/QuadTree.cpp
-  planning/plan.cpp
   )
 target_link_libraries(rover_common
   utils
@@ -309,7 +303,6 @@ target_link_libraries(TunePID ${vision_libs})
 if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
-    rospub_test.cpp
     # AR Detection tests
     ar/DetectorTests.cpp
     ar/MarkerSetTests.cpp
@@ -332,9 +325,6 @@ if(WITH_TESTS)
     ../tests/filters/MultiSensorEKFTest.cpp
     ../tests/filters/StateSpaceUtilsTest.cpp
     ../tests/filters/FullPoseEstimatorTest.cpp
-    ../tests/worldmap/TrICPTest.cpp
-    ../tests/worldmap/GlobalMapTest.cpp
-    ../tests/worldmap/QuadTreeTest.cpp
     # Command tests
     ../tests/commands/DriveToWaypointCommandTest.cpp
     # Util tests
@@ -362,6 +352,12 @@ if (WORLD_INTERFACE STREQUAL "REAL")
     LimitCalib.cpp)
   target_link_libraries(LimitSwitchCalibration real_world_interface)
 endif()
+
+add_compile_options(
+  -Wall
+  -Wextra
+  -Werror
+)
 
 add_subdirectory(ar)
 add_subdirectory(camera)

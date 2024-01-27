@@ -33,9 +33,11 @@ static void libgps_dump_state(struct gps_data_t* collect) {
 				  gps_maskdump(collect->set));
 #endif
 	if (collect->set & ONLINE_SET)
-		(void)fprintf(stdout, "ONLINE: %ld.%09ld\n", collect->online.tv_sec, collect->online.tv_nsec);
+		(void)fprintf(stdout, "ONLINE: %ld.%09ld\n", collect->online.tv_sec,
+					  collect->online.tv_nsec);
 	if (collect->set & TIME_SET)
-		(void)fprintf(stdout, "TIME: %ld.%09ld\n", collect->fix.time.tv_sec, collect->online.tv_nsec);
+		(void)fprintf(stdout, "TIME: %ld.%09ld\n", collect->fix.time.tv_sec,
+					  collect->online.tv_nsec);
 	if (collect->set & LATLON_SET)
 		(void)fprintf(stdout, "LATLON: lat/lon: %lf %lf\n", collect->fix.latitude,
 					  collect->fix.longitude);
@@ -49,9 +51,9 @@ static void libgps_dump_state(struct gps_data_t* collect) {
 	if (collect->set & CLIMB_SET)
 		(void)fprintf(stdout, "CLIMB: climb: %lf\n", collect->fix.climb);
 	if (collect->set & STATUS_SET)
-		(void)fprintf(stdout, "STATUS: status: %d\n", collect->status);
-	if (collect->set & MODE_SET)
-		(void)fprintf(stdout, "MODE: mode: %d\n", collect->fix.mode);
+		// (void)fprintf(stdout, "STATUS: status: %d\n", collect->status);
+		if (collect->set & MODE_SET)
+			(void)fprintf(stdout, "MODE: mode: %d\n", collect->fix.mode);
 	if (collect->set & DOP_SET)
 		(void)fprintf(stdout, "DOP: satellites %d, pdop=%lf, hdop=%lf, vdop=%lf\n",
 					  collect->satellites_used, collect->dop.pdop, collect->dop.hdop,

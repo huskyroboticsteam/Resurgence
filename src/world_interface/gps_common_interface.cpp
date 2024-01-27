@@ -1,4 +1,5 @@
 #include "../navtypes.h"
+#include "../utils/transform.h"
 #include "world_interface.h"
 
 #include <optional>
@@ -11,7 +12,8 @@ static std::optional<GPSToMetersConverter> converter;
 namespace robot {
 
 DataPoint<double> readIMUHeading() {
-	return readIMU().transform([](const navtypes::eulerangles_t& e) { return e.yaw; });
+	return readIMU().transform(
+		[](const Eigen::Quaterniond& q) { return util::quatToHeading(q); });
 }
 
 DataPoint<point_t> readGPS() {

@@ -6,7 +6,6 @@
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
 #include "../gps/usb_gps/read_usb_gps.h"
-#include "../log.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
 #include "motor/can_motor.h"
@@ -15,6 +14,7 @@
 
 #include <future>
 #include <iostream>
+#include <loguru.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -119,12 +119,11 @@ void openCamera(CameraID camID, const char* cameraPath) {
 		if (success) {
 			cameraMap[camID] = cam;
 		} else {
-			log(LOG_ERROR, "Failed to open camera with id %s\n",
-				util::to_string(camID).c_str());
+			LOG_F(ERROR, "Failed to open camera with id %s", util::to_string(camID).c_str());
 		}
 	} catch (const std::exception& e) {
-		log(LOG_ERROR, "Error opening camera with id %s:\n%s\n",
-			util::to_string(camID).c_str(), e.what());
+		LOG_F(ERROR, "Error opening camera with id %s:\n%s", util::to_string(camID).c_str(),
+			  e.what());
 	}
 }
 
@@ -148,7 +147,7 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 	if (itr == motor_ptrs.end()) {
 		// motor id not in map
-		log(LOG_ERROR, "getMotor(): Unknown motor %d\n", static_cast<int>(motor));
+		LOG_F(ERROR, "getMotor(): Unknown motor %d", static_cast<int>(motor));
 		return nullptr;
 	} else {
 		// return motor object pointer
@@ -169,7 +168,7 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	if (itr != cameraMap.end()) {
 		return itr->second->hasNext(oldFrameNum);
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
+		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return false;
 	}
 }
@@ -187,7 +186,7 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 			return DataPoint<CameraFrame>{};
 		}
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
+		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return DataPoint<CameraFrame>{};
 	}
 }
@@ -199,7 +198,7 @@ std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 		return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
 											: std::optional<cam::CameraParams>{};
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
+		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return {};
 	}
 }
@@ -211,7 +210,7 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 		return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
 											: std::optional<cv::Mat>{};
 	} else {
-		log(LOG_WARN, "Invalid camera id: %s\n", util::to_string(cameraID).c_str());
+		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return {};
 	}
 }
@@ -243,7 +242,8 @@ URCLeg getLeg(int index) {
 	return URCLeg{0, -1, {0., 0., 0.}};
 }
 
-template <typename T> int getIndex(const std::vector<T>& vec, const T& val) {
+template <typename T>
+int getIndex(const std::vector<T>& vec, const T& val) {
 	auto itr = std::find(vec.begin(), vec.end(), val);
 	return itr == vec.end() ? -1 : itr - vec.begin();
 }
