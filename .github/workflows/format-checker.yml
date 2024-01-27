@@ -14,15 +14,15 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 18
-        sudo apt install -y git clang-format-18
-        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-18 100
-        sudo update-alternatives --set clang-format /usr/bin/clang-format-18
+        sudo ./llvm.sh 14
+        sudo apt install -y git clang-format-14
+        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-14 100
+        sudo update-alternatives --set clang-format /usr/bin/clang-format-14
     - name: Check Formatting
       run: |
         cd ${{ github.workspace }}
         git reset --soft $(git merge-base HEAD origin/master)
-        diff=$(git clang-format-18 --style=file --diff)
+        diff=$(git clang-format-14 --style=file --diff)
         if [ $(echo "${diff}" | wc -l) != 1 ]; then
           echo "Formatting errors detected! Suggested changes:" >&2
           echo "${diff}" >&2
