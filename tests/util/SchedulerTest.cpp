@@ -120,7 +120,8 @@ TEST_CASE("Test Watchdog", "[util][scheduler]") {
 
 	SECTION("Test keep calling while starved") {
 		auto l = std::make_shared<latch>(1);
-		Watchdog<fake_clock> wd(100ms, [&]() { l->count_down(); }, true);
+		auto fn = [&]() { l->count_down(); };
+		Watchdog<fake_clock> wd(100ms, fn, true);
 		for (int i = 0; i < 5; i++) {
 			REQUIRE_FALSE(l->wait_for(50ms));
 			advanceFakeClock(50ms, 5ms, wd);
