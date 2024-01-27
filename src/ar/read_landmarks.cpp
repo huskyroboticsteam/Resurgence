@@ -36,7 +36,8 @@ void detectLandmarksLoop() {
 	while (true) {
 		if (robot::hasNewCameraFrame(Constants::MAST_CAMERA_ID, last_frame_no)) {
 			auto camData = robot::readCamera(Constants::MAST_CAMERA_ID);
-			if (!camData) continue;
+			if (!camData)
+				continue;
 			auto camFrame = camData.getData();
 			datatime_t frameTime = camData.getTime();
 			frame = camFrame.first;
@@ -108,7 +109,6 @@ bool initializeLandmarkDetection() {
 					 "cannot be performed.");
 		return false;
 	}
-  
 	if (!robot::getCameraExtrinsicParams(Constants::MAST_CAMERA_ID)) {
 		LOG_F(WARNING, "Camera does not have extrinsic parameters! Coordinates returned "
 					   "for AR tags will be relative to camera");
