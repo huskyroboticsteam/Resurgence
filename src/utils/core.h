@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -77,5 +78,40 @@ template <typename T, typename U>
 std::tuple<T, U> pairToTuple(const std::pair<T, U>& pair) {
 	return std::tuple<T, U>(pair.first, pair.second);
 }
+
+/**
+ * @brief A helper class for executing a function when leaving a scope, in RAII-style.
+ */
+class RAIIHelper {
+public:
+	/**
+	 * @brief Construct a new RAIIHelper.
+	 *
+	 * @param f The function to execute when this object is destructed.
+	 */
+	RAIIHelper(const std::function<void()>& f);
+
+	RAIIHelper(const RAIIHelper&) = delete;
+
+	/**
+	 * @brief Move an RAIIHelper into another.
+	 *
+	 * The RAIIHelper being moved is guaranteed to be empty after this, i.e. will not execute
+	 * any code when being destructed.
+	 *
+	 * @param other The RAIIHelper to move.
+	 */
+	RAIIHelper(RAIIHelper&& other);
+
+	RAIIHelper& operator=(const RAIIHelper&) = delete;
+
+	/**
+	 * @brief Destroy the RAIIHelper object, executing the given function, if not empty.
+	 */
+	~RAIIHelper();
+
+private:
+	std::function<void()> f;
+};
 
 } // namespace util
