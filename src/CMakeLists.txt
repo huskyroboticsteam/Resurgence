@@ -328,7 +328,9 @@ if(WITH_TESTS)
     # Command tests
     ../tests/commands/DriveToWaypointCommandTest.cpp
     # Util tests
-    ../tests/util/UtilTest.cpp
+    ../tests/util/CoreTest.cpp
+    ../tests/util/MathTest.cpp
+    ../tests/util/TimeTest.cpp
     ../tests/util/SchedulerTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)

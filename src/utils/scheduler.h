@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core.h"
+
 #include <chrono>
 #include <condition_variable>
 #include <functional>
@@ -297,6 +299,219 @@ private:
 			}
 		}
 	}
+};
+
+/**
+ * @brief An abstract class that can be overridden to run long-running tasks and encapsulate
+ * task-related data.
+ *
+ * Client code should use this class by deriving from it and overriding AsyncTask::task.
+ *
+ * For simpler tasks that just require a function to be run periodically, consider
+ * PeriodicTask.
+ *
+ * @tparam Clock The clock to use for timing.
+ */
+template <typename Clock = std::chrono::steady_clock>
+class AsyncTask : private virtual impl::Notifiable {
+public:
+	/**
+	 * @brief Construct a new task.
+	 *
+	 * @param name The name of this task, for logging purposes.
+	 */
+	AsyncTask(const std::optional<std::string>& name = std::nullopt)
+		: name(name), running(false), quitting(false) {}
+
+	AsyncTask(const AsyncTask&) = delete;
+
+	virtual ~AsyncTask() {
+		stop();
+		if (thread.joinable()) {
+			thread.join();
+		}
+	}
+
+	AsyncTask& operator=(const AsyncTask&) = delete;
+
+	/**
+	 * @brief Start the task.
+	 *
+	 * If the task is already running, do nothing.
+	 */
+	virtual void start() {
+		std::lock_guard lock(mutex);
+		if (!running) {
+			std::lock_guard threadLock(threadMutex);
+			if (thread.joinable()) {
+				thread.join();
+			}
+			running = true;
+			quitting = false;
+			thread = std::thread(&AsyncTask::run, this);
+		}
+	}
+
+	/**
+	 * @brief Stop the task and wait for it to finish.
+	 *
+	 * If the task is not running, do nothing.
+	 */
+	virtual void stop() {
+		bool isRunning = false;
+		{
+			std::lock_guard lock(mutex);
+			if (isRunningInternal()) {
+				quitting = true;
+				isRunning = true;
+			}
+		}
+		if (isRunning) {
+			cv.notify_one();
+			std::lock_guard threadLock(threadMutex);
+			if (thread.joinable()) {
+				thread.join();
+			}
+		}
+	}
+
+	/**
+	 * @brief Check if the task is running.
+	 *
+	 * @return If the task is currently running.
+	 */
+	bool isRunning() {
+		std::lock_guard lock(mutex);
+		return running;
+	}
+
+protected:
+	/**
+	 * @brief The long-running task, overridden by client code.
+	 *
+	 * If a task wants to stop itself, it can just return.
+	 *
+	 * @param lock The lock on the private internal state of the AsyncTask. Client code should
+	 * generally not use this except for the wait_until_xxx methods.
+	 */
+	virtual void task(std::unique_lock<std::mutex>& lock) = 0;
+
+	/**
+	 * @brief Version of AsyncTask::isRunning() that does no synchronization.
+	 *
+	 * This is useful if called from AsyncTask::task(), to prevent deadlocks.
+	 *
+	 * @return If the task is currently running.
+	 */
+	bool isRunningInternal() {
+		return running;
+	}
+
+	/**
+	 * @brief Wait until the specified time point, or until the task has been stopped.
+	 *
+	 * @param lock The lock passed to AsyncTask::task.
+	 * @param tp The time point to wait until.
+	 * @return true iff the task was stopped while waiting.
+	 */
+	bool wait_until(std::unique_lock<std::mutex>& lock,
+					const std::chrono::time_point<Clock>& tp) {
+		return cv.wait_until(lock, tp, [&]() { return quitting; });
+	}
+
+	/**
+	 * @brief Wait for a given duration, or until the task has been stopped.
+	 *
+	 * @param lock The lock passed to AsyncTask::task.
+	 * @param tp The duration of time to wait for.
+	 * @return true iff the task was stopped while waiting.
+	 */
+	template <typename Rep, typename Period>
+	bool wait_for(std::unique_lock<std::mutex>& lock,
+				  const std::chrono::duration<Rep, Period>& dur) {
+		return wait_until(lock, Clock::now() + dur);
+	}
+
+	/**
+	 * @brief Wait until the task has been stopped.
+	 *
+	 * @param lock The lock passed to AsyncTask::task.
+	 */
+	void wait_until_done(std::unique_lock<std::mutex>& lock) {
+		return cv.wait(lock, [&]() { return quitting; });
+	}
+
+	/**
+	 * @brief Not for use by client code.
+	 */
+	void notify() override {
+		cv.notify_all();
+	}
+
+private:
+	std::optional<std::string> name;
+	bool running;
+	bool quitting;
+	std::condition_variable cv;
+	std::thread thread;
+
+	// If acquiring both mutexes, acquire mutex first then threadMutex.
+	std::mutex mutex;		// protects everything except thread
+	std::mutex threadMutex; // protects only thread
+
+	friend void util::impl::notifyScheduler<>(AsyncTask&);
+
+	void run() {
+		if (name.has_value()) {
+			loguru::set_thread_name(name->c_str());
+		}
+		std::unique_lock<std::mutex> lock(mutex);
+		// clear flags when exiting
+		RAIIHelper r([&]() { running = quitting = false; });
+		task(lock);
+	}
+};
+
+/**
+ * @brief Implements a task that executes a function periodically.
+ *
+ * Note that all PeriodicTask instances are run on the same thread, so the task function should
+ * not block.
+ *
+ * @tparam Clock The clock to use for timing.
+ */
+template <typename Clock = std::chrono::steady_clock>
+class PeriodicTask : public AsyncTask<Clock>, private virtual impl::Notifiable {
+public:
+	/**
+	 * @brief Construct a new periodic task.
+	 *
+	 * @param period The period at which to run the task.
+	 * @param f The function to execute every period.
+	 */
+	PeriodicTask(const std::chrono::milliseconds& period, const std::function<void()>& f)
+		: AsyncTask<Clock>(), period(period), f(f) {}
+
+protected:
+	void task(std::unique_lock<std::mutex>& lock) override {
+		auto event = scheduler.scheduleEvent(period, f);
+		AsyncTask<Clock>::wait_until_done(lock);
+		scheduler.removeEvent(event);
+	}
+
+	void notify() override {
+		impl::notifyScheduler(scheduler);
+		AsyncTask<Clock>::notify();
+	}
+
+private:
+	std::chrono::milliseconds period;
+	std::function<void()> f;
+
+	inline static PeriodicScheduler<Clock> scheduler =
+		PeriodicScheduler<Clock>("PeriodicTask_Scheduler");
+
+	friend void util::impl::notifyScheduler<>(PeriodicTask&);
 };
 
 namespace impl {
