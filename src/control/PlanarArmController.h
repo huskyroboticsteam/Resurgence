@@ -8,6 +8,7 @@
 #include <array>
 #include <cmath>
 #include <initializer_list>
+#include <loguru.hpp>
 #include <mutex>
 #include <numeric>
 #include <optional>
@@ -41,7 +42,7 @@ public:
 		// NOTE: currJointPos could extend beyond the safetyFactor, so safety factor
 		//       normalization logic is performed.
 		set_setpoint(currJointPos);
-		assert(safetyFactor > 0.0 && safetyFactor < 1.0);
+		CHECK_F(safetyFactor > 0.0 && safetyFactor < 1.0);
 	}
 
 	/**
@@ -85,14 +86,18 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
+		Eigen::Vector2d pos;
 		std::lock_guard<std::mutex> lock(mutex);
+		pos = setpoint;
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
-			setpoint += velocity * dt;
+			pos += velocity * dt;
 		}
 
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
+		// bounds check (new pos + vel vector <= sum of joint lengths)
+		setpoint = normalizeEEWithinRadius(pos);
 	}
 
 	/**
@@ -103,14 +108,18 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
+		Eigen::Vector2d pos;
 		std::lock_guard<std::mutex> lock(mutex);
+		pos = setpoint;
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
-			setpoint += velocity * dt;
+			pos += velocity * dt;
 		}
 
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
+		// bounds check (new pos + vel vector <= sum of joint lengths)
+		setpoint = normalizeEEWithinRadius(pos);
 	}
 
 	/**
@@ -126,6 +135,7 @@ public:
 		Eigen::Vector2d newPos = get_setpoint(currTime);
 		// lock after calling get_setpoint since that internally locks the mutex
 		std::lock_guard<std::mutex> lock(mutex);
+
 		setpoint = newPos;
 
 		// get new joint positions for target EE
