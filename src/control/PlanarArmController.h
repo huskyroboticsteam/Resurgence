@@ -57,6 +57,17 @@ public:
 		velTimestamp = std::move(other.velTimestamp);
 	}
 
+	/**
+	 * @brief Instantiates and returns an std::optional containing a PlanarArmController.
+	 *
+	 * @param currJointPos The current joint positions of the arm.
+	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
+	 * arm joints).
+	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
+	 * prevent singularity lock.
+	 * @return an std::optional containing a PlanarArmController if the joint positions are
+	 * within the robot's maximum arm extension radius, or an empty std::optional otherwise.
+	 */
 	static std::optional<PlanarArmController>
 	makeController(const navtypes::Vectord<N>& currJointPos,
 				   kinematics::PlanarArmKinematics<N> kin_obj, double safetyFactor) {
