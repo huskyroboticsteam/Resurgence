@@ -140,12 +140,12 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 
-			auto o = control::PlanarArmController<2>::makeController(
+			auto newPlanarArmController = control::PlanarArmController<2>::makeController(
 				armJointPositions, Globals::planarArmKinematics,
 				Constants::arm::SAFETY_FACTOR);
 
-			if (o) {
-				Globals::planarArmController.emplace(std::move(*o));
+			if (newPlanarArmController) {
+				Globals::planarArmController.emplace(std::move(*newPlanarArmController));
 			}
 
 			if (Globals::planarArmController.has_value()) {
@@ -163,6 +163,8 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
 		}
+
+		Globals::planarArmController.reset();
 	}
 }
 
