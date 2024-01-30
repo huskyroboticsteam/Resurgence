@@ -155,8 +155,10 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 }
 
 static bool validateWaypointNavRequest(const json& j) {
-	return util::validateKey(j, "latitude", val_t::number_unsigned) &&
-		   util::validateKey(j, "longitude", val_t::number_unsigned) &&
+	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
+	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
+	return (lat_is_unsigned || util::validateKey(j, "latitude", val_t::number_float)) &&
+		   (lon_is_unsigned || util::validateKey(j, "longitude", val_t::number_float)) &&
 		   util::validateKey(j, "isApproximate", val_t::boolean) &&
 		   util::validateKey(j, "isGate", val_t::boolean);
 }
