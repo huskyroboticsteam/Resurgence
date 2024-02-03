@@ -86,18 +86,15 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
-		Eigen::Vector2d pos;
 		std::lock_guard<std::mutex> lock(mutex);
-		pos = setpoint;
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
-			pos += velocity * dt;
+			// bounds check (new pos + vel vector <= sum of joint lengths)
+			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
 		}
 
 		velocity(0) = targetVel;
 		velTimestamp = currTime;
-		// bounds check (new pos + vel vector <= sum of joint lengths)
-		setpoint = normalizeEEWithinRadius(pos);
 	}
 
 	/**
@@ -108,18 +105,15 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
-		Eigen::Vector2d pos;
 		std::lock_guard<std::mutex> lock(mutex);
-		pos = setpoint;
 		if (velTimestamp.has_value()) {
 			double dt = util::durationToSec(currTime - velTimestamp.value());
-			pos += velocity * dt;
+			// bounds check (new pos + vel vector <= sum of joint lengths)
+			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
 		}
 
 		velocity(1) = targetVel;
 		velTimestamp = currTime;
-		// bounds check (new pos + vel vector <= sum of joint lengths)
-		setpoint = normalizeEEWithinRadius(pos);
 	}
 
 	/**
