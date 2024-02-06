@@ -24,18 +24,15 @@ void DriveToWaypointCommand::setState(const navtypes::pose_t& pose,
 }
 
 command_t DriveToWaypointCommand::getOutput() {
-	LOG_SCOPE_FUNCTION(INFO);
 	if (!this->setStateCalledBeforeOutput) {
 		LOG_F(WARNING, "DriveToWaypointCommand: getOutput() called before getState() call!");
 	}
 
 	this->setStateCalledBeforeOutput = false;
 	Eigen::Vector2d toTarget = target.topRows<2>() - pose.topRows<2>();
-	LOG_F(INFO, "toTarget=[%.3f, %.3f]", toTarget.x(), toTarget.y());
 	double targetAngle = std::atan2(toTarget(1), toTarget(0));
 	double angleDelta = targetAngle - pose(2);
 	double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
-	LOG_F(INFO, "TargetAngle=%.3f, CurrAngle=%.3f", targetAngle, pose(2));
 
 	double thetaVel = thetaKP * thetaErr;
 

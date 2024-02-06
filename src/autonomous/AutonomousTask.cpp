@@ -45,7 +45,6 @@ void AutonomousTask::navigate() {
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel,
 				output.thetaVel, Constants::MAX_WHEEL_VEL);
-			LOG_F(INFO, "setCmdVel: steer=%.3f, vel=%.3f", scaledVels(2), scaledVels(0));
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
 		}
 
