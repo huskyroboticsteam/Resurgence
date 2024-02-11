@@ -1,9 +1,11 @@
 #pragma once
 
+#include "../Constants.h"
 #include "../kinematics/PlanarArmKinematics.h"
 #include "../navtypes.h"
 #include "../utils/time.h"
 #include "../world_interface/data.h"
+#include "../world_interface/world_interface.h"
 
 #include <array>
 #include <cmath>
@@ -88,9 +90,14 @@ public:
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
-			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			if (targetVel == 0.0 && velocity(1) == 0.0) {
+				set_setpoint(robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData());
+				LOG_F(INFO, "Both EE velocities 0");
+			} else {
+				double dt = util::durationToSec(currTime - velTimestamp.value());
+				// bounds check (new pos + vel vector <= sum of joint lengths)
+				setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			}
 		}
 
 		velocity(0) = targetVel;
@@ -107,9 +114,14 @@ public:
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
-			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			if (velocity(0) == 0.0 && targetVel == 0.0) {
+				set_setpoint(robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData());
+				LOG_F(INFO, "Both EE velocities 0");
+			} else {
+				double dt = util::durationToSec(currTime - velTimestamp.value());
+				// bounds check (new pos + vel vector <= sum of joint lengths)
+				setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			}
 		}
 
 		velocity(1) = targetVel;
