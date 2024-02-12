@@ -91,8 +91,10 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			if (targetVel == 0.0 && velocity(1) == 0.0) {
-				set_setpoint(robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData());
-				LOG_F(INFO, "Both EE velocities 0");
+				const navtypes::Vectord<Constants::arm::IK_MOTORS.size()>& jointPos =
+					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData();
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
+				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt = util::durationToSec(currTime - velTimestamp.value());
 				// bounds check (new pos + vel vector <= sum of joint lengths)
@@ -115,8 +117,10 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			if (velocity(0) == 0.0 && targetVel == 0.0) {
-				set_setpoint(robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData());
-				LOG_F(INFO, "Both EE velocities 0");
+				const navtypes::Vectord<Constants::arm::IK_MOTORS.size()>& jointPos =
+					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData();
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
+				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt = util::durationToSec(currTime - velTimestamp.value());
 				// bounds check (new pos + vel vector <= sum of joint lengths)
