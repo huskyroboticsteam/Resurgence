@@ -3,6 +3,7 @@
 namespace net::mc {
 
 // TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
+// TODO: MOTOR_POS_REQ, MOTOR_STATUS_REP are unimplemented, do we want to remove or implement?
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
