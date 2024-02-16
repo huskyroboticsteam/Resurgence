@@ -36,13 +36,57 @@ public:
 	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
 	 * prevent singularity lock.
 	 */
-	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
-						kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
-		: kin(kin_obj), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {
-		// NOTE: currJointPos could extend beyond the safetyFactor, so safety factor
-		//       normalization logic is performed.
-		set_setpoint(currJointPos);
+	PlanarArmController(kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
+		: kin(kin_obj), safetyFactor(safetyFactor) {
 		CHECK_F(safetyFactor > 0.0 && safetyFactor < 1.0);
+	}
+
+	/**
+	 * @brief Constructs a copy of an existing PlanarArmController object.
+	 *
+	 * @param other The existing PlanarArmController to copy.
+	 */
+	PlanarArmController(PlanarArmController&& other)
+		: kin(std::move(other.kin)), safetyFactor(other.safetyFactor) {
+		std::lock_guard<std::mutex> lock(other.mutex);
+		mutableFields = std::move(other.mutableFields);
+	}
+
+	/**
+	 * @brief Instantiates and returns an std::optional containing a PlanarArmController.
+	 *
+	 * @param currJointPos The current joint positions of the arm.
+	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
+	 * arm joints).
+	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
+	 * prevent singularity lock.
+	 * @return an std::optional containing a PlanarArmController if the joint positions are
+	 * within the robot's maximum arm extension radius, or an empty std::optional otherwise.
+	 */
+	bool tryInitController(const navtypes::Vectord<N>& currJointPos) {
+		if (is_setpoint_valid(currJointPos, kin, safetyFactor)) {
+			set_setpoint(currJointPos);
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @brief Returns whether the target joint positions are within the arm controller's radius
+	 * limit.
+	 *
+	 * @param targetJointPos The target joint positions.
+	 * @return whether the target joint positions are within the arm controller's radius limit.
+	 */
+	static bool is_setpoint_valid(const navtypes::Vectord<N>& targetJointPos,
+								  kinematics::PlanarArmKinematics<N> kin_obj,
+								  const double safetyFactor) {
+		// Compute the new EE position to determine if it is within
+		// safety factor * length of fully extended arm.
+		double eeRadius = kin_obj.jointPosToEEPos(targetJointPos).norm();
+		double maxRadius = kin_obj.getSegLens().sum() * safetyFactor;
+		return eeRadius <= maxRadius;
 	}
 
 	/**
@@ -53,7 +97,7 @@ public:
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
 		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
 		std::lock_guard<std::mutex> lock(mutex);
-		setpoint = normalizeEEWithinRadius(newSetPoint);
+		mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
 	}
 
 	/**
@@ -67,10 +111,11 @@ public:
 		{
 			std::lock_guard<std::mutex> lock(mutex);
 			// calculate current EE setpoint
-			pos = setpoint;
-			if (velTimestamp.has_value()) {
-				double dt = util::durationToSec(currTime - velTimestamp.value());
-				pos += velocity * dt;
+			pos = mutableFields->setpoint;
+			if (mutableFields->velTimestamp.has_value()) {
+				double dt =
+					util::durationToSec(currTime - mutableFields->velTimestamp.value());
+				pos += mutableFields->velocity * dt;
 			}
 		}
 
@@ -87,14 +132,15 @@ public:
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
+		if (mutableFields->velTimestamp.has_value()) {
+			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
 			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
+															  mutableFields->velocity * dt);
 		}
 
-		velocity(0) = targetVel;
-		velTimestamp = currTime;
+		mutableFields->velocity(0) = targetVel;
+		mutableFields->velTimestamp = currTime;
 	}
 
 	/**
@@ -106,14 +152,15 @@ public:
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
+		if (mutableFields->velTimestamp.has_value()) {
+			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
 			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
+															  mutableFields->velocity * dt);
 		}
 
-		velocity(1) = targetVel;
-		velTimestamp = currTime;
+		mutableFields->velocity(1) = targetVel;
+		mutableFields->velTimestamp = currTime;
 	}
 
 	/**
@@ -133,22 +180,26 @@ public:
 		// get new joint positions for target EE
 		bool success = false;
 		navtypes::Vectord<N> jp = kin.eePosToJointPos(newPos, currJointPos, success);
-		velTimestamp = currTime;
+		mutableFields->velTimestamp = currTime;
 		if (!success) {
 			LOG_F(WARNING, "IK Failure!");
-			velocity.setZero();
+			mutableFields->velocity.setZero();
 		} else {
-			setpoint = newPos;
+			mutableFields->setpoint = newPos;
 		}
 		return jp;
 	}
 
 private:
+	struct MutableFields {
+		Eigen::Vector2d setpoint;
+		Eigen::Vector2d velocity;
+		std::optional<robot::types::datatime_t> velTimestamp;
+	};
+
+	std::optional<MutableFields> mutableFields;
 	std::mutex mutex;
 	const kinematics::PlanarArmKinematics<N> kin;
-	Eigen::Vector2d setpoint;
-	Eigen::Vector2d velocity;
-	std::optional<robot::types::datatime_t> velTimestamp;
 	const double safetyFactor;
 
 	/**
@@ -165,14 +216,15 @@ private:
 			// setpoint = setpoint inside circle
 			// eePos = new setpoint outside circle
 			// radius = ||setpoint + a*(eePos - setpoint)||  solve for a
-			double diffDotProd = (eePos - setpoint).dot(setpoint);
-			double differenceNorm = (eePos - setpoint).squaredNorm();
+			double diffDotProd =
+				(eePos - mutableFields->setpoint).dot(mutableFields->setpoint);
+			double differenceNorm = (eePos - mutableFields->setpoint).squaredNorm();
 			double discriminant =
 				std::pow(diffDotProd, 2) -
-				differenceNorm * (setpoint.squaredNorm() - std::pow(radius, 2));
+				differenceNorm * (mutableFields->setpoint.squaredNorm() - std::pow(radius, 2));
 			double a = (-diffDotProd + std::sqrt(discriminant)) / differenceNorm;
 			// new constrained eePos = (1 - a) * (ee inside circle) + a * (ee outside circle)
-			eePos = (1 - a) * setpoint + a * eePos;
+			eePos = (1 - a) * mutableFields->setpoint + a * eePos;
 		}
 		return eePos;
 	}

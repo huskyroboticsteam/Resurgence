@@ -139,9 +139,11 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			}
 			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-			// Rover responds with armIKEnabledReport after requestArmIKEnable is processed
-			if (armJointPositions.isValid()) {
-				Globals::planarArmController.set_setpoint(armJointPositions.getData());
+
+			bool success =
+				Globals::planarArmController.tryInitController(armJointPositions.getData());
+
+			if (success) {
 				this->setArmIKEnabled(true);
 				_arm_ik_repeat_thread =
 					std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
@@ -156,6 +158,8 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 		if (_arm_ik_repeat_thread.joinable()) {
 			_arm_ik_repeat_thread.join();
 		}
+
+		// Globals::planarArmController.reset();
 	}
 }
 
