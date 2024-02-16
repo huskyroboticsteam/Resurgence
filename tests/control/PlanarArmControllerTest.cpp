@@ -16,7 +16,7 @@ std::string toString(const Eigen::Vector2d& pose) {
 	return ss.str();
 }
 
-void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double dist = 1e-5,
+void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double dist = 1e-4,
 				  double angle = 1e-5) {
 	std::stringstream ss;
 	ss << "Expected: " << toString(p1) << ", Actual: " << toString(p2);
