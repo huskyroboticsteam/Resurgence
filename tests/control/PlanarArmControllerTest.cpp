@@ -29,7 +29,8 @@ void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double d
 TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
 	navtypes::Vectord<2> vec({0, 0});
 	kinematics::PlanarArmKinematics<2> kin_obj(vec, vec, vec, 0.0, 0);
-	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
+	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
+	REQUIRE(foo.tryInitController({0, 0}));
 }
 
 TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
@@ -40,7 +41,8 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
 
 	// Instantiate PlanarArmController.
-	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
+	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
+	REQUIRE(foo.tryInitController({0.0, M_PI}));
 
 	// Attempt to straighten out end-effector all the way, exceeding max length.
 	// This should cause the EE to be repositioned to fit the length constraint.
