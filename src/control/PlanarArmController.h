@@ -156,7 +156,7 @@ public:
 			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
 			// bounds check (new pos + vel vector <= sum of joint lengths)
 			mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
-											   mutableFields->velocity * dt);
+															  mutableFields->velocity * dt);
 		}
 
 		mutableFields->velocity(1) = targetVel;
@@ -216,7 +216,8 @@ private:
 			// setpoint = setpoint inside circle
 			// eePos = new setpoint outside circle
 			// radius = ||setpoint + a*(eePos - setpoint)||  solve for a
-			double diffDotProd = (eePos - mutableFields->setpoint).dot(mutableFields->setpoint);
+			double diffDotProd =
+				(eePos - mutableFields->setpoint).dot(mutableFields->setpoint);
 			double differenceNorm = (eePos - mutableFields->setpoint).squaredNorm();
 			double discriminant =
 				std::pow(diffDotProd, 2) -

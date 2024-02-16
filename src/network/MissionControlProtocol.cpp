@@ -140,7 +140,8 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 
-			bool success = Globals::planarArmController.tryInitController(armJointPositions.getData());
+			bool success =
+				Globals::planarArmController.tryInitController(armJointPositions.getData());
 
 			if (success) {
 				this->setArmIKEnabled(true);
