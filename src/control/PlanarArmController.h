@@ -63,8 +63,7 @@ public:
 	 * @return an std::optional containing a PlanarArmController if the joint positions are
 	 * within the robot's maximum arm extension radius, or an empty std::optional otherwise.
 	 */
-	bool
-	tryInitController(const navtypes::Vectord<N>& currJointPos) {
+	bool tryInitController(const navtypes::Vectord<N>& currJointPos) {
 		if (is_setpoint_valid(currJointPos, kin, safetyFactor)) {
 			set_setpoint(currJointPos);
 			return true;
@@ -114,7 +113,8 @@ public:
 			// calculate current EE setpoint
 			pos = mutableFields->setpoint;
 			if (mutableFields->velTimestamp.has_value()) {
-				double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
+				double dt =
+					util::durationToSec(currTime - mutableFields->velTimestamp.value());
 				pos += mutableFields->velocity * dt;
 			}
 		}
@@ -132,10 +132,11 @@ public:
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
+		if (mutableFields->velTimestamp.has_value()) {
+			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
 			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
+															  mutableFields->velocity * dt);
 		}
 
 		mutableFields->velocity(0) = targetVel;
@@ -151,10 +152,11 @@ public:
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
+		if (mutableFields->velTimestamp.has_value()) {
+			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
 			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
+											   mutableFields->velocity * dt);
 		}
 
 		mutableFields->velocity(1) = targetVel;
@@ -214,14 +216,14 @@ private:
 			// setpoint = setpoint inside circle
 			// eePos = new setpoint outside circle
 			// radius = ||setpoint + a*(eePos - setpoint)||  solve for a
-			double diffDotProd = (eePos - setpoint).dot(setpoint);
-			double differenceNorm = (eePos - setpoint).squaredNorm();
+			double diffDotProd = (eePos - mutableFields->setpoint).dot(mutableFields->setpoint);
+			double differenceNorm = (eePos - mutableFields->setpoint).squaredNorm();
 			double discriminant =
 				std::pow(diffDotProd, 2) -
-				differenceNorm * (setpoint.squaredNorm() - std::pow(radius, 2));
+				differenceNorm * (mutableFields->setpoint.squaredNorm() - std::pow(radius, 2));
 			double a = (-diffDotProd + std::sqrt(discriminant)) / differenceNorm;
 			// new constrained eePos = (1 - a) * (ee inside circle) + a * (ee outside circle)
-			eePos = (1 - a) * setpoint + a * eePos;
+			eePos = (1 - a) * mutableFields->setpoint + a * eePos;
 		}
 		return eePos;
 	}
