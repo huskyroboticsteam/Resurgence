@@ -28,6 +28,6 @@ extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
 extern const kinematics::PlanarArmKinematics<2> planarArmKinematics;
-extern std::optional<control::PlanarArmController<2>> planarArmController;
+extern control::PlanarArmController<2> planarArmController;
 extern std::atomic<bool> armIKEnabled;
 } // namespace Globals

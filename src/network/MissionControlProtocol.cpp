@@ -140,15 +140,9 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 
-			auto newPlanarArmController = control::PlanarArmController<2>::makeController(
-				armJointPositions, Globals::planarArmKinematics,
-				Constants::arm::SAFETY_FACTOR);
+			bool success = Globals::planarArmController.tryInitController(armJointPositions.getData());
 
-			if (newPlanarArmController) {
-				Globals::planarArmController.emplace(std::move(*newPlanarArmController));
-			}
-
-			if (Globals::planarArmController.has_value()) {
+			if (success) {
 				this->setArmIKEnabled(true);
 				_arm_ik_repeat_thread =
 					std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
@@ -164,7 +158,7 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 			_arm_ik_repeat_thread.join();
 		}
 
-		Globals::planarArmController.reset();
+		// Globals::planarArmController.reset();
 	}
 }
 
@@ -476,7 +470,7 @@ void MissionControlProtocol::updateArmIKRepeatTask() {
 			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 		if (armJointPositions.isValid()) {
 			navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
-				Globals::planarArmController->getCommand(dataclock::now(), armJointPositions);
+				Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
 			targetJointPositions /=
 				M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
 			for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
