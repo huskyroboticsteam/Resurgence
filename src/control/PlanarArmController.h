@@ -6,6 +6,7 @@
 #include "../world_interface/data.h"
 
 #include <array>
+#include <cmath>
 #include <initializer_list>
 #include <loguru.hpp>
 #include <mutex>
@@ -131,9 +132,10 @@ public:
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (mutableFields->velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
-			mutableFields->setpoint += mutableFields->velocity * dt;
+		if (velTimestamp.has_value()) {
+			double dt = util::durationToSec(currTime - velTimestamp.value());
+			// bounds check (new pos + vel vector <= sum of joint lengths)
+			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
 		}
 
 		mutableFields->velocity(0) = targetVel;
@@ -149,9 +151,10 @@ public:
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (mutableFields->velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
-			mutableFields->setpoint += mutableFields->velocity * dt;
+		if (velTimestamp.has_value()) {
+			double dt = util::durationToSec(currTime - velTimestamp.value());
+			// bounds check (new pos + vel vector <= sum of joint lengths)
+			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
 		}
 
 		mutableFields->velocity(1) = targetVel;
@@ -205,15 +208,21 @@ private:
 	 */
 	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos) {
 		double radius = kin.getSegLens().sum() * safetyFactor;
-
-		if (eePos.norm() > radius) {
-			// TODO: will need to eventually shrink velocity vector until it is within radius
-			// instead of just normalizing it.
-
-			eePos.normalize();
-			eePos *= radius;
+		if (eePos.norm() > (radius + 1e-4)) {
+			// new position is outside of bounds. Set new EE setpoint so it will follow the
+			// velocity vector instead of drifting along the radius.
+			// setpoint = setpoint inside circle
+			// eePos = new setpoint outside circle
+			// radius = ||setpoint + a*(eePos - setpoint)||  solve for a
+			double diffDotProd = (eePos - setpoint).dot(setpoint);
+			double differenceNorm = (eePos - setpoint).squaredNorm();
+			double discriminant =
+				std::pow(diffDotProd, 2) -
+				differenceNorm * (setpoint.squaredNorm() - std::pow(radius, 2));
+			double a = (-diffDotProd + std::sqrt(discriminant)) / differenceNorm;
+			// new constrained eePos = (1 - a) * (ee inside circle) + a * (ee outside circle)
+			eePos = (1 - a) * setpoint + a * eePos;
 		}
-
 		return eePos;
 	}
 };
