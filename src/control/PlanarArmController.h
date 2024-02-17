@@ -5,7 +5,6 @@
 #include "../navtypes.h"
 #include "../utils/time.h"
 #include "../world_interface/data.h"
-#include "../world_interface/world_interface.h"
 
 #include <array>
 #include <cmath>
@@ -87,13 +86,13 @@ public:
 	 * @param targetVel The target x velocity.
 	 * @return The new command, which is the new joint positions.
 	 */
-	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
+	void set_x_vel(robot::types::datatime_t currTime, double targetVel,
+				   robot::types::DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>>
+					   jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			if (targetVel == 0.0 && velocity(1) == 0.0) {
-				const navtypes::Vectord<Constants::arm::IK_MOTORS.size()>& jointPos =
-					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData();
-				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos.getData());
 				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt = util::durationToSec(currTime - velTimestamp.value());
@@ -113,13 +112,13 @@ public:
 	 * @param targetVel The target y velocity.
 	 * @return The new command, which is the new joint positions.
 	 */
-	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
+	void set_y_vel(robot::types::datatime_t currTime, double targetVel,
+				   robot::types::DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>>
+					   jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			if (velocity(0) == 0.0 && targetVel == 0.0) {
-				const navtypes::Vectord<Constants::arm::IK_MOTORS.size()>& jointPos =
-					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData();
-				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos.getData());
 				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt = util::durationToSec(currTime - velTimestamp.value());
