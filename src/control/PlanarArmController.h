@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Constants.h"
 #include "../kinematics/PlanarArmKinematics.h"
 #include "../navtypes.h"
 #include "../utils/time.h"
@@ -87,8 +86,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel,
-				   robot::types::DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>>
-					   jointPos) {
+				   robot::types::DataPoint<navtypes::Vectord<N>> jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			if (targetVel == 0.0 && velocity(1) == 0.0) {
@@ -113,8 +111,7 @@ public:
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel,
-				   robot::types::DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>>
-					   jointPos) {
+				   robot::types::DataPoint<navtypes::Vectord<N>> jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
 			if (velocity(0) == 0.0 && targetVel == 0.0) {
