@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['q_0',['Q',['https://docs.opencv.org/4.2.0/d0/d8d/structcv_1_1face_1_1FacemarkAAM_1_1Model.html#acbfbc526eaf399a81500185101d62d2f',1,'cv::face::FacemarkAAM::Model']]],
-  ['q_1',['q',['https://docs.opencv.org/4.2.0/d5/d22/classcv_1_1ppf__match__3d_1_1Pose3D.html#ac4726adaf40b19bdd79f2efd1ce70588',1,'cv::ppf_match_3d::Pose3D']]],
+  ['q_0',['q',['https://docs.opencv.org/4.2.0/d5/d22/classcv_1_1ppf__match__3d_1_1Pose3D.html#ac4726adaf40b19bdd79f2efd1ce70588',1,'cv::ppf_match_3d::Pose3D']]],
+  ['q_1',['Q',['https://docs.opencv.org/4.2.0/d0/d8d/structcv_1_1face_1_1FacemarkAAM_1_1Model.html#acbfbc526eaf399a81500185101d62d2f',1,'cv::face::FacemarkAAM::Model']]],
   ['qedges_2',['qedges',['https://docs.opencv.org/4.2.0/df/dbf/classcv_1_1Subdiv2D.html#ad3f646a7263fc902b6ed9ec15c9b3b51',1,'cv::Subdiv2D']]],
   ['qp_5flevel_5finterb_3',['QP_Level_InterB',['https://docs.opencv.org/4.2.0/d3/db6/structcv_1_1cudacodec_1_1EncoderParams.html#a00666e85433420b15caf5faade8da569',1,'cv::cudacodec::EncoderParams']]],
   ['qp_5flevel_5finterp_4',['QP_Level_InterP',['https://docs.opencv.org/4.2.0/d3/db6/structcv_1_1cudacodec_1_1EncoderParams.html#afce671644b24bf1db0d6d0bba86c2c53',1,'cv::cudacodec::EncoderParams']]],

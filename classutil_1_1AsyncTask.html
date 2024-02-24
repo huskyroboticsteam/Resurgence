@@ -101,11 +101,19 @@ Inheritance diagram for util::AsyncTask&lt; Clock &gt;:</div>
 <div class="dyncontent">
 <div class="center"><img src="classutil_1_1AsyncTask__inherit__graph.png" border="0" usemap="#autil_1_1AsyncTask_3_01Clock_01_4_inherit__map" alt="Inheritance graph"/></div>
 <map name="autil_1_1AsyncTask_3_01Clock_01_4_inherit__map" id="autil_1_1AsyncTask_3_01Clock_01_4_inherit__map">
-<area shape="rect" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="5,79,170,105"/>
-<area shape="rect" href="classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="27,153,148,193"/>
-<area shape="poly" title=" " alt="" coords="90,120,90,152,85,152,85,120"/>
-<area shape="rect" href="classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="23,5,152,31"/>
-<area shape="poly" title=" " alt="" coords="90,46,90,79,85,79,85,46"/>
+<area shape="rect" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="182,46,346,72"/>
+<area shape="rect" href="classnet_1_1mc_1_1tasks_1_1CameraStreamTask.html" title="This task is responsible for sending the camera streams to Mission Control over websocket." alt="" coords="394,5,588,46"/>
+<area shape="poly" title=" " alt="" coords="361,42,393,37,394,43,362,47"/>
+<area shape="rect" href="classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="431,71,551,111"/>
+<area shape="poly" title=" " alt="" coords="362,70,431,80,430,85,361,75"/>
+<area shape="rect" href="classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="5,46,134,72"/>
+<area shape="poly" title=" " alt="" coords="149,56,181,56,181,62,149,62"/>
+<area shape="rect" href="classnet_1_1mc_1_1tasks_1_1ArmIKTask.html" title="This task sets the arm joint positions to track the current IK command." alt="" coords="636,21,826,47"/>
+<area shape="poly" title=" " alt="" coords="566,71,673,45,675,50,567,76"/>
+<area shape="rect" href="classnet_1_1mc_1_1tasks_1_1PowerRepeatTask.html" title="This task is responsible for periodically resending setMotorPower commands to the motors." alt="" coords="638,71,824,111"/>
+<area shape="poly" title=" " alt="" coords="567,88,638,88,638,94,567,94"/>
+<area shape="rect" href="classnet_1_1mc_1_1tasks_1_1TelemReportTask.html" title="This task periodically sends robot telemetry data to Mission Control." alt="" coords="640,136,822,177"/>
+<area shape="poly" title=" " alt="" coords="567,109,654,133,653,138,566,114"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -338,6 +346,8 @@ template&lt;typename Clock  = std::chrono::steady_clock&gt; </div>
 <p>Start the task. </p>
 <p>If the task is already running, do nothing. </p>
 
+<p>Reimplemented in <a class="el" href="classnet_1_1mc_1_1tasks_1_1PowerRepeatTask.html#a87f6bd02c5d093b812c0d4790b2181f3">net::mc::tasks::PowerRepeatTask</a>.</p>
+
 </div>
 </div>
 <a id="a349580908c4774c5d99159f5be226f95" name="a349580908c4774c5d99159f5be226f95"></a>
@@ -367,6 +377,8 @@ template&lt;typename Clock  = std::chrono::steady_clock&gt; </div>
 
 <p>Stop the task and wait for it to finish. </p>
 <p>If the task is not running, do nothing. </p>
+
+<p>Reimplemented in <a class="el" href="classnet_1_1mc_1_1tasks_1_1PowerRepeatTask.html#a7cdd54fa926ecd170ec4e7c215f50592">net::mc::tasks::PowerRepeatTask</a>.</p>
 
 </div>
 </div>
@@ -404,7 +416,7 @@ template&lt;typename Clock  = std::chrono::steady_clock&gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classutil_1_1PeriodicTask.html#a3bc1c0ba21e0428d03a0485be52d765b">util::PeriodicTask&lt; Clock &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classnet_1_1mc_1_1tasks_1_1CameraStreamTask.html#ad68f6be566751c9d5b5db67cd65a590e">net::mc::tasks::CameraStreamTask</a>, and <a class="el" href="classutil_1_1PeriodicTask.html#a3bc1c0ba21e0428d03a0485be52d765b">util::PeriodicTask&lt; Clock &gt;</a>.</p>
 
 </div>
 </div>

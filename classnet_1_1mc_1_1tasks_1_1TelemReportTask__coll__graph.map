@@ -1,0 +1,10 @@
+<map id="net::mc::tasks::TelemReportTask" name="net::mc::tasks::TelemReportTask">
+<area shape="rect" id="Node000001" title="This task periodically sends robot telemetry data to Mission Control." alt="" coords="5,241,216,267"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="50,153,171,193"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,209,113,241,108,241,108,209"/>
+<area shape="rect" id="Node000003" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="88,79,253,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="154,119,127,154,123,151,150,116"/>
+<area shape="rect" id="Node000004" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="46,5,175,31"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="95,45,78,80,77,99,81,117,98,151,93,153,76,119,72,99,73,78,90,43"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="132,41,162,77,158,80,128,44"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="net::mc::tasks::CameraStreamTask" name="net::mc::tasks::CameraStreamTask">
+<area shape="rect" id="Node000001" title="This task is responsible for sending the camera streams to Mission Control over websocket." alt="" coords="5,153,229,178"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="35,79,199,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,120,120,152,114,152,114,120"/>
+<area shape="rect" id="Node000003" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="53,5,181,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,46,120,79,114,79,114,46"/>
+</map>

@@ -1,8 +1,14 @@
 <map id="util::PeriodicTask&lt; Clock &gt;" name="util::PeriodicTask&lt; Clock &gt;">
-<area shape="rect" id="Node000001" title="Implements a task that executes a function periodically." alt="" coords="9,153,130,193"/>
-<area shape="rect" id="Node000002" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="47,79,212,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,119,86,154,82,151,109,116"/>
-<area shape="rect" id="Node000003" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="5,5,134,31"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="54,45,37,80,36,99,40,117,57,151,52,153,35,119,31,99,32,78,49,43"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,41,121,77,117,80,87,44"/>
+<area shape="rect" id="Node000001" title="Implements a task that executes a function periodically." alt="" coords="394,55,514,96"/>
+<area shape="rect" id="Node000004" href="$classnet_1_1mc_1_1tasks_1_1ArmIKTask.html" title="This task sets the arm joint positions to track the current IK command." alt="" coords="562,5,752,31"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="528,51,562,41,605,29,606,34,563,46,530,56"/>
+<area shape="rect" id="Node000005" href="$classnet_1_1mc_1_1tasks_1_1PowerRepeatTask.html" title="This task is responsible for periodically resending setMotorPower commands to the motors." alt="" coords="564,55,750,96"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="530,73,564,73,564,78,530,78"/>
+<area shape="rect" id="Node000006" href="$classnet_1_1mc_1_1tasks_1_1TelemReportTask.html" title="This task periodically sends robot telemetry data to Mission Control." alt="" coords="566,121,748,161"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="530,97,592,117,591,122,528,102"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="182,88,346,114"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="361,85,393,81,394,86,362,90"/>
+<area shape="rect" id="Node000003" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="5,63,134,88"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="149,73,393,73,393,78,149,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="150,83,182,87,181,93,149,89"/>
 </map>
