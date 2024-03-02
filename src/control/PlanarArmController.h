@@ -57,11 +57,15 @@ public:
 	 *
 	 * @param currJointPos The current joint positions of the arm.
 	 * @return true if the joint positions are within the robot's maximum arm extension radius,
-	           or an empty std::optional otherwise.
+			   or an empty std::optional otherwise.
 	 */
 	bool tryInitController(const navtypes::Vectord<N>& currJointPos) {
+		std::lock_guard<std::mutex> lock(mutex);
+
 		if (is_setpoint_valid(currJointPos, kin, safetyFactor)) {
-			set_setpoint(currJointPos);
+			mutableFields.emplace();
+			Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(currJointPos);
+			mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
 			return true;
 		}
 
