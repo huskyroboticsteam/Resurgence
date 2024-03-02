@@ -30,11 +30,10 @@ public:
 	/**
 	 * @brief Construct a new controller object.
 	 *
-	 * @param currJointPos The current joint positions of the arm.
 	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
-	 * arm joints).
+	 *                arm joints).
 	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
-	 * prevent singularity lock.
+	 *                      prevent singularity lock. Must be in range (0, 1).
 	 */
 	PlanarArmController(kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
 		: kin(kin_obj), safetyFactor(safetyFactor) {
@@ -53,15 +52,12 @@ public:
 	}
 
 	/**
-	 * @brief Instantiates and returns an std::optional containing a PlanarArmController.
+	 * @brief Instantiates the PlanarArmController with the current joint positions,
+	 * 		  returning true iff the joint positions are valid.
 	 *
 	 * @param currJointPos The current joint positions of the arm.
-	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
-	 * arm joints).
-	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
-	 * prevent singularity lock.
-	 * @return an std::optional containing a PlanarArmController if the joint positions are
-	 * within the robot's maximum arm extension radius, or an empty std::optional otherwise.
+	 * @return true if the joint positions are within the robot's maximum arm extension radius,
+	           or an empty std::optional otherwise.
 	 */
 	bool tryInitController(const navtypes::Vectord<N>& currJointPos) {
 		if (is_setpoint_valid(currJointPos, kin, safetyFactor)) {
