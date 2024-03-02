@@ -81,7 +81,7 @@ public:
 	 */
 	static bool is_setpoint_valid(const navtypes::Vectord<N>& targetJointPos,
 								  kinematics::PlanarArmKinematics<N> kin_obj,
-								  const double safetyFactor) {
+								  double safetyFactor) {
 		// Compute the new EE position to determine if it is within
 		// safety factor * length of fully extended arm.
 		double eeRadius = kin_obj.jointPosToEEPos(targetJointPos).norm();
