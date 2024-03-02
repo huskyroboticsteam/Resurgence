@@ -232,11 +232,8 @@ target_link_libraries(simulator_interface world_interface_core)
 target_link_libraries(stub_world_interface world_interface_core)
 
 add_library(filters SHARED
-  filters/PoseEstimator.cpp
-  filters/PoseEstimatorLinear.cpp
   filters/StateSpaceUtil.cpp
-  filters/FullPoseEstimator.cpp
-  )
+)
 target_link_libraries(filters utils)
 
 add_library(video STATIC
@@ -324,7 +321,6 @@ if(WITH_TESTS)
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp
     ../tests/filters/StateSpaceUtilsTest.cpp
-    ../tests/filters/FullPoseEstimatorTest.cpp
     # Command tests
     ../tests/commands/DriveToWaypointCommandTest.cpp
     # Util tests
@@ -365,4 +361,3 @@ add_subdirectory(ar)
 add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)
-add_subdirectory(filters)
