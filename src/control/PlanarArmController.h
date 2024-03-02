@@ -85,12 +85,18 @@ public:
 	 * @param targetVel The target x velocity.
 	 * @return The new command, which is the new joint positions.
 	 */
-	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
+	void set_x_vel(robot::types::datatime_t currTime, double targetVel,
+				   robot::types::DataPoint<navtypes::Vectord<N>> jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
-			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			if (targetVel == 0.0 && velocity(1) == 0.0) {
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos.getData());
+				setpoint = normalizeEEWithinRadius(newSetPoint);
+			} else {
+				double dt = util::durationToSec(currTime - velTimestamp.value());
+				// bounds check (new pos + vel vector <= sum of joint lengths)
+				setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			}
 		}
 
 		velocity(0) = targetVel;
@@ -104,12 +110,18 @@ public:
 	 * @param targetVel The target y velocity.
 	 * @return The new command, which is the new joint positions.
 	 */
-	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
+	void set_y_vel(robot::types::datatime_t currTime, double targetVel,
+				   robot::types::DataPoint<navtypes::Vectord<N>> jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - velTimestamp.value());
-			// bounds check (new pos + vel vector <= sum of joint lengths)
-			setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			if (velocity(0) == 0.0 && targetVel == 0.0) {
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos.getData());
+				setpoint = normalizeEEWithinRadius(newSetPoint);
+			} else {
+				double dt = util::durationToSec(currTime - velTimestamp.value());
+				// bounds check (new pos + vel vector <= sum of joint lengths)
+				setpoint = normalizeEEWithinRadius(setpoint + velocity * dt);
+			}
 		}
 
 		velocity(1) = targetVel;
