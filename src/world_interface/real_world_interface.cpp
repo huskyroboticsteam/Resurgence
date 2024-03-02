@@ -12,6 +12,7 @@
 #include "real_world_constants.h"
 #include "world_interface.h"
 
+#include <JetsonGPIO.h>
 #include <future>
 #include <iostream>
 #include <loguru.hpp>
@@ -131,6 +132,10 @@ void setupCameras() {
 	openCamera(Constants::MAST_CAMERA_ID, Constants::MAST_CAMERA_CONFIG_PATH);
 	openCamera(Constants::HAND_CAMERA_ID, Constants::HAND_CAMERA_CONFIG_PATH);
 }
+
+void world_interface_cleanup() {
+	GPIO::cleanup();
+}
 } // namespace
 
 void world_interface_init(bool initOnlyMotors) {
@@ -140,6 +145,9 @@ void world_interface_init(bool initOnlyMotors) {
 	}
 	can::initCAN();
 	initMotors();
+	GPIO::setmode(GPIO::BOARD);
+
+	std::atexit(world_interface_cleanup);
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
@@ -287,6 +295,22 @@ callbackid_t addLimitSwitchCallback(
 
 void removeLimitSwitchCallback(callbackid_t id) {
 	return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
+}
+
+void initGPIOPin(int pin, bool output) {
+	if (output) {
+		GPIO::setup(pin, GPIO::Directions::OUT, GPIO::LOW);
+	} else {
+		GPIO::setup(pin, GPIO::Directions::IN);
+	}
+}
+
+void writeGPIOPin(int pin, bool high) {
+	GPIO::output(pin, high ? GPIO::HIGH : GPIO::LOW);
+}
+
+bool readGPIOPin(int pin) {
+	return GPIO::input(pin) == GPIO::HIGH;
 }
 
 } // namespace robot

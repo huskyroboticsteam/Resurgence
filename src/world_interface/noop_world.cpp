@@ -77,6 +77,14 @@ callbackid_t addLimitSwitchCallback(
 
 void removeLimitSwitchCallback(callbackid_t id) {}
 
+void initGPIOPin(int, bool) {}
+
+void writeGPIOPin(int pin, bool high) {}
+
+bool readGPIOPin(int) {
+	return false;
+}
+
 } // namespace robot
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {

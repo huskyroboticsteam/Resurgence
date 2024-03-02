@@ -98,6 +98,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(HindsightCAN)
 
+FetchContent_Declare(
+  JetsonGPIO 
+  GIT_REPOSITORY https://github.com/pjueon/JetsonGPIO.git 
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(JetsonGPIO)
+
 FetchContent_Declare(LoguruGitRepo
 	GIT_REPOSITORY "https://github.com/emilk/loguru"
 	GIT_TAG        "master"
@@ -227,7 +234,12 @@ add_library(simulator_interface STATIC
   world_interface/motor/sim_motor.cpp
   )
 
-target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
+target_link_libraries(real_world_interface
+  gps_interface
+  can_interface
+  world_interface_core
+  JetsonGPIO::JetsonGPIO
+)
 target_link_libraries(simulator_interface world_interface_core)
 target_link_libraries(stub_world_interface world_interface_core)
 
@@ -299,6 +311,13 @@ target_link_libraries(TunePID
   real_world_interface
 )
 target_link_libraries(TunePID ${vision_libs})
+
+add_executable(GPIOTest GPIOTest.cpp)
+target_link_libraries(GPIOTest
+  ${rover_libs}
+  can_interface
+  real_world_interface
+)
 
 if(WITH_TESTS)
   add_executable(tests

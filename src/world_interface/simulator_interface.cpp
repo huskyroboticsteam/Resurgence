@@ -423,6 +423,16 @@ void setIndicator(indication_t signal) {
 	}
 }
 
+void initGPIOPin(int, bool) {}
+
+void writeGPIOPin(int pin, bool high) {
+	LOG_F(INFO, "Pin %d set to %s", pin, high ? "HIGH" : "LOW");
+}
+
+bool readGPIOPin(int) {
+	return false;
+}
+
 } // namespace robot
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {
