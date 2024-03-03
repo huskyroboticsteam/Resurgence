@@ -313,10 +313,12 @@ if(WITH_TESTS)
     ../tests/control/JacobianControllerTest.cpp
     ../tests/control/PIDControllerTest.cpp
     ../tests/control/PlanarArmControllerTest.cpp
-    # Autonomy tests
+    # Kinematics tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/kinematics/SwerveDriveKinematicsTest.cpp
-    ../tests/kinematics/PlanarArmKinematicsTest.cpp
+    ../tests/kinematics/PlanarArmFKTest.cpp
+    ../tests/kinematics/FabrikSolver2DTest.cpp
+    # Filter tests
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp

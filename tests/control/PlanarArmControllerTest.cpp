@@ -1,6 +1,8 @@
 #include "../../src/control/PlanarArmController.h"
 
 #include "../../src/Constants.h"
+#include "../../src/kinematics/FabrikSolver.h"
+#include "../../src/kinematics/PlanarArmFK.h"
 
 #include <iostream>
 
@@ -30,7 +32,11 @@ TEST_CASE("Test Planar Arm Controller Double Init", "[control][planararmcontroll
 	navtypes::Vectord<2> segLens({6.0, 4.0});
 	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
 	navtypes::Vectord<2> maxAngles({M_PI, M_PI});
-	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
+	auto fk =
+		std::make_shared<kinematics::PlanarArmFK<2>>(segLens, minAngles, maxAngles);
+	auto ik =
+		std::make_shared<kinematics::FabrikSolver2D<2>>(segLens, minAngles, maxAngles, 0.0, 0);
+	kinematics::ArmKinematics<2, 2> kin_obj(fk, ik);
 	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
 	REQUIRE(foo.tryInitController({0, M_PI_2}));
 	REQUIRE(foo.tryInitController({0, M_PI_2}));
@@ -47,7 +53,11 @@ TEST_CASE("Test Planar Arm Safety Factor Violation", "[control][planararmcontrol
 	navtypes::Vectord<2> segLens({6.0, 4.0});
 	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
 	navtypes::Vectord<2> maxAngles({M_PI, M_PI});
-	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
+	auto fk =
+		std::make_shared<kinematics::PlanarArmFK<2>>(segLens, minAngles, maxAngles);
+	auto ik =
+		std::make_shared<kinematics::FabrikSolver2D<2>>(segLens, minAngles, maxAngles, 0.0, 0);
+	kinematics::ArmKinematics<2, 2> kin_obj(fk, ik);
 	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
 	REQUIRE_FALSE(foo.tryInitController({0, 0}));
 }
@@ -57,7 +67,11 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	navtypes::Vectord<2> segLens({6.0, 4.0});
 	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
 	navtypes::Vectord<2> maxAngles({M_PI, M_PI});
-	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
+	auto fk =
+		std::make_shared<kinematics::PlanarArmFK<2>>(segLens, minAngles, maxAngles);
+	auto ik =
+		std::make_shared<kinematics::FabrikSolver2D<2>>(segLens, minAngles, maxAngles, 0.0, 0);
+	kinematics::ArmKinematics<2, 2> kin_obj(fk, ik);
 
 	// Instantiate PlanarArmController.
 	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
