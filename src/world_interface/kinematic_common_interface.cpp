@@ -133,8 +133,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 		if (armJointPositions.isValid()) {
-			Eigen::Vector2d eePos =
-				Globals::planarArmKinematics.jointPosToEEPos(armJointPositions.getData());
+			Eigen::Vector2d eePos = Globals::planarArmController.kinematics().jointPosToEEPos(
+				armJointPositions.getData());
 			Eigen::Vector2i eePosInt = (1000 * eePos).array().round().cast<int>();
 			return DataPoint<int32_t>(armJointPositions.getTime(),
 									  joint == jointid_t::ikForward ? eePosInt.x()

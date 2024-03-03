@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../navtypes.h"
+#include "InverseArmKinematics.h"
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -17,7 +18,8 @@ namespace kinematics {
  *
  * @see http://www.andreasaristidou.com/FABRIK.html
  */
-template <int N> class FabrikSolver2D {
+template <int N>
+class FabrikSolver2D : public InverseArmKinematics<2, N> {
 public:
 	/**
 	 * @brief Construct an IK solver object.
@@ -34,18 +36,8 @@ public:
 		: segLens(segLens), jointMin(jointMin), jointMax(jointMax), thresh(thresh),
 		  maxIter(maxIter) {}
 
-	/**
-	 * @brief Solve for the joint angles that yield the given EE position.
-	 *
-	 * @param eePos The desired end effector position.
-	 * @param jointAngles The current joint angles. Used as a starting guess for the IK solver.
-	 * @param[out] success Output parameter that signals if the IK solver succeeded. Failure
-	 * may occur if the target is unreachable or the IK solver exceeds the iteration limit.
-	 * @return navtypes::Arrayd<N> The target joint angles that achieve the desired EE
-	 * position.
-	 */
-	navtypes::Arrayd<N> solve(const Eigen::Vector2d& eePos,
-							  const navtypes::Arrayd<N>& jointAngles, bool& success) const {
+	navtypes::Vectord<N> eePosToJointPos(const Eigen::Vector2d& eePos,
+							  const navtypes::Vectord<N>& jointAngles, bool& success) const override {
 		double armLen = segLens.sum();
 		if (eePos.norm() >= armLen) {
 			success = false;
@@ -80,7 +72,7 @@ public:
 			}
 		}
 
-		navtypes::Arrayd<N> targetJointAngles = jointPosToJointAngles(jointPos);
+		navtypes::Vectord<N> targetJointAngles = jointPosToJointAngles(jointPos);
 		for (int i = 0; i < N; i++) {
 			if (targetJointAngles[i] > jointMax[i] || targetJointAngles[i] < jointMin[i]) {
 				success = false;
@@ -98,7 +90,7 @@ private:
 	int maxIter;
 
 	navtypes::Arrayd<N + 1, 2>
-	jointAnglesToJointPos(const navtypes::Arrayd<N>& jointAngles) const {
+	jointAnglesToJointPos(const navtypes::Vectord<N>& jointAngles) const {
 		std::array<double, N> jointAngleCumSum;
 		jointAngleCumSum[0] = jointAngles[0];
 		for (int i = 1; i < N; i++) {
@@ -115,12 +107,12 @@ private:
 		return jointPos;
 	}
 
-	navtypes::Arrayd<N>
+	navtypes::Vectord<N>
 	jointPosToJointAngles(const navtypes::Arrayd<N + 1, 2>& jointPos) const {
 		navtypes::Arrayd<N + 1, 3> jointPos3d;
 		jointPos3d << jointPos, navtypes::Arrayd<N + 1>::Zero();
 
-		navtypes::Arrayd<N> jointAngles;
+		navtypes::Vectord<N> jointAngles;
 		jointAngles[0] = std::atan2(jointPos(1, 1), jointPos(1, 0));
 		for (int i = 1; i < N; i++) {
 			Eigen::RowVector3d prevSeg =

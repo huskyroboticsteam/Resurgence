@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../kinematics/PlanarArmKinematics.h"
+#include "../kinematics/ArmKinematics.h"
 #include "../navtypes.h"
 #include "../utils/time.h"
 #include "../world_interface/data.h"
@@ -31,18 +31,23 @@ public:
 	 * @brief Construct a new controller object.
 	 *
 	 * @param currJointPos The current joint positions of the arm.
-	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
+	 * @param kin_obj ArmKinematics object for the arm (should have the same number of
 	 * arm joints).
 	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
 	 * prevent singularity lock.
 	 */
 	PlanarArmController(const navtypes::Vectord<N>& currJointPos,
-						kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
+						const kinematics::ArmKinematics<2, N>& kin_obj,
+						const double safetyFactor)
 		: kin(kin_obj), velocity({0.0, 0.0}), safetyFactor(safetyFactor) {
 		// NOTE: currJointPos could extend beyond the safetyFactor, so safety factor
 		//       normalization logic is performed.
 		set_setpoint(currJointPos);
 		CHECK_F(safetyFactor > 0.0 && safetyFactor < 1.0);
+	}
+
+	const kinematics::ArmKinematics<2, N>& kinematics() const {
+		return kin;
 	}
 
 	/**
@@ -145,7 +150,7 @@ public:
 
 private:
 	std::mutex mutex;
-	const kinematics::PlanarArmKinematics<N> kin;
+	const kinematics::ArmKinematics<2, N> kin;
 	Eigen::Vector2d setpoint;
 	Eigen::Vector2d velocity;
 	std::optional<robot::types::datatime_t> velTimestamp;

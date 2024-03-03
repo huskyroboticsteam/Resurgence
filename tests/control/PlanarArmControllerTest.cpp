@@ -1,6 +1,8 @@
 #include "../../src/control/PlanarArmController.h"
 
 #include "../../src/Constants.h"
+#include "../../src/kinematics/FabrikSolver.h"
+#include "../../src/kinematics/PlanarArmFK.h"
 
 #include <iostream>
 
@@ -26,18 +28,16 @@ void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double d
 	REQUIRE(diff.norm() <= dist);
 }
 
-TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
-	navtypes::Vectord<2> vec({0, 0});
-	kinematics::PlanarArmKinematics<2> kin_obj(vec, vec, vec, 0.0, 0);
-	PlanarArmController<2> foo({0, 0}, kin_obj, Constants::arm::SAFETY_FACTOR);
-}
-
 TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	// Set lengths and relative orientation bounds of robot joint segments.
 	navtypes::Vectord<2> segLens({6.0, 4.0});
 	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
 	navtypes::Vectord<2> maxAngles({M_PI, M_PI});
-	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
+	auto fk =
+		std::make_shared<kinematics::PlanarArmFK<2>>(segLens, minAngles, maxAngles);
+	auto ik =
+		std::make_shared<kinematics::FabrikSolver2D<2>>(segLens, minAngles, maxAngles, 0.0, 0);
+	kinematics::ArmKinematics<2, 2> kin_obj(fk, ik);
 
 	// Instantiate PlanarArmController.
 	PlanarArmController<2> foo({0, M_PI_2}, kin_obj, Constants::arm::SAFETY_FACTOR);
