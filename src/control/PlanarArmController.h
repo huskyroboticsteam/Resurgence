@@ -53,7 +53,7 @@ public:
 
 	/**
 	 * @brief Instantiates the PlanarArmController with the current joint positions,
-	 * 		  returning true iff the joint positions are valid. Otherwise, controller is
+	 * 		  returning true iff the joint positions are valid. Otherwise, controller gets
 	 * 		  uninitialized.
 	 *
 	 * @param currJointPos The current joint positions of the arm.
@@ -68,7 +68,7 @@ public:
 			mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
 			return true;
 		}
-		
+
 		mutableFields.reset();
 		return false;
 	}
