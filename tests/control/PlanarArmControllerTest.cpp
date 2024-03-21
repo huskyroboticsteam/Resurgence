@@ -33,6 +33,16 @@ TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
 	REQUIRE(foo.tryInitController({0, 0}));
 }
 
+TEST_CASE("Test Planar Arm Controller Double Init", "[control][planararmcontroller]") {
+	navtypes::Vectord<2> segLens({6.0, 4.0});
+	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
+	navtypes::Vectord<2> maxAngles({M_PI, M_PI});
+	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
+	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
+	REQUIRE(foo.tryInitController({0, M_PI_2}));
+	REQUIRE(foo.tryInitController({0, M_PI_2}));
+}
+
 TEST_CASE("Test Planar Arm Safety Factor Violation", "[control][planararmcontroller]") {
 	navtypes::Vectord<2> segLens({6.0, 4.0});
 	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
