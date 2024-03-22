@@ -58,8 +58,8 @@ public:
 	/**
 	 * @brief Instantiates the PlanarArmController with the current joint positions,
 	 * 		  returning true if the joint positions are valid. If PlanarArmController is already
-	 *        initialized, this is a no-op and returns false. Otherwise, controller gets
-	 * 		  uninitialized.
+	 *        initialized, this is a no-op and function returns false. Otherwise, controller gets
+	 * 		  uninitialized and function returns false.
 	 *
 	 * @param currJointPos The current joint positions of the arm.
 	 * @return true iff the joint positions are within the robot's maximum arm extension radius and the
