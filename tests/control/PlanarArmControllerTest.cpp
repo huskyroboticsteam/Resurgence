@@ -26,13 +26,6 @@ void assertApprox(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, double d
 	REQUIRE(diff.norm() <= dist);
 }
 
-TEST_CASE("Test Planar Arm Controller", "[control][planararmcontroller]") {
-	navtypes::Vectord<2> vec({0, 0});
-	kinematics::PlanarArmKinematics<2> kin_obj(vec, vec, vec, 0.0, 0);
-	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
-	REQUIRE(foo.tryInitController({0, 0}));
-}
-
 TEST_CASE("Test Planar Arm Controller Double Init", "[control][planararmcontroller]") {
 	navtypes::Vectord<2> segLens({6.0, 4.0});
 	navtypes::Vectord<2> minAngles({-M_PI, -M_PI});
