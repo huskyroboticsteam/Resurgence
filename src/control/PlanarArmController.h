@@ -38,6 +38,10 @@ public:
 	PlanarArmController(kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
 		: kin(kin_obj), safetyFactor(safetyFactor) {
 		CHECK_F(safetyFactor > 0.0 && safetyFactor < 1.0);
+
+		for (unsigned int i = 0; i < kin_obj.getNumSegments(); i++) {
+			CHECK_F(kin_obj.getSegLens()[i] > 0.0);
+		}
 	}
 
 	/**
