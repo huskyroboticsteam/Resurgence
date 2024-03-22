@@ -33,7 +33,13 @@ TEST_CASE("Test Planar Arm Controller Double Init", "[control][planararmcontroll
 	kinematics::PlanarArmKinematics<2> kin_obj(segLens, minAngles, maxAngles, 0.0, 0);
 	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
 	REQUIRE(foo.tryInitController({0, M_PI_2}));
-	REQUIRE(foo.tryInitController({0, M_PI_2}));
+	REQUIRE_FALSE(foo.tryInitController({0, M_PI_2}));
+
+	// Try setting the joints to be orthogonal but within max length, such that:
+	// - End effector position is (6,4), which implies that:
+	// - Max length = sqrt(6^2 + 4^2) = sqrt(36 + 16) < 7.22 < 9.5 (max length)
+	foo.set_setpoint({0.0, M_PI_2});
+	assertApprox({6.0, 4.0}, foo.get_setpoint(robot::types::dataclock::now()));
 }
 
 TEST_CASE("Test Planar Arm Safety Factor Violation", "[control][planararmcontroller]") {

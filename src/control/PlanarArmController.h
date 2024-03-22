@@ -57,14 +57,17 @@ public:
 
 	/**
 	 * @brief Instantiates the PlanarArmController with the current joint positions,
-	 * 		  returning true iff the joint positions are valid. Otherwise, controller gets
+	 * 		  returning true if the joint positions are valid. If PlanarArmController is already
+	 *        initialized, this is a no-op and returns false. Otherwise, controller gets
 	 * 		  uninitialized.
 	 *
 	 * @param currJointPos The current joint positions of the arm.
-	 * @return true iff the joint positions are within the robot's maximum arm extension radius.
+	 * @return true iff the joint positions are within the robot's maximum arm extension radius and the
+	 * 		   controller was successfully initialized in the function call.
 	 */
 	bool tryInitController(const navtypes::Vectord<N>& currJointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
+		if (mutableFields.has_value()) return false;
 
 		if (is_setpoint_valid(currJointPos, kin, safetyFactor)) {
 			mutableFields.emplace();
