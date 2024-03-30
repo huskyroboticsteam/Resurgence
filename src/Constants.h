@@ -133,6 +133,16 @@ constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t
 					{robot::types::jointid_t::activeSuspension,
 					 robot::types::motorid_t::activeSuspension}};
 
+constexpr frozen::unordered_map<robot::types::motorid_t, robot::types::jointid_t, 7>
+	MOTOR_JOINT_MAP{{robot::types::motorid_t::armBase, robot::types::jointid_t::armBase},
+					{robot::types::motorid_t::shoulder, robot::types::jointid_t::shoulder},
+					{robot::types::motorid_t::elbow, robot::types::jointid_t::elbow},
+					{robot::types::motorid_t::forearm, robot::types::jointid_t::forearm},
+					{robot::types::motorid_t::wrist, robot::types::jointid_t::wrist},
+					{robot::types::motorid_t::hand, robot::types::jointid_t::hand},
+					{robot::types::motorid_t::activeSuspension,
+					 robot::types::jointid_t::activeSuspension}};
+
 // Arm inverse kinematics
 namespace arm {
 /**

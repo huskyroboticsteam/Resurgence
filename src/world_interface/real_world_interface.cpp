@@ -268,6 +268,12 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	motor_ptr->setMotorVel(targetVel);
 }
 
+types::DataPoint<LimitSwitchData> getMotorLimits(robot::types::motorid_t motor) {
+	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
+	robot::types::DataPoint<can::telemetry_t> limits = motor_ptr->getMotorLimits();
+	limits.getData();
+}
+
 // TODO: implement
 void setIndicator(indication_t signal) {}
 
@@ -290,3 +296,4 @@ void removeLimitSwitchCallback(callbackid_t id) {
 }
 
 } // namespace robot
+

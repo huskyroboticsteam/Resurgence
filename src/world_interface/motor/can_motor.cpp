@@ -36,6 +36,11 @@ void can_motor::setMotorVel(int32_t targetVel) {
 	base_motor::setMotorVel(targetVel);
 }
 
+types::DataPoint<int32_t> can_motor::getMotorLimits() const {
+	return can::motor::getMotorLimits(serial_id);
+
+}
+
 can::deviceserial_t can_motor::getMotorSerial() {
 	return serial_id;
 }

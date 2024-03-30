@@ -62,6 +62,13 @@ public:
 	virtual void setMotorVel(int32_t targetVel);
 
 	/**
+	 * help
+	 * 
+	 * @return types::DataPoint<int32_t> The limits (if triggered).
+	 */
+	virtual types::DataPoint<int32_t> getMotorLimits() const = 0;
+
+	/**
 	 * @brief Delete the copy constructor.
 	 *
 	 * @param base_motor The motor to copy

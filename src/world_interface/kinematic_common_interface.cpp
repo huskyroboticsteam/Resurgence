@@ -150,6 +150,15 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 	}
 }
 
+// TODO: Help. Motor to Joint map not 100% accurate
+types::DataPoint<int32_t> getJointLimits(robot::types::motorid_t motor) {
+	if (Constants::MOTOR_JOINT_MAP.find(motor) != Constants::MOTOR_JOINT_MAP.end()) {
+		return getMotorLimits(motor);
+	} else {
+		LOG_F(WARNING, "getMotorLimits called with unsupported motor %s", util::to_string(motor).c_str());
+	}
+}
+
 namespace {
 void setJointPowerValue(types::jointid_t joint, double power) {
 	// make sure power value is normalized

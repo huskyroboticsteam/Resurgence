@@ -32,6 +32,8 @@ public:
 
 	void setMotorVel(int32_t targetVel) override;
 
+	types::DataPoint<int32_t> getMotorLimits() const override;
+
 	/**
 	 * @brief Returns the motor's serial id.
 	 */

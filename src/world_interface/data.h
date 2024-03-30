@@ -88,6 +88,24 @@ enum class jointid_t {
 	ikUp
 };
 
+constexpr auto all_motorid_t = frozen::make_unordered_set<motorid_t>(
+	{motorid_t::frontLeftWheel, motorid_t::frontRightWheel, motorid_t::rearLeftWheel,
+	 motorid_t::rearRightWheel, motorid_t::armBase, motorid_t::shoulder, motorid_t::elbow,
+	 motorid_t::forearm, motorid_t::wrist, motorid_t::hand, motorid_t::activeSuspension});
+
+constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, motorid_t>(
+	{{"frontLeftWheel", motorid_t::frontLeftWheel},
+	 {"frontRightWheel", motorid_t::frontRightWheel},
+	 {"rearLeftWheel", motorid_t::rearLeftWheel},
+	 {"rearRightWheel", motorid_t::rearRightWheel},
+	 {"armBase", motorid_t::armBase},
+	 {"shoulder", motorid_t::shoulder},
+	 {"elbow", motorid_t::elbow},
+	 {"forearm", motorid_t::forearm},
+	 {"wrist", motorid_t::wrist},
+	 {"hand", motorid_t::hand},
+	 {"activeSuspension", motorid_t::activeSuspension}});
+
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wrist, jointid_t::hand, jointid_t::activeSuspension, jointid_t::ikForward,

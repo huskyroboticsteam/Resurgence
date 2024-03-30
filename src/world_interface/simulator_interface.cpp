@@ -54,6 +54,9 @@ std::mutex truePoseMutex;
 std::map<std::string, DataPoint<int32_t>> motorPosMap;
 std::shared_mutex motorPosMapMutex;
 
+std::map<std::string, DataPoint<int32_t>> motorLimitsMap;
+std::shared_mutex motorLimitsMapMutex;
+
 // A mapping of (motor_id, shared pointer to object of the motor)
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
@@ -173,19 +176,17 @@ void handleMotorStatus(json msg) {
 
 void handleLimitSwitch(json msg) {
 	std::string motorName = msg["motor"];
-	uint8_t data;
-	std::string limit = msg["limit"];
-	if (limit == "maximum") {
-		data = 1 << LIMIT_SWITCH_LIM_MAX_IDX;
-	} else if (limit == "minimum") {
-		data = 1 << LIMIT_SWITCH_LIM_MIN_IDX;
+	auto limJson = msg["limit"];
+	DataPoint<int32_t> limData;
+	if(!limJson.is_null()) {
+		int32_t limit = ((std::string)limJson) == "minimum" ?
+			1 << LIMIT_SWITCH_LIM_MIN_IDX :
+			1 << LIMIT_SWITCH_LIM_MAX_IDX;
+		limData = {limit};
 	}
-	DataPoint<LimitSwitchData> lsData(data);
 
-	std::lock_guard lock(limitSwitchCallbackMapMutex);
-	for (const auto& entry : limitSwitchCallbackMap.at(motorName)) {
-		entry.second(lsData);
-	}
+	std::unique_lock lock(motorLimitsMapMutex);
+	motorLimitsMap.insert_or_assign(motorName, limData);
 }
 
 void handleTruePose(json msg) {
@@ -221,7 +222,7 @@ void initSimServer() {
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
-	protocol->addMessageHandler("simLimitSwitchAlert", handleLimitSwitch);
+	protocol->addMessageHandler("simLimitSwitchReport", handleLimitSwitch);
 	protocol->addMessageHandler("simRoverTruePoseReport", handleTruePose);
 	protocol->addConnectionHandler(clientConnected);
 	protocol->addDisconnectionHandler(clientDisconnected);
@@ -385,6 +386,22 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
+}
+
+DataPoint<int32_t> getMotorLimits(motorid_t motor) {
+	auto itr = motorNameMap.find(motor);
+	if(itr != motorNameMap.end()) {
+		std::string motorName = itr->second;
+		std::shared_lock lock(motorLimitsMapMutex);
+		auto entry = motorLimitsMap.find(motorName);
+		if(entry != motorLimitsMap.end()) {
+			return entry->second;
+		} else {
+			return {};
+		}
+	} else {
+		return {};
+	}
 }
 
 callbackid_t addLimitSwitchCallback(

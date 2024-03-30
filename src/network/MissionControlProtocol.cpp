@@ -494,6 +494,13 @@ void MissionControlProtocol::telemReportTask() {
 			}
 		}
 
+		for(const auto& cur : robot::types::name_to_motorid) {
+			robot::types::DataPoint<int32_t> limits = robot::getMotorLimits(cur.second);
+			if (limits.isValid()) {
+
+			}
+		}
+
 		sendRoverPos();
 
 		pt += TELEM_REPORT_PERIOD;

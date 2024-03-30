@@ -250,6 +250,14 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
  */
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
 
+/**
+ * RAHHHHHHHH
+ * 
+ * @param motor The motor to get limits from.
+ * @return types::DataPoint<int32_t> limits
+ */
+types::DataPoint<int32_t> getMotorLimits(robot::types::motorid_t motor);
+
 using callbackid_t = unsigned long long;
 
 callbackid_t addLimitSwitchCallback(

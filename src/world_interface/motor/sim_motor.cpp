@@ -28,8 +28,12 @@ void sim_motor::setMotorPos(int32_t targetPos) {
 }
 
 types::DataPoint<int32_t> sim_motor::getMotorPos() const {
-	// this calles the method implementation in world interface
+	// this calls the method implementation in world interface
 	return robot::getMotorPos(motor_id);
+}
+
+types::DataPoint<int32_t> sim_motor::getMotorLimits() const {
+	return robot::getMotorLimits(motor_id);
 }
 
 void sim_motor::sendJSON(const json& obj) {

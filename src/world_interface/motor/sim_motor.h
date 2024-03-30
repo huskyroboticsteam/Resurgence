@@ -29,6 +29,8 @@ public:
 
 	types::DataPoint<int32_t> getMotorPos() const override;
 
+	types::DataPoint<int32_t> getMotorLimits() const override;
+
 private:
 	std::string motor_name;
 	std::string protocol_path;
