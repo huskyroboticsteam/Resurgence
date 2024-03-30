@@ -2,60 +2,30 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../base64/base64_img.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
+#include "MissionControlMessages.h"
 
 #include <chrono>
 #include <functional>
 #include <loguru.hpp>
-#include <mutex>
-#include <shared_mutex>
-#include <thread>
-#include <unordered_map>
 #include <unordered_set>
 
 using namespace robot::types;
 using namespace std::chrono_literals;
 
-namespace net {
-namespace mc {
-
-using val_t = json::value_t;
-using robot::types::mountedperipheral_t;
+using val_t = nlohmann::json::value_t;
+using net::websocket::connhandler_t;
+using net::websocket::msghandler_t;
+using net::websocket::validator_t;
 using std::placeholders::_1;
-using websocket::connhandler_t;
-using websocket::msghandler_t;
-using websocket::validator_t;
 
-const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
+namespace net::mc {
+namespace {
 const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
-
-// TODO: possibly use frozen::string for this so we don't have to use raw char ptrs
-// request keys
-constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
-constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
-constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
-constexpr const char* ARM_IK_ENABLED_TYPE = "requestArmIKEnabled";
-constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
-constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
-constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
-constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
-constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
-constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
-
-// report keys
-constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
-constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
-constexpr const char* LIDAR_REP_TYPE = "lidarReport";
-constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
-constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
-constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
-constexpr const char* ARM_IK_ENABLED_REP_TYPE = "armIKEnabledReport";
-// TODO: add support for missing report types
-// autonomousPlannedPathReport, poseConfidenceReport
+} // namespace
 
 /**
    Set power for all joints to zero.
@@ -82,7 +52,7 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 		LOG_F(ERROR, "Emergency stop!");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
-		this->startPowerRepeat();
+		_power_repeat_task.start();
 	}
 	// TODO: reinit motors
 	Globals::E_STOP = stop;
@@ -102,7 +72,7 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		this->stopAndShutdownPowerRepeat(true);
 	} else {
 		// if we have left autonomous mode, we need to start the power repeater again.
-		this->startPowerRepeat();
+		_power_repeat_task.start();
 	}
 }
 
@@ -134,9 +104,6 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 	bool enabled = j["enabled"];
 	if (enabled) {
 		if (!Globals::armIKEnabled) {
-			if (_arm_ik_repeat_thread.joinable()) {
-				_arm_ik_repeat_thread.join();
-			}
 			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 
@@ -145,8 +112,6 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 
 			if (success) {
 				this->setArmIKEnabled(true);
-				_arm_ik_repeat_thread =
-					std::thread(&MissionControlProtocol::updateArmIKRepeatTask, this);
 			} else {
 				// unable to enable IK
 				LOG_F(WARNING, "Unable to enable IK");
@@ -155,19 +120,11 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 		}
 	} else {
 		this->setArmIKEnabled(false);
-		if (_arm_ik_repeat_thread.joinable()) {
-			_arm_ik_repeat_thread.join();
-		}
-
-		// Globals::planarArmController.reset();
 	}
 }
 
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
-	{
-		std::lock_guard<std::mutex> power_lock(this->_joint_power_mutex);
-		this->_last_cmd_vel = {dtheta, dx};
-	}
+	_power_repeat_task.setCmdVel(dtheta, dx);
 	robot::setCmdVel(dtheta, dx);
 }
 
@@ -195,36 +152,6 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	}
 }
 
-void MissionControlProtocol::sendRoverPos() {
-	auto imu = robot::readIMU();
-	auto gps = gps::readGPSCoords();
-	LOG_F(2, "imu_valid=%s, gps_valid=%s", util::to_string(imu.isValid()).c_str(),
-		  util::to_string(gps.isValid()).c_str());
-	if (imu.isValid()) {
-		Eigen::Quaterniond quat = imu.getData();
-		double lon = 0, lat = 0;
-		if (gps.isValid()) {
-			lon = gps.getData().lon;
-			lat = gps.getData().lat;
-		}
-		double imuRecency = util::durationToSec(dataclock::now() - imu.getTime());
-		double recency = imuRecency;
-		if (gps.isValid()) {
-			double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
-			recency = std::max(recency, gpsRecency);
-		}
-		json msg = {{"type", ROVER_POS_REP_TYPE},
-					{"orientW", quat.w()},
-					{"orientX", quat.x()},
-					{"orientY", quat.y()},
-					{"orientZ", quat.z()},
-					{"lon", lon},
-					{"lat", lat},
-					{"recency", recency}};
-		this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-	}
-}
-
 static bool validateJointPositionRequest(const json& j) {
 	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
 }
@@ -246,10 +173,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
 	std::unordered_set<CameraID> supported_cams = robot::getCameras();
 	if (supported_cams.find(cam) != supported_cams.end()) {
-		std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
-		this->_open_streams[cam] = 0;
-		this->_camera_encoders[cam] =
-			std::make_shared<video::H264Encoder>(j["fps"], Constants::video::H264_RF_CONSTANT);
+		_camera_stream_task.openStream(cam, j["fps"]);
 	}
 }
 
@@ -259,27 +183,11 @@ static bool validateCameraStreamCloseRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
-	std::unique_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
-	this->_open_streams.erase(cam);
-	this->_camera_encoders.erase(cam);
+	_camera_stream_task.closeStream(cam);
 }
 
-void MissionControlProtocol::sendArmIKEnabledReport() {
-	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", Globals::armIKEnabled.load()}};
-	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-}
-
-void MissionControlProtocol::sendJointPositionReport(const std::string& jointName,
-													 int32_t jointPos) {
-	json msg = {{"type", JOINT_POSITION_REP_TYPE},
-				{"joint", jointName},
-				{"position", static_cast<double>(jointPos) / 1000.0}};
-	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-}
-
-void MissionControlProtocol::sendCameraStreamReport(
-	const CameraID& cam, const std::vector<std::basic_string<uint8_t>>& videoData) {
-	json msg = {{"type", CAMERA_STREAM_REP_TYPE}, {"camera", cam}, {"data", videoData}};
+void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
+	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", enabled}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
@@ -300,7 +208,7 @@ void MissionControlProtocol::handleConnection() {
 
 	if (!Globals::AUTONOMOUS) {
 		// start power repeat thread (if not already running)
-		this->startPowerRepeat();
+		_power_repeat_task.start();
 	}
 }
 
@@ -311,56 +219,21 @@ void MissionControlProtocol::handleHeartbeatTimedOut() {
 	Globals::E_STOP = true;
 }
 
-void MissionControlProtocol::startPowerRepeat() {
-	// note: take care to lock mutexes in a consistent order
-	std::lock_guard<std::mutex> flagLock(_joint_repeat_running_mutex);
-	std::lock_guard<std::mutex> threadLock(_joint_repeat_thread_mutex);
-	if (!this->_joint_repeat_running) {
-		this->_joint_repeat_running = true;
-		this->_joint_repeat_thread =
-			std::thread(&MissionControlProtocol::jointPowerRepeatTask, this);
-	}
-}
-
 void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
-	// check to make sure the thread is actually running first (so we don't stop everything
-	// unnecessarily if it isn't; this could be bad in the case where we receive a spurious
-	// operation mode request while already in autonomous and shut down all the motors)
-	// note: take care to lock mutexes in a consistent order
-	std::unique_lock<std::mutex> power_repeat_lock(_joint_repeat_running_mutex);
-	if (this->_joint_repeat_running) {
-		// Clear the last_joint_power map so the repeater thread won't do anything
-		{
-			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
-			this->_last_joint_power.clear();
-			this->_last_cmd_vel = {};
-		}
+	if (_power_repeat_task.isRunning()) {
+		_power_repeat_task.stop();
 		// explicitly set all joints to zero
 		stopAllJoints();
 		// explicitly stop chassis
 		robot::setCmdVel(0, 0);
-		// shut down the power repeat thread
-		this->_joint_repeat_running = false;
-		// release before joining to prevent deadlock
-		power_repeat_lock.unlock();
-		_power_repeat_cv.notify_one();
-
-		std::lock_guard<std::mutex> threadLock(_joint_repeat_thread_mutex);
-		if (this->_joint_repeat_thread.joinable()) {
-			this->_joint_repeat_thread.join();
-		}
 	}
 	// Turn off inverse kinematics so that IK state will be in sync with mission control
-	if (sendDisableIK) {
-		this->setArmIKEnabled(false);
-	} else {
-		Globals::armIKEnabled = false;
-	}
+	this->setArmIKEnabled(false, sendDisableIK);
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server), _open_streams(),
-	  _last_joint_power(), _joint_repeat_running(false) {
+	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),
+	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server) {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
 	// syringe)
@@ -390,7 +263,6 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateJointPowerRequest);
 	this->addMessageHandler(JOINT_POSITION_REQ_TYPE, handleJointPositionRequest,
 							validateJointPositionRequest);
-	// camera stream handlers need the class for context since they must modify _open_streams
 	this->addMessageHandler(
 		CAMERA_STREAM_OPEN_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamOpenRequest, this, _1),
@@ -407,137 +279,30 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		HEARTBEAT_TIMEOUT_PERIOD,
 		std::bind(&MissionControlProtocol::handleHeartbeatTimedOut, this));
 
-	this->_streaming_running = true;
-	this->_streaming_thread = std::thread(&MissionControlProtocol::videoStreamTask, this);
-
-	// Joint position reporting
-	this->_joint_report_thread = std::thread(&MissionControlProtocol::telemReportTask, this);
+	_telem_report_task.start();
+	_camera_stream_task.start();
 }
 
 MissionControlProtocol::~MissionControlProtocol() {
 	this->stopAndShutdownPowerRepeat(true);
-
-	this->_streaming_running = false;
-	if (this->_streaming_thread.joinable()) {
-		this->_streaming_thread.join();
-	}
 }
 
-void MissionControlProtocol::setArmIKEnabled(bool enabled) {
+void MissionControlProtocol::setArmIKEnabled(bool enabled, bool sendReport) {
 	Globals::armIKEnabled = enabled;
-	this->sendArmIKEnabledReport();
+	if (enabled) {
+		_arm_ik_task.start();
+	} else {
+		_arm_ik_task.stop();
+	}
+
+	if (sendReport) {
+		sendArmIKEnabledReport(enabled);
+	}
 }
 
 void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {
-	std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
-	this->_last_joint_power[joint] = power;
+	_power_repeat_task.setJointPower(joint, power);
 	robot::setJointPower(joint, power);
-}
-
-void MissionControlProtocol::jointPowerRepeatTask() {
-	loguru::set_thread_name("MCP_PowerRepeat");
-	std::unique_lock<std::mutex> joint_repeat_lock(this->_joint_repeat_running_mutex);
-	while (this->_joint_repeat_running) {
-		{
-			std::lock_guard<std::mutex> joint_lock(this->_joint_power_mutex);
-			for (const auto& current_pair : this->_last_joint_power) {
-				if (!this->_joint_repeat_running) {
-					break;
-				}
-				const jointid_t& joint = current_pair.first;
-				const double& power = current_pair.second;
-				// no need to repeatedly send 0 power
-				// this is also needed to make the zero calibration script work
-				if (power != 0.0) {
-					robot::setJointPower(joint, power);
-				}
-			}
-			if (this->_last_cmd_vel) {
-				if (this->_last_cmd_vel->first != 0.0 || this->_last_cmd_vel->second != 0.0) {
-					robot::setCmdVel(this->_last_cmd_vel->first, this->_last_cmd_vel->second);
-				}
-			}
-		}
-		_power_repeat_cv.wait_for(joint_repeat_lock, Constants::JOINT_POWER_REPEAT_PERIOD,
-								  [this] { return !_joint_repeat_running; });
-	}
-}
-
-void MissionControlProtocol::updateArmIKRepeatTask() {
-	loguru::set_thread_name("MCP_ArmIK");
-	dataclock::time_point next_update_time = dataclock::now();
-	while (Globals::armIKEnabled) {
-		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-		if (armJointPositions.isValid()) {
-			navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
-				Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
-			targetJointPositions /=
-				M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
-			for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
-				robot::setMotorPos(Constants::arm::IK_MOTORS[i],
-								   static_cast<int32_t>(targetJointPositions(i)));
-			}
-		}
-		next_update_time += Constants::ARM_IK_UPDATE_PERIOD;
-		std::this_thread::sleep_until(next_update_time);
-	}
-}
-
-void MissionControlProtocol::telemReportTask() {
-	loguru::set_thread_name("MCP_Telem");
-	dataclock::time_point pt = dataclock::now();
-
-	while (true) {
-		for (const auto& cur : robot::types::name_to_jointid) {
-			robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur.second);
-			if (jpos.isValid()) {
-				auto jointNameFrznStr = cur.first;
-				std::string jointNameStdStr(jointNameFrznStr.data(), jointNameFrznStr.size());
-				sendJointPositionReport(jointNameStdStr, jpos.getData());
-			}
-		}
-
-		sendRoverPos();
-
-		pt += TELEM_REPORT_PERIOD;
-		std::this_thread::sleep_until(pt);
-	}
-}
-
-void MissionControlProtocol::videoStreamTask() {
-	loguru::set_thread_name("MCP_Video");
-	while (this->_streaming_running) {
-		std::shared_lock<std::shared_mutex> stream_lock(this->_stream_mutex);
-		// for all open streams, check if there is a new frame
-		for (const auto& stream : _open_streams) {
-			const CameraID& cam = stream.first;
-			const uint32_t& frame_num = stream.second;
-			if (robot::hasNewCameraFrame(cam, frame_num)) {
-				// if there is a new frame, grab it
-				auto camDP = robot::readCamera(cam);
-
-				if (camDP) {
-					auto data = camDP.getData();
-					uint32_t& new_frame_num = data.second;
-					cv::Mat frame = data.first;
-					// update the previous frame number
-					this->_open_streams[cam] = new_frame_num;
-					const auto& encoder = this->_camera_encoders[cam];
-
-					// convert frame to encoded data and send it
-					auto data_vector = encoder->encode_frame(frame);
-					sendCameraStreamReport(cam, data_vector);
-				}
-			}
-
-			// break out of the loop if we should stop streaming
-			if (!this->_streaming_running) {
-				break;
-			}
-		}
-		std::this_thread::yield();
-	}
 }
 
 ///// UTILITY FUNCTIONS //////
@@ -548,5 +313,4 @@ static void stopAllJoints() {
 	}
 }
 
-} // namespace mc
-} // namespace net
+} // namespace net::mc

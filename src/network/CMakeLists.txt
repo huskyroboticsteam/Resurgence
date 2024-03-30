@@ -7,7 +7,8 @@ target_link_libraries(websocket_utils
   nlohmann_json::nlohmann_json)
 
 add_library(mission_control_interface STATIC
-  MissionControlProtocol.cpp)
+  MissionControlProtocol.cpp
+  MissionControlTasks.cpp)
 target_link_libraries(mission_control_interface utils video)
 set_target_properties(mission_control_interface PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
