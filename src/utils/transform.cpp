@@ -22,9 +22,9 @@ double quatToHeading(const Eigen::Quaterniond& quat) {
 }
 
 Eigen::Quaterniond eulerAnglesToQuat(const navtypes::eulerangles_t& rpy) {
-	Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()) *
+	Eigen::Quaterniond quat(Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()) *
 							Eigen::AngleAxisd(rpy.pitch, Eigen::Vector3d::UnitY()) *
-							Eigen::AngleAxisd(rpy.yaw, Eigen::Vector3d::UnitZ()));
+							Eigen::AngleAxisd(rpy.roll, Eigen::Vector3d::UnitX()));
 	return quat;
 }
 
