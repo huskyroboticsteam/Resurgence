@@ -58,8 +58,8 @@ public:
 	/**
 	 * @brief Instantiates the PlanarArmController with the current joint positions,
 	 * 		  returning true if the joint positions are valid. If PlanarArmController is
-	 * already initialized, the PlanarArmController with the supplied
-	 * positions and this function return true. Otherwise, controller gets uninitialized and
+	 * already initialized, the PlanarArmController is reinitialized with the supplied
+	 * positions and this function returns true. Otherwise, controller gets uninitialized and
 	 * function returns false.
 	 *
 	 * @param currJointPos The current joint positions of the arm.
