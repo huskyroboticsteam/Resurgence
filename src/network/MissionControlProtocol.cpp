@@ -256,7 +256,8 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),
-	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server), _autonomous_task() {
+	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server),
+	  _autonomous_task() {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
 	// syringe)
