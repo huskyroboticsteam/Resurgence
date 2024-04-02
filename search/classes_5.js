@@ -105,8 +105,7 @@ var searchData=
   ['exposurecompensator_102',['ExposureCompensator',['https://docs.opencv.org/4.2.0/d2/d37/classcv_1_1detail_1_1ExposureCompensator.html',1,'cv::detail']]],
   ['expr_103',['Expr',['https://docs.opencv.org/4.2.0/de/dfb/structcv_1_1cudev_1_1Expr.html',1,'cv::cudev']]],
   ['extendedkalmanfilter_104',['ExtendedKalmanFilter',['../classfilters_1_1ExtendedKalmanFilter.html',1,'filters']]],
-  ['extendedkalmanfilter_3c_20numstates_2c_202_2c_203_2c_202_2c_203_20_3e_105',['ExtendedKalmanFilter&lt; numStates, 2, 3, 2, 3 &gt;',['../classfilters_1_1ExtendedKalmanFilter.html',1,'filters']]],
-  ['extent_106',['extent',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a03515.html',1,'std']]],
-  ['extobject_107',['ExtObject',['https://docs.opencv.org/4.2.0/d1/dda/structcv_1_1DetectionBasedTracker_1_1ExtObject.html',1,'cv::DetectionBasedTracker']]],
-  ['extreme_5fvalue_5fdistribution_108',['extreme_value_distribution',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06483.html',1,'std']]]
+  ['extent_105',['extent',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a03515.html',1,'std']]],
+  ['extobject_106',['ExtObject',['https://docs.opencv.org/4.2.0/d1/dda/structcv_1_1DetectionBasedTracker_1_1ExtObject.html',1,'cv::DetectionBasedTracker']]],
+  ['extreme_5fvalue_5fdistribution_107',['extreme_value_distribution',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06483.html',1,'std']]]
 ];

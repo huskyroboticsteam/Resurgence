@@ -72,11 +72,10 @@ var searchData=
   ['ftext_69',['FText',['https://docs.opencv.org/4.2.0/d6/d69/structcv_1_1gapi_1_1wip_1_1draw_1_1FText.html',1,'cv::gapi::wip::draw']]],
   ['fullpivhouseholderqr_70',['FullPivHouseholderQR',['https://eigen.tuxfamily.org/dox/classEigen_1_1FullPivHouseholderQR.html',1,'Eigen']]],
   ['fullpivlu_71',['FullPivLU',['https://eigen.tuxfamily.org/dox/classEigen_1_1FullPivLU.html',1,'Eigen']]],
-  ['fullposeestimator_72',['FullPoseEstimator',['../classfilters_1_1FullPoseEstimator.html',1,'filters']]],
-  ['function_73',['Function',['https://docs.opencv.org/4.2.0/da/d62/classcv_1_1MinProblemSolver_1_1Function.html',1,'cv::MinProblemSolver']]],
-  ['function_3c_20_5fres_28_5fargtypes_2e_2e_2e_29_3e_74',['function&lt; _Res(_ArgTypes...)&gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07175.html',1,'std']]],
-  ['future_75',['future',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02239.html',1,'std']]],
-  ['future_3c_20_5fres_20_26_20_3e_76',['future&lt; _Res &amp; &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02351.html',1,'std']]],
-  ['future_3c_20void_20_3e_77',['future&lt; void &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02355.html',1,'std']]],
-  ['future_5ferror_78',['future_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02235.html',1,'std']]]
+  ['function_72',['Function',['https://docs.opencv.org/4.2.0/da/d62/classcv_1_1MinProblemSolver_1_1Function.html',1,'cv::MinProblemSolver']]],
+  ['function_3c_20_5fres_28_5fargtypes_2e_2e_2e_29_3e_73',['function&lt; _Res(_ArgTypes...)&gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07175.html',1,'std']]],
+  ['future_74',['future',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02239.html',1,'std']]],
+  ['future_3c_20_5fres_20_26_20_3e_75',['future&lt; _Res &amp; &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02351.html',1,'std']]],
+  ['future_3c_20void_20_3e_76',['future&lt; void &gt;',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02355.html',1,'std']]],
+  ['future_5ferror_77',['future_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02235.html',1,'std']]]
 ];
