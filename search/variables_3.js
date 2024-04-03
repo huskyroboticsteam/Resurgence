@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['c_0',['C',['https://docs.opencv.org/4.2.0/d1/d2d/classcv_1_1ml_1_1SVM.html#a32d2e8d21aaa4f58cdf9c27c102becf3a8eafc49ef685613b37e1b96351fd2bd1',1,'cv::ml::SVM']]],
-  ['c_1',['c',['https://docs.opencv.org/4.2.0/d1/d10/classcv_1_1MatExpr.html#a5f728e830807710bf3cc18b428057d8e',1,'cv::MatExpr::c'],['https://docs.opencv.org/4.2.0/d9/d37/classcv_1_1ml_1_1DTrees_1_1Split.html#a34ee1a0022d3d297d42aca9302d34fbb',1,'cv::ml::DTrees::Split::c'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07807.html#a33f73620226c2827824851c0c935b28b',1,'std::queue::c']]],
+  ['c_0',['c',['https://docs.opencv.org/4.2.0/d1/d10/classcv_1_1MatExpr.html#a5f728e830807710bf3cc18b428057d8e',1,'cv::MatExpr::c'],['https://docs.opencv.org/4.2.0/d9/d37/classcv_1_1ml_1_1DTrees_1_1Split.html#a34ee1a0022d3d297d42aca9302d34fbb',1,'cv::ml::DTrees::Split::c'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07807.html#a33f73620226c2827824851c0c935b28b',1,'std::queue::c']]],
+  ['c_1',['C',['https://docs.opencv.org/4.2.0/d1/d2d/classcv_1_1ml_1_1SVM.html#a32d2e8d21aaa4f58cdf9c27c102becf3a8eafc49ef685613b37e1b96351fd2bd1',1,'cv::ml::SVM']]],
   ['c_5fsvc_2',['C_SVC',['https://docs.opencv.org/4.2.0/d1/d2d/classcv_1_1ml_1_1SVM.html#ab4b93a4c42bbe213ffd9fb3832c6c44fa18157ccaec6a252b901cff6de285d608',1,'cv::ml::SVM']]],
   ['cache_5fall_3',['CACHE_ALL',['https://docs.opencv.org/4.2.0/d7/d15/structcv_1_1rgbd_1_1OdometryFrame.html#a5505fd9ba3f77942517cc1a8ed0fe61dac4a54f32647e1d176076e9b1a4d81e82',1,'cv::rgbd::OdometryFrame']]],
   ['cache_5fdst_4',['CACHE_DST',['https://docs.opencv.org/4.2.0/d7/d15/structcv_1_1rgbd_1_1OdometryFrame.html#a5505fd9ba3f77942517cc1a8ed0fe61dabd1daa42f6fef759a4be3a20de86c291',1,'cv::rgbd::OdometryFrame']]],
@@ -460,8 +460,8 @@ var searchData=
   ['cn_457',['CN',['https://docs.opencv.org/4.2.0/d2/dff/classcv_1_1TrackerKCF.html#a2a97c5b832651524b8e782496b933d45abdd27d54b8b8e5d80e392a1a40c18fe1',1,'cv::TrackerKCF']]],
   ['code_458',['code',['https://docs.opencv.org/4.2.0/d1/dee/classcv_1_1Exception.html#a81405b438c930b556e9c71210d799e2b',1,'cv::Exception::code'],['https://docs.opencv.org/4.2.0/d3/d06/classcv_1_1viz_1_1KeyboardEvent.html#a90f5e8b6d152aa7f1ecf4a5098020c74',1,'cv::viz::KeyboardEvent::code']]],
   ['codec_459',['codec',['https://docs.opencv.org/4.2.0/d8/db6/structcv_1_1cudacodec_1_1FormatInfo.html#aa43606fe19ccfc8f9bc98a92377fd999',1,'cv::cudacodec::FormatInfo']]],
-  ['coef_460',['coef',['https://docs.opencv.org/4.2.0/d2/d7d/structcv_1_1optflow_1_1GPCTree_1_1Node.html#ac755378bf8f25e6340d5c0d690d93cb1',1,'cv::optflow::GPCTree::Node']]],
-  ['coef_461',['COEF',['https://docs.opencv.org/4.2.0/d1/d2d/classcv_1_1ml_1_1SVM.html#a32d2e8d21aaa4f58cdf9c27c102becf3ae7112825b482d70cf5f04bc571f86e57',1,'cv::ml::SVM']]],
+  ['coef_460',['COEF',['https://docs.opencv.org/4.2.0/d1/d2d/classcv_1_1ml_1_1SVM.html#a32d2e8d21aaa4f58cdf9c27c102becf3ae7112825b482d70cf5f04bc571f86e57',1,'cv::ml::SVM']]],
+  ['coef_461',['coef',['https://docs.opencv.org/4.2.0/d2/d7d/structcv_1_1optflow_1_1GPCTree_1_1Node.html#ac755378bf8f25e6340d5c0d690d93cb1',1,'cv::optflow::GPCTree::Node']]],
   ['coeffobjectsizetotrack_462',['coeffObjectSizeToTrack',['https://docs.opencv.org/4.2.0/d9/d44/structcv_1_1DetectionBasedTracker_1_1InnerParameters.html#a9687dc16c686bfa924b8f81672f07f5d',1,'cv::DetectionBasedTracker::InnerParameters']]],
   ['coeffobjectspeedusinginprediction_463',['coeffObjectSpeedUsingInPrediction',['https://docs.opencv.org/4.2.0/d9/d44/structcv_1_1DetectionBasedTracker_1_1InnerParameters.html#a7967591810eabddc5ecb13f28a45f213',1,'cv::DetectionBasedTracker::InnerParameters']]],
   ['coefftrackingwindowsize_464',['coeffTrackingWindowSize',['https://docs.opencv.org/4.2.0/d9/d44/structcv_1_1DetectionBasedTracker_1_1InnerParameters.html#a9fabef7efb531ebe2f0ba9d2ff06a253',1,'cv::DetectionBasedTracker::InnerParameters']]],
