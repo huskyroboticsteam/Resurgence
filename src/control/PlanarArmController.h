@@ -148,9 +148,9 @@ public:
 		if (mutableFields->velTimestamp.has_value()) {
 			// If we recieve a request for 0 velocity and the y velocity is 0, the arm should
 			// stop moving. Set its setpoint to the current joint position to ensure this.
-			if (targetVel == 0.0 && velocity(1) == 0.0) {
+			if (targetVel == 0.0 && mutableFields->velocity(1) == 0.0) {
 				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
-				setpoint = normalizeEEWithinRadius(newSetPoint);
+				mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt =
 					util::durationToSec(currTime - mutableFields->velTimestamp.value());
@@ -178,15 +178,15 @@ public:
 		if (mutableFields->velTimestamp.has_value()) {
 			// If we recieve a request for 0 velocity and the x velocity is 0, the arm should
 			// stop moving. Set its setpoint to the current joint position to ensure this.
-			if (velocity(0) == 0.0 && targetVel == 0.0) {
+			if (mutableFields->velocity(0) == 0.0 && targetVel == 0.0) {
 				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
-				setpoint = normalizeEEWithinRadius(newSetPoint);
+				mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt =
 					util::durationToSec(currTime - mutableFields->velTimestamp.value());
 				// bounds check (new pos + vel vector <= sum of joint lengths)
-				setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
-												   mutableFields->velocity * dt);
+				mutableFields->setpoint = normalizeEEWithinRadius(
+					mutableFields->setpoint + mutableFields->velocity * dt);
 			}
 		}
 
