@@ -183,11 +183,11 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			if (joint == jointid_t::ikForward) {
 				Globals::planarArmController.set_x_vel(
 					dataclock::now(), power * Constants::arm::MAX_EE_VEL,
-					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS));
+					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData());
 			} else {
 				Globals::planarArmController.set_y_vel(
 					dataclock::now(), power * Constants::arm::MAX_EE_VEL,
-					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS));
+					robot::getMotorPositionsRad(Constants::arm::IK_MOTORS).getData());
 			}
 		}
 	} else {

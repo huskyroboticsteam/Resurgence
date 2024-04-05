@@ -83,14 +83,17 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target x velocity.
+	 * @param jointPos The joint angles of the arm.
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel,
-				   robot::types::DataPoint<navtypes::Vectord<N>> jointPos) {
+				   const navtypes::Vectord<N> jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
+			// If we recieve a request for 0 velocity and the y velocity is 0, the arm should
+			// stop moving. Set its setpoint to the current joint position to ensure this.
 			if (targetVel == 0.0 && velocity(1) == 0.0) {
-				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos.getData());
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
 				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt = util::durationToSec(currTime - velTimestamp.value());
@@ -108,14 +111,17 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target y velocity.
+	 * @param jointPos The joint angles of the arm.
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel,
-				   robot::types::DataPoint<navtypes::Vectord<N>> jointPos) {
+				   navtypes::Vectord<N> jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (velTimestamp.has_value()) {
+			// If we recieve a request for 0 velocity and the x velocity is 0, the arm should
+			// stop moving. Set its setpoint to the current joint position to ensure this.
 			if (velocity(0) == 0.0 && targetVel == 0.0) {
-				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos.getData());
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
 				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
 				double dt = util::durationToSec(currTime - velTimestamp.value());
