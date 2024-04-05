@@ -152,9 +152,11 @@ public:
 				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
 				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
-				double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
+				double dt =
+					util::durationToSec(currTime - mutableFields->velTimestamp.value());
 				// bounds check (new pos + vel vector <= sum of joint lengths)
-				mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint + mutableFields->velocity * dt);
+				mutableFields->setpoint = normalizeEEWithinRadius(
+					mutableFields->setpoint + mutableFields->velocity * dt);
 			}
 		}
 
@@ -180,9 +182,11 @@ public:
 				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
 				setpoint = normalizeEEWithinRadius(newSetPoint);
 			} else {
-				double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
+				double dt =
+					util::durationToSec(currTime - mutableFields->velTimestamp.value());
 				// bounds check (new pos + vel vector <= sum of joint lengths)
-				setpoint = normalizeEEWithinRadius(mutableFields->setpoint + mutableFields->velocity * dt);
+				setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
+												   mutableFields->velocity * dt);
 			}
 		}
 
