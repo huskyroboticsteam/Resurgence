@@ -113,12 +113,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1318186819ba01c7745ba20487eafc99" id="r_a1318186819ba01c7745ba20487eafc99"><td class="memItemLeft" align="right" valign="top">Eigen::Vector2d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1318186819ba01c7745ba20487eafc99">get_setpoint</a> (<a class="el" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a> currTime)</td></tr>
 <tr class="memdesc:a1318186819ba01c7745ba20487eafc99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current end effector setpoint / target position.  <br /></td></tr>
 <tr class="separator:a1318186819ba01c7745ba20487eafc99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96de85809bf77ee1aab1a27232fc8bf9" id="r_a96de85809bf77ee1aab1a27232fc8bf9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96de85809bf77ee1aab1a27232fc8bf9">set_x_vel</a> (<a class="el" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a> currTime, double targetVel)</td></tr>
-<tr class="memdesc:a96de85809bf77ee1aab1a27232fc8bf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the x velocity for the end effector and returns the new command.  <br /></td></tr>
-<tr class="separator:a96de85809bf77ee1aab1a27232fc8bf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18b1f84e7946f080e6c20c6308ef4185" id="r_a18b1f84e7946f080e6c20c6308ef4185"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18b1f84e7946f080e6c20c6308ef4185">set_y_vel</a> (<a class="el" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a> currTime, double targetVel)</td></tr>
-<tr class="memdesc:a18b1f84e7946f080e6c20c6308ef4185"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the y velocity for the end effector and returns the new command.  <br /></td></tr>
-<tr class="separator:a18b1f84e7946f080e6c20c6308ef4185"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d8b187d476a4140d5f1508c5ed7f50d" id="r_a0d8b187d476a4140d5f1508c5ed7f50d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d8b187d476a4140d5f1508c5ed7f50d">set_x_vel</a> (<a class="el" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a> currTime, double targetVel, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;jointPos)</td></tr>
+<tr class="memdesc:a0d8b187d476a4140d5f1508c5ed7f50d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the x velocity for the end effector and returns the new command.  <br /></td></tr>
+<tr class="separator:a0d8b187d476a4140d5f1508c5ed7f50d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55a1443d50e3e03bc99ceab615e3ca36" id="r_a55a1443d50e3e03bc99ceab615e3ca36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55a1443d50e3e03bc99ceab615e3ca36">set_y_vel</a> (<a class="el" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a> currTime, double targetVel, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;jointPos)</td></tr>
+<tr class="memdesc:a55a1443d50e3e03bc99ceab615e3ca36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the y velocity for the end effector and returns the new command.  <br /></td></tr>
+<tr class="separator:a55a1443d50e3e03bc99ceab615e3ca36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a192788b10d6461d42a36e0e6fae0c4e6" id="r_a192788b10d6461d42a36e0e6fae0c4e6"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a192788b10d6461d42a36e0e6fae0c4e6">getCommand</a> (<a class="el" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a> currTime, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;currJointPos)</td></tr>
 <tr class="memdesc:a192788b10d6461d42a36e0e6fae0c4e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current command for the arm.  <br /></td></tr>
 <tr class="separator:a192788b10d6461d42a36e0e6fae0c4e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -373,8 +373,8 @@ template&lt;unsigned int N&gt; </div>
 
 </div>
 </div>
-<a id="a96de85809bf77ee1aab1a27232fc8bf9" name="a96de85809bf77ee1aab1a27232fc8bf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96de85809bf77ee1aab1a27232fc8bf9">&#9670;&#160;</a></span>set_x_vel()</h2>
+<a id="a0d8b187d476a4140d5f1508c5ed7f50d" name="a0d8b187d476a4140d5f1508c5ed7f50d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d8b187d476a4140d5f1508c5ed7f50d">&#9670;&#160;</a></span>set_x_vel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -392,7 +392,12 @@ template&lt;unsigned int N&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>targetVel</em></span>&#160;)</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>targetVel</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>jointPos</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -407,6 +412,7 @@ template&lt;unsigned int N&gt; </div>
   <table class="params">
     <tr><td class="paramname">currTime</td><td>The current timestamp. </td></tr>
     <tr><td class="paramname">targetVel</td><td>The target x velocity. </td></tr>
+    <tr><td class="paramname">jointPos</td><td>The current joint angles of the arm. </td></tr>
   </table>
   </dd>
 </dl>
@@ -414,8 +420,8 @@ template&lt;unsigned int N&gt; </div>
 
 </div>
 </div>
-<a id="a18b1f84e7946f080e6c20c6308ef4185" name="a18b1f84e7946f080e6c20c6308ef4185"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18b1f84e7946f080e6c20c6308ef4185">&#9670;&#160;</a></span>set_y_vel()</h2>
+<a id="a55a1443d50e3e03bc99ceab615e3ca36" name="a55a1443d50e3e03bc99ceab615e3ca36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55a1443d50e3e03bc99ceab615e3ca36">&#9670;&#160;</a></span>set_y_vel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -433,7 +439,12 @@ template&lt;unsigned int N&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>targetVel</em></span>&#160;)</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>targetVel</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>jointPos</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -448,6 +459,7 @@ template&lt;unsigned int N&gt; </div>
   <table class="params">
     <tr><td class="paramname">currTime</td><td>The current timestamp. </td></tr>
     <tr><td class="paramname">targetVel</td><td>The target y velocity. </td></tr>
+    <tr><td class="paramname">jointPos</td><td>The current joint angles of the arm. </td></tr>
   </table>
   </dd>
 </dl>
