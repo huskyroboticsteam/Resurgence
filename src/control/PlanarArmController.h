@@ -139,11 +139,11 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target x velocity.
-	 * @param jointPos The joint angles of the arm.
+	 * @param jointPos The current joint angles of the arm.
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel,
-				   const navtypes::Vectord<N> jointPos) {
+				   const navtypes::Vectord<N>& jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (mutableFields->velTimestamp.has_value()) {
 			// If we recieve a request for 0 velocity and the y velocity is 0, the arm should
@@ -169,11 +169,11 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target y velocity.
-	 * @param jointPos The joint angles of the arm.
+	 * @param jointPos The current joint angles of the arm.
 	 * @return The new command, which is the new joint positions.
 	 */
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel,
-				   navtypes::Vectord<N> jointPos) {
+				   const navtypes::Vectord<N>& jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (mutableFields->velTimestamp.has_value()) {
 			// If we recieve a request for 0 velocity and the x velocity is 0, the arm should
