@@ -139,15 +139,25 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target x velocity.
+	 * @param jointPos The current joint angles of the arm.
 	 * @return The new command, which is the new joint positions.
 	 */
-	void set_x_vel(robot::types::datatime_t currTime, double targetVel) {
+	void set_x_vel(robot::types::datatime_t currTime, double targetVel,
+				   const navtypes::Vectord<N>& jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (mutableFields->velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
-			// bounds check (new pos + vel vector <= sum of joint lengths)
-			mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
-															  mutableFields->velocity * dt);
+			// If we recieve a request for 0 velocity and the y velocity is 0, the arm should
+			// stop moving. Set its setpoint to the current joint position to ensure this.
+			if (targetVel == 0.0 && mutableFields->velocity(1) == 0.0) {
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
+				mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
+			} else {
+				double dt =
+					util::durationToSec(currTime - mutableFields->velTimestamp.value());
+				// bounds check (new pos + vel vector <= sum of joint lengths)
+				mutableFields->setpoint = normalizeEEWithinRadius(
+					mutableFields->setpoint + mutableFields->velocity * dt);
+			}
 		}
 
 		mutableFields->velocity(0) = targetVel;
@@ -159,15 +169,25 @@ public:
 	 *
 	 * @param currTime The current timestamp.
 	 * @param targetVel The target y velocity.
+	 * @param jointPos The current joint angles of the arm.
 	 * @return The new command, which is the new joint positions.
 	 */
-	void set_y_vel(robot::types::datatime_t currTime, double targetVel) {
+	void set_y_vel(robot::types::datatime_t currTime, double targetVel,
+				   const navtypes::Vectord<N>& jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (mutableFields->velTimestamp.has_value()) {
-			double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
-			// bounds check (new pos + vel vector <= sum of joint lengths)
-			mutableFields->setpoint = normalizeEEWithinRadius(mutableFields->setpoint +
-															  mutableFields->velocity * dt);
+			// If we recieve a request for 0 velocity and the x velocity is 0, the arm should
+			// stop moving. Set its setpoint to the current joint position to ensure this.
+			if (mutableFields->velocity(0) == 0.0 && targetVel == 0.0) {
+				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
+				mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
+			} else {
+				double dt =
+					util::durationToSec(currTime - mutableFields->velTimestamp.value());
+				// bounds check (new pos + vel vector <= sum of joint lengths)
+				mutableFields->setpoint = normalizeEEWithinRadius(
+					mutableFields->setpoint + mutableFields->velocity * dt);
+			}
 		}
 
 		mutableFields->velocity(1) = targetVel;
