@@ -76,6 +76,21 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	}
 }
 
+static bool validateDriveModeRequest(const json& j) {
+	return util::validateKey(j, "mode", val_t::string) &&
+		   util::validateOneOf(j, "mode", {"normal", "turn-in-place", "crab"});
+}
+
+void MissionControlProtocol::handleDriveModeRequest(const json& j) {
+	std::string mode = j["mode"];
+	if (mode == "normal")
+		Globals::drive_mode = DriveMode::Normal;
+	else if (mode == "turn-in-place")
+		Globals::drive_mode = DriveMode::TurnInPlace;
+	else if (mode == "crab")
+		Globals::drive_mode = DriveMode::Crab;
+}
+
 static bool validateDriveRequest(const json& j) {
 	std::string msg = j.dump();
 	return util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
@@ -248,6 +263,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		OPERATION_MODE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
 		validateOperationModeRequest);
+	this->addMessageHandler(
+		DRIVE_MODE_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
+		validateDriveModeRequest);
 	// drive and joint power handlers need the class for context since they must modify
 	// _last_joint_power and _last_cmd_vel (for the repeater thread)
 	this->addMessageHandler(DRIVE_REQ_TYPE,
