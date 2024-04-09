@@ -77,6 +77,75 @@ double setCmdVel(double dtheta, double dx) {
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
 
+double setTankCmdVel(double left, double right) {
+	if (Globals::E_STOP && (left != 0 || right != 0)) {
+		return 0;
+	}
+
+	wheelvel_t wheelVels = {left, right};
+	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
+	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
+	if (maxAbsPWM > 1) {
+		lPWM /= maxAbsPWM;
+		rPWM /= maxAbsPWM;
+	}
+
+	setCmdVelToIntegrate(wheelVels);
+	setMotorPower(motorid_t::frontLeftWheel, lPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, rPWM);
+
+	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
+}
+
+double setTurnInPlaceCmdVel(double dtheta) {
+	if (Globals::E_STOP && (dtheta != 0)) {
+		return 0;
+	}
+
+	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(0, dtheta);
+	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
+	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
+	if (maxAbsPWM > 1) {
+		lPWM /= maxAbsPWM;
+		rPWM /= maxAbsPWM;
+	}
+
+	setCmdVelToIntegrate(wheelVels);
+	setMotorPower(motorid_t::frontLeftWheel, lPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, rPWM);
+
+	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
+}
+
+double setCrabCmdVel(double dtheta, double dy) {
+	if (Globals::E_STOP && (dtheta != 0 || dy != 0)) {
+		return 0;
+	}
+
+	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dy, dtheta);
+	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
+	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
+	if (maxAbsPWM > 1) {
+		lPWM /= maxAbsPWM;
+		rPWM /= maxAbsPWM;
+	}
+
+	setCmdVelToIntegrate(wheelVels);
+	setMotorPower(motorid_t::frontLeftWheel, rPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, lPWM);
+
+	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
+}
+
 std::pair<double, double> getCmdVel() {
 	double l = commandedWheelVel.lVel;
 	double r = commandedWheelVel.rVel;

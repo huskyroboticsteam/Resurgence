@@ -29,7 +29,12 @@ namespace robot {
  *
  * @see WORLD_INTERFACE
  */
-enum class WorldInterface { real, sim2d, sim3d, noop };
+enum class WorldInterface {
+	real,
+	sim2d,
+	sim3d,
+	noop
+};
 
 /** @brief The current world interface being used. */
 extern const WorldInterface WORLD_INTERFACE;
@@ -70,6 +75,36 @@ void emergencyStop();
  * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
  */
 double setCmdVel(double dtheta, double dx);
+
+/**
+ * @brief Request the robot to drive in tank style, where each side is controlled individually.
+ *
+ * @param left The left velocity.
+ * @param right The right velocity.
+ * @return double If the requested velocities are too high, they will be scaled down.
+ * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
+ */
+double setTankCmdVel(double dtheta, double dx);
+
+/**
+ * @brief Request the robot to turn in place using swerve.
+ *
+ * @param dtheta The heading velocity.
+ * @return double If the requested velocities are too high, they will be scaled down.
+ * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
+ */
+double setTurnInPlaceCmdVel(double dtheta);
+
+/**
+ * @brief Request the robot to drive side to side and turn with given velocities using swerve.
+ * Essentially rotate the reference from of the robot by 90 degrees.
+ *
+ * @param dtheta The heading velocity.
+ * @param dy The side-to-side velocity.
+ * @return double If the requested velocities are too high, they will be scaled down.
+ * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
+ */
+double setCrabCmdVel(double dtheta, double dy);
 
 /**
  * @brief Get the velocity commanded to the robot. Depending on scaling,

@@ -22,6 +22,11 @@ enum class DriveMode {
 	Crab,
 };
 
+static const std::map<DriveMode, std::string> driveModeStrings = {
+	{DriveMode::Normal, "Normal"},
+	{DriveMode::TurnInPlace, "TurnInPlace"},
+	{DriveMode::Crab, "Crab"}};
+
 // NOTE(sasha): To keep linker happy, declare globals with "extern" here and then
 //              provide variable definition in Globals.cpp
 namespace Globals {
@@ -29,7 +34,7 @@ namespace Globals {
    @deprecated
  */
 extern RoverState curr_state;
-extern DriveMode drive_mode;
+extern DriveMode driveMode;
 extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;

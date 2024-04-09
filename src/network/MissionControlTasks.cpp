@@ -32,6 +32,23 @@ void PowerRepeatTask::setJointPower(jointid_t id, double power) {
 void PowerRepeatTask::setCmdVel(double steerVel, double xVel) {
 	std::lock_guard lock(_mutex);
 	_last_cmd_vel = {steerVel, xVel};
+	_tank = false;
+}
+
+void PowerRepeatTask::setTankCmdVel(double left, double right) {
+	std::lock_guard lock(_mutex);
+	_last_cmd_vel = {left, right};
+	_tank = true;
+}
+
+void PowerRepeatTask::setTurnInPlaceCmdVel(double steerVel) {
+	std::lock_guard lock(_mutex);
+	_last_cmd_vel = {steerVel, 0.0};
+}
+
+void PowerRepeatTask::setCrabCmdVel(double dtheta, double yVel) {
+	std::lock_guard lock(_mutex);
+	_last_cmd_vel = {dtheta, yVel};
 }
 
 void PowerRepeatTask::start() {
@@ -60,7 +77,17 @@ void PowerRepeatTask::periodicTask() {
 	}
 	if (_last_cmd_vel) {
 		if (_last_cmd_vel->first != 0.0 || _last_cmd_vel->second != 0.0) {
-			robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
+			if (Globals::driveMode == DriveMode::Normal) {
+				if (_tank) {
+					robot::setTankCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
+				} else {
+					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
+				}
+			} else if (Globals::driveMode == DriveMode::TurnInPlace) {
+				robot::setTurnInPlaceCmdVel(_last_cmd_vel->first);
+			} else {
+				robot::setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
+			}
 		}
 	}
 }

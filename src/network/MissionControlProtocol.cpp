@@ -84,17 +84,54 @@ static bool validateDriveModeRequest(const json& j) {
 void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	if (mode == "normal")
-		Globals::drive_mode = DriveMode::Normal;
+		Globals::driveMode = DriveMode::Normal;
 	else if (mode == "turn-in-place")
-		Globals::drive_mode = DriveMode::TurnInPlace;
+		Globals::driveMode = DriveMode::TurnInPlace;
 	else if (mode == "crab")
-		Globals::drive_mode = DriveMode::Crab;
+		Globals::driveMode = DriveMode::Crab;
 }
 
 static bool validateDriveRequest(const json& j) {
 	std::string msg = j.dump();
-	return util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
-		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
+	if (Globals::driveMode != DriveMode::Normal) {
+		LOG_F(WARNING, "Drive mode set to %s, not Normal",
+			  driveModeStrings.at(Globals::driveMode).c_str());
+	}
+	return Globals::driveMode == DriveMode::Normal && util::hasKey(j, "straight") &&
+		   util::validateRange(j, "straight", -1, 1) && util::hasKey(j, "steer") &&
+		   util::validateRange(j, "steer", -1, 1);
+}
+
+static bool validateTankDriveRequest(const json& j) {
+	std::string msg = j.dump();
+	if (Globals::driveMode != DriveMode::Normal) {
+		LOG_F(WARNING, "Drive mode set to %s, not Normal",
+			  driveModeStrings.at(Globals::driveMode).c_str());
+	}
+	return Globals::driveMode == DriveMode::Normal && util::hasKey(j, "left") &&
+		   util::validateRange(j, "left", -1, 1) && util::hasKey(j, "right") &&
+		   util::validateRange(j, "right", -1, 1);
+}
+
+static bool validateTurnInPlaceDriveRequest(const json& j) {
+	std::string msg = j.dump();
+	if (Globals::driveMode != DriveMode::TurnInPlace) {
+		LOG_F(WARNING, "Drive mode set to %s, not TurnInPlace",
+			  driveModeStrings.at(Globals::driveMode).c_str());
+	}
+	return Globals::driveMode == DriveMode::TurnInPlace && util::hasKey(j, "steer") &&
+		   util::validateRange(j, "steer", -1, 1);
+}
+
+static bool validateCrabDriveRequest(const json& j) {
+	std::string msg = j.dump();
+	if (Globals::driveMode != DriveMode::Crab) {
+		LOG_F(WARNING, "Drive mode set to %s, not Crab",
+			  driveModeStrings.at(Globals::driveMode).c_str());
+	}
+	return Globals::driveMode == DriveMode::Crab && util::hasKey(j, "crab") &&
+		   util::validateRange(j, "crab", -1, 1) && util::hasKey(j, "steer") &&
+		   util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateArmIKEnable(const json& j) {
@@ -113,6 +150,33 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
 		  dx);
 	this->setRequestedCmdVel(dtheta, dx);
+}
+
+void MissionControlProtocol::handleTankDriveRequest(const json& j) {
+	double left = j["left"];
+	double right = j["right"];
+	double leftVel = Constants::MAX_WHEEL_VEL * left;
+	double rightVel = Constants::MAX_WHEEL_VEL * right;
+	LOG_F(1, "{left=%.2f, right=%.2f} -> setTankCmdVel(%.4f, %.4f)", left, right, leftVel,
+		  rightVel);
+	this->setRequestedTankCmdVel(leftVel, rightVel);
+}
+
+void MissionControlProtocol::handleTurnInPlaceDriveRequest(const json& j) {
+	double steer = j["steer"].get<double>();
+	double dtheta = Constants::MAX_DTHETA * steer;
+	LOG_F(1, "{steer=%.2f} -> setTurnInPlaceCmdVel(%.4f)", steer, dtheta);
+	this->setRequestedTurnInPlaceCmdVel(dtheta);
+}
+
+void MissionControlProtocol::handleCrabDriveRequest(const json& j) {
+	double crab = j["crab"];
+	double steer = -j["steer"].get<double>();
+	double norm = std::sqrt(std::pow(crab, 2) + std::pow(steer, 2));
+	double dy = Constants::MAX_WHEEL_VEL * (norm > 1 ? crab / norm : crab);
+	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
+	LOG_F(1, "{crab=%.2f, steer=%.2f} -> setCrabCmdVel(%.4f, %.4f)", crab, steer, dtheta, dy);
+	this->setRequestedCrabCmdVel(dtheta, dy);
 }
 
 void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
@@ -141,6 +205,21 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 	_power_repeat_task.setCmdVel(dtheta, dx);
 	robot::setCmdVel(dtheta, dx);
+}
+
+void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
+	_power_repeat_task.setTankCmdVel(left, right);
+	robot::setTankCmdVel(left, right);
+}
+
+void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
+	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
+	robot::setTurnInPlaceCmdVel(dtheta);
+}
+
+void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
+	_power_repeat_task.setCrabCmdVel(dtheta, dy);
+	robot::setCrabCmdVel(dtheta, dy);
 }
 
 static bool validateJoint(const json& j) {
@@ -272,6 +351,18 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	this->addMessageHandler(DRIVE_REQ_TYPE,
 							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
 							validateDriveRequest);
+	this->addMessageHandler(
+		DRIVE_TANK_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleTankDriveRequest, this, _1),
+		validateTankDriveRequest);
+	this->addMessageHandler(
+		DRIVE_TURN_IN_PLACE_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleTurnInPlaceDriveRequest, this, _1),
+		validateTurnInPlaceDriveRequest);
+	this->addMessageHandler(
+		DRIVE_CRAB_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleCrabDriveRequest, this, _1),
+		validateCrabDriveRequest);
 	this->addMessageHandler(
 		ARM_IK_ENABLED_TYPE,
 		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
