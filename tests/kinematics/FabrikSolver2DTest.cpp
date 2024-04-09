@@ -2,6 +2,7 @@
 #include "../../src/kinematics/PlanarArmFK.h"
 
 #include <iostream>
+#include <memory>
 
 #include <catch2/catch.hpp>
 
@@ -19,7 +20,11 @@ constexpr float PI = M_PI;
 
 TEST_CASE("Test FabrikSolver2D eePosToJointPos", "[kinematics][planararm][ik][fabrik]") {
 	double thresh = 0.001;
-	FabrikSolver2D<2> ik({0.5, 0.5}, {-PI, -PI}, {PI, PI}, thresh, 50);
+	navtypes::Vectord<2> segLens = {0.5, 0.5};
+	navtypes::Vectord<2> jointMin = {-PI, -PI};
+	navtypes::Vectord<2> jointMax = {PI, PI};
+	auto fk = std::make_shared<PlanarArmFK<2>>(segLens, jointMin, jointMax);
+	FabrikSolver2D<2> ik(fk, thresh, 50);
 
 	SECTION("Test out of range targets") {
 		{
@@ -52,7 +57,10 @@ TEST_CASE("Test FabrikSolver2D eePosToJointPos", "[kinematics][planararm][ik][fa
 	}
 
 	SECTION("Test joint constraints") {
-		FabrikSolver2D<2> constrained({0.5, 0.5}, {-PI / 8, -PI}, {PI / 8, PI}, thresh, 50);
+		navtypes::Vectord<2> jointMin2 = {-PI / 8, -PI};
+		navtypes::Vectord<2> jointMax2 = {PI / 8, PI};
+		auto constrained_fk = std::make_shared<PlanarArmFK<2>>(segLens, jointMin2, jointMax2);
+		FabrikSolver2D<2> constrained(constrained_fk, thresh, 50);
 		Eigen::Vector2d target = {std::sqrt(2) / 2, 0};
 		bool success;
 		Eigen::Vector2d jp = constrained.eePosToJointPos(target, {PI / 2, PI / 2}, success);

@@ -2,6 +2,9 @@
 
 #include "../navtypes.h"
 #include "InverseArmKinematics.h"
+#include "PlanarArmFK.h"
+
+#include <memory>
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -24,26 +27,18 @@ public:
 	/**
 	 * @brief Construct an IK solver object.
 	 *
-	 * @param segLens The length of each arm segment.
-	 * @param jointMin The minimum angle of each joint. Set to -pi for no limit.
-	 * @param jointMax The maximum angle of each joint. Set to pi for no limit.
+	 * @param fk The forward kinematics of the arm.
 	 * @param thresh The IK solver will succeed when the EE position is off by at most this
 	 * much.
 	 * @param maxIter The maximum number of iterations to run the solver before failing.
 	 */
-	FabrikSolver2D(const navtypes::Arrayd<N>& segLens, const navtypes::Arrayd<N>& jointMin,
-				   const navtypes::Arrayd<N>& jointMax, double thresh, int maxIter)
-		: segLens(segLens), jointMin(jointMin), jointMax(jointMax), thresh(thresh),
+	FabrikSolver2D(std::shared_ptr<const PlanarArmFK<N>> fk, double thresh, int maxIter)
+		: InverseArmKinematics<2, N>(fk), segLens(fk->getSegLens()), thresh(thresh),
 		  maxIter(maxIter) {}
 
-	navtypes::Vectord<N> eePosToJointPos(const Eigen::Vector2d& eePos,
-							  const navtypes::Vectord<N>& jointAngles, bool& success) const override {
-		double armLen = segLens.sum();
-		if (eePos.norm() >= armLen) {
-			success = false;
-			return jointAngles;
-		}
-
+	navtypes::Vectord<N> solve(const Eigen::Vector2d& eePos,
+							   const navtypes::Vectord<N>& jointAngles,
+							   bool& success) const override {
 		navtypes::Arrayd<N + 1, 2> jointPos = jointAnglesToJointPos(jointAngles);
 		success = false;
 		for (int iter = 0; iter < maxIter; iter++) {
@@ -73,19 +68,11 @@ public:
 		}
 
 		navtypes::Vectord<N> targetJointAngles = jointPosToJointAngles(jointPos);
-		for (int i = 0; i < N; i++) {
-			if (targetJointAngles[i] > jointMax[i] || targetJointAngles[i] < jointMin[i]) {
-				success = false;
-				return jointAngles;
-			}
-		}
 		return targetJointAngles;
 	}
 
 private:
 	navtypes::Arrayd<N> segLens;
-	navtypes::Arrayd<N> jointMin;
-	navtypes::Arrayd<N> jointMax;
 	double thresh;
 	int maxIter;
 

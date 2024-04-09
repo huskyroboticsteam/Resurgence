@@ -43,6 +43,14 @@ public:
 	virtual navtypes::Vectord<N> getSegLens() const = 0;
 
 	/**
+	 * @brief Check if the given joint configuration is valid.
+	 *
+	 * @param jointPos The joint positions to check.
+	 * @return true iff the joint configuration is valid, false otherwise.
+	 */
+	virtual bool satisfiesConstraints(const navtypes::Vectord<N>& jointPos) const = 0;
+
+	/**
 	 * @brief Get the jacobian matrix for the arm at the given joint angles.
 	 *
 	 * @param jointPos The joint angles of the arm.

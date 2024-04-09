@@ -34,9 +34,8 @@ navtypes::Vectord<IK_MOTORS.size()> getJointLimits(bool getLow) {
 kinematics::ArmKinematics<2, Constants::arm::IK_MOTORS.size()> createArmKinematics() {
 	auto fk = std::make_shared<kinematics::PlanarArmFK<2>>(getSegLens(), getJointLimits(true),
 														   getJointLimits(false));
-	auto ik = std::make_shared<kinematics::FabrikSolver2D<2>>(
-		getSegLens(), getJointLimits(true), getJointLimits(false), IK_SOLVER_THRESH,
-		IK_SOLVER_MAX_ITER);
+	auto ik = std::make_shared<kinematics::FabrikSolver2D<2>>(fk, IK_SOLVER_THRESH,
+															  IK_SOLVER_MAX_ITER);
 	return kinematics::ArmKinematics<2, 2>(fk, ik);
 }
 } // namespace

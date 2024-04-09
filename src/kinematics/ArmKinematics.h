@@ -20,28 +20,32 @@ class ArmKinematics : public ForwardArmKinematics<D, N>, public InverseArmKinema
 public:
 	ArmKinematics(std::shared_ptr<const ForwardArmKinematics<D, N>> forwardKin,
 				  std::shared_ptr<const InverseArmKinematics<D, N>> inverseKin)
-		: fk(forwardKin), ik(inverseKin) {}
+		: InverseArmKinematics<D, N>(forwardKin), ik(inverseKin) {}
+
+	bool satisfiesConstraints(const navtypes::Vectord<N>& jointPos) const override {
+		return this->fk->satisfiesConstraints(jointPos);
+	}
 
 	navtypes::Vectord<N> getSegLens() const override {
-		return fk->getSegLens();
+		return this->fk->getSegLens();
 	}
 
 	navtypes::Vectord<D> jointPosToEEPos(const navtypes::Vectord<N>& jointPos) const override {
-		return fk->jointPosToEEPos(jointPos);
-	}
-
-	navtypes::Vectord<N> eePosToJointPos(const navtypes::Vectord<D>& eePos,
-										 const navtypes::Vectord<N>& jointAngles,
-										 bool& success) const override {
-		return ik->eePosToJointPos(eePos, jointAngles, success);
+		return this->fk->jointPosToEEPos(jointPos);
 	}
 
 	navtypes::Matrixd<D, N> getJacobian(const navtypes::Vectord<N>& jointPos) const override {
-		return fk->getJacobian(jointPos);
+		return this->fk->getJacobian(jointPos);
+	}
+
+protected:
+	navtypes::Vectord<N> solve(const navtypes::Vectord<D>& eePos,
+							   const navtypes::Vectord<N>& jointAngles,
+							   bool& success) const override {
+		return ik->eePosToJointPos(eePos, jointAngles, success);
 	}
 
 private:
-	const std::shared_ptr<const ForwardArmKinematics<D, N>> fk;
 	const std::shared_ptr<const InverseArmKinematics<D, N>> ik;
 };
 

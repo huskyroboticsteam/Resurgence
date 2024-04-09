@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../navtypes.h"
-#include "FabrikSolver.h"
 #include "ForwardArmKinematics.h"
 
 #include <array>
@@ -27,13 +26,21 @@ public:
 	 * @param jointMin The minimum angle of each joint. Set to -pi for no limit.
 	 * @param jointMax The maximum angle of each joint. Set to pi for no limit.
 	 */
-	PlanarArmFK(const navtypes::Vectord<N>& segLens,
-						const navtypes::Vectord<N>& jointMin,
-						const navtypes::Vectord<N>& jointMax)
+	PlanarArmFK(const navtypes::Vectord<N>& segLens, const navtypes::Vectord<N>& jointMin,
+				const navtypes::Vectord<N>& jointMax)
 		: segLens(segLens), jointMin(jointMin), jointMax(jointMax) {}
 
 	navtypes::Vectord<N> getSegLens() const override {
 		return segLens;
+	}
+
+	bool satisfiesConstraints(const navtypes::Vectord<N>& jointPos) const override {
+		for (unsigned int i = 0; i < N; i++) {
+			if (jointPos[i] < jointMin[i] || jointPos[i] > jointMax[i]) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	navtypes::Matrixd<2, N> getJacobian(const navtypes::Vectord<N>& jointPos) const override {
