@@ -37,6 +37,7 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 													 Constants::WS_SERVER_PORT);
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
+DriveMode driveMode = DriveMode::Normal;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 const kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
 	planarArmKinematics(getSegLens(), getJointLimits(true), getJointLimits(false),
