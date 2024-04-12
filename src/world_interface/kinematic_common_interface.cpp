@@ -106,7 +106,7 @@ double setTurnInPlaceCmdVel(double dtheta) {
 		return 0;
 	}
 
-	wheelvel_t wheelVels = SwerveDriveKinematics().robotVelToWheelVel(0, 0, dtheta);
+	swervewheelvel_t wheelVels = swerveKinematics().robotVelToWheelVel(0, 0, dtheta);
 	double lfPWM = wheelVels.lfVel / Constants::MAX_WHEEL_VEL;
 	double lbPWM = wheelVels.lbVel / Constants::MAX_WHEEL_VEL;
 	double rfPWM = wheelVels.rfVel / Constants::MAX_WHEEL_VEL;
@@ -133,7 +133,7 @@ double setCrabCmdVel(double dtheta, double dy) {
 		return 0;
 	}
 
-	wheelvel_t wheelVels = SwerveDriveKinematics().robotVelToWheelVel(0, dy, dtheta);
+	swervewheelvel_t wheelVels = swerveKinematics().robotVelToWheelVel(0, dy, dtheta);
 	double lfPWM = wheelVels.lfVel / Constants::MAX_WHEEL_VEL;
 	double lbPWM = wheelVels.lbVel / Constants::MAX_WHEEL_VEL;
 	double rfPWM = wheelVels.rfVel / Constants::MAX_WHEEL_VEL;

@@ -3,6 +3,7 @@
 #include "../gps/gps_util.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../kinematics/DiffWristKinematics.h"
+#include "../kinematics/SwerveDriveKinematics.h"
 #include "../navtypes.h"
 #include "data.h"
 #include "motor/base_motor.h"
@@ -41,6 +42,7 @@ extern const WorldInterface WORLD_INTERFACE;
 
 // TODO: add documentation
 const kinematics::DiffDriveKinematics& driveKinematics();
+const kinematics::SwerveDriveKinematics& swerveKinematics();
 const kinematics::DiffWristKinematics& wristKinematics();
 
 /**
