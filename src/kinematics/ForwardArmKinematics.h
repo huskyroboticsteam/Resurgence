@@ -64,7 +64,7 @@ public:
 	 * @brief Given a joint position, calculate the current EE position.
 	 *
 	 * @param jointPos Current joint position.
-	 * @return Eigen::Vectord<D> The EE position.
+	 * @return navtypes::Vectord<D> The EE position.
 	 */
 	virtual navtypes::Vectord<D>
 	jointPosToEEPos(const navtypes::Vectord<N>& jointPos) const = 0;
@@ -74,7 +74,7 @@ public:
 	 *
 	 * @param jointPos Current joint position.
 	 * @param jointVel Current velocity of each joint angle.
-	 * @return Eigen::Vectord<D> The EE velocity.
+	 * @return navtypes::Vectord<D> The EE velocity.
 	 */
 	navtypes::Vectord<D> jointVelToEEVel(const navtypes::Vectord<N>& jointPos,
 										 const navtypes::Vectord<N>& jointVel) const {

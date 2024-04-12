@@ -51,7 +51,7 @@ public:
 	 * solver.
 	 * @param[out] success Output parameter that signals if the IK solver succeeded. Failure
 	 * may occur if the target is unreachable or the IK solver exceeds the iteration limit.
-	 * @return navtypes::Arrayd<N> The target joint angles that achieve the desired EE
+	 * @return navtypes::Vectord<N> The target joint angles that achieve the desired EE
 	 * position.
 	 */
 	virtual navtypes::Vectord<N> eePosToJointPos(const navtypes::Vectord<D>& eePos,
@@ -83,7 +83,7 @@ protected:
 	 * solver.
 	 * @param[out] success Output parameter that signals if the IK solver succeeded. Failure
 	 * may occur if the target is unreachable or the IK solver exceeds the iteration limit.
-	 * @return navtypes::Arrayd<N> The target joint angles that achieve the desired EE
+	 * @return navtypes::Vectord<N> The target joint angles that achieve the desired EE
 	 * position.
 	 */
 	virtual navtypes::Vectord<N> solve(const navtypes::Vectord<D>& eePos,
