@@ -3,7 +3,7 @@
 name: "hand"
 description: "Camera located on the hand of the rover."
 # Make sure that this camera_id matches the one defined in the udev rules.
-camera_id: 40
+camera_id: 20
 calib_info:
    calibration_time: "Sat 01 May 2021 01:54:16 PM PDT"
    board_width: 11
