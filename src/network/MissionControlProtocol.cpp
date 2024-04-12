@@ -83,12 +83,23 @@ static bool validateDriveModeRequest(const json& j) {
 
 void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	std::string mode = j["mode"];
-	if (mode == "normal")
+	if (mode == "normal") {
 		Globals::driveMode = DriveMode::Normal;
-	else if (mode == "turn-in-place")
+		for (int i = 1; i <= 4; i++) {
+			robot::setMotorPos(Constants::WHEEL_IDS[i], Constants::NORMAL_WHEEL_ROTS[i]);
+		}
+	} else if (mode == "turn-in-place") {
 		Globals::driveMode = DriveMode::TurnInPlace;
-	else if (mode == "crab")
+		for (int i = 1; i <= 4; i++) {
+			robot::setMotorPos(Constants::WHEEL_IDS[i],
+							   Constants::TURN_IN_PLACE_WHEEL_ROTS[i]);
+		}
+	} else if (mode == "crab") {
 		Globals::driveMode = DriveMode::Crab;
+		for (int i = 1; i <= 4; i++) {
+			robot::setMotorPos(Constants::WHEEL_IDS[i], Constants::CRAB_WHEEL_ROTS[i]);
+		}
+	}
 }
 
 static bool validateDriveRequest(const json& j) {

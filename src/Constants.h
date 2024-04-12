@@ -94,6 +94,17 @@ constexpr const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
+constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
+	robot::types::motorid_t::frontLeftWheel,
+	robot::types::motorid_t::frontRightWheel,
+	robot::types::motorid_t::rearLeftWheel,
+	robot::types::motorid_t::rearRightWheel,
+};
+constexpr std::array<int32_t, 4> NORMAL_WHEEL_ROTS = {0, 0, 0, 0};
+constexpr std::array<int32_t, 4> TURN_IN_PLACE_WHEEL_ROTS = {45000, -45000, 45000, -45000};
+constexpr std::array<int32_t, 4> CRAB_WHEEL_ROTS = {90000, 90000, 90000, 90000};
+constexpr double STEER_EPSILON = 1000;
+
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
 constexpr double RADIAN_COST = EFF_WHEEL_BASE / 2.0;

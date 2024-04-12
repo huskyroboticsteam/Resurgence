@@ -60,6 +60,12 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
+	for (int i = 1; i <= 4; i++) {
+		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
+					 Constants::NORMAL_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+			return 0;
+	}
+
 	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
@@ -83,6 +89,12 @@ double setTankCmdVel(double left, double right) {
 		return 0;
 	}
 
+	for (int i = 1; i <= 4; i++) {
+		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
+					 Constants::NORMAL_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+			return 0;
+	}
+
 	wheelvel_t wheelVels = {left, right};
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
@@ -104,6 +116,12 @@ double setTankCmdVel(double left, double right) {
 double setTurnInPlaceCmdVel(double dtheta) {
 	if (Globals::E_STOP && (dtheta != 0)) {
 		return 0;
+	}
+
+	for (int i = 1; i <= 4; i++) {
+		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
+					 Constants::TURN_IN_PLACE_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+			return 0;
 	}
 
 	swervewheelvel_t wheelVels = swerveKinematics().robotVelToWheelVel(0, 0, dtheta);
@@ -131,6 +149,12 @@ double setTurnInPlaceCmdVel(double dtheta) {
 double setCrabCmdVel(double dtheta, double dy) {
 	if (Globals::E_STOP && (dtheta != 0 || dy != 0)) {
 		return 0;
+	}
+
+	for (int i = 1; i <= 4; i++) {
+		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
+					 Constants::CRAB_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+			return 0;
 	}
 
 	swervewheelvel_t wheelVels = swerveKinematics().robotVelToWheelVel(0, dy, dtheta);
