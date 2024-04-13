@@ -103,7 +103,7 @@ bool receivePacket(int fd, CANPacket& packet) {
 		std::memcpy(packet.data, frame.data, frame.can_dlc);
 		return true;
 	} else {
-		std::perror("Failed to receive CAN packet!");
+		LOG_F(ERROR, "Failed to receive CAN packet: %s", std::strerror(errno));
 		return false;
 	}
 }
@@ -169,17 +169,18 @@ void handleTelemetryPacket(CANPacket& packet) {
 int createCANSocket(std::optional<can::deviceid_t> id) {
 	int fd;
 	if ((fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		std::perror("Failed to initialize CAN bus!");
+		LOG_F(ERROR, "Failed to initialize CAN bus: %s", std::strerror(errno));
 		return -1;
 	}
 
 	struct ifreq ifr;
 	std::strcpy(ifr.ifr_name, "can0");
 	if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
-		std::perror("Failed to get hardware CAN interface index");
+		LOG_F(ERROR, "Failed to get hardware CAN interface index: %s", std::strerror(errno));
 		std::strcpy(ifr.ifr_name, "vcan0");
 		if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
-			std::perror("Failed to get virtual CAN interface index");
+			LOG_F(ERROR, "Failed to get virtual CAN interface index: %s",
+				  std::strerror(errno));
 			return -1;
 		}
 		LOG_F(INFO, "Found virtual CAN interface index.");
@@ -191,7 +192,7 @@ int createCANSocket(std::optional<can::deviceid_t> id) {
 	addr.can_ifindex = ifr.ifr_ifindex;
 
 	if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		std::perror("Bind");
+		LOG_F(ERROR, "Error binding CAN socket: %s", std::strerror(errno));
 		return -1;
 	}
 
@@ -275,7 +276,9 @@ void sendCANPacket(const CANPacket& packet) {
 	}
 
 	if (!success) {
-		std::perror("Failed to send CAN packet");
+		LOG_F(ERROR, "Failed to send CAN packet to group=%x, id=%x: %s",
+			  static_cast<int>(getDeviceGroup(packet)), getDeviceSerial(packet),
+			  std::strerror(errno));
 	}
 }
 
