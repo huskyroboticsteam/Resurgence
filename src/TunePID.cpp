@@ -63,10 +63,12 @@ int main(int argc, char** argv) {
 	signal(SIGINT, cleanup);
 
 	std::cout << "Motor Names:" << std::endl;
-	for (const auto& motor : robot::pidMotors) {
-		auto name = motorNameMap.at(motor);
+
+	for (const auto& pair : robot::motorPIDMap) {
+		auto name = motorNameMap.at(pair.first);
 		std::cout << "\t" << name << std::endl;
 	}
+
 	std::cout << "Enter motor name > ";
 	std::string motor_name;
 	std::getline(std::cin, motor_name);

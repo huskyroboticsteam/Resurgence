@@ -102,7 +102,8 @@ void initMotors() {
 	addMotorMapping(motorid_t::rearLeftWheel, false);
 	addMotorMapping(motorid_t::rearRightWheel, false);
 
-	for (motorid_t motor : pidMotors) {
+	for (const auto& pair : robot::motorPIDMap) {
+		motorid_t motor = pair.first;
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);

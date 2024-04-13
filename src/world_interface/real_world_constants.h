@@ -25,10 +25,6 @@ struct pidcoef_t {
 /** @brief The default telemetry period for motors. */
 constexpr std::chrono::milliseconds TELEM_PERIOD(50);
 
-/** @brief The set of motors that are PID controlled. */
-constexpr auto pidMotors =
-	frozen::make_unordered_set<motorid_t>({motorid_t::shoulder, motorid_t::elbow});
-
 /**
  * @brief Represents parameters defining a potentiometer scale.
  *
