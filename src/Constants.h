@@ -1,6 +1,7 @@
 #pragma once
-
+#include "Globals.h"
 #include "kinematics/DiffDriveKinematics.h"
+#include "kinematics/SwerveDriveKinematics.h"
 #include "world_interface/data.h"
 
 #include <array>
@@ -9,6 +10,7 @@
 #include <string>
 
 #include <frozen/unordered_map.h>
+
 
 using namespace kinematics;
 
@@ -100,9 +102,8 @@ constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
 	robot::types::motorid_t::rearLeftWheel,
 	robot::types::motorid_t::rearRightWheel,
 };
-constexpr std::array<int32_t, 4> NORMAL_WHEEL_ROTS = {0, 0, 0, 0};
-constexpr std::array<int32_t, 4> TURN_IN_PLACE_WHEEL_ROTS = {45000, -45000, 45000, -45000};
-constexpr std::array<int32_t, 4> CRAB_WHEEL_ROTS = {90000, 90000, 90000, 90000};
+
+const extern std::unordered_map<DriveMode, std::array<int32_t, 4>> WHEEL_ROTS;
 constexpr double STEER_EPSILON = 1000;
 
 namespace Nav {

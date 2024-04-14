@@ -60,9 +60,10 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	for (int i = 1; i <= 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
-					 Constants::NORMAL_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+					 Constants::WHEEL_ROTS.at(DriveMode::Normal)[i]) <
+			Constants::STEER_EPSILON)
 			return 0;
 	}
 
@@ -89,9 +90,10 @@ double setTankCmdVel(double left, double right) {
 		return 0;
 	}
 
-	for (int i = 1; i <= 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
-					 Constants::NORMAL_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+					 Constants::WHEEL_ROTS.at(DriveMode::Normal)[i]) <
+			Constants::STEER_EPSILON)
 			return 0;
 	}
 
@@ -118,9 +120,10 @@ double setTurnInPlaceCmdVel(double dtheta) {
 		return 0;
 	}
 
-	for (int i = 1; i <= 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
-					 Constants::TURN_IN_PLACE_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+					 Constants::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]) <
+			Constants::STEER_EPSILON)
 			return 0;
 	}
 
@@ -151,9 +154,9 @@ double setCrabCmdVel(double dtheta, double dy) {
 		return 0;
 	}
 
-	for (int i = 1; i <= 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (std::abs(robot::getMotorPos(Constants::WHEEL_IDS[i]) -
-					 Constants::CRAB_WHEEL_ROTS[i]) < Constants::STEER_EPSILON)
+					 Constants::WHEEL_ROTS.at(DriveMode::Crab)[i]) < Constants::STEER_EPSILON)
 			return 0;
 	}
 

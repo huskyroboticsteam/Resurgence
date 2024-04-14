@@ -85,25 +85,26 @@ void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	if (mode == "normal") {
 		Globals::driveMode = DriveMode::Normal;
-		for (int i = 1; i <= 4; i++) {
-			robot::setMotorPos(Constants::WHEEL_IDS[i], Constants::NORMAL_WHEEL_ROTS[i]);
+		for (int i = 0; i < 4; i++) {
+			robot::setMotorPos(Constants::WHEEL_IDS[i],
+							   Constants::WHEEL_ROTS.at(DriveMode::Normal)[i]);
 		}
 	} else if (mode == "turn-in-place") {
 		Globals::driveMode = DriveMode::TurnInPlace;
-		for (int i = 1; i <= 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::WHEEL_IDS[i],
-							   Constants::TURN_IN_PLACE_WHEEL_ROTS[i]);
+							   Constants::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
 		}
 	} else if (mode == "crab") {
 		Globals::driveMode = DriveMode::Crab;
-		for (int i = 1; i <= 4; i++) {
-			robot::setMotorPos(Constants::WHEEL_IDS[i], Constants::CRAB_WHEEL_ROTS[i]);
+		for (int i = 0; i < 4; i++) {
+			robot::setMotorPos(Constants::WHEEL_IDS[i],
+							   Constants::WHEEL_ROTS.at(DriveMode::Crab)[i]);
 		}
 	}
 }
 
 static bool validateDriveRequest(const json& j) {
-	std::string msg = j.dump();
 	if (Globals::driveMode != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
 			  driveModeStrings.at(Globals::driveMode).c_str());
@@ -114,7 +115,6 @@ static bool validateDriveRequest(const json& j) {
 }
 
 static bool validateTankDriveRequest(const json& j) {
-	std::string msg = j.dump();
 	if (Globals::driveMode != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
 			  driveModeStrings.at(Globals::driveMode).c_str());
@@ -125,7 +125,6 @@ static bool validateTankDriveRequest(const json& j) {
 }
 
 static bool validateTurnInPlaceDriveRequest(const json& j) {
-	std::string msg = j.dump();
 	if (Globals::driveMode != DriveMode::TurnInPlace) {
 		LOG_F(WARNING, "Drive mode set to %s, not TurnInPlace",
 			  driveModeStrings.at(Globals::driveMode).c_str());
@@ -135,7 +134,6 @@ static bool validateTurnInPlaceDriveRequest(const json& j) {
 }
 
 static bool validateCrabDriveRequest(const json& j) {
-	std::string msg = j.dump();
 	if (Globals::driveMode != DriveMode::Crab) {
 		LOG_F(WARNING, "Drive mode set to %s, not Crab",
 			  driveModeStrings.at(Globals::driveMode).c_str());
@@ -155,7 +153,7 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
 	double steer = -j["steer"].get<double>();
-	double norm = std::sqrt(std::pow(straight, 2) + std::pow(steer, 2));
+	double norm = std::hypot(straight, steer);
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
 	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
@@ -181,9 +179,9 @@ void MissionControlProtocol::handleTurnInPlaceDriveRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCrabDriveRequest(const json& j) {
-	double crab = j["crab"];
+	double crab = -j["crab"].get<double>();
 	double steer = -j["steer"].get<double>();
-	double norm = std::sqrt(std::pow(crab, 2) + std::pow(steer, 2));
+	double norm = std::hypot(crab, steer);
 	double dy = Constants::MAX_WHEEL_VEL * (norm > 1 ? crab / norm : crab);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
 	LOG_F(1, "{crab=%.2f, steer=%.2f} -> setCrabCmdVel(%.4f, %.4f)", crab, steer, dtheta, dy);
