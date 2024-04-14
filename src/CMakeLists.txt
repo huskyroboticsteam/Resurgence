@@ -221,6 +221,7 @@ add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
   world_interface/motor/can_motor.cpp
   Globals.cpp
+  Constants.cpp
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
@@ -260,6 +261,7 @@ list(APPEND simulator_libs
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
   Globals.cpp
+  Constants.cpp
   network/websocket/WebSocketServer.cpp
   network/websocket/WebSocketProtocol.cpp
   )
