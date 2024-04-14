@@ -11,7 +11,6 @@
 
 #include <frozen/unordered_map.h>
 
-
 using namespace kinematics;
 
 namespace Constants {
