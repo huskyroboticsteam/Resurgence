@@ -160,24 +160,21 @@ double setCrabCmdVel(double dtheta, double dy) {
 			return 0;
 	}
 
-	swervewheelvel_t wheelVels = swerveKinematics().robotVelToWheelVel(0, dy, dtheta);
-	double lfPWM = wheelVels.lfVel / Constants::MAX_WHEEL_VEL;
-	double lbPWM = wheelVels.lbVel / Constants::MAX_WHEEL_VEL;
-	double rfPWM = wheelVels.rfVel / Constants::MAX_WHEEL_VEL;
-	double rbPWM = wheelVels.rbVel / Constants::MAX_WHEEL_VEL;
-	double maxAbsPWM = std::max(std::max(std::abs(lfPWM), std::abs(lbPWM)),
-								std::max(std::abs(rfPWM), std::abs(rbPWM)));
+	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dy, dtheta);
+	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
+	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
 	if (maxAbsPWM > 1) {
-		lfPWM /= maxAbsPWM;
-		lbPWM /= maxAbsPWM;
-		rfPWM /= maxAbsPWM;
-		rbPWM /= maxAbsPWM;
+		lPWM /= maxAbsPWM;
+		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::frontLeftWheel, lfPWM);
-	setMotorPower(motorid_t::rearLeftWheel, lbPWM);
-	setMotorPower(motorid_t::frontRightWheel, rfPWM);
-	setMotorPower(motorid_t::rearRightWheel, rbPWM);
+	setCmdVelToIntegrate(wheelVels);
+	setMotorPower(motorid_t::frontLeftWheel, lPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, rPWM);
+
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
 
