@@ -5,7 +5,7 @@
 namespace Constants {
 constexpr std::array<int32_t, 4> NORMAL_WHEEL_ROTS = {0, 0, 0, 0};
 const swervewheelvel_t TURN_IN_PLACE_VEL =
-	kinematics::SwerveDriveKinematics(Constants::EFF_WHEEL_BASE, Constants::ROBOT_LENGTH)
+	kinematics::SwerveDriveKinematics(Constants::WHEEL_BASE, Constants::ROBOT_LENGTH)
 		.robotVelToWheelVel(0, 0, 1);
 const std::array<int32_t, 4> TURN_IN_PLACE_WHEEL_ROTS = {
 	static_cast<int32_t>(TURN_IN_PLACE_VEL.lfRot * 1000),
