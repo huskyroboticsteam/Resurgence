@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../kinematics/PlanarArmKinematics.h"
+#include "../kinematics/ArmKinematics.h"
 #include "../navtypes.h"
 #include "../utils/time.h"
 #include "../world_interface/data.h"
@@ -30,12 +30,14 @@ public:
 	/**
 	 * @brief Construct a new controller object.
 	 *
-	 * @param kin_obj PlanarArmKinematics object for the arm (should have the same number of
-	 *                arm joints).
+	 * @param currJointPos The current joint positions of the arm.
+	 * @param kin_obj ArmKinematics object for the arm (should have the same number of
+	 * arm joints).
 	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
 	 *                      prevent singularity lock. Must be in range (0, 1).
 	 */
-	PlanarArmController(kinematics::PlanarArmKinematics<N> kin_obj, const double safetyFactor)
+	PlanarArmController(const kinematics::ArmKinematics<2, N>& kin_obj,
+						const double safetyFactor)
 		: kin(kin_obj), safetyFactor(safetyFactor) {
 		CHECK_F(safetyFactor > 0.0 && safetyFactor < 1.0);
 
@@ -91,13 +93,17 @@ public:
 	 * @return whether the target joint positions are within the arm controller's radius limit.
 	 */
 	static bool is_setpoint_valid(const navtypes::Vectord<N>& targetJointPos,
-								  kinematics::PlanarArmKinematics<N> kin_obj,
+								  kinematics::ArmKinematics<2, N> kin_obj,
 								  double safetyFactor) {
 		// Compute the new EE position to determine if it is within
 		// safety factor * length of fully extended arm.
 		double eeRadius = kin_obj.jointPosToEEPos(targetJointPos).norm();
 		double maxRadius = kin_obj.getSegLens().sum() * safetyFactor;
 		return eeRadius <= maxRadius;
+	}
+
+	const kinematics::ArmKinematics<2, N>& kinematics() const {
+		return kin;
 	}
 
 	/**
@@ -230,7 +236,7 @@ private:
 
 	std::optional<MutableFields> mutableFields;
 	std::mutex mutex;
-	const kinematics::PlanarArmKinematics<N> kin;
+	const kinematics::ArmKinematics<2, N> kin;
 	const double safetyFactor;
 
 	/**
