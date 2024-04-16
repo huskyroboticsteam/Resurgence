@@ -56,21 +56,6 @@ void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint
 	}
 }
 
-void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo,
-					   uint16_t adcHi,
-					   std::optional<std::chrono::milliseconds> telemetryPeriod) {
-	CANPacket packet;
-	auto group = static_cast<uint8_t>(devicegroup_t::motor);
-	AssemblePotHiSetPacket(&packet, group, serial, adcHi, posHi);
-	sendCANPacket(packet);
-	AssemblePotLoSetPacket(&packet, group, serial, adcLo, posLo);
-	sendCANPacket(packet);
-	if (telemetryPeriod) {
-		scheduleTelemetryPull(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle,
-							  telemetryPeriod.value());
-	}
-}
-
 void emergencyStopMotors() {
 	CANPacket p;
 	AssembleGroupBroadcastingEmergencyStopPacket(&p, static_cast<uint8_t>(0x0),
