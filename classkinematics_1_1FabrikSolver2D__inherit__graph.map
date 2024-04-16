@@ -1,0 +1,5 @@
+<map id="kinematics::FabrikSolver2D&lt; N &gt;" name="kinematics::FabrikSolver2D&lt; N &gt;">
+<area shape="rect" id="Node000001" title="Implementation of the FABRIK algorithm, in the special case of 2 dimensions." alt="" coords="31,94,202,135"/>
+<area shape="rect" id="Node000002" href="$classkinematics_1_1InverseArmKinematics.html" title=" " alt="" coords="5,5,228,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,62,119,94,114,94,114,62"/>
+</map>

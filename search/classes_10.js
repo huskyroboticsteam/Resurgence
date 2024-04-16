@@ -114,7 +114,7 @@ var searchData=
   ['plainobjectbase_3c_20matrix_3c_20scalar_2c_20_5frows_2c_20_5fcols_2c_20_5foptions_2c_20_5fmaxrows_2c_20_5fmaxcols_20_3e_20_3e_111',['PlainObjectBase&lt; Matrix&lt; Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1PlainObjectBase.html',1,'']]],
   ['plainobjectbase_3c_20matrix_3c_20storageindex_2c_20_5frows_2c_20_5fcols_2c_20_5foptions_2c_20_5fmaxrows_2c_20_5fmaxcols_20_3e_20_3e_112',['PlainObjectBase&lt; Matrix&lt; StorageIndex, _Rows, _Cols, _Options, _MaxRows, _MaxCols &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1PlainObjectBase.html',1,'']]],
   ['planararmcontroller_113',['PlanarArmController',['../classcontrol_1_1PlanarArmController.html',1,'control']]],
-  ['planararmkinematics_114',['PlanarArmKinematics',['../classkinematics_1_1PlanarArmKinematics.html',1,'kinematics']]],
+  ['planararmfk_114',['PlanarArmFK',['../classkinematics_1_1PlanarArmFK.html',1,'kinematics']]],
   ['planeportraitprojector_115',['PlanePortraitProjector',['https://docs.opencv.org/4.2.0/df/d0d/structcv_1_1detail_1_1PlanePortraitProjector.html',1,'cv::detail']]],
   ['planeportraitwarper_116',['PlanePortraitWarper',['https://docs.opencv.org/4.2.0/d9/d77/classcv_1_1detail_1_1PlanePortraitWarper.html',1,'cv::detail']]],
   ['planeprojector_117',['PlaneProjector',['https://docs.opencv.org/4.2.0/d6/d1f/structcv_1_1detail_1_1PlaneProjector.html',1,'cv::detail']]],

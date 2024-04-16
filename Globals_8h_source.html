@@ -94,27 +94,27 @@ $(function() { codefold.init(0); });
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;control/PlanarArmController.h&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;network/websocket/WebSocketServer.h&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;world_interface/data.h&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00044.html">atomic</a>&gt;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a>&gt;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">enum class</span> RoverState {</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    RemoteControl,</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    DrivingToWaypoint,</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    LookingForTennisball,</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>};</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// NOTE(sasha): To keep linker happy, declare globals with &quot;extern&quot; here and then</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">//              provide variable definition in Globals.cpp</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">namespace </span>Globals {</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">extern</span> RoverState curr_state;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keyword">extern</span> <a class="code hl_class" href="classnet_1_1websocket_1_1SingleClientWSServer.html">net::websocket::SingleClientWSServer</a> websocketServer;</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">extern</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01727.html">std::atomic&lt;bool&gt;</a> E_STOP;</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">extern</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01727.html">std::atomic&lt;bool&gt;</a> AUTONOMOUS;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">extern</span> <a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a> mountedPeripheral;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_class" href="classkinematics_1_1PlanarArmKinematics.html">kinematics::PlanarArmKinematics&lt;2&gt;</a> planarArmKinematics;</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;kinematics/ArmKinematics.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;network/websocket/WebSocketServer.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;world_interface/data.h&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00044.html">atomic</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="codeRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">enum class</span> RoverState {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    RemoteControl,</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    DrivingToWaypoint,</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    LookingForTennisball,</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>};</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// NOTE(sasha): To keep linker happy, declare globals with &quot;extern&quot; here and then</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">//              provide variable definition in Globals.cpp</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">namespace </span>Globals {</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keyword">extern</span> RoverState curr_state;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">extern</span> <a class="code hl_class" href="classnet_1_1websocket_1_1SingleClientWSServer.html">net::websocket::SingleClientWSServer</a> websocketServer;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">extern</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01727.html">std::atomic&lt;bool&gt;</a> E_STOP;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">extern</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01727.html">std::atomic&lt;bool&gt;</a> AUTONOMOUS;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">extern</span> <a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a> mountedPeripheral;</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">extern</span> <a class="code hl_class" href="classcontrol_1_1PlanarArmController.html">control::PlanarArmController&lt;2&gt;</a> planarArmController;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">extern</span> <a class="code hl_structRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01727.html">std::atomic&lt;bool&gt;</a> armIKEnabled;</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>} <span class="comment">// namespace Globals</span></div>
@@ -122,7 +122,6 @@ $(function() { codefold.init(0); });
 <div class="ttc" id="aa00182_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00182.html">vector</a></div></div>
 <div class="ttc" id="aa01727_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01727.html">std::atomic</a></div></div>
 <div class="ttc" id="aclasscontrol_1_1PlanarArmController_html"><div class="ttname"><a href="classcontrol_1_1PlanarArmController.html">control::PlanarArmController</a></div><div class="ttdoc">Controller to move planar arm to a target end effector position.</div><div class="ttdef"><b>Definition</b> PlanarArmController.h:28</div></div>
-<div class="ttc" id="aclasskinematics_1_1PlanarArmKinematics_html"><div class="ttname"><a href="classkinematics_1_1PlanarArmKinematics.html">kinematics::PlanarArmKinematics</a></div><div class="ttdoc">Kinematics object for a sequence of arm segments in a 2d plane.</div><div class="ttdef"><b>Definition</b> PlanarArmKinematics.h:19</div></div>
 <div class="ttc" id="aclassnet_1_1websocket_1_1SingleClientWSServer_html"><div class="ttname"><a href="classnet_1_1websocket_1_1SingleClientWSServer.html">net::websocket::SingleClientWSServer</a></div><div class="ttdoc">A WebSocket server class that only accepts a single client at a time to each endpoint served by this ...</div><div class="ttdef"><b>Definition</b> WebSocketServer.h:35</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_aa93c10246999d2fdb71ba7bdb792c235"><div class="ttname"><a href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a></div><div class="ttdeci">mountedperipheral_t</div><div class="ttdoc">the mounted peripheral on the robot.</div><div class="ttdef"><b>Definition</b> data.h:71</div></div>
 </div><!-- fragment --></div><!-- contents -->

@@ -1,0 +1,5 @@
+<map id="kinematics::PlanarArmFK&lt; N &gt;" name="kinematics::PlanarArmFK&lt; N &gt;">
+<area shape="rect" id="Node000001" title="Kinematics object for a sequence of arm segments in a 2d plane." alt="" coords="18,94,219,120"/>
+<area shape="rect" id="Node000002" href="$classkinematics_1_1ForwardArmKinematics.html" title=" " alt="" coords="5,5,232,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,62,121,93,116,93,116,62"/>
+</map>

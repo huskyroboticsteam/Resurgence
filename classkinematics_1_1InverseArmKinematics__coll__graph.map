@@ -1,0 +1,5 @@
+<map id="kinematics::InverseArmKinematics&lt; D, N &gt;" name="kinematics::InverseArmKinematics&lt; D, N &gt;">
+<area shape="rect" id="Node000001" title="A class that calculates the inverse kinematics of an arm." alt="" coords="9,124,231,165"/>
+<area shape="rect" id="Node000002" href="/github/workspace/doxygen-tags/libstdc++.tag$a06899.html" title=" " alt="" coords="5,5,235,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,76,123,124,117,124,117,76"/>
+</map>

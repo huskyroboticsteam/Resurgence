@@ -108,7 +108,7 @@ $(function() {
 <li>getImageSize()&#160;:&#160;<a class="el" href="classcam_1_1CameraParams.html#a3610c3796220505394f18f65540bc88c">cam::CameraParams</a></li>
 <li>getIntrinsicList()&#160;:&#160;<a class="el" href="classcam_1_1CameraParams.html#a70b51c0df85564d4c8e62d7def1b63a2">cam::CameraParams</a></li>
 <li>getIntrinsicParams()&#160;:&#160;<a class="el" href="classcam_1_1Camera.html#addf8155bbe34ac2bcc2059d214b4ac46">cam::Camera</a></li>
-<li>getJacobian()&#160;:&#160;<a class="el" href="classkinematics_1_1PlanarArmKinematics.html#a9c72ad16c9026473b0915fee099dc8f5">kinematics::PlanarArmKinematics&lt; N &gt;</a></li>
+<li>getJacobian()&#160;:&#160;<a class="el" href="classkinematics_1_1ArmKinematics.html#a559e24bf4f3a5887e033acce5a223fbf">kinematics::ArmKinematics&lt; D, N &gt;</a>, <a class="el" href="classkinematics_1_1ForwardArmKinematics.html#a6c1833d6eca5efbd0712b590e9cdb8b7">kinematics::ForwardArmKinematics&lt; D, N &gt;</a>, <a class="el" href="classkinematics_1_1PlanarArmFK.html#af431d4e15cc22ab25eb658d690e9033d">kinematics::PlanarArmFK&lt; N &gt;</a></li>
 <li>getLocalPoseUpdate()&#160;:&#160;<a class="el" href="classkinematics_1_1DiffDriveKinematics.html#a9d99dfcd5c8fc3eda7d3e5c192293790">kinematics::DiffDriveKinematics</a>, <a class="el" href="classkinematics_1_1SwerveDriveKinematics.html#a51be22c20b35d819cb04081399edfb81">kinematics::SwerveDriveKinematics</a></li>
 <li>getMarker()&#160;:&#160;<a class="el" href="classAR_1_1Tag.html#ac841bf92ef87dcac6196435afc7c2f59">AR::Tag</a></li>
 <li>getMarkerByID()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#acf9ab0b6d35c785cc1671abe908edcce">AR::MarkerSet</a></li>
@@ -120,13 +120,14 @@ $(function() {
 <li>getMotorSerial()&#160;:&#160;<a class="el" href="classrobot_1_1can__motor.html#a8411b8ec09281a869deab04e635ef98c">robot::can_motor</a></li>
 <li>getName()&#160;:&#160;<a class="el" href="classcam_1_1Camera.html#a32cad2f8cf6533b1d7764ab0165d6b49">cam::Camera</a></li>
 <li>getNextPose()&#160;:&#160;<a class="el" href="classkinematics_1_1DiffDriveKinematics.html#a3b488799b23e168b1803490a1ac54329">kinematics::DiffDriveKinematics</a>, <a class="el" href="classkinematics_1_1SwerveDriveKinematics.html#aec51367f62c461069889aab9f512f0b5">kinematics::SwerveDriveKinematics</a></li>
-<li>getNumSegments()&#160;:&#160;<a class="el" href="classkinematics_1_1PlanarArmKinematics.html#a24bc83ca7cf3529f98c97fbb6d1eb261">kinematics::PlanarArmKinematics&lt; N &gt;</a></li>
+<li>getNumDimensions()&#160;:&#160;<a class="el" href="classkinematics_1_1ForwardArmKinematics.html#a03249f63ac81c6842ecf75b251ed2b36">kinematics::ForwardArmKinematics&lt; D, N &gt;</a></li>
+<li>getNumSegments()&#160;:&#160;<a class="el" href="classkinematics_1_1ForwardArmKinematics.html#ac92c30c6e44072af63c8a2a502f53d47">kinematics::ForwardArmKinematics&lt; D, N &gt;</a></li>
 <li>getOutput()&#160;:&#160;<a class="el" href="classcommands_1_1DriveToWaypointCommand.html#abe80bc625aa13f7507b07382dc6a3ea0">commands::DriveToWaypointCommand</a>, <a class="el" href="classcontrol_1_1PIDController.html#a97513b9997e20c850ddb60ba847bbd52">control::PIDController&lt; dim &gt;</a>, <a class="el" href="classfilters_1_1Output.html#ab277cdeec843cde0a0c81fb40d92e5be">filters::Output</a></li>
 <li>getPhysicalSize()&#160;:&#160;<a class="el" href="classAR_1_1MarkerSet.html#af12b8ab24b3670123d2ae5d717b0e53f">AR::MarkerSet</a></li>
 <li>getPoseUpdate()&#160;:&#160;<a class="el" href="classkinematics_1_1DiffDriveKinematics.html#a8c6a04b5945d3c66a404ec9878db1536">kinematics::DiffDriveKinematics</a>, <a class="el" href="classkinematics_1_1SwerveDriveKinematics.html#abf6e0b57ed0519c9a34e781ea445c3ab">kinematics::SwerveDriveKinematics</a></li>
 <li>getProtocolPath()&#160;:&#160;<a class="el" href="classnet_1_1websocket_1_1WebSocketProtocol.html#a3631c6a42909a6b7108b276b4dc791b3">net::websocket::WebSocketProtocol</a></li>
 <li>getRVec()&#160;:&#160;<a class="el" href="classAR_1_1Tag.html#a5c106533bf2eef5fffe633112ccec6fe">AR::Tag</a></li>
-<li>getSegLens()&#160;:&#160;<a class="el" href="classkinematics_1_1PlanarArmKinematics.html#a411d9bc925116fc14325da353a1e543e">kinematics::PlanarArmKinematics&lt; N &gt;</a></li>
+<li>getSegLens()&#160;:&#160;<a class="el" href="classkinematics_1_1ArmKinematics.html#a7b0b1dfb365f9be73963c3c7366b0e4c">kinematics::ArmKinematics&lt; D, N &gt;</a>, <a class="el" href="classkinematics_1_1ForwardArmKinematics.html#a4722dc443f1dc98eef392ad621849646">kinematics::ForwardArmKinematics&lt; D, N &gt;</a>, <a class="el" href="classkinematics_1_1PlanarArmFK.html#a9addf4a724f4dc24c224faf53b8a14a5">kinematics::PlanarArmFK&lt; N &gt;</a></li>
 <li>getSize()&#160;:&#160;<a class="el" href="classfilters_1_1RollingAvgFilter.html#ac75e02a7b095329a6eb213d34e052fbd">filters::RollingAvgFilter&lt; T &gt;</a></li>
 <li>getSquareEccentricity()&#160;:&#160;<a class="el" href="classGPSDatum.html#a950d3a9a6a4b00167eb6d7d3960346c0">GPSDatum</a></li>
 <li>getState()&#160;:&#160;<a class="el" href="classfilters_1_1KalmanFilterBase.html#a17e3237412ccc5293f74ec5469e44e17">filters::KalmanFilterBase&lt; stateDim, inputDim &gt;</a></li>

@@ -1,0 +1,7 @@
+<map id="kinematics::ArmKinematics&lt; D, N &gt;" name="kinematics::ArmKinematics&lt; D, N &gt;">
+<area shape="rect" id="Node000001" title="A class that combines the forward and inverse kinematics of an arm." alt="" coords="153,94,332,135"/>
+<area shape="rect" id="Node000002" href="$classkinematics_1_1ForwardArmKinematics.html" title="A class that calculates the forward kinematics of an arm." alt="" coords="5,5,232,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,53,216,91,213,96,158,57"/>
+<area shape="rect" id="Node000003" href="$classkinematics_1_1InverseArmKinematics.html" title="A class that calculates the inverse kinematics of an arm." alt="" coords="255,5,478,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="327,57,272,96,269,91,324,53"/>
+</map>

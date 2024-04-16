@@ -94,15 +94,58 @@ $(function() {
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="FabrikSolver_8h_source.html">FabrikSolver.h</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for kinematics::FabrikSolver2D&lt; N &gt;:</div>
+<div class="dyncontent">
+<div class="center"><img src="classkinematics_1_1FabrikSolver2D__inherit__graph.png" border="0" usemap="#akinematics_1_1FabrikSolver2D_3_01N_01_4_inherit__map" alt="Inheritance graph"/></div>
+<map name="akinematics_1_1FabrikSolver2D_3_01N_01_4_inherit__map" id="akinematics_1_1FabrikSolver2D_3_01N_01_4_inherit__map">
+<area shape="rect" title="Implementation of the FABRIK algorithm, in the special case of 2 dimensions." alt="" coords="31,94,202,135"/>
+<area shape="rect" href="classkinematics_1_1InverseArmKinematics.html" title=" " alt="" coords="5,5,228,46"/>
+<area shape="poly" title=" " alt="" coords="119,62,119,94,114,94,114,62"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for kinematics::FabrikSolver2D&lt; N &gt;:</div>
+<div class="dyncontent">
+<div class="center"><img src="classkinematics_1_1FabrikSolver2D__coll__graph.png" border="0" usemap="#akinematics_1_1FabrikSolver2D_3_01N_01_4_coll__map" alt="Collaboration graph"/></div>
+<map name="akinematics_1_1FabrikSolver2D_3_01N_01_4_coll__map" id="akinematics_1_1FabrikSolver2D_3_01N_01_4_coll__map">
+<area shape="rect" title="Implementation of the FABRIK algorithm, in the special case of 2 dimensions." alt="" coords="35,214,205,255"/>
+<area shape="rect" href="classkinematics_1_1InverseArmKinematics.html" title=" " alt="" coords="9,124,231,165"/>
+<area shape="poly" title=" " alt="" coords="123,180,123,214,117,214,117,180"/>
+<area shape="rect" target="_parent" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html" title=" " alt="" coords="5,5,235,61"/>
+<area shape="poly" title=" " alt="" coords="123,76,123,124,117,124,117,76"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0677f854ee0c815886e958f271e96f94" id="r_a0677f854ee0c815886e958f271e96f94"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0677f854ee0c815886e958f271e96f94">FabrikSolver2D</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;segLens, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;jointMin, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;jointMax, double thresh, int maxIter)</td></tr>
-<tr class="memdesc:a0677f854ee0c815886e958f271e96f94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an IK solver object.  <br /></td></tr>
-<tr class="separator:a0677f854ee0c815886e958f271e96f94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5098fa929b0971b6d524dcbf698f30ec" id="r_a5098fa929b0971b6d524dcbf698f30ec"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5098fa929b0971b6d524dcbf698f30ec">solve</a> (const Eigen::Vector2d &amp;eePos, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;jointAngles, bool &amp;success) const</td></tr>
-<tr class="memdesc:a5098fa929b0971b6d524dcbf698f30ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solve for the joint angles that yield the given EE position.  <br /></td></tr>
-<tr class="separator:a5098fa929b0971b6d524dcbf698f30ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeda4faa4076c5dcf0b0ba0ad9b97ea49" id="r_aeda4faa4076c5dcf0b0ba0ad9b97ea49"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeda4faa4076c5dcf0b0ba0ad9b97ea49">FabrikSolver2D</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; const <a class="el" href="classkinematics_1_1PlanarArmFK.html">PlanarArmFK</a>&lt; N &gt; &gt; fk, double thresh, int maxIter)</td></tr>
+<tr class="memdesc:aeda4faa4076c5dcf0b0ba0ad9b97ea49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an IK solver object.  <br /></td></tr>
+<tr class="separator:aeda4faa4076c5dcf0b0ba0ad9b97ea49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a353a774512637fd7adf28b249464527f" id="r_a353a774512637fd7adf28b249464527f"><td class="memItemLeft" align="right" valign="top"><a id="a353a774512637fd7adf28b249464527f" name="a353a774512637fd7adf28b249464527f"></a>
+<a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>solve</b> (const Eigen::Vector2d &amp;eePos, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;jointAngles, bool &amp;success) const override</td></tr>
+<tr class="separator:a353a774512637fd7adf28b249464527f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classkinematics_1_1InverseArmKinematics"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classkinematics_1_1InverseArmKinematics')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classkinematics_1_1InverseArmKinematics.html">kinematics::InverseArmKinematics&lt; 2, N &gt;</a></td></tr>
+<tr class="memitem:aad65afdcfb61a30f8fa7ee851bfc6d10 inherit pub_methods_classkinematics_1_1InverseArmKinematics" id="r_aad65afdcfb61a30f8fa7ee851bfc6d10"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1InverseArmKinematics.html#aad65afdcfb61a30f8fa7ee851bfc6d10">InverseArmKinematics</a> (<a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; const <a class="el" href="classkinematics_1_1ForwardArmKinematics.html">ForwardArmKinematics</a>&lt; D, N &gt; &gt; fk)</td></tr>
+<tr class="memdesc:aad65afdcfb61a30f8fa7ee851bfc6d10 inherit pub_methods_classkinematics_1_1InverseArmKinematics"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an IK object.  <br /></td></tr>
+<tr class="separator:aad65afdcfb61a30f8fa7ee851bfc6d10 inherit pub_methods_classkinematics_1_1InverseArmKinematics"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a809bfd46354dd6d6c0fbc319a23d0b82 inherit pub_methods_classkinematics_1_1InverseArmKinematics" id="r_a809bfd46354dd6d6c0fbc319a23d0b82"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1InverseArmKinematics.html#a809bfd46354dd6d6c0fbc319a23d0b82">eePosToJointPos</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; D &gt; &amp;eePos, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;currJointPos) const</td></tr>
+<tr class="memdesc:a809bfd46354dd6d6c0fbc319a23d0b82 inherit pub_methods_classkinematics_1_1InverseArmKinematics"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the joint angles that yield the desired EE position.  <br /></td></tr>
+<tr class="separator:a809bfd46354dd6d6c0fbc319a23d0b82 inherit pub_methods_classkinematics_1_1InverseArmKinematics"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e2e059e85302465156c4ae794b54a70 inherit pub_methods_classkinematics_1_1InverseArmKinematics" id="r_a7e2e059e85302465156c4ae794b54a70"><td class="memItemLeft" align="right" valign="top">virtual <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1InverseArmKinematics.html#a7e2e059e85302465156c4ae794b54a70">eePosToJointPos</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; D &gt; &amp;eePos, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;jointAngles, bool &amp;success) const</td></tr>
+<tr class="memdesc:a7e2e059e85302465156c4ae794b54a70 inherit pub_methods_classkinematics_1_1InverseArmKinematics"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solve for the joint angles that yield the given EE position.  <br /></td></tr>
+<tr class="separator:a7e2e059e85302465156c4ae794b54a70 inherit pub_methods_classkinematics_1_1InverseArmKinematics"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_classkinematics_1_1InverseArmKinematics"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_methods_classkinematics_1_1InverseArmKinematics')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classkinematics_1_1InverseArmKinematics.html">kinematics::InverseArmKinematics&lt; 2, N &gt;</a></td></tr>
+<tr class="memitem:a566ec29651bdf0b09fcd5b4bfe2e7d29 inherit pro_methods_classkinematics_1_1InverseArmKinematics" id="r_a566ec29651bdf0b09fcd5b4bfe2e7d29"><td class="memItemLeft" align="right" valign="top">virtual <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkinematics_1_1InverseArmKinematics.html#a566ec29651bdf0b09fcd5b4bfe2e7d29">solve</a> (const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; D &gt; &amp;eePos, const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &amp;jointAngles, bool &amp;success) const=0</td></tr>
+<tr class="memdesc:a566ec29651bdf0b09fcd5b4bfe2e7d29 inherit pro_methods_classkinematics_1_1InverseArmKinematics"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solve for the joint angles that yield the given EE position.  <br /></td></tr>
+<tr class="separator:a566ec29651bdf0b09fcd5b4bfe2e7d29 inherit pro_methods_classkinematics_1_1InverseArmKinematics"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classkinematics_1_1InverseArmKinematics"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_classkinematics_1_1InverseArmKinematics')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classkinematics_1_1InverseArmKinematics.html">kinematics::InverseArmKinematics&lt; 2, N &gt;</a></td></tr>
+<tr class="memitem:a2423e20d9eeba9e37bc272bef8f1d603 inherit pro_attribs_classkinematics_1_1InverseArmKinematics" id="r_a2423e20d9eeba9e37bc272bef8f1d603"><td class="memItemLeft" align="right" valign="top">
+const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; const <a class="el" href="classkinematics_1_1ForwardArmKinematics.html">ForwardArmKinematics</a>&lt; D, N &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fk</b></td></tr>
+<tr class="separator:a2423e20d9eeba9e37bc272bef8f1d603 inherit pro_attribs_classkinematics_1_1InverseArmKinematics"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;int N&gt;<br />
@@ -116,8 +159,8 @@ class kinematics::FabrikSolver2D&lt; N &gt;</div><p>Implementation of the FABRIK
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a href="http://www.andreasaristidou.com/FABRIK.html">http://www.andreasaristidou.com/FABRIK.html</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a0677f854ee0c815886e958f271e96f94" name="a0677f854ee0c815886e958f271e96f94"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0677f854ee0c815886e958f271e96f94">&#9670;&#160;</a></span>FabrikSolver2D()</h2>
+<a id="aeda4faa4076c5dcf0b0ba0ad9b97ea49" name="aeda4faa4076c5dcf0b0ba0ad9b97ea49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeda4faa4076c5dcf0b0ba0ad9b97ea49">&#9670;&#160;</a></span>FabrikSolver2D()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -130,17 +173,7 @@ template&lt;int N&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classkinematics_1_1FabrikSolver2D.html">kinematics::FabrikSolver2D</a>&lt; N &gt;::FabrikSolver2D </td>
           <td>(</td>
-          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>segLens</em>, </span></td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>jointMin</em>, </span></td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>jointMax</em>, </span></td>
+          <td class="paramtype"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; const <a class="el" href="classkinematics_1_1PlanarArmFK.html">PlanarArmFK</a>&lt; N &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>fk</em>, </span></td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -163,62 +196,12 @@ template&lt;int N&gt; </div>
 <p>Construct an IK solver object. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">segLens</td><td>The length of each arm segment. </td></tr>
-    <tr><td class="paramname">jointMin</td><td>The minimum angle of each joint. Set to -pi for no limit. </td></tr>
-    <tr><td class="paramname">jointMax</td><td>The maximum angle of each joint. Set to pi for no limit. </td></tr>
+    <tr><td class="paramname">fk</td><td>The forward kinematics of the arm. </td></tr>
     <tr><td class="paramname">thresh</td><td>The IK solver will succeed when the EE position is off by at most this much. </td></tr>
     <tr><td class="paramname">maxIter</td><td>The maximum number of iterations to run the solver before failing. </td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a5098fa929b0971b6d524dcbf698f30ec" name="a5098fa929b0971b6d524dcbf698f30ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5098fa929b0971b6d524dcbf698f30ec">&#9670;&#160;</a></span>solve()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int N&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; <a class="el" href="classkinematics_1_1FabrikSolver2D.html">kinematics::FabrikSolver2D</a>&lt; N &gt;::solve </td>
-          <td>(</td>
-          <td class="paramtype">const Eigen::Vector2d &amp;</td>          <td class="paramname"><span class="paramname"><em>eePos</em>, </span></td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html">navtypes::Arrayd</a>&lt; N &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>jointAngles</em>, </span></td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool &amp;</td>          <td class="paramname"><span class="paramname"><em>success</em></span>&#160;) const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Solve for the joint angles that yield the given EE position. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">eePos</td><td>The desired end effector position. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">jointAngles</td><td>The current joint angles. Used as a starting guess for the IK solver. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">success</td><td>Output parameter that signals if the IK solver succeeded. Failure may occur if the target is unreachable or the IK solver exceeds the iteration limit. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>navtypes::Arrayd&lt;N&gt; The target joint angles that achieve the desired EE position. </dd></dl>
 
 </div>
 </div>
