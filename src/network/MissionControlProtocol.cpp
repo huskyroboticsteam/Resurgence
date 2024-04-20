@@ -78,67 +78,70 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 
 static bool validateDriveModeRequest(const json& j) {
 	return util::validateKey(j, "mode", val_t::string) &&
-		   util::validateOneOf(j, "mode", {"normal", "turn-in-place", "crab"});
+		   util::validateOneOf(j, "mode", {"normal", "turn-in-place", "crab"}) &&
+		   util::validateKey(j, "override", val_t::boolean);
 }
 
 void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	if (mode == "normal") {
-		Globals::driveMode = DriveMode::Normal;
+		std::get<0>(Globals::driveMode) = DriveMode::Normal;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::WHEEL_IDS[i],
 							   Constants::WHEEL_ROTS.at(DriveMode::Normal)[i]);
 		}
 	} else if (mode == "turn-in-place") {
-		Globals::driveMode = DriveMode::TurnInPlace;
+		std::get<0>(Globals::driveMode) = DriveMode::TurnInPlace;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::WHEEL_IDS[i],
 							   Constants::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
 		}
 	} else if (mode == "crab") {
-		Globals::driveMode = DriveMode::Crab;
+		std::get<0>(Globals::driveMode) = DriveMode::Crab;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::WHEEL_IDS[i],
 							   Constants::WHEEL_ROTS.at(DriveMode::Crab)[i]);
 		}
 	}
+
+	std::get<1>(Globals::driveMode) = j["override"];
 }
 
 static bool validateDriveRequest(const json& j) {
-	if (Globals::driveMode != DriveMode::Normal) {
+	if (std::get<0>(Globals::driveMode) != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(Globals::driveMode).c_str());
+			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
 	}
-	return Globals::driveMode == DriveMode::Normal && util::hasKey(j, "straight") &&
-		   util::validateRange(j, "straight", -1, 1) && util::hasKey(j, "steer") &&
-		   util::validateRange(j, "steer", -1, 1);
+	return std::get<0>(Globals::driveMode) == DriveMode::Normal &&
+		   util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
+		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateTankDriveRequest(const json& j) {
-	if (Globals::driveMode != DriveMode::Normal) {
+	if (std::get<0>(Globals::driveMode) != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(Globals::driveMode).c_str());
+			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
 	}
-	return Globals::driveMode == DriveMode::Normal && util::hasKey(j, "left") &&
+	return std::get<0>(Globals::driveMode) == DriveMode::Normal && util::hasKey(j, "left") &&
 		   util::validateRange(j, "left", -1, 1) && util::hasKey(j, "right") &&
 		   util::validateRange(j, "right", -1, 1);
 }
 
 static bool validateTurnInPlaceDriveRequest(const json& j) {
-	if (Globals::driveMode != DriveMode::TurnInPlace) {
+	if (std::get<0>(Globals::driveMode) != DriveMode::TurnInPlace) {
 		LOG_F(WARNING, "Drive mode set to %s, not TurnInPlace",
-			  driveModeStrings.at(Globals::driveMode).c_str());
+			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
 	}
-	return Globals::driveMode == DriveMode::TurnInPlace && util::hasKey(j, "steer") &&
-		   util::validateRange(j, "steer", -1, 1);
+	return std::get<0>(Globals::driveMode) == DriveMode::TurnInPlace &&
+		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateCrabDriveRequest(const json& j) {
-	if (Globals::driveMode != DriveMode::Crab) {
+	if (std::get<0>(Globals::driveMode) != DriveMode::Crab) {
 		LOG_F(WARNING, "Drive mode set to %s, not Crab",
-			  driveModeStrings.at(Globals::driveMode).c_str());
+			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
 	}
-	return Globals::driveMode == DriveMode::Crab && util::hasKey(j, "crab") &&
+	return std::get<0>(Globals::driveMode) == DriveMode::Crab && util::hasKey(j, "crab") &&
 		   util::validateRange(j, "crab", -1, 1) && util::hasKey(j, "steer") &&
 		   util::validateRange(j, "steer", -1, 1);
 }

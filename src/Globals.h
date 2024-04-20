@@ -34,7 +34,7 @@ namespace Globals {
    @deprecated
  */
 extern RoverState curr_state;
-extern DriveMode driveMode;
+extern std::tuple<DriveMode, bool> driveMode;
 extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;

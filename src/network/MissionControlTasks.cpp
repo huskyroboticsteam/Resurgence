@@ -77,13 +77,13 @@ void PowerRepeatTask::periodicTask() {
 	}
 	if (_last_cmd_vel) {
 		if (_last_cmd_vel->first != 0.0 || _last_cmd_vel->second != 0.0) {
-			if (Globals::driveMode == DriveMode::Normal) {
+			if (std::get<0>(Globals::driveMode) == DriveMode::Normal) {
 				if (_tank) {
 					robot::setTankCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				} else {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
-			} else if (Globals::driveMode == DriveMode::TurnInPlace) {
+			} else if (std::get<0>(Globals::driveMode) == DriveMode::TurnInPlace) {
 				robot::setTurnInPlaceCmdVel(_last_cmd_vel->first);
 			} else {
 				robot::setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
