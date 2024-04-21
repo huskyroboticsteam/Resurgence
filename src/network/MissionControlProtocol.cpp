@@ -87,20 +87,20 @@ void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	if (mode == "normal") {
 		std::get<0>(Globals::driveMode) = DriveMode::Normal;
 		for (int i = 0; i < 4; i++) {
-			robot::setMotorPos(Constants::WHEEL_IDS[i],
-							   Constants::WHEEL_ROTS.at(DriveMode::Normal)[i]);
+			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
+							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Normal)[i]);
 		}
 	} else if (mode == "turn-in-place") {
 		std::get<0>(Globals::driveMode) = DriveMode::TurnInPlace;
 		for (int i = 0; i < 4; i++) {
-			robot::setMotorPos(Constants::WHEEL_IDS[i],
-							   Constants::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
+			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
+							   Constants::Drive::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
 		}
 	} else if (mode == "crab") {
 		std::get<0>(Globals::driveMode) = DriveMode::Crab;
 		for (int i = 0; i < 4; i++) {
-			robot::setMotorPos(Constants::WHEEL_IDS[i],
-							   Constants::WHEEL_ROTS.at(DriveMode::Crab)[i]);
+			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
+							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Crab)[i]);
 		}
 	}
 

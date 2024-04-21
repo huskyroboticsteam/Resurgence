@@ -96,6 +96,7 @@ constexpr const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 constexpr std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 constexpr std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
+namespace Drive {
 constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
 	robot::types::motorid_t::frontLeftWheel,
 	robot::types::motorid_t::frontRightWheel,
@@ -105,6 +106,7 @@ constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
 
 const extern std::unordered_map<DriveMode, std::array<int32_t, 4>> WHEEL_ROTS;
 constexpr double STEER_EPSILON = 1000;
+} // namespace Drive
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian

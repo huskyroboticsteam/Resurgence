@@ -40,7 +40,7 @@ std::atomic<bool> AUTONOMOUS = false;
 
 // The boolean here is whether or not wheel rotation check should be ignored when doing
 // swerve-based driving
-std::tuple<DriveMode, bool> driveMode = {DriveMode::Normal, false};
+std::pair<DriveMode, bool> driveMode = {DriveMode::Normal, false};
 
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 const kinematics::PlanarArmKinematics<Constants::arm::IK_MOTORS.size()>
