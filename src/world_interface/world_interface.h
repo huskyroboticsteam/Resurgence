@@ -121,7 +121,8 @@ std::pair<double, double> getCmdVel();
  * @brief Check to see if all wheels are at their target position.
  *
  * @param mode The drive mode to compare wheel rotations against.
- * @return bool if the wheels are within \f$\epsilon\f$ of their their target position.
+ * @return bool if the wheels are within `Constants::Drive::STEER_EPSILON` of their their
+ * target position.
  */
 bool checkWheelRotation(DriveMode mode);
 
