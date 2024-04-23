@@ -5,11 +5,7 @@
 
 #include <chrono>
 #include <cmath>
-#include <condition_variable>
-#include <mutex>
-#include <queue>
 #include <thread>
-#include <vector>
 
 extern "C" {
 #include <HindsightCAN/CANCommon.h>
