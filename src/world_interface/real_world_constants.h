@@ -130,10 +130,10 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::frontRightWheel, 0.7},
 												   {motorid_t::rearLeftWheel, -0.7},
 												   {motorid_t::rearRightWheel, -0.7},
-												   {motorid_t::frontLeftSwerve, 0.0},
-												   {motorid_t::frontRightSwerve, 0.0},
-												   {motorid_t::rearLeftSwerve, 0.0},
-												   {motorid_t::rearRightSwerve, 0.0},
+												   {motorid_t::frontLeftSwerve, 1.0},
+												   {motorid_t::frontRightSwerve, 1.0},
+												   {motorid_t::rearLeftSwerve, 1.0},
+												   {motorid_t::rearRightSwerve, 1.0},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5}});
 /**
@@ -150,10 +150,10 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::frontRightWheel, 0.7},
 												   {motorid_t::rearLeftWheel, -0.7},
 												   {motorid_t::rearRightWheel, -0.7},
-												   {motorid_t::frontLeftSwerve, 0.0},
-												   {motorid_t::frontRightSwerve, 0.0},
-												   {motorid_t::rearLeftSwerve, 0.0},
-												   {motorid_t::rearRightSwerve, 0.0},
+												   {motorid_t::frontLeftSwerve, 1.0},
+												   {motorid_t::frontRightSwerve, 1.0},
+												   {motorid_t::rearLeftSwerve, 1.0},
+												   {motorid_t::rearRightSwerve, 1.0},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5}});
 
