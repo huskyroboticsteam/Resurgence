@@ -85,63 +85,63 @@ static bool validateDriveModeRequest(const json& j) {
 void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	if (mode == "normal") {
-		std::get<0>(Globals::driveMode) = DriveMode::Normal;
+		Globals::driveMode.first = DriveMode::Normal;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
 							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Normal)[i]);
 		}
 	} else if (mode == "turn-in-place") {
-		std::get<0>(Globals::driveMode) = DriveMode::TurnInPlace;
+		Globals::driveMode.first = DriveMode::TurnInPlace;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
 							   Constants::Drive::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
 		}
 	} else if (mode == "crab") {
-		std::get<0>(Globals::driveMode) = DriveMode::Crab;
+		Globals::driveMode.first = DriveMode::Crab;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
 							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Crab)[i]);
 		}
 	}
 
-	std::get<1>(Globals::driveMode) = j["override"];
+	Globals::driveMode.second = j["override"];
 }
 
 static bool validateDriveRequest(const json& j) {
-	if (std::get<0>(Globals::driveMode) != DriveMode::Normal) {
+	if (Globals::driveMode.first != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
+			  driveModeStrings.at(Globals::driveMode.first).c_str());
 	}
-	return std::get<0>(Globals::driveMode) == DriveMode::Normal &&
-		   util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
-		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
+	return Globals::driveMode.first == DriveMode::Normal && util::hasKey(j, "straight") &&
+		   util::validateRange(j, "straight", -1, 1) && util::hasKey(j, "steer") &&
+		   util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateTankDriveRequest(const json& j) {
-	if (std::get<0>(Globals::driveMode) != DriveMode::Normal) {
+	if (Globals::driveMode.first != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
+			  driveModeStrings.at(Globals::driveMode.first).c_str());
 	}
-	return std::get<0>(Globals::driveMode) == DriveMode::Normal && util::hasKey(j, "left") &&
+	return Globals::driveMode.first == DriveMode::Normal && util::hasKey(j, "left") &&
 		   util::validateRange(j, "left", -1, 1) && util::hasKey(j, "right") &&
 		   util::validateRange(j, "right", -1, 1);
 }
 
 static bool validateTurnInPlaceDriveRequest(const json& j) {
-	if (std::get<0>(Globals::driveMode) != DriveMode::TurnInPlace) {
+	if (Globals::driveMode.first != DriveMode::TurnInPlace) {
 		LOG_F(WARNING, "Drive mode set to %s, not TurnInPlace",
-			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
+			  driveModeStrings.at(Globals::driveMode.first).c_str());
 	}
-	return std::get<0>(Globals::driveMode) == DriveMode::TurnInPlace &&
-		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
+	return Globals::driveMode.first == DriveMode::TurnInPlace && util::hasKey(j, "steer") &&
+		   util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateCrabDriveRequest(const json& j) {
-	if (std::get<0>(Globals::driveMode) != DriveMode::Crab) {
+	if (Globals::driveMode.first != DriveMode::Crab) {
 		LOG_F(WARNING, "Drive mode set to %s, not Crab",
-			  driveModeStrings.at(std::get<0>(Globals::driveMode)).c_str());
+			  driveModeStrings.at(Globals::driveMode.first).c_str());
 	}
-	return std::get<0>(Globals::driveMode) == DriveMode::Crab && util::hasKey(j, "crab") &&
+	return Globals::driveMode.first == DriveMode::Crab && util::hasKey(j, "crab") &&
 		   util::validateRange(j, "crab", -1, 1) && util::hasKey(j, "steer") &&
 		   util::validateRange(j, "steer", -1, 1);
 }

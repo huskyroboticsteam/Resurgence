@@ -60,7 +60,7 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	if (!std::get<1>(Globals::driveMode) && !checkWheelRotation(DriveMode::Normal))
+	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::Normal))
 		return 0;
 
 	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
@@ -86,7 +86,7 @@ double setTankCmdVel(double left, double right) {
 		return 0;
 	}
 
-	if (!std::get<1>(Globals::driveMode) && !checkWheelRotation(DriveMode::Normal))
+	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::Normal))
 		return 0;
 
 	wheelvel_t wheelVels = {left, right};
@@ -112,7 +112,7 @@ double setTurnInPlaceCmdVel(double dtheta) {
 		return 0;
 	}
 
-	if (!std::get<1>(Globals::driveMode) && !checkWheelRotation(DriveMode::TurnInPlace))
+	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::TurnInPlace))
 		return 0;
 
 	swervewheelvel_t wheelVels = swerveKinematics().robotVelToWheelVel(0, 0, dtheta);
@@ -142,7 +142,7 @@ double setCrabCmdVel(double dtheta, double dy) {
 		return 0;
 	}
 
-	if (!std::get<1>(Globals::driveMode) && !checkWheelRotation(DriveMode::Crab))
+	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::Crab))
 		return 0;
 
 	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dy, dtheta);
