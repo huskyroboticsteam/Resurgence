@@ -20,16 +20,8 @@ using namespace std::chrono_literals;
 
 namespace robot {
 namespace {
-DataPoint<transform_t> lastOdom;
-wheelvel_t commandedWheelVel{0, 0};
 jointpos_t commandedWristPos{0, 0};
 std::mutex wristPosMutex;
-
-void setCmdVelToIntegrate(const wheelvel_t& wheelVels) {
-	auto odom = robot::readOdom();
-	lastOdom = odom;
-	commandedWheelVel = wheelVels;
-}
 
 void setJointMotorPower(robot::types::jointid_t joint, double power);
 
@@ -38,21 +30,6 @@ std::mutex jointPowerValuesMutex;
 void setJointPowerValue(types::jointid_t joint, double power);
 double getJointPowerValue(types::jointid_t joint);
 } // namespace
-
-DataPoint<transform_t> readOdom() {
-	if (!lastOdom) {
-		return toTransform({0, 0, 0});
-	} else {
-		datatime_t now = dataclock::now();
-		double elapsed =
-			duration_cast<milliseconds>(now - lastOdom.getTime()).count() / 1000.0;
-		transform_t update =
-			toTransform(driveKinematics().getLocalPoseUpdate(commandedWheelVel, elapsed));
-		transform_t odom = lastOdom.getData() * update;
-		lastOdom = {now, odom};
-		return lastOdom;
-	}
-}
 
 double setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0)) {
@@ -68,20 +45,12 @@ double setCmdVel(double dtheta, double dx) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setCmdVelToIntegrate(wheelVels);
 	setMotorPower(motorid_t::frontLeftWheel, lPWM);
 	setMotorPower(motorid_t::rearLeftWheel, lPWM);
 	setMotorPower(motorid_t::frontRightWheel, rPWM);
 	setMotorPower(motorid_t::rearRightWheel, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
-}
-
-std::pair<double, double> getCmdVel() {
-	double l = commandedWheelVel.lVel;
-	double r = commandedWheelVel.rVel;
-	pose_t robotVel = driveKinematics().wheelVelToRobotVel(l, r);
-	return {robotVel(2), robotVel(0)};
 }
 
 void setJointPower(robot::types::jointid_t joint, double power) {

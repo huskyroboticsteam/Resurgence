@@ -72,14 +72,6 @@ void emergencyStop();
 double setCmdVel(double dtheta, double dx);
 
 /**
- * @brief Get the velocity commanded to the robot. Depending on scaling,
- * may not be the same numbers passed to setCmdVel().
- *
- * @return std::pair<double, double> Pair of thetaVel, xVel.
- */
-std::pair<double, double> getCmdVel();
-
-/**
  * @brief Get the IDs of the currently supported cameras.
  *
  * @return The IDs of all cameras currently supported by the world interface, as a @ref
@@ -178,15 +170,6 @@ types::DataPoint<navtypes::pose_t> getTruePose();
  * if the GPS does not have a fix.
  */
 std::optional<navtypes::point_t> gpsToMeters(const navtypes::gpscoords_t& coord);
-
-/**
- * @brief Calculates the current transform in the frame of the starting pose based purely on
- * forward kinematics
- *
- * @return types::DataPoint<navtypes::transform_t> The current transform in the frame of the
- * starting pose. Generally, this datapoint should always be valid.
- */
-types::DataPoint<navtypes::transform_t> readOdom();
 
 /**
  * @brief Calculate the current pose velocity (in the robot's reference frame) using visual
