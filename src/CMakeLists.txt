@@ -167,7 +167,6 @@ target_link_libraries(utils ${OpenCV_LIBS})
 # No clue why but CAN I/O goes to shit. Don't do it.
 add_library(can_interface STATIC)
 target_sources(can_interface PRIVATE
-  CAN/CANMotor_PSOC.cpp
   CAN/CANMotor.cpp
   CAN/CANUtils.cpp
 )
