@@ -20,7 +20,6 @@ using namespace std::chrono_literals;
 
 namespace robot {
 namespace {
-DataPoint<transform_t> lastOdom;
 jointpos_t commandedWristPos{0, 0};
 std::mutex wristPosMutex;
 
