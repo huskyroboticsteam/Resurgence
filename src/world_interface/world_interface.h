@@ -227,15 +227,6 @@ types::DataPoint<navtypes::pose_t> getTruePose();
 std::optional<navtypes::point_t> gpsToMeters(const navtypes::gpscoords_t& coord);
 
 /**
- * @brief Calculates the current transform in the frame of the starting pose based purely on
- * forward kinematics
- *
- * @return types::DataPoint<navtypes::transform_t> The current transform in the frame of the
- * starting pose. Generally, this datapoint should always be valid.
- */
-types::DataPoint<navtypes::transform_t> readOdom();
-
-/**
  * @brief Calculate the current pose velocity (in the robot's reference frame) using visual
  * odometry.
  *

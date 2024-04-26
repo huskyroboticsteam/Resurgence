@@ -21,16 +21,8 @@ using namespace std::chrono_literals;
 
 namespace robot {
 namespace {
-DataPoint<transform_t> lastOdom;
-wheelvel_t commandedWheelVel{0, 0};
 jointpos_t commandedWristPos{0, 0};
 std::mutex wristPosMutex;
-
-void setCmdVelToIntegrate(const wheelvel_t& wheelVels) {
-	auto odom = robot::readOdom();
-	lastOdom = odom;
-	commandedWheelVel = wheelVels;
-}
 
 void setJointMotorPower(robot::types::jointid_t joint, double power);
 
@@ -39,21 +31,6 @@ std::mutex jointPowerValuesMutex;
 void setJointPowerValue(types::jointid_t joint, double power);
 double getJointPowerValue(types::jointid_t joint);
 } // namespace
-
-DataPoint<transform_t> readOdom() {
-	if (!lastOdom) {
-		return toTransform({0, 0, 0});
-	} else {
-		datatime_t now = dataclock::now();
-		double elapsed =
-			duration_cast<milliseconds>(now - lastOdom.getTime()).count() / 1000.0;
-		transform_t update =
-			toTransform(driveKinematics().getLocalPoseUpdate(commandedWheelVel, elapsed));
-		transform_t odom = lastOdom.getData() * update;
-		lastOdom = {now, odom};
-		return lastOdom;
-	}
-}
 
 double setCmdVel(double dtheta, double dx) {
 	if (Globals::E_STOP && (dtheta != 0 || dx != 0)) {
@@ -72,7 +49,6 @@ double setCmdVel(double dtheta, double dx) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setCmdVelToIntegrate(wheelVels);
 	setMotorPower(motorid_t::frontLeftWheel, lPWM);
 	setMotorPower(motorid_t::rearLeftWheel, lPWM);
 	setMotorPower(motorid_t::frontRightWheel, rPWM);
@@ -154,7 +130,6 @@ double setCrabCmdVel(double dtheta, double dy) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setCmdVelToIntegrate(wheelVels);
 	setMotorPower(motorid_t::frontLeftWheel, lPWM);
 	setMotorPower(motorid_t::rearLeftWheel, lPWM);
 	setMotorPower(motorid_t::frontRightWheel, rPWM);
@@ -229,8 +204,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
 			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 		if (armJointPositions.isValid()) {
-			Eigen::Vector2d eePos =
-				Globals::planarArmKinematics.jointPosToEEPos(armJointPositions.getData());
+			Eigen::Vector2d eePos = Globals::planarArmController.kinematics().jointPosToEEPos(
+				armJointPositions.getData());
 			Eigen::Vector2i eePosInt = (1000 * eePos).array().round().cast<int>();
 			return DataPoint<int32_t>(armJointPositions.getTime(),
 									  joint == jointid_t::ikForward ? eePosInt.x()
