@@ -74,7 +74,6 @@ double setTankCmdVel(double left, double right) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setCmdVelToIntegrate(wheelVels);
 	setMotorPower(motorid_t::frontLeftWheel, lPWM);
 	setMotorPower(motorid_t::rearLeftWheel, lPWM);
 	setMotorPower(motorid_t::frontRightWheel, rPWM);
@@ -136,13 +135,6 @@ double setCrabCmdVel(double dtheta, double dy) {
 	setMotorPower(motorid_t::rearRightWheel, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
-}
-
-std::pair<double, double> getCmdVel() {
-	double l = commandedWheelVel.lVel;
-	double r = commandedWheelVel.rVel;
-	pose_t robotVel = driveKinematics().wheelVelToRobotVel(l, r);
-	return {robotVel(2), robotVel(0)};
 }
 
 bool checkWheelRotation(DriveMode mode) {
