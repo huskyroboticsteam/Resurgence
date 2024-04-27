@@ -356,7 +356,7 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateOperationModeRequest);
 	this->addMessageHandler(
 		DRIVE_MODE_REQ_TYPE,
-		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
+		std::bind(&MissionControlProtocol::handleDriveModeRequest, this, _1),
 		validateDriveModeRequest);
 	// drive and joint power handlers need the class for context since they must modify
 	// _last_joint_power and _last_cmd_vel (for the repeater thread)
