@@ -242,11 +242,17 @@ namespace robot {
 
 namespace {
 DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+kinematics::SwerveDriveKinematics swerve_kinematics(Constants::EFF_WHEEL_BASE,
+													Constants::ROBOT_LENGTH);
 DiffWristKinematics wrist_kinematics;
 } // namespace
 
 const DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
+}
+
+const kinematics::SwerveDriveKinematics& swerveKinematics() {
+	return swerve_kinematics;
 }
 
 const DiffWristKinematics& wristKinematics() {
