@@ -72,9 +72,9 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 	std::lock_guard lock(_mutex);
 	_open_streams[cam] = 0;
 	auto it = Constants::video::STREAM_RFS.find(cam);
-	int rf = it != Constants::video::STREAM_RFS.end() ? it->second : Constants::video::H264_RF_CONSTANT;
-	_camera_encoders[cam] =
-		std::make_shared<video::H264Encoder>(fps, rf);
+	int rf = it != Constants::video::STREAM_RFS.end() ? it->second
+													  : Constants::video::H264_RF_CONSTANT;
+	_camera_encoders[cam] = std::make_shared<video::H264Encoder>(fps, rf);
 }
 
 void CameraStreamTask::closeStream(const CameraID& cam) {
