@@ -234,14 +234,6 @@ landmarks_t readLandmarks() {
 	return {};
 }
 
-DataPoint<pose_t> readVisualOdomVel() {
-	return DataPoint<pose_t>{};
-}
-
-URCLeg getLeg(int index) {
-	return URCLeg{0, -1, {0., 0., 0.}};
-}
-
 template <typename T>
 int getIndex(const std::vector<T>& vec, const T& val) {
 	auto itr = std::find(vec.begin(), vec.end(), val);
