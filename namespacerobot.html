@@ -181,12 +181,6 @@ const <a class="el" href="classkinematics_1_1DiffWristKinematics.html">DiffWrist
 <tr class="memitem:a504c5a158430139ba046b30394ecc695" id="r_a504c5a158430139ba046b30394ecc695"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; pose_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a504c5a158430139ba046b30394ecc695">getTruePose</a> ()</td></tr>
 <tr class="memdesc:a504c5a158430139ba046b30394ecc695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ground truth pose, if available.  <br /></td></tr>
 <tr class="separator:a504c5a158430139ba046b30394ecc695"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b22076ebfb4d42900af348550ba0b6e" id="r_a6b22076ebfb4d42900af348550ba0b6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; pose_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b22076ebfb4d42900af348550ba0b6e">readVisualOdomVel</a> ()</td></tr>
-<tr class="memdesc:a6b22076ebfb4d42900af348550ba0b6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the current pose velocity (in the robot's reference frame) using visual odometry.  <br /></td></tr>
-<tr class="separator:a6b22076ebfb4d42900af348550ba0b6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa05c542f73e2d891ba2668a48b7a57b8" id="r_aa05c542f73e2d891ba2668a48b7a57b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnavtypes_1_1URCLeg.html">URCLeg</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa05c542f73e2d891ba2668a48b7a57b8">getLeg</a> (int <a class="elRef" href="https://docs.opencv.org/4.2.0/d9/db7/group__datasets__gr.html#gga82775e152f8a74c5fe06f5a7343e0233a9dfc90ef6dc3ba62850d76cc3534572c">index</a>)</td></tr>
-<tr class="memdesc:aa05c542f73e2d891ba2668a48b7a57b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the URC leg of the given index.  <br /></td></tr>
-<tr class="separator:aa05c542f73e2d891ba2668a48b7a57b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cbb6f1cbe802704b9e71c0f29700e45" id="r_a3cbb6f1cbe802704b9e71c0f29700e45"><td class="memItemLeft" align="right" valign="top"><a id="a3cbb6f1cbe802704b9e71c0f29700e45" name="a3cbb6f1cbe802704b9e71c0f29700e45"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotorPower</b> (motorid_t motor, double normalizedPWM)</td></tr>
 <tr class="separator:a3cbb6f1cbe802704b9e71c0f29700e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -247,9 +241,6 @@ callbackid_t&#160;</td><td class="memItemRight" valign="bottom"><b>addLimitSwitc
 <tr class="memitem:a6bb1735860af6a75595a33930d2ca6d9"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html">navtypes::Vectord</a>&lt; N &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a6bb1735860af6a75595a33930d2ca6d9">getMotorPositionsRad</a> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01703.html">std::array</a>&lt; <a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">types::motorid_t</a>, N &gt; &amp;motors)</td></tr>
 <tr class="memdesc:a6bb1735860af6a75595a33930d2ca6d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the positions in radians of multiple motors at the same time.  <br /></td></tr>
 <tr class="separator:a6bb1735860af6a75595a33930d2ca6d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb6c5baa7bd1bf5c795ea0e100a5ef30" id="r_adb6c5baa7bd1bf5c795ea0e100a5ef30"><td class="memItemLeft" align="right" valign="top"><a id="adb6c5baa7bd1bf5c795ea0e100a5ef30" name="adb6c5baa7bd1bf5c795ea0e100a5ef30"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>zeroJoint</b> (robot::types::jointid_t joint)</td></tr>
-<tr class="separator:adb6c5baa7bd1bf5c795ea0e100a5ef30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -438,33 +429,6 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the position of the joint specified by the jointid_t argument joint, in millidegrees. </dd></dl>
-
-</div>
-</div>
-<a id="aa05c542f73e2d891ba2668a48b7a57b8" name="aa05c542f73e2d891ba2668a48b7a57b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa05c542f73e2d891ba2668a48b7a57b8">&#9670;&#160;</a></span>getLeg()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structnavtypes_1_1URCLeg.html">navtypes::URCLeg</a> robot::getLeg </td>
-          <td>(</td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>index</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the URC leg of the given index. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">index</td><td>The index of the URC leg, in the range [0, 6] </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structnavtypes_1_1URCLeg.html">navtypes::URCLeg</a> Information for the URC leg of the given index.</dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated</a></b></dt><dd>This function is probably deprecated, and will be replaced in the future. </dd></dl>
 
 </div>
 </div>
@@ -760,26 +724,6 @@ template&lt;unsigned long int N&gt; </div>
 <p>Read measurement from the CV system. </p>
 <p>As of now, returns a vector of fixed length, one for each post in the competition.</p>
 <dl class="section return"><dt>Returns</dt><dd>DataPoint&lt;points_t&gt; A vector of fixed lengths. Non-visible markers are denoted with {0,0,0}, while all nonzero points are visible marker. The index of a landmark in this vector is its id. </dd></dl>
-
-</div>
-</div>
-<a id="a6b22076ebfb4d42900af348550ba0b6e" name="a6b22076ebfb4d42900af348550ba0b6e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b22076ebfb4d42900af348550ba0b6e">&#9670;&#160;</a></span>readVisualOdomVel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; navtypes::pose_t &gt; robot::readVisualOdomVel </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Calculate the current pose velocity (in the robot's reference frame) using visual odometry. </p>
-<dl class="section return"><dt>Returns</dt><dd>types::DataPoint&lt;navtypes::pose_t&gt; The current velocity in each axis of the pose vector, or an empty data point if no data is available. </dd></dl>
 
 </div>
 </div>

@@ -25,11 +25,10 @@ var searchData=
   ['lines_20by_20using_20morphological_20operations_22',['Extract horizontal and vertical lines by using morphological operations',['https://docs.opencv.org/4.2.0/dd/dd7/tutorial_morph_lines_detection.html',1,'']]],
   ['linux_23',['Installation in Linux',['https://docs.opencv.org/4.2.0/d7/d9f/tutorial_linux_install.html',1,'']]],
   ['linux_20systems_24',['Cross compilation for ARM based Linux systems',['https://docs.opencv.org/4.2.0/d0/d76/tutorial_arm_crosscompile_with_cmake.html',1,'']]],
-  ['list_25',['Deprecated List',['../deprecated.html',1,'']]],
-  ['load_20and_20display_20an_20image_26',['Load and Display an Image',['https://docs.opencv.org/4.2.0/db/deb/tutorial_display_image.html',1,'']]],
-  ['load_20caffe_20framework_20models_27',['Load Caffe framework models',['https://docs.opencv.org/4.2.0/d5/de7/tutorial_dnn_googlenet.html',1,'']]],
-  ['load_20modify_20and_20save_20an_20image_28',['Load, Modify, and Save an Image',['https://docs.opencv.org/4.2.0/db/d64/tutorial_load_save_image.html',1,'']]],
-  ['local_20features_20matching_29',['AKAZE local features matching',['https://docs.opencv.org/4.2.0/db/d70/tutorial_akaze_matching.html',1,'']]],
-  ['location_20in_20subpixels_30',['Detecting corners location in subpixels',['https://docs.opencv.org/4.2.0/dd/d92/tutorial_corner_subpixels.html',1,'']]],
-  ['lookup_20tables_20and_20time_20measurement_20with_20opencv_31',['How to scan images, lookup tables and time measurement with OpenCV',['https://docs.opencv.org/4.2.0/db/da5/tutorial_how_to_scan_images.html',1,'']]]
+  ['load_20and_20display_20an_20image_25',['Load and Display an Image',['https://docs.opencv.org/4.2.0/db/deb/tutorial_display_image.html',1,'']]],
+  ['load_20caffe_20framework_20models_26',['Load Caffe framework models',['https://docs.opencv.org/4.2.0/d5/de7/tutorial_dnn_googlenet.html',1,'']]],
+  ['load_20modify_20and_20save_20an_20image_27',['Load, Modify, and Save an Image',['https://docs.opencv.org/4.2.0/db/d64/tutorial_load_save_image.html',1,'']]],
+  ['local_20features_20matching_28',['AKAZE local features matching',['https://docs.opencv.org/4.2.0/db/d70/tutorial_akaze_matching.html',1,'']]],
+  ['location_20in_20subpixels_29',['Detecting corners location in subpixels',['https://docs.opencv.org/4.2.0/dd/d92/tutorial_corner_subpixels.html',1,'']]],
+  ['lookup_20tables_20and_20time_20measurement_20with_20opencv_30',['How to scan images, lookup tables and time measurement with OpenCV',['https://docs.opencv.org/4.2.0/db/da5/tutorial_how_to_scan_images.html',1,'']]]
 ];

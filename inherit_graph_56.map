@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classrobot_1_1types_1_1DataPoint.html" title="Represents data measured using a sensor at a given time." alt="" coords="5,5,186,31"/>
+<area shape="rect" id="Node000000" href="/github/workspace/doxygen-tags/libstdc++.tag$a05487.html" title=" " alt="" coords="5,13,106,39"/>
+<area shape="rect" id="Node000001" href="$classcam_1_1invalid__camera__config.html" title="Exception for errors in the camera configuration." alt="" coords="154,5,293,46"/>
+<area shape="poly" id="edge14_Node000000_Node000001" title=" " alt="" coords="121,23,153,23,153,28,121,28"/>
 </map>
