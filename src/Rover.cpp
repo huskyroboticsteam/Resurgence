@@ -9,7 +9,6 @@
 #include <csignal>
 #include <ctime>
 #include <filesystem>
-#include <fstream>
 #include <loguru.cpp>
 #include <sstream>
 #include <thread>
@@ -31,39 +30,6 @@ void closeRover(int signum) {
 	robot::emergencyStop();
 	Globals::websocketServer.stop();
 	raise(SIGTERM);
-}
-
-std::vector<URCLegGPS> parseGPSLegs(std::string filepath) {
-	std::vector<URCLegGPS> urc_legs;
-	std::ifstream gps_legs(filepath);
-
-	int left_post_id, right_post_id;
-	double lat, lon;
-	std::string line;
-
-	// A properly formatted file has each leg on a separate line, with each line of the form
-	// left_post_id right_post_id lat lon
-	// Improperly formatted lines (empty lines, comments) are ignored, and text
-	// after the above data on properly formatted lines is ignored
-	// An example can be found at example_gps_legs.txt
-	while (getline(gps_legs, line)) {
-		std::istringstream line_stream(line);
-		if (line_stream >> left_post_id >> right_post_id >> lat >> lon) {
-			// we assume that gps already has a fix
-			gpscoords_t gps = {lat, lon};
-			URCLegGPS leg = {left_post_id, right_post_id, gps};
-			LOG_F(INFO, "Got urc leg at lat=%f lon=%f", lat, lon);
-			urc_legs.push_back(leg);
-		}
-	}
-	LOG_F(INFO, "Got %ld urc legs\n", urc_legs.size());
-
-	if (urc_legs.size() == 0) {
-		LOG_F(ERROR, "could not get URC legs");
-		std::exit(EXIT_FAILURE);
-	}
-
-	return urc_legs;
 }
 
 void parseCommandLine(int argc, char** argv) {
