@@ -344,10 +344,6 @@ landmarks_t readLandmarks() {
 	return {};
 }
 
-DataPoint<pose_t> readVisualOdomVel() {
-	return DataPoint<pose_t>{};
-}
-
 DataPoint<Eigen::Quaterniond> readIMU() {
 	std::lock_guard<std::mutex> guard(orientationMutex);
 	return lastOrientation;
@@ -356,10 +352,6 @@ DataPoint<Eigen::Quaterniond> readIMU() {
 DataPoint<pose_t> getTruePose() {
 	std::lock_guard<std::mutex> guard(truePoseMutex);
 	return lastTruePose;
-}
-
-URCLeg getLeg(int index) {
-	return URCLeg{0, -1, {0., 0., 0.}};
 }
 
 void setMotorPower(motorid_t motor, double normalizedPWM) {
