@@ -261,7 +261,6 @@ add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
   Constants.cpp
   Globals.cpp
-  Constants.cpp
   network/websocket/WebSocketServer.cpp
   network/websocket/WebSocketProtocol.cpp
   )
