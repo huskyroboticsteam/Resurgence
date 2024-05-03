@@ -170,8 +170,13 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	bool isGate = j["isGate"];
 
 	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
-		navtypes::point_t waypointCoords(latitude, longitude, 1);
-		_autonomous_task.start(waypointCoords);
+		navtypes::gpscoords_t coords = {latitude, longitude};
+		auto target = robot::gpsToMeters(coords);
+		if (target) {
+			_autonomous_task.start(target.value());
+		} else {
+			LOG_F(WARNING, "No GPS converter initialized!");
+		}
 	}
 }
 

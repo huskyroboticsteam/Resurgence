@@ -185,5 +185,5 @@ constexpr double DRIVE_VEL = 1.5;
 constexpr double SLOW_DRIVE_VEL = 1.0;
 constexpr double DONE_THRESHOLD = 0.5;
 // Duration long enough to confirm we are there, not so long that time is wasted
-constexpr util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::seconds(1);
+constexpr util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::milliseconds(750);
 } // namespace autonomous

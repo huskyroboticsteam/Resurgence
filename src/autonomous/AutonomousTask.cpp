@@ -3,6 +3,7 @@
 #include "../Constants.h"
 #include "../commands/DriveToWaypointCommand.h"
 #include "../world_interface/world_interface.h"
+#include <loguru.hpp>
 
 using namespace std::chrono_literals;
 
@@ -38,6 +39,7 @@ void AutonomousTask::navigate() {
 		auto latestHeading = robot::readIMUHeading();
 
 		if (latestGPS.isFresh(2000ms) && latestHeading.isFresh(2000ms)) {
+			LOG_SCOPE_F(INFO, "AutoNav");
 			auto gpsData = latestGPS.getData();
 			navtypes::pose_t latestPos(gpsData.x(), gpsData.y(), latestHeading.getData());
 			cmd.setState(latestPos, robot::types::dataclock::now());
@@ -45,6 +47,11 @@ void AutonomousTask::navigate() {
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel,
 				output.thetaVel, Constants::MAX_WHEEL_VEL);
+			LOG_F(INFO, "Target: (%lf, %lf)", _waypoint_coords(0), _waypoint_coords(1));    
+			LOG_F(INFO, "CurPos: (%lf, %lf)", latestPos(0), latestPos(1));    
+			LOG_F(INFO, "curHeading: %lf", latestPos(2));
+			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));    
+			LOG_F(INFO, "xVel: %lf", scaledVels(0));
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
 		}
 
