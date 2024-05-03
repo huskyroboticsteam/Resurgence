@@ -9,11 +9,11 @@ using namespace std::chrono_literals;
 namespace commands {
 
 DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double thetaKP,
-											   double driveVel, double slowDriveVel,
+											   double driveVel, double slowDriveThresh,
 											   double doneThresh,
 											   util::dseconds closeToTargetDur)
 	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
-	  slowDriveVel(slowDriveVel), doneThresh(doneThresh), setStateCalledBeforeOutput(false),
+	  slowDriveThresh(slowDriveThresh), doneThresh(doneThresh), setStateCalledBeforeOutput(false),
 	  closeToTargetDur(closeToTargetDur) {}
 
 void DriveToWaypointCommand::setState(const navtypes::pose_t& pose,
@@ -33,14 +33,12 @@ command_t DriveToWaypointCommand::getOutput() {
 	double targetAngle = std::atan2(toTarget(1), toTarget(0));
 	double angleDelta = targetAngle - pose(2);
 	double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
-	LOG_F(INFO, "targetHeading: %lf", thetaErr);
-
 	double thetaVel = thetaKP * thetaErr;
 
 	double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
 	double xVel = driveVel;
-	if (dist <= 6 * doneThresh) {
-		xVel *= dist / (6 * doneThresh);
+	if (dist <= slowDriveThresh) {
+		xVel *= dist / slowDriveThresh;
 	}
 
 	return {.thetaVel = thetaVel, .xVel = xVel};

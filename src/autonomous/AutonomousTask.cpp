@@ -2,7 +2,9 @@
 
 #include "../Constants.h"
 #include "../commands/DriveToWaypointCommand.h"
+#include "../utils/transform.h"
 #include "../world_interface/world_interface.h"
+
 #include <loguru.hpp>
 
 using namespace std::chrono_literals;
@@ -28,8 +30,9 @@ void AutonomousTask::start(const navtypes::point_t& waypointCoords) {
 }
 
 void AutonomousTask::navigate() {
-	commands::DriveToWaypointCommand cmd(_waypoint_coords, THETA_KP, DRIVE_VEL, SLOW_DRIVE_VEL,
-										 DONE_THRESHOLD, CLOSE_TO_TARGET_DUR_VAL);
+	commands::DriveToWaypointCommand cmd(_waypoint_coords, THETA_KP, DRIVE_VEL,
+										 SLOW_DRIVE_THRESHOLD, DONE_THRESHOLD,
+										 CLOSE_TO_TARGET_DUR_VAL);
 
 	DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
 
@@ -47,10 +50,12 @@ void AutonomousTask::navigate() {
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel,
 				output.thetaVel, Constants::MAX_WHEEL_VEL);
-			LOG_F(INFO, "Target: (%lf, %lf)", _waypoint_coords(0), _waypoint_coords(1));    
-			LOG_F(INFO, "CurPos: (%lf, %lf)", latestPos(0), latestPos(1));    
+			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coords;
+			LOG_F(INFO, "Target: (%lf, %lf)", _waypoint_coords(0), _waypoint_coords(1));
+			LOG_F(INFO, "CurPos: (%lf, %lf)", latestPos(0), latestPos(1));
+			LOG_F(INFO, "Relative Target: (%lf, %lf)", relTarget(0), relTarget(1));
 			LOG_F(INFO, "curHeading: %lf", latestPos(2));
-			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));    
+			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));
 			LOG_F(INFO, "xVel: %lf", scaledVels(0));
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
 		}
