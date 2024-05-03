@@ -190,7 +190,7 @@ elseif(GPS STREQUAL "ARDUPILOT")
   target_sources(gps_interface PUBLIC
       ardupilot/ArduPilotProtocol.cpp
       ardupilot/ArduPilotInterface.cpp)
-  target_link_libraries(gps_interface utils websocket_utils)
+  target_link_libraries(gps_interface utils websocket_utils rover_common)
 else()
   target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
 endif()
@@ -259,6 +259,7 @@ list(APPEND simulator_libs
 
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
+  Constants.cpp
   Globals.cpp
   Constants.cpp
   network/websocket/WebSocketServer.cpp
