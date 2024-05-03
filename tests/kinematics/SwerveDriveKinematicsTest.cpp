@@ -32,7 +32,7 @@ void assertApprox(const pose_t& p1, const pose_t& p2, double dist = 1e-5,
 	if (distEqual && angleEqual) {
 		SUCCEED();
 	} else {
-		std::cout << "Expected: " << toString(p1) << ", Actual: " << toString(p2) << std::endl;
+		INFO("Expected: " << toString(p1) << ", Actual: " << toString(p2));
 		FAIL();
 	}
 }

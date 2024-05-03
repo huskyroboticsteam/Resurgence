@@ -3,7 +3,6 @@
 #include "../utils/transform.h"
 
 using namespace navtypes;
-using util::toTransformRotateFirst;
 
 namespace kinematics {
 DiffDriveKinematics::DiffDriveKinematics(double wheelBaseWidth)
@@ -43,7 +42,11 @@ pose_t DiffDriveKinematics::getLocalPoseUpdate(const wheelvel_t& wheelVel, doubl
 
 pose_t DiffDriveKinematics::getPoseUpdate(const wheelvel_t& wheelVel, double heading,
 										  double dt) const {
-	return toTransformRotateFirst(0, 0, -heading) * getLocalPoseUpdate(wheelVel, dt);
+	pose_t pose = getLocalPoseUpdate(wheelVel, dt);
+	point_t p = pose;
+	p(2) = 1;
+	pose.topRows<2>() = (util::toTransform(0, 0, heading) * p).topRows<2>();
+	return pose;
 }
 
 pose_t DiffDriveKinematics::getNextPose(const wheelvel_t& wheelVel, const pose_t& pose,

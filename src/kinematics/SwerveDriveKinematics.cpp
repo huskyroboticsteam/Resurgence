@@ -5,7 +5,6 @@
 #include <Eigen/QR>
 namespace kinematics {
 using namespace navtypes;
-using util::toTransformRotateFirst;
 
 SwerveDriveKinematics::SwerveDriveKinematics(double baseWidth, double baseLength)
 	: baseWidth(baseWidth), baseLength(baseLength) {}
@@ -62,7 +61,11 @@ pose_t SwerveDriveKinematics::getLocalPoseUpdate(const swervewheelvel_t& wheelVe
 
 pose_t SwerveDriveKinematics::getPoseUpdate(const swervewheelvel_t& wheelVel, double heading,
 											double dt) const {
-	return toTransformRotateFirst(0, 0, -heading) * getLocalPoseUpdate(wheelVel, dt);
+	pose_t pose = getLocalPoseUpdate(wheelVel, dt);
+	point_t p = pose;
+	p(2) = 1;
+	pose.topRows<2>() = (util::toTransform(0, 0, heading) * p).topRows<2>();
+	return pose;
 }
 
 pose_t SwerveDriveKinematics::getNextPose(const swervewheelvel_t& wheelVel,

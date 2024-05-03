@@ -56,6 +56,8 @@ TEST_CASE("EKF Predict-only")
 			ekf.predict({l, r});
 		}
 
+		INFO("Predicted: " << ekf.getState().transpose()
+						   << " Expected: " << currPose.transpose());
 		REQUIRE((currPose - ekf.getState()).norm() == Approx(0).margin(1e-9));
 	}
 }

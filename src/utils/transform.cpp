@@ -28,43 +28,6 @@ Eigen::Quaterniond eulerAnglesToQuat(const navtypes::eulerangles_t& rpy) {
 	return quat;
 }
 
-points_t transformReadings(const points_t& ps, const transform_t& tf) {
-	transform_t tf_inv = tf.inverse();
-	points_t readings({});
-	for (point_t p : ps) {
-		readings.push_back(tf_inv * p);
-	}
-	return readings;
-}
-
-trajectory_t transformTraj(const trajectory_t& traj, const transform_t& tf) {
-	trajectory_t tf_traj({});
-	for (const transform_t& tf_i : traj) {
-		tf_traj.push_back(tf_i * tf);
-	}
-	return tf_traj;
-}
-
-bool collides(const transform_t& tf, const points_t& ps, double radius) {
-	for (const point_t& p : ps) {
-		if (p(2) == 0.0) {
-			// This point is a "no data" point
-			continue;
-		}
-		point_t tf_p = tf * p;
-		tf_p(2) = 0;
-		if (tf_p.norm() < radius)
-			return true;
-	}
-	return false;
-}
-
-transform_t toTransformRotateFirst(double x, double y, double theta) {
-	transform_t m;
-	m << cos(theta), sin(theta), -x, -sin(theta), cos(theta), -y, 0, 0, 1;
-	return m;
-}
-
 double closestHeading(double theta, double prev_theta) {
 	while (theta < prev_theta - M_PI)
 		theta += 2 * M_PI;
@@ -74,16 +37,22 @@ double closestHeading(double theta, double prev_theta) {
 }
 
 pose_t toPose(const transform_t& trf, double prev_theta) {
-	pose_t s = trf.inverse() * pose_t(0, 0, 1);
+	pose_t s = trf.rightCols<1>();
 	double cos_theta = trf(0, 0);
-	double sin_theta = -trf(1, 0);
+	double sin_theta = trf(1, 0);
 	double theta = atan2(sin_theta, cos_theta);
 	s(2) = closestHeading(theta, prev_theta);
 	return s;
 }
 
 transform_t toTransform(const pose_t& pose) {
-	return toTransformRotateFirst(0, 0, pose(2)) * toTransformRotateFirst(pose(0), pose(1), 0);
+	return toTransform(pose(0), pose(1), pose(2));
+}
+
+transform_t toTransform(double x, double y, double theta) {
+	transform_t m;
+	m << cos(theta), -sin(theta), x, sin(theta), cos(theta), y, 0, 0, 1;
+	return m;
 }
 
 } // namespace util
