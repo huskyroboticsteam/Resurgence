@@ -167,7 +167,6 @@ target_link_libraries(utils ${OpenCV_LIBS})
 # No clue why but CAN I/O goes to shit. Don't do it.
 add_library(can_interface STATIC)
 target_sources(can_interface PRIVATE
-  CAN/CANMotor_PSOC.cpp
   CAN/CANMotor.cpp
   CAN/CANUtils.cpp
 )
@@ -191,7 +190,7 @@ elseif(GPS STREQUAL "ARDUPILOT")
   target_sources(gps_interface PUBLIC
       ardupilot/ArduPilotProtocol.cpp
       ardupilot/ArduPilotInterface.cpp)
-  target_link_libraries(gps_interface utils websocket_utils)
+  target_link_libraries(gps_interface utils websocket_utils rover_common)
 else()
   target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
 endif()
@@ -259,6 +258,7 @@ list(APPEND simulator_libs
 
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
+  Constants.cpp
   Globals.cpp
   network/websocket/WebSocketServer.cpp
   network/websocket/WebSocketProtocol.cpp
@@ -313,10 +313,12 @@ if(WITH_TESTS)
     ../tests/control/JacobianControllerTest.cpp
     ../tests/control/PIDControllerTest.cpp
     ../tests/control/PlanarArmControllerTest.cpp
-    # Autonomy tests
+    # Kinematics tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
     ../tests/kinematics/SwerveDriveKinematicsTest.cpp
-    ../tests/kinematics/PlanarArmKinematicsTest.cpp
+    ../tests/kinematics/PlanarArmFKTest.cpp
+    ../tests/kinematics/FabrikSolver2DTest.cpp
+    # Filter tests
     ../tests/filters/RollingAvgFilterTest.cpp
     ../tests/filters/EKFTest.cpp
     ../tests/filters/MultiSensorEKFTest.cpp

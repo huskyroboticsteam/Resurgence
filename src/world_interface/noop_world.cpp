@@ -47,14 +47,6 @@ DataPoint<pose_t> getTruePose() {
 	return {};
 }
 
-DataPoint<pose_t> readVisualOdomVel() {
-	return DataPoint<pose_t>{};
-}
-
-URCLeg getLeg(int /*id*/) {
-	return URCLeg{-1, -1, {0., 0., 0.}};
-}
-
 void setMotorPower(motorid_t motor, double normalizedPWM) {}
 
 void setMotorPos(motorid_t motor, int32_t targetPos) {}
