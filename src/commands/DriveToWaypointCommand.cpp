@@ -13,8 +13,8 @@ DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double the
 											   double doneThresh,
 											   util::dseconds closeToTargetDur)
 	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
-	  slowDriveThresh(slowDriveThresh), doneThresh(doneThresh), setStateCalledBeforeOutput(false),
-	  closeToTargetDur(closeToTargetDur) {}
+	  slowDriveThresh(slowDriveThresh), doneThresh(doneThresh),
+	  setStateCalledBeforeOutput(false), closeToTargetDur(closeToTargetDur) {}
 
 void DriveToWaypointCommand::setState(const navtypes::pose_t& pose,
 									  robot::types::datatime_t time) {
