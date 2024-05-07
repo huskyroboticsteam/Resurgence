@@ -176,14 +176,15 @@ constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size(
 					{robot::types::motorid_t::elbow, 0.461264}};
 } // namespace arm
 
-extern const double CONTROL_HZ;
-} // namespace Constants
-
 namespace autonomous {
-constexpr double THETA_KP = 2.0;
-constexpr double DRIVE_VEL = 1.5;
-constexpr double SLOW_DRIVE_THRESHOLD = 3.0;
-constexpr double DONE_THRESHOLD = 0.5;
+extern const double THETA_KP;
+extern const double DRIVE_VEL;
+extern const double SLOW_DRIVE_THRESHOLD;
+extern const double DONE_THRESHOLD;
 // Duration long enough to confirm we are there, not so long that time is wasted
-constexpr util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::milliseconds(750);
+extern const util::dseconds CLOSE_TO_TARGET_DUR_VAL;
 } // namespace autonomous
+
+extern const double CONTROL_HZ;
+
+} // namespace Constants
