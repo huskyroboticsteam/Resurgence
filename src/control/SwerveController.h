@@ -18,6 +18,11 @@
 
 #include <map>
 
+namespace Constants {
+extern const double ROBOT_LENGTH;
+extern const double EFF_WHEEL_BASE;
+} // namespace Constants
+
 namespace control {
 enum class DriveMode {
 	Normal,
@@ -32,13 +37,15 @@ static const std::map<DriveMode, std::string> driveModeStrings = {
 
 class SwerveController {
 public:
-	SwerveController(){};
+	SwerveController()
+		: driveMode(DriveMode::Normal, false),
+		  swerve_kinematics(Constants::EFF_WHEEL_BASE, Constants::ROBOT_LENGTH){};
 
 	double setTurnInPlaceCmdVel(double dtheta);
 
 	double setCrabCmdVel(double dtheta, double dy);
 
-	static const kinematics::SwerveDriveKinematics& swerveKinematics();
+	kinematics::SwerveDriveKinematics swerveKinematics();
 
 	/**
 	 * @brief Check to see if all wheels are at their target position.
@@ -48,5 +55,12 @@ public:
 	 * target position.
 	 */
 	bool checkWheelRotation(DriveMode mode);
+
+	// The boolean here is whether or not wheel rotation check should be ignored when doing
+	// swerve-based driving
+	std::pair<DriveMode, bool> driveMode;
+
+private:
+	const kinematics::SwerveDriveKinematics swerve_kinematics;
 };
 } // namespace control

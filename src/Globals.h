@@ -31,9 +31,6 @@ namespace Globals {
 /**
    @deprecated
  */
-// The boolean here is whether or not wheel rotation check should be ignored when doing
-// swerve-based driving
-extern std::pair<DriveMode, bool> driveMode;
 extern RoverState curr_state;
 extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> E_STOP;

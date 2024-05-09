@@ -3,6 +3,7 @@
 #include "../world_interface/world_interface.h"
 
 using namespace control;
+using Globals::swerveController;
 using robot::types::motorid_t;
 
 double SwerveController::setTurnInPlaceCmdVel(double dtheta) {
@@ -10,7 +11,7 @@ double SwerveController::setTurnInPlaceCmdVel(double dtheta) {
 		return 0;
 	}
 
-	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::TurnInPlace))
+	if (!swerveController.driveMode.second && !checkWheelRotation(DriveMode::TurnInPlace))
 		return 0;
 
 	kinematics::swervewheelvel_t wheelVels =
@@ -41,7 +42,7 @@ double SwerveController::setCrabCmdVel(double dtheta, double dy) {
 		return 0;
 	}
 
-	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::Crab))
+	if (!swerveController.driveMode.second && !checkWheelRotation(DriveMode::Crab))
 		return 0;
 
 	kinematics::wheelvel_t wheelVels = robot::driveKinematics().robotVelToWheelVel(dy, dtheta);
@@ -71,8 +72,6 @@ bool SwerveController::checkWheelRotation(DriveMode mode) {
 	return true;
 }
 
-const kinematics::SwerveDriveKinematics& SwerveController::swerveKinematics() {
-	static const kinematics::SwerveDriveKinematics swerve_kinematics(Constants::EFF_WHEEL_BASE,
-																	 Constants::ROBOT_LENGTH);
-	return swerve_kinematics;
+kinematics::SwerveDriveKinematics SwerveController::swerveKinematics() {
+	return SwerveController::swerve_kinematics;
 }

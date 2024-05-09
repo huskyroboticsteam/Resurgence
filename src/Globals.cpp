@@ -50,10 +50,6 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
 
-// The boolean here is whether or not wheel rotation check should be ignored when doing
-// swerve-based driving
-std::pair<DriveMode, bool> driveMode = {DriveMode::Normal, false};
-
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);

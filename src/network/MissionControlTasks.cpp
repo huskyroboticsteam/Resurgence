@@ -12,6 +12,7 @@
 
 using namespace robot::types;
 using namespace std::chrono_literals;
+using Globals::swerveController;
 
 using control::DriveMode;
 using nlohmann::json;
@@ -78,13 +79,13 @@ void PowerRepeatTask::periodicTask() {
 	}
 	if (_last_cmd_vel) {
 		if (_last_cmd_vel->first != 0.0 || _last_cmd_vel->second != 0.0) {
-			if (Globals::driveMode.first == DriveMode::Normal) {
+			if (swerveController.driveMode.first == DriveMode::Normal) {
 				if (_tank) {
 					robot::setTankCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				} else {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
-			} else if (Globals::driveMode.first == DriveMode::TurnInPlace) {
+			} else if (swerveController.driveMode.first == DriveMode::TurnInPlace) {
 				Globals::swerveController.setTurnInPlaceCmdVel(_last_cmd_vel->first);
 			} else {
 				Globals::swerveController.setCrabCmdVel(_last_cmd_vel->first,

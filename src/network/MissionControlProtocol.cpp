@@ -19,6 +19,7 @@ using namespace std::chrono_literals;
 using val_t = nlohmann::json::value_t;
 using control::DriveMode;
 using control::driveModeStrings;
+using Globals::swerveController;
 using net::websocket::connhandler_t;
 using net::websocket::msghandler_t;
 using net::websocket::validator_t;
@@ -87,63 +88,63 @@ static bool validateDriveModeRequest(const json& j) {
 void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	if (mode == "normal") {
-		Globals::driveMode.first = DriveMode::Normal;
+		swerveController.driveMode.first = DriveMode::Normal;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
 							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Normal)[i]);
 		}
 	} else if (mode == "turn-in-place") {
-		Globals::driveMode.first = DriveMode::TurnInPlace;
+		swerveController.driveMode.first = DriveMode::TurnInPlace;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
 							   Constants::Drive::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
 		}
 	} else if (mode == "crab") {
-		Globals::driveMode.first = DriveMode::Crab;
+		swerveController.driveMode.first = DriveMode::Crab;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
 							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Crab)[i]);
 		}
 	}
 
-	Globals::driveMode.second = j["override"];
+	swerveController.driveMode.second = j["override"];
 }
 
 static bool validateDriveRequest(const json& j) {
-	if (Globals::driveMode.first != DriveMode::Normal) {
+	if (swerveController.driveMode.first != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(Globals::driveMode.first).c_str());
+			  driveModeStrings.at(swerveController.driveMode.first).c_str());
 	}
-	return Globals::driveMode.first == DriveMode::Normal && util::hasKey(j, "straight") &&
-		   util::validateRange(j, "straight", -1, 1) && util::hasKey(j, "steer") &&
-		   util::validateRange(j, "steer", -1, 1);
+	return swerveController.driveMode.first == DriveMode::Normal &&
+		   util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
+		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateTankDriveRequest(const json& j) {
-	if (Globals::driveMode.first != DriveMode::Normal) {
+	if (swerveController.driveMode.first != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(Globals::driveMode.first).c_str());
+			  driveModeStrings.at(swerveController.driveMode.first).c_str());
 	}
-	return Globals::driveMode.first == DriveMode::Normal && util::hasKey(j, "left") &&
+	return swerveController.driveMode.first == DriveMode::Normal && util::hasKey(j, "left") &&
 		   util::validateRange(j, "left", -1, 1) && util::hasKey(j, "right") &&
 		   util::validateRange(j, "right", -1, 1);
 }
 
 static bool validateTurnInPlaceDriveRequest(const json& j) {
-	if (Globals::driveMode.first != DriveMode::TurnInPlace) {
+	if (swerveController.driveMode.first != DriveMode::TurnInPlace) {
 		LOG_F(WARNING, "Drive mode set to %s, not TurnInPlace",
-			  driveModeStrings.at(Globals::driveMode.first).c_str());
+			  driveModeStrings.at(swerveController.driveMode.first).c_str());
 	}
-	return Globals::driveMode.first == DriveMode::TurnInPlace && util::hasKey(j, "steer") &&
-		   util::validateRange(j, "steer", -1, 1);
+	return swerveController.driveMode.first == DriveMode::TurnInPlace &&
+		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateCrabDriveRequest(const json& j) {
-	if (Globals::driveMode.first != DriveMode::Crab) {
+	if (swerveController.driveMode.first != DriveMode::Crab) {
 		LOG_F(WARNING, "Drive mode set to %s, not Crab",
-			  driveModeStrings.at(Globals::driveMode.first).c_str());
+			  driveModeStrings.at(swerveController.driveMode.first).c_str());
 	}
-	return Globals::driveMode.first == DriveMode::Crab && util::hasKey(j, "crab") &&
+	return swerveController.driveMode.first == DriveMode::Crab && util::hasKey(j, "crab") &&
 		   util::validateRange(j, "crab", -1, 1) && util::hasKey(j, "steer") &&
 		   util::validateRange(j, "steer", -1, 1);
 }

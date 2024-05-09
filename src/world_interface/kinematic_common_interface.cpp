@@ -16,6 +16,7 @@ using namespace robot::types;
 using util::toTransform;
 
 using control::DriveMode;
+using Globals::swerveController;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using namespace std::chrono_literals;
@@ -38,7 +39,7 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	if (!Globals::driveMode.second &&
+	if (!swerveController.driveMode.second &&
 		!Globals::swerveController.checkWheelRotation(DriveMode::Normal))
 		return 0;
 
@@ -64,7 +65,7 @@ double setTankCmdVel(double left, double right) {
 		return 0;
 	}
 
-	if (!Globals::driveMode.second &&
+	if (!swerveController.driveMode.second &&
 		!Globals::swerveController.checkWheelRotation(DriveMode::Normal))
 		return 0;
 
