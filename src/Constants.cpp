@@ -2,6 +2,9 @@
 
 #include "world_interface/world_interface.h"
 
+using namespace control;
+using control::DriveMode;
+
 namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 const double SHOULDER_LENGTH = 0.6; // placeholder(m)
@@ -51,7 +54,7 @@ namespace Drive {
 namespace {
 constexpr std::array<int32_t, 4> NORMAL_WHEEL_ROTS = {0, 0, 0, 0};
 const swervewheelvel_t TURN_IN_PLACE_VEL =
-	robot::swerveKinematics().robotVelToWheelVel(0, 0, 1);
+	SwerveController::swerveKinematics().robotVelToWheelVel(0, 0, 1);
 const std::array<int32_t, 4> TURN_IN_PLACE_WHEEL_ROTS = {
 	static_cast<int32_t>(TURN_IN_PLACE_VEL.lfRot * 1000),
 	static_cast<int32_t>(TURN_IN_PLACE_VEL.rfRot * 1000),

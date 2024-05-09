@@ -20,6 +20,10 @@ namespace cam {
 class CameraParams;
 }
 
+namespace control {
+enum class DriveMode;
+}
+
 /**
  * @namespace robot
  * @brief Collection of functions that allows interfacing with the hardware and the world.
@@ -43,7 +47,6 @@ extern const WorldInterface WORLD_INTERFACE;
 
 // TODO: add documentation
 const kinematics::DiffDriveKinematics& driveKinematics();
-const kinematics::SwerveDriveKinematics& swerveKinematics();
 const kinematics::DiffWristKinematics& wristKinematics();
 
 /**
@@ -116,15 +119,6 @@ double setCrabCmdVel(double dtheta, double dy);
  * @return std::pair<double, double> Pair of thetaVel, xVel.
  */
 std::pair<double, double> getCmdVel();
-
-/**
- * @brief Check to see if all wheels are at their target position.
- *
- * @param mode The drive mode to compare wheel rotations against.
- * @return bool if the wheels are within `Constants::Drive::STEER_EPSILON` of their their
- * target position.
- */
-bool checkWheelRotation(DriveMode mode);
 
 /**
  * @brief Get the IDs of the currently supported cameras.

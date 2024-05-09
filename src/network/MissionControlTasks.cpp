@@ -13,6 +13,7 @@
 using namespace robot::types;
 using namespace std::chrono_literals;
 
+using control::DriveMode;
 using nlohmann::json;
 
 namespace net::mc::tasks {
@@ -84,9 +85,10 @@ void PowerRepeatTask::periodicTask() {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
 			} else if (Globals::driveMode.first == DriveMode::TurnInPlace) {
-				robot::setTurnInPlaceCmdVel(_last_cmd_vel->first);
+				Globals::swerveController.setTurnInPlaceCmdVel(_last_cmd_vel->first);
 			} else {
-				robot::setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
+				Globals::swerveController.setCrabCmdVel(_last_cmd_vel->first,
+														_last_cmd_vel->second);
 			}
 		}
 	}

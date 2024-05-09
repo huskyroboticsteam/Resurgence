@@ -8,6 +8,12 @@
 
 #include <frozen/unordered_map.h>
 
+namespace control {
+enum class DriveMode;
+}
+
+using control::DriveMode;
+
 namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 extern const double SHOULDER_LENGTH;

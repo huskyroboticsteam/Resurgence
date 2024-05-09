@@ -17,6 +17,8 @@ using namespace robot::types;
 using namespace std::chrono_literals;
 
 using val_t = nlohmann::json::value_t;
+using control::DriveMode;
+using control::driveModeStrings;
 using net::websocket::connhandler_t;
 using net::websocket::msghandler_t;
 using net::websocket::validator_t;
@@ -226,12 +228,12 @@ void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 
 void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
 	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
-	robot::setTurnInPlaceCmdVel(dtheta);
+	Globals::swerveController.setTurnInPlaceCmdVel(dtheta);
 }
 
 void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
 	_power_repeat_task.setCrabCmdVel(dtheta, dy);
-	robot::setCrabCmdVel(dtheta, dy);
+	Globals::swerveController.setCrabCmdVel(dtheta, dy);
 }
 
 static bool validateJoint(const json& j) {

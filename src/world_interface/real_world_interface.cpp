@@ -34,8 +34,6 @@ std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> 
 
 namespace {
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
-kinematics::SwerveDriveKinematics swerve_kinematics(Constants::EFF_WHEEL_BASE,
-													Constants::ROBOT_LENGTH);
 kinematics::DiffWristKinematics wrist_kinematics;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
@@ -52,10 +50,6 @@ void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 
 const kinematics::DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
-}
-
-const kinematics::SwerveDriveKinematics& swerveKinematics() {
-	return swerve_kinematics;
 }
 
 const kinematics::DiffWristKinematics& wristKinematics() {

@@ -15,6 +15,7 @@ using namespace navtypes;
 using namespace robot::types;
 using util::toTransform;
 
+using control::DriveMode;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using namespace std::chrono_literals;
@@ -37,7 +38,8 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::Normal))
+	if (!Globals::driveMode.second &&
+		!Globals::swerveController.checkWheelRotation(DriveMode::Normal))
 		return 0;
 
 	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
@@ -62,7 +64,8 @@ double setTankCmdVel(double left, double right) {
 		return 0;
 	}
 
-	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::Normal))
+	if (!Globals::driveMode.second &&
+		!Globals::swerveController.checkWheelRotation(DriveMode::Normal))
 		return 0;
 
 	wheelvel_t wheelVels = {left, right};
@@ -80,71 +83,6 @@ double setTankCmdVel(double left, double right) {
 	setMotorPower(motorid_t::rearRightWheel, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
-}
-
-double setTurnInPlaceCmdVel(double dtheta) {
-	if (Globals::E_STOP && (dtheta != 0)) {
-		return 0;
-	}
-
-	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::TurnInPlace))
-		return 0;
-
-	swervewheelvel_t wheelVels = swerveKinematics().robotVelToWheelVel(0, 0, dtheta);
-	double lfPWM = wheelVels.lfVel / Constants::MAX_WHEEL_VEL;
-	double lbPWM = wheelVels.lbVel / Constants::MAX_WHEEL_VEL;
-	double rfPWM = wheelVels.rfVel / Constants::MAX_WHEEL_VEL;
-	double rbPWM = wheelVels.rbVel / Constants::MAX_WHEEL_VEL;
-	double maxAbsPWM = std::max(std::max(std::abs(lfPWM), std::abs(lbPWM)),
-								std::max(std::abs(rfPWM), std::abs(rbPWM)));
-	if (maxAbsPWM > 1) {
-		lfPWM /= maxAbsPWM;
-		lbPWM /= maxAbsPWM;
-		rfPWM /= maxAbsPWM;
-		rbPWM /= maxAbsPWM;
-	}
-
-	setMotorPower(motorid_t::frontLeftWheel, lfPWM);
-	setMotorPower(motorid_t::rearLeftWheel, lbPWM);
-	setMotorPower(motorid_t::frontRightWheel, rfPWM);
-	setMotorPower(motorid_t::rearRightWheel, rbPWM);
-
-	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
-}
-
-double setCrabCmdVel(double dtheta, double dy) {
-	if (Globals::E_STOP && (dtheta != 0 || dy != 0)) {
-		return 0;
-	}
-
-	if (!Globals::driveMode.second && !checkWheelRotation(DriveMode::Crab))
-		return 0;
-
-	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dy, dtheta);
-	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
-	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
-	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
-	if (maxAbsPWM > 1) {
-		lPWM /= maxAbsPWM;
-		rPWM /= maxAbsPWM;
-	}
-
-	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::rearLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, rPWM);
-	setMotorPower(motorid_t::rearRightWheel, rPWM);
-
-	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
-}
-
-bool checkWheelRotation(DriveMode mode) {
-	for (int i = 0; i < 4; i++) {
-		if (std::abs(robot::getMotorPos(Constants::Drive::WHEEL_IDS[i]) -
-					 Constants::Drive::WHEEL_ROTS.at(mode)[i]) <
-			Constants::Drive::STEER_EPSILON)
-			return false;
-	}
-	return true;
 }
 
 void setJointPower(robot::types::jointid_t joint, double power) {

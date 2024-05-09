@@ -3,13 +3,16 @@
 #include "Constants.h"
 #include "kinematics/FabrikSolver.h"
 #include "kinematics/PlanarArmFK.h"
+#include "kinematics/SwerveDriveKinematics.h"
 #include "world_interface/data.h"
+#include "world_interface/world_interface.h"
 
 #include <atomic>
 #include <vector>
 
 using robot::types::motorid_t;
 using namespace Constants::arm;
+using control::DriveMode;
 
 namespace {
 
@@ -54,5 +57,6 @@ std::pair<DriveMode, bool> driveMode = {DriveMode::Normal, false};
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);
+control::SwerveController swerveController;
 std::atomic<bool> armIKEnabled = false;
 } // namespace Globals

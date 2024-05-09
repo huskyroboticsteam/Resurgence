@@ -1,6 +1,7 @@
 #pragma once
 
 #include "control/PlanarArmController.h"
+#include "control/SwerveController.h"
 #include "kinematics/ArmKinematics.h"
 #include "network/websocket/WebSocketServer.h"
 #include "world_interface/data.h"
@@ -17,16 +18,12 @@ enum class RoverState {
 	LookingForTennisball,
 };
 
-enum class DriveMode {
-	Normal,
-	TurnInPlace,
-	Crab,
-};
+namespace control {
+enum class DriveMode;
+class SwerveController;
+} // namespace control
 
-static const std::map<DriveMode, std::string> driveModeStrings = {
-	{DriveMode::Normal, "Normal"},
-	{DriveMode::TurnInPlace, "TurnInPlace"},
-	{DriveMode::Crab, "Crab"}};
+using control::DriveMode;
 
 // NOTE(sasha): To keep linker happy, declare globals with "extern" here and then
 //              provide variable definition in Globals.cpp
@@ -43,5 +40,6 @@ extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
 extern control::PlanarArmController<2> planarArmController;
+extern control::SwerveController swerveController;
 extern std::atomic<bool> armIKEnabled;
 } // namespace Globals
