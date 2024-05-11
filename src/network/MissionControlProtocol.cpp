@@ -23,6 +23,7 @@ using Globals::swerveController;
 using net::websocket::connhandler_t;
 using net::websocket::msghandler_t;
 using net::websocket::validator_t;
+using robot::types::motorid_t;
 using std::placeholders::_1;
 
 namespace net::mc {
@@ -229,12 +230,31 @@ void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 
 void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
 	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
-	Globals::swerveController.setTurnInPlaceCmdVel(dtheta);
+	std::vector<int> curr_wheel_rots = {
+		robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
+		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
+		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
+		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+	std::vector<double> new_wheel_rots =
+		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, curr_wheel_rots).second;
+	robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
+	robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
+	robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
+	robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
 }
 
 void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
 	_power_repeat_task.setCrabCmdVel(dtheta, dy);
-	Globals::swerveController.setCrabCmdVel(dtheta, dy);
+	std::vector<int> curr_wheel_rots = {robot::getMotorPos(Constants::Drive::WHEEL_IDS[0]),
+										robot::getMotorPos(Constants::Drive::WHEEL_IDS[1]),
+										robot::getMotorPos(Constants::Drive::WHEEL_IDS[2]),
+										robot::getMotorPos(Constants::Drive::WHEEL_IDS[3])};
+	std::vector<double> new_wheel_rots =
+		Globals::swerveController.setCrabCmdVel(dtheta, dy, curr_wheel_rots).second;
+	robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
+	robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
+	robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
+	robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
 }
 
 static bool validateJoint(const json& j) {

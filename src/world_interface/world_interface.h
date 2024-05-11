@@ -93,34 +93,6 @@ double setCmdVel(double dtheta, double dx);
 double setTankCmdVel(double dtheta, double dx);
 
 /**
- * @brief Request the robot to turn in place using swerve.
- *
- * @param dtheta The heading velocity.
- * @return double If the requested velocities are too high, they will be scaled down.
- * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
- */
-double setTurnInPlaceCmdVel(double dtheta);
-
-/**
- * @brief Request the robot to drive side to side and turn with given velocities using swerve.
- * Essentially rotate the reference frame of the robot by 90 degrees.
- *
- * @param dtheta The heading velocity.
- * @param dy The side-to-side velocity.
- * @return double If the requested velocities are too high, they will be scaled down.
- * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
- */
-double setCrabCmdVel(double dtheta, double dy);
-
-/**
- * @brief Get the velocity commanded to the robot. Depending on scaling,
- * may not be the same numbers passed to setCmdVel().
- *
- * @return std::pair<double, double> Pair of thetaVel, xVel.
- */
-std::pair<double, double> getCmdVel();
-
-/**
  * @brief Get the IDs of the currently supported cameras.
  *
  * @return The IDs of all cameras currently supported by the world interface, as a @ref

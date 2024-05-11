@@ -1,27 +1,10 @@
-// Move kinematics out of world interface
-// Own kinematics
-// Tell it the drive mode
-// Owns drive mode (no more global)
-// Ask it different drive commands
-// SetTurnInPlace
-// Do corresponding checks if not overriden
-// This would still call the world interface method
-// Set motor power directly here
-// Remove crab and turn in place
-// Create periodic task to set power velocities
 #pragma once
 
-#include "../Constants.h"
 #include "../Globals.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../kinematics/SwerveDriveKinematics.h"
 
 #include <map>
-
-namespace Constants {
-extern const double ROBOT_LENGTH;
-extern const double EFF_WHEEL_BASE;
-} // namespace Constants
 
 namespace control {
 enum class DriveMode {
@@ -37,13 +20,32 @@ static const std::map<DriveMode, std::string> driveModeStrings = {
 
 class SwerveController {
 public:
-	SwerveController()
-		: driveMode(DriveMode::Normal, false),
-		  swerve_kinematics(Constants::EFF_WHEEL_BASE, Constants::ROBOT_LENGTH){};
+	SwerveController(double baseWidth, double baseLength)
+		: driveMode(DriveMode::Normal, false), swerve_kinematics(baseWidth, baseLength),
+		  crab_kinematics(baseLength){};
 
-	double setTurnInPlaceCmdVel(double dtheta);
-
-	double setCrabCmdVel(double dtheta, double dy);
+	/**
+	 * @brief Request the robot to turn in place using swerve.
+	 *
+	 * @param dtheta The heading velocity.
+	 * @param wheel_rots The rotation of all four wheels in order FL, FR, RL, RR
+	 * @return double If the requested velocities are too high, they will be scaled down.
+	 * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
+	 */
+	std::pair<double, std::vector<double>> setTurnInPlaceCmdVel(double dtheta,
+																std::vector<int> wheels);
+	/**
+	 * @brief Request the robot to drive side to side and turn with given velocities using
+	 * swerve. Essentially rotate the reference frame of the robot by 90 degrees.
+	 *
+	 * @param dtheta The heading velocity.
+	 * @param dy The side-to-side velocity.
+	 * @param wheel_rots The rotation of all four wheels in order FL, FR, RL, RR
+	 * @return double If the requested velocities are too high, they will be scaled down.
+	 * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
+	 */
+	std::pair<double, std::vector<double>> setCrabCmdVel(double dtheta, double dy,
+														 std::vector<int> wheels);
 
 	kinematics::SwerveDriveKinematics swerveKinematics();
 
@@ -51,10 +53,11 @@ public:
 	 * @brief Check to see if all wheels are at their target position.
 	 *
 	 * @param mode The drive mode to compare wheel rotations against.
+	 * @param wheel_rots The rotation of all four wheels in order FL, FR, RL, RR
 	 * @return bool if the wheels are within `Constants::Drive::STEER_EPSILON` of their their
 	 * target position.
 	 */
-	bool checkWheelRotation(DriveMode mode);
+	bool checkWheelRotation(DriveMode mode, std::vector<int> wheel_rots);
 
 	// The boolean here is whether or not wheel rotation check should be ignored when doing
 	// swerve-based driving
@@ -62,5 +65,6 @@ public:
 
 private:
 	const kinematics::SwerveDriveKinematics swerve_kinematics;
+	const kinematics::DiffDriveKinematics crab_kinematics;
 };
 } // namespace control

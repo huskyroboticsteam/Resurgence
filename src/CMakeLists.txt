@@ -153,8 +153,7 @@ add_library(utils SHARED
   kinematics/DiffWristKinematics.cpp
   kinematics/SwerveDriveKinematics.cpp
   control/SwerveController.cpp
-  world_interface/data.cpp
-  Globals.cpp)
+  world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
 ## ====== CAN Interfaces =======
@@ -222,7 +221,6 @@ add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
   world_interface/motor/can_motor.cpp
   Globals.cpp
-  Constants.cpp
   )
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp

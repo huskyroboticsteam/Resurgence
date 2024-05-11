@@ -86,10 +86,34 @@ void PowerRepeatTask::periodicTask() {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
 			} else if (swerveController.driveMode.first == DriveMode::TurnInPlace) {
-				Globals::swerveController.setTurnInPlaceCmdVel(_last_cmd_vel->first);
+				std::vector<int> curr_wheel_rots = {
+					robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
+					robot::getMotorPos(motorid_t::frontRightWheel).getData(),
+					robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
+					robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+				std::vector<double> new_wheel_rots =
+					Globals::swerveController
+						.setTurnInPlaceCmdVel(_last_cmd_vel->first, curr_wheel_rots)
+						.second;
+				robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
+				robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
+				robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
+				robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
 			} else {
-				Globals::swerveController.setCrabCmdVel(_last_cmd_vel->first,
-														_last_cmd_vel->second);
+				std::vector<int> curr_wheel_rots = {
+					robot::getMotorPos(Constants::Drive::WHEEL_IDS[0]),
+					robot::getMotorPos(Constants::Drive::WHEEL_IDS[1]),
+					robot::getMotorPos(Constants::Drive::WHEEL_IDS[2]),
+					robot::getMotorPos(Constants::Drive::WHEEL_IDS[3])};
+				std::vector<double> new_wheel_rots =
+					Globals::swerveController
+						.setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second,
+									   curr_wheel_rots)
+						.second;
+				robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
+				robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
+				robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
+				robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
 			}
 		}
 	}

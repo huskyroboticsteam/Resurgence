@@ -1,21 +1,23 @@
 #include "SwerveController.h"
 
-#include "../world_interface/world_interface.h"
+#include "../Constants.h"
 
 using namespace control;
 using Globals::swerveController;
 using robot::types::motorid_t;
 
-double SwerveController::setTurnInPlaceCmdVel(double dtheta) {
+std::pair<double, std::vector<double>>
+SwerveController::setTurnInPlaceCmdVel(double dtheta, std::vector<int> wheel_rots) {
 	if (dtheta != 0) {
-		return 0;
+		return {0, {0.0, 0.0, 0.0, 0.0}};
 	}
 
-	if (!swerveController.driveMode.second && !checkWheelRotation(DriveMode::TurnInPlace))
-		return 0;
+	if (!swerveController.driveMode.second &&
+		!checkWheelRotation(DriveMode::TurnInPlace, wheel_rots))
+		return {0, {0.0, 0.0, 0.0, 0.0}};
 
 	kinematics::swervewheelvel_t wheelVels =
-		swerveKinematics().robotVelToWheelVel(0, 0, dtheta);
+		swerve_kinematics.robotVelToWheelVel(0, 0, dtheta);
 	double lfPWM = wheelVels.lfVel / Constants::MAX_WHEEL_VEL;
 	double lbPWM = wheelVels.lbVel / Constants::MAX_WHEEL_VEL;
 	double rfPWM = wheelVels.rfVel / Constants::MAX_WHEEL_VEL;
@@ -29,23 +31,19 @@ double SwerveController::setTurnInPlaceCmdVel(double dtheta) {
 		rbPWM /= maxAbsPWM;
 	}
 
-	robot::setMotorPower(motorid_t::frontLeftWheel, lfPWM);
-	robot::setMotorPower(motorid_t::rearLeftWheel, lbPWM);
-	robot::setMotorPower(motorid_t::frontRightWheel, rfPWM);
-	robot::setMotorPower(motorid_t::rearRightWheel, rbPWM);
-
-	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
+	return {maxAbsPWM > 1 ? maxAbsPWM : 1.0, {lfPWM, rfPWM, lbPWM, rbPWM}};
 }
 
-double SwerveController::setCrabCmdVel(double dtheta, double dy) {
+std::pair<double, std::vector<double>>
+SwerveController::setCrabCmdVel(double dtheta, double dy, std::vector<int> wheel_rots) {
 	if (Globals::E_STOP && (dtheta != 0 || dy != 0)) {
-		return 0;
+		return {0, {0.0, 0.0, 0.0, 0.0}};
 	}
 
-	if (!swerveController.driveMode.second && !checkWheelRotation(DriveMode::Crab))
-		return 0;
+	if (!swerveController.driveMode.second && !checkWheelRotation(DriveMode::Crab, wheel_rots))
+		return {0, {0.0, 0.0, 0.0, 0.0}};
 
-	kinematics::wheelvel_t wheelVels = robot::driveKinematics().robotVelToWheelVel(dy, dtheta);
+	kinematics::wheelvel_t wheelVels = crab_kinematics.robotVelToWheelVel(dy, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
@@ -54,18 +52,12 @@ double SwerveController::setCrabCmdVel(double dtheta, double dy) {
 		rPWM /= maxAbsPWM;
 	}
 
-	robot::setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	robot::setMotorPower(motorid_t::rearLeftWheel, lPWM);
-	robot::setMotorPower(motorid_t::frontRightWheel, rPWM);
-	robot::setMotorPower(motorid_t::rearRightWheel, rPWM);
-
-	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
+	return {maxAbsPWM > 1 ? maxAbsPWM : 1.0, {rPWM, rPWM, lPWM, lPWM}};
 }
 
-bool SwerveController::checkWheelRotation(DriveMode mode) {
+bool SwerveController::checkWheelRotation(DriveMode mode, std::vector<int> wheel_rots) {
 	for (int i = 0; i < 4; i++) {
-		if (std::abs(robot::getMotorPos(Constants::Drive::WHEEL_IDS[i]) -
-					 Constants::Drive::WHEEL_ROTS.at(mode)[i]) <
+		if (std::abs(wheel_rots[i] - Constants::Drive::WHEEL_ROTS.at(mode)[i]) <
 			Constants::Drive::STEER_EPSILON)
 			return false;
 	}
