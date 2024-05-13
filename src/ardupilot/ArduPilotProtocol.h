@@ -31,12 +31,6 @@ public:
 	 */
 	robot::types::DataPoint<Eigen::Quaterniond> getIMU();
 
-	/* @brief Gets the last reported heading (degrees)
-	 *
-	 * @return Last reported heading
-	 */
-	robot::types::DataPoint<int> getHeading();
-
 private:
 	/* @brief Validates GPS request
 	 *
@@ -54,14 +48,6 @@ private:
 	 */
 	static bool validateIMURequest(const nlohmann::json& j);
 
-	/* @brief Validates heading request
-	 *
-	 * @param json message
-	 *
-	 * @return True if message is valid, false otherwise
-	 */
-	static bool validateHeadingRequest(const nlohmann::json& j);
-
 	/* @brief Destructures GPS json message and updates last reported GPS values
 	 *
 	 * @param json message
@@ -73,12 +59,6 @@ private:
 	 * @param json message
 	 */
 	void handleIMURequest(const nlohmann::json& j);
-
-	/* @brief Destructures heading json message and updates last reported GPS values
-	 *
-	 * @param json message
-	 */
-	void handleHeadingRequest(const nlohmann::json& j);
 
 	/* @brief Checks if the ArduPilotProtocol is connected
 	 *
@@ -100,9 +80,6 @@ private:
 
 	std::mutex _connectionMutex;
 	bool _arduPilotProtocolConnected;
-
-	std::mutex _lastHeadingMutex;
-	robot::types::DataPoint<int> _lastHeading;
 
 	std::mutex _lastGPSMutex;
 	robot::types::DataPoint<navtypes::gpscoords_t> _lastGPS;
