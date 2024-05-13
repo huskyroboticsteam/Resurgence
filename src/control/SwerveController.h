@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Globals.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../kinematics/SwerveDriveKinematics.h"
 
