@@ -100,11 +100,12 @@ void PowerRepeatTask::periodicTask() {
 				robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
 				robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
 			} else {
+
 				std::vector<int> curr_wheel_rots = {
-					robot::getMotorPos(Constants::Drive::WHEEL_IDS[0]),
-					robot::getMotorPos(Constants::Drive::WHEEL_IDS[1]),
-					robot::getMotorPos(Constants::Drive::WHEEL_IDS[2]),
-					robot::getMotorPos(Constants::Drive::WHEEL_IDS[3])};
+					robot::getMotorPos(motorid_t::frontLeftWheel),
+					robot::getMotorPos(motorid_t::frontRightWheel),
+					robot::getMotorPos(motorid_t::rearLeftWheel),
+					robot::getMotorPos(motorid_t::rearRightWheel)};
 				std::vector<double> new_wheel_rots =
 					Globals::swerveController
 						.setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second,
