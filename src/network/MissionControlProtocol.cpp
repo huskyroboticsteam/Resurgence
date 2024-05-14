@@ -35,6 +35,16 @@ const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
  */
 static void stopAllJoints();
 
+/**
+ * Get the steer rotations of all wheels as a swerve_rots_t.
+ */
+static control::swerve_rots_t getAllSteerRotations();
+
+/**
+ * Set the steer power of all wheels with a swerve_commands_t.
+ */
+static void setAllSteerPowers(control::swerve_commands_t commands);
+
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
 
   For each protocol message type, there is a pair of functions in this section: a validator and
@@ -222,31 +232,14 @@ void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 
 void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
 	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
-	control::swerve_rots_t curr_wheel_rots = {
-		robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-	control::swerve_commands_t steer_power =
-		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, curr_wheel_rots).second;
-	robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
-	robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
-	robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
-	robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
+	setAllSteerPowers(
+		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, getAllSteerRotations()).second);
 }
 
 void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
 	_power_repeat_task.setCrabCmdVel(dtheta, dy);
-	control::swerve_rots_t curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftWheel),
-											  robot::getMotorPos(motorid_t::frontRightWheel),
-											  robot::getMotorPos(motorid_t::rearLeftWheel),
-											  robot::getMotorPos(motorid_t::rearRightWheel)};
-	control::swerve_commands_t steer_power =
-		Globals::swerveController.setCrabCmdVel(dtheta, dy, curr_wheel_rots).second;
-	robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
-	robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
-	robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
-	robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
+	setAllSteerPowers(
+		Globals::swerveController.setCrabCmdVel(dtheta, dy, getAllSteerRotations()).second);
 }
 
 static bool validateJoint(const json& j) {
@@ -448,6 +441,20 @@ static void stopAllJoints() {
 	for (jointid_t current : robot::types::all_jointid_t) {
 		robot::setJointPower(current, 0.0);
 	}
+}
+
+static control::swerve_rots_t getAllSteerRotations() {
+	return {robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
+			robot::getMotorPos(motorid_t::frontRightWheel).getData(),
+			robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
+			robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+}
+
+static void setAllSteerPowers(control::swerve_commands_t commands) {
+	robot::setMotorPower(motorid_t::frontLeftWheel, commands.lfPower);
+	robot::setMotorPower(motorid_t::frontRightWheel, commands.rfPower);
+	robot::setMotorPower(motorid_t::rearLeftWheel, commands.lbPower);
+	robot::setMotorPower(motorid_t::rearRightWheel, commands.rbPower);
 }
 
 } // namespace net::mc

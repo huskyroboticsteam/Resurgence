@@ -22,6 +22,16 @@ namespace {
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 }
 
+/**
+ * Get the steer rotations of all wheels as a swerve_rots_t.
+ */
+static control::swerve_rots_t getAllSteerRotations();
+
+/**
+ * Set the steer power of all wheels with a swerve_commands_t.
+ */
+static void setAllSteerPowers(control::swerve_commands_t commands);
+
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
 						   std::bind(&PowerRepeatTask::periodicTask, this)) {}
@@ -86,34 +96,14 @@ void PowerRepeatTask::periodicTask() {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
 			} else if (swerveController.getDriveMode() == DriveMode::TurnInPlace) {
-				control::swerve_rots_t curr_wheel_rots = {
-					robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-					robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-					robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-					robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-				control::swerve_commands_t steer_power =
-					Globals::swerveController
-						.setTurnInPlaceCmdVel(_last_cmd_vel->first, curr_wheel_rots)
-						.second;
-				robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
-				robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
-				robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
-				robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
+				setAllSteerPowers(Globals::swerveController
+									  .setTurnInPlaceCmdVel(dtheta, getAllSteerRotations())
+									  .second);
 			} else {
-				control::swerve_rots_t curr_wheel_rots = {
-					robot::getMotorPos(motorid_t::frontLeftWheel),
-					robot::getMotorPos(motorid_t::frontRightWheel),
-					robot::getMotorPos(motorid_t::rearLeftWheel),
-					robot::getMotorPos(motorid_t::rearRightWheel)};
-				control::swerve_commands_t steer_power =
-					Globals::swerveController
-						.setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second,
-									   curr_wheel_rots)
-						.second;
-				robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
-				robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
-				robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
-				robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
+
+				setAllSteerPowers(
+					Globals::swerveController.setCrabCmdVel(dtheta, dy, getAllSteerRotations())
+						.second);
 			}
 		}
 	}
@@ -239,4 +229,17 @@ void ArmIKTask::updateArmIK() {
 	}
 }
 
+static control::swerve_rots_t getAllSteerRotations() {
+	return {robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
+			robot::getMotorPos(motorid_t::frontRightWheel).getData(),
+			robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
+			robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+}
+
+static void setAllSteerPowers(control::swerve_commands_t commands) {
+	robot::setMotorPower(motorid_t::frontLeftWheel, commands.lfPower);
+	robot::setMotorPower(motorid_t::frontRightWheel, commands.rfPower);
+	robot::setMotorPower(motorid_t::rearLeftWheel, commands.lbPower);
+	robot::setMotorPower(motorid_t::rearRightWheel, commands.rbPower);
+}
 } // namespace net::mc::tasks
