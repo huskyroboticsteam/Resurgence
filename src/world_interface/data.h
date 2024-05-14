@@ -133,16 +133,6 @@ public:
 	DataPoint(datatime_t time, T data) : datapoint({time, data}) {}
 
 	/**
-	 * @brief Implicitly convert to the required data type. UB if datapoint is invalid.
-	 * Equivalent to getData().
-	 *
-	 * @return T The value of this datapoint.
-	 */
-	operator T() const {
-		return getData();
-	}
-
-	/**
 	 * @brief Check if this measurement is valid. Equivalent to isValid().
 	 *
 	 * @return bool True iff this datapoint has a value.
@@ -183,12 +173,16 @@ public:
 
 	/**
 	 * @brief Get the value of this data point.
-	 * UB if data point is not valid.
 	 *
 	 * @return T The value of this data point.
+	 * @throw std::bad_optional_access If this data point is not valid.
 	 */
 	T getData() const {
-		return datapoint.value().second;
+		if (isValid()) {
+			return datapoint.value().second;
+		} else {
+			throw std::bad_optional_access();
+		}
 	}
 
 	/**

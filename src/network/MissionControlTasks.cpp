@@ -176,7 +176,8 @@ void ArmIKTask::updateArmIK() {
 		robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 	if (armJointPositions.isValid()) {
 		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
-			Globals::planarArmController.getCommand(dataclock::now(), armJointPositions);
+			Globals::planarArmController.getCommand(dataclock::now(),
+													armJointPositions.getData());
 		targetJointPositions /= M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
 		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
 			robot::setMotorPos(Constants::arm::IK_MOTORS[i],

@@ -24,11 +24,11 @@ DataPoint<point_t> readGPS() {
 
 	if (!converter) {
 		// just recieved first fix, construct map centered at the first datapoint
-		converter.emplace(GPSDatum::WGS84, coords);
+		converter.emplace(GPSDatum::WGS84, coords.getData());
 	}
 
 	datatime_t time = coords.getTime();
-	point_t pos = converter->gpsToMeters(coords);
+	point_t pos = converter->gpsToMeters(coords.getData());
 
 	return {time, pos};
 }
