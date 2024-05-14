@@ -152,7 +152,6 @@ add_library(utils SHARED
   kinematics/DiffDriveKinematics.cpp
   kinematics/DiffWristKinematics.cpp
   kinematics/SwerveDriveKinematics.cpp
-  control/SwerveController.cpp
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
@@ -248,6 +247,7 @@ target_link_libraries(video
 
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
+  control/SwerveController.cpp
 )
 target_link_libraries(control utils)
 
@@ -266,6 +266,7 @@ add_library(rover_common SHARED
   )
 target_link_libraries(rover_common
   utils
+  control
   mission_control_interface)
 
 list(APPEND rover_libs

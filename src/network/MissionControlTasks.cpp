@@ -79,41 +79,41 @@ void PowerRepeatTask::periodicTask() {
 	}
 	if (_last_cmd_vel) {
 		if (_last_cmd_vel->first != 0.0 || _last_cmd_vel->second != 0.0) {
-			if (swerveController.driveMode.first == DriveMode::Normal) {
+			if (swerveController.getDriveMode() == DriveMode::Normal) {
 				if (_tank) {
 					robot::setTankCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				} else {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
-			} else if (swerveController.driveMode.first == DriveMode::TurnInPlace) {
+			} else if (swerveController.getDriveMode() == DriveMode::TurnInPlace) {
 				control::swerve_rots_t curr_wheel_rots = {
 					robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
 					robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 					robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 					robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-				control::swerve_commands_t steer_PWM =
+				control::swerve_commands_t steer_power =
 					Globals::swerveController
 						.setTurnInPlaceCmdVel(_last_cmd_vel->first, curr_wheel_rots)
 						.second;
-				robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
-				robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
-				robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
-				robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
+				robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
+				robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
+				robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
+				robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
 			} else {
 				control::swerve_rots_t curr_wheel_rots = {
 					robot::getMotorPos(motorid_t::frontLeftWheel),
 					robot::getMotorPos(motorid_t::frontRightWheel),
 					robot::getMotorPos(motorid_t::rearLeftWheel),
 					robot::getMotorPos(motorid_t::rearRightWheel)};
-				control::swerve_commands_t steer_PWM =
+				control::swerve_commands_t steer_power =
 					Globals::swerveController
 						.setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second,
 									   curr_wheel_rots)
 						.second;
-				robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
-				robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
-				robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
-				robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
+				robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
+				robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
+				robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
+				robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
 			}
 		}
 	}

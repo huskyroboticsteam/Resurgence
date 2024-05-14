@@ -18,7 +18,6 @@ using namespace std::chrono_literals;
 
 using val_t = nlohmann::json::value_t;
 using control::DriveMode;
-using control::driveModeStrings;
 using Globals::swerveController;
 using net::websocket::connhandler_t;
 using net::websocket::msghandler_t;
@@ -88,65 +87,57 @@ static bool validateDriveModeRequest(const json& j) {
 
 void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 	std::string mode = j["mode"];
+	control::swerve_rots_t target;
 	if (mode == "normal") {
-		swerveController.driveMode.first = DriveMode::Normal;
-		for (int i = 0; i < 4; i++) {
-			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
-							   Globals::swerveController.WHEEL_ROTS.at(DriveMode::Normal)[i]);
-		}
+		target = swerveController.setDriveMode(DriveMode::Normal);
 	} else if (mode == "turn-in-place") {
-		swerveController.driveMode.first = DriveMode::TurnInPlace;
-		for (int i = 0; i < 4; i++) {
-			robot::setMotorPos(
-				Constants::Drive::WHEEL_IDS[i],
-				Globals::swerveController.WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
-		}
+		target = swerveController.setDriveMode(DriveMode::TurnInPlace);
 	} else if (mode == "crab") {
-		swerveController.driveMode.first = DriveMode::Crab;
-		for (int i = 0; i < 4; i++) {
-			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
-							   Globals::swerveController.WHEEL_ROTS.at(DriveMode::Crab)[i]);
-		}
+		target = swerveController.setDriveMode(DriveMode::Crab);
+	}
+	std::array<int, 4> target_rots = {target.lfRot, target.rfRot, target.lbRot, target.rbRot};
+	for (int i = 0; i < 4; i++) {
+		robot::setMotorPos(Constants::Drive::WHEEL_IDS[i], target_rots[i]);
 	}
 
-	swerveController.driveMode.second = j["override"];
+	swerveController.setOverride(j["override"]);
 }
 
 static bool validateDriveRequest(const json& j) {
-	if (swerveController.driveMode.first != DriveMode::Normal) {
+	if (swerveController.getDriveMode() != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(swerveController.driveMode.first).c_str());
+			  util::to_string(swerveController.getDriveMode()).c_str());
 	}
-	return swerveController.driveMode.first == DriveMode::Normal &&
+	return swerveController.getDriveMode() == DriveMode::Normal &&
 		   util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
 		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateTankDriveRequest(const json& j) {
-	if (swerveController.driveMode.first != DriveMode::Normal) {
+	if (swerveController.getDriveMode() != DriveMode::Normal) {
 		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  driveModeStrings.at(swerveController.driveMode.first).c_str());
+			  util::to_string(swerveController.getDriveMode()).c_str());
 	}
-	return swerveController.driveMode.first == DriveMode::Normal && util::hasKey(j, "left") &&
+	return swerveController.getDriveMode() == DriveMode::Normal && util::hasKey(j, "left") &&
 		   util::validateRange(j, "left", -1, 1) && util::hasKey(j, "right") &&
 		   util::validateRange(j, "right", -1, 1);
 }
 
 static bool validateTurnInPlaceDriveRequest(const json& j) {
-	if (swerveController.driveMode.first != DriveMode::TurnInPlace) {
+	if (swerveController.getDriveMode() != DriveMode::TurnInPlace) {
 		LOG_F(WARNING, "Drive mode set to %s, not TurnInPlace",
-			  driveModeStrings.at(swerveController.driveMode.first).c_str());
+			  util::to_string(swerveController.getDriveMode()).c_str());
 	}
-	return swerveController.driveMode.first == DriveMode::TurnInPlace &&
+	return swerveController.getDriveMode() == DriveMode::TurnInPlace &&
 		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateCrabDriveRequest(const json& j) {
-	if (swerveController.driveMode.first != DriveMode::Crab) {
+	if (swerveController.getDriveMode() != DriveMode::Crab) {
 		LOG_F(WARNING, "Drive mode set to %s, not Crab",
-			  driveModeStrings.at(swerveController.driveMode.first).c_str());
+			  util::to_string(swerveController.getDriveMode()).c_str());
 	}
-	return swerveController.driveMode.first == DriveMode::Crab && util::hasKey(j, "crab") &&
+	return swerveController.getDriveMode() == DriveMode::Crab && util::hasKey(j, "crab") &&
 		   util::validateRange(j, "crab", -1, 1) && util::hasKey(j, "steer") &&
 		   util::validateRange(j, "steer", -1, 1);
 }
@@ -236,12 +227,12 @@ void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
 		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-	control::swerve_commands_t steer_PWM =
+	control::swerve_commands_t steer_power =
 		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, curr_wheel_rots).second;
-	robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
-	robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
-	robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
-	robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
+	robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
+	robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
+	robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
+	robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
 }
 
 void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
@@ -250,12 +241,12 @@ void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
 											  robot::getMotorPos(motorid_t::frontRightWheel),
 											  robot::getMotorPos(motorid_t::rearLeftWheel),
 											  robot::getMotorPos(motorid_t::rearRightWheel)};
-	control::swerve_commands_t steer_PWM =
+	control::swerve_commands_t steer_power =
 		Globals::swerveController.setCrabCmdVel(dtheta, dy, curr_wheel_rots).second;
-	robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
-	robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
-	robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
-	robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
+	robot::setMotorPower(motorid_t::frontLeftWheel, steer_power.lfPower);
+	robot::setMotorPower(motorid_t::frontRightWheel, steer_power.rfPower);
+	robot::setMotorPower(motorid_t::rearLeftWheel, steer_power.lbPower);
+	robot::setMotorPower(motorid_t::rearRightWheel, steer_power.rbPower);
 }
 
 static bool validateJoint(const json& j) {

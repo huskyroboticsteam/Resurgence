@@ -9,12 +9,6 @@
 
 #include <frozen/unordered_map.h>
 
-namespace control {
-enum class DriveMode;
-}
-
-using control::DriveMode;
-
 namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 extern const double SHOULDER_LENGTH;
@@ -27,6 +21,7 @@ extern const float MDEG_PER_DEG;
 
 // TODO: tune these drive extern constants
 extern const double ROBOT_LENGTH;
+extern const double ROBOT_WIDTH;
 /**
    Distance between left and right wheels.
 */
@@ -95,6 +90,7 @@ constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
 	robot::types::motorid_t::rearLeftWheel,
 	robot::types::motorid_t::rearRightWheel,
 };
+const double STEER_EPSILON = 1000;
 } // namespace Drive
 
 namespace Nav {

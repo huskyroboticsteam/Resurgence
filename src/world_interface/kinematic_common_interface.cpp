@@ -43,8 +43,7 @@ double setCmdVel(double dtheta, double dx) {
 		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-	if (!swerveController.driveMode.second &&
-		!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
+	if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
 		return 0;
 
 	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
@@ -74,8 +73,7 @@ double setTankCmdVel(double left, double right) {
 		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-	if (!swerveController.driveMode.second &&
-		!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
+	if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
 		return 0;
 
 	wheelvel_t wheelVels = {left, right};

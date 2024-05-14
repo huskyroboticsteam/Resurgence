@@ -18,13 +18,6 @@ enum class RoverState {
 	LookingForTennisball,
 };
 
-namespace control {
-enum class DriveMode;
-class SwerveController;
-} // namespace control
-
-using control::DriveMode;
-
 // NOTE(sasha): To keep linker happy, declare globals with "extern" here and then
 //              provide variable definition in Globals.cpp
 namespace Globals {

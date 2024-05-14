@@ -18,10 +18,6 @@ namespace cam {
 class CameraParams;
 }
 
-namespace control {
-enum class DriveMode;
-}
-
 /**
  * @namespace robot
  * @brief Collection of functions that allows interfacing with the hardware and the world.
@@ -88,7 +84,7 @@ double setCmdVel(double dtheta, double dx);
  * @return double If the requested velocities are too high, they will be scaled down.
  * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
  */
-double setTankCmdVel(double dtheta, double dx);
+double setTankCmdVel(double left, double right);
 
 /**
  * @brief Get the IDs of the currently supported cameras.

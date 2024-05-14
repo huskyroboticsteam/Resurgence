@@ -2,9 +2,6 @@
 
 #include "kinematics/DiffDriveKinematics.h"
 
-using namespace control;
-using control::DriveMode;
-
 namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 const double SHOULDER_LENGTH = 0.6; // placeholder(m)
@@ -17,6 +14,7 @@ const float MDEG_PER_DEG = 1000;
 
 // TODO: tune these drive constants
 const double ROBOT_LENGTH = 1.0;
+const double ROBOT_WIDTH = 1.0;
 /**
    Distance between left and right wheels.
 */
