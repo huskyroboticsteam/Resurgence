@@ -11,14 +11,25 @@ control::SwerveController::SwerveController(double baseWidth, double baseLength,
 	: driveMode(DriveMode::Normal), swerve_kinematics(baseWidth, baseLength),
 	  crab_kinematics(baseLength), steer_epsilon(epsilon) {}
 
-std::pair<double, swerve_commands_t>
+swerve_commands_t
 SwerveController::setTurnInPlaceCmdVel(double dtheta, const swerve_rots_t& wheel_rots) const {
+	double dummyScaleFactor;
+	swerve_commands_t commands = setTurnInPlaceCmdVel(dtheta, wheel_rots, dummyScaleFactor);
+	return commands;
+}
+
+swerve_commands_t SwerveController::setTurnInPlaceCmdVel(double dtheta,
+														 const swerve_rots_t& wheel_rots,
+														 double& scaleFactor) const {
 	if (dtheta == 0) {
-		return {0, {0.0, 0.0, 0.0, 0.0}};
+		scaleFactor = 0;
+		return {0.0, 0.0, 0.0, 0.0};
 	}
 
-	if (!checkWheelRotation(DriveMode::TurnInPlace, wheel_rots))
-		return {0, {0.0, 0.0, 0.0, 0.0}};
+	if (!checkWheelRotation(DriveMode::TurnInPlace, wheel_rots)) {
+		scaleFactor = 0;
+		return {0.0, 0.0, 0.0, 0.0};
+	}
 
 	kinematics::swervewheelvel_t wheelVels =
 		swerve_kinematics.robotVelToWheelVel(0, 0, dtheta);
@@ -28,25 +39,39 @@ SwerveController::setTurnInPlaceCmdVel(double dtheta, const swerve_rots_t& wheel
 	double rbPower = wheelVels.rbVel / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::max(std::abs(lfPower), std::abs(lbPower)),
 								std::max(std::abs(rfPower), std::abs(rbPower)));
+
 	if (maxAbsPWM > 1) {
 		lfPower /= maxAbsPWM;
 		lbPower /= maxAbsPWM;
 		rfPower /= maxAbsPWM;
 		rbPower /= maxAbsPWM;
+		scaleFactor = maxAbsPWM;
+	} else {
+		scaleFactor = 1.0;
 	}
 
-	return {maxAbsPWM > 1 ? maxAbsPWM : 1.0, {lfPower, rfPower, lbPower, rbPower}};
+	return {lfPower, rfPower, lbPower, rbPower};
 }
 
-std::pair<double, swerve_commands_t>
-SwerveController::setCrabCmdVel(double dtheta, double dy,
-								const swerve_rots_t& wheel_rots) const {
+swerve_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
+												  const swerve_rots_t& wheel_rots) const {
+	double dummyScaleFactor;
+	swerve_commands_t commands = setCrabCmdVel(dtheta, dy, wheel_rots, dummyScaleFactor);
+	return commands;
+}
+
+swerve_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
+												  const swerve_rots_t& wheel_rots,
+												  double& scaleFactor) const {
 	if (Globals::E_STOP && (dtheta != 0 || dy != 0)) {
-		return {0, {0.0, 0.0, 0.0, 0.0}};
+		scaleFactor = 0;
+		return {0.0, 0.0, 0.0, 0.0};
 	}
 
-	if (!checkWheelRotation(DriveMode::Crab, wheel_rots))
-		return {0, {0.0, 0.0, 0.0, 0.0}};
+	if (!checkWheelRotation(DriveMode::Crab, wheel_rots)) {
+		scaleFactor = 0;
+		return {0.0, 0.0, 0.0, 0.0};
+	}
 
 	kinematics::wheelvel_t wheelVels = crab_kinematics.robotVelToWheelVel(dy, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
@@ -55,12 +80,15 @@ SwerveController::setCrabCmdVel(double dtheta, double dy,
 	if (maxAbsPWM > 1) {
 		lPWM /= maxAbsPWM;
 		rPWM /= maxAbsPWM;
+		scaleFactor = maxAbsPWM;
+	} else {
+		scaleFactor = 1.0;
 	}
 
 	// Return order is lf, rf, lb, rb
 	// We rotate the output reference frame by 90 degrees CCW for crab, so right outputs are
 	// sent to the front and left outputs are sent to the back
-	return {maxAbsPWM > 1 ? maxAbsPWM : 1.0, {rPWM, rPWM, lPWM, lPWM}};
+	return {rPWM, rPWM, lPWM, lPWM};
 }
 
 bool SwerveController::checkWheelRotation(DriveMode mode, swerve_rots_t wheel_rots) const {

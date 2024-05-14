@@ -233,13 +233,13 @@ void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
 	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
 	setAllSteerPowers(
-		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, getAllSteerRotations()).second);
+		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, getAllSteerRotations()));
 }
 
 void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
 	_power_repeat_task.setCrabCmdVel(dtheta, dy);
 	setAllSteerPowers(
-		Globals::swerveController.setCrabCmdVel(dtheta, dy, getAllSteerRotations()).second);
+		Globals::swerveController.setCrabCmdVel(dtheta, dy, getAllSteerRotations()));
 }
 
 static bool validateJoint(const json& j) {

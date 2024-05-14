@@ -96,16 +96,11 @@ void PowerRepeatTask::periodicTask() {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
 			} else if (swerveController.getDriveMode() == DriveMode::TurnInPlace) {
-				setAllSteerPowers(
-					Globals::swerveController
-						.setTurnInPlaceCmdVel(_last_cmd_vel->first, getAllSteerRotations())
-						.second);
+				setAllSteerPowers(Globals::swerveController.setTurnInPlaceCmdVel(
+					_last_cmd_vel->first, getAllSteerRotations()));
 			} else {
-				setAllSteerPowers(Globals::swerveController
-									  .setCrabCmdVel(_last_cmd_vel->first,
-													 _last_cmd_vel->second,
-													 getAllSteerRotations())
-									  .second);
+				setAllSteerPowers(Globals::swerveController.setCrabCmdVel(
+					_last_cmd_vel->first, _last_cmd_vel->second, getAllSteerRotations()));
 			}
 		}
 	}
