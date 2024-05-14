@@ -4,27 +4,20 @@
 #include "../Globals.h"
 
 using namespace control;
-using Globals::swerveController;
 using robot::types::motorid_t;
-
-namespace {
-const std::array<int32_t, 4> NORMAL_WHEEL_ROTS = {0, 0, 0, 0};
-const kinematics::swervewheelvel_t TURN_IN_PLACE_VEL =
-	swerveController.swerveKinematics().robotVelToWheelVel(0, 0, 1);
-const std::array<int32_t, 4> TURN_IN_PLACE_WHEEL_ROTS = {
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.lfRot * 1000),
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.rfRot * 1000),
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.lbRot * 1000),
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.rbRot * 1000)};
-const std::array<int32_t, 4> CRAB_WHEEL_ROTS = {90000, 90000, 90000, 90000};
-} // namespace
 
 control::SwerveController::SwerveController(double baseWidth, double baseLength)
 	: driveMode(DriveMode::Normal, false), swerve_kinematics(baseWidth, baseLength),
 	  crab_kinematics(baseLength),
-	  WHEEL_ROTS({{DriveMode::Normal, NORMAL_WHEEL_ROTS},
-				  {DriveMode::TurnInPlace, TURN_IN_PLACE_WHEEL_ROTS},
-				  {DriveMode::Crab, CRAB_WHEEL_ROTS}}) {}
+	  WHEEL_ROTS(
+		  {{DriveMode::Normal, {0, 0, 0, 0}},
+		   {DriveMode::TurnInPlace,
+			{static_cast<int32_t>(swerve_kinematics.robotVelToWheelVel(0, 0, 1).lfRot * 1000),
+			 static_cast<int32_t>(swerve_kinematics.robotVelToWheelVel(0, 0, 1).rfRot * 1000),
+			 static_cast<int32_t>(swerve_kinematics.robotVelToWheelVel(0, 0, 1).lbRot * 1000),
+			 static_cast<int32_t>(swerve_kinematics.robotVelToWheelVel(0, 0, 1).rbRot *
+								  1000)}},
+		   {DriveMode::Crab, {90000, 90000, 90000, 90000}}}) {}
 
 std::pair<double, swerve_commands_t>
 SwerveController::setTurnInPlaceCmdVel(double dtheta, swerve_rots_t wheel_rots) {
@@ -32,8 +25,7 @@ SwerveController::setTurnInPlaceCmdVel(double dtheta, swerve_rots_t wheel_rots) 
 		return {0, {0.0, 0.0, 0.0, 0.0}};
 	}
 
-	if (!swerveController.driveMode.second &&
-		!checkWheelRotation(DriveMode::TurnInPlace, wheel_rots))
+	if (!driveMode.second && !checkWheelRotation(DriveMode::TurnInPlace, wheel_rots))
 		return {0, {0.0, 0.0, 0.0, 0.0}};
 
 	kinematics::swervewheelvel_t wheelVels =
@@ -60,7 +52,7 @@ SwerveController::setCrabCmdVel(double dtheta, double dy, swerve_rots_t wheel_ro
 		return {0, {0.0, 0.0, 0.0, 0.0}};
 	}
 
-	if (!swerveController.driveMode.second && !checkWheelRotation(DriveMode::Crab, wheel_rots))
+	if (!driveMode.second && !checkWheelRotation(DriveMode::Crab, wheel_rots))
 		return {0, {0.0, 0.0, 0.0, 0.0}};
 
 	kinematics::wheelvel_t wheelVels = crab_kinematics.robotVelToWheelVel(dy, dtheta);
