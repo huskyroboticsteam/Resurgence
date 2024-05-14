@@ -1,5 +1,6 @@
 #include "Constants.h"
 
+#include "Globals.h"
 #include "world_interface/world_interface.h"
 
 using namespace control;

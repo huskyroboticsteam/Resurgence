@@ -1,6 +1,7 @@
 #include "SwerveController.h"
 
 #include "../Constants.h"
+#include "../Globals.h"
 
 using namespace control;
 using Globals::swerveController;

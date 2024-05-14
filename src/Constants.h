@@ -1,5 +1,6 @@
 #pragma once
-#include "Globals.h"
+
+#include "world_interface/data.h"
 
 #include <array>
 #include <chrono>

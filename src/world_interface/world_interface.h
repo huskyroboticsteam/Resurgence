@@ -1,10 +1,8 @@
 #pragma once
 
-#include "../Globals.h"
 #include "../gps/gps_util.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../kinematics/DiffWristKinematics.h"
-#include "../kinematics/SwerveDriveKinematics.h"
 #include "../navtypes.h"
 #include "data.h"
 #include "motor/base_motor.h"

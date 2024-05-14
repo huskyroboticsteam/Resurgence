@@ -1,7 +1,6 @@
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../kinematics/DiffDriveKinematics.h"
-#include "../kinematics/SwerveDriveKinematics.h"
 #include "../navtypes.h"
 #include "../utils/transform.h"
 #include "world_interface.h"
