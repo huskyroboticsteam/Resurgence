@@ -92,19 +92,20 @@ void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 		swerveController.driveMode.first = DriveMode::Normal;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
-							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Normal)[i]);
+							   Globals::swerveController.WHEEL_ROTS.at(DriveMode::Normal)[i]);
 		}
 	} else if (mode == "turn-in-place") {
 		swerveController.driveMode.first = DriveMode::TurnInPlace;
 		for (int i = 0; i < 4; i++) {
-			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
-							   Constants::Drive::WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
+			robot::setMotorPos(
+				Constants::Drive::WHEEL_IDS[i],
+				Globals::swerveController.WHEEL_ROTS.at(DriveMode::TurnInPlace)[i]);
 		}
 	} else if (mode == "crab") {
 		swerveController.driveMode.first = DriveMode::Crab;
 		for (int i = 0; i < 4; i++) {
 			robot::setMotorPos(Constants::Drive::WHEEL_IDS[i],
-							   Constants::Drive::WHEEL_ROTS.at(DriveMode::Crab)[i]);
+							   Globals::swerveController.WHEEL_ROTS.at(DriveMode::Crab)[i]);
 		}
 	}
 
@@ -230,31 +231,31 @@ void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 
 void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
 	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
-	std::vector<int> curr_wheel_rots = {
+	control::swerve_rots_t curr_wheel_rots = {
 		robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
 		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-	std::vector<double> new_wheel_rots =
+	control::swerve_commands_t steer_PWM =
 		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, curr_wheel_rots).second;
-	robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
-	robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
-	robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
-	robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
+	robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
+	robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
+	robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
+	robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
 }
 
 void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
 	_power_repeat_task.setCrabCmdVel(dtheta, dy);
-	std::vector<int> curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftWheel),
-										robot::getMotorPos(motorid_t::frontRightWheel),
-										robot::getMotorPos(motorid_t::rearLeftWheel),
-										robot::getMotorPos(motorid_t::rearRightWheel)};
-	std::vector<double> new_wheel_rots =
+	control::swerve_rots_t curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftWheel),
+											  robot::getMotorPos(motorid_t::frontRightWheel),
+											  robot::getMotorPos(motorid_t::rearLeftWheel),
+											  robot::getMotorPos(motorid_t::rearRightWheel)};
+	control::swerve_commands_t steer_PWM =
 		Globals::swerveController.setCrabCmdVel(dtheta, dy, curr_wheel_rots).second;
-	robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
-	robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
-	robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
-	robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
+	robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
+	robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
+	robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
+	robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
 }
 
 static bool validateJoint(const json& j) {

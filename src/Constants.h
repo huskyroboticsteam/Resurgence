@@ -95,9 +95,6 @@ constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
 	robot::types::motorid_t::rearLeftWheel,
 	robot::types::motorid_t::rearRightWheel,
 };
-
-const extern std::unordered_map<DriveMode, std::array<int32_t, 4>> WHEEL_ROTS;
-constexpr double STEER_EPSILON = 1000;
 } // namespace Drive
 
 namespace Nav {

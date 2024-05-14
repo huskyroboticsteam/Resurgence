@@ -86,35 +86,34 @@ void PowerRepeatTask::periodicTask() {
 					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 				}
 			} else if (swerveController.driveMode.first == DriveMode::TurnInPlace) {
-				std::vector<int> curr_wheel_rots = {
+				control::swerve_rots_t curr_wheel_rots = {
 					robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
 					robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 					robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 					robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-				std::vector<double> new_wheel_rots =
+				control::swerve_commands_t steer_PWM =
 					Globals::swerveController
 						.setTurnInPlaceCmdVel(_last_cmd_vel->first, curr_wheel_rots)
 						.second;
-				robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
-				robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
-				robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
-				robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
+				robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
+				robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
+				robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
+				robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
 			} else {
-
-				std::vector<int> curr_wheel_rots = {
+				control::swerve_rots_t curr_wheel_rots = {
 					robot::getMotorPos(motorid_t::frontLeftWheel),
 					robot::getMotorPos(motorid_t::frontRightWheel),
 					robot::getMotorPos(motorid_t::rearLeftWheel),
 					robot::getMotorPos(motorid_t::rearRightWheel)};
-				std::vector<double> new_wheel_rots =
+				control::swerve_commands_t steer_PWM =
 					Globals::swerveController
 						.setCrabCmdVel(_last_cmd_vel->first, _last_cmd_vel->second,
 									   curr_wheel_rots)
 						.second;
-				robot::setMotorPower(motorid_t::frontLeftWheel, new_wheel_rots[0]);
-				robot::setMotorPower(motorid_t::frontRightWheel, new_wheel_rots[1]);
-				robot::setMotorPower(motorid_t::rearLeftWheel, new_wheel_rots[2]);
-				robot::setMotorPower(motorid_t::rearRightWheel, new_wheel_rots[3]);
+				robot::setMotorPower(motorid_t::frontLeftWheel, steer_PWM.lfPWM);
+				robot::setMotorPower(motorid_t::frontRightWheel, steer_PWM.rfPWM);
+				robot::setMotorPower(motorid_t::rearLeftWheel, steer_PWM.lbPWM);
+				robot::setMotorPower(motorid_t::rearRightWheel, steer_PWM.rbPWM);
 			}
 		}
 	}

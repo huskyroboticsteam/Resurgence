@@ -1,7 +1,6 @@
 #include "Constants.h"
 
-#include "Globals.h"
-#include "world_interface/world_interface.h"
+#include "kinematics/DiffDriveKinematics.h"
 
 using namespace control;
 using control::DriveMode;
@@ -49,26 +48,6 @@ const double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
  */
 const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 							  .wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
-
-namespace Drive {
-
-namespace {
-constexpr std::array<int32_t, 4> NORMAL_WHEEL_ROTS = {0, 0, 0, 0};
-const swervewheelvel_t TURN_IN_PLACE_VEL =
-	Globals::swerveController.swerveKinematics().robotVelToWheelVel(0, 0, 1);
-const std::array<int32_t, 4> TURN_IN_PLACE_WHEEL_ROTS = {
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.lfRot * 1000),
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.rfRot * 1000),
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.lbRot * 1000),
-	static_cast<int32_t>(TURN_IN_PLACE_VEL.rbRot * 1000)};
-constexpr std::array<int32_t, 4> CRAB_WHEEL_ROTS = {90000, 90000, 90000, 90000};
-} // namespace
-
-const extern std::unordered_map<DriveMode, std::array<int32_t, 4>> WHEEL_ROTS = {
-	{DriveMode::Normal, NORMAL_WHEEL_ROTS},
-	{DriveMode::TurnInPlace, TURN_IN_PLACE_WHEEL_ROTS},
-	{DriveMode::Crab, CRAB_WHEEL_ROTS}};
-} // namespace Drive
 
 // TODO: We need to recalibrate the camera, since we replaced it with a different one.
 // TODO: rename cameras (in MC as well) as appropriate

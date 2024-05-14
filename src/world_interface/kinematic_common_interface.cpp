@@ -38,7 +38,7 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	std::vector<int> curr_wheel_rots = {
+	control::swerve_rots_t curr_wheel_rots = {
 		robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
 		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
@@ -69,7 +69,7 @@ double setTankCmdVel(double left, double right) {
 		return 0;
 	}
 
-	std::vector<int> curr_wheel_rots = {
+	control::swerve_rots_t curr_wheel_rots = {
 		robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
 		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
