@@ -64,6 +64,9 @@ SwerveController::setCrabCmdVel(double dtheta, double dy, swerve_rots_t wheel_ro
 		rPWM /= maxAbsPWM;
 	}
 
+	// Return order is lf, rf, lb, rb
+	// We rotate the output reference frame by 90 degrees CCW for crab, so right outputs are
+	// sent to the front and left outputs are sent to the back
 	return {maxAbsPWM > 1 ? maxAbsPWM : 1.0, {rPWM, rPWM, lPWM, lPWM}};
 }
 
