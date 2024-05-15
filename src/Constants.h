@@ -90,7 +90,11 @@ constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
 	robot::types::motorid_t::rearLeftWheel,
 	robot::types::motorid_t::rearRightWheel,
 };
-const double STEER_EPSILON = 1000;
+
+// Represents the allowable error in millidegrees for steer motors to still process a drive
+// request. That is, we make sure all the wheels are close enough to their target rotation
+// before actually driving.
+extern const double STEER_EPSILON;
 } // namespace Drive
 
 namespace Nav {

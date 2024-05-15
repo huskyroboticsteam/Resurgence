@@ -85,6 +85,10 @@ const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
+namespace Drive {
+const double STEER_EPSILON = 1000;
+}
+
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
 const double RADIAN_COST = EFF_WHEEL_BASE / 2.0;
