@@ -56,11 +56,15 @@ void PowerRepeatTask::setTankCmdVel(double left, double right) {
 void PowerRepeatTask::setTurnInPlaceCmdVel(double steerVel) {
 	std::lock_guard lock(_mutex);
 	_last_cmd_vel = {steerVel, 0.0};
+	setAllSteerPowers(
+		Globals::swerveController.setTurnInPlaceCmdVel(steerVel, getAllSteerRotations()));
 }
 
 void PowerRepeatTask::setCrabCmdVel(double dtheta, double yVel) {
 	std::lock_guard lock(_mutex);
 	_last_cmd_vel = {dtheta, yVel};
+	setAllSteerPowers(
+		Globals::swerveController.setCrabCmdVel(dtheta, yVel, getAllSteerRotations()));
 }
 
 void PowerRepeatTask::start() {

@@ -35,16 +35,6 @@ const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
  */
 static void stopAllJoints();
 
-/**
- * Get the steer rotations of all wheels as a swerve_rots_t.
- */
-static control::swerve_rots_t getAllSteerRotations();
-
-/**
- * Set the steer power of all wheels with a swerve_commands_t.
- */
-static void setAllSteerPowers(control::swerve_commands_t commands);
-
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
 
   For each protocol message type, there is a pair of functions in this section: a validator and
@@ -104,6 +94,10 @@ void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 		target = swerveController.setDriveMode(DriveMode::TurnInPlace);
 	} else if (mode == "crab") {
 		target = swerveController.setDriveMode(DriveMode::Crab);
+	}
+	if (!target) {
+		LOG_F(WARNING, "Invalid requested Drive Mode");
+		return;
 	}
 	std::array<int, 4> target_rots = {target.lfRot, target.rfRot, target.lbRot, target.rbRot};
 	for (int i = 0; i < 4; i++) {
@@ -232,14 +226,10 @@ void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 
 void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
 	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
-	setAllSteerPowers(
-		Globals::swerveController.setTurnInPlaceCmdVel(dtheta, getAllSteerRotations()));
 }
 
 void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
 	_power_repeat_task.setCrabCmdVel(dtheta, dy);
-	setAllSteerPowers(
-		Globals::swerveController.setCrabCmdVel(dtheta, dy, getAllSteerRotations()));
 }
 
 static bool validateJoint(const json& j) {
@@ -441,20 +431,6 @@ static void stopAllJoints() {
 	for (jointid_t current : robot::types::all_jointid_t) {
 		robot::setJointPower(current, 0.0);
 	}
-}
-
-static control::swerve_rots_t getAllSteerRotations() {
-	return {robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-			robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-			robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-			robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-}
-
-static void setAllSteerPowers(control::swerve_commands_t commands) {
-	robot::setMotorPower(motorid_t::frontLeftWheel, commands.lfPower);
-	robot::setMotorPower(motorid_t::frontRightWheel, commands.rfPower);
-	robot::setMotorPower(motorid_t::rearLeftWheel, commands.lbPower);
-	robot::setMotorPower(motorid_t::rearRightWheel, commands.rbPower);
 }
 
 } // namespace net::mc
