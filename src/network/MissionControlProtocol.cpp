@@ -94,8 +94,7 @@ void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 		target = swerveController.setDriveMode(DriveMode::TurnInPlace);
 	} else if (mode == "crab") {
 		target = swerveController.setDriveMode(DriveMode::Crab);
-	}
-	if (!target) {
+	} else {
 		LOG_F(WARNING, "Invalid requested Drive Mode");
 		return;
 	}
