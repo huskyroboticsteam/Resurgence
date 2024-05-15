@@ -1,7 +1,6 @@
 #include "SwerveController.h"
 
 #include "../Constants.h"
-#include "../Globals.h"
 
 using namespace control;
 using robot::types::motorid_t;
@@ -21,11 +20,6 @@ SwerveController::setTurnInPlaceCmdVel(double dtheta, const swerve_rots_t& wheel
 swerve_commands_t SwerveController::setTurnInPlaceCmdVel(double dtheta,
 														 const swerve_rots_t& wheel_rots,
 														 double& scaleFactor) const {
-	if (dtheta == 0) {
-		scaleFactor = 0;
-		return {0.0, 0.0, 0.0, 0.0};
-	}
-
 	if (!checkWheelRotation(DriveMode::TurnInPlace, wheel_rots)) {
 		scaleFactor = 0;
 		return {0.0, 0.0, 0.0, 0.0};
@@ -63,11 +57,6 @@ swerve_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
 swerve_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
 												  const swerve_rots_t& wheel_rots,
 												  double& scaleFactor) const {
-	if (Globals::E_STOP && (dtheta != 0 || dy != 0)) {
-		scaleFactor = 0;
-		return {0.0, 0.0, 0.0, 0.0};
-	}
-
 	if (!checkWheelRotation(DriveMode::Crab, wheel_rots)) {
 		scaleFactor = 0;
 		return {0.0, 0.0, 0.0, 0.0};
@@ -91,7 +80,8 @@ swerve_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
 	return {rPWM, rPWM, lPWM, lPWM};
 }
 
-bool SwerveController::checkWheelRotation(DriveMode mode, swerve_rots_t wheel_rots) const {
+bool SwerveController::checkWheelRotation(DriveMode mode,
+										  const swerve_rots_t& wheel_rots) const {
 	std::array<int, 4> rots = {wheel_rots.lfRot, wheel_rots.rfRot, wheel_rots.lbRot,
 							   wheel_rots.rbRot};
 	swerve_rots_t target = getSteerRots(mode);
@@ -135,12 +125,12 @@ DriveMode SwerveController::getDriveMode() const {
 	return driveMode;
 }
 
-swerve_rots_t SwerveController::setDriveMode(DriveMode mode) const {
+swerve_rots_t SwerveController::setDriveMode(DriveMode mode) {
 	driveMode = mode;
 	return getSteerRots(mode);
 }
 
-void SwerveController::setOverride(bool override) const {
+void SwerveController::setOverride(bool override) {
 	override_steer_check = override;
 }
 

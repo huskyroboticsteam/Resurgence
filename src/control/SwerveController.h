@@ -132,7 +132,7 @@ public:
 	 *
 	 * @param override Override the wheel rotation check.
 	 */
-	void setOverride(bool override) const;
+	void setOverride(bool override);
 
 	/**
 	 * @brief Get the current drive mode of the controller.
@@ -147,7 +147,7 @@ public:
 	 * @param mode The new drive mode to set.
 	 * @return swerve_rots_t The wheel steer rotations associated with this drive mode.
 	 */
-	swerve_rots_t setDriveMode(DriveMode mode) const;
+	swerve_rots_t setDriveMode(DriveMode mode);
 
 	/**
 	 * @brief Check to see if all wheels are at their target position.
@@ -157,7 +157,7 @@ public:
 	 * @return bool if the wheels are within `STEER_EPSILON` of their
 	 * target position OR if `overide_steer_check` is true.
 	 */
-	bool checkWheelRotation(DriveMode mode, swerve_rots_t wheel_rots) const;
+	bool checkWheelRotation(DriveMode mode, const swerve_rots_t& wheel_rots) const;
 
 	/**
 	 * @brief Get the wheel steer rotations for a given drive mode in millidegrees.
@@ -172,13 +172,13 @@ private:
 	/**
 	 * @brief The current drive mode.
 	 */
-	mutable DriveMode driveMode;
+	DriveMode driveMode;
 
 	/**
 	 * @brief Whether or not wheel rotation check should be ignored when
 	 * doing swerve-based driving.
 	 */
-	mutable bool override_steer_check;
+	bool override_steer_check;
 };
 } // namespace control
 

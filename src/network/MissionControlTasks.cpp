@@ -30,7 +30,7 @@ static control::swerve_rots_t getAllSteerRotations();
 /**
  * Set the steer power of all wheels with a swerve_commands_t.
  */
-static void setAllSteerPowers(control::swerve_commands_t commands);
+static void setAllSteerPowers(const control::swerve_commands_t& commands);
 
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
@@ -233,7 +233,7 @@ static control::swerve_rots_t getAllSteerRotations() {
 			robot::getMotorPos(motorid_t::rearRightWheel).getData()};
 }
 
-static void setAllSteerPowers(control::swerve_commands_t commands) {
+static void setAllSteerPowers(const control::swerve_commands_t& commands) {
 	robot::setMotorPower(motorid_t::frontLeftWheel, commands.lfPower);
 	robot::setMotorPower(motorid_t::frontRightWheel, commands.rfPower);
 	robot::setMotorPower(motorid_t::rearLeftWheel, commands.lbPower);
