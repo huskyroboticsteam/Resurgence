@@ -52,10 +52,7 @@ void AutonomousTask::navigate() {
 				DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel,
 				output.thetaVel, Constants::MAX_WHEEL_VEL);
 			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coords;
-			LOG_F(INFO, "Target: (%lf, %lf)", _waypoint_coords(0), _waypoint_coords(1));
-			LOG_F(INFO, "CurPos: (%lf, %lf)", latestPos(0), latestPos(1));
 			LOG_F(INFO, "Relative Target: (%lf, %lf)", relTarget(0), relTarget(1));
-			LOG_F(INFO, "curHeading: %lf", latestPos(2));
 			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));
 			LOG_F(INFO, "xVel: %lf", scaledVels(0));
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
