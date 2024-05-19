@@ -38,11 +38,16 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	control::swerve_rots_t curr_wheel_rots = {
-		robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+	control::swerve_rots_t curr_wheel_rots;
+	try {
+		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
+						   robot::getMotorPos(motorid_t::frontRightWheel).getData(),
+						   robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
+						   robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+	} catch (const std::runtime_error& e) {
+		LOG_F(WARNING, "Invalid steer motor position(s)!");
+		return 0;
+	}
 	if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
 		return 0;
 
@@ -68,11 +73,16 @@ double setTankCmdVel(double left, double right) {
 		return 0;
 	}
 
-	control::swerve_rots_t curr_wheel_rots = {
-		robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-		robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-		robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-		robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+	control::swerve_rots_t curr_wheel_rots;
+	try {
+		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
+						   robot::getMotorPos(motorid_t::frontRightWheel).getData(),
+						   robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
+						   robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+	} catch (const std::runtime_error& e) {
+		LOG_F(WARNING, "Invalid steer motor position(s)!");
+		return 0;
+	}
 	if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
 		return 0;
 
