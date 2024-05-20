@@ -34,7 +34,7 @@ DataPoint<point_t> readGPS() {
 }
 
 std::optional<point_t> gpsToMeters(const gpscoords_t& coord) {
-	if (converter) {
+	if (gpsHasFix()) {
 		return converter->gpsToMeters(coord);
 	} else {
 		return {};

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/time.h"
 #include "world_interface/data.h"
 
 #include <array>
@@ -175,5 +176,15 @@ constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size(
 					{robot::types::motorid_t::elbow, 0.461264}};
 } // namespace arm
 
+namespace autonomous {
+extern const double THETA_KP;
+extern const double DRIVE_VEL;
+extern const double SLOW_DRIVE_THRESHOLD;
+extern const double DONE_THRESHOLD;
+// Duration long enough to confirm we are there, not so long that time is wasted
+extern const util::dseconds CLOSE_TO_TARGET_DUR_VAL;
+} // namespace autonomous
+
 extern const double CONTROL_HZ;
+
 } // namespace Constants
