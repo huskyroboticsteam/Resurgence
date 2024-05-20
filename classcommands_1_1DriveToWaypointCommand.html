@@ -117,9 +117,9 @@ Collaboration diagram for commands::DriveToWaypointCommand:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a44e1f65a76a9f69d7b19de9531a5bace" id="r_a44e1f65a76a9f69d7b19de9531a5bace"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a44e1f65a76a9f69d7b19de9531a5bace">DriveToWaypointCommand</a> (const navtypes::point_t &amp;target, double thetaKP, double driveVel, double slowDriveVel, double doneThresh, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">util::dseconds</a> closeToTargetDur)</td></tr>
-<tr class="memdesc:a44e1f65a76a9f69d7b19de9531a5bace"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="classcommands_1_1DriveToWaypointCommand.html" title="Provides robot drive velocity commands to navigate the robot to a given waypoint given the velocity p...">DriveToWaypointCommand</a> with the specified targeting information.  <br /></td></tr>
-<tr class="separator:a44e1f65a76a9f69d7b19de9531a5bace"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0d25fcc0a835db6386bcaa2a1cbada9" id="r_ad0d25fcc0a835db6386bcaa2a1cbada9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad0d25fcc0a835db6386bcaa2a1cbada9">DriveToWaypointCommand</a> (const navtypes::point_t &amp;target, double thetaKP, double driveVel, double slowDriveThresh, double doneThresh, <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01839.html">util::dseconds</a> closeToTargetDur)</td></tr>
+<tr class="memdesc:ad0d25fcc0a835db6386bcaa2a1cbada9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="classcommands_1_1DriveToWaypointCommand.html" title="Provides robot drive velocity commands to navigate the robot to a given waypoint given the velocity p...">DriveToWaypointCommand</a> with the specified targeting information.  <br /></td></tr>
+<tr class="separator:ad0d25fcc0a835db6386bcaa2a1cbada9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19c20926c6c26f6196d744b5fe51bf07" id="r_a19c20926c6c26f6196d744b5fe51bf07"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19c20926c6c26f6196d744b5fe51bf07">setState</a> (const navtypes::pose_t &amp;pose, <a class="el" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a> time)</td></tr>
 <tr class="memdesc:a19c20926c6c26f6196d744b5fe51bf07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Must be called before <a class="el" href="#abe80bc625aa13f7507b07382dc6a3ea0" title="Gets the angular velocity and forward speed to run the robot at in order to navigate robot to target.">getOutput()</a> for each iteration.  <br /></td></tr>
 <tr class="separator:a19c20926c6c26f6196d744b5fe51bf07"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,8 +133,8 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides robot drive velocity commands to navigate the robot to a given waypoint given the velocity parameters to drive the robot at, the proportional factor to steer the robot with and the 2D Cartesian position of the target in the world reference frame. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a44e1f65a76a9f69d7b19de9531a5bace" name="a44e1f65a76a9f69d7b19de9531a5bace"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44e1f65a76a9f69d7b19de9531a5bace">&#9670;&#160;</a></span>DriveToWaypointCommand()</h2>
+<a id="ad0d25fcc0a835db6386bcaa2a1cbada9" name="ad0d25fcc0a835db6386bcaa2a1cbada9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0d25fcc0a835db6386bcaa2a1cbada9">&#9670;&#160;</a></span>DriveToWaypointCommand()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -157,7 +157,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>slowDriveVel</em>, </span></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>slowDriveThresh</em>, </span></td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -175,12 +175,12 @@ Public Member Functions</h2></td></tr>
 <p>Creates a new <a class="el" href="classcommands_1_1DriveToWaypointCommand.html" title="Provides robot drive velocity commands to navigate the robot to a given waypoint given the velocity p...">DriveToWaypointCommand</a> with the specified targeting information. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">target,the</td><td>position of the target in world coordinates. </td></tr>
-    <tr><td class="paramname">thetaKP,the</td><td>scaling factor to use for robot steering proportional control. </td></tr>
-    <tr><td class="paramname">driveVel,the</td><td>speed to drive the robot at. </td></tr>
-    <tr><td class="paramname">slowDriveVel,the</td><td>slower speed to drive the robot at when near the target. </td></tr>
-    <tr><td class="paramname">doneThresh,the</td><td>threshold for minimum robot-target distance to complete command. </td></tr>
-    <tr><td class="paramname">closeToTargetDurVal,the</td><td>duration within doneThresh after which robot navigation is considered done, seconds. </td></tr>
+    <tr><td class="paramname">target</td><td>the position of the target in world coordinates. </td></tr>
+    <tr><td class="paramname">thetaKP</td><td>the scaling factor to use for robot steering proportional control. </td></tr>
+    <tr><td class="paramname">driveVel</td><td>the speed to drive the robot at. </td></tr>
+    <tr><td class="paramname">slowDriveThresh</td><td>the distance at which the robot will start slowing down. </td></tr>
+    <tr><td class="paramname">doneThresh</td><td>the threshold for minimum robot-target distance to complete command. </td></tr>
+    <tr><td class="paramname">closeToTargetDurVal</td><td>the duration within doneThresh after which robot navigation is considered done, seconds. </td></tr>
   </table>
   </dd>
 </dl>

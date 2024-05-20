@@ -220,7 +220,7 @@ var searchData=
   ['drawsegments_217',['drawSegments',['https://docs.opencv.org/4.2.0/df/d4c/classcv_1_1ximgproc_1_1FastLineDetector.html#aacfbe367964959be1173013f53912fc5',1,'cv::ximgproc::FastLineDetector::drawSegments()'],['https://docs.opencv.org/4.2.0/db/d73/classcv_1_1LineSegmentDetector.html#a1816a3c27f7c9b8d8acffec14451d4c4',1,'cv::LineSegmentDetector::drawSegments()']]],
   ['drawsignature_218',['drawSignature',['https://docs.opencv.org/4.2.0/d0/d74/classcv_1_1xfeatures2d_1_1PCTSignatures.html#a3e206c0847ce9f4474b6084deec1bc84',1,'cv::xfeatures2d::PCTSignatures']]],
   ['driverversion_219',['driverVersion',['https://docs.opencv.org/4.2.0/d7/d9f/classcv_1_1ocl_1_1Device.html#a370bb5033106a4f4feb09cc6813c566f',1,'cv::ocl::Device']]],
-  ['drivetowaypointcommand_220',['DriveToWaypointCommand',['../classcommands_1_1DriveToWaypointCommand.html#a44e1f65a76a9f69d7b19de9531a5bace',1,'commands::DriveToWaypointCommand']]],
+  ['drivetowaypointcommand_220',['DriveToWaypointCommand',['../classcommands_1_1DriveToWaypointCommand.html#ad0d25fcc0a835db6386bcaa2a1cbada9',1,'commands::DriveToWaypointCommand']]],
   ['dropforgottentrack_221',['dropForgottenTrack',['https://docs.opencv.org/4.2.0/d2/d88/classcv_1_1tbm_1_1ITrackerByMatching.html#a4954acdfb5fbf5afa657a0ca65738975',1,'cv::tbm::ITrackerByMatching']]],
   ['dropforgottentracks_222',['dropForgottenTracks',['https://docs.opencv.org/4.2.0/d2/d88/classcv_1_1tbm_1_1ITrackerByMatching.html#abd51c5e24d08a6011a8475006cbed972',1,'cv::tbm::ITrackerByMatching']]],
   ['dropoutliers_223',['dropOutliers',['https://docs.opencv.org/4.2.0/d0/dba/classcv_1_1optflow_1_1GPCDetails.html#abeab00b6118efef02aae861afc12f5a0',1,'cv::optflow::GPCDetails']]],

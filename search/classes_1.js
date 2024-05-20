@@ -179,9 +179,10 @@ var searchData=
   ['autobuffer_3c_20double_2c_201_20_3e_176',['AutoBuffer&lt; double, 1 &gt;',['https://docs.opencv.org/4.2.0/d8/dd0/classcv_1_1AutoBuffer.html',1,'']]],
   ['autobuffer_3c_20int64_2c_201_20_3e_177',['AutoBuffer&lt; int64, 1 &gt;',['https://docs.opencv.org/4.2.0/d8/dd0/classcv_1_1AutoBuffer.html',1,'']]],
   ['autobuffer_3c_20string_2c_201_20_3e_178',['AutoBuffer&lt; String, 1 &gt;',['https://docs.opencv.org/4.2.0/d8/dd0/classcv_1_1AutoBuffer.html',1,'']]],
-  ['avcapturevideodataoutputsamplebufferdelegate_2dp_2dp_179',['AVCaptureVideoDataOutputSampleBufferDelegate-p-p',['https://docs.opencv.org/4.2.0/d7/dc6/classAVCaptureVideoDataOutputSampleBufferDelegate-p.html',1,'']]],
-  ['averagehash_180',['AverageHash',['https://docs.opencv.org/4.2.0/db/d25/classcv_1_1img__hash_1_1AverageHash.html',1,'cv::img_hash']]],
-  ['avg_181',['Avg',['https://docs.opencv.org/4.2.0/da/dad/structcv_1_1cudev_1_1Avg.html',1,'cv::cudev']]],
-  ['avireadcontainer_182',['AVIReadContainer',['https://docs.opencv.org/4.2.0/d6/d8c/classcv_1_1AVIReadContainer.html',1,'cv']]],
-  ['aviwritecontainer_183',['AVIWriteContainer',['https://docs.opencv.org/4.2.0/d7/d13/classcv_1_1AVIWriteContainer.html',1,'cv']]]
+  ['autonomoustask_179',['AutonomousTask',['../classautonomous_1_1AutonomousTask.html',1,'autonomous']]],
+  ['avcapturevideodataoutputsamplebufferdelegate_2dp_2dp_180',['AVCaptureVideoDataOutputSampleBufferDelegate-p-p',['https://docs.opencv.org/4.2.0/d7/dc6/classAVCaptureVideoDataOutputSampleBufferDelegate-p.html',1,'']]],
+  ['averagehash_181',['AverageHash',['https://docs.opencv.org/4.2.0/db/d25/classcv_1_1img__hash_1_1AverageHash.html',1,'cv::img_hash']]],
+  ['avg_182',['Avg',['https://docs.opencv.org/4.2.0/da/dad/structcv_1_1cudev_1_1Avg.html',1,'cv::cudev']]],
+  ['avireadcontainer_183',['AVIReadContainer',['https://docs.opencv.org/4.2.0/d6/d8c/classcv_1_1AVIReadContainer.html',1,'cv']]],
+  ['aviwritecontainer_184',['AVIWriteContainer',['https://docs.opencv.org/4.2.0/d7/d13/classcv_1_1AVIWriteContainer.html',1,'cv']]]
 ];
