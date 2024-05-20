@@ -2,6 +2,7 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../autonomous/AutonomousTask.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
 #include "../world_interface/data.h"
@@ -71,6 +72,7 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		// if we have entered autonomous mode, we need to stop all the power repeater stuff.
 		this->stopAndShutdownPowerRepeat(true);
 	} else {
+		_autonomous_task.kill();
 		// if we have left autonomous mode, we need to start the power repeater again.
 		_power_repeat_task.start();
 	}
@@ -149,6 +151,32 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	if (it != name_to_jointid.end()) {
 		jointid_t joint_id = it->second;
 		setRequestedJointPower(joint_id, power);
+	}
+}
+
+static bool validateWaypointNavRequest(const json& j) {
+	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
+	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
+	return (lat_is_unsigned || util::validateKey(j, "latitude", val_t::number_float)) &&
+		   (lon_is_unsigned || util::validateKey(j, "longitude", val_t::number_float)) &&
+		   util::validateKey(j, "isApproximate", val_t::boolean) &&
+		   util::validateKey(j, "isGate", val_t::boolean);
+}
+
+void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
+	float latitude = j["latitude"];
+	float longitude = j["longitude"];
+	bool isApproximate = j["isApproximate"];
+	bool isGate = j["isGate"];
+
+	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
+		navtypes::gpscoords_t coords = {latitude, longitude};
+		auto target = robot::gpsToMeters(coords);
+		if (target) {
+			_autonomous_task.start(target.value());
+		} else {
+			LOG_F(WARNING, "No GPS converter initialized!");
+		}
 	}
 }
 
@@ -233,7 +261,8 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),
-	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server) {
+	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server),
+	  _autonomous_task() {
 	// TODO: Add support for tank drive requests
 	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
 	// syringe)
@@ -271,6 +300,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		CAMERA_STREAM_CLOSE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
+	this->addMessageHandler(
+		WAYPOINT_NAV_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
+		validateWaypointNavRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this, false));
