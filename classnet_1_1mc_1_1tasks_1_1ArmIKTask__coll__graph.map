@@ -1,10 +1,10 @@
 <map id="net::mc::tasks::ArmIKTask" name="net::mc::tasks::ArmIKTask">
-<area shape="rect" id="Node000001" title="This task sets the arm joint positions to track the current IK command." alt="" coords="5,241,179,267"/>
-<area shape="rect" id="Node000002" href="$classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="32,153,152,193"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,209,95,241,89,241,89,209"/>
-<area shape="rect" id="Node000003" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="70,79,234,105"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="136,119,109,154,105,151,132,116"/>
+<area shape="rect" id="Node000001" title="This task sets the arm joint positions to track the current IK command." alt="" coords="5,256,179,282"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="32,168,152,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,224,95,256,89,256,89,224"/>
+<area shape="rect" id="Node000003" href="$classutil_1_1AsyncTask.html" title=" " alt="" coords="71,79,230,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="131,134,107,169,103,166,127,131"/>
 <area shape="rect" id="Node000004" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="28,5,156,31"/>
-<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="76,45,60,80,58,99,62,117,79,151,75,153,57,119,53,99,55,78,71,43"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="114,41,144,77,140,80,110,44"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="77,45,61,80,58,99,61,119,70,144,82,166,77,168,65,146,56,120,53,99,56,78,72,43"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="112,42,138,77,134,80,108,45"/>
 </map>

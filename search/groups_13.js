@@ -32,14 +32,12 @@ var searchData=
   ['primitives_29',['Drawing primitives',['https://docs.opencv.org/4.2.0/de/db8/group__gapi__draw__prims.html',1,'']]],
   ['private_20implementation_20helpers_30',['Private implementation helpers',['https://docs.opencv.org/4.2.0/dd/d96/group__core__hal__intrin__impl.html',1,'']]],
   ['problems_20and_20decompositions_31',['Dense linear problems and decompositions',['https://eigen.tuxfamily.org/dox/group__DenseLinearSolvers__chapter.html',1,'']]],
-  ['processing_32',['Color space processing',['https://docs.opencv.org/4.2.0/db/d8c/group__cudaimgproc__color.html',1,'']]],
-  ['processing_33',['Extended Image Processing',['https://docs.opencv.org/4.2.0/df/d2d/group__ximgproc.html',1,'']]],
-  ['processing_34',['Fuzzy image processing',['https://docs.opencv.org/4.2.0/d1/dfc/group__f__image.html',1,'']]],
-  ['processing_35',['Processing',['https://docs.opencv.org/4.2.0/d7/dbd/group__imgproc.html',1,'Image Processing'],['https://docs.opencv.org/4.2.0/d0/d05/group__cudaimgproc.html',1,'Image Processing'],['https://docs.opencv.org/4.2.0/d1/d0d/group__nppi.html',1,'NPPST Image Processing'],['https://docs.opencv.org/4.2.0/de/d25/group__npps.html',1,'NPPST Signal Processing'],['https://docs.opencv.org/4.2.0/d2/d3a/group__rgbd.html',1,'RGB-Depth Processing']]],
-  ['processing_20algorithms_36',['Additional photo processing algorithms',['https://docs.opencv.org/4.2.0/de/daa/group__xphoto.html',1,'']]],
-  ['processing_20based_20on_20fuzzy_20mathematics_37',['Image processing based on fuzzy mathematics',['https://docs.opencv.org/4.2.0/df/d5b/group__fuzzy.html',1,'']]],
-  ['processing_20functionality_38',['G-API Image processing functionality',['https://docs.opencv.org/4.2.0/d2/d00/group__gapi__imgproc.html',1,'']]],
-  ['programs_39',['GUI for Interactive Visual Debugging of Computer Vision Programs',['https://docs.opencv.org/4.2.0/df/dff/group__cvv.html',1,'']]],
-  ['projection_40',['Projection',['https://docs.opencv.org/4.2.0/d0/daf/group__projection.html',1,'']]],
-  ['propagating_20wrapper_41',['Const-propagating wrapper',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01526.html',1,'']]]
+  ['processing_32',['Processing',['https://docs.opencv.org/4.2.0/df/d2d/group__ximgproc.html',1,'Extended Image Processing'],['https://docs.opencv.org/4.2.0/d7/dbd/group__imgproc.html',1,'Image Processing'],['https://docs.opencv.org/4.2.0/d0/d05/group__cudaimgproc.html',1,'Image Processing'],['https://docs.opencv.org/4.2.0/d1/d0d/group__nppi.html',1,'NPPST Image Processing'],['https://docs.opencv.org/4.2.0/de/d25/group__npps.html',1,'NPPST Signal Processing'],['https://docs.opencv.org/4.2.0/d2/d3a/group__rgbd.html',1,'RGB-Depth Processing']]],
+  ['processing_33',['processing',['https://docs.opencv.org/4.2.0/db/d8c/group__cudaimgproc__color.html',1,'Color space processing'],['https://docs.opencv.org/4.2.0/d1/dfc/group__f__image.html',1,'Fuzzy image processing']]],
+  ['processing_20algorithms_34',['Additional photo processing algorithms',['https://docs.opencv.org/4.2.0/de/daa/group__xphoto.html',1,'']]],
+  ['processing_20based_20on_20fuzzy_20mathematics_35',['Image processing based on fuzzy mathematics',['https://docs.opencv.org/4.2.0/df/d5b/group__fuzzy.html',1,'']]],
+  ['processing_20functionality_36',['G-API Image processing functionality',['https://docs.opencv.org/4.2.0/d2/d00/group__gapi__imgproc.html',1,'']]],
+  ['programs_37',['GUI for Interactive Visual Debugging of Computer Vision Programs',['https://docs.opencv.org/4.2.0/df/dff/group__cvv.html',1,'']]],
+  ['projection_38',['Projection',['https://docs.opencv.org/4.2.0/d0/daf/group__projection.html',1,'']]],
+  ['propagating_20wrapper_39',['Const-propagating wrapper',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01526.html',1,'']]]
 ];

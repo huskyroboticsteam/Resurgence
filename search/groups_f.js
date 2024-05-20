@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['layer_0',['Device layer',['https://docs.opencv.org/4.2.0/df/dfc/group__cudev.html',1,'']]],
-  ['layer_1',['Layer',['https://docs.opencv.org/4.2.0/de/d85/group__core__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d3/df3/group__imgproc__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d8/d45/group__feature2d__hal.html',1,'Hardware Acceleration Layer']]],
+  ['layer_0',['Layer',['https://docs.opencv.org/4.2.0/de/d85/group__core__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d3/df3/group__imgproc__hal.html',1,'Hardware Acceleration Layer'],['https://docs.opencv.org/4.2.0/d8/d45/group__feature2d__hal.html',1,'Hardware Acceleration Layer']]],
+  ['layer_1',['Device layer',['https://docs.opencv.org/4.2.0/df/dfc/group__cudev.html',1,'']]],
   ['layers_2',['Partial List of Implemented Layers',['https://docs.opencv.org/4.2.0/d6/d87/group__dnnLayerList.html',1,'']]],
   ['layers_20registration_3',['Utilities for New Layers Registration',['https://docs.opencv.org/4.2.0/df/dc1/group__dnnLayerFactory.html',1,'']]],
   ['learning_4',['Machine Learning',['https://docs.opencv.org/4.2.0/dd/ded/group__ml.html',1,'']]],

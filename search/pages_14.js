@@ -8,8 +8,8 @@ var searchData=
   ['object_20detection_5',['Object Detection',['https://docs.opencv.org/4.2.0/d9/de5/tutorial_py_table_of_contents_objdetect.html',1,'Object Detection'],['https://docs.opencv.org/4.2.0/dc/d73/tutorial_js_table_of_contents_objdetect.html',1,'Object Detection']]],
   ['object_20detection_20objdetect_20module_6',['Object Detection (objdetect module)',['https://docs.opencv.org/4.2.0/d2/d64/tutorial_table_of_content_objdetect.html',1,'']]],
   ['object_20detection_20using_20cnns_7',['Object Detection using CNNs',['https://docs.opencv.org/4.2.0/d2/da2/tutorial_dnn_objdetect.html',1,'']]],
-  ['objects_8',['Detection of planar objects',['https://docs.opencv.org/4.2.0/dd/dd4/tutorial_detection_of_planar_objects.html',1,'']]],
-  ['objects_9',['Feature Matching + Homography to find Objects',['https://docs.opencv.org/4.2.0/d1/de0/tutorial_py_feature_homography.html',1,'']]],
+  ['objects_8',['Feature Matching + Homography to find Objects',['https://docs.opencv.org/4.2.0/d1/de0/tutorial_py_feature_homography.html',1,'']]],
+  ['objects_9',['Detection of planar objects',['https://docs.opencv.org/4.2.0/dd/dd4/tutorial_detection_of_planar_objects.html',1,'']]],
   ['ocr_20of_20hand_20written_20data_20using_20knn_10',['OCR of Hand-written Data using kNN',['https://docs.opencv.org/4.2.0/d8/d4b/tutorial_py_knn_opencv.html',1,'']]],
   ['ocr_20of_20hand_20written_20data_20using_20svm_11',['OCR of Hand-written Data using SVM',['https://docs.opencv.org/4.2.0/dd/d3b/tutorial_py_svm_opencv.html',1,'']]],
   ['of_20a_20textured_20object_12',['Real Time pose estimation of a textured object',['https://docs.opencv.org/4.2.0/dc/d2c/tutorial_real_time_pose.html',1,'']]],
@@ -90,9 +90,8 @@ var searchData=
   ['output_20imgcodecs_20module_87',['Image Input and Output (imgcodecs module)',['https://docs.opencv.org/4.2.0/da/d8f/tutorial_table_of_content_imgcodecs.html',1,'']]],
   ['output_20using_20xml_20and_20yaml_20files_88',['File Input and Output using XML and YAML files',['https://docs.opencv.org/4.2.0/dd/d74/tutorial_file_input_output_with_xml_yml.html',1,'']]],
   ['output_20videoio_20module_89',['Video Input and Output (videoio module)',['https://docs.opencv.org/4.2.0/df/d2c/tutorial_table_of_content_videoio.html',1,'']]],
-  ['overview_90',['G-API Overview',['https://docs.opencv.org/4.2.0/db/d87/md_gapi_doc_slides_README.html',1,'']]],
+  ['overview_90',['Overview',['https://docs.opencv.org/4.2.0/db/d87/md_gapi_doc_slides_README.html',1,'G-API Overview'],['https://docs.opencv.org/4.2.0/dc/dd6/ml_intro.html',1,'Machine Learning Overview'],['https://docs.opencv.org/4.2.0/d0/da7/videoio_overview.html',1,'Video I/O with OpenCV Overview']]],
   ['overview_91',['High-level design overview',['https://docs.opencv.org/4.2.0/de/d4d/gapi_hld.html',1,'']]],
-  ['overview_92',['Overview',['https://docs.opencv.org/4.2.0/dc/dd6/ml_intro.html',1,'Machine Learning Overview'],['https://docs.opencv.org/4.2.0/d0/da7/videoio_overview.html',1,'Video I/O with OpenCV Overview']]],
-  ['own_20corner_20detector_93',['Creating your own corner detector',['https://docs.opencv.org/4.2.0/d9/dbc/tutorial_generic_corner_detector.html',1,'']]],
-  ['own_20linear_20filters_94',['Making your own linear filters!',['https://docs.opencv.org/4.2.0/d4/dbd/tutorial_filter_2d.html',1,'']]]
+  ['own_20corner_20detector_92',['Creating your own corner detector',['https://docs.opencv.org/4.2.0/d9/dbc/tutorial_generic_corner_detector.html',1,'']]],
+  ['own_20linear_20filters_93',['Making your own linear filters!',['https://docs.opencv.org/4.2.0/d4/dbd/tutorial_filter_2d.html',1,'']]]
 ];

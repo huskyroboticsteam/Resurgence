@@ -1,10 +1,10 @@
 <map id="net::mc::tasks::PowerRepeatTask" name="net::mc::tasks::PowerRepeatTask">
-<area shape="rect" id="Node000001" title="This task is responsible for periodically resending setMotorPower commands to the motors." alt="" coords="5,241,220,267"/>
-<area shape="rect" id="Node000002" href="$classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="52,153,173,193"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,209,115,241,110,241,110,209"/>
-<area shape="rect" id="Node000003" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="90,79,255,105"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="156,119,129,154,125,151,152,116"/>
+<area shape="rect" id="Node000001" title="This task is responsible for periodically resending setMotorPower commands to the motors." alt="" coords="5,256,220,282"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="52,168,173,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,224,115,256,110,256,110,224"/>
+<area shape="rect" id="Node000003" href="$classutil_1_1AsyncTask.html" title=" " alt="" coords="92,79,251,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,134,128,169,124,166,147,131"/>
 <area shape="rect" id="Node000004" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="48,5,177,31"/>
-<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="97,45,80,80,79,99,83,117,100,151,95,153,78,119,74,99,75,78,92,43"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,41,164,77,160,80,130,44"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="97,45,82,80,79,99,82,119,91,144,102,166,97,168,86,146,77,120,73,99,77,78,93,43"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="133,42,159,77,155,80,128,45"/>
 </map>

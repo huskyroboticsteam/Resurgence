@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['backends_0',['Additional flags for video I/O API backends',['https://docs.opencv.org/4.2.0/dc/dfc/group__videoio__flags__others.html',1,'']]],
-  ['backends_1',['G-API Standard Backends',['https://docs.opencv.org/4.2.0/dc/d1c/group__gapi__std__backends.html',1,'']]],
+  ['backends_0',['G-API Standard Backends',['https://docs.opencv.org/4.2.0/dc/d1c/group__gapi__std__backends.html',1,'']]],
+  ['backends_1',['Additional flags for video I/O API backends',['https://docs.opencv.org/4.2.0/dc/dfc/group__videoio__flags__others.html',1,'']]],
   ['backends_20registry_2',['Query I/O API backends registry',['https://docs.opencv.org/4.2.0/de/db1/group__videoio__registry.html',1,'']]],
   ['background_20foreground_20segmentation_20methods_3',['Improved Background-Foreground Segmentation Methods',['https://docs.opencv.org/4.2.0/d2/d55/group__bgsegm.html',1,'']]],
   ['background_20segmentation_4',['Background Segmentation',['https://docs.opencv.org/4.2.0/d6/d17/group__cudabgsegm.html',1,'']]],

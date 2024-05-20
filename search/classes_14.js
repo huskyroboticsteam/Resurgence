@@ -69,7 +69,7 @@ var searchData=
   ['tlsdata_66',['TLSData',['https://docs.opencv.org/4.2.0/d9/db0/classcv_1_1TLSData.html',1,'cv']]],
   ['tlsdata_3c_20cv_3a_3ainstr_3a_3anodedatatls_20_3e_67',['TLSData&lt; cv::instr::NodeDataTls &gt;',['https://docs.opencv.org/4.2.0/d9/db0/classcv_1_1TLSData.html',1,'']]],
   ['tlsdataaccumulator_68',['TLSDataAccumulator',['https://docs.opencv.org/4.2.0/dc/d6e/classcv_1_1TLSDataAccumulator.html',1,'cv']]],
-  ['tlsdataaccumulator_3c_20cv_3a_3ainstr_3a_3anodedatatls_20_3e_69',['TLSDataAccumulator&lt; cv::instr::NodeDataTls &gt;',['https://docs.opencv.org/4.2.0/dc/d6e/classcv_1_1TLSDataAccumulator.html',1,'']]],
+  ['tlsdataaccumulator_3c_20cv_3a_3ainstr_3a_3anodedatatls_20_3e_69',['TLSDataAccumulator&lt; cv::instr::NodeDataTls &gt;',['https://docs.opencv.org/4.2.0/dc/d6e/classcv_1_1TLSDataAccumulator.html',1,'cv::TLSDataAccumulator&lt; cv::instr::NodeDataTls &gt;'],['https://docs.opencv.org/4.2.0/dc/d6e/classcv_1_1TLSDataAccumulator.html',1,'TLSDataAccumulator&lt; cv::instr::NodeDataTls &gt;']]],
   ['tlsdatacontainer_70',['TLSDataContainer',['https://docs.opencv.org/4.2.0/df/d21/classcv_1_1TLSDataContainer.html',1,'cv']]],
   ['tofilemotionwriter_71',['ToFileMotionWriter',['https://docs.opencv.org/4.2.0/dc/dc1/classcv_1_1videostab_1_1ToFileMotionWriter.html',1,'cv::videostab']]],
   ['tonemap_72',['Tonemap',['https://docs.opencv.org/4.2.0/d8/d5e/classcv_1_1Tonemap.html',1,'cv']]],

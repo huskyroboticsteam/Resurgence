@@ -1,8 +1,8 @@
 <map id="util::PeriodicTask&lt; Clock &gt;" name="util::PeriodicTask&lt; Clock &gt;">
-<area shape="rect" id="Node000001" title="Implements a task that executes a function periodically." alt="" coords="9,153,130,193"/>
-<area shape="rect" id="Node000002" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="47,79,212,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,119,86,154,82,151,109,116"/>
+<area shape="rect" id="Node000001" title="Implements a task that executes a function periodically." alt="" coords="9,168,130,208"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1AsyncTask.html" title=" " alt="" coords="49,79,208,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,134,85,169,81,166,104,131"/>
 <area shape="rect" id="Node000003" href="$classutil_1_1impl_1_1Notifiable.html" title=" " alt="" coords="5,5,134,31"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="54,45,37,80,36,99,40,117,57,151,52,153,35,119,31,99,32,78,49,43"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,41,121,77,117,80,87,44"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="54,45,39,80,36,99,39,119,48,144,59,166,54,168,43,146,34,120,30,99,34,78,50,43"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,42,116,77,112,80,85,45"/>
 </map>

@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['s_0',['s',['https://docs.opencv.org/4.2.0/d1/d10/classcv_1_1MatExpr.html#a41e897e2deb89c8caa169194f87c2a73',1,'cv::MatExpr::s'],['https://docs.opencv.org/4.2.0/d4/d66/structcv_1_1datasets_1_1skeleton.html#a5d353fe702215021f6d753393b80a055',1,'cv::datasets::skeleton::s']]],
-  ['s_1',['S',['https://docs.opencv.org/4.2.0/d0/d8d/structcv_1_1face_1_1FacemarkAAM_1_1Model.html#a29a25d70c8b7090fc0bba855ec42696c',1,'cv::face::FacemarkAAM::Model']]],
+  ['s_0',['S',['https://docs.opencv.org/4.2.0/d0/d8d/structcv_1_1face_1_1FacemarkAAM_1_1Model.html#a29a25d70c8b7090fc0bba855ec42696c',1,'cv::face::FacemarkAAM::Model']]],
+  ['s_1',['s',['https://docs.opencv.org/4.2.0/d1/d10/classcv_1_1MatExpr.html#a41e897e2deb89c8caa169194f87c2a73',1,'cv::MatExpr::s'],['https://docs.opencv.org/4.2.0/d4/d66/structcv_1_1datasets_1_1skeleton.html#a5d353fe702215021f6d753393b80a055',1,'cv::datasets::skeleton::s']]],
   ['s0_2',['s0',['https://docs.opencv.org/4.2.0/de/d4f/structcv_1_1face_1_1FacemarkAAM_1_1Data.html#a970606e00ede24bd01b33e9b7e4053d2',1,'cv::face::FacemarkAAM::Data::s0'],['https://docs.opencv.org/4.2.0/d0/d8d/structcv_1_1face_1_1FacemarkAAM_1_1Model.html#a5829fa9198c6a27fb3a13a17a34dc2f9',1,'cv::face::FacemarkAAM::Model::s0']]],
   ['same_3',['same',['https://docs.opencv.org/4.2.0/d9/d2d/structcv_1_1datasets_1_1FR__lfwObj.html#a04ac85de3dca6204b996cfb8c0137eb8',1,'cv::datasets::FR_lfwObj']]],
   ['sampled_5fpc_4',['sampled_pc',['https://docs.opencv.org/4.2.0/db/d25/classcv_1_1ppf__match__3d_1_1PPF3DDetector.html#a3e71be57a3b21bd7bcdc64debfa28c7d',1,'cv::ppf_match_3d::PPF3DDetector']]],
@@ -167,8 +167,8 @@ var searchData=
   ['startpointy_164',['startPointY',['https://docs.opencv.org/4.2.0/d1/dd7/structcv_1_1line__descriptor_1_1KeyLine.html#ac36c0fe32df87388d9fa6a8def75f7e4',1,'cv::line_descriptor::KeyLine']]],
   ['state_165',['state',['https://docs.opencv.org/4.2.0/da/d56/classcv_1_1FileStorage.html#aa53ac52fa536aeabba795a2164a11337',1,'cv::FileStorage::state'],['https://docs.opencv.org/4.2.0/d1/dd6/classcv_1_1RNG.html#a993bd2e6a5a9b8f3b37ba6049b523136',1,'cv::RNG::state']]],
   ['stateestimator_166',['stateEstimator',['https://docs.opencv.org/4.2.0/d0/dfc/classcv_1_1TrackerModel.html#ab25e2e36eaba6e155f7227712e8ff178',1,'cv::TrackerModel']]],
-  ['statefuncjacobianw_167',['stateFuncJacobianW',['../classfilters_1_1ExtendedKalmanFilter.html#ac476587c0045b7382b0fb62c4323c26c',1,'filters::ExtendedKalmanFilter']]],
-  ['statefuncjacobianx_168',['stateFuncJacobianX',['../classfilters_1_1ExtendedKalmanFilter.html#ac4661be6187111039f681ef5afb8a233',1,'filters::ExtendedKalmanFilter']]],
+  ['statefuncjacobianw_167',['stateFuncJacobianW',['../classfilters_1_1ExtendedKalmanFilter.html#a892d03b2d44ad670f6e592c68d2fe912',1,'filters::ExtendedKalmanFilter']]],
+  ['statefuncjacobianx_168',['stateFuncJacobianX',['../classfilters_1_1ExtendedKalmanFilter.html#a28ebe1ffdb671ba81ea92a833aafaaae',1,'filters::ExtendedKalmanFilter']]],
   ['stateinit_169',['stateInit',['https://docs.opencv.org/4.2.0/da/d73/classcv_1_1tracking_1_1UnscentedKalmanFilterParams.html#a5e0d0f4982531e761f8934c97fe15689',1,'cv::tracking::UnscentedKalmanFilterParams']]],
   ['statepost_170',['statePost',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html#add8fb5ac9c04b4600b679698dcb0447d',1,'cv::KalmanFilter']]],
   ['statepre_171',['statePre',['https://docs.opencv.org/4.2.0/dd/d6a/classcv_1_1KalmanFilter.html#a926dece64b4e0e28c3f58af8b7793669',1,'cv::KalmanFilter']]],
