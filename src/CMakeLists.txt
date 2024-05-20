@@ -331,6 +331,7 @@ if(WITH_TESTS)
     ../tests/commands/DriveToWaypointCommandTest.cpp
     # Util tests
     ../tests/util/CoreTest.cpp
+    ../tests/util/DataTest.cpp
     ../tests/util/MathTest.cpp
     ../tests/util/TimeTest.cpp
     ../tests/util/SchedulerTest.cpp

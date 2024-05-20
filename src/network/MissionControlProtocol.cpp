@@ -110,6 +110,7 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
 
 			bool success =
+				armJointPositions.isValid() &&
 				Globals::planarArmController.tryInitController(armJointPositions.getData());
 
 			if (success) {
