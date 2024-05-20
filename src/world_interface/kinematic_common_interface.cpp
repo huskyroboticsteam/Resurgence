@@ -44,7 +44,7 @@ double setCmdVel(double dtheta, double dx) {
 						   robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 						   robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 						   robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-	} catch (const std::runtime_error& e) {
+	} catch (const bad_datapoint_access& e) {
 		LOG_F(WARNING, "Invalid steer motor position(s)!");
 		return 0;
 	}
@@ -79,7 +79,7 @@ double setTankCmdVel(double left, double right) {
 						   robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 						   robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 						   robot::getMotorPos(motorid_t::rearRightWheel).getData()};
-	} catch (const std::runtime_error& e) {
+	} catch (const bad_datapoint_access& e) {
 		LOG_F(WARNING, "Invalid steer motor position(s)!");
 		return 0;
 	}

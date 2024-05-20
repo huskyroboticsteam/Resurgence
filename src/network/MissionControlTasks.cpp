@@ -249,7 +249,7 @@ static DataPoint<control::swerve_rots_t> getAllSteerRotations() {
 			 robot::getMotorPos(motorid_t::frontRightWheel).getData(),
 			 robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
 			 robot::getMotorPos(motorid_t::rearRightWheel).getData()});
-	} catch (const std::runtime_error& e) {
+	} catch (const bad_datapoint_access& e) {
 		LOG_F(WARNING, "Invalid steer motor position(s)!");
 		return {};
 	}
