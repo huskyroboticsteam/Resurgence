@@ -18,6 +18,7 @@ constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
 constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
+constexpr const char* WAYPOINT_NAV_REQ_TYPE = "waypointNavRequest";
 
 // report keys
 constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";

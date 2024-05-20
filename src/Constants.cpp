@@ -152,5 +152,14 @@ const std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() {
 })();
 } // namespace arm
 
+namespace autonomous {
+const double THETA_KP = 2.0;
+const double DRIVE_VEL = 1.5;
+const double SLOW_DRIVE_THRESHOLD = 3.0;
+const double DONE_THRESHOLD = 0.5;
+// Duration long enough to confirm we are there, not so long that time is wasted
+const util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::milliseconds(750);
+} // namespace autonomous
+
 const double CONTROL_HZ = 10.0;
 } // namespace Constants

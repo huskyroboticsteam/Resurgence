@@ -20,16 +20,16 @@ public:
 	/**
 	 * Creates a new DriveToWaypointCommand with the specified targeting information.
 	 *
-	 * @param target, the position of the target in world coordinates.
-	 * @param thetaKP, the scaling factor to use for robot steering proportional control.
-	 * @param driveVel, the speed to drive the robot at.
-	 * @param slowDriveVel, the slower speed to drive the robot at when near the target.
-	 * @param doneThresh, the threshold for minimum robot-target distance to complete command.
-	 * @param closeToTargetDurVal, the duration within doneThresh after which robot navigation
+	 * @param target the position of the target in world coordinates.
+	 * @param thetaKP the scaling factor to use for robot steering proportional control.
+	 * @param driveVel the speed to drive the robot at.
+	 * @param slowDriveThresh the distance at which the robot will start slowing down.
+	 * @param doneThresh the threshold for minimum robot-target distance to complete command.
+	 * @param closeToTargetDurVal the duration within doneThresh after which robot navigation
 	 * 							   is considered done, seconds.
 	 */
 	DriveToWaypointCommand(const navtypes::point_t& target, double thetaKP, double driveVel,
-						   double slowDriveVel, double doneThresh,
+						   double slowDriveThresh, double doneThresh,
 						   util::dseconds closeToTargetDur);
 
 	/**
@@ -62,7 +62,7 @@ private:
 	navtypes::pose_t pose;
 	double thetaKP;
 	double driveVel;
-	double slowDriveVel;
+	double slowDriveThresh;
 	double doneThresh;
 	bool setStateCalledBeforeOutput;
 	util::dseconds closeToTargetDur;

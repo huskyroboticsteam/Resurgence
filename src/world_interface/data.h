@@ -5,6 +5,7 @@
 #include <bitset>
 #include <chrono>
 #include <optional>
+#include <stdexcept>
 #include <type_traits>
 #include <vector>
 
@@ -104,6 +105,11 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"ikForward", jointid_t::ikForward},
 	 {"ikUp", jointid_t::ikUp}});
 
+class bad_datapoint_access : public std::runtime_error {
+public:
+	bad_datapoint_access() : std::runtime_error("bad_datapoint_access") {}
+};
+
 /**
  * @brief Represents data measured using a sensor at a given time.
  *
@@ -131,16 +137,6 @@ public:
 	 * @param data The piece of data.
 	 */
 	DataPoint(datatime_t time, T data) : datapoint({time, data}) {}
-
-	/**
-	 * @brief Implicitly convert to the required data type. UB if datapoint is invalid.
-	 * Equivalent to getData().
-	 *
-	 * @return T The value of this datapoint.
-	 */
-	operator T() const {
-		return getData();
-	}
 
 	/**
 	 * @brief Check if this measurement is valid. Equivalent to isValid().
@@ -183,12 +179,16 @@ public:
 
 	/**
 	 * @brief Get the value of this data point.
-	 * UB if data point is not valid.
 	 *
 	 * @return T The value of this data point.
+	 * @throw bad_datapoint_access If this data point is not valid.
 	 */
 	T getData() const {
-		return datapoint.value().second;
+		if (isValid()) {
+			return datapoint.value().second;
+		} else {
+			throw bad_datapoint_access();
+		}
 	}
 
 	/**
