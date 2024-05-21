@@ -9,6 +9,6 @@ target_link_libraries(websocket_utils
 add_library(mission_control_interface STATIC
   MissionControlProtocol.cpp
   MissionControlTasks.cpp)
-target_link_libraries(mission_control_interface utils video autonomous)
+target_link_libraries(mission_control_interface utils video autonomous control)
 set_target_properties(mission_control_interface PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
