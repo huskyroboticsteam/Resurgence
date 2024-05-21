@@ -33,9 +33,12 @@ void base_motor::setMotorVel(int32_t targetVel) {
 	// schedule position event
 	velEventID = pSched->scheduleEvent(100ms, [&]() -> void {
 		types::datatime_t currTime = types::dataclock::now();
-		const navtypes::Vectord<1> currPos{getMotorPos().getData()};
-		navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
-		setMotorPos(posCommand.coeff(0, 0));
+		auto motorPos = getMotorPos();
+		if (motorPos.isValid()) {
+			const navtypes::Vectord<1> currPos{getMotorPos().getData()};
+			navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
+			setMotorPos(posCommand.coeff(0, 0));
+		}
 	});
 }
 

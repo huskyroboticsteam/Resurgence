@@ -24,17 +24,17 @@ DataPoint<point_t> readGPS() {
 
 	if (!converter) {
 		// just recieved first fix, construct map centered at the first datapoint
-		converter.emplace(GPSDatum::WGS84, coords);
+		converter.emplace(GPSDatum::WGS84, coords.getData());
 	}
 
 	datatime_t time = coords.getTime();
-	point_t pos = converter->gpsToMeters(coords);
+	point_t pos = converter->gpsToMeters(coords.getData());
 
 	return {time, pos};
 }
 
 std::optional<point_t> gpsToMeters(const gpscoords_t& coord) {
-	if (converter) {
+	if (gpsHasFix()) {
 		return converter->gpsToMeters(coord);
 	} else {
 		return {};
