@@ -83,10 +83,10 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	 {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}},
 	{motorid_t::activeSuspension,
 	 {.adc_lo = 251, .mdeg_lo = -19 * 1000, .adc_hi = 1645, .mdeg_hi = 31 * 1000}},
-	{motorid_t::frontLeftSwerve, {.adc_lo = 1331, .mdeg_lo = -133*1000, .adc_hi = 809, .mdeg_hi = 140 * 1000}},
+	{motorid_t::frontLeftSwerve, {.adc_lo = 1422, .mdeg_lo = -180*1000, .adc_hi = 656, .mdeg_hi = 180*1000}},
 	{motorid_t::frontRightSwerve, {.adc_lo = 593, .mdeg_lo = -180*1000, .adc_hi = 1397, .mdeg_hi = 180*1000}},
-	{motorid_t::rearLeftSwerve, {.adc_lo = 1379, .mdeg_lo = -180*1000, .adc_hi = 655, .mdeg_hi = 180*1000}},
-	{motorid_t::rearRightSwerve, {.adc_lo = 0, .mdeg_lo = 0, .adc_hi = 0, .mdeg_hi = 0}},
+	{motorid_t::rearLeftSwerve, {.adc_lo = 1907, .mdeg_lo = -180*1000, .adc_hi = 1133, .mdeg_hi = 180*1000}},
+	{motorid_t::rearRightSwerve, {.adc_lo = 1538, .mdeg_lo = -180*1000, .adc_hi = 767, .mdeg_hi = 180*1000}},
 });
 
 /** @brief A mapping of motorids to their corresponding serial number. */
