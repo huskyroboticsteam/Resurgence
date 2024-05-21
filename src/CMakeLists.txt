@@ -227,7 +227,7 @@ add_library(simulator_interface STATIC
   )
 
 target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
-target_link_libraries(simulator_interface world_interface_core)
+target_link_libraries(simulator_interface world_interface_core control)
 target_link_libraries(stub_world_interface world_interface_core)
 
 add_library(filters SHARED
