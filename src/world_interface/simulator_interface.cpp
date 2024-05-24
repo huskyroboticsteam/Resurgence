@@ -1,5 +1,4 @@
 #include "../Constants.h"
-#include "../Globals.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
@@ -42,6 +41,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::hand, "hand"},
 	{motorid_t::activeSuspension, "activeSuspension"}};
 
+std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
+
 DataPoint<Eigen::Quaterniond> lastOrientation;
 std::mutex orientationMutex;
 
@@ -81,7 +82,7 @@ std::mutex connectionMutex;
 bool simConnected = false;
 
 void sendJSON(const json& obj) {
-	Globals::websocketServer.sendJSON(PROTOCOL_PATH, obj);
+	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
 static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
@@ -217,7 +218,8 @@ void clientDisconnected() {
 	LOG_F(ERROR, "ERROR: Simulator disconnected! World Interface disconnected!");
 }
 
-void initSimServer() {
+void initSimServer(net::websocket::SingleClientWSServer& ws) {
+	wsServer = ws;
 	auto protocol = std::make_unique<net::websocket::WebSocketProtocol>(PROTOCOL_PATH);
 	protocol->addMessageHandler("simImuOrientationReport", handleIMU);
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
@@ -228,7 +230,7 @@ void initSimServer() {
 	protocol->addConnectionHandler(clientConnected);
 	protocol->addDisconnectionHandler(clientDisconnected);
 
-	Globals::websocketServer.addProtocol(std::move(protocol));
+	wsServer->get().addProtocol(std::move(protocol));
 
 	{
 		// wait for simulator to connect
@@ -257,8 +259,10 @@ const DiffWristKinematics& wristKinematics() {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 
-void world_interface_init(bool initOnlyMotors) {
-	initSimServer();
+void world_interface_init(
+	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
+	bool initOnlyMotors) {
+	initSimServer(wsServer.value());
 	initCameras();
 	initMotors();
 }

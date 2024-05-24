@@ -149,7 +149,7 @@ int main(int argc, char** argv) {
 	parseCommandLine(argc, argv);
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
-	robot::world_interface_init();
+	robot::world_interface_init(Globals::websocketServer);
 	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
 	Globals::websocketServer.addProtocol(std::move(mcProto));
 	// Ctrl+C doesn't stop the simulation without this line

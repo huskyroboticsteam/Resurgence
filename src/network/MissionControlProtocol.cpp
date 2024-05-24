@@ -3,6 +3,7 @@
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../autonomous/AutonomousTask.h"
+#include "../control_interface.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
 #include "../world_interface/data.h"

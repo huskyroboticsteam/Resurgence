@@ -2,7 +2,6 @@
 #include "../CAN/CANMotor.h"
 #include "../CAN/CANUtils.h"
 #include "../Constants.h"
-#include "../Globals.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
 #include "../gps/usb_gps/read_usb_gps.h"
@@ -134,10 +133,14 @@ void setupCameras() {
 }
 } // namespace
 
-void world_interface_init(bool initOnlyMotors) {
+void world_interface_init(
+	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
+	bool initOnlyMotors) {
 	if (!initOnlyMotors) {
 		setupCameras();
-		ardupilot::initArduPilotProtocol(Globals::websocketServer);
+		if (wsServer.has_value()) {
+			ardupilot::initArduPilotProtocol(wsServer.value());
+		}
 	}
 	can::initCAN();
 	initMotors();
