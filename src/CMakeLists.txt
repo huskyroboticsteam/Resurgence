@@ -190,7 +190,7 @@ elseif(GPS STREQUAL "ARDUPILOT")
   target_sources(gps_interface PUBLIC
       ardupilot/ArduPilotProtocol.cpp
       ardupilot/ArduPilotInterface.cpp)
-  target_link_libraries(gps_interface utils websocket_utils constants)
+  target_link_libraries(gps_interface utils websocket_utils)
 else()
   target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
 endif()
@@ -199,7 +199,6 @@ endif()
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
   world_interface/gps_common_interface.cpp
-  # world_interface/kinematic_common_interface.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
@@ -266,6 +265,7 @@ add_library(autonomous SHARED
 target_link_libraries(autonomous commands world_interface)
 
 add_library(constants SHARED Constants.cpp)
+link_libraries(constants)
 
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
@@ -280,7 +280,6 @@ target_link_libraries(rover_common
 
 list(APPEND rover_libs
   rover_common
-  constants
   Threads::Threads
   websocket_utils
   filters
