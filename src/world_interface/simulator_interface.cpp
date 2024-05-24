@@ -111,9 +111,9 @@ void initCameras() {
 	auto cfg = cam::readConfigFromFile(Constants::MAST_CAMERA_CONFIG_PATH);
 	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
 	// openCamera(Constants::MAST_CAMERA_ID);
-	openCamera("front", cfg.intrinsicParams->getIntrinsicList());
-	openCamera("rear", cfg.intrinsicParams->getIntrinsicList());
-	openCamera("upperArm", cfg.intrinsicParams->getIntrinsicList());
+	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 }
 
 void initMotors() {
