@@ -62,6 +62,13 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor);
 void emergencyStop();
 
 /**
+ * @brief Check if the robot has been emergency stopped.
+ *
+ * @return If emergencyStop() has been called previously.
+ */
+bool isEmergencyStopped();
+
+/**
  * @brief Request the robot to drive at the given velocities.
  *
  * @param dtheta The heading velocity.

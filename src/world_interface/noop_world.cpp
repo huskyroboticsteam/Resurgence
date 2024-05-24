@@ -35,6 +35,10 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 void emergencyStop() {}
 
+bool isEmergencyStopped() {
+	return false;
+}
+
 landmarks_t readLandmarks() {
 	return landmarks_t{};
 }

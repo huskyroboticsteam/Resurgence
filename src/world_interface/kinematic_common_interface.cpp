@@ -32,7 +32,7 @@ double getJointPowerValue(types::jointid_t joint);
 } // namespace
 
 double setCmdVel(double dtheta, double dx) {
-	if (Globals::E_STOP && (dtheta != 0 || dx != 0)) {
+	if (isEmergencyStopped()) {
 		return 0;
 	}
 

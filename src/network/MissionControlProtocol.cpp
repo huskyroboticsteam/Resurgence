@@ -56,7 +56,6 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 		_power_repeat_task.start();
 	}
 	// TODO: reinit motors
-	Globals::E_STOP = stop;
 	this->setArmIKEnabled(false);
 }
 
@@ -245,7 +244,6 @@ void MissionControlProtocol::handleHeartbeatTimedOut() {
 	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.");
 	this->stopAndShutdownPowerRepeat(true);
 	robot::emergencyStop();
-	Globals::E_STOP = true;
 }
 
 void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {

@@ -26,7 +26,7 @@ using std::chrono::steady_clock;
 using namespace navtypes;
 using namespace robot::types;
 
-void closeRover(int signum) {
+void closeRover(int) {
 	robot::emergencyStop();
 	Globals::websocketServer.stop();
 	raise(SIGTERM);

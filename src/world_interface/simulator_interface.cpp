@@ -54,6 +54,8 @@ std::mutex truePoseMutex;
 std::map<std::string, DataPoint<int32_t>> motorPosMap;
 std::shared_mutex motorPosMapMutex;
 
+bool is_emergency_stopped = false;
+
 // A mapping of (motor_id, shared pointer to object of the motor)
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
@@ -278,6 +280,11 @@ void emergencyStop() {
 	for (const auto& motor : motorNameMap) {
 		setMotorPower(motor.first, 0.0);
 	}
+	is_emergency_stopped = true;
+}
+
+bool isEmergencyStopped() {
+	return is_emergency_stopped;
 }
 
 std::unordered_set<CameraID> getCameras() {

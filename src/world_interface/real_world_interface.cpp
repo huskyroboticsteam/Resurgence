@@ -35,6 +35,7 @@ std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> 
 namespace {
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 kinematics::DiffWristKinematics wrist_kinematics;
+bool is_emergency_stopped = false;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 	// get scales for motor
@@ -157,6 +158,11 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 void emergencyStop() {
 	can::motor::emergencyStopMotors();
+	is_emergency_stopped = true;
+}
+
+bool isEmergencyStopped() {
+	return is_emergency_stopped;
 }
 
 std::unordered_set<CameraID> getCameras() {
