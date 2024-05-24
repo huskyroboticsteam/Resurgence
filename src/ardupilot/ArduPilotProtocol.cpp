@@ -32,9 +32,6 @@ void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServe
 	ardupilot_protocol->addMessageHandler(
 		"orientation", std::bind(&ArduPilotProtocol::handleIMURequest, this, _1),
 		validateIMURequest);
-	ardupilot_protocol->addMessageHandler(
-		"heading", std::bind(&ArduPilotProtocol::handleHeadingRequest, this, _1),
-		validateHeadingRequest);
 	ardupilot_protocol->addConnectionHandler(
 		std::bind(&ArduPilotProtocol::clientConnected, this));
 	ardupilot_protocol->addDisconnectionHandler(
@@ -83,20 +80,11 @@ void ArduPilotProtocol::handleIMURequest(const json& j) {
 	double roll = j["roll"];
 	double pitch = j["pitch"];
 	double yaw = j["yaw"];
+	yaw = -yaw;
 	eulerangles_t rpy{roll, pitch, yaw};
 
 	std::lock_guard lock(_lastOrientationMutex);
 	_lastOrientation = util::eulerAnglesToQuat(rpy);
-}
-
-bool ArduPilotProtocol::validateHeadingRequest(const json& j) {
-	return util::validateKey(j, "heading", val_t::number_float);
-}
-
-void ArduPilotProtocol::handleHeadingRequest(const json& j) {
-	int heading = j["heading"];
-	std::lock_guard lock(_lastHeadingMutex);
-	_lastHeading = heading;
 }
 
 DataPoint<gpscoords_t> ArduPilotProtocol::getGPS() {
@@ -107,11 +95,6 @@ DataPoint<gpscoords_t> ArduPilotProtocol::getGPS() {
 DataPoint<Eigen::Quaterniond> ArduPilotProtocol::getIMU() {
 	std::unique_lock<std::mutex> lock(_lastOrientationMutex);
 	return _lastOrientation;
-}
-
-DataPoint<int> ArduPilotProtocol::getHeading() {
-	std::unique_lock<std::mutex> lock(_lastHeadingMutex);
-	return _lastHeading;
 }
 
 bool ArduPilotProtocol::isArduPilotConnected() {
