@@ -47,7 +47,8 @@ const kinematics::DiffWristKinematics& wristKinematics();
  *
  * @param wsServer A reference to the websocket server to use for communication.
  * If empty, components that require it will not be initialized.
- * @param initOnlyMotors If true, only initialize the motors and not the rest of the world interface.
+ * @param initOnlyMotors If true, only initialize the motors and not the rest of the world
+ * interface.
  */
 void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
