@@ -115,11 +115,11 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
 	{{motorid_t::shoulder, {70, 0, 0}},
 	 {motorid_t::elbow, {15, 7, -2}},
-	 {motorid_t::frontLeftSwerve, {0, 0, 0}},
-	 {motorid_t::frontRightSwerve, {0, 0, 0}},
+	 {motorid_t::frontLeftSwerve, {2, 0, -1}},
+	 {motorid_t::frontRightSwerve, {3, 0, -1}},
 	 {motorid_t::rearLeftSwerve, {0, 0, 0}},
-	 {motorid_t::rearRightSwerve, {0, 0, 0}}});
-
+	 {motorid_t::rearRightSwerve, {2, 0, -1}}});
+	 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
  * Negative values mean that the motor is inverted.
