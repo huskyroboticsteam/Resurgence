@@ -244,7 +244,7 @@ var searchData=
   ['workstealing_2eh_241',['workstealing.h',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00983.html',1,'']]],
   ['world_20vision_242',['Retina and real-world vision',['https://docs.opencv.org/4.2.0/d3/d86/tutorial_bioinspired_retina_model.html',1,'']]],
   ['world_5finterface_243',['WORLD_INTERFACE',['../namespacerobot.html#ad2a31e2720609dd7619fc2bbafcf441e',1,'robot']]],
-  ['world_5finterface_5finit_244',['world_interface_init',['../namespacerobot.html#a65584ffb83e20412a795461b921deb5f',1,'robot']]],
+  ['world_5finterface_5finit_244',['world_interface_init',['../namespacerobot.html#a0adaa589779f8efebeb72192d753d879',1,'robot']]],
   ['worldinterface_245',['WorldInterface',['../namespacerobot.html#a81cb1706e1f0e7c0639e231446ce4c9e',1,'robot']]],
   ['wostream_246',['wostream',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01479.html#ga9ad6702c06821cdd550e08ef2b70f3b7',1,'std::wostream'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01479.html#ga9ad6702c06821cdd550e08ef2b70f3b7',1,'wostream(Global Namespace)']]],
   ['wostringstream_247',['wostringstream',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01479.html#ga811d6452576dc4c2fccd0ab26fd23f07',1,'std::wostringstream'],['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01479.html#ga811d6452576dc4c2fccd0ab26fd23f07',1,'wostringstream(Global Namespace)']]],

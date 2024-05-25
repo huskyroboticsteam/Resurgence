@@ -151,6 +151,17 @@ Functions</h2></td></tr>
 <tr class="memitem:a5a626747243a1f2ab9a842dc08399159" id="r_a5a626747243a1f2ab9a842dc08399159"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="elRef" href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#ga5daab8e66aa480465000308455578830">Eigen::Quaterniond</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5a626747243a1f2ab9a842dc08399159">readIMU</a> ()</td></tr>
 <tr class="memdesc:a5a626747243a1f2ab9a842dc08399159"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the rover orientation from the IMU.  <br /></td></tr>
 <tr class="separator:a5a626747243a1f2ab9a842dc08399159"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8363ee6c4c4bd4b93c4188984dc77ad6" id="r_a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8363ee6c4c4bd4b93c4188984dc77ad6">setCmdVel</a> (double dtheta, double dx)</td></tr>
+<tr class="memdesc:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the robot to drive at the given velocities.  <br /></td></tr>
+<tr class="separator:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac44ae9c88dad3e683bb548a345313cdb" id="r_ac44ae9c88dad3e683bb548a345313cdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac44ae9c88dad3e683bb548a345313cdb">setJointPower</a> (types::jointid_t joint, double <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a>)</td></tr>
+<tr class="memdesc:ac44ae9c88dad3e683bb548a345313cdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the power of the specified joint.  <br /></td></tr>
+<tr class="separator:ac44ae9c88dad3e683bb548a345313cdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ff9ee8b672b7ae2f67fd199236328d3" id="r_a5ff9ee8b672b7ae2f67fd199236328d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ff9ee8b672b7ae2f67fd199236328d3">setJointPos</a> (types::jointid_t joint, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos)</td></tr>
+<tr class="memdesc:a5ff9ee8b672b7ae2f67fd199236328d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the position of the specified joint.  <br /></td></tr>
+<tr class="separator:a5ff9ee8b672b7ae2f67fd199236328d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f7f6a213f9815daf709cdfb8aa975fe" id="r_a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f7f6a213f9815daf709cdfb8aa975fe">getJointPos</a> (robot::types::jointid_t joint)</td></tr>
+<tr class="separator:a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa11e482ffaef27ea65955d70d7eaa6a9" id="r_aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa11e482ffaef27ea65955d70d7eaa6a9">readIMUHeading</a> ()</td></tr>
 <tr class="memdesc:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the current heading in the global map frame based on an IMU measurement.  <br /></td></tr>
 <tr class="separator:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,31 +174,24 @@ Functions</h2></td></tr>
 <tr class="memitem:acbf2784798c0a8d1e58a484d5bcd5705" id="r_acbf2784798c0a8d1e58a484d5bcd5705"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acbf2784798c0a8d1e58a484d5bcd5705">gpsHasFix</a> ()</td></tr>
 <tr class="memdesc:acbf2784798c0a8d1e58a484d5bcd5705"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the GPS sensor has acquired a fix.  <br /></td></tr>
 <tr class="separator:acbf2784798c0a8d1e58a484d5bcd5705"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8363ee6c4c4bd4b93c4188984dc77ad6" id="r_a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8363ee6c4c4bd4b93c4188984dc77ad6">setCmdVel</a> (double dtheta, double dx)</td></tr>
-<tr class="memdesc:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the robot to drive at the given velocities.  <br /></td></tr>
-<tr class="separator:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5133347c2d5d86918b6b8267ae42c5fc" id="r_a5133347c2d5d86918b6b8267ae42c5fc"><td class="memItemLeft" align="right" valign="top"><a id="a5133347c2d5d86918b6b8267ae42c5fc" name="a5133347c2d5d86918b6b8267ae42c5fc"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setJointPower</b> (robot::types::jointid_t joint, double <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a>)</td></tr>
-<tr class="separator:a5133347c2d5d86918b6b8267ae42c5fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22bae8dc460f5d2413092e99d59c6c07" id="r_a22bae8dc460f5d2413092e99d59c6c07"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22bae8dc460f5d2413092e99d59c6c07">setJointPos</a> (robot::types::jointid_t joint, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos)</td></tr>
-<tr class="separator:a22bae8dc460f5d2413092e99d59c6c07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f7f6a213f9815daf709cdfb8aa975fe" id="r_a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f7f6a213f9815daf709cdfb8aa975fe">getJointPos</a> (robot::types::jointid_t joint)</td></tr>
-<tr class="separator:a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54f2956e8714e5906f563ed9cf3407d2" id="r_a54f2956e8714e5906f563ed9cf3407d2"><td class="memItemLeft" align="right" valign="top"><a id="a54f2956e8714e5906f563ed9cf3407d2" name="a54f2956e8714e5906f563ed9cf3407d2"></a>
 const <a class="el" href="classkinematics_1_1DiffDriveKinematics.html">DiffDriveKinematics</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>driveKinematics</b> ()</td></tr>
 <tr class="separator:a54f2956e8714e5906f563ed9cf3407d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24579cd764099c89ade1895cc300e638" id="r_a24579cd764099c89ade1895cc300e638"><td class="memItemLeft" align="right" valign="top"><a id="a24579cd764099c89ade1895cc300e638" name="a24579cd764099c89ade1895cc300e638"></a>
 const <a class="el" href="classkinematics_1_1DiffWristKinematics.html">DiffWristKinematics</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>wristKinematics</b> ()</td></tr>
 <tr class="separator:a24579cd764099c89ade1895cc300e638"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65584ffb83e20412a795461b921deb5f" id="r_a65584ffb83e20412a795461b921deb5f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65584ffb83e20412a795461b921deb5f">world_interface_init</a> (bool initOnlyMotors=false)</td></tr>
-<tr class="memdesc:a65584ffb83e20412a795461b921deb5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the world interface.  <br /></td></tr>
-<tr class="separator:a65584ffb83e20412a795461b921deb5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0adaa589779f8efebeb72192d753d879" id="r_a0adaa589779f8efebeb72192d753d879"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0adaa589779f8efebeb72192d753d879">world_interface_init</a> (std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a04235.html">std::reference_wrapper</a>&lt; <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html">net::websocket::SingleClientWSServer</a> &gt; &gt; wsServer, bool initOnlyMotors=false)</td></tr>
+<tr class="memdesc:a0adaa589779f8efebeb72192d753d879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the world interface.  <br /></td></tr>
+<tr class="separator:a0adaa589779f8efebeb72192d753d879"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61bee8f61b7f31877ad21bbd9077f5a3" id="r_a61bee8f61b7f31877ad21bbd9077f5a3"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a06899.html">std::shared_ptr</a>&lt; <a class="el" href="classrobot_1_1base__motor.html">robot::base_motor</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61bee8f61b7f31877ad21bbd9077f5a3">getMotor</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor)</td></tr>
 <tr class="memdesc:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to the motor object associated with the motor id.  <br /></td></tr>
 <tr class="separator:a61bee8f61b7f31877ad21bbd9077f5a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a902b5dd26574990fe0a8a9d3c4e7a97e" id="r_a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a902b5dd26574990fe0a8a9d3c4e7a97e">emergencyStop</a> ()</td></tr>
 <tr class="memdesc:a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emergency stop all motors.  <br /></td></tr>
 <tr class="separator:a902b5dd26574990fe0a8a9d3c4e7a97e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46a26126dbdd83112cc936661818e1fb" id="r_a46a26126dbdd83112cc936661818e1fb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46a26126dbdd83112cc936661818e1fb">isEmergencyStopped</a> ()</td></tr>
+<tr class="memdesc:a46a26126dbdd83112cc936661818e1fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the robot has been emergency stopped.  <br /></td></tr>
+<tr class="separator:a46a26126dbdd83112cc936661818e1fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdba67256ee6b98d21f683ecf1acc9f0" id="r_acdba67256ee6b98d21f683ecf1acc9f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacerobot_1_1types.html#a7d864cb4085b3ebb76a5d844bded14b5">landmarks_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acdba67256ee6b98d21f683ecf1acc9f0">readLandmarks</a> ()</td></tr>
 <tr class="memdesc:acdba67256ee6b98d21f683ecf1acc9f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read measurement from the CV system.  <br /></td></tr>
 <tr class="separator:acdba67256ee6b98d21f683ecf1acc9f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -430,14 +434,14 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PWM</
         <tr>
           <td class="memname"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt; robot::getJointPos </td>
           <td>(</td>
-          <td class="paramtype">robot::types::jointid_t</td>          <td class="paramname"><span class="paramname"><em>joint</em></span></td><td>)</td>
+          <td class="paramtype">types::jointid_t</td>          <td class="paramname"><span class="paramname"><em>joint</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">joint,the</td><td>jointid_t of the joint to get the position of. </td></tr>
+    <tr><td class="paramname">joint</td><td>the jointid_t of the joint to get the position of. </td></tr>
   </table>
   </dd>
 </dl>
@@ -630,6 +634,26 @@ template&lt;unsigned long int N&gt; </div>
 
 </div>
 </div>
+<a id="a46a26126dbdd83112cc936661818e1fb" name="a46a26126dbdd83112cc936661818e1fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46a26126dbdd83112cc936661818e1fb">&#9670;&#160;</a></span>isEmergencyStopped()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool robot::isEmergencyStopped </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if the robot has been emergency stopped. </p>
+<dl class="section return"><dt>Returns</dt><dd>If <a class="el" href="#a902b5dd26574990fe0a8a9d3c4e7a97e" title="Emergency stop all motors.">emergencyStop()</a> has been called previously. </dd></dl>
+
+</div>
+</div>
 <a id="a2f3e430760dcde603cf49d380bfe5aba" name="a2f3e430760dcde603cf49d380bfe5aba"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2f3e430760dcde603cf49d380bfe5aba">&#9670;&#160;</a></span>readCamera()</h2>
 
@@ -796,8 +820,8 @@ template&lt;unsigned long int N&gt; </div>
 
 </div>
 </div>
-<a id="a22bae8dc460f5d2413092e99d59c6c07" name="a22bae8dc460f5d2413092e99d59c6c07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22bae8dc460f5d2413092e99d59c6c07">&#9670;&#160;</a></span>setJointPos()</h2>
+<a id="a5ff9ee8b672b7ae2f67fd199236328d3" name="a5ff9ee8b672b7ae2f67fd199236328d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ff9ee8b672b7ae2f67fd199236328d3">&#9670;&#160;</a></span>setJointPos()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -805,7 +829,7 @@ template&lt;unsigned long int N&gt; </div>
         <tr>
           <td class="memname">void robot::setJointPos </td>
           <td>(</td>
-          <td class="paramtype">robot::types::jointid_t</td>          <td class="paramname"><span class="paramname"><em>joint</em></span>, </td>
+          <td class="paramtype">types::jointid_t</td>          <td class="paramname"><span class="paramname"><em>joint</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -814,10 +838,42 @@ template&lt;unsigned long int N&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the position of the specified joint. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">joint,the</td><td>jointid_t of the joint to set the position of. </td></tr>
-    <tr><td class="paramname">targetPos,the</td><td>position to set the joint to, in millidegrees. </td></tr>
+    <tr><td class="paramname">joint</td><td>the jointid_t of the joint to set the position of. </td></tr>
+    <tr><td class="paramname">targetPos</td><td>the position to set the joint to, in millidegrees. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac44ae9c88dad3e683bb548a345313cdb" name="ac44ae9c88dad3e683bb548a345313cdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac44ae9c88dad3e683bb548a345313cdb">&#9670;&#160;</a></span>setJointPower()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void robot::setJointPower </td>
+          <td>(</td>
+          <td class="paramtype">types::jointid_t</td>          <td class="paramname"><span class="paramname"><em>joint</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>power</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the power of the specified joint. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">joint</td><td>The joint to set the power of. </td></tr>
+    <tr><td class="paramname">power</td><td>The power value to set, in the range [-1,1]. </td></tr>
   </table>
   </dd>
 </dl>
@@ -915,8 +971,8 @@ template&lt;unsigned long int N&gt; </div>
 
 </div>
 </div>
-<a id="a65584ffb83e20412a795461b921deb5f" name="a65584ffb83e20412a795461b921deb5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65584ffb83e20412a795461b921deb5f">&#9670;&#160;</a></span>world_interface_init()</h2>
+<a id="a0adaa589779f8efebeb72192d753d879" name="a0adaa589779f8efebeb72192d753d879"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0adaa589779f8efebeb72192d753d879">&#9670;&#160;</a></span>world_interface_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -924,14 +980,25 @@ template&lt;unsigned long int N&gt; </div>
         <tr>
           <td class="memname">void robot::world_interface_init </td>
           <td>(</td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>initOnlyMotors</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
+          <td class="paramtype">std::optional&lt; <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a04235.html">std::reference_wrapper</a>&lt; <a class="el" href="classnet_1_1websocket_1_1SingleClientWSServer.html">net::websocket::SingleClientWSServer</a> &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>wsServer</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>initOnlyMotors</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Initialize the world interface. </p>
-<p>This method should only be called once, and must be called before any other world interface methods. </p>
+<p>This method should only be called once, and must be called before any other world interface methods.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wsServer</td><td>A reference to the websocket server to use for communication. If empty, components that require it will not be initialized. </td></tr>
+    <tr><td class="paramname">initOnlyMotors</td><td>If true, only initialize the motors and not the rest of the world interface. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
