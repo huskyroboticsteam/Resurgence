@@ -82,16 +82,6 @@ void emergencyStop();
 bool isEmergencyStopped();
 
 /**
- * @brief Request the robot to drive in tank style, where each side is controlled individually.
- *
- * @param left The left velocity.
- * @param right The right velocity.
- * @return double If the requested velocities are too high, they will be scaled down.
- * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
- */
-double setTankCmdVel(double left, double right);
-
-/**
  * @brief Get the IDs of the currently supported cameras.
  *
  * @return The IDs of all cameras currently supported by the world interface, as a @ref
