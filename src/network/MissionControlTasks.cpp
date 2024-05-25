@@ -2,6 +2,7 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../control_interface.h"
 #include "../utils/core.h"
 #include "../world_interface/world_interface.h"
 #include "MissionControlMessages.h"

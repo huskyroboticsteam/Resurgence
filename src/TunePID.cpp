@@ -55,7 +55,7 @@ void cleanup(int signum) {
 }
 
 int main(int argc, char** argv) {
-	robot::world_interface_init();
+	robot::world_interface_init(std::nullopt);
 
 	// TODO: Before running this script, make sure the PPJR is set correctly for each motor
 	// in real_world_constants.cpp

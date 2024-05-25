@@ -34,7 +34,7 @@ void cleanup(int signum) {
 // Then begins to run the motors.
 int main() {
 	// init motors.
-	robot::world_interface_init(true);
+	robot::world_interface_init(std::nullopt, true);
 
 	signal(SIGINT, cleanup);
 

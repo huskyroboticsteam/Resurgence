@@ -25,7 +25,6 @@ namespace Globals {
  */
 extern RoverState curr_state;
 extern net::websocket::SingleClientWSServer websocketServer;
-extern std::atomic<bool> E_STOP;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
 extern control::PlanarArmController<2> planarArmController;
