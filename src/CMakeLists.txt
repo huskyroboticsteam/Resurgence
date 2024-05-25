@@ -298,7 +298,6 @@ add_executable(TunePID TunePID.cpp)
 target_link_libraries(TunePID
   ${rover_libs}
   can_interface
-  world_interface
 )
 target_link_libraries(TunePID ${vision_libs})
 

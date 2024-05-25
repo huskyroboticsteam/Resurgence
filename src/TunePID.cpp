@@ -2,7 +2,6 @@
 #include "CAN/CANMotor.h"
 #include "Constants.h"
 #include "world_interface/real_world_constants.h"
-#include "world_interface/world_interface.h"
 
 #include <chrono>
 #include <csignal>
@@ -33,9 +32,13 @@ std::map<V, K> reverseMap(const std::map<K, V>& map) {
 
 const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::frontLeftWheel, "frontLeftWheel"},
+	{motorid_t::frontLeftSwerve, "frontLeftSwerve"},
 	{motorid_t::frontRightWheel, "frontRightWheel"},
+	{motorid_t::frontRightSwerve, "frontRightSwerve"},
 	{motorid_t::rearLeftWheel, "rearLeftWheel"},
+	{motorid_t::rearLeftSwerve, "rearLeftSwerve"},
 	{motorid_t::rearRightWheel, "rearRightWheel"},
+	{motorid_t::rearRightSwerve, "rearRightSwerve"},
 	{motorid_t::armBase, "armBase"},
 	{motorid_t::shoulder, "shoulder"},
 	{motorid_t::elbow, "elbow"},
@@ -54,8 +57,31 @@ void cleanup(int signum) {
 	exit(0);
 }
 
+bool initMotor(motorid_t motor) {
+	uint8_t serial = robot::motorSerialIDMap.at(motor);
+
+	if (robot::potMotors.find(motor) != robot::potMotors.end()) {
+		std::cout << "Initializing potentiometer parameters...\n";
+		robot::potparams_t pot_params = robot::potMotors.at(motor);
+		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
+									  pot_params.adc_lo, pot_params.adc_hi,
+									  robot::TELEM_PERIOD);
+	} else if (robot::encMotors.find(motor) != robot::encMotors.end()) {
+		std::cout << "Initializing encoder parameters...\n";
+		robot::encparams_t enc_params = robot::encMotors.at(motor);
+		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
+								robot::TELEM_PERIOD);
+		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
+										 enc_params.limitSwitchHigh);
+	} else {
+		std::cerr << "The given motor is not a pot or enc motor!\n";
+		return false;
+	}
+	return true;
+}
+
 int main(int argc, char** argv) {
-	robot::world_interface_init(std::nullopt);
+	can::initCAN();
 
 	// TODO: Before running this script, make sure the PPJR is set correctly for each motor
 	// in real_world_constants.cpp
@@ -63,17 +89,23 @@ int main(int argc, char** argv) {
 	signal(SIGINT, cleanup);
 
 	std::cout << "Motor Names:" << std::endl;
-	for (const auto& motor : robot::pidMotors) {
-		auto name = motorNameMap.at(motor);
+
+	for (const auto& pair : robot::motorPIDMap) {
+		auto name = motorNameMap.at(pair.first);
 		std::cout << "\t" << name << std::endl;
 	}
+
 	std::cout << "Enter motor name > ";
 	std::string motor_name;
 	std::getline(std::cin, motor_name);
 	motorid_t motor = nameToMotorMap.at(motor_name);
 	uint8_t serial = robot::motorSerialIDMap.at(motor);
 
-	printf("Enter coefficients for motor [%s] (serial %d):\n", motor_name.c_str(), serial);
+	if (!initMotor(motor)) {
+		return 1;
+	}
+
+	printf("Enter coefficients for motor [%s] (serial 0x%x):\n", motor_name.c_str(), serial);
 	std::string str;
 	std::cout << "P > ";
 	std::getline(std::cin, str);
@@ -114,12 +146,13 @@ int main(int argc, char** argv) {
 		angle_target =
 			(int32_t)round(amplitude * sin(2 * M_PI * time / period)) + starting_angle;
 
-		robot::setMotorPos(motor, angle_target);
+		can::motor::setMotorPIDTarget(serial, angle_target);
 
 		tp += 20ms;
 		std::this_thread::sleep_until(tp);
 	}
-	robot::setMotorPower(motor, 0.0);
+	can::motor::setMotorMode(serial, can::motor::motormode_t::pwm);
+	can::motor::setMotorPower(serial, 0.0);
 	std::cout << "RMSE: " << sqrt(acc_error / total_steps) << std::endl;
 	return 0;
 }

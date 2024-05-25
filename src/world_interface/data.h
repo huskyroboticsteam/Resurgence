@@ -56,9 +56,13 @@ enum class indication_t {
 /** @brief The motors on the robot. */
 enum class motorid_t {
 	frontLeftWheel,
+	frontLeftSwerve,
 	frontRightWheel,
+	frontRightSwerve,
 	rearLeftWheel,
+	rearLeftSwerve,
 	rearRightWheel,
+	rearRightSwerve,
 	armBase,
 	shoulder,
 	elbow,
