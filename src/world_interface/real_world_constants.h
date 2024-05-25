@@ -25,10 +25,6 @@ struct pidcoef_t {
 /** @brief The default telemetry period for motors. */
 constexpr std::chrono::milliseconds TELEM_PERIOD(50);
 
-/** @brief The set of motors that are PID controlled. */
-constexpr auto pidMotors =
-	frozen::make_unordered_set<motorid_t>({motorid_t::shoulder, motorid_t::elbow});
-
 /**
  * @brief Represents parameters defining a potentiometer scale.
  *
@@ -78,15 +74,24 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 // clang-format on
 
 // TODO: find appropriate bounds
-constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>(
-	{{motorid_t::armBase,
-	  {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},
-	 {motorid_t::forearm,
-	  {.adc_lo = 1208, .mdeg_lo = -180 * 1000, .adc_hi = 841, .mdeg_hi = 180 * 1000}},
-	 {motorid_t::wrist,
-	  {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}},
-	 {motorid_t::activeSuspension,
-	  {.adc_lo = 251, .mdeg_lo = -19 * 1000, .adc_hi = 1645, .mdeg_hi = 31 * 1000}}});
+constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
+	{motorid_t::armBase,
+	 {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},
+	{motorid_t::forearm,
+	 {.adc_lo = 1208, .mdeg_lo = -180 * 1000, .adc_hi = 841, .mdeg_hi = 180 * 1000}},
+	{motorid_t::wrist,
+	 {.adc_lo = 123, .mdeg_lo = -100 * 1000, .adc_hi = 456, .mdeg_hi = 100 * 1000}},
+	{motorid_t::activeSuspension,
+	 {.adc_lo = 251, .mdeg_lo = -19 * 1000, .adc_hi = 1645, .mdeg_hi = 31 * 1000}},
+	{motorid_t::frontLeftSwerve,
+	 {.adc_lo = 1422, .mdeg_lo = -180 * 1000, .adc_hi = 656, .mdeg_hi = 180 * 1000}},
+	{motorid_t::frontRightSwerve,
+	 {.adc_lo = 644, .mdeg_lo = -180 * 1000, .adc_hi = 1404, .mdeg_hi = 180 * 1000}},
+	{motorid_t::rearLeftSwerve,
+	 {.adc_lo = 1907, .mdeg_lo = -180 * 1000, .adc_hi = 1133, .mdeg_hi = 180 * 1000}},
+	{motorid_t::rearRightSwerve,
+	 {.adc_lo = 1538, .mdeg_lo = -180 * 1000, .adc_hi = 767, .mdeg_hi = 180 * 1000}},
+});
 
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
@@ -94,6 +99,10 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},
 	 {motorid_t::rearLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},
 	 {motorid_t::rearRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BR},
+	 {motorid_t::frontLeftSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_FL_SW},
+	 {motorid_t::frontRightSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_FR_SW},
+	 {motorid_t::rearLeftSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_BL_SW},
+	 {motorid_t::rearRightSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_BR_SW},
 	 {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
 	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
@@ -104,7 +113,12 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
-	{{motorid_t::shoulder, {70, 0, 0}}, {motorid_t::elbow, {15, 7, -2}}});
+	{{motorid_t::shoulder, {70, 0, 0}},
+	 {motorid_t::elbow, {15, 7, -2}},
+	 {motorid_t::frontLeftSwerve, {2, 0, -1}},
+	 {motorid_t::frontRightSwerve, {3, 0, -1}},
+	 {motorid_t::rearLeftSwerve, {0, 0, 0}},
+	 {motorid_t::rearRightSwerve, {2, 0, -1}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
@@ -120,6 +134,10 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::frontRightWheel, 0.7},
 												   {motorid_t::rearLeftWheel, 0.7},
 												   {motorid_t::rearRightWheel, -0.7},
+												   {motorid_t::frontLeftSwerve, 1.0},
+												   {motorid_t::frontRightSwerve, 1.0},
+												   {motorid_t::rearLeftSwerve, 1.0},
+												   {motorid_t::rearRightSwerve, 1.0},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5}});
 /**
@@ -136,6 +154,10 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::frontRightWheel, 0.7},
 												   {motorid_t::rearLeftWheel, 0.7},
 												   {motorid_t::rearRightWheel, -0.7},
+												   {motorid_t::frontLeftSwerve, 1.0},
+												   {motorid_t::frontRightSwerve, 1.0},
+												   {motorid_t::rearLeftSwerve, 1.0},
+												   {motorid_t::rearRightSwerve, 1.0},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5}});
 
