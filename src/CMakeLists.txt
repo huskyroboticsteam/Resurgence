@@ -268,7 +268,10 @@ add_library(constants SHARED Constants.cpp)
 link_libraries(constants)
 
 add_executable(Rover Rover.cpp)
-add_library(rover_common SHARED
+# **DON'T MAKE THIS SHARED**
+# Making this library shared causes some memory fuckery
+# No clue why but CAN I/O goes to shit. Don't do it.
+add_library(rover_common STATIC
   Globals.cpp
   control_interface.cpp
   )
