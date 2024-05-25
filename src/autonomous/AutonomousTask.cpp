@@ -2,6 +2,7 @@
 
 #include "../Constants.h"
 #include "../commands/DriveToWaypointCommand.h"
+#include "../control_interface.h"
 #include "../utils/transform.h"
 #include "../world_interface/world_interface.h"
 

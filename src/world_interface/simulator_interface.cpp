@@ -1,5 +1,4 @@
 #include "../Constants.h"
-#include "../Globals.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
@@ -42,6 +41,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::hand, "hand"},
 	{motorid_t::activeSuspension, "activeSuspension"}};
 
+std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
+
 DataPoint<Eigen::Quaterniond> lastOrientation;
 std::mutex orientationMutex;
 
@@ -53,6 +54,8 @@ std::mutex truePoseMutex;
 
 std::map<std::string, DataPoint<int32_t>> motorPosMap;
 std::shared_mutex motorPosMapMutex;
+
+bool is_emergency_stopped = false;
 
 // A mapping of (motor_id, shared pointer to object of the motor)
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
@@ -79,7 +82,7 @@ std::mutex connectionMutex;
 bool simConnected = false;
 
 void sendJSON(const json& obj) {
-	Globals::websocketServer.sendJSON(PROTOCOL_PATH, obj);
+	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
 static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
@@ -215,7 +218,8 @@ void clientDisconnected() {
 	LOG_F(ERROR, "ERROR: Simulator disconnected! World Interface disconnected!");
 }
 
-void initSimServer() {
+void initSimServer(net::websocket::SingleClientWSServer& ws) {
+	wsServer = ws;
 	auto protocol = std::make_unique<net::websocket::WebSocketProtocol>(PROTOCOL_PATH);
 	protocol->addMessageHandler("simImuOrientationReport", handleIMU);
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
@@ -226,7 +230,7 @@ void initSimServer() {
 	protocol->addConnectionHandler(clientConnected);
 	protocol->addDisconnectionHandler(clientDisconnected);
 
-	Globals::websocketServer.addProtocol(std::move(protocol));
+	wsServer->get().addProtocol(std::move(protocol));
 
 	{
 		// wait for simulator to connect
@@ -255,8 +259,10 @@ const DiffWristKinematics& wristKinematics() {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 
-void world_interface_init(bool initOnlyMotors) {
-	initSimServer();
+void world_interface_init(
+	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
+	bool initOnlyMotors) {
+	initSimServer(wsServer.value());
 	initCameras();
 	initMotors();
 }
@@ -278,6 +284,11 @@ void emergencyStop() {
 	for (const auto& motor : motorNameMap) {
 		setMotorPower(motor.first, 0.0);
 	}
+	is_emergency_stopped = true;
+}
+
+bool isEmergencyStopped() {
+	return is_emergency_stopped;
 }
 
 std::unordered_set<CameraID> getCameras() {

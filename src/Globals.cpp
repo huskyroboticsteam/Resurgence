@@ -44,7 +44,6 @@ namespace Globals {
 RoverState curr_state;
 net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 													 Constants::WS_SERVER_PORT);
-std::atomic<bool> E_STOP = false;
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),

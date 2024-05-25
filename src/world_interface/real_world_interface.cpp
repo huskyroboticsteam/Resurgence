@@ -2,7 +2,6 @@
 #include "../CAN/CANMotor.h"
 #include "../CAN/CANUtils.h"
 #include "../Constants.h"
-#include "../Globals.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
 #include "../gps/usb_gps/read_usb_gps.h"
@@ -35,6 +34,7 @@ std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> 
 namespace {
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 kinematics::DiffWristKinematics wrist_kinematics;
+bool is_emergency_stopped = false;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 	// get scales for motor
@@ -102,7 +102,8 @@ void initMotors() {
 	addMotorMapping(motorid_t::rearLeftWheel, false);
 	addMotorMapping(motorid_t::rearRightWheel, false);
 
-	for (motorid_t motor : pidMotors) {
+	for (const auto& pair : robot::motorPIDMap) {
+		motorid_t motor = pair.first;
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
@@ -133,10 +134,14 @@ void setupCameras() {
 }
 } // namespace
 
-void world_interface_init(bool initOnlyMotors) {
+void world_interface_init(
+	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
+	bool initOnlyMotors) {
 	if (!initOnlyMotors) {
 		setupCameras();
-		ardupilot::initArduPilotProtocol(Globals::websocketServer);
+		if (wsServer.has_value()) {
+			ardupilot::initArduPilotProtocol(wsServer.value());
+		}
 	}
 	can::initCAN();
 	initMotors();
@@ -157,6 +162,11 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 
 void emergencyStop() {
 	can::motor::emergencyStopMotors();
+	is_emergency_stopped = true;
+}
+
+bool isEmergencyStopped() {
+	return is_emergency_stopped;
 }
 
 std::unordered_set<CameraID> getCameras() {

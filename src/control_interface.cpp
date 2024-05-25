@@ -1,9 +1,11 @@
-#include "../Constants.h"
-#include "../Globals.h"
-#include "../kinematics/DiffDriveKinematics.h"
-#include "../navtypes.h"
-#include "../utils/transform.h"
-#include "world_interface.h"
+#include "control_interface.h"
+
+#include "Constants.h"
+#include "Globals.h"
+#include "kinematics/DiffDriveKinematics.h"
+#include "navtypes.h"
+#include "utils/transform.h"
+#include "world_interface/world_interface.h"
 
 #include <atomic>
 #include <chrono>
@@ -34,7 +36,7 @@ double getJointPowerValue(types::jointid_t joint);
 } // namespace
 
 double setCmdVel(double dtheta, double dx) {
-	if (Globals::E_STOP && (dtheta != 0 || dx != 0)) {
+	if (isEmergencyStopped()) {
 		return 0;
 	}
 
