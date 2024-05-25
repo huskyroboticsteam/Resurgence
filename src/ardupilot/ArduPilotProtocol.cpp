@@ -1,7 +1,6 @@
 #include "ArduPilotProtocol.h"
 
 #include "../Constants.h"
-#include "../Globals.h"
 #include "../utils/json.h"
 #include "../utils/transform.h"
 

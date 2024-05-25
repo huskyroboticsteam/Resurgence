@@ -4,6 +4,7 @@
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../kinematics/DiffWristKinematics.h"
 #include "../navtypes.h"
+#include "../network/websocket/WebSocketServer.h"
 #include "data.h"
 #include "motor/base_motor.h"
 
@@ -43,8 +44,15 @@ const kinematics::DiffWristKinematics& wristKinematics();
  *
  * This method should only be called once, and must be called
  * before any other world interface methods.
+ *
+ * @param wsServer A reference to the websocket server to use for communication.
+ * If empty, components that require it will not be initialized.
+ * @param initOnlyMotors If true, only initialize the motors and not the rest of the world
+ * interface.
  */
-void world_interface_init(bool initOnlyMotors = false);
+void world_interface_init(
+	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
+	bool initOnlyMotors = false);
 
 /**
  * @brief Get a pointer to the motor object associated with the motor id.
@@ -62,14 +70,11 @@ std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor);
 void emergencyStop();
 
 /**
- * @brief Request the robot to drive at the given velocities.
+ * @brief Check if the robot has been emergency stopped.
  *
- * @param dtheta The heading velocity.
- * @param dx The forward velocity.
- * @return double If the requested velocities are too high, they will be scaled down.
- * The returned value is the scale divisor. If no scaling was performed, 1 is returned.
+ * @return If emergencyStop() has been called previously.
  */
-double setCmdVel(double dtheta, double dx);
+bool isEmergencyStopped();
 
 /**
  * @brief Get the IDs of the currently supported cameras.
@@ -223,22 +228,6 @@ callbackid_t addLimitSwitchCallback(
 		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
 void removeLimitSwitchCallback(callbackid_t id);
-
-// TODO: document
-void setJointPower(robot::types::jointid_t joint, double power);
-
-/**
- * @param joint, the jointid_t of the joint to set the position of.
- * @param targetPos, the position to set the joint to, in millidegrees.
- */
-void setJointPos(robot::types::jointid_t joint, int32_t targetPos);
-
-/**
- * @param joint, the jointid_t of the joint to get the position of.
- * @return the position of the joint specified by the jointid_t argument joint,
- * in millidegrees.
- */
-types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint);
 
 /**
  * @brief Get the positions in radians of multiple motors at the same time.

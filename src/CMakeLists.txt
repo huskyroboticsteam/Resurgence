@@ -190,7 +190,7 @@ elseif(GPS STREQUAL "ARDUPILOT")
   target_sources(gps_interface PUBLIC
       ardupilot/ArduPilotProtocol.cpp
       ardupilot/ArduPilotInterface.cpp)
-  target_link_libraries(gps_interface utils websocket_utils rover_common)
+  target_link_libraries(gps_interface utils websocket_utils)
 else()
   target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
 endif()
@@ -199,7 +199,6 @@ endif()
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
   world_interface/gps_common_interface.cpp
-  world_interface/kinematic_common_interface.cpp
   ar/Detector.cpp
   ar/MarkerSet.cpp
   ar/MarkerPattern.cpp
@@ -219,16 +218,24 @@ add_library(stub_world_interface STATIC
 add_library(real_world_interface STATIC
   world_interface/real_world_interface.cpp
   world_interface/motor/can_motor.cpp
-  Globals.cpp
-  )
+)
+
 add_library(simulator_interface STATIC
   world_interface/simulator_interface.cpp
   world_interface/motor/sim_motor.cpp
-  )
+)
 
 target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
 target_link_libraries(simulator_interface world_interface_core)
 target_link_libraries(stub_world_interface world_interface_core)
+
+if(WORLD_INTERFACE STREQUAL "REAL")
+  add_library(world_interface ALIAS real_world_interface)
+elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
+  add_library(world_interface ALIAS simulator_interface)
+else()
+  add_library(world_interface ALIAS stub_world_interface)
+endif()
 
 add_library(filters SHARED
   filters/StateSpaceUtil.cpp
@@ -255,21 +262,21 @@ add_library(commands SHARED
 
 add_library(autonomous SHARED
   autonomous/AutonomousTask.cpp)
-target_link_libraries(autonomous commands)
+target_link_libraries(autonomous commands world_interface)
 
-list(APPEND simulator_libs
-  simulator_interface)
+add_library(constants SHARED Constants.cpp)
+link_libraries(constants)
 
 add_executable(Rover Rover.cpp)
 add_library(rover_common SHARED
-  Constants.cpp
   Globals.cpp
-  network/websocket/WebSocketServer.cpp
-  network/websocket/WebSocketProtocol.cpp
+  control_interface.cpp
   )
 target_link_libraries(rover_common
   utils
-  mission_control_interface)
+  websocket_utils
+  world_interface
+)
 
 list(APPEND rover_libs
   rover_common
@@ -281,17 +288,11 @@ list(APPEND rover_libs
   utils
 )
 target_link_libraries(Rover
-  ${rover_libs})
-
-if(WORLD_INTERFACE STREQUAL "REAL")
-  target_link_libraries(Rover real_world_interface)
-elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
-  target_link_libraries(Rover ${simulator_libs})
-else()
-  target_link_libraries(Rover real_world_interface) # TODO: support other interfaces
-endif()
-
-target_link_libraries(Rover ${vision_libs})
+  ${rover_libs}
+  mission_control_interface
+  world_interface
+  ${vision_libs}
+)
 
 add_executable(TunePID TunePID.cpp)
 target_link_libraries(TunePID
