@@ -101,10 +101,10 @@ void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 		return;
 	}
 
-	robot::setMotorPower(motorid_t::frontLeftSwerve, target.lfRot);
-	robot::setMotorPower(motorid_t::rearLeftSwerve, target.lbRot);
-	robot::setMotorPower(motorid_t::frontRightSwerve, target.rfRot);
-	robot::setMotorPower(motorid_t::rearRightSwerve, target.rbRot);
+	robot::setMotorPos(motorid_t::frontLeftSwerve, target.lfRot);
+	robot::setMotorPos(motorid_t::rearLeftSwerve, target.lbRot);
+	robot::setMotorPos(motorid_t::frontRightSwerve, target.rfRot);
+	robot::setMotorPos(motorid_t::rearRightSwerve, target.rbRot);
 
 	swerveController.setOverride(j["override"]);
 }

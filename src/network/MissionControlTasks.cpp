@@ -29,9 +29,9 @@ const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 static DataPoint<control::swerve_rots_t> getAllSteerRotations();
 
 /**
- * Set the steer power of all wheels with a swerve_commands_t.
+ * Set the drive power of all wheels with a drive_commands_t.
  */
-static void setAllSteerPowers(const control::swerve_commands_t& commands);
+static void setAllDrivePowers(const control::drive_commands_t& commands);
 
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
@@ -59,7 +59,7 @@ void PowerRepeatTask::setTurnInPlaceCmdVel(double steerVel) {
 	_last_cmd_vel = {steerVel, 0.0};
 	DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
 	if (curr_rot.isValid()) {
-		setAllSteerPowers(
+		setAllDrivePowers(
 			Globals::swerveController.setTurnInPlaceCmdVel(steerVel, curr_rot.getData()));
 	}
 }
@@ -69,7 +69,7 @@ void PowerRepeatTask::setCrabCmdVel(double dtheta, double yVel) {
 	_last_cmd_vel = {dtheta, yVel};
 	DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
 	if (curr_rot.isValid()) {
-		setAllSteerPowers(
+		setAllDrivePowers(
 			Globals::swerveController.setCrabCmdVel(dtheta, yVel, curr_rot.getData()));
 	}
 }
@@ -109,13 +109,13 @@ void PowerRepeatTask::periodicTask() {
 			} else if (swerveController.getDriveMode() == DriveMode::TurnInPlace) {
 				DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
 				if (curr_rot.isValid()) {
-					setAllSteerPowers(Globals::swerveController.setTurnInPlaceCmdVel(
+					setAllDrivePowers(Globals::swerveController.setTurnInPlaceCmdVel(
 						_last_cmd_vel->first, curr_rot.getData()));
 				}
 			} else {
 				DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
 				if (curr_rot.isValid()) {
-					setAllSteerPowers(Globals::swerveController.setCrabCmdVel(
+					setAllDrivePowers(Globals::swerveController.setCrabCmdVel(
 						_last_cmd_vel->first, _last_cmd_vel->second, curr_rot.getData()));
 				}
 			}
@@ -257,10 +257,10 @@ static DataPoint<control::swerve_rots_t> getAllSteerRotations() {
 	}
 }
 
-static void setAllSteerPowers(const control::swerve_commands_t& commands) {
-	robot::setMotorPower(motorid_t::frontLeftSwerve, commands.lfPower);
-	robot::setMotorPower(motorid_t::frontRightSwerve, commands.rfPower);
-	robot::setMotorPower(motorid_t::rearLeftSwerve, commands.lbPower);
-	robot::setMotorPower(motorid_t::rearRightSwerve, commands.rbPower);
+static void setAllDrivePowers(const control::drive_commands_t& commands) {
+	robot::setMotorPower(motorid_t::frontLeftWheel, commands.lfPower);
+	robot::setMotorPower(motorid_t::frontRightWheel, commands.rfPower);
+	robot::setMotorPower(motorid_t::rearLeftWheel, commands.lbPower);
+	robot::setMotorPower(motorid_t::rearRightWheel, commands.rbPower);
 }
 } // namespace net::mc::tasks

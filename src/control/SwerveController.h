@@ -41,9 +41,9 @@ struct swerve_rots_t {
 };
 
 /**
- * @brief The power commands to all four steer motors.
+ * @brief The power commands to all four drive motors.
  */
-struct swerve_commands_t {
+struct drive_commands_t {
 	double lfPower;
 	double rfPower;
 	double lbPower;
@@ -72,10 +72,10 @@ public:
 	 *
 	 * @param dtheta The heading velocity.
 	 * @param wheel_rots The rotation of all four wheels in millidegrees
-	 * @return swerve_commands_t The power commands for all four wheels.
+	 * @return drive_commands_t The power commands for all four wheels.
 	 */
-	swerve_commands_t setTurnInPlaceCmdVel(double dtheta,
-										   const swerve_rots_t& wheel_rots) const;
+	drive_commands_t setTurnInPlaceCmdVel(double dtheta,
+										  const swerve_rots_t& wheel_rots) const;
 
 	/**
 	 * @brief Request the robot to turn in place using swerve.
@@ -85,10 +85,10 @@ public:
 	 * @param scaleFactor This is an output parameter. If the requested velocities
 	 * are too high, they will be scaled down. The returned value is the scale divisor. If no
 	 * scaling was performed, 1 is returned.
-	 * @return swerve_commands_t The power commands for all four wheels.
+	 * @return drive_commands_t The power commands for all four wheels.
 	 */
-	swerve_commands_t setTurnInPlaceCmdVel(double dtheta, const swerve_rots_t& wheel_rots,
-										   double& scaleFactor) const;
+	drive_commands_t setTurnInPlaceCmdVel(double dtheta, const swerve_rots_t& wheel_rots,
+										  double& scaleFactor) const;
 
 	/**
 	 * @brief Request the robot to drive side to side and turn with given velocities using
@@ -97,10 +97,10 @@ public:
 	 * @param dtheta The heading velocity.
 	 * @param dy The side-to-side velocity.
 	 * @param wheel_rots The rotation of all four wheels in millidegrees
-	 * @return swerve_commands_t The power commands for all four wheels.
+	 * @return drive_commands_t The power commands for all four wheels.
 	 */
-	swerve_commands_t setCrabCmdVel(double dtheta, double dy,
-									const swerve_rots_t& wheel_rots) const;
+	drive_commands_t setCrabCmdVel(double dtheta, double dy,
+								   const swerve_rots_t& wheel_rots) const;
 
 	/**
 	 * @brief Request the robot to drive side to side and turn with given velocities using
@@ -112,10 +112,10 @@ public:
 	 * @param scaleFactor This is an output parameter. If the requested velocities
 	 * are too high, they will be scaled down. The returned value is the scale divisor. If no
 	 * scaling was performed, 1 is returned.
-	 * @return swerve_commands_t The power commands for all four wheels.
+	 * @return drive_commands_t The power commands for all four wheels.
 	 */
-	swerve_commands_t setCrabCmdVel(double dtheta, double dy, const swerve_rots_t& wheel_rots,
-									double& scaleFactor) const;
+	drive_commands_t setCrabCmdVel(double dtheta, double dy, const swerve_rots_t& wheel_rots,
+								   double& scaleFactor) const;
 
 	/**
 	 * @brief Get the SwerveDriveKinematics object used by the controller.

@@ -10,16 +10,16 @@ control::SwerveController::SwerveController(double baseWidth, double baseLength,
 	: driveMode(DriveMode::Normal), swerve_kinematics(baseWidth, baseLength),
 	  crab_kinematics(baseLength), steer_epsilon(epsilon) {}
 
-swerve_commands_t
+drive_commands_t
 SwerveController::setTurnInPlaceCmdVel(double dtheta, const swerve_rots_t& wheel_rots) const {
 	double dummyScaleFactor;
-	swerve_commands_t commands = setTurnInPlaceCmdVel(dtheta, wheel_rots, dummyScaleFactor);
+	drive_commands_t commands = setTurnInPlaceCmdVel(dtheta, wheel_rots, dummyScaleFactor);
 	return commands;
 }
 
-swerve_commands_t SwerveController::setTurnInPlaceCmdVel(double dtheta,
-														 const swerve_rots_t& wheel_rots,
-														 double& scaleFactor) const {
+drive_commands_t SwerveController::setTurnInPlaceCmdVel(double dtheta,
+														const swerve_rots_t& wheel_rots,
+														double& scaleFactor) const {
 	if (!checkWheelRotation(DriveMode::TurnInPlace, wheel_rots)) {
 		scaleFactor = 0;
 		return {0.0, 0.0, 0.0, 0.0};
@@ -47,16 +47,16 @@ swerve_commands_t SwerveController::setTurnInPlaceCmdVel(double dtheta,
 	return {lfPower, rfPower, lbPower, rbPower};
 }
 
-swerve_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
-												  const swerve_rots_t& wheel_rots) const {
+drive_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
+												 const swerve_rots_t& wheel_rots) const {
 	double dummyScaleFactor;
-	swerve_commands_t commands = setCrabCmdVel(dtheta, dy, wheel_rots, dummyScaleFactor);
+	drive_commands_t commands = setCrabCmdVel(dtheta, dy, wheel_rots, dummyScaleFactor);
 	return commands;
 }
 
-swerve_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
-												  const swerve_rots_t& wheel_rots,
-												  double& scaleFactor) const {
+drive_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
+												 const swerve_rots_t& wheel_rots,
+												 double& scaleFactor) const {
 	if (!checkWheelRotation(DriveMode::Crab, wheel_rots)) {
 		scaleFactor = 0;
 		return {0.0, 0.0, 0.0, 0.0};

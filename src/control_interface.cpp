@@ -62,10 +62,10 @@ double setCmdVel(double dtheta, double dx) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::frontLeftSwerve, lPWM);
-	setMotorPower(motorid_t::rearLeftSwerve, lPWM);
-	setMotorPower(motorid_t::frontRightSwerve, rPWM);
-	setMotorPower(motorid_t::rearRightSwerve, rPWM);
+	setMotorPower(motorid_t::frontLeftWheel, lPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
@@ -97,10 +97,10 @@ double setTankCmdVel(double left, double right) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::frontLeftSwerve, lPWM);
-	setMotorPower(motorid_t::rearLeftSwerve, lPWM);
-	setMotorPower(motorid_t::frontRightSwerve, rPWM);
-	setMotorPower(motorid_t::rearRightSwerve, rPWM);
+	setMotorPower(motorid_t::frontLeftWheel, lPWM);
+	setMotorPower(motorid_t::rearLeftWheel, lPWM);
+	setMotorPower(motorid_t::frontRightWheel, rPWM);
+	setMotorPower(motorid_t::rearRightWheel, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
