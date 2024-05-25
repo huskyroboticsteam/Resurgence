@@ -31,7 +31,7 @@ void setJointPower(types::jointid_t joint, double power);
  * @param joint the jointid_t of the joint to set the position of.
  * @param targetPos the position to set the joint to, in millidegrees.
  */
-void setJointPos(types::jointid_t joint, int32_t pos);
+void setJointPos(types::jointid_t joint, int32_t targetPos);
 
 /**
  * @param joint the jointid_t of the joint to get the position of.
