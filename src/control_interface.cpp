@@ -71,7 +71,7 @@ double setCmdVel(double dtheta, double dx) {
 }
 
 double setTankCmdVel(double left, double right) {
-	if (Globals::E_STOP && (left != 0 || right != 0)) {
+	if (isEmergencyStopped()) {
 		return 0;
 	}
 

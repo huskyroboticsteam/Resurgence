@@ -247,10 +247,10 @@ void ArmIKTask::updateArmIK() {
 static DataPoint<control::swerve_rots_t> getAllSteerRotations() {
 	try {
 		return DataPoint<control::swerve_rots_t>(
-			{robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-			 robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-			 robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-			 robot::getMotorPos(motorid_t::rearRightWheel).getData()});
+			{robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
+			 robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
+			 robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
+			 robot::getMotorPos(motorid_t::rearRightSwerve).getData()});
 	} catch (const bad_datapoint_access& e) {
 		LOG_F(WARNING, "Invalid steer motor position(s)!");
 		return {};
@@ -258,9 +258,9 @@ static DataPoint<control::swerve_rots_t> getAllSteerRotations() {
 }
 
 static void setAllSteerPowers(const control::swerve_commands_t& commands) {
-	robot::setMotorPower(motorid_t::frontLeftWheel, commands.lfPower);
-	robot::setMotorPower(motorid_t::frontRightWheel, commands.rfPower);
-	robot::setMotorPower(motorid_t::rearLeftWheel, commands.lbPower);
-	robot::setMotorPower(motorid_t::rearRightWheel, commands.rbPower);
+	robot::setMotorPower(motorid_t::frontLeftSwerve, commands.lfPower);
+	robot::setMotorPower(motorid_t::frontRightSwerve, commands.rfPower);
+	robot::setMotorPower(motorid_t::rearLeftSwerve, commands.lbPower);
+	robot::setMotorPower(motorid_t::rearRightSwerve, commands.rbPower);
 }
 } // namespace net::mc::tasks
