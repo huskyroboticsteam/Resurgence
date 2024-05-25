@@ -100,10 +100,11 @@ void MissionControlProtocol::handleDriveModeRequest(const json& j) {
 		LOG_F(WARNING, "Invalid requested Drive Mode");
 		return;
 	}
-	std::array<int, 4> target_rots = {target.lfRot, target.rfRot, target.lbRot, target.rbRot};
-	for (int i = 0; i < 4; i++) {
-		robot::setMotorPos(Constants::Drive::WHEEL_IDS[i], target_rots[i]);
-	}
+
+	robot::setMotorPower(motorid_t::frontLeftSwerve, target.lfRot);
+	robot::setMotorPower(motorid_t::rearLeftSwerve, target.lbRot);
+	robot::setMotorPower(motorid_t::frontRightSwerve, target.rfRot);
+	robot::setMotorPower(motorid_t::rearRightSwerve, target.rbRot);
 
 	swerveController.setOverride(j["override"]);
 }

@@ -42,10 +42,10 @@ double setCmdVel(double dtheta, double dx) {
 
 	control::swerve_rots_t curr_wheel_rots;
 	try {
-		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-						   robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-						   robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-						   robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
+						   robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
+						   robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
+						   robot::getMotorPos(motorid_t::rearRightSwerve).getData()};
 	} catch (const bad_datapoint_access& e) {
 		LOG_F(WARNING, "Invalid steer motor position(s)!");
 		return 0;
@@ -62,10 +62,10 @@ double setCmdVel(double dtheta, double dx) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::rearLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, rPWM);
-	setMotorPower(motorid_t::rearRightWheel, rPWM);
+	setMotorPower(motorid_t::frontLeftSwerve, lPWM);
+	setMotorPower(motorid_t::rearLeftSwerve, lPWM);
+	setMotorPower(motorid_t::frontRightSwerve, rPWM);
+	setMotorPower(motorid_t::rearRightSwerve, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
@@ -77,10 +77,10 @@ double setTankCmdVel(double left, double right) {
 
 	control::swerve_rots_t curr_wheel_rots;
 	try {
-		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftWheel).getData(),
-						   robot::getMotorPos(motorid_t::frontRightWheel).getData(),
-						   robot::getMotorPos(motorid_t::rearLeftWheel).getData(),
-						   robot::getMotorPos(motorid_t::rearRightWheel).getData()};
+		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
+						   robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
+						   robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
+						   robot::getMotorPos(motorid_t::rearRightSwerve).getData()};
 	} catch (const bad_datapoint_access& e) {
 		LOG_F(WARNING, "Invalid steer motor position(s)!");
 		return 0;
@@ -97,10 +97,10 @@ double setTankCmdVel(double left, double right) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::rearLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, rPWM);
-	setMotorPower(motorid_t::rearRightWheel, rPWM);
+	setMotorPower(motorid_t::frontLeftSwerve, lPWM);
+	setMotorPower(motorid_t::rearLeftSwerve, lPWM);
+	setMotorPower(motorid_t::frontRightSwerve, rPWM);
+	setMotorPower(motorid_t::rearRightSwerve, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }

@@ -85,13 +85,6 @@ extern const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD;
 extern const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD;
 
 namespace Drive {
-constexpr std::array<robot::types::motorid_t, 4> WHEEL_IDS = {
-	robot::types::motorid_t::frontLeftWheel,
-	robot::types::motorid_t::frontRightWheel,
-	robot::types::motorid_t::rearLeftWheel,
-	robot::types::motorid_t::rearRightWheel,
-};
-
 // Represents the allowable error in millidegrees for steer motors to still process a drive
 // request. That is, we make sure all the wheels are close enough to their target rotation
 // before actually driving.
