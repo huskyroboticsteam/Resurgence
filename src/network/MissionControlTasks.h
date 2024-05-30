@@ -33,6 +33,24 @@ public:
 	 */
 	void setCmdVel(double steerVel, double xVel);
 
+	/**
+	 * @brief Set the tank drive command to resend. This does not execute the drive command
+	 * right now.
+	 */
+	void setTankCmdVel(double steerVel, double xVel);
+
+	/**
+	 * @brief Set the turn-in-place drive command to resend. This does not execute the drive
+	 * command right now.
+	 */
+	void setTurnInPlaceCmdVel(double steerVel);
+
+	/**
+	 * @brief Set the crab drive command to resend. This does not execute the drive command
+	 * right now.
+	 */
+	void setCrabCmdVel(double steerVel, double xVel);
+
 	void start() override;
 
 	void stop() override;
@@ -42,6 +60,7 @@ private:
 	std::unordered_map<robot::types::jointid_t, double> _last_joint_power;
 	// if not present, then there is no last requested drive power
 	std::optional<std::pair<double, double>> _last_cmd_vel;
+	bool _tank;
 
 	void periodicTask();
 };

@@ -22,6 +22,7 @@ extern const float MDEG_PER_DEG;
 
 // TODO: tune these drive extern constants
 extern const double ROBOT_LENGTH;
+extern const double ROBOT_WIDTH;
 /**
    Distance between left and right wheels.
 */
@@ -82,6 +83,13 @@ extern const char* ARDUPILOT_PROTOCOL_NAME;
 
 extern const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD;
 extern const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD;
+
+namespace Drive {
+// Represents the allowable error in millidegrees for steer motors to still process a drive
+// request. That is, we make sure all the wheels are close enough to their target rotation
+// before actually driving.
+extern const double STEER_EPSILON;
+} // namespace Drive
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian

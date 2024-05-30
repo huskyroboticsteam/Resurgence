@@ -254,6 +254,7 @@ target_link_libraries(video
 
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
+  control/SwerveController.cpp
 )
 target_link_libraries(control utils)
 
