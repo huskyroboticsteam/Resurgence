@@ -164,6 +164,12 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 				}
 			}
 		}
+	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
+		kinematics::DiffWristKinematics diffWristKinematics;
+		setJointPowerValue(joint, power);
+		kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristPitch),
+										 getJointPowerValue(jointid_t::wristRoll));
+		kinematics::gearpos_t gearPwr = diffWristKinematics.jointPowerToGearPower(jointPwr); 
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
