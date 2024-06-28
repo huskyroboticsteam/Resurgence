@@ -1,7 +1,7 @@
 %YAML:1.0
 ---
-name: "forearm"
-description: "Camera located on the forearm of the rover."
+name: "wrist"
+description: "Camera located on the wrist of the rover arm."
 # Make sure that this camera_id matches the one defined in the udev rules.
 camera_id: 30
 calib_info:

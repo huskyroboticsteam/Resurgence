@@ -51,7 +51,7 @@ const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 const char* MAST_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
 const robot::types::CameraID MAST_CAMERA_ID = "mast";
 
-const char* FOREARM_CAMERA_CONFIG_PATH = "../camera-config/ForearmCameraCalibration.yml";
+const char* FOREARM_CAMERA_CONFIG_PATH = "../camera-config/WristCameraCalibration.yml";
 const robot::types::CameraID FOREARM_CAMERA_ID = "wrist";
 
 const char* HAND_CAMERA_CONFIG_PATH = "../camera-config/HandCameraCalibration.yml";
