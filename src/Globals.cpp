@@ -46,6 +46,7 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 													 Constants::WS_SERVER_PORT);
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
+const kinematics::DiffWristKinematics wristKinematics;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);
 std::atomic<bool> armIKEnabled = false;

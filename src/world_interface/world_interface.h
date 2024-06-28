@@ -2,7 +2,6 @@
 
 #include "../gps/gps_util.h"
 #include "../kinematics/DiffDriveKinematics.h"
-#include "../kinematics/DiffWristKinematics.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
@@ -37,7 +36,6 @@ extern const WorldInterface WORLD_INTERFACE;
 
 // TODO: add documentation
 const kinematics::DiffDriveKinematics& driveKinematics();
-const kinematics::DiffWristKinematics& wristKinematics();
 
 /**
  * @brief Initialize the world interface.

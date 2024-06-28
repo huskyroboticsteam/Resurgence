@@ -123,13 +123,13 @@ extern const std::unordered_map<robot::types::CameraID, int> STREAM_RFS;
 
 /**
  * A map that pairs each of the joints to its corresponding motor.
+ * (one-to-one pairs only)
  */
-constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t, 7>
+constexpr frozen::unordered_map<robot::types::jointid_t, robot::types::motorid_t, 6>
 	JOINT_MOTOR_MAP{{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
 					{robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
 					{robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
 					{robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
-					{robot::types::jointid_t::wrist, robot::types::motorid_t::wrist},
 					{robot::types::jointid_t::hand, robot::types::motorid_t::hand},
 					{robot::types::jointid_t::activeSuspension,
 					 robot::types::motorid_t::activeSuspension}};

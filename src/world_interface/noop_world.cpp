@@ -6,7 +6,6 @@
 
 // using namespace kinematics;
 using kinematics::DiffDriveKinematics;
-using kinematics::DiffWristKinematics;
 using namespace navtypes;
 using namespace robot::types;
 
@@ -16,15 +15,10 @@ extern const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
 
 namespace {
 DiffDriveKinematics drive_kinematics(1); // doesn't really matter what we set this to
-DiffWristKinematics wrist_kinematics;
 } // namespace
 
 const DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
-}
-
-const DiffWristKinematics& wristKinematics() {
-	return wrist_kinematics;
 }
 
 void world_interface_init(
