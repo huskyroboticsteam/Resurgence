@@ -2,6 +2,7 @@
 
 #include "control/PlanarArmController.h"
 #include "kinematics/ArmKinematics.h"
+#include "kinematics/DiffWristKinematics.h"
 #include "network/websocket/WebSocketServer.h"
 #include "world_interface/data.h"
 
@@ -28,5 +29,6 @@ extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
 extern control::PlanarArmController<2> planarArmController;
+extern const kinematics::DiffWristKinematics wristKinematics;
 extern std::atomic<bool> armIKEnabled;
 } // namespace Globals
