@@ -1,7 +1,7 @@
 <map id="kinematics::FabrikSolver2D&lt; N &gt;" name="kinematics::FabrikSolver2D&lt; N &gt;">
-<area shape="rect" id="Node000001" title="Implementation of the FABRIK algorithm, in the special case of 2 dimensions." alt="" coords="35,214,205,255"/>
+<area shape="rect" id="Node000001" title="Implementation of the FABRIK algorithm, in the special case of 2 dimensions." alt="" coords="35,213,205,253"/>
 <area shape="rect" id="Node000002" href="$classkinematics_1_1InverseArmKinematics.html" title=" " alt="" coords="9,124,231,165"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,180,123,214,117,214,117,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,180,123,212,117,212,117,180"/>
 <area shape="rect" id="Node000003" href="/github/workspace/doxygen-tags/libstdc++.tag$a06899.html" title=" " alt="" coords="5,5,235,61"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,76,123,124,117,124,117,76"/>
 </map>

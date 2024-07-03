@@ -202,10 +202,10 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">  115</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">motorPIDMap</a> = frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;(</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    {{motorid_t::shoulder, {70, 0, 0}},</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>     {motorid_t::elbow, {15, 7, -2}},</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>     {motorid_t::frontLeftSwerve, {2, 0, -1}},</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>     {motorid_t::frontRightSwerve, {3, 0, -1}},</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>     {motorid_t::frontLeftSwerve, {2, 0, 0}},</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>     {motorid_t::frontRightSwerve, {2, 0, 0}},</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>     {motorid_t::rearLeftSwerve, {0, 0, 0}},</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>     {motorid_t::rearRightSwerve, {2, 0, -1}}});</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>     {motorid_t::rearRightSwerve, {2, 0, 0}}});</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno"><a class="line" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">  127</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a> =</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.75},</div>
