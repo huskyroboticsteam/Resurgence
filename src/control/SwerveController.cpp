@@ -5,8 +5,7 @@
 using namespace control;
 using robot::types::motorid_t;
 
-control::SwerveController::SwerveController(double baseWidth, double baseLength,
-											int epsilon)
+control::SwerveController::SwerveController(double baseWidth, double baseLength, int epsilon)
 	: driveMode(DriveMode::Normal), swerve_kinematics(baseWidth, baseLength),
 	  crab_kinematics(baseLength), steer_epsilon(epsilon) {}
 
