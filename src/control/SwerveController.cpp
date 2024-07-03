@@ -25,12 +25,16 @@ drive_commands_t SwerveController::setTurnInPlaceCmdVel(double dtheta,
 		return {0.0, 0.0, 0.0, 0.0};
 	}
 
+	// robotVelToWheelVel() will return steers and vels such that the vels are positive. Since
+	// we're using preset steer angles this isn't correct, since we need to reverse the wheels
+	// to turn the other way instead of rotating the modules by 180deg. So, we just reverse the
+	// vels if the target rotVel is negative.
 	kinematics::swervewheelvel_t wheelVels =
-		swerve_kinematics.robotVelToWheelVel(0, 0, dtheta);
-	double lfPower = wheelVels.lfVel / Constants::MAX_WHEEL_VEL;
-	double lbPower = wheelVels.lbVel / Constants::MAX_WHEEL_VEL;
-	double rfPower = wheelVels.rfVel / Constants::MAX_WHEEL_VEL;
-	double rbPower = wheelVels.rbVel / Constants::MAX_WHEEL_VEL;
+		swerve_kinematics.robotVelToWheelVel(0, 0, std::abs(dtheta));
+	double lfPower = std::copysign(wheelVels.lfVel, dtheta) / Constants::MAX_WHEEL_VEL;
+	double lbPower = std::copysign(wheelVels.lbVel, dtheta) / Constants::MAX_WHEEL_VEL;
+	double rfPower = std::copysign(wheelVels.rfVel, dtheta) / Constants::MAX_WHEEL_VEL;
+	double rbPower = std::copysign(wheelVels.rbVel, dtheta) / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::max(std::abs(lfPower), std::abs(lbPower)),
 								std::max(std::abs(rfPower), std::abs(rbPower)));
 
@@ -105,10 +109,11 @@ swerve_rots_t SwerveController::getSteerRots(DriveMode mode) const {
 		case DriveMode::TurnInPlace: {
 			kinematics::swervewheelvel_t wheelVels =
 				swerve_kinematics.robotVelToWheelVel(0, 0, 1);
-			return {static_cast<int32_t>(wheelVels.lfRot * 1000),
-					static_cast<int32_t>(wheelVels.rfRot * 1000),
-					static_cast<int32_t>(wheelVels.lbRot * 1000),
-					static_cast<int32_t>(wheelVels.rbRot * 1000)};
+			// convert from rad to deg
+			return {static_cast<int32_t>(wheelVels.lfRot * 1000 * 180 / M_PI),
+					static_cast<int32_t>(wheelVels.rfRot * 1000 * 180 / M_PI),
+					static_cast<int32_t>(wheelVels.lbRot * 1000 * 180 / M_PI),
+					static_cast<int32_t>(wheelVels.rbRot * 1000 * 180 / M_PI)};
 		}
 		case DriveMode::Crab:
 			return {90000, 90000, 90000, 90000};

@@ -177,7 +177,7 @@ void MissionControlProtocol::handleTankDriveRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleTurnInPlaceDriveRequest(const json& j) {
-	double steer = j["steer"].get<double>();
+	double steer = -j["steer"].get<double>();
 	double dtheta = Constants::MAX_DTHETA * steer;
 	LOG_F(1, "{steer=%.2f} -> setTurnInPlaceCmdVel(%.4f)", steer, dtheta);
 	this->setRequestedTurnInPlaceCmdVel(dtheta);
