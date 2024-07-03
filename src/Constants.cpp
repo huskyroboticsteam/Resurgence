@@ -86,7 +86,7 @@ const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
 namespace Drive {
-const double STEER_EPSILON = 1000;
+const double STEER_EPSILON = 10000;
 }
 
 namespace Nav {
