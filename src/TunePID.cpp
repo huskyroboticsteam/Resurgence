@@ -17,6 +17,10 @@ extern "C" {
 #include "HindsightCAN/CANCommon.h"
 }
 
+enum class targetmode_t {
+	step, sinusoidal
+};
+
 using namespace robot::types;
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -101,6 +105,16 @@ int main(int argc, char** argv) {
 	motorid_t motor = nameToMotorMap.at(motor_name);
 	uint8_t serial = robot::motorSerialIDMap.at(motor);
 
+	std::cout << "Enter amplitude (deg) > ";
+	std::string ampl_str;
+	std::getline(std::cin, ampl_str);
+	const double amplitude = std::stoi(ampl_str) * 1000.0;
+
+	std::cout << "Enter mode (0=step, 1=sinusoidal) > ";
+	std::string mode_name;
+	std::getline(std::cin, mode_name);
+	targetmode_t mode = static_cast<targetmode_t>(std::stoi(mode_name));
+
 	if (!initMotor(motor)) {
 		return 1;
 	}
@@ -121,9 +135,6 @@ int main(int argc, char** argv) {
 	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
 
 	double period = 8.0;
-	double amplitude =
-		20 * 1000.0; // in 1000th's of degrees
-					 // (doesn't make sense for hand motor, but that doesn't use PID)
 
 	std::this_thread::sleep_for(300ms); // wait for encoder position data to arrive
 	int32_t starting_angle = can::motor::getMotorPosition(serial);
@@ -134,7 +145,7 @@ int main(int argc, char** argv) {
 	time_point<steady_clock> tp = steady_clock::now();
 	time_point<steady_clock> startTime = tp;
 	while (steady_clock::now() - startTime < 3 * milliseconds((int)(period * 1000))) {
-		int32_t current_angle = can::motor::getMotorPosition(serial);
+		int32_t current_angle = can::motor::getMotorPosition(serial).getData();
 		double difference = (current_angle - angle_target) / 1000.0;
 		acc_error += difference * difference;
 		printf("Step %02d: target %05d actual %05d\n", total_steps, angle_target,
@@ -143,8 +154,11 @@ int main(int argc, char** argv) {
 
 		double time =
 			duration_cast<milliseconds>(steady_clock::now() - startTime).count() / 1000.0;
-		angle_target =
-			(int32_t)round(amplitude * sin(2 * M_PI * time / period)) + starting_angle;
+		double prescaled_target = sin(2 * M_PI * time / period);
+		if (mode == targetmode_t::step) {
+			prescaled_target = round(prescaled_target);
+		}
+		angle_target = (int32_t) round(amplitude * prescaled_target) + starting_angle;
 
 		can::motor::setMotorPIDTarget(serial, angle_target);
 
