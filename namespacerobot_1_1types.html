@@ -185,6 +185,11 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:aa93c10246999d2fdb71ba7bdb792c235"><td class="mdescLeft">&#160;</td><td class="mdescRight">the mounted peripheral on the robot. <br /></td></tr>
 <tr class="separator:aa93c10246999d2fdb71ba7bdb792c235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e0fafe7d1af6624074f9dbb7402fdbc" id="r_a4e0fafe7d1af6624074f9dbb7402fdbc"><td class="memItemLeft" align="right" valign="top"><a id="a4e0fafe7d1af6624074f9dbb7402fdbc" name="a4e0fafe7d1af6624074f9dbb7402fdbc"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>jointid_t</b> { <br />
+&#160;&#160;<b>frontLeftSwerve</b>
+, <b>frontRightSwerve</b>
+, <b>rearLeftSwerve</b>
+, <b>rearRightSwerve</b>
+, <br />
 &#160;&#160;<b>armBase</b>
 , <b>shoulder</b>
 , <b>elbow</b>
@@ -284,7 +289,11 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;frozen::string, jointid_t&gt;(</div>
-<div class="line">    {{<span class="stringliteral">&quot;armBase&quot;</span>, jointid_t::armBase},</div>
+<div class="line">    {{<span class="stringliteral">&quot;frontLeftSwerve&quot;</span>, jointid_t::frontLeftSwerve},</div>
+<div class="line">     {<span class="stringliteral">&quot;frontRightSwerve&quot;</span>, jointid_t::frontRightSwerve},</div>
+<div class="line">     {<span class="stringliteral">&quot;rearLeftSwerve&quot;</span>, jointid_t::rearLeftSwerve},</div>
+<div class="line">     {<span class="stringliteral">&quot;rearRightSwerve&quot;</span>, jointid_t::rearRightSwerve},</div>
+<div class="line">     {<span class="stringliteral">&quot;armBase&quot;</span>, jointid_t::armBase},</div>
 <div class="line">     {<span class="stringliteral">&quot;shoulder&quot;</span>, jointid_t::shoulder},</div>
 <div class="line">     {<span class="stringliteral">&quot;elbow&quot;</span>, jointid_t::elbow},</div>
 <div class="line">     {<span class="stringliteral">&quot;forearm&quot;</span>, jointid_t::forearm},</div>

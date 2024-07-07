@@ -146,6 +146,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a52eb0845b28f3e387f244b1d0ff906df" id="r_a52eb0845b28f3e387f244b1d0ff906df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52eb0845b28f3e387f244b1d0ff906df">setCmdVel</a> (double steerVel, double xVel)</td></tr>
 <tr class="memdesc:a52eb0845b28f3e387f244b1d0ff906df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the drive command to resend.  <br /></td></tr>
 <tr class="separator:a52eb0845b28f3e387f244b1d0ff906df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3367d4c26dc2f4517de323e2a51959a1" id="r_a3367d4c26dc2f4517de323e2a51959a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3367d4c26dc2f4517de323e2a51959a1">setTankCmdVel</a> (double steerVel, double xVel)</td></tr>
+<tr class="memdesc:a3367d4c26dc2f4517de323e2a51959a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the tank drive command to resend.  <br /></td></tr>
+<tr class="separator:a3367d4c26dc2f4517de323e2a51959a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea39aecba56d0f839c2b34154e82750b" id="r_aea39aecba56d0f839c2b34154e82750b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aea39aecba56d0f839c2b34154e82750b">setTurnInPlaceCmdVel</a> (double steerVel)</td></tr>
+<tr class="memdesc:aea39aecba56d0f839c2b34154e82750b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the turn-in-place drive command to resend.  <br /></td></tr>
+<tr class="separator:aea39aecba56d0f839c2b34154e82750b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a424373d41a5905b35a31b058e116775e" id="r_a424373d41a5905b35a31b058e116775e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a424373d41a5905b35a31b058e116775e">setCrabCmdVel</a> (double steerVel, double xVel)</td></tr>
+<tr class="memdesc:a424373d41a5905b35a31b058e116775e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the crab drive command to resend.  <br /></td></tr>
+<tr class="separator:a424373d41a5905b35a31b058e116775e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87f6bd02c5d093b812c0d4790b2181f3" id="r_a87f6bd02c5d093b812c0d4790b2181f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87f6bd02c5d093b812c0d4790b2181f3">start</a> () override</td></tr>
 <tr class="memdesc:a87f6bd02c5d093b812c0d4790b2181f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start the task.  <br /></td></tr>
 <tr class="separator:a87f6bd02c5d093b812c0d4790b2181f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -221,6 +230,30 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
+<a id="a424373d41a5905b35a31b058e116775e" name="a424373d41a5905b35a31b058e116775e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a424373d41a5905b35a31b058e116775e">&#9670;&#160;</a></span>setCrabCmdVel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::mc::tasks::PowerRepeatTask::setCrabCmdVel </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>steerVel</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>xVel</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the crab drive command to resend. </p>
+<p>This does not execute the drive command right now. </p>
+
+</div>
+</div>
 <a id="a03c0709ff0e80f3921da8b7f4dd71f59" name="a03c0709ff0e80f3921da8b7f4dd71f59"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a03c0709ff0e80f3921da8b7f4dd71f59">&#9670;&#160;</a></span>setJointPower()</h2>
 
@@ -242,6 +275,50 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Set the power to resend to the given joint. </p>
 <p>This does not set the motor power right now. </p>
+
+</div>
+</div>
+<a id="a3367d4c26dc2f4517de323e2a51959a1" name="a3367d4c26dc2f4517de323e2a51959a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3367d4c26dc2f4517de323e2a51959a1">&#9670;&#160;</a></span>setTankCmdVel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::mc::tasks::PowerRepeatTask::setTankCmdVel </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>steerVel</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>xVel</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the tank drive command to resend. </p>
+<p>This does not execute the drive command right now. </p>
+
+</div>
+</div>
+<a id="aea39aecba56d0f839c2b34154e82750b" name="aea39aecba56d0f839c2b34154e82750b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea39aecba56d0f839c2b34154e82750b">&#9670;&#160;</a></span>setTurnInPlaceCmdVel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::mc::tasks::PowerRepeatTask::setTurnInPlaceCmdVel </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>steerVel</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the turn-in-place drive command to resend. </p>
+<p>This does not execute the drive command right now. </p>
 
 </div>
 </div>

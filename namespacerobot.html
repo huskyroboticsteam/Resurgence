@@ -154,6 +154,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a8363ee6c4c4bd4b93c4188984dc77ad6" id="r_a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8363ee6c4c4bd4b93c4188984dc77ad6">setCmdVel</a> (double dtheta, double dx)</td></tr>
 <tr class="memdesc:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the robot to drive at the given velocities.  <br /></td></tr>
 <tr class="separator:a8363ee6c4c4bd4b93c4188984dc77ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59108140d47f26f19d57c54cac3b8ff1" id="r_a59108140d47f26f19d57c54cac3b8ff1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59108140d47f26f19d57c54cac3b8ff1">setTankCmdVel</a> (double <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a96d1c2cab30f14f4e34ccb460f1ad1c9">left</a>, double <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01548.html#a1a23b13efe06ee9b3cd9324af25ab538">right</a>)</td></tr>
+<tr class="memdesc:a59108140d47f26f19d57c54cac3b8ff1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the robot to drive in tank style, where each side is controlled individually.  <br /></td></tr>
+<tr class="separator:a59108140d47f26f19d57c54cac3b8ff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac44ae9c88dad3e683bb548a345313cdb" id="r_ac44ae9c88dad3e683bb548a345313cdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac44ae9c88dad3e683bb548a345313cdb">setJointPower</a> (types::jointid_t joint, double <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a>)</td></tr>
 <tr class="memdesc:ac44ae9c88dad3e683bb548a345313cdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the power of the specified joint.  <br /></td></tr>
 <tr class="separator:ac44ae9c88dad3e683bb548a345313cdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -965,6 +968,37 @@ template&lt;unsigned long int N&gt; </div>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a59108140d47f26f19d57c54cac3b8ff1" name="a59108140d47f26f19d57c54cac3b8ff1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59108140d47f26f19d57c54cac3b8ff1">&#9670;&#160;</a></span>setTankCmdVel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double robot::setTankCmdVel </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>left</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>right</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Request the robot to drive in tank style, where each side is controlled individually. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">left</td><td>The left velocity. </td></tr>
+    <tr><td class="paramname">right</td><td>The right velocity. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>double If the requested velocities are too high, they will be scaled down. The returned value is the scale divisor. If no scaling was performed, 1 is returned. </dd></dl>
 
 </div>
 </div>
