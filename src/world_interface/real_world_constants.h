@@ -109,9 +109,8 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
 	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
 	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
-	 // TODO: change serial IDs for differentials appropriately.
-	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST},
-	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST},
+	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
+	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
 
@@ -133,7 +132,7 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::shoulder, 1},
 												   {motorid_t::elbow, 1},
 												   {motorid_t::forearm, -0.65},
-												   {motorid_t::wristDiffLeft, 0.1},
+												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, 0.7},
@@ -154,7 +153,7 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::shoulder, 1},
 												   {motorid_t::elbow, 1},
 												   {motorid_t::forearm, -0.65},
-												   {motorid_t::wristDiffLeft, 0.1},
+												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, 0.7},
