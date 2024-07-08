@@ -88,7 +88,7 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	{motorid_t::frontRightSwerve,
 	 {.adc_lo = 644, .mdeg_lo = -180 * 1000, .adc_hi = 1404, .mdeg_hi = 180 * 1000}},
 	{motorid_t::rearLeftSwerve,
-	 {.adc_lo = 1907, .mdeg_lo = -180 * 1000, .adc_hi = 1133, .mdeg_hi = 180 * 1000}},
+	 {.adc_lo = 1260, .mdeg_lo = -180 * 1000, .adc_hi = 476, .mdeg_hi = 180 * 1000}},
 	{motorid_t::rearRightSwerve,
 	 {.adc_lo = 1538, .mdeg_lo = -180 * 1000, .adc_hi = 767, .mdeg_hi = 180 * 1000}},
 });
@@ -117,7 +117,7 @@ constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
 	 {motorid_t::elbow, {15, 7, -2}},
 	 {motorid_t::frontLeftSwerve, {2, 0, 0}},
 	 {motorid_t::frontRightSwerve, {2, 0, 0}},
-	 {motorid_t::rearLeftSwerve, {0, 0, 0}},
+	 {motorid_t::rearLeftSwerve, {2, 0, 0}},
 	 {motorid_t::rearRightSwerve, {2, 0, 0}}});
 
 /**
