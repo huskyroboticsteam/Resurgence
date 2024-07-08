@@ -61,6 +61,9 @@ std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 void initMotors() {
 	for (const auto& it : motorSerialIDMap) {
 		can::motor::initMotor(it.second);
+		bool hasPosSensor = robot::potMotors.find(it.first) != robot::potMotors.end() ||
+							robot::encMotors.find(it.first) != robot::encMotors.end();
+		addMotorMapping(it.first, hasPosSensor);
 	}
 
 	for (const auto& pot_motor_pair : robot::potMotors) {
@@ -71,9 +74,6 @@ void initMotors() {
 
 		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
-
-		// initialize motor objects and add them to map
-		addMotorMapping(motor_id, true);
 	}
 
 	for (const auto& enc_motor_pair : robot::encMotors) {
@@ -86,16 +86,7 @@ void initMotors() {
 								TELEM_PERIOD);
 		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
 										 enc_params.limitSwitchHigh);
-
-		// initialize motor objects and add them to map
-		addMotorMapping(motor_id, true);
 	}
-
-	// initialize motor objects and add them to map
-	addMotorMapping(motorid_t::frontLeftWheel, false);
-	addMotorMapping(motorid_t::frontRightWheel, false);
-	addMotorMapping(motorid_t::rearLeftWheel, false);
-	addMotorMapping(motorid_t::rearRightWheel, false);
 
 	for (const auto& pair : robot::motorPIDMap) {
 		motorid_t motor = pair.first;
@@ -105,7 +96,6 @@ void initMotors() {
 	}
 
 	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
-	addMotorMapping(motorid_t::hand, false);
 }
 
 void openCamera(CameraID camID, const char* cameraPath) {

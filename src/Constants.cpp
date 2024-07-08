@@ -14,6 +14,7 @@ const float MDEG_PER_DEG = 1000;
 
 // TODO: tune these drive constants
 const double ROBOT_LENGTH = 1.0;
+const double ROBOT_WIDTH = 1.0;
 /**
    Distance between left and right wheels.
 */
@@ -83,6 +84,10 @@ const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 
 const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
+
+namespace Drive {
+const double STEER_EPSILON = 10000;
+}
 
 namespace Nav {
 // Distance (m) we could have traveled forward in the time it takes to turn 1 radian
