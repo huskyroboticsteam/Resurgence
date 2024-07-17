@@ -166,7 +166,8 @@ Enumerations</h2></td></tr>
 , <b>elbow</b>
 , <b>forearm</b>
 , <br />
-&#160;&#160;<b>wrist</b>
+&#160;&#160;<b>wristDiffRight</b>
+, <b>wristDiffLeft</b>
 , <b>hand</b>
 , <b>activeSuspension</b>
 <br />
@@ -195,12 +196,13 @@ Enumerations</h2></td></tr>
 , <b>elbow</b>
 , <b>forearm</b>
 , <br />
-&#160;&#160;<b>wrist</b>
+&#160;&#160;<b>wristPitch</b>
+, <b>wristRoll</b>
 , <b>hand</b>
 , <b>activeSuspension</b>
-, <b>ikForward</b>
 , <br />
-&#160;&#160;<b>ikUp</b>
+&#160;&#160;<b>ikForward</b>
+, <b>ikUp</b>
 <br />
  }</td></tr>
 <tr class="separator:a4e0fafe7d1af6624074f9dbb7402fdbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,8 +266,8 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;jointid_t&gt;(</div>
 <div class="line">    {jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,</div>
-<div class="line">     jointid_t::wrist, jointid_t::hand, jointid_t::activeSuspension, jointid_t::ikForward,</div>
-<div class="line">     jointid_t::ikUp})</div>
+<div class="line">     jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,</div>
+<div class="line">     jointid_t::ikForward, jointid_t::ikUp})</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -297,7 +299,8 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 <div class="line">     {<span class="stringliteral">&quot;shoulder&quot;</span>, jointid_t::shoulder},</div>
 <div class="line">     {<span class="stringliteral">&quot;elbow&quot;</span>, jointid_t::elbow},</div>
 <div class="line">     {<span class="stringliteral">&quot;forearm&quot;</span>, jointid_t::forearm},</div>
-<div class="line">     {<span class="stringliteral">&quot;wrist&quot;</span>, jointid_t::wrist},</div>
+<div class="line">     {<span class="stringliteral">&quot;wristPitch&quot;</span>, jointid_t::wristPitch},</div>
+<div class="line">     {<span class="stringliteral">&quot;wristRoll&quot;</span>, jointid_t::wristRoll},</div>
 <div class="line">     {<span class="stringliteral">&quot;hand&quot;</span>, jointid_t::hand},</div>
 <div class="line">     {<span class="stringliteral">&quot;activeSuspension&quot;</span>, jointid_t::activeSuspension},</div>
 <div class="line">     {<span class="stringliteral">&quot;ikForward&quot;</span>, jointid_t::ikForward},</div>
