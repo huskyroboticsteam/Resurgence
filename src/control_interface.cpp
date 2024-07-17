@@ -40,18 +40,22 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	control::swerve_rots_t curr_wheel_rots;
-	try {
-		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
-						   robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
-						   robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
-						   robot::getMotorPos(motorid_t::rearRightSwerve).getData()};
-	} catch (const bad_datapoint_access& e) {
-		LOG_F(WARNING, "Invalid steer motor position(s)!");
-		return 0;
+	if (!Globals::swerveController.isOverridden()) {
+		try {
+			control::swerve_rots_t curr_wheel_rots = {
+				robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
+				robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
+				robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
+				robot::getMotorPos(motorid_t::rearRightSwerve).getData()};
+			if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal,
+															  curr_wheel_rots)) {
+				return 0;
+			}
+		} catch (const bad_datapoint_access& e) {
+			LOG_F(WARNING, "Invalid steer motor position(s)!");
+			return 0;
+		}
 	}
-	if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
-		return 0;
 
 	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
@@ -121,27 +125,7 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	using robot::types::jointid_t;
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
 		setMotorPos(Constants::JOINT_MOTOR_MAP.at(joint), targetPos);
-	}
-	// FIXME: need to do some extra control (probably implementing our own PID control) for the
-	// differential position, since the potentiometers are giving us joint position instead of
-	// motor position.
-	/*
-	else if (joint == jointid_t::differentialPitch || joint == jointid_t::differentialRoll) {
-		std::lock_guard<std::mutex> lk(wristPosMutex);
-		if (joint == jointid_t::differentialPitch){
-			commandedWristPos.pitch = targetPos;
-		} else {
-			commandedWristPos.roll = targetPos;
-		}
-		gearpos_t gearPos = wristKinematics().jointPosToGearPos(commandedWristPos);
-		setMotorPos(motorid_t::differentialLeft, gearPos.left);
-		setMotorPos(motorid_t::differentialRight, gearPos.right);
-	}
-	*/
-	else {
-		// FIXME: this should ideally never happen, but we don't have support for all joints
-		// yet because we don't know anything about the drill arm (and need to do extra work
-		// for the differential)
+	} else {
 		LOG_F(WARNING, "setJointPos called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
 	}
@@ -160,6 +144,19 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 			return DataPoint<int32_t>(armJointPositions.getTime(),
 									  joint == jointid_t::ikForward ? eePosInt.x()
 																	: eePosInt.y());
+		} else {
+			return {};
+		}
+	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
+		auto mdegToRad = [](int32_t mdeg) { return (mdeg / 1000.0) * (M_PI / 180.0); };
+		auto lPos = getMotorPos(motorid_t::wristDiffLeft).transform(mdegToRad);
+		auto rPos = getMotorPos(motorid_t::wristDiffRight).transform(mdegToRad);
+		if (lPos.isValid() && rPos.isValid()) {
+			kinematics::gearpos_t gearPos(lPos.getData(), rPos.getData());
+			auto jointPos = Globals::wristKinematics.gearPosToJointPos(gearPos);
+			float angle = joint == jointid_t::wristPitch ? jointPos.pitch : jointPos.roll;
+			return DataPoint<int32_t>(lPos.getTime(),
+									  static_cast<int32_t>(angle * (180.0 / M_PI) * 1000));
 		} else {
 			return {};
 		}
@@ -214,6 +211,14 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 				}
 			}
 		}
+	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
+		setJointPowerValue(joint, power);
+		kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristPitch),
+										getJointPowerValue(jointid_t::wristRoll));
+		kinematics::gearpos_t gearPwr =
+			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
+		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
+		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

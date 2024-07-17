@@ -44,6 +44,7 @@ void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint
 	auto group = static_cast<uint8_t>(devicegroup_t::motor);
 	AssemblePotHiSetPacket(&packet, group, serial, adcHi, posHi);
 	sendCANPacket(packet);
+	std::this_thread::sleep_for(1ms);
 	AssemblePotLoSetPacket(&packet, group, serial, adcLo, posLo);
 	sendCANPacket(packet);
 	if (telemetryPeriod) {
@@ -72,7 +73,7 @@ void setLimitSwitchLimits(deviceserial_t serial, int32_t lo, int32_t hi) {
 	// 0 is low limit, 1 is high limit.
 	AssembleLimSwEncoderBoundPacket(&p, motorGroupCode, serial, 0, lo);
 	sendCANPacket(p);
-
+	std::this_thread::sleep_for(1ms);
 	AssembleLimSwEncoderBoundPacket(&p, motorGroupCode, serial, 1, hi);
 	sendCANPacket(p);
 }
@@ -82,11 +83,13 @@ void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t
 	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);
 	AssemblePSetPacket(&p, motorGroupCode, serial, kP);
 	sendCANPacket(p);
+	std::this_thread::sleep_for(1ms);
 	AssembleISetPacket(&p, motorGroupCode, serial, kI);
 	sendCANPacket(p);
+	std::this_thread::sleep_for(1ms);
 	AssembleDSetPacket(&p, motorGroupCode, serial, kD);
 	sendCANPacket(p);
-	std::this_thread::sleep_for(1000us);
+	std::this_thread::sleep_for(1ms);
 }
 
 void setMotorMode(deviceserial_t serial, motormode_t mode) {

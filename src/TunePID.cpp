@@ -47,7 +47,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::shoulder, "shoulder"},
 	{motorid_t::elbow, "elbow"},
 	{motorid_t::forearm, "forearm"},
-	{motorid_t::wrist, "wrist"},
+	{motorid_t::wristDiffRight, "wristDiffRight"},
+	{motorid_t::wristDiffLeft, "wristDiffLeft"},
 	{motorid_t::hand, "hand"},
 	{motorid_t::activeSuspension, "activeSuspension"}};
 

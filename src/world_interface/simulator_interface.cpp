@@ -37,7 +37,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::shoulder, "shoulder"},
 	{motorid_t::elbow, "elbow"},
 	{motorid_t::forearm, "forearm"},
-	{motorid_t::wrist, "wrist"},
+	{motorid_t::wristDiffLeft, "wristDiffLeft"},
+	{motorid_t::wristDiffRight, "wristDiffRight"},
 	{motorid_t::hand, "hand"},
 	{motorid_t::activeSuspension, "activeSuspension"}};
 
@@ -246,15 +247,10 @@ namespace robot {
 
 namespace {
 DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
-DiffWristKinematics wrist_kinematics;
 } // namespace
 
 const DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
-}
-
-const DiffWristKinematics& wristKinematics() {
-	return wrist_kinematics;
 }
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
