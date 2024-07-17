@@ -48,16 +48,14 @@ const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 							  .wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
 // TODO: We need to recalibrate the camera, since we replaced it with a different one.
-// TODO: rename cameras (in MC as well) as appropriate
 const char* MAST_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
-const robot::types::CameraID MAST_CAMERA_ID =
-	"upperArm"; // TODO: replace with real camera name
+const robot::types::CameraID MAST_CAMERA_ID = "mast";
 
-const char* FOREARM_CAMERA_CONFIG_PATH = "../camera-config/ForearmCameraCalibration.yml";
-const robot::types::CameraID FOREARM_CAMERA_ID = "rear";
+const char* FOREARM_CAMERA_CONFIG_PATH = "../camera-config/WristCameraCalibration.yml";
+const robot::types::CameraID FOREARM_CAMERA_ID = "wrist";
 
 const char* HAND_CAMERA_CONFIG_PATH = "../camera-config/HandCameraCalibration.yml";
-const robot::types::CameraID HAND_CAMERA_ID = "front";
+const robot::types::CameraID HAND_CAMERA_ID = "hand";
 
 /**
    @deprecated No need for this constant once we fully switch over the Mission Control PlanViz
