@@ -138,7 +138,7 @@ public:
 	 * @brief Check the override flag for wheel rotation checking.
 	 *
 	 * @return True iff the rotation checking is overridden.
-	*/
+	 */
 	bool isOverridden() const;
 
 	/**
