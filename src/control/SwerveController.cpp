@@ -138,6 +138,10 @@ void SwerveController::setOverride(bool override) {
 	override_steer_check = override;
 }
 
+bool SwerveController::isOverridden() const {
+	return override_steer_check;
+}
+
 namespace util {
 std::string to_string(control::DriveMode mode) {
 	using control::DriveMode;

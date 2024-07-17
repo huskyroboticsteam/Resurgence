@@ -94,8 +94,6 @@ void initMotors() {
 		pidcoef_t pid = motorPIDMap.at(motor);
 		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
 	}
-
-	can::motor::initMotor(motorSerialIDMap.at(motorid_t::hand));
 }
 
 void openCamera(CameraID camID, const char* cameraPath) {

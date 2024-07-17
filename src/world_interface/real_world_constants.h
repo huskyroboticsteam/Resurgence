@@ -63,28 +63,18 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		.ppjr = 4590 * 1024 * 4,
 		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
-		.zeroCalibrationPower = 0.4}},
-	{motorid_t::elbow,
-		{.isInverted = false,
-		.ppjr = 1620 * 1024 * 4,
-		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::elbow).first,
-		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::elbow).second,
-		.zeroCalibrationPower = -0.15}}
+		.zeroCalibrationPower = 0.4}}
 });
 // clang-format on
 
 // TODO: find appropriate bounds
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
-	{motorid_t::armBase,
-	 {.adc_lo = 123, .mdeg_lo = -200 * 1000, .adc_hi = 456, .mdeg_hi = 200 * 1000}},
 	{motorid_t::forearm,
 	 {.adc_lo = 1208, .mdeg_lo = -180 * 1000, .adc_hi = 841, .mdeg_hi = 180 * 1000}},
 	{motorid_t::wristDiffLeft,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{motorid_t::wristDiffRight,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
-	{motorid_t::activeSuspension,
-	 {.adc_lo = 251, .mdeg_lo = -19 * 1000, .adc_hi = 1645, .mdeg_hi = 31 * 1000}},
 	{motorid_t::frontLeftSwerve,
 	 {.adc_lo = 1422, .mdeg_lo = -180 * 1000, .adc_hi = 656, .mdeg_hi = 180 * 1000}},
 	{motorid_t::frontRightSwerve,
@@ -115,9 +105,9 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
-constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
-	{{motorid_t::shoulder, {70, 0, 0}},
-	 {motorid_t::elbow, {15, 7, -2}},
+constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>({
+	// {{motorid_t::shoulder, {70, 0, 0}},
+	//  {motorid_t::elbow, {15, 7, -2}},
 	 {motorid_t::frontLeftSwerve, {2, 0, 0}},
 	 {motorid_t::frontRightSwerve, {2, 0, 0}},
 	 {motorid_t::rearLeftSwerve, {2, 0, 0}},
@@ -128,16 +118,16 @@ constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
  * Negative values mean that the motor is inverted.
  */
 constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
-												   {motorid_t::shoulder, 1},
-												   {motorid_t::elbow, 1},
-												   {motorid_t::forearm, -0.65},
+	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
+												   {motorid_t::shoulder, -1},
+												   {motorid_t::elbow, -1},
+												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, 0.7},
 												   {motorid_t::rearLeftWheel, 0.7},
-												   {motorid_t::rearRightWheel, -0.7},
+												   {motorid_t::rearRightWheel, 0.7},
 												   {motorid_t::frontLeftSwerve, 1.0},
 												   {motorid_t::frontRightSwerve, 1.0},
 												   {motorid_t::rearLeftSwerve, 1.0},
@@ -149,16 +139,16 @@ constexpr auto positive_pwm_scales =
  * Negative values mean that the motor is inverted.
  */
 constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.75},
-												   {motorid_t::shoulder, 1},
-												   {motorid_t::elbow, 1},
-												   {motorid_t::forearm, -0.65},
+	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
+												   {motorid_t::shoulder, -1},
+												   {motorid_t::elbow, -1},
+												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::frontLeftWheel, 0.7},
 												   {motorid_t::frontRightWheel, 0.7},
 												   {motorid_t::rearLeftWheel, 0.7},
-												   {motorid_t::rearRightWheel, -0.7},
+												   {motorid_t::rearRightWheel, 0.7},
 												   {motorid_t::frontLeftSwerve, 1.0},
 												   {motorid_t::frontRightSwerve, 1.0},
 												   {motorid_t::rearLeftSwerve, 1.0},

@@ -135,6 +135,13 @@ public:
 	void setOverride(bool override);
 
 	/**
+	 * @brief Check the override flag for wheel rotation checking.
+	 *
+	 * @return True iff the rotation checking is overridden.
+	*/
+	bool isOverridden() const;
+
+	/**
 	 * @brief Get the current drive mode of the controller.
 	 *
 	 * @return DriveMode The current drive mode.
