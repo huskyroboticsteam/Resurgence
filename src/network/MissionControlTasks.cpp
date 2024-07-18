@@ -5,6 +5,7 @@
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../world_interface/world_interface.h"
+#include "../base64/base64_img.h"
 #include "MissionControlMessages.h"
 
 #include <loguru.hpp>
@@ -142,15 +143,21 @@ void CameraStreamTask::closeStream(const CameraID& cam) {
 }
 
 void CameraStreamTask::sendCurrentFrame(const robot::types::CameraID& cam) {
-	// robot::types::CameraFrame data;
+	std::string b64_data = "";
 	{
-		// std::lock_guard lg(_mutex);
-		// check if there is a stream with the camera name
-		// grab frame
+		std::lock_guard lg(_mutex);
+		if (_open_streams.find(cam) != _open_streams.end()) {
+			auto camDP = robot::readCamera(cam);
+			if (camDP) {
+				auto data = camDP.getData();
+				cv::Mat frame = data.first;
+				b64_data = base64::encodeMat(frame, ".jpg");
+			}
+		}
 	}
 	json msg = {{"type", CAMERA_FRAME_REP_TYPE},
 				{"camera", cam},
-				{"data", "base64encoded!!!"}};
+				{"data", b64_data}};
 	_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
