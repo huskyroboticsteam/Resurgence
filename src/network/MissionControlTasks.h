@@ -88,6 +88,13 @@ public:
 	 */
 	void closeStream(const robot::types::CameraID& cam);
 
+	/**
+	 * @brief Send the current frame of an open stream to Mission Control as a
+	 * 		base64 encoded string.
+	 * @param cam The camera that should be sent.
+	 */
+	void sendCurrentFrame(const robot::types::CameraID& cam);
+
 protected:
 	void task(std::unique_lock<std::mutex>& lock) override;
 

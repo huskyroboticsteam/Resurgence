@@ -141,6 +141,19 @@ void CameraStreamTask::closeStream(const CameraID& cam) {
 	_camera_encoders.erase(cam);
 }
 
+void CameraStreamTask::sendCurrentFrame(const robot::types::CameraID& cam) {
+	// robot::types::CameraFrame data;
+	{
+		// std::lock_guard lg(_mutex);
+		// check if there is a stream with the camera name
+		// grab frame
+	}
+	json msg = {{"type", CAMERA_FRAME_REP_TYPE},
+				{"camera", cam},
+				{"data", "base64encoded!!!"}};
+	_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+}
+
 void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 	while (isRunningInternal()) {
 		{
