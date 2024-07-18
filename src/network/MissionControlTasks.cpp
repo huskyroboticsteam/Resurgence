@@ -2,10 +2,10 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../base64/base64_img.h"
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../world_interface/world_interface.h"
-#include "../base64/base64_img.h"
 #include "MissionControlMessages.h"
 
 #include <loguru.hpp>
@@ -155,9 +155,7 @@ void CameraStreamTask::sendCurrentFrame(const robot::types::CameraID& cam) {
 			}
 		}
 	}
-	json msg = {{"type", CAMERA_FRAME_REP_TYPE},
-				{"camera", cam},
-				{"data", b64_data}};
+	json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
 	_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
