@@ -2,7 +2,6 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
-#include "../base64/base64_img.h"
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../world_interface/world_interface.h"
@@ -140,17 +139,6 @@ void CameraStreamTask::closeStream(const CameraID& cam) {
 	std::lock_guard lock(_mutex);
 	_open_streams.erase(cam);
 	_camera_encoders.erase(cam);
-}
-
-void CameraStreamTask::sendCurrentFrame(const robot::types::CameraID& cam) {
-	auto camDP = robot::readCamera(cam);
-	if (camDP) {
-		auto data = camDP.getData();
-		cv::Mat frame = data.first;
-		std::string b64_data = base64::encodeMat(frame, ".jpg");
-		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
-		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-	}
 }
 
 void CameraStreamTask::task(std::unique_lock<std::mutex>&) {

@@ -6,6 +6,7 @@
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
+#include "../base64/base64_img.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
 #include "MissionControlMessages.h"
@@ -325,7 +326,14 @@ static bool validateCameraFrameRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 	CameraID cam = j["camera"];
-	_camera_stream_task.sendCurrentFrame(cam);
+	auto camDP = robot::readCamera(cam);
+	if (camDP) {
+		auto data = camDP.getData();
+		cv::Mat frame = data.first;
+		std::string b64_data = base64::encodeMat(frame, ".jpg");
+		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
