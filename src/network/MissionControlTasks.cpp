@@ -143,20 +143,14 @@ void CameraStreamTask::closeStream(const CameraID& cam) {
 }
 
 void CameraStreamTask::sendCurrentFrame(const robot::types::CameraID& cam) {
-	std::string b64_data = "";
-	{
-		std::lock_guard lg(_mutex);
-		if (_open_streams.find(cam) != _open_streams.end()) {
-			auto camDP = robot::readCamera(cam);
-			if (camDP) {
-				auto data = camDP.getData();
-				cv::Mat frame = data.first;
-				b64_data = base64::encodeMat(frame, ".jpg");
-			}
-		}
+	auto camDP = robot::readCamera(cam);
+	if (camDP) {
+		auto data = camDP.getData();
+		cv::Mat frame = data.first;
+		std::string b64_data = base64::encodeMat(frame, ".jpg");
+		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
-	json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
-	_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
 void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
