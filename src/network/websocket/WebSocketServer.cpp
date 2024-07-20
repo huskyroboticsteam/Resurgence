@@ -159,7 +159,7 @@ void SingleClientWSServer::onOpen(connection_hdl hdl) {
 					ProtocolData& pd = this->getProtocol(path).value();
 					std::lock_guard lock(pd.mutex);
 					if (pd.client.has_value()) {
-						LOG_F(2, "Ping!");
+						LOG_F(3, "Ping!");
 						server.ping(pd.client.value(), path);
 					}
 				});
@@ -206,7 +206,7 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 		// No need to lock this pd because we only access the protocol, which is constant
 		ProtocolData& pd = protocolDataOpt.value();
 		std::string jsonStr = message->get_payload();
-		LOG_F(1, "Message on %s: %s", path.c_str(), jsonStr.c_str());
+		LOG_F(2, "Message on %s: %s", path.c_str(), jsonStr.c_str());
 		json obj = json::parse(jsonStr);
 		pd.protocol->processMessage(obj);
 	} else {
@@ -215,7 +215,7 @@ void SingleClientWSServer::onMessage(connection_hdl hdl, message_t message) {
 }
 
 void SingleClientWSServer::onPong(connection_hdl hdl, const std::string& payload) {
-	LOG_F(2, "Pong from %s", payload.c_str());
+	LOG_F(3, "Pong from %s", payload.c_str());
 	auto conn = server.get_con_from_hdl(hdl);
 
 	auto protocolDataOpt = this->getProtocol(payload);

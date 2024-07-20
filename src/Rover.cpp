@@ -63,15 +63,17 @@ void parseCommandLine(int argc, char** argv) {
 				{"LOG_ERROR", loguru::Verbosity_ERROR},
 				{"LOG_WARN", loguru::Verbosity_WARNING},
 				{"LOG_INFO", loguru::Verbosity_INFO},
-				{"LOG_DEBUG", 2},
-				{"LOG_TRACE", 1},
+				{"LOG_VERBOSE", 1},
+				{"LOG_TRACE", 2},
+				{"LOG_DEBUG", 3},
 			};
 
 			if (allowed.find(value) != allowed.end()) {
 				loguru::g_stderr_verbosity = allowed[value];
+				return value;
+			} else {
+				throw std::runtime_error("Invalid log level " + value);
 			}
-
-			throw std::runtime_error("Invalid log level " + value);
 		});
 
 	program.add_argument("-nc", "--no-colors")
