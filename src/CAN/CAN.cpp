@@ -264,13 +264,16 @@ void initCAN() {
 }
 
 void sendCANPacket(const CANPacket& packet) {
-	can_frame frame;
+	canfd_frame frame;
+	std::memset(&frame, 0, sizeof(frame));
 	frame.can_id = packet.id;
-	frame.can_dlc = packet.dlc;
+	frame.len = packet.dlc;
 	std::memcpy(frame.data, packet.data, packet.dlc);
 	bool success;
 	{
 		std::lock_guard lock(socketMutex);
+		// note that frame is a canfd_frame but we're using sizeof(can_frame)
+		// not sure why this is required to work
 		success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
 		tcdrain(can_fd);
 	}
