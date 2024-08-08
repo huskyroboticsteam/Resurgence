@@ -40,6 +40,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "forearm";
 		case jointid_t::hand:
 			return "hand";
+		case jointid_t::handActuator:
+			return "handActuator";
 		case jointid_t::wristPitch:
 			return "wristPitch";
 		case jointid_t::wristRoll:
