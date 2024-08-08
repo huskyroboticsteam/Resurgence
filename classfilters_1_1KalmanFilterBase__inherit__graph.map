@@ -3,7 +3,7 @@
 <area shape="rect" id="Node000002" href="$classfilters_1_1ExtendedKalmanFilter.html" title="Implements a discrete&#45;time EKF." alt="" coords="215,5,453,61"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,85,245,59,246,64,166,90"/>
 <area shape="rect" id="Node000003" href="$classfilters_1_1KalmanFilter.html" title="Implements a Kalman Filter." alt="" coords="261,85,407,141"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,111,260,111,260,116,182,116"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,110,260,110,260,116,182,116"/>
 <area shape="rect" id="Node000004" href="$classfilters_1_1MultiSensorEKF.html" title=" " alt="" coords="226,165,442,221"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,136,246,162,245,167,165,141"/>
 </map>

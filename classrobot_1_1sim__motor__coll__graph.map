@@ -1,9 +1,9 @@
 <map id="robot::sim_motor" name="robot::sim_motor">
-<area shape="rect" id="Node000001" title=" " alt="" coords="35,168,152,193"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="35,169,152,195"/>
 <area shape="rect" id="Node000002" href="$classrobot_1_1base__motor.html" title="An abstract motor class." alt="" coords="32,94,156,120"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,135,96,167,91,167,91,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,135,96,169,91,169,91,135"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="5,5,81,31"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="53,44,64,69,83,92,79,96,60,71,48,47"/>
-<area shape="rect" id="Node000004" href="/github/workspace/doxygen-tags/libstdc++.tag$a07191.html" title=" " alt="" coords="104,5,185,31"/>
+<area shape="rect" id="Node000004" href="/github/workspace/doxygen-tags/libstdc++.tag$a07191.html" title=" " alt="" coords="104,5,184,31"/>
 <area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="132,46,117,71,103,95,99,92,113,69,127,43"/>
 </map>

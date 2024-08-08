@@ -1,24 +1,24 @@
 <map id="util::impl::Notifiable" name="util::impl::Notifiable">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,189,134,215"/>
-<area shape="rect" id="Node000002" href="$classutil_1_1AsyncTask.html" title=" " alt="" coords="184,26,344,67"/>
+<area shape="rect" id="Node000002" href="$classutil_1_1AsyncTask.html" title=" " alt="" coords="184,26,344,66"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,175,128,129,180,83,210,65,213,69,183,87,132,133,92,178"/>
 <area shape="rect" id="Node000003" href="$classutil_1_1PeriodicTask.html" title="Implements a task that executes a function periodically." alt="" coords="431,55,551,96"/>
 <area shape="poly" id="edge10_Node000001_Node000003" title=" " alt="" coords="97,177,135,150,181,126,246,105,313,91,430,76,431,81,314,96,247,110,183,131,138,155,100,181"/>
-<area shape="rect" id="Node000007" href="$classutil_1_1PeriodicScheduler.html" title=" " alt="" coords="189,141,339,197"/>
+<area shape="rect" id="Node000007" href="$classutil_1_1PeriodicScheduler.html" title=" " alt="" coords="189,141,338,197"/>
 <area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="149,186,188,179,189,184,150,191"/>
 <area shape="rect" id="Node000008" href="$classutil_1_1AsyncTask.html" title="An abstract class that can be overridden to run long&#45;running tasks and encapsulate task&#45;related data." alt="" coords="182,221,346,247"/>
 <area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="150,213,182,218,181,223,149,218"/>
-<area shape="rect" id="Node000010" href="$classutil_1_1PeriodicScheduler.html" title="Uses a single thread to periodically invoke callbacks at a given frequency." alt="" coords="189,271,339,312"/>
+<area shape="rect" id="Node000010" href="$classutil_1_1PeriodicScheduler.html" title="Uses a single thread to periodically invoke callbacks at a given frequency." alt="" coords="189,271,338,312"/>
 <area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="109,220,183,257,208,268,206,273,181,262,107,225"/>
-<area shape="rect" id="Node000011" href="$classutil_1_1Watchdog.html" title="Implements a thread&#45;safe watchdog." alt="" coords="185,336,343,362"/>
+<area shape="rect" id="Node000011" href="$classutil_1_1Watchdog.html" title="Implements a thread&#45;safe watchdog." alt="" coords="185,336,342,362"/>
 <area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="90,226,129,275,155,300,183,321,207,333,205,338,180,326,151,304,125,278,86,230"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="359,56,431,65,430,70,358,61"/>
 <area shape="rect" id="Node000004" href="$classnet_1_1mc_1_1tasks_1_1ArmIKTask.html" title="This task sets the arm joint positions to track the current IK command." alt="" coords="636,5,826,31"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="566,55,673,29,675,34,567,60"/>
 <area shape="rect" id="Node000005" href="$classnet_1_1mc_1_1tasks_1_1PowerRepeatTask.html" title="This task is responsible for periodically resending setMotorPower commands to the motors." alt="" coords="638,55,824,96"/>
 <area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="567,73,638,73,638,78,567,78"/>
-<area shape="rect" id="Node000006" href="$classnet_1_1mc_1_1tasks_1_1TelemReportTask.html" title="This task periodically sends robot telemetry data to Mission Control." alt="" coords="640,121,822,161"/>
+<area shape="rect" id="Node000006" href="$classnet_1_1mc_1_1tasks_1_1TelemReportTask.html" title="This task periodically sends robot telemetry data to Mission Control." alt="" coords="640,120,822,161"/>
 <area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="567,93,654,117,653,122,566,98"/>
-<area shape="rect" id="Node000009" href="$classnet_1_1mc_1_1tasks_1_1CameraStreamTask.html" title="This task is responsible for sending the camera streams to Mission Control over websocket." alt="" coords="394,214,588,255"/>
+<area shape="rect" id="Node000009" href="$classnet_1_1mc_1_1tasks_1_1CameraStreamTask.html" title="This task is responsible for sending the camera streams to Mission Control over websocket." alt="" coords="394,214,588,254"/>
 <area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="362,232,394,232,394,237,362,237"/>
 </map>

@@ -1,16 +1,16 @@
 <map id="filters::KalmanFilter&lt; stateDim, inputDim, outputDim &gt;" name="filters::KalmanFilter&lt; stateDim, inputDim, outputDim &gt;">
-<area shape="rect" id="Node000001" title="Implements a Kalman Filter." alt="" coords="931,49,1077,105"/>
-<area shape="rect" id="Node000002" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="721,56,883,97"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="898,74,930,74,930,79,898,79"/>
-<area shape="rect" id="Node000003" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1Matrix.html" title=" " alt="" coords="496,23,643,64"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="659,53,721,62,721,68,658,59"/>
-<area shape="rect" id="Node000004" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1PlainObjectBase.html" title=" " alt="" coords="219,5,430,76"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="445,39,496,40,496,45,445,45"/>
-<area shape="rect" id="Node000005" href="/github/workspace/doxygen-tags/Eigen.doxytags$structEigen_1_1doxygen_1_1dense__xpr__base__dispatcher.html" title=" " alt="" coords="5,57,153,113"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="168,66,218,57,219,62,168,71"/>
-<area shape="rect" id="Node000007" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1PlainObjectBase.html" title=" " alt="" coords="201,100,448,155"/>
-<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="169,97,201,103,200,108,168,103"/>
-<area shape="rect" id="Node000006" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1Matrix.html" title=" " alt="" coords="496,91,643,132"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="658,96,721,86,721,91,659,101"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="463,116,496,113,496,119,464,121"/>
+<area shape="rect" id="Node000001" title="Implements a Kalman Filter." alt="" coords="935,49,1081,104"/>
+<area shape="rect" id="Node000002" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="724,56,885,97"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="901,74,934,74,934,79,901,79"/>
+<area shape="rect" id="Node000003" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1Matrix.html" title=" " alt="" coords="499,23,646,64"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="661,53,724,62,723,68,661,59"/>
+<area shape="rect" id="Node000004" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1PlainObjectBase.html" title=" " alt="" coords="220,5,431,76"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="446,39,498,40,498,45,446,45"/>
+<area shape="rect" id="Node000005" href="/github/workspace/doxygen-tags/Eigen.doxytags$structEigen_1_1doxygen_1_1dense__xpr__base__dispatcher.html" title=" " alt="" coords="5,57,153,112"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="167,66,220,57,220,62,168,72"/>
+<area shape="rect" id="Node000007" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1PlainObjectBase.html" title=" " alt="" coords="202,100,449,155"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="168,97,202,103,201,108,167,103"/>
+<area shape="rect" id="Node000006" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1Matrix.html" title=" " alt="" coords="499,91,646,132"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="661,96,723,86,724,91,661,101"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="465,116,498,113,498,119,465,121"/>
 </map>
