@@ -18,11 +18,13 @@ constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
 constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
+constexpr const char* CAMERA_FRAME_REQ_TYPE = "cameraFrameRequest";
 constexpr const char* WAYPOINT_NAV_REQ_TYPE = "waypointNavRequest";
 
 // report keys
 constexpr const char* MOTOR_STATUS_REP_TYPE = "motorStatusReport";
 constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";
+constexpr const char* CAMERA_FRAME_REP_TYPE = "cameraFrameReport";
 constexpr const char* MOUNTED_PERIPHERAL_REP_TYPE = "mountedPeripheralReport";
 constexpr const char* JOINT_POSITION_REP_TYPE = "jointPositionReport";
 constexpr const char* ROVER_POS_REP_TYPE = "roverPositionReport";
