@@ -7,10 +7,10 @@
 # Install this in /etc/udev/rules.d
 
 # Hand camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="6369", KERNELS=="1-2.1", SYMLINK+="video20"
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="6369", ATTR{index}=="0", SYMLINK+="video20"
 
 # Forearm camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="32e4", ATTRS{idProduct}=="9230", KERNELS=="1-2.1", SYMLINK+="video30"
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="32e4", ATTRS{idProduct}=="9230", ATTR{index}=="0", SYMLINK+="video30"
 
 # Mast camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9230", KERNELS=="1-2.4.4", SYMLINK+="video40"
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9230", ATTR{index}=="0", SYMLINK+="video40"
