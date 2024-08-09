@@ -128,17 +128,20 @@ CameraStreamTask::CameraStreamTask(websocket::SingleClientWSServer& server)
 
 void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 	// run async since opening a camera can take a while
-	std::thread([this, cam, fps]() {
-		std::lock_guard lock(_mutex);
-		auto it = Constants::video::STREAM_RFS.find(cam);
-		int rf = it != Constants::video::STREAM_RFS.end() ? it->second
-														  : Constants::video::H264_RF_CONSTANT;
-		auto enc = std::make_shared<video::H264Encoder>(fps, rf);
-		auto cam_handle = robot::openCamera(cam);
-		if (cam_handle) {
-			_open_streams.insert_or_assign(cam, stream_data_t(enc, cam_handle));
-		}
-	}).detach();
+	if (_open_streams.find(cam) == _open_streams.end()) {
+		std::thread([this, cam, fps]() {
+			std::lock_guard lock(_mutex);
+			auto it = Constants::video::STREAM_RFS.find(cam);
+			int rf = it != Constants::video::STREAM_RFS.end()
+						 ? it->second
+						 : Constants::video::H264_RF_CONSTANT;
+			auto enc = std::make_shared<video::H264Encoder>(fps, rf);
+			auto cam_handle = robot::openCamera(cam);
+			if (cam_handle) {
+				_open_streams.insert_or_assign(cam, stream_data_t(enc, cam_handle));
+			}
+		}).detach();
+	}
 }
 
 void CameraStreamTask::closeStream(const CameraID& cam) {
