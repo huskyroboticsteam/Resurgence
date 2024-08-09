@@ -97,6 +97,13 @@ void initMotors() {
 }
 
 std::shared_ptr<cam::Camera> openCamera(CameraID camID, const std::string& cameraPath) {
+	auto it = cameraMap.find(camID);
+	if (it != cameraMap.end()) {
+		auto cam = it->second.lock();
+		if (cam) {
+			return cam;
+		}
+	}
 	try {
 		auto cam = std::make_shared<cam::Camera>();
 		bool success = cam->openFromConfigFile(cameraPath);
