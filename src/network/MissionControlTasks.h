@@ -3,6 +3,7 @@
 #include "../utils/scheduler.h"
 #include "../video/H264Encoder.h"
 #include "../world_interface/data.h"
+#include "../world_interface/world_interface.h"
 #include "websocket/WebSocketServer.h"
 
 #include <memory>
@@ -92,11 +93,19 @@ protected:
 	void task(std::unique_lock<std::mutex>& lock) override;
 
 private:
+	struct stream_data_t {
+		std::shared_ptr<video::H264Encoder> encoder;
+		std::shared_ptr<robot::types::CameraHandle> cam_handle;
+		uint32_t frame_num;
+
+		stream_data_t(std::shared_ptr<video::H264Encoder> encoder,
+					std::shared_ptr<robot::types::CameraHandle> cam_handle)
+			: encoder(encoder), cam_handle(cam_handle), frame_num(0) {}
+	};
+
 	websocket::SingleClientWSServer& _server;
 	std::mutex _mutex;
-	std::unordered_map<robot::types::CameraID, uint32_t> _open_streams;
-	std::unordered_map<robot::types::CameraID, std::shared_ptr<video::H264Encoder>>
-		_camera_encoders;
+	std::unordered_map<robot::types::CameraID, stream_data_t> _open_streams;
 };
 
 /**

@@ -3,6 +3,8 @@
 #include "../gps/gps_util.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
+#include "../camera/Camera.h"
+#include "../camera/CameraParams.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
 #include "motor/base_motor.h"
@@ -12,17 +14,20 @@
 #include <unordered_set>
 
 using namespace kinematics;
-// forward declare cam::CameraParams instead of including it
-// we do this to avoid unnecessarily including OpenCV in all build targets
-namespace cam {
-class CameraParams;
-}
 
 /**
  * @namespace robot
  * @brief Collection of functions that allows interfacing with the hardware and the world.
  */
 namespace robot {
+namespace types {
+class CameraHandle {
+public:
+	CameraHandle(std::shared_ptr<cam::Camera> cam) : camera(cam) {}
+private:
+	std::shared_ptr<cam::Camera> camera;
+};
+}
 
 /**
  * @brief An enum which defines the possible types of world interfaces.
@@ -86,6 +91,8 @@ bool isEmergencyStopped();
  * std::unordered_set.
  */
 std::unordered_set<types::CameraID> getCameras();
+
+std::shared_ptr<types::CameraHandle> openCamera(types::CameraID camera);
 
 /**
  * @brief Check if a new camera frame from the specified camera is available.

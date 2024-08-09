@@ -90,7 +90,7 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
+static void openCamera_(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
 					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
 	if (list1d) {
 		json msg = {{"type", "simCameraStreamOpenRequest"},
@@ -112,11 +112,11 @@ static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d =
 }
 
 void initCameras() {
-	auto cfg = cam::readConfigFromFile(Constants::MAST_CAMERA_CONFIG_PATH);
+	auto cfg = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(Constants::MAST_CAMERA_ID));
 	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
-	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera_(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera_(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera_(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 }
 
 void initMotors() {
@@ -288,6 +288,10 @@ void emergencyStop() {
 
 bool isEmergencyStopped() {
 	return is_emergency_stopped;
+}
+
+std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
+	return nullptr;
 }
 
 std::unordered_set<CameraID> getCameras() {

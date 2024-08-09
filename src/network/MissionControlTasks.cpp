@@ -127,18 +127,23 @@ CameraStreamTask::CameraStreamTask(websocket::SingleClientWSServer& server)
 	: util::AsyncTask<>("MCP_Stream"), _server(server) {}
 
 void CameraStreamTask::openStream(const CameraID& cam, int fps) {
-	std::lock_guard lock(_mutex);
-	_open_streams[cam] = 0;
-	auto it = Constants::video::STREAM_RFS.find(cam);
-	int rf = it != Constants::video::STREAM_RFS.end() ? it->second
-													  : Constants::video::H264_RF_CONSTANT;
-	_camera_encoders[cam] = std::make_shared<video::H264Encoder>(fps, rf);
+	// run async since opening a camera can take a while
+	std::thread([this, cam, fps]() {
+		std::lock_guard lock(_mutex);
+		auto it = Constants::video::STREAM_RFS.find(cam);
+		int rf = it != Constants::video::STREAM_RFS.end() ? it->second
+														  : Constants::video::H264_RF_CONSTANT;
+		auto enc = std::make_shared<video::H264Encoder>(fps, rf);
+		auto cam_handle = robot::openCamera(cam);
+		if (cam_handle) {
+			_open_streams.insert_or_assign(cam, stream_data_t(enc, cam_handle));
+		}
+	}).detach();
 }
 
 void CameraStreamTask::closeStream(const CameraID& cam) {
 	std::lock_guard lock(_mutex);
 	_open_streams.erase(cam);
-	_camera_encoders.erase(cam);
 }
 
 void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
@@ -146,9 +151,10 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 		{
 			std::lock_guard lg(_mutex);
 			// for all open streams, check if there is a new frame
-			for (const auto& stream : _open_streams) {
+			for (auto& stream : _open_streams) {
 				const CameraID& cam = stream.first;
-				const uint32_t& frame_num = stream.second;
+				stream_data_t& stream_data = stream.second;
+				uint32_t frame_num = stream_data.frame_num;
 				if (robot::hasNewCameraFrame(cam, frame_num)) {
 					// if there is a new frame, grab it
 					auto camDP = robot::readCamera(cam);
@@ -158,8 +164,8 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						uint32_t& new_frame_num = data.second;
 						cv::Mat frame = data.first;
 						// update the previous frame number
-						this->_open_streams[cam] = new_frame_num;
-						const auto& encoder = this->_camera_encoders[cam];
+						stream_data.frame_num = new_frame_num;
+						const auto& encoder = stream_data.encoder;
 
 						// convert frame to encoded data and send it
 						auto data_vector = encoder->encode_frame(frame);
