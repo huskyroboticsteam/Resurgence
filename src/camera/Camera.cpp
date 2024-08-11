@@ -24,14 +24,19 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 	}
 	_capture_lock->lock();
 	std::stringstream gstr_ss;
+	gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! ";
 	if (camera_id == 20) {
-		gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! "
-					"image/jpeg,width=640,height=480,framerate=30/1 ! "
+		gstr_ss << "image/jpeg,width=640,height=480,framerate=30/1 ! "
 					"jpegdec ! videoconvert ! appsink";
-	} else {
-		gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! "
-					"image/jpeg,width=1024,height=768,framerate=30/1 ! "
+	} else if (camera_id == 40 || camera_id == 60) {
+		gstr_ss << "image/jpeg,width=1024,height=768,framerate=30/1 ! "
 					"jpegdec ! videoconvert ! appsink";
+	} else if (camera_id == 100) {
+		gstr_ss << "image/jpeg,width=1280,height=720,framerate=30/1 ! "
+					"jpegdec ! videoflip method=rotate-180 ! videoconvert ! appsink";
+	} else if (camera_id == 110) {
+		gstr_ss << "image/jpeg,width=960,height=720,framerate=30/1 ! "
+					"jpegdec ! videoflip method=rotate-180 ! videoconvert ! appsink";
 	}
 	LOG_F(INFO, "GSTR: %s", gstr_ss.str().c_str());
 	this->_capture = std::make_shared<cv::VideoCapture>(gstr_ss.str(), cv::CAP_GSTREAMER);

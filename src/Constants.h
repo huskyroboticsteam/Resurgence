@@ -54,6 +54,8 @@ extern const double MAX_DTHETA;
 extern const robot::types::CameraID MAST_CAMERA_ID;
 extern const robot::types::CameraID FOREARM_CAMERA_ID;
 extern const robot::types::CameraID HAND_CAMERA_ID;
+extern const robot::types::CameraID PANO_CAMERA_ID;
+extern const robot::types::CameraID DRILL_CAMERA_ID;
 
 extern const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS;
 
