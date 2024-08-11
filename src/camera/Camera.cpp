@@ -4,6 +4,8 @@
 
 #include <loguru.hpp>
 
+#include <opencv2/aruco.hpp>
+
 using cv::Mat;
 using cv::Size;
 using std::string;
@@ -13,8 +15,7 @@ using namespace robot::types;
 namespace cam {
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(),
+	  _frame_time(std::make_shared<datatime_t>()), _capture(),
 	  _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
@@ -27,16 +28,16 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 	gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! ";
 	if (camera_id == 20) {
 		gstr_ss << "image/jpeg,width=640,height=480,framerate=30/1 ! "
-					"jpegdec ! videoconvert ! appsink";
+				   "jpegdec ! videoconvert ! appsink";
 	} else if (camera_id == 40 || camera_id == 60) {
 		gstr_ss << "image/jpeg,width=1024,height=768,framerate=30/1 ! "
-					"jpegdec ! videoconvert ! appsink";
+				   "jpegdec ! videoconvert ! appsink";
 	} else if (camera_id == 100) {
 		gstr_ss << "image/jpeg,width=1280,height=720,framerate=30/1 ! "
-					"jpegdec ! videoflip method=rotate-180 ! videoconvert ! appsink";
+				   "jpegdec ! videoflip method=rotate-180 ! videoconvert ! appsink";
 	} else if (camera_id == 110) {
 		gstr_ss << "image/jpeg,width=960,height=720,framerate=30/1 ! "
-					"jpegdec ! videoflip method=rotate-180 ! videoconvert ! appsink";
+				   "jpegdec ! videoflip method=rotate-180 ! videoconvert ! appsink";
 	}
 	LOG_F(INFO, "GSTR: %s", gstr_ss.str().c_str());
 	this->_capture = std::make_shared<cv::VideoCapture>(gstr_ss.str(), cv::CAP_GSTREAMER);
@@ -141,8 +142,20 @@ void Camera::captureLoop() {
 		bool success = _capture->read(frame);
 		_capture_lock->unlock();
 		if (success && !frame.empty()) {
+			// Aruco detection here:
+			cv::Ptr<cv::aruco::Dictionary> dictionary =
+				cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
+			std::vector<std::vector<cv::Point2f>> markerCorners;
+			cv::Mat frameCopy;
+			std::vector<int> markerIds;
+			cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds);
+			frame.copyTo(frameCopy);
+			if (!markerIds.empty()) {
+				cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds);
+			}
+
 			_frame_lock->lock();
-			frame.copyTo(*(this->_frame));
+			frameCopy.copyTo(*(this->_frame));
 			(*_frame_num)++;
 			*_frame_time = dataclock::now();
 			_frame_lock->unlock();
