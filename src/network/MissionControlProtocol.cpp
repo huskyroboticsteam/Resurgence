@@ -343,9 +343,6 @@ void MissionControlProtocol::handleConnection() {
 }
 
 void MissionControlProtocol::handleHeartbeatTimedOut() {
-	LOG_F(ERROR, "Heartbeat timed out! Emergency stopping.");
-	this->stopAndShutdownPowerRepeat(true);
-	robot::emergencyStop();
 }
 
 void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {

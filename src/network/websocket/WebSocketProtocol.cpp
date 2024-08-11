@@ -65,9 +65,6 @@ void WebSocketProtocol::clientDisconnected() {
 }
 
 void WebSocketProtocol::heartbeatTimedOut() {
-	if (heartbeatInfo.has_value()) {
-		heartbeatInfo->second();
-	}
 }
 
 void WebSocketProtocol::processMessage(const json& obj) const {
