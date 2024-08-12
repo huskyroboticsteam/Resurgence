@@ -210,12 +210,15 @@ public:
 	 */
 	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
 									const navtypes::Vectord<N>& currJointPos) {
+		LOG_SCOPE_F(INFO, "IK getCommand");
 		Eigen::Vector2d newPos = get_setpoint(currTime);
 		// lock after calling get_setpoint since that internally locks the mutex
 		std::lock_guard<std::mutex> lock(mutex);
 
 		// get new joint positions for target EE
 		bool success = false;
+		LOG_F(INFO, "newPos=[%.2f, %.2f]", newPos(0), newPos(1));
+		LOG_F(INFO, "currJP=[%.2f, %.2f]", currJointPos(0), currJointPos(1));
 		navtypes::Vectord<N> jp = kin.eePosToJointPos(newPos, currJointPos, success);
 		mutableFields->velTimestamp = currTime;
 		if (!success) {

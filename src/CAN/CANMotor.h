@@ -136,6 +136,8 @@ void setMotorPower(deviceserial_t serial, int16_t power);
  */
 void setMotorPIDTarget(deviceserial_t serial, int32_t target);
 
+void setMotorPIDMaxPower(deviceserial_t serial, uint16_t maxPower);
+
 /**
  * @brief Set the angle of the PCA servo
  *
