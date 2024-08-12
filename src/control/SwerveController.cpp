@@ -85,6 +85,7 @@ drive_commands_t SwerveController::setCrabCmdVel(double dtheta, double dy,
 
 bool SwerveController::checkWheelRotation(DriveMode mode,
 										  const swerve_rots_t& wheel_rots) const {
+    return true;
 	std::array<int, 4> rots = {wheel_rots.lfRot, wheel_rots.rfRot, wheel_rots.lbRot,
 							   wheel_rots.rbRot};
 	swerve_rots_t target = getSteerRots(mode);

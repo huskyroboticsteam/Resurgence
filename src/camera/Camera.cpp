@@ -29,7 +29,7 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 	if (camera_id == 20) {
 		gstr_ss << "image/jpeg,width=640,height=480,framerate=30/1 ! "
 				   "jpegdec ! videoconvert ! appsink";
-	} else if (camera_id == 40 || camera_id == 60) {
+	} else if (camera_id == 40 || camera_id == 30) {
 		gstr_ss << "image/jpeg,width=1024,height=768,framerate=30/1 ! "
 				   "jpegdec ! videoconvert ! appsink";
 	} else if (camera_id == 100) {
