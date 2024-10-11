@@ -95,8 +95,8 @@ public:
 
 	   @returns true if opening the camera succeeds, and false if not.
 	 */
-	bool open(std::string filename, CameraParams intrinsic_params = CameraParams(),
-			  cv::Mat extrinsic_params = cv::Mat());
+	// bool open(std::string filename, CameraParams intrinsic_params = CameraParams(),
+	// 		  cv::Mat extrinsic_params = cv::Mat());
 	/**
 	   @brief Opens a Camera that is not already open.
 
@@ -163,6 +163,8 @@ public:
 	   @throws std::invalid_argument If the configuration file does not exist.
 	*/
 	bool openFromConfigFile(std::string filename);
+
+	std::stringstream GStreamerFromFile(robot::types::CameraID camera_id);
 
 	/**
 	   @brief Returns true if the camera is open.

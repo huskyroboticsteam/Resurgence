@@ -1,8 +1,11 @@
 #include "Camera.h"
+#include "../Constants.h"
 
 #include "CameraConfig.h"
 
 #include <loguru.hpp>
+
+#include <opencv2/aruco.hpp>
 
 using cv::Mat;
 using cv::Size;
@@ -14,7 +17,7 @@ namespace cam {
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>()),
+	  _capture(),
 	  _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
@@ -23,21 +26,11 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 		return false;
 	}
 	_capture_lock->lock();
-	bool result = this->_capture->open(camera_id);
+	std::stringstream gstr_ss = GStreamerFromFile(camera_id);
+	this->_capture = std::make_shared<cv::VideoCapture>(gstr_ss.str(), cv::CAP_GSTREAMER);
+	bool result = this->_capture->isOpened();
 	_capture_lock->unlock();
 	LOG_F(INFO, "Opening camera %d... %s", camera_id, result ? "success" : "failed");
-	this->_intrinsic_params = intrinsic_params;
-	init(extrinsic_params);
-	return result;
-}
-
-bool Camera::open(string filename, CameraParams intrinsic_params, Mat extrinsic_params) {
-	if (*_running) {
-		return false;
-	}
-	_capture_lock->lock();
-	bool result = this->_capture->open(filename);
-	_capture_lock->unlock();
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
 	return result;
@@ -103,7 +96,7 @@ bool Camera::openFromConfigFile(std::string filename) {
 	}
 
 	if (std::holds_alternative<std::string>(cfg.filenameOrID)) {
-		return this->open(std::get<std::string>(cfg.filenameOrID), intrinsics, extrinsics);
+		// return this->open(std::get<std::string>(cfg.filenameOrID), intrinsics, extrinsics);
 	} else if (std::holds_alternative<int>(cfg.filenameOrID)) {
 		return this->open(std::get<int>(cfg.filenameOrID), intrinsics, extrinsics);
 	} else {
@@ -111,6 +104,35 @@ bool Camera::openFromConfigFile(std::string filename) {
 		throw invalid_camera_config("One of " + KEY_FILENAME + " or " + KEY_CAMERA_ID +
 									" must be present");
 	}
+}
+
+std::stringstream Camera::GStreamerFromFile(robot::types::CameraID camera_id) {
+	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
+	if (!fs.isOpened()) {
+		throw std::invalid_argument("Configuration file of camera ID" + std::to_string(camera_id) + " does not exist");
+	}
+
+	std::stringstream gstr_ss;
+	gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! ";
+
+	const std::string KEY_NAME = "name";
+	const std::string KEY_DESCRIPTION = "description";
+	const std::string KEY_CAMERA_ID = "camera_id";
+	const std::string KEY_FORMAT = "format";
+	const std::string KEY_WIDTH = "width";
+	const std::string KEY_HEIGHT = "height";
+	const std::string KEY_FRAMERATE = "framerate";
+
+	gstr_ss << "image/" << fs[KEY_FORMAT].operator std::string();
+	gstr_ss << ",width=" << fs[KEY_WIDTH].operator std::string();
+	gstr_ss << ",height=" << fs[KEY_HEIGHT].operator std::string();
+	gstr_ss << ",framerate=" << fs[KEY_FRAMERATE].operator std::string() << "/1";
+	gstr_ss << " ! " << fs[KEY_FORMAT].operator std::string() << "dec ! videoconvert";
+	
+	gstr_ss << " ! appsink";
+	LOG_F(INFO, "GSTR: %s", gstr_ss.str().c_str());
+
+	return gstr_ss;
 }
 
 void Camera::captureLoop() {

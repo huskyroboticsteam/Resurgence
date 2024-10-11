@@ -43,7 +43,7 @@ using landmarks_t = std::vector<DataPoint<navtypes::point_t>>;
 /** @brief A pair of a camera frame and its corresponding frame number */
 using CameraFrame = std::pair<cv::Mat, uint32_t>;
 /** @brief The type of a camera id */
-using CameraID = std::string;
+using CameraID = int;
 
 /** @brief An indication enum, used to command the LED to flash different signals */
 enum class indication_t {

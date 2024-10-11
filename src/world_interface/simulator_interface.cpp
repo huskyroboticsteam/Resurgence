@@ -112,11 +112,11 @@ static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d =
 }
 
 void initCameras() {
-	auto cfg = cam::readConfigFromFile(Constants::MAST_CAMERA_CONFIG_PATH);
-	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
-	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	// auto cfg = cam::readConfigFromFile(Constants::MAST_CAMERA_CONFIG_PATH);
+	// cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
+	// openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	// openCamera(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	// openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 }
 
 void initMotors() {
@@ -148,12 +148,13 @@ void handleIMU(json msg) {
 
 void handleCamFrame(json msg) {
 	std::string cam = msg["camera"];
+	robot::types::CameraID id = Constants::CAMERA_NAME_TO_ID.at(cam);
 	std::string b64 = msg["data"];
 	cv::Mat mat = base64::decodeMat(b64);
 
 	// acquire exclusive lock
 	std::lock_guard<std::shared_mutex> lock(cameraFrameMapMutex);
-	auto entry = cameraLastFrameIdxMap.find(cam);
+	auto entry = cameraLastFrameIdxMap.find(id);
 	uint32_t idx = 0;
 	if (entry != cameraLastFrameIdxMap.end()) {
 		idx = entry->second + 1;
@@ -161,8 +162,8 @@ void handleCamFrame(json msg) {
 
 	CameraFrame cf = {mat, idx};
 	DataPoint<CameraFrame> df(cf);
-	cameraFrameMap[cam] = df;
-	cameraLastFrameIdxMap[cam] = idx;
+	cameraFrameMap[id] = df;
+	cameraLastFrameIdxMap[id] = idx;
 }
 
 void handleMotorStatus(json msg) {
