@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../camera/CameraParams.h"
 #include "MarkerSet.h"
 #include "Tag.h"
 
@@ -19,7 +18,6 @@ namespace AR {
 class Detector {
 private:
 	std::shared_ptr<MarkerSet> marker_set_;
-	cam::CameraParams camera_params_;
 	cv::Ptr<cv::aruco::DetectorParameters> detector_params_;
 	cv::Mat map1_, map2_;
 	std::vector<Tag> _detectTagsImpl(const cv::Mat& input,
@@ -28,7 +26,7 @@ private:
 
 public:
 	Detector();
-	Detector(std::shared_ptr<MarkerSet> marker_set, cam::CameraParams camera_params,
+	Detector(std::shared_ptr<MarkerSet> marker_set,
 			 cv::Ptr<cv::aruco::DetectorParameters> detector_params =
 				 cv::aruco::DetectorParameters::create());
 	std::vector<Tag> detectTags(const cv::Mat& input,

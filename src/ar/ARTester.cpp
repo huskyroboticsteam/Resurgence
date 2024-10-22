@@ -1,6 +1,4 @@
 #include "../camera/Camera.h"
-#include "../camera/CameraConfig.h"
-#include "../camera/CameraParams.h"
 #include "Detector.h"
 
 #include <chrono>
@@ -36,7 +34,6 @@ const std::string keys =
 // TODO: come up with a better solution for examining video files
 // cam::Camera cap;
 cv::VideoCapture cap;
-cam::CameraParams PARAMS;
 std::shared_ptr<AR::MarkerSet> MARKER_SET;
 
 std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec);
@@ -56,8 +53,8 @@ int main(int argc, char* argv[]) {
 		return EXIT_SUCCESS;
 	}
 
-	if (!parser.has("c") || parser.get<std::string>("c").empty()) {
-		std::cerr << "Error: camera configuration file is required." << std::endl;
+	if (!parser.has("co")) {
+		std:cerr << "Error: camera ID required." << std::endl;
 		parser.printMessage();
 		return EXIT_FAILURE;
 	}
@@ -78,35 +75,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	int cam_id = parser.get<int>("co", -1);
-	std::string cam_file = parser.get<std::string>("fo");
-	cv::FileStorage cam_config(parser.get<std::string>("c"), cv::FileStorage::READ);
-	if (!cam_config.isOpened()) {
-		std::cerr << "Error: given camera configuration file " << parser.get<std::string>("c")
-				  << " does not exist!" << std::endl;
-		cam_config.release();
-		return EXIT_FAILURE;
-	}
-	if (cam_config[cam::KEY_INTRINSIC_PARAMS].empty()) {
-		std::cerr << "Error: Intrinsic parameters are required for AR tag detection!"
-				  << std::endl;
-		cam_config.release();
-		return EXIT_FAILURE;
-	}
-	cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
-	// read filename or camera ID, and open camera.
-	if (!cam_config[cam::KEY_FILENAME].empty() && !parser.has("fo")) {
-		cam_file = (std::string)cam_config[cam::KEY_FILENAME];
-	} else if (!cam_config[cam::KEY_CAMERA_ID].empty() && !parser.has("co")) {
-		cam_id = (int)cam_config[cam::KEY_CAMERA_ID];
-	} else if (!parser.has("fo") && !parser.has("co")) {
-		std::cerr << "Error: no file or camera_id was provided in the configuration file or "
-					 "on the command line!"
-				  << std::endl;
-		std::cerr << "Usage:" << std::endl;
-		parser.printMessage();
-		return EXIT_FAILURE;
-	}
-	cam_config.release();
 
 	cv::Mat frame;
 	[[maybe_unused]] uint32_t fnum = 0;
@@ -115,8 +83,9 @@ int main(int argc, char* argv[]) {
 	bool open_success = false;
 	if (cam_id > -1) {
 		open_success = cap.open(cam_id);
-	} else if (!cam_file.empty()) {
-		open_success = cap.open(cam_file);
+	} else {
+		std::cerr << "Error: invalid camera ID" << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	if (!open_success) {
@@ -124,8 +93,8 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	const int w = PARAMS.getImageSize().width;
-	const int h = PARAMS.getImageSize().height;
+	const int w = cap.getWidth();
+	const int h = cap.getHeight();
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
 	std::cout << "Set image dimensions to " << w << " x " << h << std::endl;

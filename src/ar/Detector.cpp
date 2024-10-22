@@ -1,6 +1,5 @@
 #include "Detector.h"
 
-#include "../camera/CameraParams.h"
 #include "Tag.h"
 
 #include <cassert>
@@ -17,9 +16,9 @@ namespace AR {
 Detector::Detector() {
 }
 
-Detector::Detector(std::shared_ptr<MarkerSet> marker_set, cam::CameraParams camera_params,
+Detector::Detector(std::shared_ptr<MarkerSet> marker_set,
 				   cv::Ptr<cv::aruco::DetectorParameters> detector_params)
-	: marker_set_(marker_set), camera_params_(camera_params),
+	: marker_set_(marker_set),
 	  detector_params_(detector_params) {
 	if (!this->empty()) {
 		this->detector_params_->markerBorderBits = marker_set->getBorderSize();

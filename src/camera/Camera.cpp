@@ -1,8 +1,6 @@
 #include "Camera.h"
 #include "../Constants.h"
 
-#include "CameraConfig.h"
-
 #include <loguru.hpp>
 
 #include <opencv2/aruco.hpp>
@@ -21,7 +19,23 @@ Camera::Camera()
 	  _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
-bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_params) {
+Camera::Camera(robot::types::CameraID camera_id)
+	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
+	  _frame_time(std::make_shared<datatime_t>()),
+	  _capture(std::make_shared<cv::VideoCapture>(camera_id)),
+	  _frame_lock(std::make_shared<std::mutex>()),
+	  _capture_lock(std::make_shared<std::mutex>()),
+	  _running(std::make_shared<bool>(false)) {
+	open(camera_id);
+}
+
+Camera::Camera(const Camera& other)
+	: _frame(other._frame), _frame_num(other._frame_num), _frame_time(other._frame_time),
+	  _capture(other._capture), _name(other._name), _description(other._description),
+	  _frame_lock(other._frame_lock), _capture_lock(other._capture_lock),
+	  _thread(other._thread), _running(other._running) {}
+
+bool Camera::open(robot::types::CameraID camera_id) {
 	if (*_running) {
 		return false;
 	}
@@ -31,38 +45,11 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 	bool result = this->_capture->isOpened();
 	_capture_lock->unlock();
 	LOG_F(INFO, "Opening camera %d... %s", camera_id, result ? "success" : "failed");
-	this->_intrinsic_params = intrinsic_params;
-	init(extrinsic_params);
+	init();
 	return result;
 }
 
-Camera::Camera(string filename, string name, string description, CameraParams intrinsic_params,
-			   Mat extrinsic_params)
-	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>(filename)), _name(name),
-	  _description(description), _frame_lock(std::make_shared<std::mutex>()),
-	  _capture_lock(std::make_shared<std::mutex>()), _intrinsic_params(intrinsic_params),
-	  _running(std::make_shared<bool>(false)) {
-	init(extrinsic_params);
-}
-
-Camera::Camera(int camera_id, string name, string description, CameraParams intrinsic_params,
-			   Mat extrinsic_params)
-	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>(camera_id)), _name(name),
-	  _description(description), _frame_lock(std::make_shared<std::mutex>()),
-	  _capture_lock(std::make_shared<std::mutex>()), _intrinsic_params(intrinsic_params),
-	  _running(std::make_shared<bool>(false)) {
-	init(extrinsic_params);
-}
-
-void Camera::init(const Mat& extrinsic_params) {
-	if (!extrinsic_params.empty() && extrinsic_params.size() != Size(4, 4)) {
-		throw std::invalid_argument("extrinsic_params must be 4x4 if given");
-	}
-	extrinsic_params.copyTo(this->_extrinsic_params);
+void Camera::init() {
 	*(this->_running) = true;
 	this->_thread = std::shared_ptr<std::thread>(
 		new std::thread(&Camera::captureLoop, this), [this](std::thread* p) {
@@ -73,37 +60,6 @@ void Camera::init(const Mat& extrinsic_params) {
 			}
 			delete p;
 		});
-}
-
-Camera::Camera(const Camera& other)
-	: _frame(other._frame), _frame_num(other._frame_num), _frame_time(other._frame_time),
-	  _capture(other._capture), _name(other._name), _description(other._description),
-	  _frame_lock(other._frame_lock), _capture_lock(other._capture_lock),
-	  _thread(other._thread), _intrinsic_params(other._intrinsic_params),
-	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
-
-bool Camera::openFromConfigFile(std::string filename) {
-	CameraConfig cfg = readConfigFromFile(filename);
-
-	cv::Mat extrinsics;
-	if (cfg.extrinsicParams) {
-		extrinsics = cfg.extrinsicParams.value();
-	}
-
-	CameraParams intrinsics;
-	if (cfg.intrinsicParams) {
-		intrinsics = cfg.intrinsicParams.value();
-	}
-
-	if (std::holds_alternative<std::string>(cfg.filenameOrID)) {
-		// return this->open(std::get<std::string>(cfg.filenameOrID), intrinsics, extrinsics);
-	} else if (std::holds_alternative<int>(cfg.filenameOrID)) {
-		return this->open(std::get<int>(cfg.filenameOrID), intrinsics, extrinsics);
-	} else {
-		// this should never happen
-		throw invalid_camera_config("One of " + KEY_FILENAME + " or " + KEY_CAMERA_ID +
-									" must be present");
-	}
 }
 
 std::stringstream Camera::GStreamerFromFile(robot::types::CameraID camera_id) {
@@ -123,9 +79,14 @@ std::stringstream Camera::GStreamerFromFile(robot::types::CameraID camera_id) {
 	const std::string KEY_HEIGHT = "height";
 	const std::string KEY_FRAMERATE = "framerate";
 
+	_name = fs[KEY_NAME].operator std::string();
+	_description = fs[KEY_DESCRIPTION].operator std::string();
+	_width = fs[KEY_WIDTH].operator int();
+	_height = fs[KEY_HEIGHT].operator int();
+
 	gstr_ss << "image/" << fs[KEY_FORMAT].operator std::string();
-	gstr_ss << ",width=" << fs[KEY_WIDTH].operator std::string();
-	gstr_ss << ",height=" << fs[KEY_HEIGHT].operator std::string();
+	gstr_ss << ",width=" << _width;
+	gstr_ss << ",height=" << _height;
 	gstr_ss << ",framerate=" << fs[KEY_FRAMERATE].operator std::string() << "/1";
 	gstr_ss << " ! " << fs[KEY_FORMAT].operator std::string() << "dec ! videoconvert";
 	
@@ -137,23 +98,25 @@ std::stringstream Camera::GStreamerFromFile(robot::types::CameraID camera_id) {
 
 void Camera::captureLoop() {
 	loguru::set_thread_name(_name.c_str());
-	cv::Size image_size(640, 480);
-	if (!_intrinsic_params.empty()) {
-		image_size = _intrinsic_params.getImageSize();
-	}
-	_capture_lock->lock();
-	_capture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-	_capture->set(cv::CAP_PROP_FRAME_WIDTH, image_size.width);
-	_capture->set(cv::CAP_PROP_FRAME_HEIGHT, image_size.height);
-	_capture_lock->unlock();
 	cv::Mat frame;
 	while (*_running) {
 		_capture_lock->lock();
 		bool success = _capture->read(frame);
 		_capture_lock->unlock();
 		if (success && !frame.empty()) {
+			// Aruco detection here:
+			cv::Ptr<cv::aruco::Dictionary> dictionary =
+				cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
+			std::vector<std::vector<cv::Point2f>> markerCorners;
+			cv::Mat frameCopy;
+			std::vector<int> markerIds;
+			cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds);
+			frame.copyTo(frameCopy);
+			if (!markerIds.empty()) {
+				cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds);
+			}
 			_frame_lock->lock();
-			frame.copyTo(*(this->_frame));
+			frameCopy.copyTo(*(this->_frame));
 			(*_frame_num)++;
 			*_frame_time = dataclock::now();
 			_frame_lock->unlock();
@@ -196,28 +159,20 @@ bool Camera::next(cv::Mat& frame, uint32_t& frame_num, datatime_t& frame_time) c
 	return true;
 }
 
-bool Camera::hasIntrinsicParams() const {
-	return !(_intrinsic_params.empty());
-}
-
-bool Camera::hasExtrinsicParams() const {
-	return !(_extrinsic_params.empty());
-}
-
-CameraParams Camera::getIntrinsicParams() const {
-	return _intrinsic_params;
-}
-
-cv::Mat Camera::getExtrinsicParams() const {
-	return _extrinsic_params.clone();
-}
-
 std::string Camera::getName() const {
 	return _name;
 }
 
 std::string Camera::getDescription() const {
 	return _description;
+}
+
+int Camera::getWidth() const {
+	return _width;
+}
+
+int Camera::getHeight() const {
+	return _height;
 }
 
 void Camera::setName(std::string new_name) {

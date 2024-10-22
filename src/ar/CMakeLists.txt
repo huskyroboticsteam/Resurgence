@@ -3,9 +3,7 @@ find_package(Threads REQUIRED)
 
 add_executable(ar_tester
   ARTester.cpp
-  ../camera/CameraParams.cpp
   ../camera/Camera.cpp
-  ../camera/CameraConfig.cpp
   Detector.cpp
   MarkerSet.cpp
   MarkerPattern.cpp

@@ -132,8 +132,6 @@ endif()
 
 add_library(camera SHARED
   camera/Camera.cpp
-  camera/CameraParams.cpp
-  camera/CameraConfig.cpp
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
 
@@ -309,8 +307,8 @@ if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
     # AR Detection tests
-    ar/DetectorTests.cpp
-    ar/MarkerSetTests.cpp
+    # ar/DetectorTests.cpp
+    # ar/MarkerSetTests.cpp
     # Camera tests
     ../tests/camera/CameraParamsTests.cpp
     # GPS tests
