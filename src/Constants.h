@@ -53,14 +53,12 @@ extern const double MAX_DTHETA;
 
 // TODO: We need to recalibrate the camera, since we replaced it with a different one.
 // TODO: rename cameras (in MC as well) as appropriate
-extern const char* MAST_CAMERA_CONFIG_PATH;
 extern const robot::types::CameraID MAST_CAMERA_ID;
-
-extern const char* FOREARM_CAMERA_CONFIG_PATH;
-extern const robot::types::CameraID FOREARM_CAMERA_ID;
-
-extern const char* HAND_CAMERA_CONFIG_PATH;
+extern const robot::types::CameraID WRIST_CAMERA_ID;
 extern const robot::types::CameraID HAND_CAMERA_ID;
+
+extern const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS;
+extern const std::unordered_map<std::string, robot::types::CameraID> CAMERA_NAME_TO_ID;
 
 extern const uint16_t WS_SERVER_PORT;
 
@@ -186,8 +184,8 @@ constexpr frozen::unordered_map<robot::types::motorid_t, std::pair<int, int>, IK
  * Map from motor ids to segment length in meters
  */
 constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size()>
-	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.3848608},
-					{robot::types::motorid_t::elbow, 0.461264}};
+	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.394},
+					{robot::types::motorid_t::elbow, 0.749}};
 } // namespace arm
 
 namespace autonomous {

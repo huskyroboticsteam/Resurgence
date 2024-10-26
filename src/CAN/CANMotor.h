@@ -16,11 +16,17 @@
 namespace can::motor {
 
 /** @brief The possible motor modes. */
-enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
+enum class motormode_t {
+	pwm = MOTOR_UNIT_MODE_PWM,
+	pid = MOTOR_UNIT_MODE_PID
+};
 
 /** @brief The supported motor position sensors. */
 struct sensor_t {
-	enum { encoder = 0, potentiometer = 1 };
+	enum {
+		encoder = 0,
+		potentiometer = 1
+	};
 };
 
 /**
@@ -135,6 +141,14 @@ void setMotorPower(deviceserial_t serial, int16_t power);
  * @param target The position in millidegrees to track with the PID controller.
  */
 void setMotorPIDTarget(deviceserial_t serial, int32_t target);
+
+/**
+ * @brief Set the maximum power allowed for a motor when running PID.
+ *
+ * @param serial The CAN serial number of the motor board.
+ * @param maxPower The maximum power allowed for the motor.
+ */
+void setMotorPIDMaxPower(deviceserial_t serial, uint16_t maxPower);
 
 /**
  * @brief Set the angle of the PCA servo
