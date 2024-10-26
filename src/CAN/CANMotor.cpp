@@ -92,6 +92,13 @@ void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t
 	std::this_thread::sleep_for(1ms);
 }
 
+void setMotorPIDMaxPower(deviceserial_t serial, uint16_t maxPower) {
+	CANPacket p;
+	auto motorGroupCode = static_cast<uint8_t>(devicegroup_t::motor);
+	AssembleMaxPIDPWMPacket(&p, motorGroupCode, serial, maxPower);
+	sendCANPacket(p);
+}
+
 void setMotorMode(deviceserial_t serial, motormode_t mode) {
 	CANPacket p;
 	AssembleModeSetPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial,
