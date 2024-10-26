@@ -67,6 +67,7 @@ message("========================================")
 # here to avoid the compiler spamming warnings at us for stuff in the Eigen headers.
 find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+include_directories("/usr/local/include")
 
 # Find the WebSocket++ library and Boost (provides the ASIO backend for Websocket++ and also
 # provides the program_options argument parser). Only the `system` component of Boost is
@@ -197,11 +198,11 @@ endif()
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
   world_interface/gps_common_interface.cpp
-  ar/Detector.cpp
-  ar/MarkerSet.cpp
-  ar/MarkerPattern.cpp
-  ar/Tag.cpp
-  ar/read_landmarks.cpp
+  #ar/Detector.cpp
+  #ar/MarkerSet.cpp
+  #ar/MarkerPattern.cpp
+  #ar/Tag.cpp
+  #ar/read_landmarks.cpp
   world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})

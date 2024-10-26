@@ -26,7 +26,7 @@ Camera::Camera(robot::types::CameraID camera_id)
 	  _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()),
 	  _running(std::make_shared<bool>(false)) {
-	open(camera_id);
+	this->open(camera_id);
 }
 
 Camera::Camera(const Camera& other)

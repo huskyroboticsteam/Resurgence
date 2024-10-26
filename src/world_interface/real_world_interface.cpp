@@ -96,10 +96,10 @@ void initMotors() {
 	}
 }
 
-void openCamera(CameraID camID, const char* cameraPath) {
+void openCamera(CameraID camID) {
 	try {
 		auto cam = std::make_shared<cam::Camera>();
-		bool success = cam->openFromConfigFile(cameraPath);
+		bool success = cam->open(camID)
 		if (success) {
 			cameraMap[camID] = cam;
 		} else {
@@ -112,10 +112,11 @@ void openCamera(CameraID camID, const char* cameraPath) {
 }
 
 void setupCameras() {
-	openCamera(Constants::MAST_CAMERA_ID, Constants::MAST_CAMERA_CONFIG_PATH);
-	openCamera(Constants::FOREARM_CAMERA_ID, Constants::FOREARM_CAMERA_CONFIG_PATH);
-	openCamera(Constants::HAND_CAMERA_ID, Constants::HAND_CAMERA_CONFIG_PATH);
+	openCamera(Constants::MAST_CAMERA_ID);
+	openCamera(Constants::FOREARM_CAMERA_ID);
+	openCamera(Constants::HAND_CAMERA_ID);
 }
+
 } // namespace
 
 void world_interface_init(
