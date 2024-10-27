@@ -87,25 +87,14 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
-					   uint8_t fps = 30, uint16_t width = 640, uint16_t height = 480) {
-	if (list1d) {
-		json msg = {{"type", "simCameraStreamOpenRequest"},
-					{"camera", cam},
-					{"fps", fps},
-					{"width", width},
-					{"height", height},
-					{"intrinsics", list1d.value()}};
-		sendJSON(msg);
-	} else {
-		json msg = {{"type", "simCameraStreamOpenRequest"},
-					{"camera", cam},
-					{"fps", fps},
-					{"width", width},
-					{"height", height},
-					{"intrinsics", nullptr}};
-		sendJSON(msg);
-	}
+static void openCamera(CameraID cam, uint8_t fps = 30, uint16_t width = 640, uint16_t height = 480) {
+	json msg = {{"type", "simCameraStreamOpenRequest"},
+				{"cameraID", cam},
+				{"fps", fps},
+				{"width", width},
+				{"height", height}};
+	sendJSON(msg);
+
 }
 
 void initCameras() {
@@ -142,8 +131,7 @@ void handleIMU(json msg) {
 }
 
 void handleCamFrame(json msg) {
-	std::string cam = msg["camera"];
-	robot::types::CameraID id = Constants::CAMERA_NAME_TO_ID.at(cam);
+	robot::types::CameraID id = msg["cameraID"];
 	std::string b64 = msg["data"];
 	cv::Mat mat = base64::decodeMat(b64);
 
