@@ -95,8 +95,8 @@ void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint
 /**
  * @brief Set the PID constants for a motor board.
  *
- * Note that the PID constants are specified in units of 10000, so a 1 is interpreted as a
- * 10000. This is because the controller operates on millidegrees.
+ * Note that the PID constants are specified in units of 1000, so a 1 is interpreted as a
+ * 1000. This is because the controller operates on millidegrees.
  *
  * @param serial The CAN serial number of the motor board.
  * @param kP The P coefficient.
