@@ -84,8 +84,15 @@ void initMotors() {
 
 		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
 								TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
-										 enc_params.limitSwitchHigh);
+
+		auto mDegToPulses = [&](int32_t mdeg) {
+			return static_cast<int32_t>(static_cast<double>(mdeg) / 360000.0 *
+										enc_params.ppjr);
+		};
+
+		// TODO: get rid of the negatives once firmware fixes the limit switch limits issue
+		can::motor::setLimitSwitchLimits(serial, mDegToPulses(-enc_params.limitSwitchLow),
+										 mDegToPulses(-enc_params.limitSwitchHigh));
 	}
 
 	for (const auto& pair : robot::motorPIDMap) {
