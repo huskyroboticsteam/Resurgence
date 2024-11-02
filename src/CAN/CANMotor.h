@@ -71,8 +71,8 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
  * Use this method for motorboard with both encoders and limit switches
  *
  * @param serial The CAN serial number of the motor board.
- * @param lo The joint position in millidegrees of the low limit switch.
- * @param hi The joint position in millidegrees of the high limit switch.
+ * @param lo The joint position in encoder ticks of the low limit switch.
+ * @param hi The joint position in encoder ticks of the high limit switch.
  */
 void setLimitSwitchLimits(deviceserial_t serial, int32_t lo, int32_t hi);
 
