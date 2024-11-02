@@ -3,7 +3,6 @@
 #include "../navtypes.h"
 
 namespace kinematics {
-using namespace navtypes;
 
 /**
  * Represents robot wheel velocities in robot reference frame,
@@ -61,7 +60,7 @@ public:
 	 * robot's reference frame.
 	 * @return the robot's translational and angular velocity in the robot's reference frame.
 	 */
-	pose_t wheelVelToRobotVel(swervewheelvel_t wheelVel) const;
+	navtypes::pose_t wheelVelToRobotVel(swervewheelvel_t wheelVel) const;
 
 	/**
 	 * Calculate the pose update in the local reference frame given the velocities of the
@@ -75,7 +74,7 @@ public:
 	navtypes::pose_t getLocalPoseUpdate(const swervewheelvel_t& wheelVel, double dt) const;
 
 	/**
-	 * Calculate the pose update in the global reference frame given the velocities of the
+	 * Calculate th	e pose update in the global reference frame given the velocities of the
 	 * robot's wheels and the time step.
 	 *
 	 * @param wheelVel The velocities of the wheels.
