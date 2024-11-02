@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 	int d_coeff = std::stoi(str);
 
 	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
-	// TODO: set the motor pid max power
+	// can::motor::setMotorPIDMaxPower(serial, 32767);  // this was here from circ
 	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
 	double period = 8.0;
 
