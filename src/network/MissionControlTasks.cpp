@@ -164,7 +164,7 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						// convert frame to encoded data and send it
 						auto data_vector = encoder->encode_frame(frame);
 						json msg = {{"type", CAMERA_STREAM_REP_TYPE},
-									{"camera", cam},
+									{"cameraID", cam},
 									{"data", data_vector}};
 						_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 					}

@@ -1,7 +1,6 @@
 #include "../Constants.h"
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
-#include "../camera/CameraConfig.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketProtocol.h"
@@ -79,8 +78,6 @@ std::unordered_map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // but this one is guaranteed to have indices, if there are any
 std::unordered_map<CameraID, uint32_t> cameraLastFrameIdxMap;
 std::shared_mutex cameraFrameMapMutex; // protects both of the above maps
-// not modified after startup, no need to synchronize
-std::unordered_map<CameraID, cam::CameraConfig> cameraConfigMap;
 
 std::condition_variable connectionCV;
 std::mutex connectionMutex;
@@ -90,33 +87,20 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
-					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
-	if (list1d) {
-		json msg = {{"type", "simCameraStreamOpenRequest"},
-					{"camera", cam},
-					{"fps", fps},
-					{"width", width},
-					{"height", height},
-					{"intrinsics", list1d.value()}};
-		sendJSON(msg);
-	} else {
-		json msg = {{"type", "simCameraStreamOpenRequest"},
-					{"camera", cam},
-					{"fps", fps},
-					{"width", width},
-					{"height", height},
-					{"intrinsics", nullptr}};
-		sendJSON(msg);
-	}
+static void openCamera(CameraID cam, uint8_t fps = 30, uint16_t width = 640,
+					   uint16_t height = 480) {
+	json msg = {{"type", "simCameraStreamOpenRequest"},
+				{"cameraID", cam},
+				{"fps", fps},
+				{"width", width},
+				{"height", height}};
+	sendJSON(msg);
 }
 
 void initCameras() {
-	auto cfg = cam::readConfigFromFile(Constants::MAST_CAMERA_CONFIG_PATH);
-	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
-	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera(Constants::HAND_CAMERA_ID);
+	openCamera(Constants::WRIST_CAMERA_ID);
+	openCamera(Constants::MAST_CAMERA_ID);
 }
 
 void initMotors() {
@@ -147,13 +131,13 @@ void handleIMU(json msg) {
 }
 
 void handleCamFrame(json msg) {
-	std::string cam = msg["camera"];
+	robot::types::CameraID id = msg["cameraID"];
 	std::string b64 = msg["data"];
 	cv::Mat mat = base64::decodeMat(b64);
 
 	// acquire exclusive lock
 	std::lock_guard<std::shared_mutex> lock(cameraFrameMapMutex);
-	auto entry = cameraLastFrameIdxMap.find(cam);
+	auto entry = cameraLastFrameIdxMap.find(id);
 	uint32_t idx = 0;
 	if (entry != cameraLastFrameIdxMap.end()) {
 		idx = entry->second + 1;
@@ -161,8 +145,8 @@ void handleCamFrame(json msg) {
 
 	CameraFrame cf = {mat, idx};
 	DataPoint<CameraFrame> df(cf);
-	cameraFrameMap[cam] = df;
-	cameraLastFrameIdxMap[cam] = idx;
+	cameraFrameMap[id] = df;
+	cameraLastFrameIdxMap[id] = idx;
 }
 
 void handleMotorStatus(json msg) {
@@ -311,34 +295,6 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 	auto cfEntry = cameraFrameMap.find(cameraID);
 	if (cfEntry != cameraFrameMap.end()) {
 		return cfEntry->second;
-	} else {
-		return {};
-	}
-}
-
-std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
-	auto entry = cameraConfigMap.find(cameraID);
-	if (entry != cameraConfigMap.end()) {
-		auto cfg = entry->second;
-		if (cfg.intrinsicParams) {
-			return cfg.intrinsicParams;
-		} else {
-			return {};
-		}
-	} else {
-		return {};
-	}
-}
-
-std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
-	auto entry = cameraConfigMap.find(cameraID);
-	if (entry != cameraConfigMap.end()) {
-		auto cfg = entry->second;
-		if (cfg.extrinsicParams) {
-			return cfg.extrinsicParams;
-		} else {
-			return {};
-		}
 	} else {
 		return {};
 	}

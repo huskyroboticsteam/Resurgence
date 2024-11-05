@@ -1,0 +1,11 @@
+%YAML:1.0
+---
+name: "hand"
+description: "Camera located on the hand of the rover."
+# Make sure that this camera_id matches the one defined in the udev rules.
+camera_id: 20
+
+format: "jpeg"
+width: 640
+height: 480
+framerate: 30

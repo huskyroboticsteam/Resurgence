@@ -299,11 +299,11 @@ static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "cameraID", val_t::number_unsigned);
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
-	CameraID cam = j["camera"];
+	CameraID cam = j["cameraID"];
 	std::unordered_set<CameraID> supported_cams = robot::getCameras();
 	if (supported_cams.find(cam) != supported_cams.end()) {
 		_camera_stream_task.openStream(cam, j["fps"]);
@@ -311,11 +311,11 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "cameraID", val_t::number_unsigned);
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
-	CameraID cam = j["camera"];
+	CameraID cam = j["cameraID"];
 	_camera_stream_task.closeStream(cam);
 }
 

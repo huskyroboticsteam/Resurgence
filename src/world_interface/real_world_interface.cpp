@@ -96,10 +96,10 @@ void initMotors() {
 	}
 }
 
-void openCamera(CameraID camID, const char* cameraPath) {
+void openCamera(CameraID camID) {
 	try {
 		auto cam = std::make_shared<cam::Camera>();
-		bool success = cam->openFromConfigFile(cameraPath);
+		bool success = cam->open(camID);
 		if (success) {
 			cameraMap[camID] = cam;
 		} else {
@@ -112,10 +112,11 @@ void openCamera(CameraID camID, const char* cameraPath) {
 }
 
 void setupCameras() {
-	openCamera(Constants::MAST_CAMERA_ID, Constants::MAST_CAMERA_CONFIG_PATH);
-	openCamera(Constants::FOREARM_CAMERA_ID, Constants::FOREARM_CAMERA_CONFIG_PATH);
-	openCamera(Constants::HAND_CAMERA_ID, Constants::HAND_CAMERA_CONFIG_PATH);
+	openCamera(Constants::MAST_CAMERA_ID);
+	openCamera(Constants::WRIST_CAMERA_ID);
+	openCamera(Constants::HAND_CAMERA_ID);
 }
+
 } // namespace
 
 void world_interface_init(
@@ -182,30 +183,6 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 	} else {
 		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return DataPoint<CameraFrame>{};
-	}
-}
-
-std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
-	auto itr = cameraMap.find(cameraID);
-	if (itr != cameraMap.end()) {
-		auto camera = itr->second;
-		return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
-											: std::optional<cam::CameraParams>{};
-	} else {
-		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
-		return {};
-	}
-}
-
-std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
-	auto itr = cameraMap.find(cameraID);
-	if (itr != cameraMap.end()) {
-		auto camera = itr->second;
-		return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
-											: std::optional<cv::Mat>{};
-	} else {
-		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
-		return {};
 	}
 }
 

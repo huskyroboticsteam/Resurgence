@@ -67,6 +67,7 @@ message("========================================")
 # here to avoid the compiler spamming warnings at us for stuff in the Eigen headers.
 find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+include_directories("/usr/local/include")
 
 # Find the WebSocket++ library and Boost (provides the ASIO backend for Websocket++ and also
 # provides the program_options argument parser). Only the `system` component of Boost is
@@ -132,8 +133,6 @@ endif()
 
 add_library(camera SHARED
   camera/Camera.cpp
-  camera/CameraParams.cpp
-  camera/CameraConfig.cpp
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
 
@@ -199,11 +198,11 @@ endif()
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
   world_interface/gps_common_interface.cpp
-  ar/Detector.cpp
-  ar/MarkerSet.cpp
-  ar/MarkerPattern.cpp
-  ar/Tag.cpp
-  ar/read_landmarks.cpp
+  #ar/Detector.cpp
+  #ar/MarkerSet.cpp
+  #ar/MarkerPattern.cpp
+  #ar/Tag.cpp
+  #ar/read_landmarks.cpp
   world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -309,10 +308,10 @@ if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
     # AR Detection tests
-    ar/DetectorTests.cpp
-    ar/MarkerSetTests.cpp
+    # ar/DetectorTests.cpp
+    # ar/MarkerSetTests.cpp
     # Camera tests
-    ../tests/camera/CameraParamsTests.cpp
+    # ../tests/camera/CameraParamsTests.cpp
     # GPS tests
     ../tests/gps/GPSDatumTest.cpp
     ../tests/gps/GPSConverterTest.cpp
@@ -368,7 +367,6 @@ add_compile_options(
   -Werror
 )
 
-add_subdirectory(ar)
 add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)
