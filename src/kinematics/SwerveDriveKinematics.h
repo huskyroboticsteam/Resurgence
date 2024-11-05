@@ -74,7 +74,7 @@ public:
 	navtypes::pose_t getLocalPoseUpdate(const swervewheelvel_t& wheelVel, double dt) const;
 
 	/**
-	 * Calculate th	e pose update in the global reference frame given the velocities of the
+	 * Calculate the pose update in the global reference frame given the velocities of the
 	 * robot's wheels and the time step.
 	 *
 	 * @param wheelVel The velocities of the wheels.
