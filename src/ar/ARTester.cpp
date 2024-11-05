@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
 	if (!cam_config[cam::KEY_FILENAME].empty() && !parser.has("fo")) {
 		cam_file = (std::string)cam_config[cam::KEY_FILENAME];
 	} else if (!cam_config[cam::KEY_CAMERA_ID].empty() && !parser.has("co")) {
-		cam_id = (int)cam_config[cam::KEY_CAMERA_ID];
+		cam_id = static_cast<int>(cam_config[cam::KEY_CAMERA_ID]);
 	} else if (!parser.has("fo") && !parser.has("co")) {
 		std::cerr << "Error: no file or camera_id was provided in the configuration file or "
 					 "on the command line!"
@@ -196,8 +196,8 @@ int main(int argc, char* argv[]) {
 		if (show_grid) {
 			std::vector<cv::Point2f> grid = projectGrid(imageSize, grid_spacing);
 			for (cv::Point2f pt : grid) {
-				cv::Point2f newPt(pt.x * (float)imageSize.width,
-								  pt.y * (float)imageSize.height);
+				cv::Point2f newPt(pt.x * static_cast<float>(imageSize.width),
+								  pt.y * static_cast<float>(imageSize.height));
 				cv::drawMarker(frame, newPt, cv::Scalar(255, 0, 0), cv::MARKER_CROSS, 10, 1);
 			}
 		}
@@ -252,14 +252,14 @@ std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec) 
 }
 
 std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing) {
-	cv::Point2f center((float)imageSize.width / 2.0f, (float)imageSize.height / 2.0f);
+	cv::Point2f center(static_cast<float>(imageSize.width) / 2.0f, static_cast<float>(imageSize.height) / 2.0f);
 	std::vector<cv::Point2f> grid_points;
 	std::vector<cv::Point2f> projected_points;
 	float xf, yf;
 	for (int x = 0; x < imageSize.width / 2; x += spacing) {
 		for (int y = 0; y < imageSize.height / 2; y += spacing) {
-			xf = (float)x;
-			yf = (float)y;
+			xf = static_cast<float>(x);
+			yf = static_cast<float>(y);
 			grid_points.push_back(cv::Point2f(xf, yf) + center);
 			if (x != 0 || y != 0) {
 				grid_points.push_back(cv::Point2f(-xf, -yf) + center);

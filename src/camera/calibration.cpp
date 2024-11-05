@@ -135,12 +135,12 @@ computeReprojectionErrors(const std::vector<std::vector<cv::Point3f>>& objectPoi
 	double totalErr = 0, err;
 	perViewErrors.resize(objectPoints.size());
 
-	for (i = 0; i < (int)objectPoints.size(); i++) {
+	for (i = 0; i < static_cast<int>(objectPoints.size()); i++) {
 		projectPoints(cv::Mat(objectPoints[i]), rvecs[i], tvecs[i], cameraMatrix, distCoeffs,
 					  imagePoints2);
 		err = norm(cv::Mat(imagePoints[i]), cv::Mat(imagePoints2), cv::NORM_L2);
-		int n = (int)objectPoints[i].size();
-		perViewErrors[i] = (float)std::sqrt(err * err / n);
+		int n = static_cast<int>(objectPoints[i].size());
+		perViewErrors[i] = static_cast<float>(std::sqrt(err * err / n));
 		totalErr += err * err;
 		totalPoints += n;
 	}
@@ -264,7 +264,7 @@ saveCameraParams(const std::string& filename, cv::Size imageSize, cv::Size board
 		fs << "per_view_reprojection_errors" << cv::Mat(reprojErrs);
 
 	if (!rvecs.empty() || !reprojErrs.empty())
-		fs << "nframes" << (int)std::max(rvecs.size(), reprojErrs.size());
+		fs << "nframes" << static_cast<int>(std::max(rvecs.size(), reprojErrs.size()));
 
 	if (flags & cv::CALIB_FIX_ASPECT_RATIO)
 		fs << "aspectRatio" << aspectRatio;
@@ -293,8 +293,8 @@ saveCameraParams(const std::string& filename, cv::Size imageSize, cv::Size board
 
 	if (!rvecs.empty() && !tvecs.empty()) {
 		CV_Assert(rvecs[0].type() == tvecs[0].type());
-		cv::Mat bigmat((int)rvecs.size(), 6, rvecs[0].type());
-		for (int i = 0; i < (int)rvecs.size(); i++) {
+		cv::Mat bigmat(static_cast<int>(rvecs.size()), 6, rvecs[0].type());
+		for (int i = 0; i < static_cast<int>(rvecs.size()); i++) {
 			cv::Mat r = bigmat(cv::Range(i, i + 1), cv::Range(0, 3));
 			cv::Mat t = bigmat(cv::Range(i, i + 1), cv::Range(3, 6));
 
@@ -310,8 +310,8 @@ saveCameraParams(const std::string& filename, cv::Size imageSize, cv::Size board
 	}
 
 	if (!imagePoints.empty()) {
-		cv::Mat imagePtMat((int)imagePoints.size(), (int)imagePoints[0].size(), CV_32FC2);
-		for (int i = 0; i < (int)imagePoints.size(); i++) {
+		cv::Mat imagePtMat(static_cast<int>(imagePoints.size()), static_cast<int>(imagePoints[0].size()), CV_32FC2);
+		for (int i = 0; i < static_cast<int>(imagePoints.size()); i++) {
 			cv::Mat r = imagePtMat.row(i).reshape(2, imagePtMat.cols);
 			cv::Mat imgpti(imagePoints[i]);
 			imgpti.copyTo(r);
@@ -489,7 +489,7 @@ int main(int argc, char** argv) {
 		return fprintf(stderr, "Could not initialize video (%d) capture\n", cameraId), -2;
 
 	if (!imageList.empty())
-		nframes = (int)imageList.size();
+		nframes = static_cast<int>(imageList.size());
 
 	if (capture.isOpened())
 		printf("%s", liveCaptureHelp);
@@ -509,7 +509,7 @@ int main(int argc, char** argv) {
 			cv::Mat view0;
 			capture >> view0;
 			view0.copyTo(view);
-		} else if (i < (int)imageList.size())
+		} else if (i < static_cast<int>(imageList.size()))
 			view = cv::imread(imageList[i], 1);
 
 		if (view.empty()) {
@@ -573,9 +573,9 @@ int main(int argc, char** argv) {
 
 		if (mode == CAPTURING) {
 			if (undistortImage)
-				msg = cv::format("%d/%d Undist", (int)imagePoints.size(), nframes);
+				msg = cv::format("%d/%d Undist", static_cast<int>(imagePoints.size()), nframes);
 			else
-				msg = cv::format("%d/%d", (int)imagePoints.size(), nframes);
+				msg = cv::format("%d/%d", static_cast<int>(imagePoints.size()), nframes);
 		}
 
 		putText(view, msg, textOrigin, 1, 1,
@@ -590,7 +590,7 @@ int main(int argc, char** argv) {
 		}
 
 		imshow("Image View", view);
-		char key = (char)cv::waitKey(capture.isOpened() ? 50 : 500);
+		char key = static_cast<char>(cv::waitKey(capture.isOpened() ? 50 : 500));
 
 		if (key == 27)
 			break;
@@ -622,14 +622,14 @@ int main(int argc, char** argv) {
 			getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0),
 			imageSize, CV_16SC2, map1, map2);
 
-		for (i = 0; i < (int)imageList.size(); i++) {
+		for (i = 0; i < static_cast<int>(imageList.size()); i++) {
 			view = cv::imread(imageList[i], 1);
 			if (view.empty())
 				continue;
 			// undistort( view, rview, cameraMatrix, distCoeffs, cameraMatrix );
 			remap(view, rview, map1, map2, cv::INTER_LINEAR);
 			imshow("Image View", rview);
-			char c = (char)cv::waitKey();
+			char c = static_cast<char>(cv::waitKey());
 			if (c == 27 || c == 'q' || c == 'Q')
 				break;
 		}

@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
 
 	time_point<steady_clock> tp = steady_clock::now();
 	time_point<steady_clock> startTime = tp;
-	while (steady_clock::now() - startTime < 3 * milliseconds((int)(period * 1000))) {
+	while (steady_clock::now() - startTime < 3 * milliseconds(static_cast<int>(period * 1000))) {
 		int32_t current_angle = can::motor::getMotorPosition(serial).getData();
 		double difference = (current_angle - angle_target) / 1000.0;
 		acc_error += difference * difference;
