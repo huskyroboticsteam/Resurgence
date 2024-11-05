@@ -1,4 +1,5 @@
 #include "Camera.h"
+
 #include "../Constants.h"
 
 #include <loguru.hpp>
@@ -14,8 +15,7 @@ using namespace robot::types;
 namespace cam {
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(),
+	  _frame_time(std::make_shared<datatime_t>()), _capture(),
 	  _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
@@ -24,8 +24,7 @@ Camera::Camera(robot::types::CameraID camera_id)
 	  _frame_time(std::make_shared<datatime_t>()),
 	  _capture(std::make_shared<cv::VideoCapture>(camera_id)),
 	  _frame_lock(std::make_shared<std::mutex>()),
-	  _capture_lock(std::make_shared<std::mutex>()),
-	  _running(std::make_shared<bool>(false)) {
+	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {
 	this->open(camera_id);
 }
 
@@ -65,7 +64,8 @@ void Camera::init() {
 std::stringstream Camera::GStreamerFromFile(robot::types::CameraID camera_id) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file of camera ID" + std::to_string(camera_id) + " does not exist");
+		throw std::invalid_argument("Configuration file of camera ID" +
+									std::to_string(camera_id) + " does not exist");
 	}
 
 	std::stringstream gstr_ss;
@@ -89,7 +89,7 @@ std::stringstream Camera::GStreamerFromFile(robot::types::CameraID camera_id) {
 	gstr_ss << ",height=" << _height;
 	gstr_ss << ",framerate=" << fs[KEY_FRAMERATE].operator std::string() << "/1";
 	gstr_ss << " ! " << fs[KEY_FORMAT].operator std::string() << "dec ! videoconvert";
-	
+
 	gstr_ss << " ! appsink";
 	LOG_F(INFO, "GSTR: %s", gstr_ss.str().c_str());
 

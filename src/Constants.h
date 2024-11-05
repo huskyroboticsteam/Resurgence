@@ -57,8 +57,9 @@ extern const robot::types::CameraID MAST_CAMERA_ID;
 extern const robot::types::CameraID WRIST_CAMERA_ID;
 extern const robot::types::CameraID HAND_CAMERA_ID;
 
-extern const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS;
-extern const std::unordered_map<std::string, robot::types::CameraID> CAMERA_NAME_TO_ID;
+extern constexpr frozen::unordered_map<robot::types::CameraID, std::string>
+	CAMERA_CONFIG_PATHS;
+extern constexpr frozen::unordered_map<std::string, robot::types::CameraID> CAMERA_NAME_TO_ID;
 
 extern const uint16_t WS_SERVER_PORT;
 

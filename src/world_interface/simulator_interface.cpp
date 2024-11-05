@@ -87,14 +87,14 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static void openCamera(CameraID cam, uint8_t fps = 30, uint16_t width = 640, uint16_t height = 480) {
+static void openCamera(CameraID cam, uint8_t fps = 30, uint16_t width = 640,
+					   uint16_t height = 480) {
 	json msg = {{"type", "simCameraStreamOpenRequest"},
 				{"cameraID", cam},
 				{"fps", fps},
 				{"width", width},
 				{"height", height}};
 	sendJSON(msg);
-
 }
 
 void initCameras() {
