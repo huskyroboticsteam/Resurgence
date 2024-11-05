@@ -137,8 +137,20 @@ int main(int argc, char** argv) {
 
 	double period = 8.0;
 
-	std::this_thread::sleep_for(300ms); // wait for encoder position data to arrive
-	int32_t starting_angle = can::motor::getMotorPosition(serial);
+	time_point<steady_clock> start = steady_clock::now();
+	int timeout = 300; // in milliseconds
+	DataPoint<int32_t> starting_angle_data_point = can::motor::getMotorPosition(serial);
+	while(!starting_angle_data_point.isValid() && steady_clock::now() - start < milliseconds(timeout)) {
+		starting_angle_data_point = can::motor::getMotorPosition(serial);
+	}
+
+	int32_t starting_angle;
+	if(starting_angle_data_point.isValid()) {
+		starting_angle = starting_angle_data_point.getData();
+	} else {
+		LOG_F(WARNING, "STARTING ANGLE DATA NOT FOUND");
+	}
+
 	int32_t angle_target = starting_angle;
 	double acc_error = 0.0;
 	int total_steps = 0;
