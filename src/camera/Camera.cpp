@@ -62,7 +62,8 @@ void Camera::init() {
 }
 
 std::stringstream Camera::GStreamerFromFile(robot::types::CameraID camera_id) {
-	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id).data(), cv::FileStorage::READ);
+	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id).data(),
+					   cv::FileStorage::READ);
 	if (!fs.isOpened()) {
 		throw std::invalid_argument("Configuration file of camera ID" +
 									std::to_string(camera_id) + " does not exist");
