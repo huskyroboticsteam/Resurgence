@@ -337,6 +337,7 @@ if(WITH_TESTS)
     ../tests/util/CoreTest.cpp
     ../tests/util/DataTest.cpp
     ../tests/util/MathTest.cpp
+    ../tests/util/RandomTest.cpp
     ../tests/util/TimeTest.cpp
     ../tests/util/SchedulerTest.cpp
 	# Protocol/teleop tests
@@ -344,7 +345,10 @@ if(WITH_TESTS)
 
   target_link_libraries(tests
     ${rover_libs}
-    stub_world_interface
+    stub_world_interface    double sample0 = stdn(0);
+    double sample1 = stdn(1);
+
+    REQUIRE(sample0 != sample1);
     ${OpenCV_LIBS})
   include(CTest)
   include(Catch)
