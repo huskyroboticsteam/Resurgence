@@ -17,10 +17,8 @@ extern "C" {
 #include "HindsightCAN/CANCommon.h"
 }
 
-enum class targetmode_t
-{
-	step,
-	sinusoidal
+enum class targetmode_t {
+	step, sinusoidal
 };
 
 using namespace robot::types;
