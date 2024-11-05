@@ -50,8 +50,8 @@ void AutonomousTask::navigate() {
 			cmd.setState(latestPos, robot::types::dataclock::now());
 			commands::command_t output = cmd.getOutput();
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
-				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel,
-				output.thetaVel, Constants::MAX_WHEEL_VEL);
+				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
+				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
 			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coords;
 			LOG_F(INFO, "Relative Target: (%lf, %lf)", relTarget(0), relTarget(1));
 			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));
