@@ -367,7 +367,6 @@ add_compile_options(
   -Werror
 )
 
-add_subdirectory(ar)
 add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)
