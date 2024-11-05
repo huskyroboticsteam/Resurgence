@@ -51,12 +51,12 @@ const robot::types::CameraID MAST_CAMERA_ID = 40;
 const robot::types::CameraID WRIST_CAMERA_ID = 30;
 const robot::types::CameraID HAND_CAMERA_ID = 20;
 
-constexpr frozen::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
+constexpr frozen::unordered_map<robot::types::CameraID, frozen::string, 3> CAMERA_CONFIG_PATHS = {
 	{MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
 	{WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
 	{HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"}};
 
-constexpr frozen::unordered_map<std::string, robot::types::CameraID> CAMERA_NAME_TO_ID = {
+constexpr frozen::unordered_map<frozen::string, robot::types::CameraID, 3> CAMERA_NAME_TO_ID = {
 	{"mast", MAST_CAMERA_ID}, {"wrist", WRIST_CAMERA_ID}, {"hand", HAND_CAMERA_ID}};
 
 /**
