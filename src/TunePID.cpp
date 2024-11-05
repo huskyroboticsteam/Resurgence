@@ -17,8 +17,10 @@ extern "C" {
 #include "HindsightCAN/CANCommon.h"
 }
 
-enum class targetmode_t {
-	step, sinusoidal
+enum class targetmode_t
+{
+	step,
+	sinusoidal
 };
 
 using namespace robot::types;
@@ -140,12 +142,13 @@ int main(int argc, char** argv) {
 	time_point<steady_clock> start = steady_clock::now();
 	int timeout = 300; // in milliseconds
 	DataPoint<int32_t> starting_angle_data_point = can::motor::getMotorPosition(serial);
-	while(!starting_angle_data_point.isValid() && steady_clock::now() - start < milliseconds(timeout)) {
+	while (!starting_angle_data_point.isValid() &&
+		   steady_clock::now() - start < milliseconds(timeout)) {
 		starting_angle_data_point = can::motor::getMotorPosition(serial);
 	}
 
 	int32_t starting_angle;
-	if(starting_angle_data_point.isValid()) {
+	if (starting_angle_data_point.isValid()) {
 		starting_angle = starting_angle_data_point.getData();
 	} else {
 		LOG_F(WARNING, "STARTING ANGLE DATA NOT FOUND");
@@ -171,7 +174,7 @@ int main(int argc, char** argv) {
 		if (mode == targetmode_t::step) {
 			prescaled_target = round(prescaled_target);
 		}
-		angle_target = (int32_t) round(amplitude * prescaled_target) + starting_angle;
+		angle_target = (int32_t)round(amplitude * prescaled_target) + starting_angle;
 
 		can::motor::setMotorPIDTarget(serial, angle_target);
 
