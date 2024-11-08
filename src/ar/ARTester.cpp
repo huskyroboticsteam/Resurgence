@@ -252,7 +252,8 @@ std::vector<cv::Point2d> projectCube(float len, cv::Vec3d rvec, cv::Vec3d tvec) 
 }
 
 std::vector<cv::Point2f> projectGrid(cv::Size imageSize, int spacing) {
-	cv::Point2f center(static_cast<float>(imageSize.width) / 2.0f, static_cast<float>(imageSize.height) / 2.0f);
+	cv::Point2f center(static_cast<float>(imageSize.width) / 2.0f,
+					   static_cast<float>(imageSize.height) / 2.0f);
 	std::vector<cv::Point2f> grid_points;
 	std::vector<cv::Point2f> projected_points;
 	float xf, yf;

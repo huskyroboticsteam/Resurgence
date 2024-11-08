@@ -121,8 +121,16 @@ static void help(char** argv) {
 	printf("\n%s", liveCaptureHelp);
 }
 
-enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
-enum Pattern { CHESSBOARD, CIRCLES_GRID, ASYMMETRIC_CIRCLES_GRID };
+enum {
+	DETECTION = 0,
+	CAPTURING = 1,
+	CALIBRATED = 2
+};
+enum Pattern {
+	CHESSBOARD,
+	CIRCLES_GRID,
+	ASYMMETRIC_CIRCLES_GRID
+};
 
 static double
 computeReprojectionErrors(const std::vector<std::vector<cv::Point3f>>& objectPoints,
@@ -310,7 +318,8 @@ saveCameraParams(const std::string& filename, cv::Size imageSize, cv::Size board
 	}
 
 	if (!imagePoints.empty()) {
-		cv::Mat imagePtMat(static_cast<int>(imagePoints.size()), static_cast<int>(imagePoints[0].size()), CV_32FC2);
+		cv::Mat imagePtMat(static_cast<int>(imagePoints.size()),
+						   static_cast<int>(imagePoints[0].size()), CV_32FC2);
 		for (int i = 0; i < static_cast<int>(imagePoints.size()); i++) {
 			cv::Mat r = imagePtMat.row(i).reshape(2, imagePtMat.cols);
 			cv::Mat imgpti(imagePoints[i]);
@@ -563,9 +572,9 @@ int main(int argc, char** argv) {
 		if (found)
 			drawChessboardCorners(view, boardSize, cv::Mat(pointbuf), found);
 
-		std::string msg = mode == CAPTURING
-							  ? "100/100"
-							  : mode == CALIBRATED ? "Calibrated" : "Press 'g' to start";
+		std::string msg = mode == CAPTURING	   ? "100/100"
+						  : mode == CALIBRATED ? "Calibrated"
+											   : "Press 'g' to start";
 		int baseLine = 0;
 		cv::Size textSize = cv::getTextSize(msg, 1, 1, 1, &baseLine);
 		cv::Point textOrigin(view.cols - 2 * textSize.width - 10,
@@ -573,7 +582,8 @@ int main(int argc, char** argv) {
 
 		if (mode == CAPTURING) {
 			if (undistortImage)
-				msg = cv::format("%d/%d Undist", static_cast<int>(imagePoints.size()), nframes);
+				msg =
+					cv::format("%d/%d Undist", static_cast<int>(imagePoints.size()), nframes);
 			else
 				msg = cv::format("%d/%d", static_cast<int>(imagePoints.size()), nframes);
 		}
