@@ -93,8 +93,8 @@ void CameraParams::readFromFileNode(const cv::FileNode& file_node) {
 	file_node[KEY_CAMERA_MATRIX] >> cam;
 	file_node[KEY_DIST_COEFFS] >> dist;
 	int w, h;
-	w = (int)file_node[KEY_IMAGE_WIDTH];
-	h = (int)file_node[KEY_IMAGE_HEIGHT];
+	w = static_cast<int>(file_node[KEY_IMAGE_WIDTH]);
+	h = static_cast<int>(file_node[KEY_IMAGE_HEIGHT]);
 	cv::Size size(w, h);
 	// call init to do validation
 	init(cam, dist, size);
