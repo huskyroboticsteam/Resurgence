@@ -16,11 +16,17 @@
 namespace can::motor {
 
 /** @brief The possible motor modes. */
-enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
+enum class motormode_t {
+	pwm = MOTOR_UNIT_MODE_PWM,
+	pid = MOTOR_UNIT_MODE_PID
+};
 
 /** @brief The supported motor position sensors. */
 struct sensor_t {
-	enum { encoder = 0, potentiometer = 1 };
+	enum {
+		encoder = 0,
+		potentiometer = 1
+	};
 };
 
 /**
@@ -65,8 +71,8 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
  * Use this method for motorboard with both encoders and limit switches
  *
  * @param serial The CAN serial number of the motor board.
- * @param lo The joint position in millidegrees of the low limit switch.
- * @param hi The joint position in millidegrees of the high limit switch.
+ * @param lo The joint position in encoder ticks of the low limit switch.
+ * @param hi The joint position in encoder ticks of the high limit switch.
  */
 void setLimitSwitchLimits(deviceserial_t serial, int32_t lo, int32_t hi);
 
@@ -89,8 +95,8 @@ void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint
 /**
  * @brief Set the PID constants for a motor board.
  *
- * Note that the PID constants are specified in units of 10000, so a 1 is interpreted as a
- * 10000. This is because the controller operates on millidegrees.
+ * Note that the PID constants are specified in units of 1000, so a 1 is interpreted as a
+ * 1000. This is because the controller operates on millidegrees.
  *
  * @param serial The CAN serial number of the motor board.
  * @param kP The P coefficient.
@@ -135,6 +141,14 @@ void setMotorPower(deviceserial_t serial, int16_t power);
  * @param target The position in millidegrees to track with the PID controller.
  */
 void setMotorPIDTarget(deviceserial_t serial, int32_t target);
+
+/**
+ * @brief Set the maximum power allowed for a motor when running PID.
+ *
+ * @param serial The CAN serial number of the motor board.
+ * @param maxPower The maximum power allowed for the motor.
+ */
+void setMotorPIDMaxPower(deviceserial_t serial, uint16_t maxPower);
 
 /**
  * @brief Set the angle of the PCA servo

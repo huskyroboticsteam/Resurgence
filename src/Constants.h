@@ -186,8 +186,8 @@ constexpr frozen::unordered_map<robot::types::motorid_t, std::pair<int, int>, IK
  * Map from motor ids to segment length in meters
  */
 constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size()>
-	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.3848608},
-					{robot::types::motorid_t::elbow, 0.461264}};
+	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.394},
+					{robot::types::motorid_t::elbow, 0.749}};
 } // namespace arm
 
 namespace autonomous {
