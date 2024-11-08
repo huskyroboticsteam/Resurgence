@@ -213,7 +213,6 @@ void TelemReportTask::sendTelemetry() {
 			double gpsRecency = util::durationToSec(dataclock::now() - gps.getTime());
 			recency = std::max(recency, gpsRecency);
 		}
-		
 		json msg = {{"type", ROVER_POS_REP_TYPE},
 					{"orientW", quat.w()},
 					{"orientX", quat.x()},
