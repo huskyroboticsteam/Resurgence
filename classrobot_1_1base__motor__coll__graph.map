@@ -1,7 +1,5 @@
 <map id="robot::base_motor" name="robot::base_motor">
-<area shape="rect" id="Node000001" title="An abstract motor class." alt="" coords="32,94,156,120"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,81,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,44,64,69,83,92,79,96,60,71,48,47"/>
-<area shape="rect" id="Node000003" href="/github/workspace/doxygen-tags/libstdc++.tag$a07191.html" title=" " alt="" coords="104,5,184,31"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="132,46,117,71,103,95,99,92,113,69,127,43"/>
+<area shape="rect" id="Node000001" title="An abstract motor class." alt="" coords="5,94,130,120"/>
+<area shape="rect" id="Node000002" href="/github/workspace/doxygen-tags/libstdc++.tag$a07191.html" title=" " alt="" coords="27,5,108,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,47,70,94,65,94,65,47"/>
 </map>
