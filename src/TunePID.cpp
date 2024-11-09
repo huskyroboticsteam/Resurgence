@@ -138,19 +138,18 @@ int main(int argc, char** argv) {
 	double period = 8.0;
 
 	time_point<steady_clock> start = steady_clock::now();
-	int timeout = 300; // in milliseconds
+	constexpr int timeout = 300ms;
 	DataPoint<int32_t> starting_angle_data_point = can::motor::getMotorPosition(serial);
 	while (!starting_angle_data_point.isValid() &&
 		   steady_clock::now() - start < milliseconds(timeout)) {
 		starting_angle_data_point = can::motor::getMotorPosition(serial);
 	}
 
-	int32_t starting_angle;
-	if (starting_angle_data_point.isValid()) {
-		starting_angle = starting_angle_data_point.getData();
-	} else {
+	if (!starting_angle_data_point.isValid()) {
 		LOG_F(WARNING, "STARTING ANGLE DATA NOT FOUND");
 	}
+	// throws bad_datapoint_access if the data point is not valid
+	int32_t starting_angle = starting_angle_data_point.getData();
 
 	int32_t angle_target = starting_angle;
 	double acc_error = 0.0;
