@@ -11,8 +11,6 @@
 #include <optional>
 #include <unordered_set>
 
-using namespace kinematics;
-
 /**
  * @namespace robot
  * @brief Collection of functions that allows interfacing with the hardware and the world.
