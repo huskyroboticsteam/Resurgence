@@ -17,8 +17,10 @@ extern "C" {
 #include "HindsightCAN/CANCommon.h"
 }
 
-enum class targetmode_t {
-	step, sinusoidal
+enum class targetmode_t
+{
+	step,
+	sinusoidal
 };
 
 using namespace robot::types;
@@ -138,10 +140,9 @@ int main(int argc, char** argv) {
 	double period = 8.0;
 
 	time_point<steady_clock> start = steady_clock::now();
-	constexpr int timeout = 300ms;
+	constexpr milliseconds timeout = 300ms;
 	DataPoint<int32_t> starting_angle_data_point = can::motor::getMotorPosition(serial);
-	while (!starting_angle_data_point.isValid() &&
-		   steady_clock::now() - start < milliseconds(timeout)) {
+	while (!starting_angle_data_point.isValid() && steady_clock::now() - start < timeout) {
 		starting_angle_data_point = can::motor::getMotorPosition(serial);
 	}
 
