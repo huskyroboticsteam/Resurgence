@@ -109,7 +109,8 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
 	{{motorid_t::shoulder, {200, 0, 0}},
 	 {motorid_t::elbow, {250, 0, 0}},
-	 // swerve constants need to be updated when firmware changes PID scaling
+	 // FIXME: swerve constants need to be updated when firmware changes PID scaling
+	 // Numbers should be 200
 	 {motorid_t::frontLeftSwerve, {2, 0, 0}},
 	 {motorid_t::frontRightSwerve, {2, 0, 0}},
 	 {motorid_t::rearLeftSwerve, {2, 0, 0}},

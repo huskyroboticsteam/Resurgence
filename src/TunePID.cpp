@@ -139,7 +139,6 @@ int main(int argc, char** argv) {
 	int d_coeff = std::stoi(str);
 
 	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
-	// can::motor::setMotorPIDMaxPower(serial, 32767);  // this was here from circ
 	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
 	double period = 8.0;
 
@@ -167,7 +166,7 @@ int main(int argc, char** argv) {
 		if (mode == targetmode_t::step) {
 			prescaled_target = round(prescaled_target);
 		}
-		angle_target = (int32_t)round(amplitude * prescaled_target) + starting_angle;
+		angle_target = static_cast<int32_t>(round(amplitude * prescaled_target)) + starting_angle;
 
 		can::motor::setMotorPIDTarget(serial, angle_target);
 
