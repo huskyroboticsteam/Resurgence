@@ -19,10 +19,7 @@ TEST_CASE("Test almostEqual", "[util][core]") {
 TEST_CASE("Test Key Set", "[util][core]") {
 	SECTION("Extracting keys from a given map") {
 		std::unordered_map<std::string, int> inputtedMap = {
-			{"key1", 1},
-			{"key2", 2},
-			{"key3", 3}
-		};
+			{"key1", 1}, {"key2", 2}, {"key3", 3}};
 
 		auto keys = keySet(inputtedMap);
 
@@ -45,7 +42,7 @@ TEST_CASE("Test To String", "[util][core]") {
 	}
 
 	SECTION("Convert floats to strings") {
-		REQUIRE(to_string(3.14).substr(0,4) == "3.14");
+		REQUIRE(to_string(3.14).substr(0, 4) == "3.14");
 		REQUIRE(to_string(1e-6) == "0.000001");
 	}
 
@@ -71,7 +68,7 @@ TEST_CASE("Test Freeze String", "[util][core]") {
 
 TEST_CASE("Test Pair To Tuple", "[util][core]") {
 	SECTION("Converting pair of integers to tuple") {
-		std::pair<int, int> pair = {0,1};
+		std::pair<int, int> pair = {0, 1};
 		auto tuple = pairToTuple(pair);
 		REQUIRE(std::get<0>(tuple) == 0);
 		REQUIRE(std::get<1>(tuple) == 1);
