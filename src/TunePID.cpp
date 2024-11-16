@@ -148,8 +148,8 @@ int main(int argc, char** argv) {
 
 	if (!starting_angle_data_point.isValid()) {
 		LOG_F(WARNING, "STARTING ANGLE DATA NOT FOUND");
+		exit(1);
 	}
-	// throws bad_datapoint_access if the data point is not valid
 	int32_t starting_angle = starting_angle_data_point.getData();
 
 	int32_t angle_target = starting_angle;
