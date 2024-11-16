@@ -341,6 +341,7 @@ if(WITH_TESTS)
     ../tests/util/SchedulerTest.cpp
     ../tests/util/RandomTest.cpp
     ../tests/util/JsonTest.cpp
+    ../tests/util/ThreadingTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
