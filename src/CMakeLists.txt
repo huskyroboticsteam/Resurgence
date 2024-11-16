@@ -337,18 +337,15 @@ if(WITH_TESTS)
     ../tests/util/CoreTest.cpp
     ../tests/util/DataTest.cpp
     ../tests/util/MathTest.cpp
-    ../tests/util/RandomTest.cpp
     ../tests/util/TimeTest.cpp
     ../tests/util/SchedulerTest.cpp
+    ../tests/util/RandomTest.cpp
+    ../tests/util/JsonTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
   target_link_libraries(tests
     ${rover_libs}
-    stub_world_interface    double sample0 = stdn(0);
-    double sample1 = stdn(1);
-
-    REQUIRE(sample0 != sample1);
     ${OpenCV_LIBS})
   include(CTest)
   include(Catch)
