@@ -24,7 +24,7 @@ using namespace std::chrono_literals;
 
 namespace robot {
 namespace {
-jointpos_t commandedWristPos{0, 0};
+kinematics::jointpos_t commandedWristPos{0, 0};
 std::mutex wristPosMutex;
 
 void setJointMotorPower(robot::types::jointid_t joint, double power);
@@ -57,7 +57,7 @@ double setCmdVel(double dtheta, double dx) {
 		}
 	}
 
-	wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
+	kinematics::wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
@@ -92,7 +92,7 @@ double setTankCmdVel(double left, double right) {
 	if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
 		return 0;
 
-	wheelvel_t wheelVels = {left, right};
+	kinematics::wheelvel_t wheelVels = {left, right};
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));

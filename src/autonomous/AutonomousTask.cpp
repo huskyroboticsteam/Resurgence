@@ -36,7 +36,7 @@ void AutonomousTask::navigate() {
 										 SLOW_DRIVE_THRESHOLD, DONE_THRESHOLD,
 										 CLOSE_TO_TARGET_DUR_VAL);
 
-	DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
+	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
 
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
@@ -50,8 +50,8 @@ void AutonomousTask::navigate() {
 			cmd.setState(latestPos, robot::types::dataclock::now());
 			commands::command_t output = cmd.getOutput();
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
-				DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel, output.xVel,
-				output.thetaVel, Constants::MAX_WHEEL_VEL);
+				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
+				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
 			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coords;
 			LOG_F(INFO, "Relative Target: (%lf, %lf)", relTarget(0), relTarget(1));
 			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));

@@ -11,7 +11,6 @@
 #include <optional>
 #include <unordered_set>
 
-using namespace kinematics;
 // forward declare cam::CameraParams instead of including it
 // we do this to avoid unnecessarily including OpenCV in all build targets
 namespace cam {

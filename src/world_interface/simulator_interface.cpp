@@ -249,10 +249,10 @@ void initSimServer(net::websocket::SingleClientWSServer& ws) {
 namespace robot {
 
 namespace {
-DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 } // namespace
 
-const DiffDriveKinematics& driveKinematics() {
+const kinematics::DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
 }
 
