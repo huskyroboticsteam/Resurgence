@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (!starting_angle_data_point.isValid()) {
-		LOG_F(WARNING, "STARTING ANGLE DATA NOT FOUND");
+		LOG_F(ERROR, "STARTING ANGLE DATA NOT FOUND");
 		exit(1);
 	}
 	int32_t starting_angle = starting_angle_data_point.getData();
