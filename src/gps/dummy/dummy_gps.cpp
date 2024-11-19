@@ -6,6 +6,6 @@ DataPoint<navtypes::gpscoords_t> readGPSCoords() {
 	return {};
 }
 
-DataPoint<navtypes::eulerangles_t> readIMUHeading() {
+DataPoint<double> readIMUHeading() {
 	return {};
 }
