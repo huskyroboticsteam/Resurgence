@@ -129,9 +129,9 @@ void parseCommandLine(int argc, char** argv) {
 		const auto now = std::chrono::system_clock::now();
 		const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
 		std::stringstream ss;
-		ss << std::put_time(std::localtime(&t_c), "%Y%m%d_%H%M%S.log");
+		ss << "logs/" << std::put_time(std::localtime(&t_c), "%Y%m%d_%H%M%S.log");
 		std::string logFileName = ss.str();
-		loguru::add_file("latest.log", loguru::Truncate, loguru::Verbosity_INFO);
+		loguru::add_file("logs/latest.log", loguru::Truncate, loguru::Verbosity_INFO);
 		loguru::add_file(logFileName.c_str(), loguru::Append, loguru::Verbosity_INFO);
 
 		program.parse_args(argc, argv);
