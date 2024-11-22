@@ -3,6 +3,7 @@
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../autonomous/AutonomousTask.h"
+#include "../base64/base64_img.h"
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
@@ -319,6 +320,22 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	_camera_stream_task.closeStream(cam);
 }
 
+static bool validateCameraFrameRequest(const json& j) {
+	return util::validateKey(j, "camera", val_t::string);
+}
+
+void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
+	CameraID cam = j["camera"];
+	auto camDP = robot::readCamera(cam);
+	if (camDP) {
+		auto data = camDP.getData();
+		cv::Mat frame = data.first;
+		std::string b64_data = base64::encodeMat(frame, ".jpg");
+		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
+}
+
 void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
 	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", enabled}};
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
@@ -420,6 +437,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		CAMERA_STREAM_CLOSE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
+	this->addMessageHandler(
+		CAMERA_FRAME_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleCameraFrameRequest, this, _1),
+		validateCameraFrameRequest);
 	this->addMessageHandler(
 		WAYPOINT_NAV_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
