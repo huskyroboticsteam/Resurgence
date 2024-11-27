@@ -50,4 +50,10 @@ void setJointPos(types::jointid_t joint, int32_t targetPos);
  */
 types::DataPoint<int32_t> getJointPos(types::jointid_t joint);
 
+/**
+ * @brief Check if all motors are connected to the rover.
+ *
+ * @exception runtime_error if a motor's voltage cannot be detected.
+ */
+void verifyAllMotorsConnected();
 } // namespace robot
