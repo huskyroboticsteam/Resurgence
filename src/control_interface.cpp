@@ -1,14 +1,14 @@
 #include "control_interface.h"
 
+#include "CAN/CAN.h"
+#include "CAN/CANUtils.h"
 #include "Constants.h"
 #include "Globals.h"
 #include "kinematics/DiffDriveKinematics.h"
 #include "navtypes.h"
 #include "utils/transform.h"
-#include "world_interface/world_interface.h"
-#include "CAN/CAN.h"
-#include "CAN/CANUtils.h"
 #include "world_interface/real_world_constants.h"
+#include "world_interface/world_interface.h"
 
 #include <atomic>
 #include <chrono>
