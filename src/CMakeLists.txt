@@ -297,12 +297,12 @@ target_link_libraries(Rover
   ${vision_libs}
 )
 
-add_executable(TunePID TunePID.cpp)
-target_link_libraries(TunePID
-  ${rover_libs}
-  can_interface
-)
-target_link_libraries(TunePID ${vision_libs})
+# add_executable(TunePID TunePID.cpp)
+# target_link_libraries(TunePID
+#   ${rover_libs}
+#   can_interface
+# )
+# target_link_libraries(TunePID ${vision_libs})
 
 if(WITH_TESTS)
   add_executable(tests
@@ -351,9 +351,9 @@ if(WITH_TESTS)
   catch_discover_tests(tests)
 endif()
 
-add_executable(gpsd_test
-  gps/gpsd_test.cpp)
-target_link_libraries(gpsd_test gps)
+# add_executable(gpsd_test
+#   gps/gpsd_test.cpp)
+# target_link_libraries(gpsd_test gps)
 
 if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration
@@ -367,6 +367,7 @@ add_compile_options(
   -Werror
 )
 
+add_subdirectory(ar)
 add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)

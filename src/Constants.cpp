@@ -50,11 +50,13 @@ const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 const robot::types::CameraID MAST_CAMERA_ID = 40;
 const robot::types::CameraID WRIST_CAMERA_ID = 30;
 const robot::types::CameraID HAND_CAMERA_ID = 20;
+const robot::types::CameraID TEST_CAMERA_ID = 0;
 
-constexpr frozen::unordered_map<robot::types::CameraID, frozen::string, 3>
+constexpr frozen::unordered_map<robot::types::CameraID, frozen::string, 4>
 	CAMERA_CONFIG_PATHS = {{MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
 						   {WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
-						   {HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"}};
+						   {HAND_CAMERA_ID, "../camera-config/HandCameraConfig.yml"},
+                           {TEST_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"}};
 
 constexpr frozen::unordered_map<frozen::string, robot::types::CameraID, 3> CAMERA_NAME_TO_ID =
 	{{"mast", MAST_CAMERA_ID}, {"wrist", WRIST_CAMERA_ID}, {"hand", HAND_CAMERA_ID}};
