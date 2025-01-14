@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CAN/CAN.h"
 #include "world_interface/data.h"
 
 // This is a layer that provides further abstraction on top of
@@ -56,4 +57,12 @@ types::DataPoint<int32_t> getJointPos(types::jointid_t joint);
  * @exception runtime_error if a motor's voltage cannot be detected.
  */
 void verifyAllMotorsConnected();
+
+/**
+ * @brief Check if a motor returns voltage data.
+ *
+ * @param id id of motor to check.
+ * @return true if data is returned, false if not.
+ */
+bool hasData(can::deviceid_t id);
 } // namespace robot

@@ -172,14 +172,14 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 	}
 }
 
-bool hasData(deviceid_t id) {
+bool hasData(can::deviceid_t id) {
 	auto start = std::chrono::steady_clock::now();
 	const int timeout_ms = 100;
 
 	while (std::chrono::duration_cast<std::chrono::milliseconds>(
 			   std::chrono::steady_clock::now() - start)
 			   .count() < timeout_ms) {
-		if (can::checkDeviceTelemetry(id)) {
+		if (can::getDeviceTelemetry(id, can::telemtype_t::voltage)) {
 			return true;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -189,13 +189,12 @@ bool hasData(deviceid_t id) {
 
 void verifyAllMotorsConnected() {
 	for (auto motorMap : robot::motorSerialIDMap) {
-		can::pullDeviceTelemetry(std::make_pair(devicegroup_t::motor, motorMap.second),
-								 telemtype_t::voltage);
-		if (!hasData(std::make_pair(devicegroup_t::motor, motorMap.second))) {
-			LOG_F(ERROR, "Motor not connected!\nID: " + motorMap.first +
-							 "\nSerial: " + motorMap.second);
-			throw std::runtime_error("Motor not connected!\nID: " + motorMap.first +
-									 "\nSerial: " + motorMap.second);
+		can::pullDeviceTelemetry(std::make_pair(can::devicegroup_t::motor, motorMap.second),
+								 can::telemtype_t::voltage);
+		if (!hasData(std::make_pair(can::devicegroup_t::motor, motorMap.second))) {
+			LOG_F(ERROR, "Motor not connected!\nID: %s",
+				  std::to_string(motorMap.second).c_str());
+			throw std::runtime_error("Not all motors connected!");
 		}
 	}
 }
