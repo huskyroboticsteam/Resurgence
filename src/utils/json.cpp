@@ -1,4 +1,5 @@
 #include "json.h"
+#include <frozen/unordered_set.h>
 
 namespace util {
 
@@ -11,12 +12,12 @@ bool validateKey(const json& j, const std::string& key, const val_t& type) {
 }
 
 bool validateKey(const json& j, const std::string& key,
-				 const std::unordered_set<val_t>& types) {
+				 const frozen::unordered_set<val_t>& types) {
 	return hasKey(j, key) && types.find(j.at(key).type()) != types.end();
 }
 
 bool validateOneOf(const json& j, const std::string& key,
-				   const std::unordered_set<std::string>& vals) {
+				   const frozen::unordered_set<std::string>& vals) {
 	// TODO convert this to use Frozen sets
 	return validateKey(j, key, val_t::string) &&
 		   vals.find(static_cast<std::string>(j[key])) != vals.end();
