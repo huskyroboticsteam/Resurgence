@@ -20,7 +20,8 @@ using namespace std::chrono_literals;
 using can::motor::motormode_t;
 using namespace robot::types;
 
-enum class TestMode {
+enum class TestMode
+{
 	ModeSet,
 	PWM,
 	PID,
@@ -137,8 +138,8 @@ int main() {
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = std::make_shared<robot::can_motor>(motorid_t::leftTread, true,
-														   serial, posScale, negScale);
+				motor = std::make_shared<robot::can_motor>(motorid_t::leftTread, true, serial,
+														   posScale, negScale);
 
 				// get initial motor position
 				DataPoint<int32_t> dataPoint = motor->getMotorPos();
