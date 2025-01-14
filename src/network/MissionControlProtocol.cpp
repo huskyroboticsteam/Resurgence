@@ -129,25 +129,6 @@ static bool validateTankDriveRequest(const json& j) {
 		   util::validateRange(j, "right", -1, 1);
 }
 
-static bool validateTurnInPlaceDriveRequest(const json& j) {
-	if (swerveController.getDriveMode() != DriveMode::TurnInPlace) {
-		LOG_F(WARNING, "Drive mode set to %s, not TurnInPlace",
-			  util::to_string(swerveController.getDriveMode()).c_str());
-	}
-	return swerveController.getDriveMode() == DriveMode::TurnInPlace &&
-		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
-}
-
-static bool validateCrabDriveRequest(const json& j) {
-	if (swerveController.getDriveMode() != DriveMode::Crab) {
-		LOG_F(WARNING, "Drive mode set to %s, not Crab",
-			  util::to_string(swerveController.getDriveMode()).c_str());
-	}
-	return swerveController.getDriveMode() == DriveMode::Crab && util::hasKey(j, "crab") &&
-		   util::validateRange(j, "crab", -1, 1) && util::hasKey(j, "steer") &&
-		   util::validateRange(j, "steer", -1, 1);
-}
-
 static bool validateArmIKEnable(const json& j) {
 	return util::validateKey(j, "enabled", val_t::boolean);
 }
@@ -174,23 +155,6 @@ void MissionControlProtocol::handleTankDriveRequest(const json& j) {
 	LOG_F(1, "{left=%.2f, right=%.2f} -> setTankCmdVel(%.4f, %.4f)", left, right, leftVel,
 		  rightVel);
 	this->setRequestedTankCmdVel(leftVel, rightVel);
-}
-
-void MissionControlProtocol::handleTurnInPlaceDriveRequest(const json& j) {
-	double steer = -j["steer"].get<double>();
-	double dtheta = Constants::MAX_DTHETA * steer;
-	LOG_F(1, "{steer=%.2f} -> setTurnInPlaceCmdVel(%.4f)", steer, dtheta);
-	this->setRequestedTurnInPlaceCmdVel(dtheta);
-}
-
-void MissionControlProtocol::handleCrabDriveRequest(const json& j) {
-	double crab = -j["crab"].get<double>();
-	double steer = -j["steer"].get<double>();
-	double norm = std::hypot(crab, steer);
-	double dy = Constants::MAX_WHEEL_VEL * (norm > 1 ? crab / norm : crab);
-	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
-	LOG_F(1, "{crab=%.2f, steer=%.2f} -> setCrabCmdVel(%.4f, %.4f)", crab, steer, dtheta, dy);
-	this->setRequestedCrabCmdVel(dtheta, dy);
 }
 
 void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
@@ -225,14 +189,6 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 	_power_repeat_task.setTankCmdVel(left, right);
 	robot::setTankCmdVel(left, right);
-}
-
-void MissionControlProtocol::setRequestedTurnInPlaceCmdVel(double dtheta) {
-	_power_repeat_task.setTurnInPlaceCmdVel(dtheta);
-}
-
-void MissionControlProtocol::setRequestedCrabCmdVel(double dtheta, double dy) {
-	_power_repeat_task.setCrabCmdVel(dtheta, dy);
 }
 
 static bool validateJoint(const json& j) {
@@ -394,14 +350,6 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		DRIVE_TANK_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleTankDriveRequest, this, _1),
 		validateTankDriveRequest);
-	this->addMessageHandler(
-		DRIVE_TURN_IN_PLACE_REQ_TYPE,
-		std::bind(&MissionControlProtocol::handleTurnInPlaceDriveRequest, this, _1),
-		validateTurnInPlaceDriveRequest);
-	this->addMessageHandler(
-		DRIVE_CRAB_REQ_TYPE,
-		std::bind(&MissionControlProtocol::handleCrabDriveRequest, this, _1),
-		validateCrabDriveRequest);
 	this->addMessageHandler(
 		ARM_IK_ENABLED_TYPE,
 		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
