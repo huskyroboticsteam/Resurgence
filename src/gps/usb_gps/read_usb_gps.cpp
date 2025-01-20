@@ -60,15 +60,14 @@ void gps_loop() {
 			} else {
 				double lat = newdata->fix.latitude;
 				double lon = newdata->fix.longitude;
-				double alt = newdata->fix.altitude;
-				LOG_F(2, "Received fresh GPS data: (lat %.6f, lon %.6f).", lat, lon, alt);
+				LOG_F(2, "Received fresh GPS data: (lat %.6f, lon %.6f).", lat, lon);
 				gps_mutex.lock();
 				if (!has_fix) {
 					// This is our first fix
 					has_fix = true;
 				}
 
-				most_recent_coords = {lat, lon, alt};
+				most_recent_coords = {lat, lon};
 				gps_time = dataclock::now();
 				gps_mutex.unlock();
 			}

@@ -12,7 +12,7 @@ struct gpscoords_t {
 	double lat;
 	/** the longitude of the gps coordinate, in degrees */
 	double lon;
-	/** the altitude of the gps coordinate */
+	/** the altitude of the gps coordinate, in meters */
 	double alt;
 };
 
