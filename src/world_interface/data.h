@@ -71,6 +71,7 @@ enum class motorid_t {
 	wristDiffLeft,
 	hand,
 	activeSuspension,
+	drillActuator,
 	drillMotor
 };
 
