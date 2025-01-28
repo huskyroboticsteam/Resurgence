@@ -46,8 +46,7 @@ using CameraFrame = std::pair<cv::Mat, uint32_t>;
 using CameraID = std::string;
 
 /** @brief An indication enum, used to command the LED to flash different signals */
-enum class indication_t
-{
+enum class indication_t {
 	off,
 	autonomous,
 	teleop,
@@ -55,8 +54,7 @@ enum class indication_t
 };
 
 /** @brief The motors on the robot. */
-enum class motorid_t
-{
+enum class motorid_t {
 	frontLeftWheel,
 	frontLeftSwerve,
 	frontRightWheel,
@@ -78,8 +76,7 @@ enum class motorid_t
 };
 
 /** @brief the mounted peripheral on the robot. */
-enum class mountedperipheral_t
-{
+enum class mountedperipheral_t {
 	none,
 	arm,
 	armServo,
@@ -87,8 +84,7 @@ enum class mountedperipheral_t
 	lidar
 };
 
-enum class jointid_t
-{
+enum class jointid_t {
 	frontLeftSwerve,
 	frontRightSwerve,
 	rearLeftSwerve,
