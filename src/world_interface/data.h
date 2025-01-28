@@ -46,7 +46,8 @@ using CameraFrame = std::pair<cv::Mat, uint32_t>;
 using CameraID = std::string;
 
 /** @brief An indication enum, used to command the LED to flash different signals */
-enum class indication_t {
+enum class indication_t
+{
 	off,
 	autonomous,
 	teleop,
@@ -54,7 +55,8 @@ enum class indication_t {
 };
 
 /** @brief The motors on the robot. */
-enum class motorid_t {
+enum class motorid_t
+{
 	frontLeftWheel,
 	frontLeftSwerve,
 	frontRightWheel,
@@ -78,7 +80,8 @@ enum class motorid_t {
 };
 
 /** @brief the mounted peripheral on the robot. */
-enum class mountedperipheral_t {
+enum class mountedperipheral_t
+{
 	none,
 	arm,
 	armServo,
@@ -86,7 +89,8 @@ enum class mountedperipheral_t {
 	lidar
 };
 
-enum class jointid_t {
+enum class jointid_t
+{
 	frontLeftSwerve,
 	frontRightSwerve,
 	rearLeftSwerve,
@@ -108,7 +112,8 @@ enum class jointid_t {
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,
-	 jointid_t::ikForward, jointid_t::ikUp, jointid_t::fourBarLinkage1, jointid_t::fourBarLinkage2});
+	 jointid_t::ikForward, jointid_t::ikUp, jointid_t::fourBarLinkage1,
+	 jointid_t::fourBarLinkage2});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"frontLeftSwerve", jointid_t::frontLeftSwerve},
