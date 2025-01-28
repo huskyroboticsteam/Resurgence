@@ -50,6 +50,10 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "ikUp";
 		case jointid_t::ikForward:
 			return "ikForward";
+		case jointid_t::fourBarLinkage1:
+			return "fourBarLinkage1";
+		case jointid_t::fourBarLinkage2:
+			return "fourBarLinkage2";
 		default:
 			// should never happen
 			return "<unknown>";
