@@ -201,10 +201,11 @@ void TelemReportTask::sendTelemetry() {
 		  util::to_string(gps.isValid()).c_str());
 	if (imu.isValid()) {
 		Eigen::Quaterniond quat = imu.getData();
-		double lon = 0, lat = 0;
+		double lon = 0, lat = 0, alt = 0;
 		if (gps.isValid()) {
 			lon = gps.getData().lon;
 			lat = gps.getData().lat;
+			alt = gps.getData().alt;
 		}
 		double imuRecency = util::durationToSec(dataclock::now() - imu.getTime());
 		double recency = imuRecency;
@@ -219,6 +220,7 @@ void TelemReportTask::sendTelemetry() {
 					{"orientZ", quat.z()},
 					{"lon", lon},
 					{"lat", lat},
+					{"alt", alt},
 					{"recency", recency}};
 		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
