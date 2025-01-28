@@ -1,16 +1,20 @@
 #include "control_interface.h"
 
+#include "CAN/CAN.h"
+#include "CAN/CANUtils.h"
 #include "Constants.h"
 #include "Globals.h"
 #include "kinematics/DiffDriveKinematics.h"
 #include "navtypes.h"
 #include "utils/transform.h"
+#include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"
 
 #include <atomic>
 #include <chrono>
 #include <loguru.hpp>
 #include <mutex>
+#include <thread>
 
 using namespace navtypes;
 using namespace robot::types;
@@ -165,6 +169,33 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
 		return {};
+	}
+}
+
+bool hasData(can::deviceid_t id) {
+	auto start = std::chrono::steady_clock::now();
+	constexpr int timeout_ms = 100;
+
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(
+			   std::chrono::steady_clock::now() - start)
+			   .count() < timeout_ms) {
+		if (can::getDeviceTelemetry(id, can::telemtype_t::voltage)) {
+			return true;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	return false;
+}
+
+void verifyAllMotorsConnected() {
+	for (auto motorMap : robot::motorSerialIDMap) {
+		auto motor_pair = std::make_pair(can::devicegroup_t::motor, motorMap.second);
+		can::pullDeviceTelemetry(motor_pair, can::telemtype_t::voltage);
+		if (!hasData(motor_pair)) {
+			LOG_F(ERROR, "Motor not connected!\nID: %s",
+				  std::to_string(motorMap.second).c_str());
+			throw std::runtime_error("Not all motors connected!");
+		}
 	}
 }
 
