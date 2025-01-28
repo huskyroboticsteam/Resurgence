@@ -103,7 +103,7 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
-	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR}});
+	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
