@@ -8,5 +8,7 @@ var searchData=
   ['join_5ferror_5',['join_error',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a11135.html',1,'__gnu_pbds']]],
   ['jointpos_5ft_6',['jointpos_t',['../structkinematics_1_1jointpos__t.html',1,'kinematics']]],
   ['json_5fpointer_7',['json_pointer',['https://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer.html',1,'nlohmann']]],
-  ['json_5fsax_8',['json_sax',['https://nlohmann.github.io/json/doxygen/structnlohmann_1_1json__sax.html',1,'nlohmann']]]
+  ['json_5fpointer_3c_20basic_5fjson_20_3e_8',['json_pointer&lt; basic_json &gt;',['https://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer.html',1,'nlohmann']]],
+  ['json_5fsax_9',['json_sax',['https://nlohmann.github.io/json/doxygen/structnlohmann_1_1json__sax.html',1,'nlohmann']]],
+  ['json_5fsax_3c_20basic_5fjson_20_3e_10',['json_sax&lt; basic_json &gt;',['https://nlohmann.github.io/json/doxygen/structnlohmann_1_1json__sax.html',1,'nlohmann']]]
 ];

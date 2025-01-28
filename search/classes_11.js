@@ -13,11 +13,13 @@ var searchData=
   ['quantizedpyramid_10',['QuantizedPyramid',['https://docs.opencv.org/4.2.0/d7/d6f/classcv_1_1linemod_1_1QuantizedPyramid.html',1,'cv::linemod']]],
   ['quasidensestereo_11',['QuasiDenseStereo',['https://docs.opencv.org/4.2.0/dc/df4/classcv_1_1stereo_1_1QuasiDenseStereo.html',1,'cv::stereo']]],
   ['quaternion_12',['Quaternion',['https://eigen.tuxfamily.org/dox/classEigen_1_1Quaternion.html',1,'Eigen']]],
-  ['quaternionbase_13',['QuaternionBase',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'Eigen']]],
-  ['quaternionbase_3c_20map_3c_20const_20quaternion_3c_20_5fscalar_20_3e_2c_20_5foptions_20_3e_20_3e_14',['QuaternionBase&lt; Map&lt; const Quaternion&lt; _Scalar &gt;, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
-  ['quaternionbase_3c_20map_3c_20quaternion_3c_20_5fscalar_20_3e_2c_20_5foptions_20_3e_20_3e_15',['QuaternionBase&lt; Map&lt; Quaternion&lt; _Scalar &gt;, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
-  ['quaternionbase_3c_20quaternion_3c_20_5fscalar_2c_20_5foptions_20_3e_20_3e_16',['QuaternionBase&lt; Quaternion&lt; _Scalar, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
-  ['queue_17',['Queue',['https://docs.opencv.org/4.2.0/dd/dc0/classcv_1_1ocl_1_1Queue.html',1,'cv::ocl']]],
-  ['queue_18',['queue',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07807.html',1,'std']]],
-  ['quicksort_5ftag_19',['quicksort_tag',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09755.html',1,'__gnu_parallel']]]
+  ['quaternion_3c_20double_20_3e_13',['Quaternion&lt; double &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1Quaternion.html',1,'Eigen']]],
+  ['quaternion_3c_20float_20_3e_14',['Quaternion&lt; float &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1Quaternion.html',1,'Eigen']]],
+  ['quaternionbase_15',['QuaternionBase',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'Eigen']]],
+  ['quaternionbase_3c_20map_3c_20const_20quaternion_3c_20_5fscalar_20_3e_2c_20_5foptions_20_3e_20_3e_16',['QuaternionBase&lt; Map&lt; const Quaternion&lt; _Scalar &gt;, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
+  ['quaternionbase_3c_20map_3c_20quaternion_3c_20_5fscalar_20_3e_2c_20_5foptions_20_3e_20_3e_17',['QuaternionBase&lt; Map&lt; Quaternion&lt; _Scalar &gt;, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
+  ['quaternionbase_3c_20quaternion_3c_20_5fscalar_2c_20_5foptions_20_3e_20_3e_18',['QuaternionBase&lt; Quaternion&lt; _Scalar, _Options &gt; &gt;',['https://eigen.tuxfamily.org/dox/classEigen_1_1QuaternionBase.html',1,'']]],
+  ['queue_19',['Queue',['https://docs.opencv.org/4.2.0/dd/dc0/classcv_1_1ocl_1_1Queue.html',1,'cv::ocl']]],
+  ['queue_20',['queue',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07807.html',1,'std']]],
+  ['quicksort_5ftag_21',['quicksort_tag',['https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a09755.html',1,'__gnu_parallel']]]
 ];
