@@ -13,25 +13,13 @@
 
 using namespace robot::types;
 using namespace std::chrono_literals;
-using Globals::swerveController;
 
-using control::DriveMode;
 using nlohmann::json;
 
 namespace net::mc::tasks {
 namespace {
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
 }
-
-/**
- * Get the steer rotations of all wheels as a swerve_rots_t.
- */
-static DataPoint<control::swerve_rots_t> getAllSteerRotations();
-
-/**
- * Set the drive power of all wheels with a drive_commands_t.
- */
-static void setAllDrivePowers(const control::drive_commands_t& commands);
 
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
@@ -52,26 +40,6 @@ void PowerRepeatTask::setTankCmdVel(double left, double right) {
 	std::lock_guard lock(_mutex);
 	_last_cmd_vel = {left, right};
 	_tank = true;
-}
-
-void PowerRepeatTask::setTurnInPlaceCmdVel(double steerVel) {
-	std::lock_guard lock(_mutex);
-	_last_cmd_vel = {steerVel, 0.0};
-	DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
-	if (curr_rot.isValid()) {
-		setAllDrivePowers(
-			Globals::swerveController.setTurnInPlaceCmdVel(steerVel, curr_rot.getData()));
-	}
-}
-
-void PowerRepeatTask::setCrabCmdVel(double dtheta, double yVel) {
-	std::lock_guard lock(_mutex);
-	_last_cmd_vel = {dtheta, yVel};
-	DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
-	if (curr_rot.isValid()) {
-		setAllDrivePowers(
-			Globals::swerveController.setCrabCmdVel(dtheta, yVel, curr_rot.getData()));
-	}
 }
 
 void PowerRepeatTask::start() {
@@ -100,24 +68,10 @@ void PowerRepeatTask::periodicTask() {
 	}
 	if (_last_cmd_vel) {
 		if (_last_cmd_vel->first != 0.0 || _last_cmd_vel->second != 0.0) {
-			if (swerveController.getDriveMode() == DriveMode::Normal) {
-				if (_tank) {
-					robot::setTankCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
-				} else {
-					robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
-				}
-			} else if (swerveController.getDriveMode() == DriveMode::TurnInPlace) {
-				DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
-				if (curr_rot.isValid()) {
-					setAllDrivePowers(Globals::swerveController.setTurnInPlaceCmdVel(
-						_last_cmd_vel->first, curr_rot.getData()));
-				}
+			if (_tank) {
+				robot::setTankCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 			} else {
-				DataPoint<control::swerve_rots_t> curr_rot = getAllSteerRotations();
-				if (curr_rot.isValid()) {
-					setAllDrivePowers(Globals::swerveController.setCrabCmdVel(
-						_last_cmd_vel->first, _last_cmd_vel->second, curr_rot.getData()));
-				}
+				robot::setCmdVel(_last_cmd_vel->first, _last_cmd_vel->second);
 			}
 		}
 	}
@@ -244,23 +198,4 @@ void ArmIKTask::updateArmIK() {
 	}
 }
 
-static DataPoint<control::swerve_rots_t> getAllSteerRotations() {
-	try {
-		return DataPoint<control::swerve_rots_t>(
-			{robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
-			 robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
-			 robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
-			 robot::getMotorPos(motorid_t::rearRightSwerve).getData()});
-	} catch (const bad_datapoint_access& e) {
-		LOG_F(WARNING, "Invalid steer motor position(s)!");
-		return {};
-	}
-}
-
-static void setAllDrivePowers(const control::drive_commands_t& commands) {
-	robot::setMotorPower(motorid_t::frontLeftWheel, commands.lfPower);
-	robot::setMotorPower(motorid_t::frontRightWheel, commands.rfPower);
-	robot::setMotorPower(motorid_t::rearLeftWheel, commands.lbPower);
-	robot::setMotorPower(motorid_t::rearRightWheel, commands.rbPower);
-}
 } // namespace net::mc::tasks

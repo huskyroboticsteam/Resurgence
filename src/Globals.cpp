@@ -49,7 +49,5 @@ robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperip
 const kinematics::DiffWristKinematics wristKinematics;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);
-control::SwerveController swerveController(Constants::ROBOT_WIDTH, Constants::ROBOT_LENGTH,
-										   Constants::Drive::STEER_EPSILON);
 std::atomic<bool> armIKEnabled = false;
 } // namespace Globals
