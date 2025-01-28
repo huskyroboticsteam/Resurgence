@@ -28,6 +28,11 @@ public:
 	void setJointPower(robot::types::jointid_t id, double power);
 
 	/**
+	 * @brief Set the power to resend to the given motor.
+	 */
+	void setMotorPower(robot::types::motorid_t id, double power);
+
+	/**
 	 * @brief Set the drive command to resend. This does not execute the drive command right
 	 * now.
 	 */
@@ -58,6 +63,7 @@ public:
 private:
 	std::mutex _mutex;
 	std::unordered_map<robot::types::jointid_t, double> _last_joint_power;
+	std::unordered_map<robot::types::motorid_t, double> _last_motor_power;
 	// if not present, then there is no last requested drive power
 	std::optional<std::pair<double, double>> _last_cmd_vel;
 	bool _tank;

@@ -42,6 +42,11 @@ void PowerRepeatTask::setJointPower(jointid_t id, double power) {
 	_last_joint_power[id] = power;
 }
 
+void PowerRepeatTask::setMotorPower(motorid_t id, double power) {
+	std::lock_guard lock(_mutex);
+	_last_motor_power[id] = power;
+}
+
 void PowerRepeatTask::setCmdVel(double steerVel, double xVel) {
 	std::lock_guard lock(_mutex);
 	_last_cmd_vel = {steerVel, xVel};
@@ -96,6 +101,13 @@ void PowerRepeatTask::periodicTask() {
 		// this is also needed to make the zero calibration script work
 		if (power != 0.0) {
 			robot::setJointPower(joint, power);
+		}
+	}
+	for (const auto& current_pair : _last_motor_power) {
+		const motorid_t& motor = current_pair.first;
+		const double& power = current_pair.second;
+		if (power != 0.0) {
+			robot::setMotorPower(motor, power);
 		}
 	}
 	if (_last_cmd_vel) {

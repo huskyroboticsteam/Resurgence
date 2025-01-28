@@ -458,6 +458,11 @@ void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double powe
 	robot::setJointPower(joint, power);
 }
 
+void MissionControlProtocol::setRequestedMotorPower(motorid_t motor, double power) {
+	_power_repeat_task.setMotorPower(motor, power);
+	robot::setMotorPower(motor, power);
+}
+
 ///// UTILITY FUNCTIONS //////
 
 static void stopAllJoints() {
