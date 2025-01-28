@@ -57,10 +57,6 @@ enum class indication_t {
 enum class motorid_t {
 	leftTread,
 	rightTread,
-	frontLeftSwerve,
-	frontRightSwerve,
-	rearLeftSwerve,
-	rearRightSwerve,
 	armBase,
 	shoulder,
 	elbow,
@@ -81,10 +77,6 @@ enum class mountedperipheral_t {
 };
 
 enum class jointid_t {
-	frontLeftSwerve,
-	frontRightSwerve,
-	rearLeftSwerve,
-	rearRightSwerve,
 	armBase,
 	shoulder,
 	elbow,
@@ -103,11 +95,7 @@ constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	 jointid_t::ikForward, jointid_t::ikUp});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
-	{{"frontLeftSwerve", jointid_t::frontLeftSwerve},
-	 {"frontRightSwerve", jointid_t::frontRightSwerve},
-	 {"rearLeftSwerve", jointid_t::rearLeftSwerve},
-	 {"rearRightSwerve", jointid_t::rearRightSwerve},
-	 {"armBase", jointid_t::armBase},
+	{{"armBase", jointid_t::armBase},
 	 {"shoulder", jointid_t::shoulder},
 	 {"elbow", jointid_t::elbow},
 	 {"forearm", jointid_t::forearm},

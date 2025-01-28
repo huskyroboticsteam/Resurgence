@@ -13,9 +13,7 @@
 
 using namespace robot::types;
 using namespace std::chrono_literals;
-using Globals::swerveController;
 
-using control::DriveMode;
 using nlohmann::json;
 
 namespace net::mc::tasks {

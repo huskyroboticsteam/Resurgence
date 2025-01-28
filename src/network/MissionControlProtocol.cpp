@@ -19,8 +19,6 @@ using namespace robot::types;
 using namespace std::chrono_literals;
 
 using val_t = nlohmann::json::value_t;
-using control::DriveMode;
-using Globals::swerveController;
 using net::websocket::connhandler_t;
 using net::websocket::msghandler_t;
 using net::websocket::validator_t;
@@ -81,52 +79,14 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	}
 }
 
-static bool validateDriveModeRequest(const json& j) {
-	return util::validateKey(j, "mode", val_t::string) &&
-		   util::validateOneOf(j, "mode", {"normal", "turn-in-place", "crab"}) &&
-		   util::validateKey(j, "override", val_t::boolean);
-}
-
-void MissionControlProtocol::handleDriveModeRequest(const json& j) {
-	std::string mode = j["mode"];
-	control::swerve_rots_t target;
-	if (mode == "normal") {
-		target = swerveController.setDriveMode(DriveMode::Normal);
-	} else if (mode == "turn-in-place") {
-		target = swerveController.setDriveMode(DriveMode::TurnInPlace);
-	} else if (mode == "crab") {
-		target = swerveController.setDriveMode(DriveMode::Crab);
-	} else {
-		LOG_F(WARNING, "Invalid requested Drive Mode");
-		return;
-	}
-
-	robot::setMotorPos(motorid_t::frontLeftSwerve, target.lfRot);
-	robot::setMotorPos(motorid_t::rearLeftSwerve, target.lbRot);
-	robot::setMotorPos(motorid_t::frontRightSwerve, target.rfRot);
-	robot::setMotorPos(motorid_t::rearRightSwerve, target.rbRot);
-
-	swerveController.setOverride(j["override"]);
-}
-
 static bool validateDriveRequest(const json& j) {
-	if (swerveController.getDriveMode() != DriveMode::Normal) {
-		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  util::to_string(swerveController.getDriveMode()).c_str());
-	}
-	return swerveController.getDriveMode() == DriveMode::Normal &&
-		   util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
+	return util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
 		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
 }
 
 static bool validateTankDriveRequest(const json& j) {
-	if (swerveController.getDriveMode() != DriveMode::Normal) {
-		LOG_F(WARNING, "Drive mode set to %s, not Normal",
-			  util::to_string(swerveController.getDriveMode()).c_str());
-	}
-	return swerveController.getDriveMode() == DriveMode::Normal && util::hasKey(j, "left") &&
-		   util::validateRange(j, "left", -1, 1) && util::hasKey(j, "right") &&
-		   util::validateRange(j, "right", -1, 1);
+	return util::hasKey(j, "left") && util::validateRange(j, "left", -1, 1) &&
+		   util::hasKey(j, "right") && util::validateRange(j, "right", -1, 1);
 }
 
 static bool validateArmIKEnable(const json& j) {
@@ -337,10 +297,6 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		OPERATION_MODE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
 		validateOperationModeRequest);
-	this->addMessageHandler(
-		DRIVE_MODE_REQ_TYPE,
-		std::bind(&MissionControlProtocol::handleDriveModeRequest, this, _1),
-		validateDriveModeRequest);
 	// drive and joint power handlers need the class for context since they must modify
 	// _last_joint_power and _last_cmd_vel (for the repeater thread)
 	this->addMessageHandler(DRIVE_REQ_TYPE,
