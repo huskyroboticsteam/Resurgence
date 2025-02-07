@@ -18,9 +18,7 @@ of our code will be Unix-specific.
 Linux](https://docs.microsoft.com/en-us/windows/wsl/about) or a VM with a Linux
 distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions. As noted above, **use Ubuntu 20.04**.
 
-**Mac users:** We do not make any effort to support Mac systems. You *may* be able to get things working, but if you try you'll be on your own. It's **highly recommended** for Mac users to use a Linux VM.
-
-> ⚠️ For Mac users, we recommend running a Ubuntu virtual machine via [UTM](https://mac.getutm.app/). After installing the app, set up your VM using [UTM's Ubuntu image](https://mac.getutm.app/gallery/ubuntu-20-04). Please note that UTM only supports the latest version of Ubuntu (22.04). Since the codebase is based on an older version of Ubuntu, there may be package errors that you need to manually resolve. For the sake of convenience, we also recommend SSHing into UTM via VSCode's Remote SSH feature. [More info can be found here](https://arteen.linux.ucla.edu/ssh-into-utm-vm.html). 
+**Mac users:** We recommend running an Ubuntu virtual machine via [UTM](https://mac.getutm.app/). After installing the app, set up your VM using [UTM's Ubuntu image](https://mac.getutm.app/gallery/ubuntu-20-04). Please note that UTM only supports the latest version of Ubuntu (22.04). Since the codebase is based on an older version of Ubuntu, there will be package errors that you need to manually resolve (more details below).
 
 **From here on out, the installation instructions will assume you are using Ubuntu 20.04 LTS**. Windows users should run commands in either their Linux VM or their WSL
 terminal. For Linux users, we'll assume you're running Ubuntu; users of another
@@ -41,11 +39,30 @@ cd <place to put repository>
 git clone https://github.com/huskyroboticsteam/Resurgence/
 ```
 
+> You may need to set up a SSH key to clone the repo. You can follow the steps below or find more information [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+> Inside your VM, check if there are existing SSH keys by running `ls -al ~/.ssh`, which will list all files inside your .ssh directory, if they exist. Existing public keys are (by default) one of the following: *id_rsa.pub*, *id_ecdsa.pub*, *id_ed25519.pub*.
+
+> To create a new SSH key, run the following command with your Github email address: `ssh-keygen -t ed25519 -C "github_email@example.com"`. You can accept all of the default configurations.
+
+> To add the SSH key to your GitHub account, run the following command, substituting in for your .pub file: `gh ssh-key add ~/.ssh/<file>.pub -t "UTM Linux" --type signing`
+
 Install dependencies in one go:
 ```bash
 cd Resurgence
 ./easy_install.sh
 ```
+
+> If you are using UTM with Ubuntu 22.04, here are additional steps needed to install the dependencies.
+```bash
+./update_deps.sh
+sudo apt-get install -y cmake build-essential libeigen3-dev libwebsocketpp-dev libboost-system-dev frozen libargparse-dev nlohmann-json3-dev
+sudo apt-get install -y libopencv-dev=4.5.4+dfsg-9ubuntu4 catch2 libx264-dev libgps-dev
+sudo apt-get install -y clang-format-12
+```
+
+We use clang-format for git. For Ubuntu 22.04, we can install up to clang-format-12.
+
 
 Done! Continue on to the "IDE Setup" section.
 
@@ -65,6 +82,8 @@ a) Develop within the VM, in which case see "Native Linux" above.
 b) Create a shared folder (shared between your computer and VM) and clone the project there. Then use an editor to edit the files on your machine and run them within the VM.
 
 c) Set up the VM as an ssh server (pretty easy) and run VSCode on your machine (not the VM) using the [remote development](https://code.visualstudio.com/docs/remote/ssh) feature.
+> For the sake of convenience, we also recommend SSHing into UTM via VSCode's Remote SSH feature. [More info can be found here](https://arteen.linux.ucla.edu/ssh-into-utm-vm.html).
+> Remember to run `sudo apt-get install -y openssh-server`.
 
 Of these, (c) probably has the most convenient/usable setup, while (a) is probably the least work.
 
