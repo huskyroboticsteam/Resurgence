@@ -10,6 +10,7 @@
 #include "motor/can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
+#include "../control_interface.h"
 
 #include <future>
 #include <iostream>
@@ -59,6 +60,7 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
+	robot::verifyAllMotorsConnected();
 	for (const auto& it : motorSerialIDMap) {
 		can::motor::initMotor(it.second);
 		bool hasPosSensor = robot::potMotors.find(it.first) != robot::potMotors.end() ||
