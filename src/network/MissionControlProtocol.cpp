@@ -262,7 +262,7 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 static bool validateMotor(const json& j) {
 	return util::validateKey(j, "motor", val_t::string) &&
 		   std::any_of(all_motorid_t.begin(), all_motorid_t.end(), [&](const auto& motor) {
-		       return j["motor"].get<std::string>() == util::to_string(motor);
+			   return j["motor"].get<std::string>() == util::to_string(motor);
 		   });
 }
 
