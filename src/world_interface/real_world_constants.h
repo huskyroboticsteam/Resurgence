@@ -102,7 +102,8 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
-	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR}});
+	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
+	 {motorid_t::scienceStepper, DEVICE_SERIAL_MOTOR_SCIENCE_STEPPER}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
@@ -132,7 +133,8 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::rearLeftSwerve, 1.0},
 												   {motorid_t::rearRightSwerve, 1.0},
 												   {motorid_t::hand, -0.75},
-												   {motorid_t::activeSuspension, -0.5}});
+												   {motorid_t::activeSuspension, -0.5}}),
+													 {motorid_t::scienceStepper, 0.7}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
