@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CAN_BITRATE=125000
-CAN_DBITRATE=500000
+CAN_DBITRATE=125000
 GPS_PATH="/dev/ttyUSB0"
 
 sudo modprobe can
@@ -9,16 +9,11 @@ sudo modprobe can_raw
 sudo modprobe mttcan
 
 sudo ip link set can0 type can bitrate "${CAN_BITRATE}" dbitrate "${CAN_DBITRATE}" \
-     berr-reporting on fd on
-sudo ip link set can1 type can bitrate "${CAN_BITRATE}" dbitrate "${CAN_DBITRATE}" \
-     berr-reporting on fd on
+     berr-reporting on fd on restart-ms 100
 sudo ip link set up can0
-sudo ip link set up can1
 
 if [[ $? != 0 ]]; then
-  echo "Could not enable hardware CAN interface; using virtual CAN instead."
-  sudo ip link add type vcan
-  sudo ip link set dev vcan0 up
+  echo "Error enabling can0 interface!"
 fi
 
 # For some reason, on the rover, the gpsd that starts on boot does not

@@ -113,6 +113,7 @@ void openCamera(CameraID camID, const char* cameraPath) {
 
 void setupCameras() {
 	openCamera(Constants::MAST_CAMERA_ID, Constants::MAST_CAMERA_CONFIG_PATH);
+	openCamera(Constants::FOREARM_CAMERA_ID, Constants::FOREARM_CAMERA_CONFIG_PATH);
 	openCamera(Constants::HAND_CAMERA_ID, Constants::HAND_CAMERA_CONFIG_PATH);
 }
 } // namespace
