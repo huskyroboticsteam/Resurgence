@@ -360,11 +360,19 @@ DataPoint<pose_t> getTruePose() {
 }
 
 void setMotorPower(motorid_t motor, double normalizedPWM) {
+	if (isEmergencyStopped()) {
+		LOG_F(ERROR, "E-Stopped! Ignoring call for: setMotorPower");
+		return;
+	}
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPower(normalizedPWM);
 }
 
 void setMotorPos(motorid_t motor, int32_t targetPos) {
+	if (isEmergencyStopped()) {
+		LOG_F(ERROR, "E-Stopped! Ignoring call for: setMotorPos");
+		return;
+	}
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
 }
@@ -386,6 +394,10 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 }
 
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
+	if (isEmergencyStopped()) {
+		LOG_F(ERROR, "E-Stopped! Ignoring call for: setMotorVel");
+		return;
+	}
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
 }
