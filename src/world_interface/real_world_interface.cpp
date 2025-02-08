@@ -4,13 +4,13 @@
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
+#include "../control_interface.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
 #include "motor/can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
-#include "../control_interface.h"
 
 #include <future>
 #include <iostream>
