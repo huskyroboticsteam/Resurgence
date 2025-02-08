@@ -29,7 +29,7 @@ namespace util {
 
 std::string to_string(robot::types::jointid_t joint) {
 	using robot::types::name_to_jointid;
-	for (auto pair : name_to_jointid) {
+	for (const auto& pair : name_to_jointid) {
 		if (pair.second == joint) {
 			return std::string(pair.first.data());
 		}
@@ -39,7 +39,7 @@ std::string to_string(robot::types::jointid_t joint) {
 
 std::string to_string(robot::types::motorid_t motor) {
 	using robot::types::name_to_motorid;
-	for (auto pair : name_to_motorid) {
+	for (const auto& pair : name_to_motorid) {
 		if (pair.second == motor) {
 			return std::string(pair.first.data());
 		}
