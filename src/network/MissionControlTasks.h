@@ -39,18 +39,6 @@ public:
 	 */
 	void setTankCmdVel(double steerVel, double xVel);
 
-	/**
-	 * @brief Set the turn-in-place drive command to resend. This does not execute the drive
-	 * command right now.
-	 */
-	void setTurnInPlaceCmdVel(double steerVel);
-
-	/**
-	 * @brief Set the crab drive command to resend. This does not execute the drive command
-	 * right now.
-	 */
-	void setCrabCmdVel(double steerVel, double xVel);
-
 	void start() override;
 
 	void stop() override;
