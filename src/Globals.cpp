@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include "Constants.h"
+#include "CAN/CANUtils.h"
 #include "kinematics/FabrikSolver.h"
 #include "kinematics/PlanarArmFK.h"
 #include "world_interface/data.h"
@@ -46,6 +47,7 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 													 Constants::WS_SERVER_PORT);
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
+can::devicegroup_t deviceGroup = can::devicegroup_t::motor;
 const kinematics::DiffWristKinematics wristKinematics;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);

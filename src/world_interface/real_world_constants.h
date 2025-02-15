@@ -79,11 +79,11 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
-	{{motorid_t::leftTread, DEVICE_SERIAL_MOTOR_CHASSIS_FL},
-	 {motorid_t::rightTread, DEVICE_SERIAL_MOTOR_CHASSIS_FR},
-	 {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
+	{{motorid_t::leftTread, 0x0d},
+	 {motorid_t::rightTread, 0x04},
+	 {motorid_t::armBase, 0x02},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
-	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
+	 {motorid_t::elbow, 0x04},
 	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
 	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
@@ -102,12 +102,12 @@ constexpr auto motorPIDMap =
 constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
 												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
+												   {motorid_t::elbow, -0.7},
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::leftTread, 0.7},
-												   {motorid_t::rightTread, 0.7},
+												   {motorid_t::rightTread, 0.2},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillMotor, 1.0}});
@@ -118,12 +118,12 @@ constexpr auto positive_pwm_scales =
 constexpr auto negative_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
 												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
+												   {motorid_t::elbow, -0.7},
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::leftTread, 0.7},
-												   {motorid_t::rightTread, 0.7},
+												   {motorid_t::rightTread, 0.2},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillMotor, 1.0}});
