@@ -129,9 +129,8 @@ void setServoPos(deviceserial_t serial, uint8_t servoNum, int32_t angle) {
 	sendCANPacket(p);
 }
 
-DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
-	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial),
-							  telemtype_t::angle);
+DataPoint<int32_t> getMotorPosition(deviceid_t motor) {
+	return getDeviceTelemetry(motor, telemtype_t::angle);
 }
 
 void pullMotorPosition(deviceserial_t serial) {
