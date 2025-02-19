@@ -81,7 +81,7 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
 	{{motorid_t::leftTread, 0x0d},
 	 {motorid_t::rightTread, 0x04},
-	 {motorid_t::armBase, 0x02},
+	 {motorid_t::armBase, 0x01},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
 	 {motorid_t::elbow, 0x04},
 	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
@@ -106,13 +106,14 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
-												   {motorid_t::leftTread, 0.7},
-												   {motorid_t::rightTread, 0.2},
+												   // TODO: Tune the ratio between left/right tread
+												   {motorid_t::leftTread, 0.56},
+												   {motorid_t::rightTread, -0.7},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillMotor, 1.0}});
 /**
- * @brief A mapping of motorids to power scale factors when commanded with negative power.
+ * @brief A mapping of motorids to power scale factors when commanded with negative power
  * Negative values mean that the motor is inverted.
  */
 constexpr auto negative_pwm_scales =
@@ -122,8 +123,9 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
-												   {motorid_t::leftTread, 0.7},
-												   {motorid_t::rightTread, 0.2},
+												   // TODO: Tune the ratio between left/right tread
+												   {motorid_t::leftTread, 0.56},
+												   {motorid_t::rightTread, -0.7},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillMotor, 1.0}});
