@@ -74,7 +74,7 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	{motorid_t::wristDiffLeft,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{motorid_t::wristDiffRight,
-	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
+	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}}
 });
 
 /** @brief A mapping of motorids to their corresponding serial number. */
@@ -93,7 +93,11 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
-	frozen::make_unordered_map<motorid_t, pidcoef_t>({{motorid_t::shoulder, {70, 0, 0}}});
+	frozen::make_unordered_map<motorid_t, pidcoef_t>(
+		{{motorid_t::shoulder, {200, 0, 0}}});
+		 //{motorid_t::elbow, {250, 0, 0}},
+		 //{motorid_t::leftTread, {300, 0, 0}},
+		 //{motorid_t::rightTread, {200, 0, 0}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
@@ -108,7 +112,7 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::wristDiffRight, 0.1},
 												   // TODO: Tune the ratio between left/right tread
 												   {motorid_t::leftTread, 0.56},
-												   {motorid_t::rightTread, -0.7},
+												   {motorid_t::rightTread, 0.7},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillMotor, 1.0}});
