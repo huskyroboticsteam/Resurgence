@@ -98,13 +98,33 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
 	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
-	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
+	 {motorid_t::forearm, },
 	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
 	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR},
 	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR}});
+
+constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
+	{{motorid_t::frontLeftWheel, can::devicegroup_t::motor},
+	 {motorid_t::frontRightWheel, can::devicegroup_t::motor},
+	 {motorid_t::rearLeftWheel, can::devicegroup_t::motor},
+	 {motorid_t::rearRightWheel, can::devicegroup_t::motor},
+	 {motorid_t::frontLeftSwerve, can::devicegroup_t::motor},
+	 {motorid_t::frontRightSwerve, can::devicegroup_t::motor},
+	 {motorid_t::rearLeftSwerve, can::devicegroup_t::motor},
+	 {motorid_t::rearRightSwerve, can::devicegroup_t::motor},
+	 {motorid_t::armBase, can::devicegroup_t::motor},
+	 {motorid_t::shoulder, can::devicegroup_t::motor},
+	 {motorid_t::elbow, can::devicegroup_t::motor},
+	 {motorid_t::forearm, can::devicegroup_t::motor},
+	 {motorid_t::wristDiffLeft, can::devicegroup_t::motor},
+	 {motorid_t::wristDiffRight, can::devicegroup_t::motor},
+	 {motorid_t::hand, can::devicegroup_t::motor},
+	 {motorid_t::activeSuspension, can::devicegroup_t::motor},
+	 {motorid_t::drillActuator, can::devicegroup_t::science},
+	 {motorid_t::drillMotor, can::devicegroup_t::science}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(

@@ -35,14 +35,14 @@ namespace {
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
-void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+void addMotorMapping(motorid_t motor, can::devicegroup_t group, bool hasPosSensor) {
 	// get scales for motor
 	double posScale = positive_pwm_scales.at(motor);
 	double negScale = negative_pwm_scales.at(motor);
 
 	// create ptr and insert in map
 	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(
-		motor, hasPosSensor, motorSerialIDMap.at(motor), posScale, negScale);
+		motor, group, hasPosSensor, motorSerialIDMap.at(motor), posScale, negScale);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace
@@ -60,19 +60,24 @@ std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
 	for (const auto& it : motorSerialIDMap) {
-		can::motor::initMotor(it.second);
+		can::deviceid_t device = std::make_pair(
+			motorGroupMap.at(it.first), it.second
+		);
+		can::motor::initMotor(device);
 		bool hasPosSensor = robot::potMotors.find(it.first) != robot::potMotors.end() ||
 							robot::encMotors.find(it.first) != robot::encMotors.end();
-		addMotorMapping(it.first, hasPosSensor);
+		addMotorMapping(it.first, motorGroupMap.find(it.first)->second, hasPosSensor);
 	}
 
 	for (const auto& pot_motor_pair : robot::potMotors) {
 		motorid_t motor_id = pot_motor_pair.first;
 		potparams_t pot_params = pot_motor_pair.second;
 
-		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
+		can::deviceid_t device = std::make_pair(
+			motorGroupMap.at(motor_id), motorSerialIDMap.at(motor_id)
+		);
 
-		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
+		can::motor::initPotentiometer(device, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
 	}
 
@@ -80,19 +85,23 @@ void initMotors() {
 		motorid_t motor_id = enc_motor_pair.first;
 		encparams_t enc_params = enc_motor_pair.second;
 
-		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
+		can::deviceid_t device = std::make_pair(
+			motorGroupMap.at(motor_id), motorSerialIDMap.at(motor_id)
+		);
 
-		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
+		can::motor::initEncoder(device, enc_params.isInverted, true, enc_params.ppjr,
 								TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
+		can::motor::setLimitSwitchLimits(device, enc_params.limitSwitchLow,
 										 enc_params.limitSwitchHigh);
 	}
 
 	for (const auto& pair : robot::motorPIDMap) {
 		motorid_t motor = pair.first;
-		can::deviceserial_t serial = motorSerialIDMap.at(motor);
+		can::deviceid_t device = std::make_pair(
+			motorGroupMap.at(motor), motorSerialIDMap.at(motor)
+		);
 		pidcoef_t pid = motorPIDMap.at(motor);
-		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
+		can::motor::setMotorPIDConstants(device, pid.kP, pid.kI, pid.kD);
 	}
 }
 
@@ -265,7 +274,10 @@ callbackid_t addLimitSwitchCallback(
 	auto func = [=](can::deviceserial_t serial, DataPoint<LimitSwitchData> data) {
 		callback(motor, data);
 	};
-	auto id = can::motor::addLimitSwitchCallback(motorSerialIDMap.at(motor), func);
+	can::deviceid_t device = std::make_pair(
+		motorGroupMap.at(motor), motorSerialIDMap.at(motor)
+	);
+	auto id = can::motor::addLimitSwitchCallback(device, func);
 	auto nextID = nextCallbackID++;
 	callbackIDMap.insert({nextID, id});
 	return nextID;

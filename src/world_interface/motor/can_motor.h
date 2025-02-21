@@ -21,7 +21,7 @@ public:
 	 * @param pos_pwm_scale The positive pwm scale for the motor power.
 	 * @param neg_pwm_scale The positive pwm scale for the motor power.
 	 */
-	can_motor(robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial,
+	can_motor(robot::types::motorid_t motor, can::devicegroup_t group, bool hasPosSensor, can::deviceserial_t serial,
 			  double pos_pwm_scale, double neg_pwm_scale);
 
 	void setMotorPower(double power) override;
@@ -38,7 +38,7 @@ public:
 	can::deviceserial_t getMotorSerial();
 
 private:
-	can::deviceserial_t serial_id;
+	can::deviceid_t device_id;
 	std::optional<can::motor::motormode_t> motor_mode;
 	double positive_scale;
 	double negative_scale;
