@@ -106,6 +106,26 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR},
 	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR}});
 
+constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
+	{{motorid_t::frontLeftWheel, can::devicegroup_t::motor},
+	 {motorid_t::frontRightWheel, can::devicegroup_t::motor},
+	 {motorid_t::rearLeftWheel, can::devicegroup_t::motor},
+	 {motorid_t::rearRightWheel, can::devicegroup_t::motor},
+	 {motorid_t::frontLeftSwerve, can::devicegroup_t::motor},
+	 {motorid_t::frontRightSwerve, can::devicegroup_t::motor},
+	 {motorid_t::rearLeftSwerve, can::devicegroup_t::motor},
+	 {motorid_t::rearRightSwerve, can::devicegroup_t::motor},
+	 {motorid_t::armBase, can::devicegroup_t::motor},
+	 {motorid_t::shoulder, can::devicegroup_t::motor},
+	 {motorid_t::elbow, can::devicegroup_t::motor},
+	 {motorid_t::forearm, can::devicegroup_t::motor},
+	 {motorid_t::wristDiffLeft, can::devicegroup_t::motor},
+	 {motorid_t::wristDiffRight, can::devicegroup_t::motor},
+	 {motorid_t::hand, can::devicegroup_t::motor},
+	 {motorid_t::activeSuspension, can::devicegroup_t::motor},
+	 {motorid_t::drillActuator, can::devicegroup_t::science},
+	 {motorid_t::drillMotor, can::devicegroup_t::science}});
+
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
 	{{motorid_t::shoulder, {70, 0, 0}},
