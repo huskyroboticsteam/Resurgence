@@ -259,6 +259,29 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	}
 }
 
+static bool validateMotor(const json& j) {
+	return util::validateKey(j, "motor", val_t::string) &&
+		   std::any_of(all_motorid_t.begin(), all_motorid_t.end(), [&](const auto& motor) {
+			   return j["motor"].get<std::string>() == util::to_string(motor);
+		   });
+}
+
+static bool validateMotorPowerRequest(const json& j) {
+	return validateMotor(j) && util::validateRange(j, "power", -1, 1);
+}
+
+void MissionControlProtocol::handleMotorPowerRequest(const json& j) {
+	using robot::types::motorid_t;
+	using robot::types::name_to_motorid;
+	std::string motor = j["motor"];
+	double power = j["power"];
+	auto it = name_to_motorid.find(util::freezeStr(motor));
+	if (it != name_to_motorid.end()) {
+		motorid_t motor_id = it->second;
+		setRequestedMotorPower(motor_id, power);
+	}
+}
+
 static bool validateWaypointNavRequest(const json& j) {
 	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
 	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
@@ -410,6 +433,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		JOINT_POWER_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
 		validateJointPowerRequest);
+	this->addMessageHandler(
+		MOTOR_POWER_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleMotorPowerRequest, this, _1),
+		validateMotorPowerRequest);
 	this->addMessageHandler(JOINT_POSITION_REQ_TYPE, handleJointPositionRequest,
 							validateJointPositionRequest);
 	this->addMessageHandler(
@@ -456,6 +483,11 @@ void MissionControlProtocol::setArmIKEnabled(bool enabled, bool sendReport) {
 void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {
 	_power_repeat_task.setJointPower(joint, power);
 	robot::setJointPower(joint, power);
+}
+
+void MissionControlProtocol::setRequestedMotorPower(motorid_t motor, double power) {
+	_power_repeat_task.setMotorPower(motor, power);
+	robot::setMotorPower(motor, power);
 }
 
 ///// UTILITY FUNCTIONS //////
