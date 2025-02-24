@@ -145,7 +145,6 @@ constexpr auto JOINT_MOTOR_MAP =
 		 {robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
 		 {robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
 		 {robot::types::jointid_t::hand, robot::types::motorid_t::hand},
-		//  {robot::types::jointid_t::handActuator, robot::types::motorid_t::handActuator},
 		 {robot::types::jointid_t::drillActuator, robot::types::motorid_t::drillActuator},
 		 {robot::types::jointid_t::drillMotor, robot::types::motorid_t::drillMotor},
 		 {robot::types::jointid_t::activeSuspension,

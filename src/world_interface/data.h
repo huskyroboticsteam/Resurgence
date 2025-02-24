@@ -70,9 +70,8 @@ enum class motorid_t {
 	wristDiffRight,
 	wristDiffLeft,
 	hand,
-	drillMotor,
-	// handActuator,
 	activeSuspension,
+	drillMotor,
 	drillActuator
 };
 
@@ -100,7 +99,6 @@ enum class jointid_t {
 	activeSuspension,
 	ikForward,
 	ikUp,
-	// handActuator,
 	drillMotor,
 	drillActuator
 };
@@ -140,7 +138,6 @@ constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, moto
 	 {"wristDiffRight", motorid_t::wristDiffRight},
 	 {"wristDiffLeft", motorid_t::wristDiffLeft},
 	 {"hand", motorid_t::hand},
-	//  {"handActuator", motorid_t::handActuator},
 	 {"activeSuspension", motorid_t::activeSuspension},
 	 {"drillActuator", motorid_t::drillActuator},
 	 {"drillMotor", motorid_t::drillMotor}});
@@ -157,7 +154,6 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"wristPitch", jointid_t::wristPitch},
 	 {"wristRoll", jointid_t::wristRoll},
 	 {"hand", jointid_t::hand},
-	//  {"handActuator", jointid_t::handActuator},
 	 {"drillMotor", jointid_t::drillMotor},
 	 {"drillActuator", jointid_t::drillActuator},
 	 {"activeSuspension", jointid_t::activeSuspension},
