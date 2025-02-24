@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CAN/CANUtils.h"
 #include "control/PlanarArmController.h"
 #include "control/SwerveController.h"
 #include "kinematics/ArmKinematics.h"
@@ -30,7 +29,6 @@ extern RoverState curr_state;
 extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
-extern can::devicegroup_t deviceGroup;
 extern control::PlanarArmController<2> planarArmController;
 extern const kinematics::DiffWristKinematics wristKinematics;
 extern control::SwerveController swerveController;
