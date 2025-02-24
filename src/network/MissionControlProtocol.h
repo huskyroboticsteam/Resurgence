@@ -46,8 +46,6 @@ private:
 	void handleOperationModeRequest(const json& j);
 	void handleDriveModeRequest(const json& j);
 	void handleTankDriveRequest(const json& j);
-	void handleTurnInPlaceDriveRequest(const json& j);
-	void handleCrabDriveRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
@@ -64,8 +62,6 @@ private:
 	void setRequestedMotorPower(motorid_t motor, double power);
 	void setRequestedCmdVel(double dtheta, double dx);
 	void setRequestedTankCmdVel(double left, double right);
-	void setRequestedTurnInPlaceCmdVel(double dtheta);
-	void setRequestedCrabCmdVel(double dtheta, double dy);
 };
 
 }; // namespace mc

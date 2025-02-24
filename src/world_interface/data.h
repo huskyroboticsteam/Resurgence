@@ -55,14 +55,8 @@ enum class indication_t {
 
 /** @brief The motors on the robot. */
 enum class motorid_t {
-	frontLeftWheel,
-	frontLeftSwerve,
-	frontRightWheel,
-	frontRightSwerve,
-	rearLeftWheel,
-	rearLeftSwerve,
-	rearRightWheel,
-	rearRightSwerve,
+	leftTread,
+	rightTread,
 	armBase,
 	shoulder,
 	elbow,
@@ -70,6 +64,7 @@ enum class motorid_t {
 	wristDiffRight,
 	wristDiffLeft,
 	hand,
+	handActuator,
 	drillMotor,
 	drillActuator
 };
@@ -84,10 +79,6 @@ enum class mountedperipheral_t {
 };
 
 enum class jointid_t {
-	frontLeftSwerve,
-	frontRightSwerve,
-	rearLeftSwerve,
-	rearRightSwerve,
 	armBase,
 	shoulder,
 	elbow,
@@ -95,6 +86,7 @@ enum class jointid_t {
 	wristPitch,
 	wristRoll,
 	hand,
+	handActuator,
 	ikForward,
 	ikUp,
 	drillMotor,
@@ -134,17 +126,14 @@ constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, moto
 	 {"drillMotor", motorid_t::drillMotor}});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
-	{{"frontLeftSwerve", jointid_t::frontLeftSwerve},
-	 {"frontRightSwerve", jointid_t::frontRightSwerve},
-	 {"rearLeftSwerve", jointid_t::rearLeftSwerve},
-	 {"rearRightSwerve", jointid_t::rearRightSwerve},
-	 {"armBase", jointid_t::armBase},
+	{{"armBase", jointid_t::armBase},
 	 {"shoulder", jointid_t::shoulder},
 	 {"elbow", jointid_t::elbow},
 	 {"forearm", jointid_t::forearm},
 	 {"wristPitch", jointid_t::wristPitch},
 	 {"wristRoll", jointid_t::wristRoll},
 	 {"hand", jointid_t::hand},
+	 {"handActuator", jointid_t::handActuator},
 	 {"ikForward", jointid_t::ikForward},
 	 {"ikUp", jointid_t::ikUp},
 	 {"drillMotor", jointid_t::drillMotor},

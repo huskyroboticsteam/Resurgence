@@ -135,16 +135,12 @@ extern const std::unordered_map<robot::types::CameraID, int> STREAM_RFS;
  */
 constexpr auto JOINT_MOTOR_MAP =
 	frozen::make_unordered_map<robot::types::jointid_t, robot::types::motorid_t>(
-		{{robot::types::jointid_t::frontLeftSwerve, robot::types::motorid_t::frontLeftSwerve},
-		 {robot::types::jointid_t::frontRightSwerve,
-		  robot::types::motorid_t::frontRightSwerve},
-		 {robot::types::jointid_t::rearLeftSwerve, robot::types::motorid_t::rearLeftSwerve},
-		 {robot::types::jointid_t::rearRightSwerve, robot::types::motorid_t::rearRightSwerve},
-		 {robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
+		{{robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
 		 {robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
 		 {robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
 		 {robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
 		 {robot::types::jointid_t::hand, robot::types::motorid_t::hand},
+       {robot::types::jointid_t::handActuator, robot::types::motorid_t::handActuator},
 		 {robot::types::jointid_t::drillActuator, robot::types::motorid_t::drillActuator},
 		 {robot::types::jointid_t::drillMotor, robot::types::motorid_t::drillMotor}});
 
