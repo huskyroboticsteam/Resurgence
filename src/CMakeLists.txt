@@ -94,7 +94,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 FetchContent_Declare(
     HindsightCAN
     GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-    GIT_TAG 58fae5bbcb403a0026fa11a54cdabfed9148d697
+    GIT_TAG 4b28a4a638f827222671d68d53e8516b98ca6e0a
 )
 FetchContent_MakeAvailable(HindsightCAN)
 
