@@ -183,6 +183,10 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
+	} else if (joint == jointid_t::handActuator) {
+		if (std::abs(power) > 0.1) {
+			setMotorPos(motorid_t::handActuator, power > 0 ? 1 : 0);
+		}
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
