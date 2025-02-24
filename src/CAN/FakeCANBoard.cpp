@@ -140,9 +140,10 @@ int main() {
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = std::make_shared<robot::can_motor>(motorid_t::leftTread, true, serial,
-														   posScale, negScale);
 
+				std::shared_ptr<robot::base_motor> motor =
+					std::make_shared<robot::can_motor>(motorid_t::leftTread, true, serial,
+													   group, posScale, negScale);
 				// get initial motor position
 				DataPoint<int32_t> dataPoint = motor->getMotorPos();
 				while (!dataPoint.isValid()) {

@@ -151,7 +151,6 @@ add_library(utils SHARED
   base64/base64_img.cpp
   kinematics/DiffDriveKinematics.cpp
   kinematics/DiffWristKinematics.cpp
-  kinematics/SwerveDriveKinematics.cpp
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
@@ -254,7 +253,6 @@ target_link_libraries(video
 
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
-  control/SwerveController.cpp
 )
 target_link_libraries(control utils)
 
@@ -323,7 +321,6 @@ if(WITH_TESTS)
     ../tests/control/PlanarArmControllerTest.cpp
     # Kinematics tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
-    ../tests/kinematics/SwerveDriveKinematicsTest.cpp
     ../tests/kinematics/PlanarArmFKTest.cpp
     ../tests/kinematics/FabrikSolver2DTest.cpp
     # Filter tests
