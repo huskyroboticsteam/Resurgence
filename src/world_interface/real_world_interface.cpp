@@ -41,8 +41,9 @@ void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 	double negScale = negative_pwm_scales.at(motor);
 
 	// create ptr and insert in map
-	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(
-		motor, hasPosSensor, motorSerialIDMap.at(motor), motorGroupMap.at(motor), posScale, negScale);
+	std::shared_ptr<robot::base_motor> ptr =
+		std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
+									motorGroupMap.at(motor), posScale, negScale);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace
@@ -267,10 +268,10 @@ callbackid_t addLimitSwitchCallback(
 	const std::function<void(robot::types::motorid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
-	auto func = [=](can::devicegroup_t group, can::deviceserial_t serial, DataPoint<LimitSwitchData> data) {
-		callback(motor, data);
-	};
-	auto id = can::motor::addLimitSwitchCallback(motorGroupMap.at(motor), motorSerialIDMap.at(motor), func);
+	auto func = [=](can::devicegroup_t group, can::deviceserial_t serial,
+					DataPoint<LimitSwitchData> data) { callback(motor, data); };
+	auto id = can::motor::addLimitSwitchCallback(motorGroupMap.at(motor),
+												 motorSerialIDMap.at(motor), func);
 	auto nextID = nextCallbackID++;
 	callbackIDMap.insert({nextID, id});
 	return nextID;

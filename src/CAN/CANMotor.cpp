@@ -19,13 +19,13 @@ using robot::types::LimitSwitchData;
 
 namespace can::motor {
 
-void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-				 int32_t pulsesPerJointRev,
+void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder,
+				 bool zeroEncoder, int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod) {
 	auto groupCode = static_cast<uint8_t>(group);
 	CANPacket p;
-	AssembleEncoderInitializePacket(&p, groupCode, serial, sensor_t::encoder,
-									invertEncoder, zeroEncoder);
+	AssembleEncoderInitializePacket(&p, groupCode, serial, sensor_t::encoder, invertEncoder,
+									zeroEncoder);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 	AssembleEncoderPPJRSetPacket(&p, groupCode, serial, pulsesPerJointRev);
@@ -37,8 +37,8 @@ void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder,
 	}
 }
 
-void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo,
-					   uint16_t adcHi,
+void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo,
+					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
 					   std::optional<std::chrono::milliseconds> telemetryPeriod) {
 	CANPacket packet;
 	auto groupCode = static_cast<uint8_t>(group);
@@ -78,7 +78,8 @@ void setLimitSwitchLimits(devicegroup_t group, deviceserial_t serial, int32_t lo
 	sendCANPacket(p);
 }
 
-void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP, int32_t kI, int32_t kD) {
+void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP, int32_t kI,
+						  int32_t kD) {
 	CANPacket p;
 	auto motorGroupCode = static_cast<uint8_t>(group);
 	AssemblePSetPacket(&p, motorGroupCode, serial, kP);
@@ -94,8 +95,7 @@ void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP
 
 void setMotorMode(devicegroup_t group, deviceserial_t serial, motormode_t mode) {
 	CANPacket p;
-	AssembleModeSetPacket(&p, static_cast<uint8_t>(group), serial,
-						  static_cast<uint8_t>(mode));
+	AssembleModeSetPacket(&p, static_cast<uint8_t>(group), serial, static_cast<uint8_t>(mode));
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 }
@@ -121,14 +121,12 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
 
 void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle) {
 	CANPacket p;
-	AssemblePCAServoPacket(&p, static_cast<uint8_t>(group), serial, servoNum,
-						   angle);
+	AssemblePCAServoPacket(&p, static_cast<uint8_t>(group), serial, servoNum, angle);
 	sendCANPacket(p);
 }
 
 DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial) {
-	return getDeviceTelemetry(std::make_pair(group, serial),
-							  telemtype_t::angle);
+	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }
 
 void pullMotorPosition(devicegroup_t group, deviceserial_t serial) {

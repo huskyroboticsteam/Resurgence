@@ -108,7 +108,6 @@ constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,
 	 jointid_t::ikForward, jointid_t::ikUp});
 
-
 constexpr auto all_motorid_t = frozen::make_unordered_set<motorid_t>(
 	{motorid_t::frontLeftWheel, motorid_t::frontLeftSwerve, motorid_t::frontRightWheel,
 	 motorid_t::frontRightSwerve, motorid_t::rearLeftWheel, motorid_t::rearLeftSwerve,

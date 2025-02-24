@@ -32,10 +32,10 @@ enum class TestMode {
 };
 
 std::unordered_set<int> modes = {
-	static_cast<int>(TestMode::ModeSet),	  static_cast<int>(TestMode::PWM),
-	static_cast<int>(TestMode::PID),		  static_cast<int>(TestMode::Encoder),
-	static_cast<int>(TestMode::PIDVel),		  static_cast<int>(TestMode::LimitSwitch),
-	static_cast<int>(TestMode::Telemetry),	  static_cast<int>(TestMode::ScienceServos)};
+	static_cast<int>(TestMode::ModeSet),   static_cast<int>(TestMode::PWM),
+	static_cast<int>(TestMode::PID),	   static_cast<int>(TestMode::Encoder),
+	static_cast<int>(TestMode::PIDVel),	   static_cast<int>(TestMode::LimitSwitch),
+	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -83,7 +83,8 @@ int main() {
 			int serial = prompt("Enter motor serial");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
 			std::cout << "got " << serial << " and " << mode << std::endl;
-			can::motor::setMotorMode(group, serial, mode == 0 ? motormode_t::pwm : motormode_t::pid);
+			can::motor::setMotorMode(group, serial,
+									 mode == 0 ? motormode_t::pwm : motormode_t::pid);
 		} else if (testMode == TestMode::PWM) {
 			auto group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
 			int serial = prompt("Enter motor serial");
