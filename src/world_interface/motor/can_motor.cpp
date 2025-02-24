@@ -38,7 +38,7 @@ void can_motor::setMotorVel(int32_t targetVel) {
 }
 
 can::deviceserial_t can_motor::getMotorSerial() {
-	return device_id.second;
+	return serial_id;
 }
 
 void can_motor::ensureMotorMode(robot::types::motorid_t motor, can::motor::motormode_t mode) {

@@ -22,7 +22,7 @@ namespace can::motor {
 void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
 				 int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod) {
-	auto motorGroupCode = static_cast<uint8_t>(group);
+	auto groupCode = static_cast<uint8_t>(group);
 	CANPacket p;
 	AssembleEncoderInitializePacket(&p, groupCode, serial, sensor_t::encoder,
 									invertEncoder, zeroEncoder);
@@ -68,7 +68,7 @@ void initMotor(devicegroup_t group, deviceserial_t serial) {
 
 void setLimitSwitchLimits(devicegroup_t group, deviceserial_t serial, int32_t lo, int32_t hi) {
 	CANPacket p;
-	auto motorGroupCode = static_cast<uint8_t>(group);
+	auto groupCode = static_cast<uint8_t>(group);
 
 	// 0 is low limit, 1 is high limit.
 	AssembleLimSwEncoderBoundPacket(&p, groupCode, serial, 0, lo);
@@ -150,7 +150,7 @@ callbackid_t addLimitSwitchCallback(
 			callback(deviceID.first, deviceID.second, {});
 		}
 	};
-	return addDeviceTelemetryCallback(limit, telemtype_t::limit_switch, func);
+	return addDeviceTelemetryCallback(id, telemtype_t::limit_switch, func);
 }
 
 void removeLimitSwitchCallback(callbackid_t id) {

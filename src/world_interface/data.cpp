@@ -47,16 +47,6 @@ std::string to_string(robot::types::motorid_t motor) {
 	return "<unknown>";
 }
 
-std::string to_string(robot::types::motorid_t motor) {
-	using robot::types::name_to_motorid;
-	for (const auto& pair : name_to_motorid) {
-		if (pair.second == motor) {
-			return std::string(pair.first.data());
-		}
-	}
-	return "<unknown>";
-}
-
 std::string to_string(const robot::types::CameraID& id) {
 	return id;
 }

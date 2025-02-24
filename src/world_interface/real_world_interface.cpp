@@ -35,7 +35,7 @@ namespace {
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
-void addMotorMapping(motorid_t motor, can::devicegroup_t group, bool hasPosSensor) {
+void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 	// get scales for motor
 	double posScale = positive_pwm_scales.at(motor);
 	double negScale = negative_pwm_scales.at(motor);

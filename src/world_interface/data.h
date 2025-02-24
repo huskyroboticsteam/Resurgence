@@ -101,14 +101,6 @@ enum class jointid_t {
 	ikUp
 };
 
-constexpr auto all_motorid_t = frozen::make_unordered_set<motorid_t>(
-	{motorid_t::frontLeftWheel, motorid_t::frontLeftSwerve, motorid_t::frontRightWheel,
-	 motorid_t::frontRightSwerve, motorid_t::rearLeftWheel, motorid_t::rearLeftSwerve,
-	 motorid_t::rearRightWheel, motorid_t::rearRightSwerve, motorid_t::armBase,
-	 motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm, motorid_t::wristDiffRight,
-	 motorid_t::wristDiffLeft, motorid_t::hand, motorid_t::activeSuspension,
-	 motorid_t::drillActuator, motorid_t::drillMotor});
-
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,
