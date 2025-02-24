@@ -94,27 +94,19 @@ enum class jointid_t {
 };
 
 constexpr auto all_motorid_t = frozen::make_unordered_set<motorid_t>(
-	{motorid_t::frontLeftWheel, motorid_t::frontLeftSwerve, motorid_t::frontRightWheel,
-	 motorid_t::frontRightSwerve, motorid_t::rearLeftWheel, motorid_t::rearLeftSwerve,
-	 motorid_t::rearRightWheel, motorid_t::rearRightSwerve, motorid_t::armBase,
+	{motorid_t::leftTread, motorid_t::rightTread, motorid_t::armBase,
 	 motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm, motorid_t::wristDiffRight,
-	 motorid_t::wristDiffLeft, motorid_t::hand, motorid_t::drillActuator,
-	 motorid_t::drillMotor});
+	 motorid_t::wristDiffLeft, motorid_t::hand, motorid_t::handActuator,
+	 motorid_t::drillActuator, motorid_t::drillMotor});
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::ikForward,
-	 jointid_t::ikUp, jointid_t::drillActuator, jointid_t::drillMotor});
+	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::handActuator,
+	 jointid_t::ikForward, jointid_t::ikUp, jointid_t::drillActuator, jointid_t::drillMotor});
 
 constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, motorid_t>(
-	{{"frontLeftWheel", motorid_t::frontLeftWheel},
-	 {"frontLeftSwerve", motorid_t::frontLeftSwerve},
-	 {"frontRightWheel", motorid_t::frontRightWheel},
-	 {"frontRightSwerve", motorid_t::frontRightSwerve},
-	 {"rearLeftWheel", motorid_t::rearLeftWheel},
-	 {"rearLeftSwerve", motorid_t::rearLeftSwerve},
-	 {"rearRightWheel", motorid_t::rearRightWheel},
-	 {"rearRightSwerve", motorid_t::rearRightSwerve},
+	{{"leftTread", motorid_t::leftTread},
+	 {"rightTread", motorid_t::rightTread},
 	 {"armBase", motorid_t::armBase},
 	 {"shoulder", motorid_t::shoulder},
 	 {"elbow", motorid_t::elbow},
