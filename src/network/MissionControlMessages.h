@@ -14,6 +14,7 @@ constexpr const char* DRIVE_TURN_IN_PLACE_REQ_TYPE = "turnInPlaceDriveRequest";
 constexpr const char* DRIVE_CRAB_REQ_TYPE = "crabDriveRequest";
 constexpr const char* ARM_IK_ENABLED_TYPE = "requestArmIKEnabled";
 constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
+constexpr const char* MOTOR_POWER_REQ_TYPE = "motorPowerRequest";
 constexpr const char* MOTOR_POSITION_REQ_TYPE = "motorPositionRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* CAMERA_STREAM_OPEN_REQ_TYPE = "cameraStreamOpenRequest";
