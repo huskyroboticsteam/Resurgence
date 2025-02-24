@@ -16,11 +16,17 @@
 namespace can::motor {
 
 /** @brief The possible motor modes. */
-enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
+enum class motormode_t {
+	pwm = MOTOR_UNIT_MODE_PWM,
+	pid = MOTOR_UNIT_MODE_PID
+};
 
 /** @brief The supported motor position sensors. */
 struct sensor_t {
-	enum { encoder = 0, potentiometer = 1 };
+	enum {
+		encoder = 0,
+		potentiometer = 1
+	};
 };
 
 /**
@@ -54,8 +60,8 @@ void initMotor(devicegroup_t group, deviceserial_t serial);
  * The telemetry will be fetched at this period automatically. An empty optional disables this
  * behavior, in which case the motor position must be explicitly pulled.
  */
-void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-				 int32_t pulsesPerJointRev,
+void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder,
+				 bool zeroEncoder, int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**
@@ -82,8 +88,8 @@ void setLimitSwitchLimits(devicegroup_t group, deviceserial_t serial, int32_t lo
  * The telemetry will be fetched at this period automatically. An empty optional disables this
  * behavior, in which case the motor position must be explicitly pulled.
  */
-void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo,
-					   uint16_t adcHi,
+void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo,
+					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
 					   std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**
@@ -97,7 +103,8 @@ void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo
  * @param kI The I coefficient.
  * @param kD The D coefficient.
  */
-void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP, int32_t kI, int32_t kD);
+void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP, int32_t kI,
+						  int32_t kD);
 
 /**
  * @brief Set the mode of a motor board.
