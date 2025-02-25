@@ -126,8 +126,8 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   // TODO: Tune the ratio between left/right tread
-												   {motorid_t::leftTread, 0.56},
-												   {motorid_t::rightTread, -0.7},
+												   {motorid_t::leftTread, 0.5},
+												   {motorid_t::rightTread, -0.75},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::handActuator, -1.0},
 												   {motorid_t::drillActuator, -0.5},
@@ -144,8 +144,8 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
 												   // TODO: Tune the ratio between left/right tread
-												   {motorid_t::leftTread, 0.56},
-												   {motorid_t::rightTread, -0.7},
+												   {motorid_t::leftTread, 0.5},
+												   {motorid_t::rightTread, -0.75},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::handActuator, -1.0},
 												   {motorid_t::drillActuator, -0.5},
