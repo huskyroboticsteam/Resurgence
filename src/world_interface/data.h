@@ -83,10 +83,11 @@ enum class jointid_t {
 	shoulder,
 	elbow,
 	forearm,
-	wristPitch,
 	wristRoll,
 	hand,
 	handActuator,
+	wristDiffLeft,
+	wristDiffRight,
 	ikForward,
 	ikUp,
 	drillMotor,
@@ -101,7 +102,7 @@ constexpr auto all_motorid_t = frozen::make_unordered_set<motorid_t>(
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::handActuator,
+	 jointid_t::wristDiffLeft, jointid_t::wristDiffRight, jointid_t::hand, jointid_t::handActuator,
 	 jointid_t::ikForward, jointid_t::ikUp, jointid_t::drillActuator, jointid_t::drillMotor});
 
 constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, motorid_t>(
@@ -123,8 +124,8 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"shoulder", jointid_t::shoulder},
 	 {"elbow", jointid_t::elbow},
 	 {"forearm", jointid_t::forearm},
-	 {"wristPitch", jointid_t::wristPitch},
-	 {"wristRoll", jointid_t::wristRoll},
+	 {"wristDiffLeft", jointid_t::wristDiffLeft},
+	 {"wristDiffRight", jointid_t::wristDiffRight},
 	 {"hand", jointid_t::hand},
 	 {"handActuator", jointid_t::handActuator},
 	 {"ikForward", jointid_t::ikForward},

@@ -2,9 +2,12 @@
 
 #include "Constants.h"
 #include "Globals.h"
+#include "CAN/CANUtils.h"
+#include "CAN/CANMotor.h"
 #include "kinematics/DiffDriveKinematics.h"
 #include "navtypes.h"
 #include "utils/transform.h"
+#include "world_interface/real_world_constants.h"
 #include "world_interface/world_interface.h"
 
 #include <atomic>
@@ -111,20 +114,20 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
-	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
-		auto mdegToRad = [](int32_t mdeg) { return (mdeg / 1000.0) * (M_PI / 180.0); };
-		auto lPos = getMotorPos(motorid_t::wristDiffLeft).transform(mdegToRad);
-		auto rPos = getMotorPos(motorid_t::wristDiffRight).transform(mdegToRad);
-		if (lPos.isValid() && rPos.isValid()) {
-			kinematics::gearpos_t gearPos(lPos.getData(), rPos.getData());
-			auto jointPos = Globals::wristKinematics.gearPosToJointPos(gearPos);
-			float angle = joint == jointid_t::wristPitch ? jointPos.pitch : jointPos.roll;
-			return DataPoint<int32_t>(lPos.getTime(),
-									  static_cast<int32_t>(angle * (180.0 / M_PI) * 1000));
-		} else {
-			return {};
-		}
-	} else {
+	} //else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
+	// 	auto mdegToRad = [](int32_t mdeg) { return (mdeg / 1000.0) * (M_PI / 180.0); };
+	// 	auto lPos = getMotorPos(motorid_t::wristDiffLeft).transform(mdegToRad);
+	// 	auto rPos = getMotorPos(motorid_t::wristDiffRight).transform(mdegToRad);
+	// 	if (lPos.isValid() && rPos.isValid()) {
+	// 		kinematics::gearpos_t gearPos(lPos.getData(), rPos.getData());
+	// 		auto jointPos = Globals::wristKinematics.gearPosToJointPos(gearPos);
+	// 		float angle = joint == jointid_t::wristPitch ? jointPos.pitch : jointPos.roll;
+	// 		return DataPoint<int32_t>(lPos.getTime(),
+	// 								  static_cast<int32_t>(angle * (180.0 / M_PI) * 1000));
+	// 	} else {
+	// 		return {};
+	// 	}
+    else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
@@ -175,17 +178,19 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 				}
 			}
 		}
-	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
-		setJointPowerValue(joint, power);
-		kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristPitch),
-										getJointPowerValue(jointid_t::wristRoll));
-		kinematics::gearpos_t gearPwr =
-			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
-		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
-		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
-	} else if (joint == jointid_t::handActuator) {
+	} //else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
+		// setJointPowerValue(joint, power);
+		// kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristPitch),
+		// 								getJointPowerValue(jointid_t::wristRoll));
+		// kinematics::gearpos_t gearPwr =
+		// 	Globals::wristKinematics.jointPowerToGearPower(jointPwr);
+		// setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
+		// setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
+	else if (joint == jointid_t::handActuator) {
 		if (std::abs(power) > 0.1) {
-			setMotorPos(motorid_t::handActuator, power > 0 ? 1 : 0);
+		// setMotorPos(motorid_t::handActuator, power > 0 ? 1 : 0);
+			can::deviceserial_t serial = robot::motorSerialIDMap.at(motorid_t::handActuator);
+			can::motor::setLinearActuator(can::devicegroup_t::motor, serial, power > 0 ? 1 : 0);
 		}
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",

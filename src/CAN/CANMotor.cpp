@@ -125,6 +125,19 @@ void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, i
 	sendCANPacket(p);
 }
 
+void setLinearActuator(devicegroup_t group, deviceserial_t serial, bool extend) {
+	uint8_t groupCode = static_cast<uint8_t>(group);
+	uint8_t serialCode = static_cast<uint8_t>(serial);
+
+	CANPacket p;
+	p.id = ConstructCANID(PRIO_MOTOR_UNIT_SET_PERIPHERALS, groupCode, serialCode);
+	p.dlc = DLC_MOTOR_UNIT_PERIPHERALS;
+	p.data[1] = LINEAR_PERIPH_ID;
+	p.data[3] = extend;
+
+	sendCANPacket(p);
+}
+
 DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }

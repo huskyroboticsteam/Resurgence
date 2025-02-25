@@ -152,6 +152,8 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
  */
 void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle);
 
+void setLinearActuator(devicegroup_t group, deviceserial_t serial, bool extend);
+
 /**
  * @brief Get the last reported position of a motor.
  *

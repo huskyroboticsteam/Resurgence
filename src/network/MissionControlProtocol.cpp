@@ -27,7 +27,8 @@ using std::placeholders::_1;
 
 namespace net::mc {
 namespace {
-const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
+// FIXME: Make this a reasonable value + figure out why heartbeat sensitive
+const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 60000ms;
 } // namespace
 
 /**
