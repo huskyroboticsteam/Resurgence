@@ -1,5 +1,6 @@
 
 #include "../world_interface/motor/can_motor.h"
+#include "../world_interface/real_world_constants.h"
 #include "CAN.h"
 #include "CANMotor.h"
 #include "CANUtils.h"
@@ -20,7 +21,8 @@ using namespace std::chrono_literals;
 using can::motor::motormode_t;
 using namespace robot::types;
 
-enum class TestMode {
+enum class TestMode
+{
 	ModeSet,
 	PWM,
 	PID,
@@ -29,15 +31,16 @@ enum class TestMode {
 	LimitSwitch,
 	Telemetry,
 	ScienceMotors,
-	ScienceServos
+	ScienceServos,
+	MotorPing
 };
 
 std::unordered_set<int> modes = {
-	static_cast<int>(TestMode::ModeSet),	  static_cast<int>(TestMode::PWM),
-	static_cast<int>(TestMode::PID),		  static_cast<int>(TestMode::Encoder),
-	static_cast<int>(TestMode::PIDVel),		  static_cast<int>(TestMode::LimitSwitch),
-	static_cast<int>(TestMode::Telemetry),	  static_cast<int>(TestMode::ScienceMotors),
-	static_cast<int>(TestMode::ScienceServos)};
+	static_cast<int>(TestMode::ModeSet),	   static_cast<int>(TestMode::PWM),
+	static_cast<int>(TestMode::PID),		   static_cast<int>(TestMode::Encoder),
+	static_cast<int>(TestMode::PIDVel),		   static_cast<int>(TestMode::LimitSwitch),
+	static_cast<int>(TestMode::Telemetry),	   static_cast<int>(TestMode::ScienceMotors),
+	static_cast<int>(TestMode::ScienceServos), static_cast<int>(TestMode::MotorPing)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -72,6 +75,7 @@ int main() {
 	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceMotors) << " for SCIENCE MOTORS\n";
 	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
+	ss << static_cast<int>(TestMode::MotorPing) << " for PING ALL MOTORS\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
@@ -291,6 +295,8 @@ int main() {
 			AssembleScienceServoPacket(&p, science_group, 0x0, (uint8_t)servo_no,
 									   (uint8_t)degrees);
 			can::sendCANPacket(p);
+		} else if (testMode == TestMode::MotorPing) {
+			can::verifyAllMotorsConnected(robot::motorSerialIDMap);
 		}
 	}
 }

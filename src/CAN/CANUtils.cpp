@@ -1,7 +1,10 @@
 #include "CANUtils.h"
 
+#include "CAN.h"
+
 #include <ios>
 #include <sstream>
+#include <thread>
 
 extern "C" {
 #include <HindsightCAN/CANPacket.h>
@@ -44,6 +47,34 @@ std::string packetToString(const CANPacket& packet) {
 		}
 	}
 	return ss.str();
+}
+
+bool hasData(deviceid_t id) {
+	auto start = std::chrono::steady_clock::now();
+	constexpr int timeout_ms = 100;
+
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(
+			   std::chrono::steady_clock::now() - start)
+			   .count() < timeout_ms) {
+		if (getDeviceTelemetry(id, telemtype_t::voltage)) {
+			return true;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	return false;
+}
+
+void verifyAllMotorsConnected(
+	frozen::unordered_map<robot::types::motorid_t, deviceserial_t, 18UL> motor_id_map) {
+	for (auto motorMap : motor_id_map) {
+		auto motor_pair = std::make_pair(devicegroup_t::motor, motorMap.second);
+		pullDeviceTelemetry(motor_pair, telemtype_t::voltage);
+		if (!hasData(motor_pair)) {
+			LOG_F(ERROR, "Motor not connected!\nID: %s",
+				  std::to_string(motorMap.second).c_str());
+			throw std::runtime_error("Not all motors connected!");
+		}
+	}
 }
 
 } // namespace can

@@ -4,7 +4,6 @@
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
-#include "../control_interface.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
@@ -60,7 +59,7 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
-	verifyAllMotorsConnected();
+	can::verifyAllMotorsConnected(motorSerialIDMap);
 	for (const auto& it : motorSerialIDMap) {
 		can::motor::initMotor(it.second);
 		bool hasPosSensor = robot::potMotors.find(it.first) != robot::potMotors.end() ||
