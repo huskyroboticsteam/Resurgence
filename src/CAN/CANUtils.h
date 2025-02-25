@@ -21,8 +21,7 @@ namespace can {
  *
  * Every can device is in a group. These are the possible groups.
  */
-enum class devicegroup_t
-{
+enum class devicegroup_t {
 	broadcast = DEVICE_GROUP_BROADCAST,
 	reserved = DEVICE_GROUP_RESERVED,
 	master = DEVICE_GROUP_MASTER,
@@ -38,8 +37,7 @@ enum class devicegroup_t
  *
  * A device may offer some or none of these telemetry types.
  */
-enum class telemtype_t
-{
+enum class telemtype_t {
 	voltage = PACKET_TELEMETRY_VOLTAGE,
 	current = PACKET_TELEMETRY_CURRENT,
 	pwr_rail = PACKET_TELEMETRY_PWR_RAIL_STATE,
