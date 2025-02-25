@@ -114,6 +114,7 @@ constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, moto
 	 {"wristDiffRight", motorid_t::wristDiffRight},
 	 {"wristDiffLeft", motorid_t::wristDiffLeft},
 	 {"hand", motorid_t::hand},
+	 {"handActuator", motorid_t::handActuator},
 	 {"drillActuator", motorid_t::drillActuator},
 	 {"drillMotor", motorid_t::drillMotor}});
 

@@ -102,6 +102,7 @@ constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::device
 	 {motorid_t::wristDiffLeft, can::devicegroup_t::motor},
 	 {motorid_t::wristDiffRight, can::devicegroup_t::motor},
 	 {motorid_t::hand, can::devicegroup_t::motor},
+	 {motorid_t::handActuator, can::devicegroup_t::motor},
 	 {motorid_t::drillActuator, can::devicegroup_t::science},
 	 {motorid_t::drillMotor, can::devicegroup_t::science}});
 
