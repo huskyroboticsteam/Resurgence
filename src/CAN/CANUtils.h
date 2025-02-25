@@ -6,9 +6,13 @@ extern "C" {
 #include <HindsightCAN/CANPacket.h>
 }
 
+#include "../control_interface.h"
+
 #include <chrono>
 #include <string>
 #include <utility>
+
+#include <frozen/unordered_map.h>
 
 namespace can {
 
@@ -57,7 +61,10 @@ enum class telemtype_t {
  * @brief The types of CAN packets that we recognize.
  */
 struct packettype_t {
-	enum { telemetry = ID_TELEMETRY_REPORT, limit_alert = ID_MOTOR_UNIT_LIM_ALERT };
+	enum {
+		telemetry = ID_TELEMETRY_REPORT,
+		limit_alert = ID_MOTOR_UNIT_LIM_ALERT
+	};
 };
 
 /** @brief The type of the device serial number. */
@@ -135,4 +142,11 @@ deviceid_t getSenderDeviceGroupAndSerial(const CANPacket& packet);
  */
 std::string packetToString(const CANPacket& packet);
 
+/**
+ * @brief Check if all motors are connected to the rover.
+ *
+ * @exception runtime_error if a motor's voltage cannot be detected.
+ */
+void verifyAllMotorsConnected(
+	frozen::unordered_map<robot::types::motorid_t, deviceserial_t, 18UL> motor_id_map);
 } // namespace can
