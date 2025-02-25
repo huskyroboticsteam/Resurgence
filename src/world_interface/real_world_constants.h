@@ -83,7 +83,7 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::rightTread, 0x04},
 	 {motorid_t::armBase, 0x01},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
-	 {motorid_t::elbow, 0x0},
+	 {motorid_t::elbow, 0x0c},
 	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
 	 {motorid_t::wristDiffLeft, 0x0d},
 	 {motorid_t::wristDiffRight, 0x04},
