@@ -72,7 +72,9 @@ enum class motorid_t {
 	hand,
 	activeSuspension,
 	drillActuator,
-	drillMotor
+	drillMotor,
+	fourbar1,
+	fourbar2
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -112,7 +114,7 @@ constexpr auto all_motorid_t = frozen::make_unordered_set<motorid_t>(
 	 motorid_t::rearRightWheel, motorid_t::rearRightSwerve, motorid_t::armBase,
 	 motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm, motorid_t::wristDiffRight,
 	 motorid_t::wristDiffLeft, motorid_t::hand, motorid_t::activeSuspension,
-	 motorid_t::drillActuator, motorid_t::drillMotor});
+	 motorid_t::drillActuator, motorid_t::drillMotor, motorid_t::fourbar1, motorid_t::fourbar2});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"frontLeftSwerve", jointid_t::frontLeftSwerve},
@@ -148,7 +150,9 @@ constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, moto
 	 {"hand", motorid_t::hand},
 	 {"activeSuspension", motorid_t::activeSuspension},
 	 {"drillActuator", motorid_t::drillActuator},
-	 {"drillMotor", motorid_t::drillMotor}});
+	 {"drillMotor", motorid_t::drillMotor},
+	 {"fourbar1", motorid_t::fourbar1},
+	 {"fourbar2", motorid_t::fourbar2}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:
