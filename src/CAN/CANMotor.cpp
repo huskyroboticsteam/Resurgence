@@ -132,7 +132,9 @@ void setLinearActuator(devicegroup_t group, deviceserial_t serial, bool extend) 
 	CANPacket p;
 	p.id = ConstructCANID(PRIO_MOTOR_UNIT_SET_PERIPHERALS, groupCode, serialCode);
 	p.dlc = DLC_MOTOR_UNIT_PERIPHERALS;
+	p.data[0] = ID_MOTOR_UNIT_SET_PERIPHERALS;
 	p.data[1] = LINEAR_PERIPH_ID;
+	p.data[2] = 0;
 	p.data[3] = extend;
 
 	sendCANPacket(p);
