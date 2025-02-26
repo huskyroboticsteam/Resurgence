@@ -55,14 +55,8 @@ enum class indication_t {
 
 /** @brief The motors on the robot. */
 enum class motorid_t {
-	frontLeftWheel,
-	frontLeftSwerve,
-	frontRightWheel,
-	frontRightSwerve,
-	rearLeftWheel,
-	rearLeftSwerve,
-	rearRightWheel,
-	rearRightSwerve,
+	leftTread,
+	rightTread,
 	armBase,
 	shoulder,
 	elbow,
@@ -70,9 +64,9 @@ enum class motorid_t {
 	wristDiffRight,
 	wristDiffLeft,
 	hand,
-	activeSuspension,
-	drillActuator,
-	drillMotor
+	handActuator,
+	drillMotor,
+	drillActuator
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -85,42 +79,59 @@ enum class mountedperipheral_t {
 };
 
 enum class jointid_t {
-	frontLeftSwerve,
-	frontRightSwerve,
-	rearLeftSwerve,
-	rearRightSwerve,
 	armBase,
 	shoulder,
 	elbow,
 	forearm,
-	wristPitch,
 	wristRoll,
 	hand,
-	activeSuspension,
+	handActuator,
+	wristDiffLeft,
+	wristDiffRight,
 	ikForward,
-	ikUp
+	ikUp,
+	drillMotor,
+	drillActuator
 };
+
+constexpr auto all_motorid_t = frozen::make_unordered_set<motorid_t>(
+	{motorid_t::leftTread, motorid_t::rightTread, motorid_t::armBase,
+	 motorid_t::shoulder, motorid_t::elbow, motorid_t::forearm, motorid_t::wristDiffRight,
+	 motorid_t::wristDiffLeft, motorid_t::hand, motorid_t::handActuator,
+	 motorid_t::drillActuator, motorid_t::drillMotor});
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,
-	 jointid_t::ikForward, jointid_t::ikUp});
+	 jointid_t::wristDiffLeft, jointid_t::wristDiffRight, jointid_t::hand, jointid_t::handActuator,
+	 jointid_t::ikForward, jointid_t::ikUp, jointid_t::drillActuator, jointid_t::drillMotor});
+
+constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, motorid_t>(
+	{{"leftTread", motorid_t::leftTread},
+	 {"rightTread", motorid_t::rightTread},
+	 {"armBase", motorid_t::armBase},
+	 {"shoulder", motorid_t::shoulder},
+	 {"elbow", motorid_t::elbow},
+	 {"forearm", motorid_t::forearm},
+	 {"wristDiffRight", motorid_t::wristDiffRight},
+	 {"wristDiffLeft", motorid_t::wristDiffLeft},
+	 {"hand", motorid_t::hand},
+	 {"handActuator", motorid_t::handActuator},
+	 {"drillActuator", motorid_t::drillActuator},
+	 {"drillMotor", motorid_t::drillMotor}});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
-	{{"frontLeftSwerve", jointid_t::frontLeftSwerve},
-	 {"frontRightSwerve", jointid_t::frontRightSwerve},
-	 {"rearLeftSwerve", jointid_t::rearLeftSwerve},
-	 {"rearRightSwerve", jointid_t::rearRightSwerve},
-	 {"armBase", jointid_t::armBase},
+	{{"armBase", jointid_t::armBase},
 	 {"shoulder", jointid_t::shoulder},
 	 {"elbow", jointid_t::elbow},
 	 {"forearm", jointid_t::forearm},
-	 {"wristPitch", jointid_t::wristPitch},
-	 {"wristRoll", jointid_t::wristRoll},
+	 {"wristDiffLeft", jointid_t::wristDiffLeft},
+	 {"wristDiffRight", jointid_t::wristDiffRight},
 	 {"hand", jointid_t::hand},
-	 {"activeSuspension", jointid_t::activeSuspension},
+	 {"handActuator", jointid_t::handActuator},
 	 {"ikForward", jointid_t::ikForward},
-	 {"ikUp", jointid_t::ikUp}});
+	 {"ikUp", jointid_t::ikUp},
+	 {"drillMotor", jointid_t::drillMotor},
+	 {"drillActuator", jointid_t::drillActuator}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:
@@ -320,6 +331,7 @@ private:
 
 namespace util {
 std::string to_string(robot::types::jointid_t joint);
+std::string to_string(robot::types::motorid_t motor);
 std::string to_string(const robot::types::CameraID& id);
 std::string to_string(robot::types::mountedperipheral_t peripheral);
 } // namespace util
