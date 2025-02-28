@@ -28,32 +28,23 @@ std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) 
 namespace util {
 
 std::string to_string(robot::types::jointid_t joint) {
-	using robot::types::jointid_t;
-	switch (joint) {
-		case jointid_t::armBase:
-			return "armBase";
-		case jointid_t::shoulder:
-			return "shoulder";
-		case jointid_t::elbow:
-			return "elbow";
-		case jointid_t::forearm:
-			return "forearm";
-		case jointid_t::hand:
-			return "hand";
-		case jointid_t::wristPitch:
-			return "wristPitch";
-		case jointid_t::wristRoll:
-			return "wristRoll";
-		case jointid_t::activeSuspension:
-			return "activeSuspension";
-		case jointid_t::ikUp:
-			return "ikUp";
-		case jointid_t::ikForward:
-			return "ikForward";
-		default:
-			// should never happen
-			return "<unknown>";
+	using robot::types::name_to_jointid;
+	for (const auto& pair : name_to_jointid) {
+		if (pair.second == joint) {
+			return std::string(pair.first.data());
+		}
 	}
+	return "<unknown>";
+}
+
+std::string to_string(robot::types::motorid_t motor) {
+	using robot::types::name_to_motorid;
+	for (const auto& pair : name_to_motorid) {
+		if (pair.second == motor) {
+			return std::string(pair.first.data());
+		}
+	}
+	return "<unknown>";
 }
 
 std::string to_string(const robot::types::CameraID& id) {

@@ -16,11 +16,17 @@
 namespace can::motor {
 
 /** @brief The possible motor modes. */
-enum class motormode_t { pwm = MOTOR_UNIT_MODE_PWM, pid = MOTOR_UNIT_MODE_PID };
+enum class motormode_t {
+	pwm = MOTOR_UNIT_MODE_PWM,
+	pid = MOTOR_UNIT_MODE_PID
+};
 
 /** @brief The supported motor position sensors. */
 struct sensor_t {
-	enum { encoder = 0, potentiometer = 1 };
+	enum {
+		encoder = 0,
+		potentiometer = 1
+	};
 };
 
 /**
@@ -37,7 +43,7 @@ void emergencyStopMotors();
  *
  * @param serial The CAN serial number of the motor to initialize.
  */
-void initMotor(deviceserial_t serial);
+void initMotor(devicegroup_t group, deviceserial_t serial);
 
 /**
  * @brief Initialize an encoder attached to the given motor.
@@ -54,8 +60,8 @@ void initMotor(deviceserial_t serial);
  * The telemetry will be fetched at this period automatically. An empty optional disables this
  * behavior, in which case the motor position must be explicitly pulled.
  */
-void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
-				 int32_t pulsesPerJointRev,
+void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder,
+				 bool zeroEncoder, int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**
@@ -68,7 +74,7 @@ void initEncoder(deviceserial_t serial, bool invertEncoder, bool zeroEncoder,
  * @param lo The joint position in millidegrees of the low limit switch.
  * @param hi The joint position in millidegrees of the high limit switch.
  */
-void setLimitSwitchLimits(deviceserial_t serial, int32_t lo, int32_t hi);
+void setLimitSwitchLimits(devicegroup_t group, deviceserial_t serial, int32_t lo, int32_t hi);
 
 /**
  * @brief Initialize a potentiometer attached to the given motor.
@@ -82,8 +88,8 @@ void setLimitSwitchLimits(deviceserial_t serial, int32_t lo, int32_t hi);
  * The telemetry will be fetched at this period automatically. An empty optional disables this
  * behavior, in which case the motor position must be explicitly pulled.
  */
-void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint16_t adcLo,
-					   uint16_t adcHi,
+void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo,
+					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
 					   std::optional<std::chrono::milliseconds> telemetryPeriod);
 
 /**
@@ -97,7 +103,8 @@ void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint
  * @param kI The I coefficient.
  * @param kD The D coefficient.
  */
-void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t kD);
+void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP, int32_t kI,
+						  int32_t kD);
 
 /**
  * @brief Set the mode of a motor board.
@@ -105,7 +112,7 @@ void setMotorPIDConstants(deviceserial_t serial, int32_t kP, int32_t kI, int32_t
  * @param serial The CAN serial number of the motor board.
  * @param mode The mode to set.
  */
-void setMotorMode(deviceserial_t serial, motormode_t mode);
+void setMotorMode(devicegroup_t group, deviceserial_t serial, motormode_t mode);
 
 /**
  * @brief Set the power output of a motor board.
@@ -113,7 +120,7 @@ void setMotorMode(deviceserial_t serial, motormode_t mode);
  * @param serial The CAN serial number of the motor board.
  * @param power Percent power, in the range [-1,1].
  */
-void setMotorPower(deviceserial_t serial, double power);
+void setMotorPower(devicegroup_t group, deviceserial_t serial, double power);
 
 /**
  * @brief Set the power output of a motor board.
@@ -123,7 +130,7 @@ void setMotorPower(deviceserial_t serial, double power);
  * @param serial The CAN serial number of the motor board.
  * @param power The power to set. Any signed 16-bit integer is valid.
  */
-void setMotorPower(deviceserial_t serial, int16_t power);
+void setMotorPower(devicegroup_t group, deviceserial_t serial, int16_t power);
 
 /**
  * @brief Set the position PID target of a motor board.
@@ -134,7 +141,7 @@ void setMotorPower(deviceserial_t serial, int16_t power);
  * @param serial The CAN serial number of the motor board.
  * @param target The position in millidegrees to track with the PID controller.
  */
-void setMotorPIDTarget(deviceserial_t serial, int32_t target);
+void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t target);
 
 /**
  * @brief Set the angle of the PCA servo
@@ -143,7 +150,7 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target);
  * @param servoNum the servo number.
  * @param angle the angle of the servo in millidegrees.
  */
-void setServoPos(deviceserial_t serial, uint8_t servoNum, int32_t angle);
+void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle);
 
 /**
  * @brief Get the last reported position of a motor.
@@ -154,7 +161,7 @@ void setServoPos(deviceserial_t serial, uint8_t servoNum, int32_t angle);
  * @return robot::types::DataPoint<int32_t> The position data of the given motor, in
  * millidegrees. If no position data has been received, returns an empty data point.
  */
-robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial);
+robot::types::DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial);
 
 /**
  * @brief Poll the position data from a motor board.
@@ -163,7 +170,7 @@ robot::types::DataPoint<int32_t> getMotorPosition(deviceserial_t serial);
  *
  * @param serial The CAN serial number of the motor board.
  */
-void pullMotorPosition(deviceserial_t serial);
+void pullMotorPosition(devicegroup_t group, deviceserial_t serial);
 
 /**
  * @brief Add a callback that is invoked when the limit switch is triggered for a motor board.
@@ -176,9 +183,9 @@ void pullMotorPosition(deviceserial_t serial);
  * This can be passed to removeLimitSwitchCallback() to remove this callback.
  */
 callbackid_t addLimitSwitchCallback(
-	deviceserial_t serial,
+	devicegroup_t group, deviceserial_t serial,
 	const std::function<void(
-		deviceserial_t serial,
+		devicegroup_t group, deviceserial_t serial,
 		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
 /**
