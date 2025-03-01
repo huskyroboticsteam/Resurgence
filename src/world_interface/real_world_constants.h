@@ -79,8 +79,8 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
-	{{motorid_t::leftTread, DEVICE_SERIAL_MOTOR_CHASSIS_FL},
-	 {motorid_t::rightTread, DEVICE_SERIAL_MOTOR_CHASSIS_FR},
+	{{motorid_t::leftTread, DEVICE_SERIAL_TREAD_LEFT},
+	 {motorid_t::rightTread, DEVICE_SERIAL_TREAD_RIGHT},
 	 {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
 	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
