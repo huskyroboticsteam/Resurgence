@@ -56,7 +56,9 @@ bool hasData(deviceid_t id) {
 	while (std::chrono::duration_cast<std::chrono::milliseconds>(
 			   std::chrono::steady_clock::now() - start)
 			   .count() < timeout_ms) {
-		if (getDeviceTelemetry(id, telemtype_t::voltage)) {
+		LOG_F(INFO, std::to_string(scheduleTelemetryPull(id, telemtype_t::adc_raw,
+											   std::chrono::milliseconds(100))).c_str());
+		if (getDeviceTelemetry(id, telemtype_t::adc_raw).isValid()) {
 			return true;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
