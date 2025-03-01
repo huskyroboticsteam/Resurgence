@@ -66,14 +66,23 @@ bool hasData(deviceid_t id) {
 
 void verifyAllMotorsConnected(
 	frozen::unordered_map<robot::types::motorid_t, deviceserial_t, 18UL> motor_id_map) {
+	std::vector<deviceserial_t> disconnected_motors;
 	for (auto motorMap : motor_id_map) {
 		auto motor_pair = std::make_pair(devicegroup_t::motor, motorMap.second);
 		pullDeviceTelemetry(motor_pair, telemtype_t::voltage);
 		if (!hasData(motor_pair)) {
-			LOG_F(ERROR, "Motor not connected!\nID: %s",
-				  std::to_string(motorMap.second).c_str());
-			throw std::runtime_error("Not all motors connected!");
+			disconnected_motors.push_back(motorMap.second);
 		}
+	}
+	
+	if (disconnected_motors.empty()) {
+		LOG_F(INFO, "All motors connected!");
+	} else {
+		LOG_F(ERROR, "Disconnected motors:");
+		for (auto motor_id : disconnected_motors) {
+			LOG_F(ERROR, std::to_string(motor_id).c_str());
+		}
+		throw std::runtime_error("Not all motors connected!");
 	}
 }
 
