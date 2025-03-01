@@ -74,7 +74,7 @@ void verifyAllMotorsConnected(
 			disconnected_motors.push_back(motorMap.second);
 		}
 	}
-	
+
 	if (disconnected_motors.empty()) {
 		LOG_F(INFO, "All motors connected!");
 	} else {
