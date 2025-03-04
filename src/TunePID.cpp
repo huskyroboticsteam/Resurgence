@@ -18,8 +18,7 @@ extern "C" {
 }
 
 enum class targetmode_t {
-	step,
-	sinusoidal
+	step, sinusoidal
 };
 
 using namespace robot::types;
@@ -174,7 +173,7 @@ int main(int argc, char** argv) {
 		if (mode == targetmode_t::step) {
 			prescaled_target = round(prescaled_target);
 		}
-		angle_target = (int32_t)round(amplitude * prescaled_target) + starting_angle;
+		angle_target = static_cast<int32_t>(round(amplitude * prescaled_target)) + starting_angle;
 
 		can::motor::setMotorPIDTarget(serial, angle_target);
 
