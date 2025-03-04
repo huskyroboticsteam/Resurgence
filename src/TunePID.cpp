@@ -17,8 +17,7 @@ extern "C" {
 #include "HindsightCAN/CANCommon.h"
 }
 
-enum class targetmode_t
-{
+enum class targetmode_t {
 	step,
 	sinusoidal
 };
@@ -52,7 +51,9 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::wristDiffRight, "wristDiffRight"},
 	{motorid_t::wristDiffLeft, "wristDiffLeft"},
 	{motorid_t::hand, "hand"},
-	{motorid_t::activeSuspension, "activeSuspension"}};
+	{motorid_t::activeSuspension, "activeSuspension"},
+	{motorid_t::drillActuator, "drillActuator"},
+	{motorid_t::drillMotor, "drillMotor"}};
 
 const std::map<std::string, motorid_t> nameToMotorMap = reverseMap(motorNameMap);
 
@@ -158,7 +159,8 @@ int main(int argc, char** argv) {
 
 	time_point<steady_clock> tp = steady_clock::now();
 	time_point<steady_clock> startTime = tp;
-	while (steady_clock::now() - startTime < 3 * milliseconds((int)(period * 1000))) {
+	while (steady_clock::now() - startTime <
+		   3 * milliseconds(static_cast<int>(period * 1000))) {
 		int32_t current_angle = can::motor::getMotorPosition(serial).getData();
 		double difference = (current_angle - angle_target) / 1000.0;
 		acc_error += difference * difference;
