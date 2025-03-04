@@ -339,12 +339,14 @@ if(WITH_TESTS)
     ../tests/util/MathTest.cpp
     ../tests/util/TimeTest.cpp
     ../tests/util/SchedulerTest.cpp
+    ../tests/util/RandomTest.cpp
+    ../tests/util/JsonTest.cpp
+    ../tests/util/ThreadingTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
   target_link_libraries(tests
     ${rover_libs}
-    stub_world_interface
     ${OpenCV_LIBS})
   include(CTest)
   include(Catch)
