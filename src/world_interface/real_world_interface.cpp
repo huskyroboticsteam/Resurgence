@@ -235,11 +235,19 @@ int getIndex(const std::vector<T>& vec, const T& val) {
 }
 
 void setMotorPower(robot::types::motorid_t motor, double power) {
+	if (isEmergencyStopped()) {
+		LOG_F(ERROR, "E-Stopped! Ignoring call for: setMotorPower");
+		return;
+	}
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPower(power);
 }
 
 void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
+	if (isEmergencyStopped()) {
+		LOG_F(ERROR, "E-Stopped! Ignoring call for: setMotorPos");
+		return;
+	}
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
 }
