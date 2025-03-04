@@ -18,7 +18,8 @@ extern "C" {
 }
 
 enum class targetmode_t {
-	step, sinusoidal
+	step,
+	sinusoidal
 };
 
 using namespace robot::types;
