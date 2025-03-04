@@ -72,7 +72,8 @@ enum class motorid_t {
 	hand,
 	activeSuspension,
 	drillActuator,
-	drillMotor
+	drillMotor,
+	scienceStepper
 };
 
 /** @brief the mounted peripheral on the robot. */
