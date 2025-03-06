@@ -41,8 +41,9 @@ void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 	double negScale = negative_pwm_scales.at(motor);
 
 	// create ptr and insert in map
-	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(
-		motor, hasPosSensor, motorSerialIDMap.at(motor), posScale, negScale);
+	std::shared_ptr<robot::base_motor> ptr =
+		std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
+									motorGroupMap.at(motor), posScale, negScale);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace
@@ -60,19 +61,22 @@ std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
 	for (const auto& it : motorSerialIDMap) {
-		can::motor::initMotor(it.second);
-		bool hasPosSensor = robot::potMotors.find(it.first) != robot::potMotors.end() ||
-							robot::encMotors.find(it.first) != robot::encMotors.end();
-		addMotorMapping(it.first, hasPosSensor);
+		motorid_t motor = it.first;
+		auto group = motorGroupMap.at(motor);
+		can::motor::initMotor(group, it.second);
+		bool hasPosSensor = robot::potMotors.find(motor) != robot::potMotors.end() ||
+							robot::encMotors.find(motor) != robot::encMotors.end();
+		addMotorMapping(motor, hasPosSensor);
 	}
 
 	for (const auto& pot_motor_pair : robot::potMotors) {
 		motorid_t motor_id = pot_motor_pair.first;
 		potparams_t pot_params = pot_motor_pair.second;
 
+		can::devicegroup_t group = motorGroupMap.at(motor_id);
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
+		can::motor::initPotentiometer(group, serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
 	}
 
@@ -80,19 +84,21 @@ void initMotors() {
 		motorid_t motor_id = enc_motor_pair.first;
 		encparams_t enc_params = enc_motor_pair.second;
 
+		can::devicegroup_t group = motorGroupMap.at(motor_id);
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
+		can::motor::initEncoder(group, serial, enc_params.isInverted, true, enc_params.ppjr,
 								TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
+		can::motor::setLimitSwitchLimits(group, serial, enc_params.limitSwitchLow,
 										 enc_params.limitSwitchHigh);
 	}
 
 	for (const auto& pair : robot::motorPIDMap) {
 		motorid_t motor = pair.first;
+		can::devicegroup_t group = motorGroupMap.at(motor);
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
-		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
+		can::motor::setMotorPIDConstants(group, serial, pid.kP, pid.kI, pid.kD);
 	}
 }
 
@@ -262,10 +268,10 @@ callbackid_t addLimitSwitchCallback(
 	const std::function<void(robot::types::motorid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
-	auto func = [=](can::deviceserial_t serial, DataPoint<LimitSwitchData> data) {
-		callback(motor, data);
-	};
-	auto id = can::motor::addLimitSwitchCallback(motorSerialIDMap.at(motor), func);
+	auto func = [=](can::devicegroup_t group, can::deviceserial_t serial,
+					DataPoint<LimitSwitchData> data) { callback(motor, data); };
+	auto id = can::motor::addLimitSwitchCallback(motorGroupMap.at(motor),
+												 motorSerialIDMap.at(motor), func);
 	auto nextID = nextCallbackID++;
 	callbackIDMap.insert({nextID, id});
 	return nextID;
