@@ -52,18 +52,24 @@ std::string packetToString(const CANPacket& packet) {
 bool hasData(deviceid_t id) {
 	auto start = std::chrono::steady_clock::now();
 	constexpr int timeout_ms = 100;
+	bool dataRecieved = false;
 
-	while (std::chrono::duration_cast<std::chrono::milliseconds>(
-			   std::chrono::steady_clock::now() - start)
-			   .count() < timeout_ms) {
-		LOG_F(INFO, std::to_string(scheduleTelemetryPull(id, telemtype_t::adc_raw,
-											   std::chrono::milliseconds(100))).c_str());
-		if (getDeviceTelemetry(id, telemtype_t::adc_raw).isValid()) {
-			return true;
-		}
+	auto callbackID = can::addDeviceTelemetryCallback(
+		id, telemtype_t::adc_raw,
+		[&dataRecieved](deviceid_t id, telemtype_t telemType, robot::types::DataPoint<telemetry_t> data) {
+			dataRecieved = data.isValid();
+		});
+
+	can::scheduleTelemetryPull(id, telemtype_t::adc_raw, std::chrono::milliseconds(10));
+
+	while (!dataRecieved && std::chrono::duration_cast<std::chrono::milliseconds>(
+								std::chrono::steady_clock::now() - start)
+									.count() < timeout_ms) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
-	return false;
+
+	removeDeviceTelemetryCallback(callbackID);
+	return dataRecieved;
 }
 
 void verifyAllMotorsConnected(
