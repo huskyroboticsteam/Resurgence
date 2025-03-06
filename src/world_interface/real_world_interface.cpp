@@ -18,6 +18,7 @@
 #include <vector>
 
 #include <opencv2/calib3d.hpp>
+#include <HindsightCAN/CANCommon.h>
 
 using nlohmann::json;
 using namespace navtypes;
@@ -255,7 +256,19 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 }
 
 // TODO: implement
-void setIndicator(indication_t signal) {}
+void setIndicator(indication_t signal) {
+	CANPacket packet;
+	if(signal == indication_t::off) {
+		AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 0, 0, 0);
+	} else if(signal == indication_t::autonomous) {
+		AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 255, 0, 0);
+	} else if(signal == indication_t::teleop) {
+		AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 0, 0, 255);
+	} else if(signal == indication_t::arrivedAtDest) {
+		AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 0, 255, 0);
+	}
+	AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 255, 0, 0);
+}
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
