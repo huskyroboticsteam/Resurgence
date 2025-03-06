@@ -56,7 +56,8 @@ bool hasData(deviceid_t id) {
 
 	auto callbackID = can::addDeviceTelemetryCallback(
 		id, telemtype_t::adc_raw,
-		[&dataRecieved](deviceid_t id, telemtype_t telemType, robot::types::DataPoint<telemetry_t> data) {
+		[&dataRecieved](deviceid_t id, telemtype_t telemType,
+						robot::types::DataPoint<telemetry_t> data) {
 			dataRecieved = data.isValid();
 		});
 
