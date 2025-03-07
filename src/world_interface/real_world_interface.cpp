@@ -257,7 +257,11 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 
 // TODO: implement
 void setIndicator(indication_t signal) {
-	CANPacket packet;
+	CANPacket* packet;
+	uint8_t targetGroup = 0;
+	uint8_t targetSerial = 0;
+	uint8_t addrLED = 0;
+
 	if(signal == indication_t::off) {
 		AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 0, 0, 0);
 	} else if(signal == indication_t::autonomous) {
@@ -267,7 +271,8 @@ void setIndicator(indication_t signal) {
 	} else if(signal == indication_t::arrivedAtDest) {
 		AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 0, 255, 0);
 	}
-	AssembleRGBColorPacket(packet, targetGroup, targetSerial, addrLED, 255, 0, 0);
+	
+	can::sendCANPacket(*packet);
 }
 
 callbackid_t addLimitSwitchCallback(
