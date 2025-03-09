@@ -144,9 +144,7 @@ constexpr auto JOINT_MOTOR_MAP =
 		 {robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
 		 {robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
 		 {robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
-		 {robot::types::jointid_t::hand, robot::types::motorid_t::hand},
-		 {robot::types::jointid_t::activeSuspension,
-		  robot::types::motorid_t::activeSuspension}});
+		 {robot::types::jointid_t::hand, robot::types::motorid_t::hand}});
 
 // Arm inverse kinematics
 namespace arm {

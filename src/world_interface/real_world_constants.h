@@ -102,7 +102,6 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
-	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
 	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR},
 	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR}});
 
@@ -134,7 +133,6 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::rearLeftSwerve, 1.0},
 												   {motorid_t::rearRightSwerve, 1.0},
 												   {motorid_t::hand, -0.75},
-												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, 1.0}});
 /**
@@ -157,7 +155,6 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::rearLeftSwerve, 1.0},
 												   {motorid_t::rearRightSwerve, 1.0},
 												   {motorid_t::hand, -0.75},
-												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, 1.0}});
 
