@@ -75,9 +75,6 @@ std::string to_string(robot::types::mountedperipheral_t peripheral) {
 		case mountedperipheral_t::armServo:
 			return "armServo";
 
-		case mountedperipheral_t::lidar:
-			return "lidar";
-
 		case mountedperipheral_t::scienceStation:
 			return "scienceStation";
 

@@ -108,14 +108,6 @@ extern const double LANDMARK_WAYPOINT_RADIUS;
 extern const double EPS;
 } // namespace Nav
 
-// Lidar
-namespace Lidar {
-extern const std::string RP_PATH;
-extern const double MM_PER_M;
-extern const uint32_t RPLIDAR_A1_BAUDRATE;
-extern const uint32_t RPLIDAR_S1_BAUDRATE;
-} // namespace Lidar
-
 // Video encoding
 namespace video {
 /**

@@ -80,7 +80,6 @@ enum class mountedperipheral_t {
 	arm,
 	armServo,
 	scienceStation,
-	lidar
 };
 
 enum class jointid_t {
