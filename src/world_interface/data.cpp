@@ -50,7 +50,7 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "ikForward";
 		case jointid_t::drillActuator:
 			return "drillActuator";
-		case jointid_t::drillMotor;
+		case jointid_t::drillMotor:
 			return "drillMotor";
 		default:
 			// should never happen
