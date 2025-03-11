@@ -29,7 +29,8 @@ enum class TestMode {
 	LimitSwitch,
 	Telemetry,
 	ScienceMotors,
-	ScienceServos
+	ScienceServos,
+	PCAServos
 };
 
 std::unordered_set<int> modes = {
@@ -37,7 +38,7 @@ std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::PID),		  static_cast<int>(TestMode::Encoder),
 	static_cast<int>(TestMode::PIDVel),		  static_cast<int>(TestMode::LimitSwitch),
 	static_cast<int>(TestMode::Telemetry),	  static_cast<int>(TestMode::ScienceMotors),
-	static_cast<int>(TestMode::ScienceServos)};
+	static_cast<int>(TestMode::ScienceServos),static_cast<int>(TestMode::PCAServos)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -72,6 +73,7 @@ int main() {
 	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceMotors) << " for SCIENCE MOTORS\n";
 	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
+	ss << static_cast<int>(TestMode::PCAServos) << " for PCA SERVOS\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
@@ -290,6 +292,13 @@ int main() {
 			int degrees = prompt("Enter degrees");
 			AssembleScienceServoPacket(&p, science_group, 0x0, (uint8_t)servo_no,
 									   (uint8_t)degrees);
+			can::sendCANPacket(p);
+		} else if (testMode == TestMode::PCAServos) {
+			auto group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
+			int serial = prompt("Enter serial");
+			int servo_no = prompt("Enter servo no");
+			int degrees = prompt("Enter degrees");
+			AssemblePCAServoPacket(&p, (uint8_t) group, serial, (uint8_t) servo_no, (uint8_t) degrees);
 			can::sendCANPacket(p);
 		}
 	}
