@@ -10,6 +10,10 @@
 
 #include <frozen/unordered_map.h>
 
+using robot::types::CameraID;
+using robot::types::jointid_t;
+using robot::types::motorid_t;
+
 namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 extern const double SHOULDER_LENGTH;
@@ -54,13 +58,13 @@ extern const double MAX_DTHETA;
 // TODO: We need to recalibrate the camera, since we replaced it with a different one.
 // TODO: rename cameras (in MC as well) as appropriate
 extern const char* MAST_CAMERA_CONFIG_PATH;
-extern const robot::types::CameraID MAST_CAMERA_ID;
+extern const CameraID MAST_CAMERA_ID;
 
 extern const char* FOREARM_CAMERA_CONFIG_PATH;
-extern const robot::types::CameraID FOREARM_CAMERA_ID;
+extern const CameraID FOREARM_CAMERA_ID;
 
 extern const char* HAND_CAMERA_CONFIG_PATH;
-extern const robot::types::CameraID HAND_CAMERA_ID;
+extern const CameraID HAND_CAMERA_ID;
 
 extern const uint16_t WS_SERVER_PORT;
 
@@ -126,7 +130,7 @@ extern const int H264_RF_CONSTANT;
 /**
  * @brief Stream-specific RF constants.
  */
-extern const std::unordered_map<robot::types::CameraID, int> STREAM_RFS;
+extern const std::unordered_map<CameraID, int> STREAM_RFS;
 } // namespace video
 
 /**
@@ -134,17 +138,18 @@ extern const std::unordered_map<robot::types::CameraID, int> STREAM_RFS;
  * (one-to-one pairs only)
  */
 constexpr auto JOINT_MOTOR_MAP =
-	frozen::make_unordered_map<robot::types::jointid_t, robot::types::motorid_t>(
-		{{robot::types::jointid_t::frontLeftSwerve, robot::types::motorid_t::frontLeftSwerve},
-		 {robot::types::jointid_t::frontRightSwerve,
-		  robot::types::motorid_t::frontRightSwerve},
-		 {robot::types::jointid_t::rearLeftSwerve, robot::types::motorid_t::rearLeftSwerve},
-		 {robot::types::jointid_t::rearRightSwerve, robot::types::motorid_t::rearRightSwerve},
-		 {robot::types::jointid_t::armBase, robot::types::motorid_t::armBase},
-		 {robot::types::jointid_t::shoulder, robot::types::motorid_t::shoulder},
-		 {robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
-		 {robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
-		 {robot::types::jointid_t::hand, robot::types::motorid_t::hand}});
+	frozen::make_unordered_map<jointid_t, motorid_t>(
+		{{jointid_t::frontLeftSwerve, motorid_t::frontLeftSwerve},
+		 {jointid_t::frontRightSwerve,motorid_t::frontRightSwerve},
+		 {jointid_t::rearLeftSwerve, motorid_t::rearLeftSwerve},
+		 {jointid_t::rearRightSwerve, motorid_t::rearRightSwerve},
+		 {jointid_t::armBase, motorid_t::armBase},
+		 {jointid_t::shoulder, motorid_t::shoulder},
+		 {jointid_t::elbow, motorid_t::elbow},
+		 {jointid_t::forearm, motorid_t::forearm},
+		 {jointid_t::hand, motorid_t::hand},
+		 {jointid_t::drillActuator, motorid_t::drillActuator},
+		 {jointid_t::drillMotor, motorid_t::drillMotor}});
 
 // Arm inverse kinematics
 namespace arm {
@@ -165,27 +170,27 @@ extern const int IK_SOLVER_MAX_ITER;
  * The joints corresponding to the motors used for IK in the arm. The ordering in this array is
  * the canonical ordering of these joints for IK purposes.
  */
-extern const std::array<robot::types::jointid_t, 2> IK_MOTOR_JOINTS;
+extern const std::array<jointid_t, 2> IK_MOTOR_JOINTS;
 
 /**
  * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
  * element of `IK_MOTOR_JOINTS`
  */
-extern const std::array<robot::types::motorid_t, 2> IK_MOTORS;
+extern const std::array<motorid_t, 2> IK_MOTORS;
 
 /**
  * Map from motor ids to min and max joint limits in millidegrees
  */
-constexpr frozen::unordered_map<robot::types::motorid_t, std::pair<int, int>, IK_MOTORS.size()>
-	JOINT_LIMITS{{robot::types::motorid_t::shoulder, {18200, 152500}},
-				 {robot::types::motorid_t::elbow, {-169100, 0}}};
+constexpr frozen::unordered_map<motorid_t, std::pair<int, int>, IK_MOTORS.size()>
+	JOINT_LIMITS{{motorid_t::shoulder, {18200, 152500}},
+				 {motorid_t::elbow, {-169100, 0}}};
 
 /**
  * Map from motor ids to segment length in meters
  */
-constexpr frozen::unordered_map<robot::types::motorid_t, double, IK_MOTORS.size()>
-	SEGMENT_LENGTHS{{robot::types::motorid_t::shoulder, 0.3848608},
-					{robot::types::motorid_t::elbow, 0.461264}};
+constexpr frozen::unordered_map<motorid_t, double, IK_MOTORS.size()>
+	SEGMENT_LENGTHS{{motorid_t::shoulder, 0.3848608},
+					{motorid_t::elbow, 0.461264}};
 } // namespace arm
 
 namespace autonomous {
