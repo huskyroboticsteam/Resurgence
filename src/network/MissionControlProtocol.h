@@ -23,7 +23,6 @@ namespace mc {
 using json = nlohmann::json;
 using robot::types::CameraID;
 using robot::types::jointid_t;
-using robot::types::motorid_t;
 using websocket::SingleClientWSServer;
 using websocket::WebSocketProtocol;
 
@@ -51,7 +50,6 @@ private:
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
-	void handleMotorPowerRequest(const json& j);
 	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
@@ -61,7 +59,6 @@ private:
 	void stopAndShutdownPowerRepeat(bool sendDisableIK);
 	void setArmIKEnabled(bool enabled, bool sendReport = true);
 	void setRequestedJointPower(jointid_t joint, double power);
-	void setRequestedMotorPower(motorid_t motor, double power);
 	void setRequestedCmdVel(double dtheta, double dx);
 	void setRequestedTankCmdVel(double left, double right);
 	void setRequestedTurnInPlaceCmdVel(double dtheta);
