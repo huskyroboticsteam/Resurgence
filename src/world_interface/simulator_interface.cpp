@@ -38,7 +38,8 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::wristDiffLeft, "wristDiffLeft"},
 	{motorid_t::wristDiffRight, "wristDiffRight"},
 	{motorid_t::hand, "hand"},
-	{motorid_t::activeSuspension, "activeSuspension"}};
+	{motorid_t::activeSuspension, "activeSuspension"},
+	{motorid_t::drillActuator, "drillActuator"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 
@@ -123,7 +124,7 @@ void initMotors() {
 }
 
 void handleGPS(json msg) {
-	gpscoords_t coords{msg["latitude"], msg["longitude"]};
+	gpscoords_t coords{msg["latitude"], msg["longitude"], msg["altitude"]};
 	std::lock_guard<std::mutex> guard(gpsMutex);
 	lastGPS = {coords};
 }
