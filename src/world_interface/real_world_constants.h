@@ -63,8 +63,16 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		.ppjr = 4590 * 1024 * 4,
 		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
-		.zeroCalibrationPower = 0.4}}
+		.zeroCalibrationPower = 0.4}},
+	{motorid_t::fourbar2,
+		{.isInverted = false,
+		.ppjr = 1,
+		.limitSwitchLow = -100000,
+		.limitSwitchHigh = 100000,
+		.zeroCalibrationPower = 0.0}},
 });
+
+constexpr double FOURBAR_GEAR_RATIO = 71.71875;
 // clang-format on
 
 // TODO: find appropriate bounds
@@ -103,8 +111,32 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
-	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR},
-	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR}});
+	 {motorid_t::drillActuator, 0x12},
+	 {motorid_t::drillMotor, 0x02},
+	 {motorid_t::fourbar1, 0x03},
+	 {motorid_t::fourbar2, 0x13}});
+
+constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
+	{{motorid_t::frontLeftWheel, can::devicegroup_t::motor},
+	 {motorid_t::frontRightWheel, can::devicegroup_t::motor},
+	 {motorid_t::rearLeftWheel, can::devicegroup_t::motor},
+	 {motorid_t::rearRightWheel, can::devicegroup_t::motor},
+	 {motorid_t::frontLeftSwerve, can::devicegroup_t::motor},
+	 {motorid_t::frontRightSwerve, can::devicegroup_t::motor},
+	 {motorid_t::rearLeftSwerve, can::devicegroup_t::motor},
+	 {motorid_t::rearRightSwerve, can::devicegroup_t::motor},
+	 {motorid_t::armBase, can::devicegroup_t::motor},
+	 {motorid_t::shoulder, can::devicegroup_t::motor},
+	 {motorid_t::elbow, can::devicegroup_t::motor},
+	 {motorid_t::forearm, can::devicegroup_t::motor},
+	 {motorid_t::wristDiffLeft, can::devicegroup_t::motor},
+	 {motorid_t::wristDiffRight, can::devicegroup_t::motor},
+	 {motorid_t::hand, can::devicegroup_t::motor},
+	 {motorid_t::activeSuspension, can::devicegroup_t::motor},
+	 {motorid_t::drillActuator, can::devicegroup_t::science},
+	 {motorid_t::drillMotor, can::devicegroup_t::science},
+	 {motorid_t::fourbar1, can::devicegroup_t::science},
+	 {motorid_t::fourbar2, can::devicegroup_t::science}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
@@ -136,7 +168,9 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillActuator, -0.5},
-												   {motorid_t::drillMotor, 1.0}});
+												   {motorid_t::drillMotor, -1.0},
+												   {motorid_t::fourbar1, 0.3},
+												   {motorid_t::fourbar2, 0.3}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
@@ -159,6 +193,8 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillActuator, -0.5},
-												   {motorid_t::drillMotor, 1.0}});
+												   {motorid_t::drillMotor, -1.0},
+												   {motorid_t::fourbar1, 0.15},
+												   {motorid_t::fourbar2, 0.15}});
 
 } // namespace robot
