@@ -59,7 +59,7 @@ struct encparams_t {
 // clang-format off
 constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 	{motorid_t::shoulder,
-		{.isInverted = true,
+		{.isInverted = false,
 		.ppjr = 4590 * 1024 * 4,
 		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
@@ -69,6 +69,7 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 
 // TODO: find appropriate bounds
 constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
+	{motorid_t::elbow, {.adc_lo = 563, .mdeg_lo = -160000, .adc_hi = 1927, .mdeg_hi = 0}},
 	{motorid_t::forearm,
 	 {.adc_lo = 1208, .mdeg_lo = -180 * 1000, .adc_hi = 841, .mdeg_hi = 180 * 1000}},
 	{motorid_t::wristDiffLeft,
@@ -108,7 +109,10 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
-	{{motorid_t::shoulder, {70, 0, 0}},
+	{{motorid_t::shoulder, {200, 0, 0}},
+	 {motorid_t::elbow, {250, 0, 0}},
+	 // FIXME: swerve constants need to be updated when firmware changes PID scaling
+	 // Numbers should be 200
 	 {motorid_t::frontLeftSwerve, {2, 0, 0}},
 	 {motorid_t::frontRightSwerve, {2, 0, 0}},
 	 {motorid_t::rearLeftSwerve, {2, 0, 0}},
@@ -120,8 +124,8 @@ constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
  */
 constexpr auto positive_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
-												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
+												   {motorid_t::shoulder, 1},
+												   {motorid_t::elbow, 1},
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
@@ -143,8 +147,8 @@ constexpr auto positive_pwm_scales =
  */
 constexpr auto negative_pwm_scales =
 	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
-												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
+												   {motorid_t::shoulder, 1},
+												   {motorid_t::elbow, 1},
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},

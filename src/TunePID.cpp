@@ -79,8 +79,13 @@ bool initMotor(motorid_t motor) {
 		robot::encparams_t enc_params = robot::encMotors.at(motor);
 		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
 								robot::TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
-										 enc_params.limitSwitchHigh);
+
+		auto mDegToPulses = [&](int32_t mdeg) {
+			return static_cast<int32_t>(static_cast<double>(mdeg) / 360000.0 *
+										enc_params.ppjr);
+		};
+		can::motor::setLimitSwitchLimits(serial, mDegToPulses(enc_params.limitSwitchLow),
+										 mDegToPulses(enc_params.limitSwitchHigh));
 	} else {
 		std::cerr << "The given motor is not a pot or enc motor!\n";
 		return false;
@@ -135,13 +140,13 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, str);
 	int d_coeff = std::stoi(str);
 
-	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
 	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
-
+	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
 	double period = 8.0;
 
+	// TODO: remove and replace with a loop
 	std::this_thread::sleep_for(300ms); // wait for encoder position data to arrive
-	int32_t starting_angle = can::motor::getMotorPosition(serial);
+	int32_t starting_angle = can::motor::getMotorPosition(serial).getData();
 	int32_t angle_target = starting_angle;
 	double acc_error = 0.0;
 	int total_steps = 0;
@@ -163,7 +168,8 @@ int main(int argc, char** argv) {
 		if (mode == targetmode_t::step) {
 			prescaled_target = round(prescaled_target);
 		}
-		angle_target = (int32_t)round(amplitude * prescaled_target) + starting_angle;
+		angle_target =
+			static_cast<int32_t>(round(amplitude * prescaled_target)) + starting_angle;
 
 		can::motor::setMotorPIDTarget(serial, angle_target);
 
