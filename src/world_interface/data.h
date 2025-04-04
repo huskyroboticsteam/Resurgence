@@ -100,13 +100,15 @@ enum class jointid_t {
 	hand,
 	activeSuspension,
 	ikForward,
-	ikUp
+	ikUp,
+	fourbar1,
+	fourbar2
 };
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,
-	 jointid_t::ikForward, jointid_t::ikUp});
+	 jointid_t::ikForward, jointid_t::ikUp, jointid_t::fourbar1, jointid_t::fourbar2});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"frontLeftSwerve", jointid_t::frontLeftSwerve},
@@ -122,7 +124,9 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"hand", jointid_t::hand},
 	 {"activeSuspension", jointid_t::activeSuspension},
 	 {"ikForward", jointid_t::ikForward},
-	 {"ikUp", jointid_t::ikUp}});
+	 {"ikUp", jointid_t::ikUp},
+	 {"fourbar1", jointid_t::fourbar1},
+	 {"fourbar2", jointid_t::fourbar2}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:

@@ -63,8 +63,16 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		.ppjr = 4590 * 1024 * 4,
 		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
-		.zeroCalibrationPower = 0.4}}
+		.zeroCalibrationPower = 0.4}},
+	{motorid_t::fourbar2,
+		{.isInverted = false,
+		.ppjr = 1,
+		.limitSwitchLow = -100000,
+		.limitSwitchHigh = 100000,
+		.zeroCalibrationPower = 0.0}},
 });
+
+constexpr double FOURBAR_GEAR_RATIO = 71.71875;
 // clang-format on
 
 // TODO: find appropriate bounds
@@ -103,10 +111,10 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
-	 {motorid_t::drillActuator, 0x13},
-	 {motorid_t::drillMotor, 0x03},
-	 {motorid_t::fourbar1, 0x02},
-	 {motorid_t::fourbar2, 0x12}});
+	 {motorid_t::drillActuator, 0x12},
+	 {motorid_t::drillMotor, 0x02},
+	 {motorid_t::fourbar1, 0x03},
+	 {motorid_t::fourbar2, 0x13}});
 
 constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
 	{{motorid_t::frontLeftWheel, can::devicegroup_t::motor},
