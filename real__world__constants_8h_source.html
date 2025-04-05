@@ -164,83 +164,53 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>     {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    {motorid_t::wristDiffRight,</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>     {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    {motorid_t::frontLeftSwerve,</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>     {.adc_lo = 1422, .mdeg_lo = -180 * 1000, .adc_hi = 656, .mdeg_hi = 180 * 1000}},</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    {motorid_t::frontRightSwerve,</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>     {.adc_lo = 644, .mdeg_lo = -180 * 1000, .adc_hi = 1404, .mdeg_hi = 180 * 1000}},</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    {motorid_t::rearLeftSwerve,</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>     {.adc_lo = 1260, .mdeg_lo = -180 * 1000, .adc_hi = 476, .mdeg_hi = 180 * 1000}},</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    {motorid_t::rearRightSwerve,</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>     {.adc_lo = 1538, .mdeg_lo = -180 * 1000, .adc_hi = 767, .mdeg_hi = 180 * 1000}},</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>});</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">   89</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">motorSerialIDMap</a> = frozen::make_unordered_map&lt;motorid_t, can::deviceserial_t&gt;(</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    {{motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>     {motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>     {motorid_t::rearLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>     {motorid_t::rearRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BR},</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>     {motorid_t::frontLeftSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_FL_SW},</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>     {motorid_t::frontRightSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_FR_SW},</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>     {motorid_t::rearLeftSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_BL_SW},</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>     {motorid_t::rearRightSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_BR_SW},</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>     {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>     {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>     {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>     {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>     {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>     {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>     {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>     {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>     {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR},</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>     {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR}});</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">  110</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">motorPIDMap</a> = frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;(</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    {{motorid_t::shoulder, {70, 0, 0}},</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>     {motorid_t::frontLeftSwerve, {2, 0, 0}},</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>     {motorid_t::frontRightSwerve, {2, 0, 0}},</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>     {motorid_t::rearLeftSwerve, {2, 0, 0}},</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>     {motorid_t::rearRightSwerve, {2, 0, 0}}});</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">  121</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a> =</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.25},</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>                                                   {motorid_t::shoulder, -1},</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>                                                   {motorid_t::elbow, -1},</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                                                   {motorid_t::forearm, -0.2},</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                                                   {motorid_t::wristDiffLeft, -0.1},</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>                                                   {motorid_t::wristDiffRight, 0.1},</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>                                                   {motorid_t::frontLeftWheel, 0.7},</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                                                   {motorid_t::frontRightWheel, 0.7},</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>                                                   {motorid_t::rearLeftWheel, 0.7},</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>                                                   {motorid_t::rearRightWheel, 0.7},</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>                                                   {motorid_t::frontLeftSwerve, 1.0},</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>                                                   {motorid_t::frontRightSwerve, 1.0},</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>                                                   {motorid_t::rearLeftSwerve, 1.0},</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>                                                   {motorid_t::rearRightSwerve, 1.0},</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>                                                   {motorid_t::hand, -0.75},</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>                                                   {motorid_t::activeSuspension, -0.5},</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>                                                   {motorid_t::drillActuator, -0.5},</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>                                                   {motorid_t::drillMotor, 1.0}});</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">  144</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">negative_pwm_scales</a> =</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.25},</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>                                                   {motorid_t::shoulder, -1},</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>                                                   {motorid_t::elbow, -1},</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>                                                   {motorid_t::forearm, -0.2},</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>                                                   {motorid_t::wristDiffLeft, -0.1},</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>                                                   {motorid_t::wristDiffRight, 0.1},</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>                                                   {motorid_t::frontLeftWheel, 0.7},</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>                                                   {motorid_t::frontRightWheel, 0.7},</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>                                                   {motorid_t::rearLeftWheel, 0.7},</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>                                                   {motorid_t::rearRightWheel, 0.7},</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>                                                   {motorid_t::frontLeftSwerve, 1.0},</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>                                                   {motorid_t::frontRightSwerve, 1.0},</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>                                                   {motorid_t::rearLeftSwerve, 1.0},</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>                                                   {motorid_t::rearRightSwerve, 1.0},</div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>                                                   {motorid_t::hand, -0.75},</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>                                                   {motorid_t::activeSuspension, -0.5},</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>                                                   {motorid_t::drillActuator, -0.5},</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>                                                   {motorid_t::drillMotor, 1.0}});</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>} <span class="comment">// namespace robot</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>});</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">   81</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">motorSerialIDMap</a> = frozen::make_unordered_map&lt;motorid_t, can::deviceserial_t&gt;(</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    {{motorid_t::leftTread, DEVICE_SERIAL_TREAD_LEFT},</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>     {motorid_t::rightTread, DEVICE_SERIAL_TREAD_RIGHT},</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>     {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>     {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>     {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>     {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>     {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>     {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>     {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>     {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>     {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR},</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>     {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR}});</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">   96</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">motorPIDMap</a> =</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    frozen::make_unordered_map&lt;motorid_t, pidcoef_t&gt;({{motorid_t::shoulder, {70, 0, 0}}});</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">  103</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">positive_pwm_scales</a> =</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.25},</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>                                                   {motorid_t::shoulder, -1},</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>                                                   {motorid_t::elbow, -1},</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                                                   {motorid_t::forearm, -0.2},</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>                                                   {motorid_t::wristDiffLeft, -0.1},</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>                                                   {motorid_t::wristDiffRight, 0.1},</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>                                                   {motorid_t::leftTread, 0.7},</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>                                                   {motorid_t::rightTread, 0.7},</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>                                                   {motorid_t::hand, -0.75},</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                                                   {motorid_t::activeSuspension, -0.5},</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                                                   {motorid_t::drillActuator, -0.5},</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>                                                   {motorid_t::drillMotor, 1.0}});</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno"><a class="line" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">  120</a></span><span class="keyword">constexpr</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">negative_pwm_scales</a> =</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    frozen::make_unordered_map&lt;motorid_t, double&gt;({{motorid_t::armBase, -0.25},</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>                                                   {motorid_t::shoulder, -1},</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>                                                   {motorid_t::elbow, -1},</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>                                                   {motorid_t::forearm, -0.2},</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                                                   {motorid_t::wristDiffLeft, -0.1},</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                                                   {motorid_t::wristDiffRight, 0.1},</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>                                                   {motorid_t::leftTread, 0.7},</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>                                                   {motorid_t::rightTread, 0.7},</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                                                   {motorid_t::hand, -0.75},</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>                                                   {motorid_t::activeSuspension, -0.5},</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>                                                   {motorid_t::drillActuator, -0.5},</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>                                                   {motorid_t::drillMotor, 1.0}});</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>} <span class="comment">// namespace robot</span></div>
 <div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
 <div class="ttc" id="aa00170_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00170.html">unordered_map</a></div></div>
 <div class="ttc" id="aa00173_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00173.html">unordered_set</a></div></div>
@@ -251,10 +221,10 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="anamespacerobot_1_1types_html_a7278b81a300fa12b4b6525bff976f190"><div class="ttname"><a href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a></div><div class="ttdeci">motorid_t</div><div class="ttdoc">The motors on the robot.</div><div class="ttdef"><b>Definition</b> data.h:57</div></div>
 <div class="ttc" id="anamespacerobot_html"><div class="ttname"><a href="namespacerobot.html">robot</a></div><div class="ttdoc">Collection of functions for manipulating a motor.</div><div class="ttdef"><b>Definition</b> ArduPilotInterface.cpp:27</div></div>
 <div class="ttc" id="anamespacerobot_html_a014644aaac752932a2caa9d0be8b2842"><div class="ttname"><a href="namespacerobot.html#a014644aaac752932a2caa9d0be8b2842">robot::TELEM_PERIOD</a></div><div class="ttdeci">constexpr std::chrono::milliseconds TELEM_PERIOD(50)</div><div class="ttdoc">The default telemetry period for motors.</div></div>
-<div class="ttc" id="anamespacerobot_html_aa66a3a3666eb218c89671933350db78f"><div class="ttname"><a href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">robot::motorSerialIDMap</a></div><div class="ttdeci">constexpr auto motorSerialIDMap</div><div class="ttdoc">A mapping of motorids to their corresponding serial number.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:89</div></div>
-<div class="ttc" id="anamespacerobot_html_abf2d3136c13712a212ebf41ed4a6ff58"><div class="ttname"><a href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">robot::positive_pwm_scales</a></div><div class="ttdeci">constexpr auto positive_pwm_scales</div><div class="ttdoc">A mapping of motorids to power scale factors when commanded with positive power.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:121</div></div>
-<div class="ttc" id="anamespacerobot_html_ac1eaa5d6745c8aad93d6304c0f8b1821"><div class="ttname"><a href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">robot::motorPIDMap</a></div><div class="ttdeci">constexpr auto motorPIDMap</div><div class="ttdoc">A mapping of PID controlled motors to their pid coefficients.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:110</div></div>
-<div class="ttc" id="anamespacerobot_html_ad5b3523412c0bfd79035091d88e01624"><div class="ttname"><a href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">robot::negative_pwm_scales</a></div><div class="ttdeci">constexpr auto negative_pwm_scales</div><div class="ttdoc">A mapping of motorids to power scale factors when commanded with negative power.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:144</div></div>
+<div class="ttc" id="anamespacerobot_html_aa66a3a3666eb218c89671933350db78f"><div class="ttname"><a href="namespacerobot.html#aa66a3a3666eb218c89671933350db78f">robot::motorSerialIDMap</a></div><div class="ttdeci">constexpr auto motorSerialIDMap</div><div class="ttdoc">A mapping of motorids to their corresponding serial number.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:81</div></div>
+<div class="ttc" id="anamespacerobot_html_abf2d3136c13712a212ebf41ed4a6ff58"><div class="ttname"><a href="namespacerobot.html#abf2d3136c13712a212ebf41ed4a6ff58">robot::positive_pwm_scales</a></div><div class="ttdeci">constexpr auto positive_pwm_scales</div><div class="ttdoc">A mapping of motorids to power scale factors when commanded with positive power.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:103</div></div>
+<div class="ttc" id="anamespacerobot_html_ac1eaa5d6745c8aad93d6304c0f8b1821"><div class="ttname"><a href="namespacerobot.html#ac1eaa5d6745c8aad93d6304c0f8b1821">robot::motorPIDMap</a></div><div class="ttdeci">constexpr auto motorPIDMap</div><div class="ttdoc">A mapping of PID controlled motors to their pid coefficients.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:96</div></div>
+<div class="ttc" id="anamespacerobot_html_ad5b3523412c0bfd79035091d88e01624"><div class="ttname"><a href="namespacerobot.html#ad5b3523412c0bfd79035091d88e01624">robot::negative_pwm_scales</a></div><div class="ttdeci">constexpr auto negative_pwm_scales</div><div class="ttdoc">A mapping of motorids to power scale factors when commanded with negative power.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:120</div></div>
 <div class="ttc" id="astructrobot_1_1encparams__t_html"><div class="ttname"><a href="structrobot_1_1encparams__t.html">robot::encparams_t</a></div><div class="ttdef"><b>Definition</b> real_world_constants.h:46</div></div>
 <div class="ttc" id="astructrobot_1_1encparams__t_html_a0c643c14682b7da130b53098e1902bab"><div class="ttname"><a href="structrobot_1_1encparams__t.html#a0c643c14682b7da130b53098e1902bab">robot::encparams_t::limitSwitchHigh</a></div><div class="ttdeci">int limitSwitchHigh</div><div class="ttdoc">Limit switch high, in millidegrees.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:54</div></div>
 <div class="ttc" id="astructrobot_1_1encparams__t_html_a27db5296741a8b6987501d35444a1377"><div class="ttname"><a href="structrobot_1_1encparams__t.html#a27db5296741a8b6987501d35444a1377">robot::encparams_t::zeroCalibrationPower</a></div><div class="ttdeci">double zeroCalibrationPower</div><div class="ttdoc">Power value set during limit switch calibration.</div><div class="ttdef"><b>Definition</b> real_world_constants.h:56</div></div>
