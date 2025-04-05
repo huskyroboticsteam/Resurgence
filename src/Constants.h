@@ -144,9 +144,7 @@ constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<robot::types::jointi
 	 {robot::types::jointid_t::elbow, robot::types::motorid_t::elbow},
 	 {robot::types::jointid_t::forearm, robot::types::motorid_t::forearm},
 	 {robot::types::jointid_t::hand, robot::types::motorid_t::hand},
-	 {robot::types::jointid_t::activeSuspension, robot::types::motorid_t::activeSuspension},
-	 {robot::types::jointid_t::fourBarLinkage1, robot::types::motorid_t::fourBarLinkage1},
-	 {robot::types::jointid_t::fourBarLinkage2, robot::types::motorid_t::fourBarLinkage2}});
+	 {robot::types::jointid_t::activeSuspension, robot::types::motorid_t::activeSuspension}});
 
 // Arm inverse kinematics
 namespace arm {
