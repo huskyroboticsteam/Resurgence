@@ -130,7 +130,7 @@ void initMotors() {
 }
 
 void handleGPS(json msg) {
-	gpscoords_t coords{msg["latitude"], msg["longitude"]};
+	gpscoords_t coords{msg["latitude"], msg["longitude"], msg["altitude"]};
 	std::lock_guard<std::mutex> guard(gpsMutex);
 	lastGPS = {coords};
 }
