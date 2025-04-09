@@ -160,7 +160,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
-	} else if (joint == jointid_t::fourbar1 || joint == jointid_t::fourbar2) {
+	} else if (joint == jointid_t::fourBarLinkage) {
 		return getMotorPos(motorid_t::fourbar1);
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
@@ -221,6 +221,9 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
+	} else if (joint == jointid_t::fourBarLinkage) {
+		setMotorPower(motorid_t::fourbar1, power);
+		setMotorPower(motorid_t::fourbar2, power);
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

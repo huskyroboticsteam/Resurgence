@@ -64,12 +64,6 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
 		.zeroCalibrationPower = 0.4}},
-	{motorid_t::fourbar2,
-		{.isInverted = false,
-		.ppjr = 1,
-		.limitSwitchLow = -100000,
-		.limitSwitchHigh = 100000,
-		.zeroCalibrationPower = 0.0}},
 });
 
 constexpr double FOURBAR_GEAR_RATIO = 71.71875;
@@ -83,6 +77,8 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{motorid_t::wristDiffRight,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
+	{motorid_t::fourbar1,
+	 {.adc_lo = 0, .mdeg_lo = 0 * 1000, .adc_hi = 0, .mdeg_hi = 360 * 1000}},
 	{motorid_t::frontLeftSwerve,
 	 {.adc_lo = 1422, .mdeg_lo = -180 * 1000, .adc_hi = 656, .mdeg_hi = 180 * 1000}},
 	{motorid_t::frontRightSwerve,
