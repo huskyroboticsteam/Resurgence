@@ -53,14 +53,14 @@ extern const double MAX_DTHETA;
 
 // TODO: We need to recalibrate the camera, since we replaced it with a different one.
 // TODO: rename cameras (in MC as well) as appropriate
-extern const char* MAST_CAMERA_CONFIG_PATH;
 extern const robot::types::CameraID MAST_CAMERA_ID;
-
-extern const char* FOREARM_CAMERA_CONFIG_PATH;
-extern const robot::types::CameraID FOREARM_CAMERA_ID;
-
-extern const char* HAND_CAMERA_CONFIG_PATH;
+extern const robot::types::CameraID WRIST_CAMERA_ID;
 extern const robot::types::CameraID HAND_CAMERA_ID;
+
+extern const frozen::unordered_map<robot::types::CameraID, frozen::string, 4>
+	CAMERA_CONFIG_PATHS;
+extern const frozen::unordered_map<frozen::string, robot::types::CameraID, 3>
+	CAMERA_NAME_TO_ID;
 
 extern const uint16_t WS_SERVER_PORT;
 

@@ -67,6 +67,7 @@ message("========================================")
 # here to avoid the compiler spamming warnings at us for stuff in the Eigen headers.
 find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+include_directories("/usr/local/include")
 
 # Find the WebSocket++ library and Boost (provides the ASIO backend for Websocket++ and also
 # provides the program_options argument parser). Only the `system` component of Boost is
@@ -132,8 +133,6 @@ endif()
 
 add_library(camera SHARED
   camera/Camera.cpp
-  camera/CameraParams.cpp
-  camera/CameraConfig.cpp
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
 
@@ -198,11 +197,11 @@ endif()
 # hardware-agnostic utilities and common code for world interface
 add_library(world_interface_core STATIC
   world_interface/gps_common_interface.cpp
-  ar/Detector.cpp
-  ar/MarkerSet.cpp
-  ar/MarkerPattern.cpp
-  ar/Tag.cpp
-  ar/read_landmarks.cpp
+  #ar/Detector.cpp
+  #ar/MarkerSet.cpp
+  #ar/MarkerPattern.cpp
+  #ar/Tag.cpp
+  #ar/read_landmarks.cpp
   world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -296,21 +295,21 @@ target_link_libraries(Rover
   ${vision_libs}
 )
 
-add_executable(TunePID TunePID.cpp)
-target_link_libraries(TunePID
-  ${rover_libs}
-  can_interface
-)
-target_link_libraries(TunePID ${vision_libs})
+# add_executable(TunePID TunePID.cpp)
+# target_link_libraries(TunePID
+#   ${rover_libs}
+#   can_interface
+# )
+# target_link_libraries(TunePID ${vision_libs})
 
 if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
     # AR Detection tests
-    ar/DetectorTests.cpp
-    ar/MarkerSetTests.cpp
+    # ar/DetectorTests.cpp
+    # ar/MarkerSetTests.cpp
     # Camera tests
-    ../tests/camera/CameraParamsTests.cpp
+    # ../tests/camera/CameraParamsTests.cpp
     # GPS tests
     ../tests/gps/GPSDatumTest.cpp
     ../tests/gps/GPSConverterTest.cpp
@@ -351,9 +350,9 @@ if(WITH_TESTS)
   catch_discover_tests(tests)
 endif()
 
-add_executable(gpsd_test
-  gps/gpsd_test.cpp)
-target_link_libraries(gpsd_test gps)
+# add_executable(gpsd_test
+#   gps/gpsd_test.cpp)
+# target_link_libraries(gpsd_test gps)
 
 if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration

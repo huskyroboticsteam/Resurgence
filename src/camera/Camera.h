@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../world_interface/data.h"
-#include "CameraParams.h"
 
 #include <memory>
 #include <mutex>
@@ -68,14 +67,14 @@ private:
 	std::shared_ptr<cv::VideoCapture> _capture;
 	std::string _name;
 	std::string _description;
+	int _width;
+	int _height;
 	std::shared_ptr<std::mutex> _frame_lock;
 	std::shared_ptr<std::mutex> _capture_lock;
 	std::shared_ptr<std::thread> _thread;
-	CameraParams _intrinsic_params;
-	cv::Mat _extrinsic_params;
 	std::shared_ptr<bool> _running;
 	void captureLoop();
-	void init(const cv::Mat& extrinsic_params);
+	void init();
 
 public:
 	/**
@@ -88,59 +87,12 @@ public:
 	*/
 	Camera();
 	/**
-	   @brief Opens a Camera that is not already open.
-
-	   Will open the given file for input and use the given intrinsic and
-	   extrinsic parameters, similar to the constructor.
-
-	   @returns true if opening the camera succeeds, and false if not.
-	 */
-	bool open(std::string filename, CameraParams intrinsic_params = CameraParams(),
-			  cv::Mat extrinsic_params = cv::Mat());
-	/**
-	   @brief Opens a Camera that is not already open.
-
-	   Will open the camera at the given camera ID and use the given intrinsic
-	   and extrinsic parameters, similar to the constructor.
-
-	   @returns true if opening the camera succeeds, and false if not.
-	*/
-	bool open(int camera_id, CameraParams intrinsic_params = CameraParams(),
-			  cv::Mat extrinsic_params = cv::Mat());
-	/**
-	   @brief Constructs a Camera that will open the given file for input and
-	   have the given name and description.
-
-	   @param filename The file to open and read a video feed from. This may be
-	   the name of a video file, or a URI of a video stream. This will be passed
-	   to the underlying OpenCV VideoCapture object, so anything supported by
-	   VideoCapture is supported here.
-
-	   @param name The name of the camera. This should ideally be unique, but
-	   isn't enforced at this time.
-
-	   @param description An optional description of the camera.
-	 */
-	Camera(std::string filename, std::string name, std::string description = "",
-		   CameraParams intrinsic_params = CameraParams(),
-		   cv::Mat extrinsic_params = cv::Mat());
-	/**
 	   @brief Constructs a Camera that will open the camera with the given ID
 	   and have the given name and description.
 
-	   @param filename The file to open and read a video feed from. This may be
-	   the name of a video file, or a URI of a video stream. This will be passed
-	   to the underlying OpenCV VideoCapture object, so anything supported by
-	   VideoCapture is supported here.
-
-	   @param name The name of the camera. This should ideally be unique, but
-	   isn't enforced at this time.
-
-	   @param description An optional description of the camera.
+	   @param camera_id The ID of the Camera to open and read a video feed from.
 	*/
-	Camera(int camera_id, std::string name, std::string description = "",
-		   CameraParams intrinsic_params = CameraParams(),
-		   cv::Mat extrinsic_params = cv::Mat());
+	Camera(robot::types::CameraID camera_id);
 	/**
 	   @brief Copy constructor.
 
@@ -149,21 +101,22 @@ public:
 	   objects sharing access are destroyed, the camera will be closed.
 	 */
 	Camera(const Camera& other);
-
 	/**
-	   @brief Opens the camera using the given configuration file.
+	   @brief Opens a Camera that is not already open.
 
-	   @param filename The path to the configuration file to open and
-	   read. Configuration file should be formatted as described in @ref
-	   cameraconfig.
+	   Will open the camera at the given camera ID, similar to the constructor.
 
-	   @throws invalid_camera_config If the configuration is invalid for any
-	   reason.
-
-	   @throws std::invalid_argument If the configuration file does not exist.
+	   @returns true if opening the camera succeeds, and false if not.
 	*/
-	bool openFromConfigFile(std::string filename);
+	bool open(robot::types::CameraID camera_id);
+	/**
+		@brief Get camera configs for the specified camera.
 
+		@param camera_id The ID of the Camera to get the configs for.
+
+		@returns The Gstream with configs.
+	 */
+	std::stringstream GStreamerFromFile(robot::types::CameraID camera_id);
 	/**
 	   @brief Returns true if the camera is open.
 	 */
@@ -204,22 +157,9 @@ public:
 	 */
 	bool next(cv::Mat& frame, uint32_t& frame_num, robot::types::datatime_t& frame_time) const;
 	/**
-	   @brief Returns true if this camera has associated intrinsic parameters.
+	   @brief Returns the name of the camera.
 	 */
-	bool hasIntrinsicParams() const;
-	/**
-	   @brief Returns true if this camera has associated extrinsic parameters.
-	 */
-	bool hasExtrinsicParams() const;
-	/**
-	   @brief Returns the associated intrinsic parameters as a CameraParams
-	   object.
-	 */
-	CameraParams getIntrinsicParams() const;
-	/**
-	   @brief Returns the associated extrinsic parameters as an OpenCV matrix.
-	 */
-	cv::Mat getExtrinsicParams() const;
+	std::string getName() const;
 	/**
 	   @brief Returns the description of the camera.
 
@@ -228,9 +168,13 @@ public:
 	 */
 	std::string getDescription() const;
 	/**
-	   @brief Returns the name of the camera.
+		@brief Returns the width of the camera feed.
 	 */
-	std::string getName() const;
+	int getWidth() const;
+	/**
+		@brief Returns the height of the camera feed.
+	 */
+	int getHeight() const;
 	/**
 	   @brief Updates the name of the camera to the given name.
 	   @param new_name The new name for the camera.

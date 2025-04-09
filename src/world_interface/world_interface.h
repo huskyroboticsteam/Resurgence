@@ -11,12 +11,6 @@
 #include <optional>
 #include <unordered_set>
 
-// forward declare cam::CameraParams instead of including it
-// we do this to avoid unnecessarily including OpenCV in all build targets
-namespace cam {
-class CameraParams;
-}
-
 /**
  * @namespace robot
  * @brief Collection of functions that allows interfacing with the hardware and the world.
@@ -105,22 +99,6 @@ bool hasNewCameraFrame(types::CameraID camera, uint32_t oldFrameNum);
  * If an error occurs or the ID is invalid, returns an invalid datapoint.
  */
 types::DataPoint<types::CameraFrame> readCamera(types::CameraID camera);
-
-/**
- * @brief Get the intrinsic params of the specified camera, if it exists.
- *
- * @param camera The ID of the camera for which to get the intrinsic params.
- * @returns The intrinsic params if it exists, else an empty optional object.
- */
-std::optional<cam::CameraParams> getCameraIntrinsicParams(types::CameraID camera);
-
-/**
- * @brief Get the extrinsic params of the specified camera, if it exists.
- *
- * @param camera The ID of the camera for which to get the extrinsic params.
- * @returns The extrinsic params if it exists, else an empty optional object.
- */
-std::optional<cv::Mat> getCameraExtrinsicParams(types::CameraID camera);
 
 /**
  * @brief Read measurement from the CV system. As of now, returns a vector of fixed length, one
