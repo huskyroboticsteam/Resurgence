@@ -79,26 +79,12 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{motorid_t::fourbar1,
 	 {.adc_lo = 0, .mdeg_lo = 0 * 1000, .adc_hi = 0, .mdeg_hi = 360 * 1000}},
-	{motorid_t::frontLeftSwerve,
-	 {.adc_lo = 1422, .mdeg_lo = -180 * 1000, .adc_hi = 656, .mdeg_hi = 180 * 1000}},
-	{motorid_t::frontRightSwerve,
-	 {.adc_lo = 644, .mdeg_lo = -180 * 1000, .adc_hi = 1404, .mdeg_hi = 180 * 1000}},
-	{motorid_t::rearLeftSwerve,
-	 {.adc_lo = 1260, .mdeg_lo = -180 * 1000, .adc_hi = 476, .mdeg_hi = 180 * 1000}},
-	{motorid_t::rearRightSwerve,
-	 {.adc_lo = 1538, .mdeg_lo = -180 * 1000, .adc_hi = 767, .mdeg_hi = 180 * 1000}},
 });
 
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
-	{{motorid_t::frontLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FL},
-	 {motorid_t::frontRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_FR},
-	 {motorid_t::rearLeftWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BL},
-	 {motorid_t::rearRightWheel, DEVICE_SERIAL_MOTOR_CHASSIS_BR},
-	 {motorid_t::frontLeftSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_FL_SW},
-	 {motorid_t::frontRightSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_FR_SW},
-	 {motorid_t::rearLeftSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_BL_SW},
-	 {motorid_t::rearRightSwerve, DEVICE_SERIAL_MOTOR_CHASSIS_BR_SW},
+	{{motorid_t::leftTread, DEVICE_SERIAL_TREAD_LEFT},
+	 {motorid_t::rightTread, DEVICE_SERIAL_TREAD_RIGHT},
 	 {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
 	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
@@ -135,12 +121,8 @@ constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::device
 	 {motorid_t::fourbar2, can::devicegroup_t::science}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
-constexpr auto motorPIDMap = frozen::make_unordered_map<motorid_t, pidcoef_t>(
-	{{motorid_t::shoulder, {70, 0, 0}},
-	 {motorid_t::frontLeftSwerve, {2, 0, 0}},
-	 {motorid_t::frontRightSwerve, {2, 0, 0}},
-	 {motorid_t::rearLeftSwerve, {2, 0, 0}},
-	 {motorid_t::rearRightSwerve, {2, 0, 0}}});
+constexpr auto motorPIDMap =
+	frozen::make_unordered_map<motorid_t, pidcoef_t>({{motorid_t::shoulder, {70, 0, 0}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
@@ -153,14 +135,8 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
-												   {motorid_t::frontLeftWheel, 0.7},
-												   {motorid_t::frontRightWheel, 0.7},
-												   {motorid_t::rearLeftWheel, 0.7},
-												   {motorid_t::rearRightWheel, 0.7},
-												   {motorid_t::frontLeftSwerve, 1.0},
-												   {motorid_t::frontRightSwerve, 1.0},
-												   {motorid_t::rearLeftSwerve, 1.0},
-												   {motorid_t::rearRightSwerve, 1.0},
+												   {motorid_t::leftTread, 0.7},
+												   {motorid_t::rightTread, 0.7},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillActuator, -0.5},
@@ -178,14 +154,8 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::forearm, -0.2},
 												   {motorid_t::wristDiffLeft, -0.1},
 												   {motorid_t::wristDiffRight, 0.1},
-												   {motorid_t::frontLeftWheel, 0.7},
-												   {motorid_t::frontRightWheel, 0.7},
-												   {motorid_t::rearLeftWheel, 0.7},
-												   {motorid_t::rearRightWheel, 0.7},
-												   {motorid_t::frontLeftSwerve, 1.0},
-												   {motorid_t::frontRightSwerve, 1.0},
-												   {motorid_t::rearLeftSwerve, 1.0},
-												   {motorid_t::rearRightSwerve, 1.0},
+												   {motorid_t::leftTread, 0.7},
+												   {motorid_t::rightTread, 0.7},
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::activeSuspension, -0.5},
 												   {motorid_t::drillActuator, -0.5},

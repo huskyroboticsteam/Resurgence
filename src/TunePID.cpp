@@ -36,14 +36,8 @@ std::map<V, K> reverseMap(const std::map<K, V>& map) {
 }
 
 const std::map<motorid_t, std::string> motorNameMap = {
-	{motorid_t::frontLeftWheel, "frontLeftWheel"},
-	{motorid_t::frontLeftSwerve, "frontLeftSwerve"},
-	{motorid_t::frontRightWheel, "frontRightWheel"},
-	{motorid_t::frontRightSwerve, "frontRightSwerve"},
-	{motorid_t::rearLeftWheel, "rearLeftWheel"},
-	{motorid_t::rearLeftSwerve, "rearLeftSwerve"},
-	{motorid_t::rearRightWheel, "rearRightWheel"},
-	{motorid_t::rearRightSwerve, "rearRightSwerve"},
+	{motorid_t::leftTread, "leftTread"},
+	{motorid_t::rightTread, "rightTread"},
 	{motorid_t::armBase, "armBase"},
 	{motorid_t::shoulder, "shoulder"},
 	{motorid_t::elbow, "elbow"},

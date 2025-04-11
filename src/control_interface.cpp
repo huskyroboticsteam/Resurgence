@@ -16,8 +16,6 @@ using namespace navtypes;
 using namespace robot::types;
 using util::toTransform;
 
-using control::DriveMode;
-using Globals::swerveController;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using namespace std::chrono_literals;
@@ -40,23 +38,6 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	if (!Globals::swerveController.isOverridden()) {
-		try {
-			control::swerve_rots_t curr_wheel_rots = {
-				robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
-				robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
-				robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
-				robot::getMotorPos(motorid_t::rearRightSwerve).getData()};
-			if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal,
-															  curr_wheel_rots)) {
-				return 0;
-			}
-		} catch (const bad_datapoint_access& e) {
-			LOG_F(WARNING, "Invalid steer motor position(s)!");
-			return 0;
-		}
-	}
-
 	kinematics::wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
@@ -66,10 +47,8 @@ double setCmdVel(double dtheta, double dx) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::rearLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, rPWM);
-	setMotorPower(motorid_t::rearRightWheel, rPWM);
+	setMotorPower(motorid_t::leftTread, lPWM);
+	setMotorPower(motorid_t::rightTread, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
@@ -78,19 +57,6 @@ double setTankCmdVel(double left, double right) {
 	if (isEmergencyStopped()) {
 		return 0;
 	}
-
-	control::swerve_rots_t curr_wheel_rots;
-	try {
-		curr_wheel_rots = {robot::getMotorPos(motorid_t::frontLeftSwerve).getData(),
-						   robot::getMotorPos(motorid_t::frontRightSwerve).getData(),
-						   robot::getMotorPos(motorid_t::rearLeftSwerve).getData(),
-						   robot::getMotorPos(motorid_t::rearRightSwerve).getData()};
-	} catch (const bad_datapoint_access& e) {
-		LOG_F(WARNING, "Invalid steer motor position(s)!");
-		return 0;
-	}
-	if (!Globals::swerveController.checkWheelRotation(DriveMode::Normal, curr_wheel_rots))
-		return 0;
 
 	kinematics::wheelvel_t wheelVels = {left, right};
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
@@ -101,10 +67,8 @@ double setTankCmdVel(double left, double right) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::frontLeftWheel, lPWM);
-	setMotorPower(motorid_t::rearLeftWheel, lPWM);
-	setMotorPower(motorid_t::frontRightWheel, rPWM);
-	setMotorPower(motorid_t::rearRightWheel, rPWM);
+	setMotorPower(motorid_t::leftTread, lPWM);
+	setMotorPower(motorid_t::rightTread, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
