@@ -6,11 +6,8 @@ namespace net::mc {
 // request keys
 constexpr const char* EMERGENCY_STOP_REQ_TYPE = "emergencyStopRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
-constexpr const char* DRIVE_MODE_REQ_TYPE = "swerveDriveModeRequest";
 constexpr const char* DRIVE_REQ_TYPE = "driveRequest";
 constexpr const char* DRIVE_TANK_REQ_TYPE = "tankDriveRequest";
-constexpr const char* DRIVE_TURN_IN_PLACE_REQ_TYPE = "turnInPlaceDriveRequest";
-constexpr const char* DRIVE_CRAB_REQ_TYPE = "crabDriveRequest";
 constexpr const char* ARM_IK_ENABLED_TYPE = "requestArmIKEnabled";
 constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
