@@ -78,7 +78,7 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	{motorid_t::wristDiffRight,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{motorid_t::fourbar1,
-	 {.adc_lo = 0, .mdeg_lo = 0 * 1000, .adc_hi = 0, .mdeg_hi = 360 * 1000}},
+	 {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
 });
 
 /** @brief A mapping of motorids to their corresponding serial number. */
@@ -93,20 +93,14 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
-	 {motorid_t::drillActuator, 0x12},
-	 {motorid_t::drillMotor, 0x02},
-	 {motorid_t::fourbar1, 0x03},
-	 {motorid_t::fourbar2, 0x13}});
+	 {motorid_t::drillActuator, 0x13},
+	 {motorid_t::drillMotor, 0x03},
+	 {motorid_t::fourbar1, 0x02},
+	 {motorid_t::fourbar2, 0x12}});
 
 constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
-	{{motorid_t::frontLeftWheel, can::devicegroup_t::motor},
-	 {motorid_t::frontRightWheel, can::devicegroup_t::motor},
-	 {motorid_t::rearLeftWheel, can::devicegroup_t::motor},
-	 {motorid_t::rearRightWheel, can::devicegroup_t::motor},
-	 {motorid_t::frontLeftSwerve, can::devicegroup_t::motor},
-	 {motorid_t::frontRightSwerve, can::devicegroup_t::motor},
-	 {motorid_t::rearLeftSwerve, can::devicegroup_t::motor},
-	 {motorid_t::rearRightSwerve, can::devicegroup_t::motor},
+	{{motorid_t::leftTread, can::devicegroup_t::motor},
+	 {motorid_t::rightTread, can::devicegroup_t::motor},
 	 {motorid_t::armBase, can::devicegroup_t::motor},
 	 {motorid_t::shoulder, can::devicegroup_t::motor},
 	 {motorid_t::elbow, can::devicegroup_t::motor},

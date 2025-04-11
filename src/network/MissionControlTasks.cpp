@@ -141,6 +141,7 @@ void TelemReportTask::sendTelemetry() {
 		if (jpos.isValid()) {
 			auto jointNameFrznStr = cur.first;
 			std::string jointNameStdStr(jointNameFrznStr.data(), jointNameFrznStr.size());
+			LOG_F(INFO, "[%s] telemetry sent", jointNameStdStr.c_str());
 			json msg = {{"type", JOINT_POSITION_REP_TYPE},
 						{"joint", jointNameStdStr},
 						{"position", static_cast<double>(jpos.getData()) / 1000.0}};
