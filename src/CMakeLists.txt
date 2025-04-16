@@ -283,6 +283,7 @@ target_link_libraries(rover_common
 list(APPEND rover_libs
   rover_common
   Threads::Threads
+  Eigen3::Eigen
   websocket_utils
   filters
   control
