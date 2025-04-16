@@ -130,11 +130,7 @@ extern const std::unordered_map<CameraID, int> STREAM_RFS;
  * (one-to-one pairs only)
  */
 constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, motorid_t>(
-	{{jointid_t::frontLeftSwerve, motorid_t::frontLeftSwerve},
-	 {jointid_t::frontRightSwerve, motorid_t::frontRightSwerve},
-	 {jointid_t::rearLeftSwerve, motorid_t::rearLeftSwerve},
-	 {jointid_t::rearRightSwerve, motorid_t::rearRightSwerve},
-	 {jointid_t::armBase, motorid_t::armBase},
+	{{jointid_t::armBase, motorid_t::armBase},
 	 {jointid_t::shoulder, motorid_t::shoulder},
 	 {jointid_t::elbow, motorid_t::elbow},
 	 {jointid_t::forearm, motorid_t::forearm},
