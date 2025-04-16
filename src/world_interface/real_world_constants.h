@@ -77,8 +77,7 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{motorid_t::wristDiffRight,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
-	{motorid_t::fourbar1,
-	 {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
+	{motorid_t::fourbar1, {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
 });
 
 /** @brief A mapping of motorids to their corresponding serial number. */
