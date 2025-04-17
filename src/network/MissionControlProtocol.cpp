@@ -187,11 +187,11 @@ static bool validateWaypointNavRequest(const json& j) {
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	float latitude = j["latitude"];
 	float longitude = j["longitude"];
-	float altitude = j["altitude"];
 	bool isApproximate = j["isApproximate"];
 	bool isGate = j["isGate"];
 	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
-		navtypes::gpscoords_t coords = {latitude, longitude, altitude};
+		// gpsToMeters will not use altitude
+		navtypes::gpscoords_t coords = {latitude, longitude, 0};
 		auto target = robot::gpsToMeters(coords);
 		if (target) {
 			_autonomous_task.start(target.value());
