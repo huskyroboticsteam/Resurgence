@@ -9,8 +9,7 @@ sudo gpg --no-default-keyring --keyring ./temp-keyring.gpg --import KEY.gpg
 sudo gpg --no-default-keyring --keyring ./temp-keyring.gpg --export --output KEY.gpg
 sudo rm temp-keyring.gpg
 
-# sudo wget -P /etc/apt/sources.list.d "https://huskyroboticsteam.github.io/ubuntu-repo/husky_robotics.list"
-echo "deb [signed-by=/etc/apt/keyrings/KEY.gpg] https://huskyroboticsteam.github.io/ubuntu-repo ./" > /etc/apt/sources.list.d/husky_robotics.list
+sudo wget -P /etc/apt/sources.list.d "https://huskyroboticsteam.github.io/ubuntu-repo/husky_robotics.list"
 ./update_deps.sh
 
 echo "Done installing Resurgence dependencies!"
