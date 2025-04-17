@@ -57,15 +57,17 @@ void ArduPilotProtocol::clientDisconnected() {
 
 bool ArduPilotProtocol::validateGPSRequest(const json& j) {
 	return util::validateKey(j, "lat", val_t::number_float) &&
-		   util::validateKey(j, "lon", val_t::number_float);
+		   util::validateKey(j, "lon", val_t::number_float) &&
+		   util::validateKey(j, "alt", val_t::number_float);
 }
 
 void ArduPilotProtocol::handleGPSRequest(const json& j) {
 	double lat = j["lat"];
 	double lon = j["lon"];
+	double alt = j["alt"];
 	{
 		std::lock_guard<std::mutex> lock(_lastGPSMutex);
-		_lastGPS = gpscoords_t{lat, lon};
+		_lastGPS = gpscoords_t{lat, lon, alt};
 	}
 }
 

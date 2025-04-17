@@ -12,6 +12,8 @@ struct gpscoords_t {
 	double lat;
 	/** the longitude of the gps coordinate, in degrees */
 	double lon;
+	/** the altitude of the gps coordinate, in meters */
+	double alt;
 };
 
 /* @brief Euler angles to represent orientation. Rotation ordering is XYZ extrinsic

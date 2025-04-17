@@ -94,7 +94,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 FetchContent_Declare(
     HindsightCAN
     GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-    GIT_TAG 45b1544f20e7ba6dd0db19fb97e947430031fc6a
+    GIT_TAG 675aa2c32a5b6cdb24f3f2b8aae5b7e43d717bf6
 )
 FetchContent_MakeAvailable(HindsightCAN)
 
@@ -151,7 +151,6 @@ add_library(utils SHARED
   base64/base64_img.cpp
   kinematics/DiffDriveKinematics.cpp
   kinematics/DiffWristKinematics.cpp
-  kinematics/SwerveDriveKinematics.cpp
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
@@ -254,7 +253,6 @@ target_link_libraries(video
 
 add_library(control SHARED
   control/TrapezoidalVelocityProfile.cpp
-  control/SwerveController.cpp
 )
 target_link_libraries(control utils)
 
@@ -323,7 +321,6 @@ if(WITH_TESTS)
     ../tests/control/PlanarArmControllerTest.cpp
     # Kinematics tests
     ../tests/kinematics/DiffDriveKinematicsTest.cpp
-    ../tests/kinematics/SwerveDriveKinematicsTest.cpp
     ../tests/kinematics/PlanarArmFKTest.cpp
     ../tests/kinematics/FabrikSolver2DTest.cpp
     # Filter tests
@@ -339,12 +336,14 @@ if(WITH_TESTS)
     ../tests/util/MathTest.cpp
     ../tests/util/TimeTest.cpp
     ../tests/util/SchedulerTest.cpp
+    ../tests/util/RandomTest.cpp
+    ../tests/util/JsonTest.cpp
+    ../tests/util/ThreadingTest.cpp
 	# Protocol/teleop tests
 	../tests/kinematics/DiffWristKinematicsTest.cpp)
 
   target_link_libraries(tests
     ${rover_libs}
-    stub_world_interface
     ${OpenCV_LIBS})
   include(CTest)
   include(Catch)
