@@ -59,6 +59,7 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
+	can::verifyAllMotorsConnected(motorSerialIDMap);
 	for (const auto& it : motorSerialIDMap) {
 		can::motor::initMotor(it.second);
 		bool hasPosSensor = robot::potMotors.find(it.first) != robot::potMotors.end() ||
