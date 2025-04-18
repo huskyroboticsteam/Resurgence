@@ -12,15 +12,15 @@ Some of our dependencies are team-managed, including the CAN library and the H26
 Our codebase is developed for an NVIDIA Jetson TX2, which runs Ubuntu Linux; as such, much
 of our code will be Unix-specific.
 
-> ⚠️ The only supported platform is Ubuntu 20.04 LTS. Other versions/distros/platforms may work, but if you want as easy as possible, go with this version. 
+> ⚠️ The only supported platform is Ubuntu 22.04 LTS. Other versions/distros/platforms may work, but if you want as easy as possible, go with this version. 
 
 **Windows users:** You should use either [Windows Subsystem for
 Linux](https://docs.microsoft.com/en-us/windows/wsl/about) or a VM with a Linux
-distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions. As noted above, **use Ubuntu 20.04**.
+distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions. As noted above, **use Ubuntu 22.04**.
 
-**Mac users:** We recommend running an Ubuntu virtual machine via [UTM](https://mac.getutm.app/). After installing the app, set up your VM using [UTM's Ubuntu image](https://mac.getutm.app/gallery/ubuntu-20-04). Please note that UTM only supports the latest version of Ubuntu (22.04). Since the codebase is based on an older version of Ubuntu, there will be package errors that you need to manually resolve (more details below).
+**Mac users:** We recommend running an Ubuntu virtual machine via [UTM](https://mac.getutm.app/). After installing the app, set up your VM using [UTM's Ubuntu image](https://mac.getutm.app/gallery/ubuntu-20-04). Please note that UTM only supports the latest version of Ubuntu (22.04).
 
-**From here on out, the installation instructions will assume you are using Ubuntu 20.04 LTS**. Windows users should run commands in either their Linux VM or their WSL
+**From here on out, the installation instructions will assume you are using Ubuntu 22.04 LTS**. Windows users should run commands in either their Linux VM or their WSL
 terminal. For Linux users, we'll assume you're running Ubuntu; users of another
 distribution may need to change some instructions (e.g. package managers) depending on
 your distro.
@@ -52,17 +52,6 @@ Install dependencies in one go:
 cd Resurgence
 ./easy_install.sh
 ```
-
-> If you are using UTM with Ubuntu 22.04, here are additional steps needed to install the dependencies.
-```bash
-./update_deps.sh
-sudo apt-get install -y cmake build-essential libeigen3-dev libwebsocketpp-dev libboost-system-dev frozen libargparse-dev nlohmann-json3-dev
-sudo apt-get install -y libopencv-dev=4.5.4+dfsg-9ubuntu4 catch2 libx264-dev libgps-dev
-sudo apt-get install -y clang-format-12
-```
-
-We use clang-format for git. For Ubuntu 22.04, we can install up to clang-format-12.
-
 
 Done! Continue on to the "IDE Setup" section.
 
