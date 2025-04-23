@@ -9,9 +9,12 @@
 const std::string WINDOW_NAME = "Test";
 
 int main() {
-    cv::VideoCapture cap(0);
-    // cam::Camera c;
-    // c.open(40);
+    // cv::VideoCapture cap;
+    // cap.open(40);
+    // cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+    // cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+    cam::Camera c;
+    c.open(40);
 
     // cap.open(0);
 
@@ -20,16 +23,16 @@ int main() {
     cv::Mat frame;
     // uint32_t frame_num;
 
-    while (true) {
-        if (!cap.grab()) { continue; }
+    // while (true) {
+    //     if (!cap.grab()) { continue; }
 
-        cap.retrieve(frame);
+    //     cap.retrieve(frame);
 
-        if (frame.empty()) { continue; }
+    //     if (frame.empty()) { continue; }
 
-        // c.next(frame, frame_num);
-        cv::imshow(WINDOW_NAME, frame);
+    //     // c.next(frame, frame_num);
+    //     cv::imshow(WINDOW_NAME, frame);
 
-        cv::waitKey(0);
-    }
+    //     cv::waitKey(0);
+    // }
 }
