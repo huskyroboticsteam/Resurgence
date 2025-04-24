@@ -153,51 +153,51 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    wristDiffRight,</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    wristDiffLeft,</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    hand,</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    activeSuspension,</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    drillActuator,</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    drillMotor</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>};</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    drillActuator,</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    drillMotor</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>};</div>
 </div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span></div>
-<div class="foldopen" id="foldopen00073" data-start="{" data-end="};">
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">   73</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">mountedperipheral_t</a> {</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    none,</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    arm,</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    armServo,</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    scienceStation,</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    lidar</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>};</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span></div>
+<div class="foldopen" id="foldopen00072" data-start="{" data-end="};">
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">   72</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">mountedperipheral_t</a> {</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    none,</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    arm,</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    armServo,</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    scienceStation,</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>};</div>
 </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keyword">enum class</span> jointid_t {</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    armBase,</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    shoulder,</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    elbow,</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    forearm,</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    wristPitch,</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    wristRoll,</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    hand,</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    activeSuspension,</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    ikForward,</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    ikUp</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>};</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> all_jointid_t = frozen::make_unordered_set&lt;jointid_t&gt;(</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    {jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>     jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>     jointid_t::ikForward, jointid_t::ikUp});</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> name_to_jointid = frozen::make_unordered_map&lt;frozen::string, jointid_t&gt;(</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    {{<span class="stringliteral">&quot;armBase&quot;</span>, jointid_t::armBase},</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>     {<span class="stringliteral">&quot;shoulder&quot;</span>, jointid_t::shoulder},</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>     {<span class="stringliteral">&quot;elbow&quot;</span>, jointid_t::elbow},</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>     {<span class="stringliteral">&quot;forearm&quot;</span>, jointid_t::forearm},</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>     {<span class="stringliteral">&quot;wristPitch&quot;</span>, jointid_t::wristPitch},</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>     {<span class="stringliteral">&quot;wristRoll&quot;</span>, jointid_t::wristRoll},</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>     {<span class="stringliteral">&quot;hand&quot;</span>, jointid_t::hand},</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>     {<span class="stringliteral">&quot;activeSuspension&quot;</span>, jointid_t::activeSuspension},</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>     {<span class="stringliteral">&quot;ikForward&quot;</span>, jointid_t::ikForward},</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>     {<span class="stringliteral">&quot;ikUp&quot;</span>, jointid_t::ikUp}});</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="keyword">enum class</span> jointid_t {</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    armBase,</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    shoulder,</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    elbow,</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    forearm,</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    wristPitch,</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    wristRoll,</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    hand,</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    ikForward,</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    ikUp,</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    drillActuator,</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    drillMotor</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>};</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> all_jointid_t = frozen::make_unordered_set&lt;jointid_t&gt;(</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    {jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>     jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::ikForward,</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>     jointid_t::ikUp, jointid_t::drillActuator, jointid_t::drillMotor});</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> name_to_jointid = frozen::make_unordered_map&lt;frozen::string, jointid_t&gt;(</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    {{<span class="stringliteral">&quot;armBase&quot;</span>, jointid_t::armBase},</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>     {<span class="stringliteral">&quot;shoulder&quot;</span>, jointid_t::shoulder},</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>     {<span class="stringliteral">&quot;elbow&quot;</span>, jointid_t::elbow},</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>     {<span class="stringliteral">&quot;forearm&quot;</span>, jointid_t::forearm},</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>     {<span class="stringliteral">&quot;wristPitch&quot;</span>, jointid_t::wristPitch},</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>     {<span class="stringliteral">&quot;wristRoll&quot;</span>, jointid_t::wristRoll},</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>     {<span class="stringliteral">&quot;hand&quot;</span>, jointid_t::hand},</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>     {<span class="stringliteral">&quot;ikForward&quot;</span>, jointid_t::ikForward},</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>     {<span class="stringliteral">&quot;ikUp&quot;</span>, jointid_t::ikUp},</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>     {<span class="stringliteral">&quot;drillActuator&quot;</span>, jointid_t::drillActuator},</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>     {<span class="stringliteral">&quot;drillMotor&quot;</span>, jointid_t::drillMotor}});</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
 <div class="foldopen" id="foldopen00111" data-start="{" data-end="};">
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1bad__datapoint__access.html">  111</a></span><span class="keyword">class </span>bad_datapoint_access : <span class="keyword">public</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02811.html">std::runtime_error</a> {</div>
@@ -344,7 +344,7 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="anamespacerobot_1_1types_html_a661b446ff0dd408d725e2fdcf8ee4494"><div class="ttname"><a href="namespacerobot_1_1types.html#a661b446ff0dd408d725e2fdcf8ee4494">robot::types::CameraID</a></div><div class="ttdeci">std::string CameraID</div><div class="ttdoc">The type of a camera id.</div><div class="ttdef"><b>Definition</b> data.h:46</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_a7278b81a300fa12b4b6525bff976f190"><div class="ttname"><a href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a></div><div class="ttdeci">motorid_t</div><div class="ttdoc">The motors on the robot.</div><div class="ttdef"><b>Definition</b> data.h:57</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_a7d864cb4085b3ebb76a5d844bded14b5"><div class="ttname"><a href="namespacerobot_1_1types.html#a7d864cb4085b3ebb76a5d844bded14b5">robot::types::landmarks_t</a></div><div class="ttdeci">std::vector&lt; DataPoint&lt; navtypes::point_t &gt; &gt; landmarks_t</div><div class="ttdoc">A data structure that represents when each landmark was seen.</div><div class="ttdef"><b>Definition</b> data.h:41</div></div>
-<div class="ttc" id="anamespacerobot_1_1types_html_aa93c10246999d2fdb71ba7bdb792c235"><div class="ttname"><a href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a></div><div class="ttdeci">mountedperipheral_t</div><div class="ttdoc">the mounted peripheral on the robot.</div><div class="ttdef"><b>Definition</b> data.h:73</div></div>
+<div class="ttc" id="anamespacerobot_1_1types_html_aa93c10246999d2fdb71ba7bdb792c235"><div class="ttname"><a href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a></div><div class="ttdeci">mountedperipheral_t</div><div class="ttdoc">the mounted peripheral on the robot.</div><div class="ttdef"><b>Definition</b> data.h:72</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_aca6679b197c5bb4ea8e72ce486d97ab7"><div class="ttname"><a href="namespacerobot_1_1types.html#aca6679b197c5bb4ea8e72ce486d97ab7">robot::types::CameraFrame</a></div><div class="ttdeci">std::pair&lt; cv::Mat, uint32_t &gt; CameraFrame</div><div class="ttdoc">A pair of a camera frame and its corresponding frame number.</div><div class="ttdef"><b>Definition</b> data.h:44</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_ae853854e1c1dbbb2dc44e06838c4cf54"><div class="ttname"><a href="namespacerobot_1_1types.html#ae853854e1c1dbbb2dc44e06838c4cf54">robot::types::dataclock</a></div><div class="ttdeci">std::chrono::steady_clock dataclock</div><div class="ttdoc">The clock used for time measurements for data.</div><div class="ttdef"><b>Definition</b> data.h:29</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_ae97c57e01b5bad73f687df87ce66b4b9"><div class="ttname"><a href="namespacerobot_1_1types.html#ae97c57e01b5bad73f687df87ce66b4b9">robot::types::N_LIMIT_SWITCH</a></div><div class="ttdeci">constexpr size_t N_LIMIT_SWITCH</div><div class="ttdoc">The maximum number of limit switches associated with any motor.</div><div class="ttdef"><b>Definition</b> data.h:236</div></div>

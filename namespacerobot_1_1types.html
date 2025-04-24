@@ -162,21 +162,16 @@ Enumerations</h2></td></tr>
 , <b>wristDiffLeft</b>
 , <br />
 &#160;&#160;<b>hand</b>
-, <b>activeSuspension</b>
 , <b>drillActuator</b>
 , <b>drillMotor</b>
 <br />
  }</td></tr>
 <tr class="memdesc:a7278b81a300fa12b4b6525bff976f190"><td class="mdescLeft">&#160;</td><td class="mdescRight">The motors on the robot. <br /></td></tr>
 <tr class="separator:a7278b81a300fa12b4b6525bff976f190"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa93c10246999d2fdb71ba7bdb792c235" id="r_aa93c10246999d2fdb71ba7bdb792c235"><td class="memItemLeft" align="right" valign="top"><a id="aa93c10246999d2fdb71ba7bdb792c235" name="aa93c10246999d2fdb71ba7bdb792c235"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa93c10246999d2fdb71ba7bdb792c235">mountedperipheral_t</a> { <br />
-&#160;&#160;<b>none</b>
+<tr class="memitem:aa93c10246999d2fdb71ba7bdb792c235" id="r_aa93c10246999d2fdb71ba7bdb792c235"><td class="memItemLeft" align="right" valign="top"><a id="aa93c10246999d2fdb71ba7bdb792c235" name="aa93c10246999d2fdb71ba7bdb792c235"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa93c10246999d2fdb71ba7bdb792c235">mountedperipheral_t</a> { <b>none</b>
 , <b>arm</b>
 , <b>armServo</b>
 , <b>scienceStation</b>
-, <br />
-&#160;&#160;<b>lidar</b>
-<br />
  }</td></tr>
 <tr class="memdesc:aa93c10246999d2fdb71ba7bdb792c235"><td class="mdescLeft">&#160;</td><td class="mdescRight">the mounted peripheral on the robot. <br /></td></tr>
 <tr class="separator:aa93c10246999d2fdb71ba7bdb792c235"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -189,10 +184,11 @@ Enumerations</h2></td></tr>
 &#160;&#160;<b>wristPitch</b>
 , <b>wristRoll</b>
 , <b>hand</b>
-, <b>activeSuspension</b>
+, <b>ikForward</b>
 , <br />
-&#160;&#160;<b>ikForward</b>
-, <b>ikUp</b>
+&#160;&#160;<b>ikUp</b>
+, <b>drillActuator</b>
+, <b>drillMotor</b>
 <br />
  }</td></tr>
 <tr class="separator:a4e0fafe7d1af6624074f9dbb7402fdbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -256,8 +252,8 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;jointid_t&gt;(</div>
 <div class="line">    {jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,</div>
-<div class="line">     jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::activeSuspension,</div>
-<div class="line">     jointid_t::ikForward, jointid_t::ikUp})</div>
+<div class="line">     jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::ikForward,</div>
+<div class="line">     jointid_t::ikUp, jointid_t::drillActuator, jointid_t::drillMotor})</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -288,9 +284,10 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 <div class="line">     {<span class="stringliteral">&quot;wristPitch&quot;</span>, jointid_t::wristPitch},</div>
 <div class="line">     {<span class="stringliteral">&quot;wristRoll&quot;</span>, jointid_t::wristRoll},</div>
 <div class="line">     {<span class="stringliteral">&quot;hand&quot;</span>, jointid_t::hand},</div>
-<div class="line">     {<span class="stringliteral">&quot;activeSuspension&quot;</span>, jointid_t::activeSuspension},</div>
 <div class="line">     {<span class="stringliteral">&quot;ikForward&quot;</span>, jointid_t::ikForward},</div>
-<div class="line">     {<span class="stringliteral">&quot;ikUp&quot;</span>, jointid_t::ikUp}})</div>
+<div class="line">     {<span class="stringliteral">&quot;ikUp&quot;</span>, jointid_t::ikUp},</div>
+<div class="line">     {<span class="stringliteral">&quot;drillActuator&quot;</span>, jointid_t::drillActuator},</div>
+<div class="line">     {<span class="stringliteral">&quot;drillMotor&quot;</span>, jointid_t::drillMotor}})</div>
 </div><!-- fragment -->
 </div>
 </div>
