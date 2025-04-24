@@ -39,7 +39,7 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::wristDiffRight, "wristDiffRight"},
 	{motorid_t::hand, "hand"},
 	{motorid_t::drillActuator, "drillActuator"},
-    {motorid_t::drillMotor, "drillMotor"}};
+    	{motorid_t::drillMotor, "drillMotor"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 
