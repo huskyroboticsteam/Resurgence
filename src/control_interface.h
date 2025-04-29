@@ -49,5 +49,4 @@ void setJointPos(types::jointid_t joint, int32_t targetPos);
  * in millidegrees.
  */
 types::DataPoint<int32_t> getJointPos(types::jointid_t joint);
-
 } // namespace robot

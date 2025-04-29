@@ -1,7 +1,10 @@
 #include "CANUtils.h"
 
+#include "CAN.h"
+
 #include <ios>
 #include <sstream>
+#include <thread>
 
 extern "C" {
 #include <HindsightCAN/CANPacket.h>
@@ -44,6 +47,52 @@ std::string packetToString(const CANPacket& packet) {
 		}
 	}
 	return ss.str();
+}
+
+bool hasData(deviceid_t id) {
+	auto start = std::chrono::steady_clock::now();
+	constexpr int timeout_ms = 100;
+	bool dataRecieved = false;
+
+	auto callbackID = can::addDeviceTelemetryCallback(
+		id, telemtype_t::adc_raw,
+		[&dataRecieved](deviceid_t id, telemtype_t telemType,
+						robot::types::DataPoint<telemetry_t> data) {
+			dataRecieved = data.isValid();
+		});
+
+	can::scheduleTelemetryPull(id, telemtype_t::adc_raw, std::chrono::milliseconds(10));
+
+	while (!dataRecieved && std::chrono::duration_cast<std::chrono::milliseconds>(
+								std::chrono::steady_clock::now() - start)
+									.count() < timeout_ms) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	removeDeviceTelemetryCallback(callbackID);
+	return dataRecieved;
+}
+
+void verifyAllMotorsConnected(
+	frozen::unordered_map<robot::types::motorid_t, deviceserial_t, 18UL> motor_id_map) {
+	std::vector<deviceserial_t> disconnected_motors;
+	for (auto motorMap : motor_id_map) {
+		auto motor_pair = std::make_pair(devicegroup_t::motor, motorMap.second);
+		pullDeviceTelemetry(motor_pair, telemtype_t::voltage);
+		if (!hasData(motor_pair)) {
+			disconnected_motors.push_back(motorMap.second);
+		}
+	}
+
+	if (disconnected_motors.empty()) {
+		LOG_F(INFO, "All motors connected!");
+	} else {
+		LOG_F(ERROR, "Disconnected motors:");
+		for (auto motor_id : disconnected_motors) {
+			LOG_F(ERROR, std::to_string(motor_id).c_str());
+		}
+		throw std::runtime_error("Not all motors connected!");
+	}
 }
 
 } // namespace can
