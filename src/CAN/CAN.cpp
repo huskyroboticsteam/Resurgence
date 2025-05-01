@@ -279,9 +279,9 @@ void sendCANPacket(const CANPacket& packet) {
 	}
 
 	if (!success) {
-		LOG_F(ERROR, "Failed to send CAN packet to group=%x, id=%x: %s",
-			  static_cast<int>(getDeviceGroup(packet)), getDeviceSerial(packet),
-			  std::strerror(errno));
+		// LOG_F(ERROR, "Failed to send CAN packet to group=%x, id=%x: %s",
+		// 	  static_cast<int>(getDeviceGroup(packet)), getDeviceSerial(packet),
+		// 	  std::strerror(errno));
 	}
 }
 

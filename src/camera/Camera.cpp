@@ -14,7 +14,7 @@ namespace cam {
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>()),
+	  _capture(),
 	  _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
@@ -23,7 +23,12 @@ bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_pa
 		return false;
 	}
 	_capture_lock->lock();
-	bool result = this->_capture->open(camera_id);
+	// bool result = this->_capture->open(camera_id);
+	std::stringstream gstr_ss;
+	gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! image/jpeg,width=1024,height=768,framerate=30/1 ! jpegdec ! videoconvert ! appsink";
+	LOG_F(INFO, "GSTR: %s", gstr_ss.str().c_str());
+	this->_capture = std::make_shared<cv::VideoCapture>(gstr_ss.str(), cv::CAP_GSTREAMER);
+	bool result = this->_capture->isOpened();
 	_capture_lock->unlock();
 	LOG_F(INFO, "Opening camera %d... %s", camera_id, result ? "success" : "failed");
 	this->_intrinsic_params = intrinsic_params;
@@ -115,15 +120,15 @@ bool Camera::openFromConfigFile(std::string filename) {
 
 void Camera::captureLoop() {
 	loguru::set_thread_name(_name.c_str());
-	cv::Size image_size(640, 480);
-	if (!_intrinsic_params.empty()) {
-		image_size = _intrinsic_params.getImageSize();
-	}
-	_capture_lock->lock();
-	_capture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-	_capture->set(cv::CAP_PROP_FRAME_WIDTH, image_size.width);
-	_capture->set(cv::CAP_PROP_FRAME_HEIGHT, image_size.height);
-	_capture_lock->unlock();
+	// cv::Size image_size(640, 480);
+	// if (!_intrinsic_params.empty()) {
+	// 	image_size = _intrinsic_params.getImageSize();
+	// }
+	// _capture_lock->lock();
+	// _capture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+	// _capture->set(cv::CAP_PROP_FRAME_WIDTH, image_size.width);
+	// _capture->set(cv::CAP_PROP_FRAME_HEIGHT, image_size.height);
+	// _capture_lock->unlock();
 	cv::Mat frame;
 	while (*_running) {
 		_capture_lock->lock();

@@ -221,10 +221,10 @@ static bool validateCameraStreamOpenRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
-	std::unordered_set<CameraID> supported_cams = robot::getCameras();
-	if (supported_cams.find(cam) != supported_cams.end()) {
+	//std::unordered_set<CameraID> supported_cams = robot::getCameras();
+	//if (supported_cams.find(cam) != supported_cams.end()) {
 		_camera_stream_task.openStream(cam, j["fps"]);
-	}
+	//}
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
