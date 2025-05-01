@@ -104,7 +104,7 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 	}
 	try {
 		auto cam = std::make_shared<cam::Camera>();
-		bool success = cam->openFromConfigFile(Constants::CAMERA_CONFIG_PATHS.at(camID));
+		bool success = cam->open(camID);
 		if (success) {
 			cameraMap[camID] = cam;
 			return cam;

@@ -144,7 +144,7 @@ void handleIMU(json msg) {
 }
 
 void handleCamFrame(json msg) {
-	std::string cam = msg["camera"];
+	CameraID cam = msg["camera"];
 	std::string b64 = msg["data"];
 	cv::Mat mat = base64::decodeMat(b64);
 

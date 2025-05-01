@@ -216,7 +216,8 @@ static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	// return util::validateKey(j, "camera", val_t::number_integer);
+	return util::hasKey(j, "camera");
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
@@ -228,7 +229,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "camera", val_t::number_integer);
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
@@ -237,7 +238,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 static bool validateCameraFrameRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateKey(j, "camera", val_t::number_integer);
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
