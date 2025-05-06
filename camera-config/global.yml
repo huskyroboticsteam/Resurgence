@@ -36,3 +36,5 @@ intrinsic_params:
           2.6390433411918726e-04, -2.9625819516459952e-04, 0. ]
    image_width: 640
    image_height: 480
+
+# Once you're done, make sure to modify Constants.h with the ID, Constants.cpp with the path to this file

@@ -47,15 +47,25 @@ const double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
 const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 							  .wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
-// TODO: We need to recalibrate the camera, since we replaced it with a different one.
-const char* MAST_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
-const robot::types::CameraID MAST_CAMERA_ID = "mast";
+const robot::types::CameraID HAND_CAMERA_ID = 20;
+const robot::types::CameraID WRIST_CAMERA_ID = 30;
+const robot::types::CameraID MAST_CAMERA_ID = 40;
+const robot::types::CameraID RAND_CAMERA_ID = 50;
+const robot::types::CameraID CJ1_CAMERA_ID = 510;
+const robot::types::CameraID CJ2_CAMERA_ID = 520;
+const robot::types::CameraID CJ3_CAMERA_ID = 530;
+const robot::types::CameraID CJ4_CAMERA_ID = 540;
 
-const char* FOREARM_CAMERA_CONFIG_PATH = "../camera-config/WristCameraCalibration.yml";
-const robot::types::CameraID FOREARM_CAMERA_ID = "wrist";
-
-const char* HAND_CAMERA_CONFIG_PATH = "../camera-config/HandCameraCalibration.yml";
-const robot::types::CameraID HAND_CAMERA_ID = "hand";
+const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
+   {HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"},
+   {WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
+   {MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
+   {RAND_CAMERA_ID, "../camera-config/RandCameraCalibration.yml"},
+   {CJ1_CAMERA_ID, "../camera-config/CJ1.yml"},
+   {CJ2_CAMERA_ID, "../camera-config/CJ2.yml"},
+   {CJ3_CAMERA_ID, "../camera-config/CJ3.yml"},
+   {CJ4_CAMERA_ID, "../camera-config/CJ4.yml"},
+};
 
 /**
    @deprecated No need for this constant once we fully switch over the Mission Control PlanViz

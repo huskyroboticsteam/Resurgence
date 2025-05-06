@@ -216,19 +216,21 @@ static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	// return util::validateKey(j, "camera", val_t::number_integer);
+	return util::hasKey(j, "camera");
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
-	std::unordered_set<CameraID> supported_cams = robot::getCameras();
-	if (supported_cams.find(cam) != supported_cams.end()) {
+	//std::unordered_set<CameraID> supported_cams = robot::getCameras();
+	//if (supported_cams.find(cam) != supported_cams.end()) {
 		_camera_stream_task.openStream(cam, j["fps"]);
-	}
+	//}
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	// return util::validateKey(j, "camera", val_t::number_integer);
+	return util::hasKey(j, "camera");
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
@@ -237,7 +239,8 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 static bool validateCameraFrameRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	// return util::validateKey(j, "camera", val_t::number_integer);
+	return util::hasKey(j, "camera");
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
