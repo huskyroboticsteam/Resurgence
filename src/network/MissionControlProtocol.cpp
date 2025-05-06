@@ -239,7 +239,8 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 static bool validateCameraFrameRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::number_integer);
+	// return util::validateKey(j, "camera", val_t::number_integer);
+	return util::hasKey(j, "camera");
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
