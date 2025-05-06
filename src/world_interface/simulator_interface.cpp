@@ -39,7 +39,7 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::wristDiffRight, "wristDiffRight"},
 	{motorid_t::hand, "hand"},
 	{motorid_t::drillActuator, "drillActuator"},
-    	{motorid_t::drillMotor, "drillMotor"}};
+	{motorid_t::drillMotor, "drillMotor"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 
@@ -85,6 +85,10 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
+static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
+	return nullptr;
+}
+
 static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
 					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
 	if (list1d) {
@@ -112,7 +116,7 @@ void initCameras() {
 	auto cfg = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(Constants::MAST_CAMERA_ID));
 	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
 	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera(Constants::WRIST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 }
 

@@ -74,19 +74,15 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 		throw std::invalid_argument("Configuration file for Camera ID" + std::to_string(camera_id) + " does not exist");
 	}
 
-	const std::string KEY_CAMERA_IMAGE_WIDTH = "image_width";
-	const std::string KEY_CAMERA_IMAGE_HEIGHT = "image_height";
-	const std::string KEY_CAMERA_FRAMERATE = "framerate";
-
-	if (fs[KEY_CAMERA_IMAGE_WIDTH].empty() || fs[KEY_CAMERA_IMAGE_HEIGHT].empty() || fs[KEY_CAMERA_FRAMERATE].empty()) {
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
 		throw std::invalid_argument("Configuration file missing key(s)");
 	}
 
 	std::stringstream gstr_ss;
 	gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! ";
-	gstr_ss << "image/jpeg,width=" << static_cast<int>(fs[KEY_CAMERA_IMAGE_WIDTH]);
-	gstr_ss << ",height=" << static_cast<int>(fs[KEY_CAMERA_IMAGE_HEIGHT]);
-	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_CAMERA_FRAMERATE]) << "/1 ! ";
+	gstr_ss << "image/jpeg,width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 	gstr_ss << "jpegdec ! videoconvert ! appsink";
 
 	return gstr_ss.str();
