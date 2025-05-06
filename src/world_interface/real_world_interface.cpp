@@ -133,7 +133,8 @@ void world_interface_init(
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
-	return std::make_shared<types::CameraHandle>(openCamera_(cameraID));
+	std::shared_ptr<cam::Camera> cam = openCamera_(cameraID);
+	return cam ? std::make_shared<types::CameraHandle>(cam) : nullptr;
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
