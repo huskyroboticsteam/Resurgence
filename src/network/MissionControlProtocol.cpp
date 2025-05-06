@@ -159,23 +159,6 @@ static bool validateJoint(const json& j) {
 		   });
 }
 
-static bool validateJointPowerRequest(const json& j) {
-	return validateJoint(j) && util::validateRange(j, "power", -1, 1);
-}
-
-void MissionControlProtocol::handleJointPowerRequest(const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
-	using robot::types::jointid_t;
-	using robot::types::name_to_jointid;
-	std::string joint = j["joint"];
-	double power = j["power"];
-	auto it = name_to_jointid.find(util::freezeStr(joint));
-	if (it != name_to_jointid.end()) {
-		jointid_t joint_id = it->second;
-		setRequestedJointPower(joint_id, power);
-	}
-}
-
 static bool validateWaypointNavRequest(const json& j) {
 	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
 	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
@@ -202,6 +185,23 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	}
 }
 
+static bool validateJointPowerRequest(const json& j) {
+	return validateJoint(j) && util::validateRange(j, "power", -1, 1);
+}
+
+void MissionControlProtocol::handleJointPowerRequest(const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
+	using robot::types::jointid_t;
+	using robot::types::name_to_jointid;
+	std::string joint = j["joint"];
+	double power = j["power"];
+	auto it = name_to_jointid.find(util::freezeStr(joint));
+	if (it != name_to_jointid.end()) {
+		jointid_t joint_id = it->second;
+		setRequestedJointPower(joint_id, power);
+	}
+}
+
 static bool validateJointPositionRequest(const json& j) {
 	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
 }
@@ -213,6 +213,17 @@ static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 	// int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO: actually implement joint position requests
 	// setMotorPos(motor, position_mdeg);
+}
+
+static bool validateServoPowerRequest(const json& j) {
+	return util::validateRange(j, "servo", 0, 8);
+}
+
+void MissionControlProtocol::handleServoPowerRequest(const json& j) {
+	uint8_t servo = j["servo"];
+	int8_t power = j["power"];
+
+	robot::setServoPower(servo, power);
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
@@ -333,6 +344,22 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateJointPowerRequest);
 	this->addMessageHandler(JOINT_POSITION_REQ_TYPE, handleJointPositionRequest,
 							validateJointPositionRequest);
+	this->addMessageHandler(
+		SERVO_POWER_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleServoPowerRequest, this, _1),
+		validateServoPowerRequest);
+	this->addMessageHandler(
+		SERVO_POSITION_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleServoPositionRequest, this, _1),
+		validateServoPositionRequest);
+	this->addMessageHandler(
+		STEPPER_TURN_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleStepperTurnRequest, this, _1),
+		validateStepperTurnRequest);
+	this->addMessageHandler(
+		STEPPER_STEP_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleStepperStepRequest, this, _1),
+		validateStepperStepRequest);
 	this->addMessageHandler(
 		CAMERA_STREAM_OPEN_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamOpenRequest, this, _1),

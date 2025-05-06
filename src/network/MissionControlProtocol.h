@@ -48,6 +48,10 @@ private:
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleCameraFrameRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
+	void handleServoPowerRequest(const json& j);
+	void handleServoPositionRequest(const json& j);
+	void handleStepperTurnRequest(const json& j);
+	void handleStepperStepRequest(const json& j);
 	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
