@@ -133,8 +133,19 @@ int main(int argc, char** argv) {
 
 	double period = 8.0;
 
-	std::this_thread::sleep_for(300ms); // wait for encoder position data to arrive
-	int32_t starting_angle = can::motor::getMotorPosition(serial);
+	time_point<steady_clock> start = steady_clock::now();
+	constexpr milliseconds timeout = 300ms;
+	DataPoint<int32_t> starting_angle_data_point = can::motor::getMotorPosition(serial);
+	while (!starting_angle_data_point.isValid() && steady_clock::now() - start < timeout) {
+		starting_angle_data_point = can::motor::getMotorPosition(serial);
+	}
+
+	if (!starting_angle_data_point.isValid()) {
+		LOG_F(ERROR, "STARTING ANGLE DATA NOT FOUND");
+		exit(1);
+	}
+	int32_t starting_angle = starting_angle_data_point.getData();
+
 	int32_t angle_target = starting_angle;
 	double acc_error = 0.0;
 	int total_steps = 0;
@@ -156,7 +167,8 @@ int main(int argc, char** argv) {
 		if (mode == targetmode_t::step) {
 			prescaled_target = round(prescaled_target);
 		}
-		angle_target = (int32_t)round(amplitude * prescaled_target) + starting_angle;
+		angle_target =
+			static_cast<int32_t>(round(amplitude * prescaled_target)) + starting_angle;
 
 		can::motor::setMotorPIDTarget(serial, angle_target);
 
