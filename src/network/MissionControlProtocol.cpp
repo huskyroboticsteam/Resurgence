@@ -208,11 +208,19 @@ static bool validateJointPositionRequest(const json& j) {
 
 static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
-	// std::string motor = j["joint"];
-	// double position_deg = j["position"];
-	// int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO: actually implement joint position requests
-	// setMotorPos(motor, position_mdeg);
+	using robot::types::jointid_t;
+	using robot::types::name_to_jointid;
+	std::string motor = j["joint"];
+	double position_deg = j["position"];
+	int32_t position_mdeg = std::round(position_deg * 1000);
+  // Set joint pos has checks already for checking whether the set joint pos
+  // function works with the motor
+  auto it = name_to_jointid.find(util::freezeStr(motor));
+	if (it != name_to_jointid.end()) {
+		jointid_t joint_id = it->second;
+    setJointPos(motor, position_mdeg);
+	}
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
