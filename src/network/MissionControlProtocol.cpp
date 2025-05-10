@@ -219,7 +219,7 @@ static void handleJointPositionRequest([[maybe_unused]] const json& j) {
   auto it = name_to_jointid.find(util::freezeStr(motor));
 	if (it != name_to_jointid.end()) {
 		jointid_t joint_id = it->second;
-    setJointPos(motor, position_mdeg);
+    robot::setJointPos(joint_id, position_mdeg);
 	}
 }
 
