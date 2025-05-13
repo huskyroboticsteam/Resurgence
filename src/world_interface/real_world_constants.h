@@ -92,10 +92,10 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
 	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
 	 {motorid_t::activeSuspension, DEVICE_SERIAL_LINEAR_ACTUATOR},
-	 {motorid_t::drillActuator, 0x13},
-	 {motorid_t::drillMotor, 0x03},
-	 {motorid_t::fourbar1, 0x02},
-	 {motorid_t::fourbar2, 0x12}});
+	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},
+	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
+	 {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
+	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2}});
 
 constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
 	{{motorid_t::leftTread, can::devicegroup_t::motor},
