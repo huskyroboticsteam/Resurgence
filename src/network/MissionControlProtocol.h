@@ -46,6 +46,7 @@ private:
 	void handleTankDriveRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
+	void handleCameraFrameRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
 	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);

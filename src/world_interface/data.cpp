@@ -44,14 +44,16 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "wristPitch";
 		case jointid_t::wristRoll:
 			return "wristRoll";
-		case jointid_t::activeSuspension:
-			return "activeSuspension";
 		case jointid_t::ikUp:
 			return "ikUp";
 		case jointid_t::ikForward:
 			return "ikForward";
 		case jointid_t::fourBarLinkage:
 			return "fourBarLinkage";
+		case jointid_t::drillActuator:
+			return "drillActuator";
+		case jointid_t::drillMotor:
+			return "drillMotor";
 		default:
 			// should never happen
 			return "<unknown>";
@@ -74,9 +76,6 @@ std::string to_string(robot::types::mountedperipheral_t peripheral) {
 
 		case mountedperipheral_t::armServo:
 			return "armServo";
-
-		case mountedperipheral_t::lidar:
-			return "lidar";
 
 		case mountedperipheral_t::scienceStation:
 			return "scienceStation";

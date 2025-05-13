@@ -12,17 +12,15 @@ Some of our dependencies are team-managed, including the CAN library and the H26
 Our codebase is developed for an NVIDIA Jetson TX2, which runs Ubuntu Linux; as such, much
 of our code will be Unix-specific.
 
-> ⚠️ The only supported platform is Ubuntu 20.04 LTS. Other versions/distros/platforms may work, but if you want as easy as possible, go with this version. 
+> ⚠️ The only supported platform is Ubuntu 22.04 LTS. Other versions/distros/platforms may work, but if you want as easy as possible, go with this version. 
 
 **Windows users:** You should use either [Windows Subsystem for
 Linux](https://docs.microsoft.com/en-us/windows/wsl/about) or a VM with a Linux
-distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions. As noted above, **use Ubuntu 20.04**.
+distribution installed (Ubuntu recommended). Either should work fine. Whichever you use, install either the VM or WSL2 and follow the Linux instructions. As noted above, **use Ubuntu 22.04**.
 
-**Mac users:** We do not make any effort to support Mac systems. You *may* be able to get things working, but if you try you'll be on your own. It's **highly recommended** for Mac users to use a Linux VM.
+**Mac users:** We recommend running an Ubuntu virtual machine via [UTM](https://mac.getutm.app/). After installing the app, set up your VM using [UTM's Ubuntu image](https://mac.getutm.app/gallery/ubuntu-20-04). Please note that UTM only supports the latest version of Ubuntu (22.04).
 
-> ⚠️ For Mac users, we recommend running a Ubuntu virtual machine via [UTM](https://mac.getutm.app/). After installing the app, set up your VM using [UTM's Ubuntu image](https://mac.getutm.app/gallery/ubuntu-20-04). Please note that UTM only supports the latest version of Ubuntu (22.04). Since the codebase is based on an older version of Ubuntu, there may be package errors that you need to manually resolve. For the sake of convenience, we also recommend SSHing into UTM via VSCode's Remote SSH feature. [More info can be found here](https://arteen.linux.ucla.edu/ssh-into-utm-vm.html). 
-
-**From here on out, the installation instructions will assume you are using Ubuntu 20.04 LTS**. Windows users should run commands in either their Linux VM or their WSL
+**From here on out, the installation instructions will assume you are using Ubuntu 22.04 LTS**. Windows users should run commands in either their Linux VM or their WSL
 terminal. For Linux users, we'll assume you're running Ubuntu; users of another
 distribution may need to change some instructions (e.g. package managers) depending on
 your distro.
@@ -40,6 +38,14 @@ Clone repository:
 cd <place to put repository>
 git clone https://github.com/huskyroboticsteam/Resurgence/
 ```
+
+> You may need to set up a SSH key to clone the repo. You can follow the steps below or find more information [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+> Inside your VM, check if there are existing SSH keys by running `ls -al ~/.ssh`, which will list all files inside your .ssh directory, if they exist. Existing public keys are (by default) one of the following: *id_rsa.pub*, *id_ecdsa.pub*, *id_ed25519.pub*.
+
+> To create a new SSH key, run the following command with your Github email address: `ssh-keygen -t ed25519 -C "github_email@example.com"`. You can accept all of the default configurations.
+
+> To add the SSH key to your GitHub account, run the following command, substituting in for your .pub file: `gh ssh-key add ~/.ssh/<file>.pub -t "UTM Linux" --type signing`
 
 Install dependencies in one go:
 ```bash
@@ -65,6 +71,8 @@ a) Develop within the VM, in which case see "Native Linux" above.
 b) Create a shared folder (shared between your computer and VM) and clone the project there. Then use an editor to edit the files on your machine and run them within the VM.
 
 c) Set up the VM as an ssh server (pretty easy) and run VSCode on your machine (not the VM) using the [remote development](https://code.visualstudio.com/docs/remote/ssh) feature.
+> For the sake of convenience, we also recommend SSHing into UTM via VSCode's Remote SSH feature. [More info can be found here](https://arteen.linux.ucla.edu/ssh-into-utm-vm.html).
+> Remember to run `sudo apt-get install -y openssh-server`.
 
 Of these, (c) probably has the most convenient/usable setup, while (a) is probably the least work.
 
@@ -117,7 +125,7 @@ make -j Rover
 Launch the appropriate simulator executable for your platform. Then, run the rover code, using the `p` flag to specify a peripheral:
 
 ```bash
-./Rover -p {none|arm|science|lidar}
+./Rover -p {none|arm|science}
 ```
 
 The programs can be started in any order, it doesn't matter.
