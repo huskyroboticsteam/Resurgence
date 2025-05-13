@@ -82,8 +82,8 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
-	{{motorid_t::leftTread, DEVICE_SERIAL_TREAD_LEFT},
-	 {motorid_t::rightTread, DEVICE_SERIAL_TREAD_RIGHT},
+	{{motorid_t::leftTread, 0x04},
+	 {motorid_t::rightTread, 0x0d},
 	 {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
 	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
 	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
@@ -94,7 +94,8 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},
 	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
 	 {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
-	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2}});
+	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},
+   {motorid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO}});
 
 constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
 	{{motorid_t::leftTread, can::devicegroup_t::motor},
@@ -109,7 +110,8 @@ constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::device
 	 {motorid_t::drillActuator, can::devicegroup_t::science},
 	 {motorid_t::drillMotor, can::devicegroup_t::science},
 	 {motorid_t::fourbar1, can::devicegroup_t::science},
-	 {motorid_t::fourbar2, can::devicegroup_t::science}});
+	 {motorid_t::fourbar2, can::devicegroup_t::science},
+   {motorid_t::scienceServoBoard, can::devicegroup_t::science}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =

@@ -176,6 +176,43 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 	}
 }
 
+static bool validateJointPositionRequest(const json& j) {
+	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
+}
+
+static void handleJointPositionRequest([[maybe_unused]] const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
+	// std::string motor = j["joint"];
+	// double position_deg = j["position"];
+	// int32_t position_mdeg = std::round(position_deg * 1000);
+	// TODO: actually implement joint position requests
+	// setMotorPos(motor, position_mdeg);
+}
+
+static bool validateServo(const json& j) {
+	return util::validateKey(j, "servo", val_t::string);/* &&
+		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
+			   return j["joint"].get<std::string>() == util::to_string(joint);
+		   });*/
+}
+
+static bool validateServoPositionRequest(const json& j) {
+  return validateServo(j);// && util::validateKey(j, "position", val_t::number_integer);
+}
+
+void MissionControlProtocol::handleServoPositionRequest(const json& j) {
+  LOG_F(INFO, "mc handle");
+  std::string servoName = j["servo"];
+  int32_t position = j["position"];
+  auto servo = name_to_servoid.find(util::freezeStr(servoName));
+  if (servo != name_to_servoid.end()) {
+    auto servo_num = servoid_to_servo_num.find(servo->second);
+    if (servo_num != servoid_to_servo_num.end()) {
+      robot::setServoPos((uint8_t) servo_num->second, position);
+    }
+  }
+}
+
 static bool validateWaypointNavRequest(const json& j) {
 	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
 	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
@@ -200,19 +237,6 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 			LOG_F(WARNING, "No GPS converter initialized!");
 		}
 	}
-}
-
-static bool validateJointPositionRequest(const json& j) {
-	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
-}
-
-static void handleJointPositionRequest([[maybe_unused]] const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
-	// std::string motor = j["joint"];
-	// double position_deg = j["position"];
-	// int32_t position_mdeg = std::round(position_deg * 1000);
-	// TODO: actually implement joint position requests
-	// setMotorPos(motor, position_mdeg);
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
@@ -349,6 +373,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		WAYPOINT_NAV_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
 		validateWaypointNavRequest);
+  this->addMessageHandler(
+    SERVO_POSITION_REQ_TYPE,
+    std::bind(&MissionControlProtocol::handleServoPositionRequest, this, _1),
+    validateServoPositionRequest);
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this, false));

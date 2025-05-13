@@ -67,7 +67,9 @@ enum class motorid_t {
 	drillActuator,
 	drillMotor,
 	fourbar1,
-	fourbar2
+	fourbar2,
+  // Hack, see real_world_interface.cpp for details
+  scienceServoBoard,
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -111,6 +113,32 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"fourBarLinkage", jointid_t::fourBarLinkage},
 	 {"drillActuator", jointid_t::drillActuator},
 	 {"drillMotor", jointid_t::drillMotor}});
+
+enum class servoid_t {
+  microscope,
+  syringe,
+  cuvette,
+  filter,
+  soilBox,
+};
+
+constexpr auto all_servoid_t = frozen::make_unordered_set<servoid_t>(
+  {servoid_t::microscope, servoid_t::syringe, servoid_t::soilBox,
+   servoid_t::cuvette, servoid_t::filter});
+
+constexpr auto name_to_servoid = frozen::make_unordered_map<frozen::string, servoid_t>(
+  {{"microscope", servoid_t::microscope},
+   {"syringe", servoid_t::syringe},
+   {"cuvette", servoid_t::cuvette},
+   {"filter", servoid_t::filter},
+   {"soilBox", servoid_t::soilBox}});
+
+constexpr auto servoid_to_servo_num = frozen::make_unordered_map<servoid_t, int>(
+  {{servoid_t::microscope, 0},
+   {servoid_t::syringe, 1},
+   {servoid_t::cuvette, 2},
+   {servoid_t::filter, 3},
+   {servoid_t::soilBox, 4}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:
