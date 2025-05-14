@@ -26,3 +26,10 @@ jobs:
     - name: Run tests
       run: |
         cd build && ./tests
+    - name: Build codebase (for sim)
+      run: |
+        cd ${{ github.workspace }}
+        mkdir build && cd build && cmake ../src -DWORLD_INTERFACE=SIMULATOR && cmake --build . -j$(nproc)
+    - name: Run tests (for sim)
+      run: |
+        cd build && ./tests
