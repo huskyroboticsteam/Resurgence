@@ -119,9 +119,9 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
 	sendCANPacket(p);
 }
 
-void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle) {
+void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t position) {
 	CANPacket p;
-	AssemblePCAServoPacket(&p, static_cast<uint8_t>(group), serial, servoNum, angle);
+	AssemblePCAServoPacket(&p, static_cast<uint8_t>(group), serial, servoNum, position);
 	sendCANPacket(p);
 }
 

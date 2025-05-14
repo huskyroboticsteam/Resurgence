@@ -134,11 +134,6 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 	}
 }
 
-void setScienceServoPos(uint8_t servoNum, int32_t angle) {
-  robot::can::deviceserial_t DEVICE_SERIAL_SCIENCE_SERVO = 0x5;
-  setServoPos(robot::can::devicegroup_t::science, DEVICE_SERIAL_SCIENCE_SERVO, servoNum, angle);
-}
-
 namespace {
 void setJointPowerValue(types::jointid_t joint, double power) {
 	// make sure power value is normalized

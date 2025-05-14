@@ -32,7 +32,7 @@ public:
 
 	void setMotorVel(int32_t targetVel) override;
 
-  void setServoPos(robot::types::servoid_t servo, int32_t position);
+  	void setServoPos(uint8_t servo, int32_t position) override;
 
 	/**
 	 * @brief Returns the motor's serial id.

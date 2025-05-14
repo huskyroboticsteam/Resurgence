@@ -340,4 +340,5 @@ namespace util {
 std::string to_string(robot::types::jointid_t joint);
 std::string to_string(const robot::types::CameraID& id);
 std::string to_string(robot::types::mountedperipheral_t peripheral);
+std::string to_string(robot::types::servoid_t servo);
 } // namespace util

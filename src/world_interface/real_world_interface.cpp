@@ -143,7 +143,7 @@ void world_interface_init(
   std::shared_ptr<robot::base_motor> ptr =
     std::make_shared<can_motor>(servo_board, false, motorSerialIDMap.at(servo_board),
     motorGroupMap.at(servo_board), 0, 0);
-	motor_ptrs.insert({motor, ptr});
+	motor_ptrs.insert({servo_board, ptr});
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
@@ -270,8 +270,11 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 }
 
 void setServoPos(robot::types::servoid_t servo, int32_t position) {
-  std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motorid_t::scienceServoBoard);
-  motor_ptr->setServoPos(servo, position);
+  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
+  auto servo_num = servoid_to_servo_num.find(servo);
+  if (servo_num != servoid_to_servo_num.end()) {
+  	servo_board->setServoPos(servo_num->second, position);
+  }
 }
 
 // TODO: implement

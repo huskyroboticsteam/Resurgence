@@ -206,10 +206,7 @@ void MissionControlProtocol::handleServoPositionRequest(const json& j) {
   int32_t position = j["position"];
   auto servo = name_to_servoid.find(util::freezeStr(servoName));
   if (servo != name_to_servoid.end()) {
-    auto servo_num = servoid_to_servo_num.find(servo->second);
-    if (servo_num != servoid_to_servo_num.end()) {
-      robot::setServoPos((uint8_t) servo_num->second, position);
-    }
+	robot::setServoPos(servo->second, position);
   }
 }
 

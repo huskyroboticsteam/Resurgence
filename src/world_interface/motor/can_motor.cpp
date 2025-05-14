@@ -37,6 +37,11 @@ void can_motor::setMotorVel(int32_t targetVel) {
 	base_motor::setMotorVel(targetVel);
 }
 
+// Hack for Science Servo Board
+void can_motor::setServoPos(uint8_t servo, int32_t position) {
+	can::motor::setServoPos(device_group, serial_id, servo, position);
+}
+
 can::deviceserial_t can_motor::getMotorSerial() {
 	return serial_id;
 }

@@ -148,9 +148,9 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
  *
  * @param serial The CAN serial number of the motor board.
  * @param servoNum the servo number.
- * @param angle the angle of the servo in millidegrees.
+ * @param position the position of the servo in degrees.
  */
-void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle);
+void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t position);
 
 /**
  * @brief Get the last reported position of a motor.

@@ -61,6 +61,8 @@ public:
 	 */
 	virtual void setMotorVel(int32_t targetVel);
 
+	virtual void setServoPos(uint8_t servo, int32_t position) = 0;
+
 	/**
 	 * @brief Delete the copy constructor.
 	 *

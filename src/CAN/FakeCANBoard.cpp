@@ -28,16 +28,14 @@ enum class TestMode {
 	Encoder,
 	LimitSwitch,
 	Telemetry,
-	ScienceServos,
-  Steppers
+	ScienceServos
 };
 
 std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::ModeSet),   static_cast<int>(TestMode::PWM),
 	static_cast<int>(TestMode::PID),	   static_cast<int>(TestMode::Encoder),
 	static_cast<int>(TestMode::PIDVel),	   static_cast<int>(TestMode::LimitSwitch),
-	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos),
-  static_cast<int>(TestMode::Steppers)};
+	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -61,8 +59,6 @@ int prompt(std::string_view message) {
 int main() {
 	can::initCAN();
 
-	CANPacket p;
-	uint8_t science_group = static_cast<int>(can::devicegroup_t::science);
 	std::stringstream ss("What are you testing?\n");
 	ss << static_cast<int>(TestMode::ModeSet) << " for MODE SET\n";
 	ss << static_cast<int>(TestMode::PWM) << " for PWM\n";
@@ -71,7 +67,6 @@ int main() {
 	ss << static_cast<int>(TestMode::LimitSwitch) << " for LIMIT SWITCH\n";
 	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
-  ss << static_cast<int>(TestMode::Steppers) << " for STEPPERS\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
@@ -288,27 +283,13 @@ int main() {
 			}
 			std::this_thread::sleep_for(1s);
 		} else if (testMode == TestMode::ScienceServos) {
-		// 	int servo_no = prompt("Enter servo no");
-		// 	int degrees = prompt("Enter degrees");
-		// 	AssembleScienceServoPacket(&p, science_group, 0x5, (uint8_t)servo_no,
-		// 							   (uint8_t)degrees);
-		// 	can::sendCANPacket(p);
-		// } else if (testMode == TestMode::Steppers) {
-    //   int stepper_no = prompt("Enter stepper no");
-    //   int mode = prompt("Degrees (0) or Steps (1)");
-    //   if (mode == 0) {
-    //     int degrees = prompt("Enter degrees");
-    //     int speed = prompt("Enter speed");
-    //     AssembleScienceStepperTurnAnglePacket(&p, 0x7, 0x4, (uint8_t)stepper_no, (int16_t)degrees, (uint8_t)speed);
-    //   } else if (mode == 1) {
-    //     int steps = prompt("Enter steps");
-    //     int speed = prompt("Enter speed");
-    //     AssembleScienceStepperTurnStepsPacket(&p, 0x7, 0x4, (uint8_t)stepper_no, (int16_t)steps, (uint8_t)speed);
-    //     p.data[0] = 0x0A;
-    //     p.data[1] = 1;
-    //     p.data[2] = 8;
-    //   }
-    //   can::sendCANPacket(p);
-    }
+			int servo_no = prompt("Enter servo no");
+			int degrees = prompt("Enter degrees");
+
+			CANPacket p;
+			AssembleScienceServoPacket(&p, 0x7, 0x5, (uint8_t)servo_no,
+									   (uint8_t)degrees);
+			can::sendCANPacket(p);
+		}
 	}
 }
