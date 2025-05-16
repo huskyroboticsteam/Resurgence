@@ -65,7 +65,9 @@ enum class motorid_t {
 	wristDiffLeft,
 	hand,
 	drillActuator,
-	drillMotor
+	drillMotor,
+	fourbar1,
+	fourbar2
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -86,6 +88,7 @@ enum class jointid_t {
 	hand,
 	ikForward,
 	ikUp,
+	fourBarLinkage,
 	drillActuator,
 	drillMotor
 };
@@ -93,7 +96,7 @@ enum class jointid_t {
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::ikForward,
-	 jointid_t::ikUp, jointid_t::drillActuator, jointid_t::drillMotor});
+   jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -105,6 +108,7 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"hand", jointid_t::hand},
 	 {"ikForward", jointid_t::ikForward},
 	 {"ikUp", jointid_t::ikUp},
+	 {"fourBarLinkage", jointid_t::fourBarLinkage},
 	 {"drillActuator", jointid_t::drillActuator},
 	 {"drillMotor", jointid_t::drillMotor}});
 
