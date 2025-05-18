@@ -1,11 +1,11 @@
 #include "CANMotor.h"
-
 #include "CAN.h"
 #include "CANUtils.h"
 
 #include <chrono>
 #include <cmath>
 #include <thread>
+#include <any>
 
 extern "C" {
 #include <HindsightCAN/CANCommon.h>
@@ -55,11 +55,9 @@ void initPotentiometer(deviceserial_t serial, int32_t posLo, int32_t posHi, uint
 
 void emergencyStopMotors() {
     CANPacket p;
-    // Emergency stop for AVR/PSoC motors
     AssembleGroupBroadcastingEmergencyStopPacket(&p, static_cast<uint8_t>(devicegroup_t::motor),
                                                  ESTOP_ERR_GENERAL);
     sendCANPacket(p);
-    // Emergency stop for ODrive motors
     AssembleODriveEstopPacket(&p, NODE_ID_1);
     sendCANPacket(p);
     AssembleODriveEstopPacket(&p, NODE_ID_2);
@@ -74,11 +72,9 @@ void initMotor(deviceserial_t serial) {
 
 void initODriveMotor(uint8_t node_id) {
     CANPacket p;
-    // Set axis state to idle initially
-    AssembleODriveSetAxisStatePacket(&p, node_id, 1); // AXIS_STATE_IDLE
+    AssembleODriveSetAxisStatePacket(&p, node_id, 1);
     sendCANPacket(p);
     std::this_thread::sleep_for(1000us);
-    // Clear any errors
     AssembleODriveClearErrorsPacket(&p, node_id, 0);
     sendCANPacket(p);
     std::this_thread::sleep_for(1000us);
@@ -131,16 +127,16 @@ void setODriveMode(uint8_t node_id, odrive_motormode_t mode) {
     uint32_t control_mode, input_mode;
     switch (mode) {
         case odrive_motormode_t::position:
-            control_mode = 3; // CONTROL_MODE_POSITION_CONTROL
-            input_mode = 1;   // INPUT_MODE_PASSTHROUGH
+            control_mode = 3;
+            input_mode = 1;
             break;
         case odrive_motormode_t::velocity:
-            control_mode = 2; // CONTROL_MODE_VELOCITY_CONTROL
-            input_mode = 1;   // INPUT_MODE_PASSTHROUGH
+            control_mode = 2;
+            input_mode = 1;
             break;
         case odrive_motormode_t::torque:
-            control_mode = 1; // CONTROL_MODE_TORQUE_CONTROL
-            input_mode = 1;   // INPUT_MODE_PASSTHROUGH
+            control_mode = 1;
+            input_mode = 1;
             break;
         default:
             return;
@@ -148,8 +144,7 @@ void setODriveMode(uint8_t node_id, odrive_motormode_t mode) {
     AssembleODriveSetControllerModePacket(&p, node_id, control_mode, input_mode);
     sendCANPacket(p);
     std::this_thread::sleep_for(1000us);
-    // Set axis state to closed-loop control to activate the mode
-    AssembleODriveSetAxisStatePacket(&p, node_id, 8); // AXIS_STATE_CLOSED_LOOP_CONTROL
+    AssembleODriveSetAxisStatePacket(&p, node_id, 8);
     sendCANPacket(p);
     std::this_thread::sleep_for(1000us);
 }
@@ -175,7 +170,21 @@ void setMotorPIDTarget(deviceserial_t serial, int32_t target) {
 
 void setODrivePosition(uint8_t node_id, float position, float vel_ff, float torque_ff) {
     CANPacket p;
-    AssembleODriveSetInputPosPacket(&p, node_id, position, vel_ff, torque_ff);
+    p.id = ((node_id & 0x1F) << 6) | ID_ODRIVE_SET_INPUT_POS;
+    p.dlc = 8;
+    p.rtr = 0;
+    union { float f; uint32_t u; } float_to_uint;
+    float_to_uint.f = position;
+    p.data[0] = float_to_uint.u & 0xFF;
+    p.data[1] = (float_to_uint.u >> 8) & 0xFF;
+    p.data[2] = (float_to_uint.u >> 16) & 0xFF;
+    p.data[3] = (float_to_uint.u >> 24) & 0xFF;
+    int16_t vel_ff_scaled = static_cast<int16_t>(vel_ff / 0.0005);
+    int16_t torque_ff_scaled = static_cast<int16_t>(torque_ff / 0.001);
+    p.data[4] = vel_ff_scaled & 0xFF;
+    p.data[5] = (vel_ff_scaled >> 8) & 0xFF;
+    p.data[6] = torque_ff_scaled & 0xFF;
+    p.data[7] = (torque_ff_scaled >> 8) & 0xFF;
     sendCANPacket(p);
 }
 
@@ -193,41 +202,32 @@ void setODriveTorque(uint8_t node_id, float torque) {
 
 void setServoPos(deviceserial_t serial, uint8_t servoNum, int32_t angle) {
     CANPacket p;
-    AssemblePCAServoPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, servoNum,
-                           angle);
+    AssemblePCAServoPacket(&p, static_cast<uint8_t>(devicegroup_t::motor), serial, servoNum, angle);
     sendCANPacket(p);
 }
 
 DataPoint<int32_t> getMotorPosition(deviceserial_t serial) {
-    return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial),
-                              telemtype_t::angle);
+    auto data = getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial), telemtype_t::angle);
+    if (!data) return {};
+    return DataPoint<int32_t>(data.getTime(), std::any_cast<int32_t>(data.getData()));
 }
 
 DataPoint<float> getODrivePosition(uint8_t node_id) {
-    auto data = getDeviceTelemetry(std::make_pair(devicegroup_t::motor, node_id),
-                                   telemtype_t::angle);
+    auto data = getDeviceTelemetry(std::make_pair(devicegroup_t::motor, node_id), telemtype_t::angle);
     if (!data) return {};
-    float position = static_cast<float>(data.getData());
-    return DataPoint<float>(data.getTime(), position);
+    return DataPoint<float>(data.getTime(), std::any_cast<float>(data.getData()));
 }
 
 DataPoint<float> getODriveVelocity(uint8_t node_id) {
-    auto data = getDeviceTelemetry(std::make_pair(devicegroup_t::motor, node_id),
-                                   telemtype_t::gyro_x); // Using gyro_x for velocity
+    auto data = getDeviceTelemetry(std::make_pair(devicegroup_t::motor, node_id), telemtype_t::velocity);
     if (!data) return {};
-    float velocity = static_cast<float>(data.getData());
-    return DataPoint<float>(data.getTime(), velocity);
+    return DataPoint<float>(data.getTime(), std::any_cast<float>(data.getData()));
 }
 
 DataPoint<std::pair<float, float>> getODriveTemperature(uint8_t node_id) {
-    auto data = getDeviceTelemetry(std::make_pair(devicegroup_t::motor, node_id),
-                                   telemtype_t::temp);
+    auto data = getDeviceTelemetry(std::make_pair(devicegroup_t::motor, node_id), telemtype_t::odrive_temp);
     if (!data) return {};
-    float temp = static_cast<float>(data.getData());
-    // Since temp contains both FET and motor temperatures packed, we'll assume it's split
-    float fet_temp = temp; // Simplified; in reality, need to decode both
-    float motor_temp = temp;
-    return DataPoint<std::pair<float, float>>(data.getTime(), {fet_temp, motor_temp});
+    return DataPoint<std::pair<float, float>>(data.getTime(), std::any_cast<std::pair<float, float>>(data.getData()));
 }
 
 void pullMotorPosition(deviceserial_t serial) {
@@ -244,13 +244,12 @@ void pullODriveTemperature(uint8_t node_id) {
 
 callbackid_t addLimitSwitchCallback(
     deviceserial_t serial,
-    const std::function<void(deviceserial_t serial,
-                             DataPoint<LimitSwitchData> limitSwitchData)>& callback) {
+    const std::function<void(deviceserial_t serial, DataPoint<LimitSwitchData> limitSwitchData)>& callback) {
     auto id = std::make_pair(devicegroup_t::motor, serial);
     auto func = [callback](deviceid_t deviceID, telemtype_t,
-                           DataPoint<telemetry_t> telemData) {
+                           DataPoint<std::any> telemData) {
         if (telemData) {
-            LimitSwitchData data = telemData.getData();
+            LimitSwitchData data = std::any_cast<LimitSwitchData>(telemData.getData());
             callback(deviceID.second, {telemData.getTime(), data});
         } else {
             callback(deviceID.second, {});
