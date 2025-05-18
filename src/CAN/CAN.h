@@ -45,7 +45,7 @@ void sendCANPacket(const CANPacket& packet);
 
 /**
  * @brief Get the latest telemetry from a CAN device.
- *
+ * 
  * This method does NOT query for new data, it just returns the last reported value.
  *
  * @param id The device group and serial number of the device.
@@ -82,9 +82,9 @@ void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
 
 /**
  * @brief Stop pulling the latest telemetry data from the given device.
- *
+ * 
  * This method is NOT thread safe.
- *
+ * 
  * @param id The device group and serial number of the device.
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
  */
