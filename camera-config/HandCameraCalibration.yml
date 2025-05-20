@@ -4,6 +4,7 @@ name: "hand"
 description: "Camera located on the hand of the rover."
 # Make sure that this camera_id matches the one defined in the udev rules.
 camera_id: 20
+format: "image/jpeg"
 image_width: 1024
 image_height: 768
 framerate: 30
