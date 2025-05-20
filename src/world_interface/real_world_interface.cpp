@@ -36,9 +36,16 @@ kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+  double posScale = 0;
+  double negScale = 0;
+
 	// get scales for motor
-	double posScale = positive_pwm_scales.at(motor);
-	double negScale = negative_pwm_scales.at(motor);
+  try {
+    posScale = positive_pwm_scales.at(motor);
+    negScale = negative_pwm_scales.at(motor);
+  } catch (const std::out_of_range& err) {
+    LOG_F(ERROR, "Couldn't find PWM scales for motor 0x%x", static_cast<uint8_t>(motor));
+  }
 
 	// create ptr and insert in map
 	std::shared_ptr<robot::base_motor> ptr =

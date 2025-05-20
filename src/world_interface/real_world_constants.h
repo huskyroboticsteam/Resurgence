@@ -134,7 +134,8 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, -1.0},
 												   {motorid_t::fourbar1, 0.3},
-												   {motorid_t::fourbar2, 0.3}});
+												   {motorid_t::fourbar2, 0.3},
+                           {motorid_t::scienceServoBoard, 0}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
@@ -152,6 +153,7 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, -1.0},
 												   {motorid_t::fourbar1, 0.15},
-												   {motorid_t::fourbar2, 0.15}});
+												   {motorid_t::fourbar2, 0.15},
+                           {motorid_t::scienceServoBoard, 0}});
 
 } // namespace robot
