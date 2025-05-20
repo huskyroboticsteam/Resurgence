@@ -55,6 +55,7 @@ const robot::types::CameraID CJ1_CAMERA_ID = 510;
 const robot::types::CameraID CJ2_CAMERA_ID = 520;
 const robot::types::CameraID CJ3_CAMERA_ID = 530;
 const robot::types::CameraID CJ4_CAMERA_ID = 540;
+const robot::types::CameraID MICROSCOPE_ID = 500;
 
 const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
    {HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"},
@@ -65,6 +66,7 @@ const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATH
    {CJ2_CAMERA_ID, "../camera-config/CJ2.yml"},
    {CJ3_CAMERA_ID, "../camera-config/CJ3.yml"},
    {CJ4_CAMERA_ID, "../camera-config/CJ4.yml"},
+   {MICROSCOPE_ID, "../camera-config/Microscope.yml"},
 };
 
 /**

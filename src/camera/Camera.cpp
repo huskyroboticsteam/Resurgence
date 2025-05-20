@@ -80,13 +80,13 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
 	std::stringstream gstr_ss;
 	gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! ";
-  gstr_ss << fs[KEY_FORMAT] << ",";
+  gstr_ss << std::string(fs[KEY_FORMAT]) << ",";
 	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
-  if (fs[KEY_FORMAT] == "image/jpeg") {
-    gstr_ss << "jpegdec ! ";
-  }
+  // if (fs[KEY_FORMAT] == "image/jpeg") {
+  //   gstr_ss << "jpegdec ! ";
+  // }
 	gstr_ss << "videoconvert ! appsink";
 
 	return gstr_ss.str();
