@@ -89,7 +89,10 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	using robot::types::jointid_t;
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
 		setMotorPos(Constants::JOINT_MOTOR_MAP.at(joint), targetPos);
-	} else {
+	} else if (joint == jointid_t::fourBarLinkage) {
+    setMotorPos(motorid_t::fourbar1, targetPos);
+    setMotorPos(motorid_t::fourbar2, targetPos);
+  } else {
 		LOG_F(WARNING, "setJointPos called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
 	}
