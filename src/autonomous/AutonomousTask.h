@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include <queue>
 
 namespace autonomous {
 
@@ -29,7 +30,8 @@ public:
 	 *
 	 * @param navtypes::pose_t The waypoint to navigate to
 	 */
-	void start(const navtypes::point_t&);
+	void start(std::queue<navtypes::point_t> waypoints);
+
 
 	/*
 	 * @brief Halts autonomous navigation by exiting the navigate() function and joining the
@@ -41,8 +43,8 @@ private:
 	/*
 	 * @brief Handles navigation to waypoint, called by start()
 	 */
+	std::queue<navtypes::point_t> _waypoint_queue;   
 	void navigate();
-
 	navtypes::point_t _waypoint_coords;
 	std::mutex _autonomous_task_mutex;
 	std::thread _autonomous_task_thread;

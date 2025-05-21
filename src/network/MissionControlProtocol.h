@@ -48,6 +48,7 @@ private:
 	void handleCameraStreamCloseRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
 	void handleWaypointNavRequest(const json& j);
+	void handleWaypointNavListRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
 	void sendArmIKEnabledReport(bool enabled);

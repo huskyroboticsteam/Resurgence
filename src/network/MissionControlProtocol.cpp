@@ -14,6 +14,7 @@
 #include <functional>
 #include <loguru.hpp>
 #include <unordered_set>
+#include <queue>
 
 using namespace robot::types;
 using namespace std::chrono_literals;
@@ -185,22 +186,56 @@ static bool validateWaypointNavRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
+	if(j.contains("points")) {
+		handleWaypointNavListRequest(j);
+		return;
+	}	
+	
 	float latitude = j["latitude"];
-	float longitude = j["longitude"];
-	bool isApproximate = j["isApproximate"];
-	bool isGate = j["isGate"];
-	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
-		// gpsToMeters will not use altitude
+    float longitude = j["longitude"];
+    bool isApproximate = j["isApproximate"];
+    bool isGate = j["isGate"];
+    if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
+        navtypes::gpscoords_t coords = {latitude, longitude, 0};
+        auto target = robot::gpsToMeters(coords);
+        if (target) {
+            std::queue<navtypes::point_t> single_point_queue;
+            single_point_queue.push(target.value());
+            _autonomous_task.start(std::move(single_point_queue));
+        } else {
+            LOG_F(WARNING, "No GPS converter initialized!");
+        }
+    } 
+}
+
+//add in some messages from mission control to the general stuff idk but yeah
+void MissionControlProtocol :: handleWaypointNavListRequest(const json& j) {
+	bool isApproximate = j.value("isApproximate", false);
+	bool isGate = j.value("isGate", false);
+	std::queue<navtypes::point_t> waypoint_queue;
+
+	for (const auto& point : j["points"]) {
+		float latitude = std::stof(point[0].get<std::string>());
+		float longitude = std::stof(point[1].get<std::string>());
+
 		navtypes::gpscoords_t coords = {latitude, longitude, 0};
-		auto target = robot::gpsToMeters(coords);
-		if (target) {
-			_autonomous_task.start(target.value());
+		auto maybe_target = robot::gpsToMeters(coords);
+
+		if (maybe_target) {
+			waypoint_queue.push(maybe_target.value());
+			LOG_F(INFO, "Current Target: (%lf, %lf)", latitude, longitude);
 		} else {
-			LOG_F(WARNING, "No GPS converter initialized!");
+			LOG_F(WARNING, "No GPS converter initialized for waypoint (%f, %f)", latitude, longitude);
+		}
+
+		if (!waypoint_queue.empty() && Globals::AUTONOMOUS && !isApproximate && !isGate) {
+			_autonomous_task.start(std::move(waypoint_queue));
+
 		}
 	}
 }
 
+	
 static bool validateJointPositionRequest(const json& j) {
 	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
 }
