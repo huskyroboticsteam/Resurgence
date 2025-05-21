@@ -203,8 +203,8 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 }
 
 static bool validateJointPositionRequest(const json& j) {
-	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
-}
+	return validateJoint(j);
+} 
 
 static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
@@ -212,7 +212,8 @@ static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 	using robot::types::jointid_t;
 	using robot::types::name_to_jointid;
 	std::string motor = j["joint"];
-	double position_deg = j["position"];
+	int position_deg = static_cast<int>(j["position"]);
+  printf("%i\n", position_deg);
 	int32_t position_mdeg = std::round(position_deg * 1000);
   // Set joint pos has checks already for checking whether the set joint pos
   // function works with the motor
