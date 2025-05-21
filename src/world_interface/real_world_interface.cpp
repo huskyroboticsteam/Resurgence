@@ -146,11 +146,6 @@ void world_interface_init(
   // Initialize Science Servo Board
 
   // For now, we can consider the board as a motor and just use it for its serial
-  motorid_t servo_board = motorid_t::scienceServoBoard;
-  std::shared_ptr<robot::base_motor> ptr =
-    std::make_shared<can_motor>(servo_board, false, motorSerialIDMap.at(servo_board),
-    motorGroupMap.at(servo_board), 0, 0);
-	motor_ptrs.insert({servo_board, ptr});
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
