@@ -573,7 +573,7 @@ var searchData=
   ['getmotion_570',['getMotion',['https://docs.opencv.org/4.2.0/d4/d2c/group__videostab__motion.html#ga1ea168631bcaeda9fb62aa5bab4dddd2',1,'cv::videostab::getMotion()'],['https://docs.opencv.org/4.2.0/d4/d2c/group__videostab__motion.html#ga1ea168631bcaeda9fb62aa5bab4dddd2',1,'getMotion()(Global Namespace)']]],
   ['getmotor_571',['getMotor',['../namespacerobot.html#a61bee8f61b7f31877ad21bbd9077f5a3',1,'robot']]],
   ['getmotorpos_572',['getMotorPos',['../classrobot_1_1base__motor.html#a13047ec43ba315940fd7697d6873f6ab',1,'robot::base_motor::getMotorPos()'],['../classrobot_1_1can__motor.html#a40bcbea7ff150352c01737b5e996d12b',1,'robot::can_motor::getMotorPos()'],['../classrobot_1_1sim__motor.html#ac851461753d761164a7bf43d56477030',1,'robot::sim_motor::getMotorPos()'],['../namespacerobot.html#ae800298bad4e0c54e8112edd16e860b5',1,'robot::getMotorPos()']]],
-  ['getmotorposition_573',['getMotorPosition',['../namespacecan_1_1motor.html#a566a73312d54f8c5e439e6c414fc7a5f',1,'can::motor']]],
+  ['getmotorposition_573',['getMotorPosition',['../namespacecan_1_1motor.html#ae09a1fb79556a26fec0dd91abce0c9ed',1,'can::motor']]],
   ['getmotorpositionsrad_574',['getMotorPositionsRad',['../namespacerobot.html#a6bb1735860af6a75595a33930d2ca6d9',1,'robot']]],
   ['getmotorserial_575',['getMotorSerial',['../classrobot_1_1can__motor.html#a8411b8ec09281a869deab04e635ef98c',1,'robot::can_motor']]],
   ['getmousewheeldelta_576',['getMouseWheelDelta',['https://docs.opencv.org/4.2.0/d7/dfc/group__highgui.html#gaedb513e6cf8623a976427be947c53c3f',1,'cv::getMouseWheelDelta()'],['https://docs.opencv.org/4.2.0/d7/dfc/group__highgui.html#gaedb513e6cf8623a976427be947c53c3f',1,'getMouseWheelDelta()(Global Namespace)']]],

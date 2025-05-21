@@ -171,7 +171,7 @@ var searchData=
   ['can_168',['can',['../namespacecan.html',1,'']]],
   ['can_3a_3amotor_169',['motor',['../namespacecan_1_1motor.html',1,'can']]],
   ['can_5fdescribe_170',['can_describe',['https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#acd80cf3f542d39ca2d1b5688e917aad3',1,'cv::can_describe(const GMetaArg &amp;meta, const GRunArg &amp;arg)'],['https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#adeef82445e8695e38c9eea17281a62c6',1,'cv::can_describe(const GMetaArgs &amp;metas, const GRunArgs &amp;args)']]],
-  ['can_5fmotor_171',['can_motor',['../classrobot_1_1can__motor.html',1,'robot::can_motor'],['../classrobot_1_1can__motor.html#ad9516b34a81d5bd06d337b0fc4bcc5e0',1,'robot::can_motor::can_motor()']]],
+  ['can_5fmotor_171',['can_motor',['../classrobot_1_1can__motor.html',1,'robot::can_motor'],['../classrobot_1_1can__motor.html#a9f930e52462ce0dc19e1b7d0a1f5bca2',1,'robot::can_motor::can_motor()']]],
   ['cancel_172',['cancel',['https://docs.opencv.org/4.2.0/d8/d11/classcv_1_1gapi_1_1wip_1_1GAsyncContext.html#a90ca03859848638a92ff5ab0780ce810',1,'cv::gapi::wip::GAsyncContext']]],
   ['cancreatealias_173',['canCreateAlias',['https://docs.opencv.org/4.2.0/d0/d4e/classcv_1_1ocl_1_1Image2D.html#a8c9dd58298eed71239fbf5da38e79480',1,'cv::ocl::Image2D']]],
   ['candescribe_174',['canDescribe',['https://docs.opencv.org/4.2.0/d0/d82/structcv_1_1GMatDesc.html#a4eb272351ccdf19f1236fc68bcc8a4be',1,'cv::GMatDesc::canDescribe(const cv::gapi::own::Mat &amp;mat) const'],['https://docs.opencv.org/4.2.0/d0/d82/structcv_1_1GMatDesc.html#af5ff4c580b9c3d2162ae4d6ff9c0537e',1,'cv::GMatDesc::canDescribe(const cv::Mat &amp;mat) const']]],

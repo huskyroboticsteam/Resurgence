@@ -261,11 +261,16 @@ const <a class="el" href="#a81cb1706e1f0e7c0639e231446ce4c9e">WorldInterface</a>
 <tr class="separator:ad2a31e2720609dd7619fc2bbafcf441e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04b54fc9d9d5912feb6dca13bd1bf223" id="r_a04b54fc9d9d5912feb6dca13bd1bf223"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04b54fc9d9d5912feb6dca13bd1bf223">encMotors</a></td></tr>
 <tr class="separator:a04b54fc9d9d5912feb6dca13bd1bf223"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c74d29e2b056935aee0a66650677151" id="r_a3c74d29e2b056935aee0a66650677151"><td class="memItemLeft" align="right" valign="top"><a id="a3c74d29e2b056935aee0a66650677151" name="a3c74d29e2b056935aee0a66650677151"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>FOURBAR_GEAR_RATIO</b> = 71.71875</td></tr>
+<tr class="separator:a3c74d29e2b056935aee0a66650677151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9acbcb79337aba8f5d847566cd2d9510" id="r_a9acbcb79337aba8f5d847566cd2d9510"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9acbcb79337aba8f5d847566cd2d9510">potMotors</a></td></tr>
 <tr class="separator:a9acbcb79337aba8f5d847566cd2d9510"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa66a3a3666eb218c89671933350db78f" id="r_aa66a3a3666eb218c89671933350db78f"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa66a3a3666eb218c89671933350db78f">motorSerialIDMap</a></td></tr>
 <tr class="memdesc:aa66a3a3666eb218c89671933350db78f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of motorids to their corresponding serial number.  <br /></td></tr>
 <tr class="separator:aa66a3a3666eb218c89671933350db78f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a119b8a6d52d3d6d759bff41d0e2cd7b9" id="r_a119b8a6d52d3d6d759bff41d0e2cd7b9"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a119b8a6d52d3d6d759bff41d0e2cd7b9">motorGroupMap</a></td></tr>
+<tr class="separator:a119b8a6d52d3d6d759bff41d0e2cd7b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1eaa5d6745c8aad93d6304c0f8b1821" id="r_ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1eaa5d6745c8aad93d6304c0f8b1821">motorPIDMap</a></td></tr>
 <tr class="memdesc:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mapping of PID controlled motors to their pid coefficients.  <br /></td></tr>
 <tr class="separator:ac1eaa5d6745c8aad93d6304c0f8b1821"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1050,8 +1055,44 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">        .ppjr = 4590 * 1024 * 4,</div>
 <div class="line">        .limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,</div>
 <div class="line">        .limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,</div>
-<div class="line">        .zeroCalibrationPower = 0.4}}</div>
+<div class="line">        .zeroCalibrationPower = 0.4}},</div>
 <div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a119b8a6d52d3d6d759bff41d0e2cd7b9" name="a119b8a6d52d3d6d759bff41d0e2cd7b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a119b8a6d52d3d6d759bff41d0e2cd7b9">&#9670;&#160;</a></span>motorGroupMap</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto robot::motorGroupMap</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;motorid_t, can::devicegroup_t&gt;(</div>
+<div class="line">    {{motorid_t::leftTread, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::rightTread, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::armBase, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::shoulder, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::elbow, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::forearm, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::wristDiffLeft, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::wristDiffRight, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::hand, can::devicegroup_t::motor},</div>
+<div class="line">     {motorid_t::drillActuator, can::devicegroup_t::science},</div>
+<div class="line">     {motorid_t::drillMotor, can::devicegroup_t::science},</div>
+<div class="line">     {motorid_t::fourbar1, can::devicegroup_t::science},</div>
+<div class="line">     {motorid_t::fourbar2, can::devicegroup_t::science}})</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1110,8 +1151,10 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">     {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},</div>
 <div class="line">     {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},</div>
 <div class="line">     {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},</div>
-<div class="line">     {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ARM_MOTOR},</div>
-<div class="line">     {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR}})</div>
+<div class="line">     {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},</div>
+<div class="line">     {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},</div>
+<div class="line">     {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},</div>
+<div class="line">     {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to their corresponding serial number. </p>
 
@@ -1147,7 +1190,9 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">                                                   {motorid_t::rightTread, 0.7},</div>
 <div class="line">                                                   {motorid_t::hand, -0.75},</div>
 <div class="line">                                                   {motorid_t::drillActuator, -0.5},</div>
-<div class="line">                                                   {motorid_t::drillMotor, 1.0}})</div>
+<div class="line">                                                   {motorid_t::drillMotor, -1.0},</div>
+<div class="line">                                                   {motorid_t::fourbar1, 0.15},</div>
+<div class="line">                                                   {motorid_t::fourbar2, 0.15}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to power scale factors when commanded with negative power. </p>
 <p>Negative values mean that the motor is inverted. </p>
@@ -1184,7 +1229,9 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">                                                   {motorid_t::rightTread, 0.7},</div>
 <div class="line">                                                   {motorid_t::hand, -0.75},</div>
 <div class="line">                                                   {motorid_t::drillActuator, -0.5},</div>
-<div class="line">                                                   {motorid_t::drillMotor, 1.0}})</div>
+<div class="line">                                                   {motorid_t::drillMotor, -1.0},</div>
+<div class="line">                                                   {motorid_t::fourbar1, 0.3},</div>
+<div class="line">                                                   {motorid_t::fourbar2, 0.3}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to power scale factors when commanded with positive power. </p>
 <p>Negative values mean that the motor is inverted. </p>
@@ -1217,6 +1264,7 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">     {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},</div>
 <div class="line">    {motorid_t::wristDiffRight,</div>
 <div class="line">     {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},</div>
+<div class="line">    {motorid_t::fourbar1, {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},</div>
 <div class="line">})</div>
 </div><!-- fragment -->
 </div>

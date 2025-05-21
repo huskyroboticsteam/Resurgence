@@ -127,9 +127,9 @@ Collaboration diagram for robot::can_motor:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad9516b34a81d5bd06d337b0fc4bcc5e0" id="r_ad9516b34a81d5bd06d337b0fc4bcc5e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9516b34a81d5bd06d337b0fc4bcc5e0">can_motor</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, bool hasPosSensor, <a class="el" href="namespacecan.html#ad9e11e8dde365a609487743b3ebf7cd0">can::deviceserial_t</a> serial, double pos_pwm_scale, double neg_pwm_scale)</td></tr>
-<tr class="memdesc:ad9516b34a81d5bd06d337b0fc4bcc5e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for can motor.  <br /></td></tr>
-<tr class="separator:ad9516b34a81d5bd06d337b0fc4bcc5e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f930e52462ce0dc19e1b7d0a1f5bca2" id="r_a9f930e52462ce0dc19e1b7d0a1f5bca2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f930e52462ce0dc19e1b7d0a1f5bca2">can_motor</a> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, bool hasPosSensor, <a class="el" href="namespacecan.html#ad9e11e8dde365a609487743b3ebf7cd0">can::deviceserial_t</a> serial, <a class="el" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">can::devicegroup_t</a> group, double pos_pwm_scale, double neg_pwm_scale)</td></tr>
+<tr class="memdesc:a9f930e52462ce0dc19e1b7d0a1f5bca2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for can motor.  <br /></td></tr>
+<tr class="separator:a9f930e52462ce0dc19e1b7d0a1f5bca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c6f8c9360ee2f37bf1a0a02d3df037f" id="r_a8c6f8c9360ee2f37bf1a0a02d3df037f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c6f8c9360ee2f37bf1a0a02d3df037f">setMotorPower</a> (double <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01468.html#ga52a0d4d0aad4e35cbcc82c8be1dfcebe">power</a>) override</td></tr>
 <tr class="memdesc:a8c6f8c9360ee2f37bf1a0a02d3df037f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the PWM command of the motor.  <br /></td></tr>
 <tr class="separator:a8c6f8c9360ee2f37bf1a0a02d3df037f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -193,8 +193,8 @@ static <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++
 <tr class="separator:afe9ed091e4a5dbc45bb00c7dd2651155 inherit pro_static_attribs_classrobot_1_1base__motor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad9516b34a81d5bd06d337b0fc4bcc5e0" name="ad9516b34a81d5bd06d337b0fc4bcc5e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad9516b34a81d5bd06d337b0fc4bcc5e0">&#9670;&#160;</a></span>can_motor()</h2>
+<a id="a9f930e52462ce0dc19e1b7d0a1f5bca2" name="a9f930e52462ce0dc19e1b7d0a1f5bca2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f930e52462ce0dc19e1b7d0a1f5bca2">&#9670;&#160;</a></span>can_motor()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -213,6 +213,11 @@ static <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="namespacecan.html#ad9e11e8dde365a609487743b3ebf7cd0">can::deviceserial_t</a></td>          <td class="paramname"><span class="paramname"><em>serial</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">can::devicegroup_t</a></td>          <td class="paramname"><span class="paramname"><em>group</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
