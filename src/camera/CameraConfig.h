@@ -50,6 +50,14 @@ const std::string KEY_NAME = "name";
    Config file key for camera description.
  */
 const std::string KEY_DESCRIPTION = "description";
+/**
+   Config file key for camera framerate.
+*/
+const std::string KEY_FRAMERATE = "framerate";
+/**
+   Config file key for camera format.
+*/
+const std::string KEY_FORMAT = "format";
 /**@}*/
 
 /**
