@@ -62,9 +62,9 @@ extern const CameraID WRIST_CAMERA_ID;
 extern const CameraID HAND_CAMERA_ID;
 extern const CameraID RAND_CAMERA_ID;
 extern const CameraID CJ1_CAMERA_ID;
-extern const CameraID CJ2_CAMERA_ID;
+extern const CameraID BOX_CAMERA_ID;
 extern const CameraID CJ3_CAMERA_ID;
-extern const CameraID CJ4_CAMERA_ID;
+extern const CameraID DRILL_CAMERA_ID;
 extern const CameraID MICROSCOPE_ID;
 
 extern const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS;

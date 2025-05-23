@@ -52,9 +52,9 @@ const robot::types::CameraID WRIST_CAMERA_ID = 30;
 const robot::types::CameraID MAST_CAMERA_ID = 40;
 const robot::types::CameraID RAND_CAMERA_ID = 50;
 const robot::types::CameraID CJ1_CAMERA_ID = 510;
-const robot::types::CameraID CJ2_CAMERA_ID = 520;
+const robot::types::CameraID BOX_CAMERA_ID = 520;
 const robot::types::CameraID CJ3_CAMERA_ID = 530;
-const robot::types::CameraID CJ4_CAMERA_ID = 540;
+const robot::types::CameraID DRILL_CAMERA_ID = 540;
 const robot::types::CameraID MICROSCOPE_ID = 500;
 
 const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
@@ -63,9 +63,9 @@ const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATH
    {MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
    {RAND_CAMERA_ID, "../camera-config/RandCameraCalibration.yml"},
    {CJ1_CAMERA_ID, "../camera-config/CJ1.yml"},
-   {CJ2_CAMERA_ID, "../camera-config/CJ2.yml"},
+   {BOX_CAMERA_ID, "../camera-config/BoxCamera.yml"},
    {CJ3_CAMERA_ID, "../camera-config/CJ3.yml"},
-   {CJ4_CAMERA_ID, "../camera-config/CJ4.yml"},
+   {DRILL_CAMERA_ID, "../camera-config/DrillCamera.yml"},
    {MICROSCOPE_ID, "../camera-config/Microscope.yml"},
 };
 
