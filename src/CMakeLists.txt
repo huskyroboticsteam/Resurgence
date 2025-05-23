@@ -111,6 +111,9 @@ link_libraries(loguru::loguru -ldl)
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
+# find LibTorch package for object detection
+find_package(Torch REQUIRED)
+
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()
@@ -354,6 +357,10 @@ endif()
 add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
+
+add_executable(object_detection object_detection/object_detection.cpp)
+target_link_libraries(object_detection "${TORCH_LIBRARIES}" ${OpenCV_LIBS})
+target_include_directories(object_detection PRIVATE ${OpenCV_INCLUDE_DIRS})
 
 if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration
