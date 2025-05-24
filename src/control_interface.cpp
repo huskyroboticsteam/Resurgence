@@ -202,6 +202,10 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
       setMotorPower(motorid_t::fourbar1, power);
       setMotorPower(motorid_t::fourbar2, power);
     }
+    else {
+      setMotorPower(motorid_t::fourbar1, power * 0.2);
+      setMotorPower(motorid_t::fourbar2, power * 0.2);
+    }
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
