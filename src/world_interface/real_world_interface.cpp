@@ -54,7 +54,7 @@ const kinematics::DiffDriveKinematics& driveKinematics() {
 
 namespace {
 // map that associates camera id to the camera object
-std::unordered_map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 
 callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
@@ -102,12 +102,18 @@ void initMotors() {
 	}
 }
 
-void openCamera(CameraID camID, const char* cameraPath) {
+std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
+	auto it = cameraMap.find(camID);
+	if (it != cameraMap.end()) {
+		auto cam = it->second.lock();
+		if (cam) { return cam; }
+	}
 	try {
 		auto cam = std::make_shared<cam::Camera>();
-		bool success = cam->openFromConfigFile(cameraPath);
+		bool success = cam->open(camID);
 		if (success) {
 			cameraMap[camID] = cam;
+			return cam;
 		} else {
 			LOG_F(ERROR, "Failed to open camera with id %s", util::to_string(camID).c_str());
 		}
@@ -115,12 +121,8 @@ void openCamera(CameraID camID, const char* cameraPath) {
 		LOG_F(ERROR, "Error opening camera with id %s:\n%s", util::to_string(camID).c_str(),
 			  e.what());
 	}
-}
 
-void setupCameras() {
-	openCamera(Constants::MAST_CAMERA_ID, Constants::MAST_CAMERA_CONFIG_PATH);
-	openCamera(Constants::FOREARM_CAMERA_ID, Constants::FOREARM_CAMERA_CONFIG_PATH);
-	openCamera(Constants::HAND_CAMERA_ID, Constants::HAND_CAMERA_CONFIG_PATH);
+	return nullptr;
 }
 } // namespace
 
@@ -128,13 +130,17 @@ void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors) {
 	if (!initOnlyMotors) {
-		setupCameras();
 		if (wsServer.has_value()) {
 			ardupilot::initArduPilotProtocol(wsServer.value());
 		}
 	}
 	can::initCAN();
 	initMotors();
+}
+
+std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
+	std::shared_ptr<cam::Camera> cam = openCamera_(cameraID);
+	return cam ? std::make_shared<types::CameraHandle>(cam) : nullptr;
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
@@ -166,9 +172,16 @@ std::unordered_set<CameraID> getCameras() {
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
-		return itr->second->hasNext(oldFrameNum);
+		// return itr->second->hasNext(oldFrameNum);
+		auto cam = itr->second.lock();
+		if (cam) {
+			return cam->hasNext(oldFrameNum);
+		} else {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return false;
+		}
 	} else {
-		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
+		// LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return false;
 	}
 }
@@ -176,10 +189,15 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
+		auto cam = itr->second.lock();
+		if (!cam) {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return DataPoint<CameraFrame>{};
+		}
 		cv::Mat mat;
 		uint32_t frameNum;
 		datatime_t time;
-		bool success = itr->second->next(mat, frameNum, time);
+		bool success = cam->next(mat, frameNum, time);
 		if (success) {
 			return DataPoint<CameraFrame>{time, {mat, frameNum}};
 		} else {
@@ -194,9 +212,14 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
-		auto camera = itr->second;
-		return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
-											: std::optional<cam::CameraParams>{};
+		auto camera = itr->second.lock();
+		if (camera) {
+			return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
+												: std::optional<cam::CameraParams>{};
+		} else {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return {};
+		}
 	} else {
 		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return {};
@@ -206,9 +229,14 @@ std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
-		auto camera = itr->second;
-		return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
-											: std::optional<cv::Mat>{};
+		auto camera = itr->second.lock();
+		if (camera) {
+			return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
+												: std::optional<cv::Mat>{};
+		} else {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return {};
+		}
 	} else {
 		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return {};
