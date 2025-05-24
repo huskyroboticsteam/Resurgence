@@ -6,6 +6,10 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 
+#include "../world_interface/world_interface.h"
+#include "../camera/Camera.h"
+#include "../Constants.h"
+
 // Function to preprocess a given image into the format required by the owl-vit model
 torch::Tensor preprocess(const cv::Mat& image) {
 	const std::vector<float> mean = {0.5, 0.5, 0.5};
@@ -154,11 +158,11 @@ void draw_detected_objects(cv::Mat& image, torch::Tensor logits, torch::Tensor b
 }
 
 int main(int argc, char* argv[]) {
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " <image_path>" << std::endl;
-		return -1;
-	}
-	char* image_path = argv[1];
+	// if (argc < 2) {
+	// 	std::cerr << "Usage: " << argv[0] << " <image_path>" << std::endl;
+	// 	return -1;
+	// }
+	// char* image_path = argv[1];
 
 	// Load the model
 	torch::jit::script::Module model;
@@ -173,19 +177,27 @@ int main(int argc, char* argv[]) {
 	}
 	std::cout << "Model loaded successfully\n";
 
-	cv::Mat img = cv::imread(image_path);
-	auto outputs = run_owlvit_model(model, img);
+	// cv::Mat img = cv::imread(image_path);
+	robot::openCamera(Constants::MAST_CAMERA_ID);
+	while(1) {
+		auto camDP = robot::readCamera(Constants::MAST_CAMERA_ID);
+		auto data = camDP.getData();
+		uint32_t& new_frame_num = data.second;
+		cv::Mat frame = data.first;
 
-	auto logits = outputs[0];
-	auto boxes = outputs[1];
+		auto outputs = run_owlvit_model(model, frame);
 
-	std::vector<std::string> class_names = {"no object", "orange mallet or hammer",
-											"water bottle"};
+		auto logits = outputs[0];
+		auto boxes = outputs[1];
 
-	draw_detected_objects(img, logits, boxes, class_names, 0.5);
+		std::vector<std::string> class_names = {"no object", "orange mallet or hammer",
+												"water bottle"};
 
-	cv::imshow("Detected Objects", img);
-	cv::waitKey(0);
+		draw_detected_objects(frame, logits, boxes, class_names, 0.5);
+
+		cv::imshow("Detected Objects", frame);
+	}
+	
 
 	return 0;
 }
