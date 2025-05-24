@@ -4,9 +4,12 @@
 #include "CameraParams.h"
 
 #include <iostream>
+#include <vector>
+#include <memory>
 
 #define DEFAULT_CAMERA_PATH "PATH"
 #define DEFAULT_CONFIG_PATH "PATH"
+#define NUMBER_OF_CAPS 10
 /**
  * @brief captures a frame from the panoramic camera
  * @param frame reference to cv::Mat to store frame
@@ -28,7 +31,7 @@ int main(int argc, char* argv[]) {
 
 	cv::VideoCapture cap;
 	cam::CameraParams PARAMS;
-	cv::Mat frame;
+    std::vector<std::shared_ptr<cv::Mat>> frames;
 
 	// set up the capture size
 	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
@@ -42,10 +45,16 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	if (capture_frame(cap, frame)) {
-		std::cout << "Captured an empty frame!" << std::endl;
-		return EXIT_FAILURE;
-	}
+    for (size_t i = 0; i < NUMBER_OF_CAPS; i++) {
+        std::shared_ptr<cv::Mat> frame = std::make_shared<cv::Mat>();
+        if (!capture_frame(cap, *frame)) {
+            std::cout << "Captured an empty frame!" << std::endl;
+            // continue;
+            return EXIT_FAILURE;
+        }
+        frames.push_back(frame);
+    }
+
 
 	return EXIT_SUCCESS;
 }
