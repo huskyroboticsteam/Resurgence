@@ -1,0 +1,10 @@
+%YAML:1.0
+---
+name: "CJ3"
+description: "Camera"
+# Make sure that this camera_id matches the one defined in the udev rules.
+camera_id: 530
+format: "image/jpeg"
+image_width: 1280
+image_height: 720
+framerate: 30
