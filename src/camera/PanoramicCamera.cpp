@@ -15,43 +15,43 @@
 bool capture_frame(cv::VideoCapture& cap, cv::Mat& frame);
 
 /**
- * cli arguments:   
+ * cli arguments:
  *      ./panoramic [camera_path] [config_path]
  */
 int main(int argc, char* argv[]) {
-    std::string camera_path = DEFAULT_CAMERA_PATH;
-    std::string config_path = DEFAULT_CONFIG_PATH;
-    if (argc == 3) {
-        camera_path = argv[1];
-        config_path = argv[2];
-    }
+	std::string camera_path = DEFAULT_CAMERA_PATH;
+	std::string config_path = DEFAULT_CONFIG_PATH;
+	if (argc == 3) {
+		camera_path = argv[1];
+		config_path = argv[2];
+	}
 
-    cv::VideoCapture cap;
-    cam::CameraParams PARAMS;
-    cv::Mat frame;
-    
-    // set up the capture size
-    cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
-    const int w = PARAMS.getImageSize().width;
+	cv::VideoCapture cap;
+	cam::CameraParams PARAMS;
+	cv::Mat frame;
+
+	// set up the capture size
+	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
+	const int w = PARAMS.getImageSize().width;
 	const int h = PARAMS.getImageSize().height;
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
 
-    if (!cap.open(camera_path)) {
-        std::cout << "Failed to open camera!" << std::endl;
-        return EXIT_FAILURE;
-    }
-    
-    if (capture_frame(cap, frame)) {
-        std::cout << "Captured an empty frame!"  << std::endl;
-        return EXIT_FAILURE;
-    }
+	if (!cap.open(camera_path)) {
+		std::cout << "Failed to open camera!" << std::endl;
+		return EXIT_FAILURE;
+	}
 
-    return EXIT_SUCCESS;
+	if (capture_frame(cap, frame)) {
+		std::cout << "Captured an empty frame!" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
 }
 
 bool capture_frame(cv::VideoCapture& cap, cv::Mat& frame) {
-    cap.grab();
-    cap.retrieve(frame);
-    return !frame.empty();
+	cap.grab();
+	cap.retrieve(frame);
+	return !frame.empty();
 }
