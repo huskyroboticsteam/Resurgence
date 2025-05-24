@@ -94,7 +94,8 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},
 	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
 	 {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
-	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2}});
+	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},
+	  motorid_t::lazySusanPosition, DEVICE_SERIAL_LAZY_SUSAN_POSITION}); // TODO: change to actual serial num.
 
 constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
 	{{motorid_t::leftTread, can::devicegroup_t::motor},
@@ -109,7 +110,8 @@ constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::device
 	 {motorid_t::drillActuator, can::devicegroup_t::science},
 	 {motorid_t::drillMotor, can::devicegroup_t::science},
 	 {motorid_t::fourbar1, can::devicegroup_t::science},
-	 {motorid_t::fourbar2, can::devicegroup_t::science}});
+	 {motorid_t::fourbar2, can::devicegroup_t::science},
+	 {motorid_t::lazySusanPosition, can::devicegroup_t::science}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
@@ -132,7 +134,8 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, -1.0},
 												   {motorid_t::fourbar1, 0.3},
-												   {motorid_t::fourbar2, 0.3}});
+												   {motorid_t::fourbar2, 0.3},
+												   {motorid_t::lazySusanPosition, 0}}); // TODO: change to actual pwm 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
@@ -150,6 +153,7 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, -1.0},
 												   {motorid_t::fourbar1, 0.15},
-												   {motorid_t::fourbar2, 0.15}});
+												   {motorid_t::fourbar2, 0.15}
+												   {motorid_t::lazySusanPosition, 0}}); // TODO: change to actual pwm 
 
 } // namespace robot

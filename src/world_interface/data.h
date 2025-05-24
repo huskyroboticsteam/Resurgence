@@ -67,7 +67,8 @@ enum class motorid_t {
 	drillActuator,
 	drillMotor,
 	fourbar1,
-	fourbar2
+	fourbar2,
+	lazySusanPosition,
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -90,13 +91,15 @@ enum class jointid_t {
 	ikUp,
 	fourBarLinkage,
 	drillActuator,
-	drillMotor
+	drillMotor,
+	lazySusanPosition
 };
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::ikForward,
-   jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor});
+     jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor,
+	 jointid_t::lazySusanPosition});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -110,7 +113,8 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"ikUp", jointid_t::ikUp},
 	 {"fourBarLinkage", jointid_t::fourBarLinkage},
 	 {"drillActuator", jointid_t::drillActuator},
-	 {"drillMotor", jointid_t::drillMotor}});
+	 {"drillMotor", jointid_t::drillMotor},
+	 {"lazySusanPosition", jointid_t::lazySusanPosition}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:

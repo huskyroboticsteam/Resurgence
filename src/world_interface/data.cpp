@@ -54,6 +54,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "drillActuator";
 		case jointid_t::drillMotor:
 			return "drillMotor";
+		case jointid_t::lazySusanPosition:
+			return "lazySusanPosition";
 		default:
 			// should never happen
 			return "<unknown>";
