@@ -130,7 +130,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		}
 	} else if (joint == jointid_t::fourBarLinkage) {
     robot::types::DataPoint<int32_t> angle = getMotorPos(motorid_t::fourbar1);
-    std::cout << angle << std::endl;
+    std::cout << "In milli degrees" << angle << std::endl;
+    std::cout << "In degrees" << angle / 1000 << std::endl;
 		return angle;
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
