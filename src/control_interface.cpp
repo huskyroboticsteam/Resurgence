@@ -128,7 +128,9 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 			return {};
 		}
 	} else if (joint == jointid_t::fourBarLinkage) {
-		return getMotorPos(motorid_t::fourbar1);
+    robot::types::DataPoint<int32_t> angle = getMotorPos(motorid_t::fourbar1);
+    std::cout << angle << std::endl;
+		return angle;
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
