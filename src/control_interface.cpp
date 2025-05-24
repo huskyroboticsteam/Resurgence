@@ -195,16 +195,16 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
 	} else if (joint == jointid_t::fourBarLinkage) {
-    std::cout <<getJointPos(jointid_t::fourBarLinkage).getData() << std::endl;
+    // std::cout <<getJointPos(jointid_t::fourBarLinkage).getData() << std::endl;
     // Important for later!!! make sure that cant go up further than 34 and make sure cant go downn after 230
-    if (getJointPos(jointid_t::fourBarLinkage).getData() > 34 && 
-        getJointPos(jointid_t::fourBarLinkage).getData() < 230) {
-      setMotorPower(motorid_t::fourbar1, power);
-      setMotorPower(motorid_t::fourbar2, power);
+    if (power < 0) {
+      setMotorPower(motorid_t::fourbar1, power * 0.8);
+      setMotorPower(motorid_t::fourbar2, power * 0.8);
     }
     else {
-      setMotorPower(motorid_t::fourbar1, power * 0.2);
-      setMotorPower(motorid_t::fourbar2, power * 0.2);
+      std::cout << power << std::endl;
+      setMotorPower(motorid_t::fourbar1, power * 1.2);
+      setMotorPower(motorid_t::fourbar2, power * 1.2);
     }
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
