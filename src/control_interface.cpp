@@ -90,6 +90,7 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
 		setMotorPos(Constants::JOINT_MOTOR_MAP.at(joint), targetPos);
 	} else if (joint == jointid_t::fourBarLinkage) {
+    std::cout << "trying to set the position" << std::endl;
     setMotorPos(motorid_t::fourbar1, targetPos);
     setMotorPos(motorid_t::fourbar2, targetPos);
   } else {
@@ -165,6 +166,9 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 								   Constants::arm::IK_MOTOR_JOINTS.end(),
 								   joint) != Constants::arm::IK_MOTOR_JOINTS.end();
 		if (!Globals::armIKEnabled || !isIKMotor) {
+      robot::types::DataPoint<int32_t> currAngleGeneric = 
+          getJointPos(joint);
+      std::cout << currAngleGeneric << std::endl;
 			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
 		}
 	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
