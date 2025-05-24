@@ -100,14 +100,6 @@ const double LANDMARK_WAYPOINT_RADIUS = Constants::ROBOT_LENGTH * 1.3;
 const double EPS = 2.0; // heuristic weight for weighted A*
 } // namespace Nav
 
-// Lidar
-namespace Lidar {
-const std::string RP_PATH = "/dev/ttyUSB0";
-const double MM_PER_M = 1000;
-const uint32_t RPLIDAR_A1_BAUDRATE = 115200;
-const uint32_t RPLIDAR_S1_BAUDRATE = 256000;
-} // namespace Lidar
-
 // Video encoding
 namespace video {
 const int H264_RF_CONSTANT = 40;

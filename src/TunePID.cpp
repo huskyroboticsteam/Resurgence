@@ -45,7 +45,6 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::wristDiffRight, "wristDiffRight"},
 	{motorid_t::wristDiffLeft, "wristDiffLeft"},
 	{motorid_t::hand, "hand"},
-	{motorid_t::activeSuspension, "activeSuspension"},
 	{motorid_t::drillActuator, "drillActuator"},
 	{motorid_t::drillMotor, "drillMotor"}};
 
@@ -60,20 +59,21 @@ void cleanup(int signum) {
 }
 
 bool initMotor(motorid_t motor) {
+	can::devicegroup_t group = robot::motorGroupMap.at(motor);
 	uint8_t serial = robot::motorSerialIDMap.at(motor);
 
 	if (robot::potMotors.find(motor) != robot::potMotors.end()) {
 		std::cout << "Initializing potentiometer parameters...\n";
 		robot::potparams_t pot_params = robot::potMotors.at(motor);
-		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
+		can::motor::initPotentiometer(group, serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi,
 									  robot::TELEM_PERIOD);
 	} else if (robot::encMotors.find(motor) != robot::encMotors.end()) {
 		std::cout << "Initializing encoder parameters...\n";
 		robot::encparams_t enc_params = robot::encMotors.at(motor);
-		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
+		can::motor::initEncoder(group, serial, enc_params.isInverted, true, enc_params.ppjr,
 								robot::TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
+		can::motor::setLimitSwitchLimits(group, serial, enc_params.limitSwitchLow,
 										 enc_params.limitSwitchHigh);
 	} else {
 		std::cerr << "The given motor is not a pot or enc motor!\n";
@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
 	std::string motor_name;
 	std::getline(std::cin, motor_name);
 	motorid_t motor = nameToMotorMap.at(motor_name);
+	can::devicegroup_t group = robot::motorGroupMap.at(motor);
 	uint8_t serial = robot::motorSerialIDMap.at(motor);
 
 	std::cout << "Enter amplitude (deg) > ";
@@ -129,13 +130,13 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, str);
 	int d_coeff = std::stoi(str);
 
-	can::motor::setMotorMode(serial, can::motor::motormode_t::pid);
-	can::motor::setMotorPIDConstants(serial, p_coeff, i_coeff, d_coeff);
+	can::motor::setMotorMode(group, serial, can::motor::motormode_t::pid);
+	can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
 
 	double period = 8.0;
 
 	std::this_thread::sleep_for(300ms); // wait for encoder position data to arrive
-	int32_t starting_angle = can::motor::getMotorPosition(serial);
+	int32_t starting_angle = can::motor::getMotorPosition(group, serial);
 	int32_t angle_target = starting_angle;
 	double acc_error = 0.0;
 	int total_steps = 0;
@@ -144,7 +145,7 @@ int main(int argc, char** argv) {
 	time_point<steady_clock> startTime = tp;
 	while (steady_clock::now() - startTime <
 		   3 * milliseconds(static_cast<int>(period * 1000))) {
-		int32_t current_angle = can::motor::getMotorPosition(serial).getData();
+		int32_t current_angle = can::motor::getMotorPosition(group, serial).getData();
 		double difference = (current_angle - angle_target) / 1000.0;
 		acc_error += difference * difference;
 		printf("Step %02d: target %05d actual %05d\n", total_steps, angle_target,
@@ -159,13 +160,13 @@ int main(int argc, char** argv) {
 		}
 		angle_target = (int32_t)round(amplitude * prescaled_target) + starting_angle;
 
-		can::motor::setMotorPIDTarget(serial, angle_target);
+		can::motor::setMotorPIDTarget(group, serial, angle_target);
 
 		tp += 20ms;
 		std::this_thread::sleep_until(tp);
 	}
-	can::motor::setMotorMode(serial, can::motor::motormode_t::pwm);
-	can::motor::setMotorPower(serial, 0.0);
+	can::motor::setMotorMode(group, serial, can::motor::motormode_t::pwm);
+	can::motor::setMotorPower(group, serial, 0.0);
 	std::cout << "RMSE: " << sqrt(acc_error / total_steps) << std::endl;
 	return 0;
 }

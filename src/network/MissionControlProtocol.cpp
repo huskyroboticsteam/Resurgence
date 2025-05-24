@@ -3,6 +3,7 @@
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../autonomous/AutonomousTask.h"
+#include "../base64/base64_img.h"
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../utils/json.h"
@@ -187,11 +188,11 @@ static bool validateWaypointNavRequest(const json& j) {
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	float latitude = j["latitude"];
 	float longitude = j["longitude"];
-	float altitude = j["altitude"];
 	bool isApproximate = j["isApproximate"];
 	bool isGate = j["isGate"];
 	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
-		navtypes::gpscoords_t coords = {latitude, longitude, altitude};
+		// gpsToMeters will not use altitude
+		navtypes::gpscoords_t coords = {latitude, longitude, 0};
 		auto target = robot::gpsToMeters(coords);
 		if (target) {
 			_autonomous_task.start(target.value());
@@ -233,6 +234,22 @@ static bool validateCameraStreamCloseRequest(const json& j) {
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
 	_camera_stream_task.closeStream(cam);
+}
+
+static bool validateCameraFrameRequest(const json& j) {
+	return util::validateKey(j, "camera", val_t::string);
+}
+
+void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
+	CameraID cam = j["camera"];
+	auto camDP = robot::readCamera(cam);
+	if (camDP) {
+		auto data = camDP.getData();
+		cv::Mat frame = data.first;
+		std::string b64_data = base64::encodeMat(frame, ".jpg");
+		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
+		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
@@ -324,6 +341,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		CAMERA_STREAM_CLOSE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamCloseRequest, this, _1),
 		validateCameraStreamCloseRequest);
+	this->addMessageHandler(
+		CAMERA_FRAME_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleCameraFrameRequest, this, _1),
+		validateCameraFrameRequest);
 	this->addMessageHandler(
 		WAYPOINT_NAV_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
