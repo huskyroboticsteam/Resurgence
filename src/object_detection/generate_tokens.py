@@ -1,4 +1,4 @@
-# Script to generate hard coded input tokens (Input IDs and Attention Masks) to prompt owl-vit
+#Script to generate hard coded input tokens(Input IDs and Attention Masks) to prompt owl - vit
 
 from transformers import OwlViTProcessor, OwlViTForObjectDetection, OwlViTConfig
 import torch
@@ -6,7 +6,7 @@ import torch
 model_name = "google/owlvit-base-patch32"
 processor = OwlViTProcessor.from_pretrained(model_name)
 
-# Move to GPU if available
+#Move to GPU if available
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 detector = OwlViTForObjectDetection.from_pretrained(model_name, config=OwlViTConfig(return_dict=False)).to(device)
 
