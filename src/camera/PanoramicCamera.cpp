@@ -15,8 +15,9 @@ extern "C" {
 }
 
 // opencv imports
-#include "../opencv4/opencv2/imgcodecs.hpp"
-#include "../opencv4/opencv2/stitching.hpp"
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/stitching.hpp>
 
 // standard library imports
 #include <iostream>
@@ -24,6 +25,7 @@ extern "C" {
 
 // CONSTANTS
 #define DEFAULT_CONFIG_PATH "~/Resurgence/camera-config/MastCameraCalibration.yml"
+#define COMPASS_PATH
 #define ASSUMED_FOV 60  // TODO: replace with real FOV of camera
 #define NUMBER_OF_CAPS 360 / ASSUMED_FOV
 #define STEPPER_ID 0  // TODO: replace with real value
@@ -43,6 +45,13 @@ bool save_frame(const cv::Mat& frame);
  * @return true on success
  */
 bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched);
+
+/**
+ * @brief adds the cardinal directions to a panoramic image
+ * @param panoramic the panoramic image
+ * @return true on success
+ */
+bool add_directions(cv::Mat& panoramic, double heading);
 
 /**
  * @brief captures a frame from the panoramic camera
@@ -65,9 +74,18 @@ void rotate_camera(uint8_t angle);
 int main(int argc, char* argv[]) {
     can::initCAN();
     
-	std::string config_path = DEFAULT_CONFIG_PATH;
-	if (argc == 2) {
-		config_path = argv[2];
+	// std::string config_path = DEFAULT_CONFIG_PATH;
+	if (argc < 2) {
+		std::cout << "You must provide the heading of the rover." << std::endl
+				  << "Usage: " << argv[0] << " heading" << std::endl;
+		return EXIT_FAILURE;
+	}
+	double heading = 0;
+	try {
+		heading = std::stod(argv[1]);
+	} catch (const std::invalid_argument& e) {
+		std::cout << "Unable to parse double for heading" << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	cv::VideoCapture cap;
@@ -113,16 +131,22 @@ int main(int argc, char* argv[]) {
 		rotate_camera(i * ASSUMED_FOV);
     }
 
-	cv::Mat stitched;
-	if (!stitch_frames(frames, stitched)) {
+	cv::Mat panoramic;
+	if (!stitch_frames(frames, panoramic)) {
 		std::cout << "Failed to stitch frames!" << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	if (!save_frame(stitched)) {
+	if (!add_directions(panoramic, heading)) {
+		std::cout << "Failed to add heading to the panoramic" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	if (!save_frame(panoramic)) {
 		std::cout << "Failed to save panoramic image to disk!" << std::endl;
 		return EXIT_FAILURE;
 	}
+
 
 	return EXIT_SUCCESS;
 }
@@ -134,7 +158,15 @@ bool save_frame(const cv::Mat& frame) {
 bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched) {
 	auto stitcher = cv::Stitcher::create();  // default mode is panoramic
 	cv::Stitcher::Status status = stitcher->stitch(frames, stitched);
-	if (status != cv::Stitcher::OK) return false;
+	return status == cv::Stitcher::OK;
+}
+
+bool add_directions(cv::Mat& panoramic, double heading) {	
+	cv::putText(panoramic, "N", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + panoramic.cols / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
+	cv::putText(panoramic, "S", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + (panoramic.cols * 3) / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
+	cv::putText(panoramic, "E", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + (panoramic.cols * 5) / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
+	cv::putText(panoramic, "W", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + (panoramic.cols * 7) / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
+
 	return true;
 }
 
