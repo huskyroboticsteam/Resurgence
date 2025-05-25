@@ -285,6 +285,8 @@ int main() {
 			}
 			std::this_thread::sleep_for(1s);
 		} else if (testMode == TestMode::ScienceServos) {
+			int servo_no = prompt("Enter servo no");
+			int degrees = prompt("Enter degrees");
 			AssembleScienceServoPacket(&p, science_group, 0x0, (uint8_t)servo_no,
 									   (uint8_t)degrees);
 			can::sendCANPacket(p);

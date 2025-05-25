@@ -23,11 +23,11 @@ extern "C" {
 #include <vector>
 
 // CONSTANTS
-#define DEFAULT_CONFIG_PATH "../../camera-config/MastCameraCalibration.yml"
-#define NUMBER_OF_CAPS 4
-#define STEPPER_ID 0  // TODO: replace with real value
+#define DEFAULT_CONFIG_PATH "~/Resurgence/camera-config/MastCameraCalibration.yml"
 #define ASSUMED_FOV 60  // TODO: replace with real FOV of camera
-#define SAVED_FILE_NAME "panoramic.jpg"
+#define NUMBER_OF_CAPS 360 / ASSUMED_FOV
+#define STEPPER_ID 0  // TODO: replace with real value
+#define SAVED_FILE_NAME "~/panoramic.jpg"
 
 /**
  * @brief saves a frame to disk
@@ -74,31 +74,43 @@ int main(int argc, char* argv[]) {
 	cam::CameraParams PARAMS;
     std::vector<cv::Mat> frames;
 
-	// set up the capture size
-	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
+	// set up parameters from file
+	// TODO: Figure out why the config file is not opening
+	// cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
+	// if (!cam_config.isOpened()) {
+	// 	std::cout << "Failed to open the camera config file: " << config_path << std::endl;
+	// 	return EXIT_FAILURE;
+	// }
+    // cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
+	// int camera_id = static_cast<int>(cam_config[cam::KEY_CAMERA_ID]);
+	// const int w = PARAMS.getImageSize().width;
+	// const int h = PARAMS.getImageSize().height;
 
-    cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
-	const int w = PARAMS.getImageSize().width;
-	const int h = PARAMS.getImageSize().height;
+	const int camera_id = 40;
+	const int w = 640;
+	const int h = 480;
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
 
-	if (!cam_config[cam::KEY_CAMERA_ID].empty() && !cap.open(static_cast<int>(cam_config[cam::KEY_CAMERA_ID]))) {
+	if (!cap.open(camera_id)) {
 		std::cout << "Failed to open camera!" << std::endl;
 		return EXIT_FAILURE;
 	}
 
+	// std::stringstream gst;
+	// gst << "v4l2src device=/dev/video40 ! image/jpeg,width=640,height=480,framerate=30/1 ! jpegdec ! videoconvert ! appsink";
+	// cap.open(40, gst, )
 
 	rotate_camera(0);
     for (size_t i = 0; i < NUMBER_OF_CAPS; i++) {
         cv::Mat frame;
         if (!capture_frame(cap, frame)) {
-            std::cout << "Captured an empty frame!" << std::endl;
+            std::cout << "Failed to capture a frame!" << std::endl;
             // continue;
             return EXIT_FAILURE;
         }
         frames.push_back(frame);
-		rotate_camera(i * 15);
+		rotate_camera(i * ASSUMED_FOV);
     }
 
 	cv::Mat stitched;
