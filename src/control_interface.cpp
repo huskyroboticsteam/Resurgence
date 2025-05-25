@@ -197,15 +197,17 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	} else if (joint == jointid_t::fourBarLinkage) {
     // std::cout <<getJointPos(jointid_t::fourBarLinkage).getData() << std::endl;
     // Important for later!!! make sure that cant go up further than 34 and make sure cant go downn after 230
-    if (power < 0) {
-      setMotorPower(motorid_t::fourbar1, power * 0.8);
-      setMotorPower(motorid_t::fourbar2, power * 0.8);
-    }
-    else {
-      std::cout << power << std::endl;
+    // if (power < 0) {
+    //   setMotorPower(motorid_t::fourbar1, power * 0.8);
+    //   setMotorPower(motorid_t::fourbar2, power * 0.8);
+    // }
+    // else {
+    //   std::cout << power << std::endl;
+    //   setMotorPower(motorid_t::fourbar1, power * 1.2);
+    //   setMotorPower(motorid_t::fourbar2, power * 1.2);
+    // }
       setMotorPower(motorid_t::fourbar1, power * 1.2);
       setMotorPower(motorid_t::fourbar2, power * 1.2);
-    }
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
