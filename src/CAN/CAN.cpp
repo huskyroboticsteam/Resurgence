@@ -285,6 +285,21 @@ void sendCANPacket(const CANPacket& packet) {
 	}
 }
 
+void printCANPacket(const CANPacket& packet) {
+  std::stringstream ss;
+  ss << "CAN: p" << ((packet.id >> 10) & 0x1);
+  ss << " g" << ((packet.id & 0x03C0) >> 6);
+  ss << " s" << ((packet.id & 0x003F));
+  ss << " pid" << (packet.data[0]);
+  ss << " data:";
+  for (int i = 3; i < packet.dlc; i++) {
+    ss << packet.data[i] << " ";
+  }
+  ss << "\n";
+
+  LOG_F(INFO, ss.str().c_str());
+}
+
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
 	std::shared_lock mapLock(telemMapMutex); // acquire read lock
 	// find entry for device in map

@@ -28,14 +28,16 @@ enum class TestMode {
 	Encoder,
 	LimitSwitch,
 	Telemetry,
-	ScienceServos
+	ScienceServos,
+  Stepper
 };
 
 std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::ModeSet),   static_cast<int>(TestMode::PWM),
 	static_cast<int>(TestMode::PID),	   static_cast<int>(TestMode::Encoder),
 	static_cast<int>(TestMode::PIDVel),	   static_cast<int>(TestMode::LimitSwitch),
-	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos)};
+	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos),
+  static_cast<int>(TestMode::Stepper)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -67,6 +69,7 @@ int main() {
 	ss << static_cast<int>(TestMode::LimitSwitch) << " for LIMIT SWITCH\n";
 	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
+  ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
@@ -290,6 +293,14 @@ int main() {
 			AssembleScienceServoPacket(&p, 0x7, 0x5, (uint8_t)servo_no,
 									   (uint8_t)degrees);
 			can::sendCANPacket(p);
-		}
+		} else if (testMode == TestMode::Stepper) {
+      int stepper = prompt("Enter stepper");
+      int angle = prompt("Enter angle");
+
+      CANPacket p;
+      AssembleScienceServoPacket(&p, 0x7, 0x3, stepper, angle);
+      can::sendCANPacket(p);
+      can::printCANPacket(p);
+    }
 	}
 }
