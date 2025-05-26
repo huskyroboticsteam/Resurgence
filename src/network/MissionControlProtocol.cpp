@@ -204,7 +204,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 
 static bool validateJointPositionRequest(const json& j) {
 	return validateJoint(j);
-} 
+}
 
 static void handleJointPositionRequest([[maybe_unused]] const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.

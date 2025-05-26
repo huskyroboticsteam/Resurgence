@@ -190,19 +190,16 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
 	} else if (joint == jointid_t::fourBarLinkage) {
-    int currAngle = getJointPos(jointid_t::fourBarLinkage).getData();
-    currAngle = currAngle / 1000;
+		int currAngle = getJointPos(jointid_t::fourBarLinkage).getData();
+		currAngle = currAngle / 1000;
 		if(currAngle > 320 || 
 			currAngle < 50) {
 			setMotorPower(motorid_t::fourbar1, power * 0.7);
 			setMotorPower(motorid_t::fourbar2, power * 0.7);
-		} 
-		else if (currAngle < 265 && power < 0){
+		} else if (currAngle < 265 && power < 0){
 			setMotorPower(motorid_t::fourbar1, -power);
 			setMotorPower(motorid_t::fourbar2, -power);
-		}
-		else
-		{
+		} else {
 			setMotorPower(motorid_t::fourbar1, power);
 			setMotorPower(motorid_t::fourbar2, power);
 		}		
