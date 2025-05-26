@@ -33,6 +33,15 @@ extern "C" {
 #define HOME_DIRECTORY "/home/huskyrobotics/"
 #define DEFAULT_CONFIG_PATH HOME_DIRECTORY "Resurgence/camera-config/MastCameraCalibration.yml"
 #define SAVED_FILE_NAME HOME_DIRECTORY "panoramic.bmp"
+#define DIRECTIONS_SIZE 2.0  // the size of the text for the cardinal directions
+
+/**
+ * @brief computes the mathematical mod of a number s.t. it is always positive
+ * @param dividend the value to be divided
+ * @param divisor the value to divide by
+ * @return the strictly positive remainder
+ */
+inline int pos_mod(int dividend, int divisor);
 
 /**
  * @brief sets up a camera in a cv::VideoCapture object
@@ -76,9 +85,11 @@ bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched);
 /**
  * @brief adds the cardinal directions to a panoramic image
  * @param panoramic the panoramic image
+ * @param heading the heading that the camera is facing
+ * @param cam_width the width of the pictures taken by the camera
  * @return true on success
  */
-bool add_directions(cv::Mat& panoramic, double heading);
+bool add_directions(cv::Mat& panoramic, double heading, int cam_width);
 
 /**
  * @brief captures a frame from the panoramic camera
@@ -98,9 +109,7 @@ void rotate_camera(int angle);
  * cli arguments:
  *      ./panoramic [camera_path] [r]
  */
-int main(int argc, char* argv[]) {
-    can::initCAN();
-    
+int main(int argc, char* argv[]) {    
 	// parse command line arguments
 	std::string config_path = DEFAULT_CONFIG_PATH;
 	if (argc < 2) {
@@ -147,6 +156,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (use_cam) {
+		can::initCAN();
+
 		// set up video capture
 		cv::VideoCapture cap;
 
@@ -181,10 +192,12 @@ int main(int argc, char* argv[]) {
 	}
 
 	std::cout << "Adding directions" << std::endl;
-	if (!add_directions(panoramic, heading)) {
+	if (!add_directions(panoramic, heading, frames[0].cols)) {
 		std::cout << "Failed to add heading to the panoramic" << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	// add scale here
 
 	std::cout << "Saving to disk" << std::endl;
 	if (!save_frame(panoramic)) {
@@ -193,6 +206,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	return EXIT_SUCCESS;
+}
+
+inline int pos_mod(int dividend, int divisor) {
+	return (dividend % divisor + divisor) % divisor;
 }
 
 bool set_up_camera(cv::VideoCapture& cap, std::string& config_path) {
@@ -255,12 +272,44 @@ bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched) {
 	return status == cv::Stitcher::OK;
 }
 
-bool add_directions(cv::Mat& panoramic, double heading) {	
-	cv::putText(panoramic, "N", cv::Point((heading / 360.0) * panoramic.rows + panoramic.rows / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
-	cv::putText(panoramic, "E", cv::Point((heading / 360.0) * panoramic.rows + (panoramic.rows * 3.0) / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
-	cv::putText(panoramic, "S", cv::Point((heading / 360.0) * panoramic.rows + (panoramic.rows * 5.0) / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
-	cv::putText(panoramic, "W", cv::Point((heading / 360.0) * panoramic.rows + (panoramic.rows * 7.0) / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
+bool add_directions(cv::Mat& panoramic, double heading, int cam_width) {
+	const int pixels_per_degree = panoramic.cols / CAPTURE_ANGLE;
+	const int starting_point = cam_width / 2;
 
+	int north, south, east, west;  // degrees relative to heading
+	north = heading;
+	east = heading + 90;
+	south = heading + 180;
+	west = heading + 270;
+	north = pos_mod(north, 360) * pixels_per_degree + starting_point;
+	east = pos_mod(east, 360) * pixels_per_degree + starting_point;
+	south = pos_mod(south, 360) * pixels_per_degree + starting_point;
+	west = pos_mod(west, 360) * pixels_per_degree + starting_point;
+
+	std::cout << "N: " << north << " "
+			  << "E: " << east << " "
+			  << "S: " << south << " "
+			  << "W: " << west << " "
+			  << std::endl;
+
+	const int height = 30 * DIRECTIONS_SIZE;
+
+	if (north > 0 && north < panoramic.cols) {
+		cv::putText(panoramic, "N", cv::Point(north, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
+	}
+
+	if (east > 0 && east < panoramic.cols) {
+		cv::putText(panoramic, "E", cv::Point(east, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
+	}
+
+	if (south > 0 && south < panoramic.cols) {
+		cv::putText(panoramic, "S", cv::Point(south, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
+	}
+	
+	if (west > 0 && west < panoramic.cols) {
+		cv::putText(panoramic, "W", cv::Point(west, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(100, 0, 0), 3);
+	}
+	
 	return true;
 }
 
