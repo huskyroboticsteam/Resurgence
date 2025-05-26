@@ -27,7 +27,7 @@ extern "C" {
 // CONSTANTS
 #define DEFAULT_CONFIG_PATH "/home/husky/Resurgence/camera-config/MastCameraCalibration.yml"
 #define COMPASS_PATH
-#define ASSUMED_FOV 15  // TODO: replace with real FOV of camera
+#define ASSUMED_FOV 15  // TODO: tune this value
 #define CAPTURE_ANGLE 180
 #define NUMBER_OF_CAPS CAPTURE_ANGLE / ASSUMED_FOV
 #define STEPPER_ID 1
@@ -114,7 +114,6 @@ int main(int argc, char* argv[]) {
 	cam::CameraParams PARAMS;
     std::vector<cv::Mat> frames;
 
-	// TODO: Figure out why the config file is not opening
 	// set up parameters from file
 	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
 	if (!cam_config.isOpened()) {
@@ -125,14 +124,11 @@ int main(int argc, char* argv[]) {
 	int camera_id = static_cast<int>(cam_config[cam::KEY_CAMERA_ID]);
 	const int w = PARAMS.getImageSize().width;
 	const int h = PARAMS.getImageSize().height;
-	// const int camera_id = 40;
-	// const int w = 640;
-	// const int h = 480;
 
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
 
-	if (!cap.open(camera_id)) {
+	if (!cap.open(camera_id, cv::CAP_V4L2)) {
 		std::cout << "Failed to open camera!" << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -157,6 +153,7 @@ int main(int argc, char* argv[]) {
 		}
     }
 
+	// save individual photos to disk
 	for (size_t i = 0; i < frames.size(); i++) {
 		std::stringstream filename_stream;
 		filename_stream << "/home/husky/image_" << i << ".bmp";
@@ -175,11 +172,11 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	// std::cout << "Adding directions" << std::endl;
-	// if (!add_directions(panoramic, heading)) {
-	// 	std::cout << "Failed to add heading to the panoramic" << std::endl;
-	// 	return EXIT_FAILURE;
-	// }
+	std::cout << "Adding directions" << std::endl;
+	if (!add_directions(panoramic, heading)) {
+		std::cout << "Failed to add heading to the panoramic" << std::endl;
+		return EXIT_FAILURE;
+	}
 	std::cout << heading << std::endl;
 
 	std::cout << "Saving to disk" << std::endl;
@@ -207,10 +204,10 @@ bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched) {
 }
 
 bool add_directions(cv::Mat& panoramic, double heading) {	
-	cv::putText(panoramic, "N", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + panoramic.cols / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
-	cv::putText(panoramic, "S", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + (panoramic.cols * 3) / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
-	cv::putText(panoramic, "E", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + (panoramic.cols * 5) / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
-	cv::putText(panoramic, "W", cv::Point((panoramic.rows * 5) / 6, (heading / 360) * panoramic.cols + (panoramic.cols * 7) / 8), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(0, 0, 0));
+	cv::putText(panoramic, "N", cv::Point((heading / 360.0) * panoramic.rows + panoramic.rows / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
+	cv::putText(panoramic, "E", cv::Point((heading / 360.0) * panoramic.rows + (panoramic.rows * 3.0) / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
+	cv::putText(panoramic, "S", cv::Point((heading / 360.0) * panoramic.rows + (panoramic.rows * 5.0) / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
+	cv::putText(panoramic, "W", cv::Point((heading / 360.0) * panoramic.rows + (panoramic.rows * 7.0) / 8.0, (panoramic.cols * 5.0) / 6.0), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 1.5, CV_RGB(255, 0, 0), 5);
 
 	return true;
 }
