@@ -25,12 +25,13 @@ extern "C" {
 #include <thread>
 
 // CONSTANTS
-#define DEFAULT_CONFIG_PATH "~/Resurgence/camera-config/MastCameraCalibration.yml"
+#define DEFAULT_CONFIG_PATH "/home/husky/Resurgence/camera-config/MastCameraCalibration.yml"
 #define COMPASS_PATH
-#define ASSUMED_FOV 60  // TODO: replace with real FOV of camera
-#define NUMBER_OF_CAPS 360 / ASSUMED_FOV
-#define STEPPER_ID 0  // TODO: replace with real value
-#define SAVED_FILE_NAME "~/panoramic.jpg"
+#define ASSUMED_FOV 15  // TODO: replace with real FOV of camera
+#define CAPTURE_ANGLE 180
+#define NUMBER_OF_CAPS CAPTURE_ANGLE / ASSUMED_FOV
+#define STEPPER_ID 1
+#define SAVED_FILE_NAME "/home/husky/panoramic.bmp"
 
 /**
  * @brief saves a frame to disk
@@ -38,6 +39,14 @@ extern "C" {
  * @return true on success
  */
 bool save_frame(const cv::Mat& frame);
+
+/**
+ * @brief saves a frame to disk
+ * @param frame the frame to be saved
+ * @param filename the name of the file to store the image
+ * @return true on success
+ */
+bool save_frame(const cv::Mat& frame, const std::string& filename);
 
 /**
  * @brief stitches together cv::Mat frames into a single panoramic image
@@ -66,21 +75,32 @@ bool capture_frame(cv::VideoCapture& cap, cv::Mat& frame);
  * @brief rotates the camera to a specific position
  * @param angle angle in degrees to rotate to
  */
-void rotate_camera(uint8_t angle);
+void rotate_camera(int angle);
 
 /**
  * cli arguments:
- *      ./panoramic [camera_path] [config_path]
+ *      ./panoramic [camera_path] [r]
  */
 int main(int argc, char* argv[]) {
     can::initCAN();
     
-	// std::string config_path = DEFAULT_CONFIG_PATH;
+	// parse command line arguments
+	std::string config_path = DEFAULT_CONFIG_PATH;
 	if (argc < 2) {
 		std::cout << "You must provide the heading of the rover." << std::endl
-				  << "Usage: " << argv[0] << " heading" << std::endl;
+				  << "Usage: " << argv[0] << " heading [r]" << std::endl;
 		return EXIT_FAILURE;
 	}
+	if (argc == 2) {
+
+	}
+
+	bool reverse = false;
+	if (argc > 2) {
+		reverse = true;
+		std::cout << "Running the camera motor in reverse!" << std::endl;
+	}
+
 	double heading = 0;
 	try {
 		heading = std::stod(argv[1]);
@@ -89,25 +109,26 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	// set up video capture
 	cv::VideoCapture cap;
 	cam::CameraParams PARAMS;
     std::vector<cv::Mat> frames;
 
-	// set up parameters from file
 	// TODO: Figure out why the config file is not opening
-	// cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
-	// if (!cam_config.isOpened()) {
-	// 	std::cout << "Failed to open the camera config file: " << config_path << std::endl;
-	// 	return EXIT_FAILURE;
-	// }
-    // cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
-	// int camera_id = static_cast<int>(cam_config[cam::KEY_CAMERA_ID]);
-	// const int w = PARAMS.getImageSize().width;
-	// const int h = PARAMS.getImageSize().height;
+	// set up parameters from file
+	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
+	if (!cam_config.isOpened()) {
+		std::cout << "Failed to open the camera config file: " << config_path << std::endl;
+		return EXIT_FAILURE;
+	}
+    cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
+	int camera_id = static_cast<int>(cam_config[cam::KEY_CAMERA_ID]);
+	const int w = PARAMS.getImageSize().width;
+	const int h = PARAMS.getImageSize().height;
+	// const int camera_id = 40;
+	// const int w = 640;
+	// const int h = 480;
 
-	const int camera_id = 40;
-	const int w = 640;
-	const int h = 480;
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
 
@@ -116,11 +137,8 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	// std::stringstream gst;
-	// gst << "v4l2src device=/dev/video40 ! image/jpeg,width=640,height=480,framerate=30/1 ! jpegdec ! videoconvert ! appsink";
-	// cap.open(40, gst, )
+	std::cout << "Taking photos" << std::endl;
 
-	rotate_camera(0);
     for (size_t i = 0; i < NUMBER_OF_CAPS; i++) {
         cv::Mat frame;
         if (!capture_frame(cap, frame)) {
@@ -129,20 +147,42 @@ int main(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
         frames.push_back(frame);
-		rotate_camera(ASSUMED_FOV);
+		
+		if (i != NUMBER_OF_CAPS - 1) {
+			if (reverse) {
+				rotate_camera(-ASSUMED_FOV);
+			} else {
+				rotate_camera(ASSUMED_FOV);
+			}
+		}
     }
 
+	for (size_t i = 0; i < frames.size(); i++) {
+		std::stringstream filename_stream;
+		filename_stream << "/home/husky/image_" << i << ".bmp";
+
+		std::string filename = filename_stream.str();
+		std::cout << "Saving " << filename << " to disk." << std::endl;
+		if (!save_frame(frames[i], filename)) {
+			std::cout << "Failed to save to disk!" << std::endl;
+		}
+	}
+
 	cv::Mat panoramic;
+	std::cout << "Stitching images" << std::endl;
 	if (!stitch_frames(frames, panoramic)) {
 		std::cout << "Failed to stitch frames!" << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	if (!add_directions(panoramic, heading)) {
-		std::cout << "Failed to add heading to the panoramic" << std::endl;
-		return EXIT_FAILURE;
-	}
+	// std::cout << "Adding directions" << std::endl;
+	// if (!add_directions(panoramic, heading)) {
+	// 	std::cout << "Failed to add heading to the panoramic" << std::endl;
+	// 	return EXIT_FAILURE;
+	// }
+	std::cout << heading << std::endl;
 
+	std::cout << "Saving to disk" << std::endl;
 	if (!save_frame(panoramic)) {
 		std::cout << "Failed to save panoramic image to disk!" << std::endl;
 		return EXIT_FAILURE;
@@ -153,7 +193,11 @@ int main(int argc, char* argv[]) {
 }
 
 bool save_frame(const cv::Mat& frame) {
-	return cv::imwrite(SAVED_FILE_NAME, frame);
+	return save_frame(frame, SAVED_FILE_NAME);
+}
+
+bool save_frame(const cv::Mat& frame, const std::string& filename) {
+	return cv::imwrite(filename, frame);
 }
 
 bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched) {
@@ -177,11 +221,11 @@ bool capture_frame(cv::VideoCapture& cap, cv::Mat& frame) {
 	return !frame.empty();
 }
 
-void rotate_camera(uint8_t angle) {
+void rotate_camera(int angle) {
 	using namespace std::chrono_literals;
     CANPacket p;
     uint8_t science_group = static_cast<int>(can::devicegroup_t::science);
-	AssembleScienceStepperTurnAnglePacket(&p, science_group, 0x0, STEPPER_ID, angle, 3);
-    can::sendCANPacket(p);
-	std::this_thread::sleep_for(500ms);  // make sure it's done spinning
+	AssembleScienceStepperTurnAnglePacket(&p, science_group, 0x3, STEPPER_ID, angle, 3);
+    can::sendCANPacket(p);  // TODO: uncomment to make it move
+	std::this_thread::sleep_for(50ms * ASSUMED_FOV);  // make sure it's done spinning
 }
