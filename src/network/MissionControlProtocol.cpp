@@ -203,7 +203,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 }
 
 static bool validateJointPositionRequest(const json& j) {
-	return validateJoint(j);
+	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
 }
 
 static void handleJointPositionRequest([[maybe_unused]] const json& j) {
