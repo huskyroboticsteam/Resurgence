@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
         frames.push_back(frame);
-		rotate_camera(i * ASSUMED_FOV);
+		rotate_camera(ASSUMED_FOV);
     }
 
 	cv::Mat panoramic;
