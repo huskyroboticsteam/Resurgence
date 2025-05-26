@@ -125,8 +125,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 			return {};
 		}
 	} else if (joint == jointid_t::fourBarLinkage) {
-    robot::types::DataPoint<int32_t> angle = getMotorPos(motorid_t::fourbar1);
-		return angle;
+		return getMotorPos(motorid_t::fourbar1);
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
@@ -161,9 +160,6 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 								   Constants::arm::IK_MOTOR_JOINTS.end(),
 								   joint) != Constants::arm::IK_MOTOR_JOINTS.end();
 		if (!Globals::armIKEnabled || !isIKMotor) {
-      robot::types::DataPoint<int32_t> currAngleGeneric = 
-          getJointPos(joint);
-      std::cout << currAngleGeneric << std::endl;
 			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
 		}
 	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
