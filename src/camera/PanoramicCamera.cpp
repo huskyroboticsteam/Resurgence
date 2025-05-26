@@ -1,6 +1,9 @@
 // https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html#tutorial_homography_Demo5
 // https://docs.opencv.org/4.x/d8/d19/tutorial_stitcher.html
 
+// the camera used is the ELP-USBFHD06H-L36
+// it has a focal length of 3.6mm, which equates to an FOV of 78 degrees
+
 // husky robotics imports
 #include "Camera.h"
 #include "CameraParams.h"
@@ -23,10 +26,12 @@ extern "C" {
 #include <iostream>
 #include <vector>
 #include <thread>
+#include <cmath>
 
 // CONSTANTS
 #define COMPASS_PATH
 #define ASSUMED_FOV 15  // TODO: tune this value
+#define CAMERA_FOV 78
 #define CAPTURE_ANGLE 180
 #define NUMBER_OF_CAPS CAPTURE_ANGLE / ASSUMED_FOV
 #define STEPPER_ID 1
@@ -48,7 +53,7 @@ inline int pos_mod(int dividend, int divisor);
  * @param cap where the video capture device to be used for image capture
  * @param config_path the path to the camera config file
  */
-bool set_up_camera(cv::VideoCapture& cap, std::string& config_path);
+bool set_up_camera(cv::VideoCapture& cap, const std::string& config_path);
 
 /**
  * @brief captures frames and puts them into a std::vector
@@ -92,6 +97,15 @@ bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched);
 bool add_directions(cv::Mat& panoramic, double heading, int cam_width);
 
 /**
+ * @brief adds a scale to corner to the top left of the image
+ * @param panoramic the panoramic image
+ * @param distance the distance from the landmark
+ * @param cam_width the width of the pictures taked by the camera
+ * @return true on success
+ */
+bool add_scale(cv::Mat& panoramic, int distance, int cam_width);
+
+/**
  * @brief captures a frame from the panoramic camera
  * @param cap the device to capture from
  * @param frame output reference to cv::Mat to store frame
@@ -106,23 +120,32 @@ bool capture_frame(cv::VideoCapture& cap, cv::Mat& frame);
 void rotate_camera(int angle);
 
 /**
- * cli arguments:
- *      ./panoramic [camera_path] [r]
+ * Usage:
+ *      ./panoramic heading distance [r/l] [image_1 image_2 ...]
  */
 int main(int argc, char* argv[]) {    
 	// parse command line arguments
 	std::string config_path = DEFAULT_CONFIG_PATH;
-	if (argc < 2) {
-		std::cout << "You must provide the heading of the rover." << std::endl
-		<< "Usage: " << argv[0] << " heading [r/l] [image_1 image_2 ...]" << std::endl;
+	if (argc < 3) {
+		std::cout << "ERROR: You must provide the heading AND distance of the rover." << std::endl
+		  		  << "Usage: " << std::endl
+				  << "\t" << argv[0] << " heading distance [r/l] [image_1 image_2 ...]" << std::endl;
 		return EXIT_FAILURE;
 	}
 	
-	double heading = 0;
+	double heading;
 	try {
 		heading = std::stod(argv[1]);
 	} catch (const std::invalid_argument& e) {
-		std::cout << "Unable to parse double for heading" << std::endl;
+		std::cout << "ERROR: Unable to parse double for heading" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	int distance;
+	try {
+		distance = std::stod(argv[2]);
+	} catch (const std::invalid_argument& e) {
+		std::cout << "ERROR: Unable to parse int for distance" << std::endl;
 		return EXIT_FAILURE;
 	}
 	
@@ -130,18 +153,18 @@ int main(int argc, char* argv[]) {
 	bool reverse = false;
 	std::vector<cv::Mat> frames;
 	
-	if (argc > 2) {
-		if (argv[2][0] == 'r') {
+	if (argc > 3) {
+		if (argv[3][0] == 'r') {
 			reverse = true;
-			std::cout << "Running the camera motor in reverse!" << std::endl;
-		} else if (argv[2][0]) {
+			std::cout << "WARNING: Running the camera motor in reverse!" << std::endl;
+		} else if (argv[3][0] == 'l') {
 			if (argc < 4) {
-				std::cout << "You must specify at least one image to stitch with." << std::endl;
+				std::cout << "ERROR: You must specify at least one image to stitch with." << std::endl;
 				return EXIT_FAILURE;
 			}
 			use_cam = false;
-			std::cout << "Running using local images." << std::endl;
-			for (int i = 3; i < argc; i++) {
+			std::cout << "WARNING: Running using local images." << std::endl;
+			for (int i = 4; i < argc; i++) {
 				char* image_path = argv[i];
 				std::cout << "Reading " << image_path << std::endl;
 
@@ -152,6 +175,9 @@ int main(int argc, char* argv[]) {
 				}
 				frames.push_back(image);
 			}
+		} else {
+			std::cout << "ERROR: Unrecognized command line argument \"" << argv[3] << "\"" << std::endl;
+			return EXIT_FAILURE;
 		}
 	}
 
@@ -180,28 +206,32 @@ int main(int argc, char* argv[]) {
 		std::string filename = filename_stream.str();
 		std::cout << "Saving " << filename << " to disk." << std::endl;
 		if (!save_frame(frames[i], filename)) {
-			std::cout << "Failed to save to disk!" << std::endl;
+			std::cout << "WARNING: Failed to image to disk!" << std::endl;
 		}
 	}
 
 	cv::Mat panoramic;
 	std::cout << "Stitching images" << std::endl;
 	if (!stitch_frames(frames, panoramic)) {
-		std::cout << "Failed to stitch frames!" << std::endl;
+		std::cout << "ERROR: Failed to stitch frames!" << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	std::cout << "Adding directions" << std::endl;
 	if (!add_directions(panoramic, heading, frames[0].cols)) {
-		std::cout << "Failed to add heading to the panoramic" << std::endl;
-		return EXIT_FAILURE;
+		std::cout << "WARNING: Failed to add heading to the panoramic" << std::endl;
+		// return EXIT_FAILURE;
 	}
 
-	// add scale here
+	std::cout << "Adding scale" << std::endl;
+	if (!add_scale(panoramic, distance, frames[0].cols)) {
+		std::cout << "WARNING: Failed to add scale bar to panoramic" << std::endl;
+		// return EXIT_FAILURE;
+	}
 
 	std::cout << "Saving to disk" << std::endl;
 	if (!save_frame(panoramic)) {
-		std::cout << "Failed to save panoramic image to disk!" << std::endl;
+		std::cout << "ERROR: Failed to save panoramic image to disk!" << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -212,7 +242,7 @@ inline int pos_mod(int dividend, int divisor) {
 	return (dividend % divisor + divisor) % divisor;
 }
 
-bool set_up_camera(cv::VideoCapture& cap, std::string& config_path) {
+bool set_up_camera(cv::VideoCapture& cap, const std::string& config_path) {
 	cam::CameraParams PARAMS;
 		
 	// set up parameters from file
@@ -307,9 +337,21 @@ bool add_directions(cv::Mat& panoramic, double heading, int cam_width) {
 	}
 	
 	if (west > 0 && west < panoramic.cols) {
-		cv::putText(panoramic, "W", cv::Point(west, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(100, 0, 0), 3);
+		cv::putText(panoramic, "W", cv::Point(west, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
 	}
 	
+	return true;
+}
+
+bool add_scale(cv::Mat& panoramic, int distance, int cam_width) {
+	double meters_per_pixel = (2.0 * std::tan(CAMERA_FOV / 2.0) * distance) / cam_width;
+	int scale_width = 200;  // TODO: Have the scale width equal to a power of 10
+	int scale_distance = static_cast<int>(meters_per_pixel * scale_width);
+	const int scale_offset = 25;
+	std::cout << "MPP: " << meters_per_pixel << " scale_distance: " << scale_distance;
+	cv::line(panoramic, cv::Point(scale_offset, scale_offset), cv::Point(scale_offset + scale_width, scale_offset), CV_RGB(0, 255, 0), 2);
+	cv::putText(panoramic, std::to_string(scale_distance) + " meters", cv::Point(scale_offset, scale_offset + 25), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(0, 255, 0), 2);
+
 	return true;
 }
 
@@ -324,6 +366,6 @@ void rotate_camera(int angle) {
     CANPacket p;
     uint8_t science_group = static_cast<int>(can::devicegroup_t::science);
 	AssembleScienceStepperTurnAnglePacket(&p, science_group, 0x3, STEPPER_ID, angle, 3);
-    can::sendCANPacket(p);  // TODO: uncomment to make it move
-	std::this_thread::sleep_for(50ms * ASSUMED_FOV);  // make sure it's done spinning
+    can::sendCANPacket(p);
+	std::this_thread::sleep_for(100ms * ASSUMED_FOV);  // make sure it's done spinning
 }
