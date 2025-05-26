@@ -208,21 +208,17 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	int currAngle = getJointPos(jointid_t::fourBarLinkage).getData();
 	currAngle = currAngle / 1000;
 std::cout << "In degrees" << currAngle << std::endl;
-		if(currAngle > 300 || 
+		if(currAngle > 320 || 
 			currAngle < 50) {
-			std::cout <<"slow" <<std::endl;
-			setMotorPower(motorid_t::fourbar1, power * 1);
-			setMotorPower(motorid_t::fourbar2, power * 1);
+			setMotorPower(motorid_t::fourbar1, power * 0.7);
+			setMotorPower(motorid_t::fourbar2, power * 0.7);
 		} 
-		else if (currAngle > 280){
-			std::cout <<"counter" <<std::endl;
-			setMotorPower(motorid_t::fourbar1, -power * 3);
-			setMotorPower(motorid_t::fourbar2, -power * 3);
+		else if (currAngle < 265 && power < 0){
+			setMotorPower(motorid_t::fourbar1, -power);
+			setMotorPower(motorid_t::fourbar2, -power);
 		}
 		else
 		{
-			std::cout <<"else" <<std::endl;
-
 			setMotorPower(motorid_t::fourbar1, power);
 			setMotorPower(motorid_t::fourbar2, power);
 		}		
