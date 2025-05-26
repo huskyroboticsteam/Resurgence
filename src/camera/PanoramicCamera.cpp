@@ -25,13 +25,30 @@ extern "C" {
 #include <thread>
 
 // CONSTANTS
-#define DEFAULT_CONFIG_PATH "/home/husky/Resurgence/camera-config/MastCameraCalibration.yml"
 #define COMPASS_PATH
 #define ASSUMED_FOV 15  // TODO: tune this value
 #define CAPTURE_ANGLE 180
 #define NUMBER_OF_CAPS CAPTURE_ANGLE / ASSUMED_FOV
 #define STEPPER_ID 1
-#define SAVED_FILE_NAME "/home/husky/panoramic.bmp"
+#define HOME_DIRECTORY "/home/huskyrobotics/"
+#define DEFAULT_CONFIG_PATH HOME_DIRECTORY "Resurgence/camera-config/MastCameraCalibration.yml"
+#define SAVED_FILE_NAME HOME_DIRECTORY "panoramic.bmp"
+
+/**
+ * @brief sets up a camera in a cv::VideoCapture object
+ * @param cap where the video capture device to be used for image capture
+ * @param config_path the path to the camera config file
+ */
+bool set_up_camera(cv::VideoCapture& cap, std::string& config_path);
+
+/**
+ * @brief captures frames and puts them into a std::vector
+ * @param cap the image capture device
+ * @param reverse whether or not the motor should be driven in reverse
+ * @param frames where the frames should be stored
+ * @return true on success
+ */
+bool capture_frames(cv::VideoCapture& cap, bool reverse, std::vector<cv::Mat>& frames);
 
 /**
  * @brief saves a frame to disk
@@ -88,19 +105,10 @@ int main(int argc, char* argv[]) {
 	std::string config_path = DEFAULT_CONFIG_PATH;
 	if (argc < 2) {
 		std::cout << "You must provide the heading of the rover." << std::endl
-				  << "Usage: " << argv[0] << " heading [r]" << std::endl;
+		<< "Usage: " << argv[0] << " heading [r/l] [image_1 image_2 ...]" << std::endl;
 		return EXIT_FAILURE;
 	}
-	if (argc == 2) {
-
-	}
-
-	bool reverse = false;
-	if (argc > 2) {
-		reverse = true;
-		std::cout << "Running the camera motor in reverse!" << std::endl;
-	}
-
+	
 	double heading = 0;
 	try {
 		heading = std::stod(argv[1]);
@@ -108,55 +116,55 @@ int main(int argc, char* argv[]) {
 		std::cout << "Unable to parse double for heading" << std::endl;
 		return EXIT_FAILURE;
 	}
+	
+	bool use_cam = true;
+	bool reverse = false;
+	std::vector<cv::Mat> frames;
+	
+	if (argc > 2) {
+		if (argv[2][0] == 'r') {
+			reverse = true;
+			std::cout << "Running the camera motor in reverse!" << std::endl;
+		} else if (argv[2][0]) {
+			if (argc < 4) {
+				std::cout << "You must specify at least one image to stitch with." << std::endl;
+				return EXIT_FAILURE;
+			}
+			use_cam = false;
+			std::cout << "Running using local images." << std::endl;
+			for (int i = 3; i < argc; i++) {
+				char* image_path = argv[i];
+				std::cout << "Reading " << image_path << std::endl;
 
-	// set up video capture
-	cv::VideoCapture cap;
-	cam::CameraParams PARAMS;
-    std::vector<cv::Mat> frames;
-
-	// set up parameters from file
-	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
-	if (!cam_config.isOpened()) {
-		std::cout << "Failed to open the camera config file: " << config_path << std::endl;
-		return EXIT_FAILURE;
-	}
-    cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
-	int camera_id = static_cast<int>(cam_config[cam::KEY_CAMERA_ID]);
-	const int w = PARAMS.getImageSize().width;
-	const int h = PARAMS.getImageSize().height;
-
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
-
-	if (!cap.open(camera_id, cv::CAP_V4L2)) {
-		std::cout << "Failed to open camera!" << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	std::cout << "Taking photos" << std::endl;
-
-    for (size_t i = 0; i < NUMBER_OF_CAPS; i++) {
-        cv::Mat frame;
-        if (!capture_frame(cap, frame)) {
-            std::cout << "Failed to capture a frame!" << std::endl;
-            // continue;
-            return EXIT_FAILURE;
-        }
-        frames.push_back(frame);
-		
-		if (i != NUMBER_OF_CAPS - 1) {
-			if (reverse) {
-				rotate_camera(-ASSUMED_FOV);
-			} else {
-				rotate_camera(ASSUMED_FOV);
+				cv::Mat image = cv::imread(image_path, cv::IMREAD_COLOR);
+				if (image.empty()) {
+					std::cout << "WARNING: This image could not be read, skipping." << std::endl;
+					return EXIT_FAILURE;
+				}
+				frames.push_back(image);
 			}
 		}
-    }
+	}
+
+	if (use_cam) {
+		// set up video capture
+		cv::VideoCapture cap;
+
+		std::cout << "Setting up camera." << std::endl;
+		if (!set_up_camera(cap, config_path)) {
+			return EXIT_FAILURE;
+		}
+
+		std::cout << "Taking photos." << std::endl;
+		if (!capture_frames(cap, reverse, frames)) {
+			return EXIT_FAILURE;
+		}	
+	}
 
 	// save individual photos to disk
-	for (size_t i = 0; i < frames.size(); i++) {
+	for (size_t i = 0; i < (frames.size() && use_cam); i++) {
 		std::stringstream filename_stream;
-		filename_stream << "/home/husky/image_" << i << ".bmp";
+		filename_stream << HOME_DIRECTORY "image_" << i << ".bmp";
 
 		std::string filename = filename_stream.str();
 		std::cout << "Saving " << filename << " to disk." << std::endl;
@@ -177,7 +185,6 @@ int main(int argc, char* argv[]) {
 		std::cout << "Failed to add heading to the panoramic" << std::endl;
 		return EXIT_FAILURE;
 	}
-	std::cout << heading << std::endl;
 
 	std::cout << "Saving to disk" << std::endl;
 	if (!save_frame(panoramic)) {
@@ -185,8 +192,53 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-
 	return EXIT_SUCCESS;
+}
+
+bool set_up_camera(cv::VideoCapture& cap, std::string& config_path) {
+	cam::CameraParams PARAMS;
+		
+	// set up parameters from file
+	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
+	if (!cam_config.isOpened()) {
+		std::cout << "Failed to open the camera config file: " << config_path << std::endl;
+		return false;
+	}
+	cam_config[cam::KEY_INTRINSIC_PARAMS] >> PARAMS;
+	int camera_id = static_cast<int>(cam_config[cam::KEY_CAMERA_ID]);
+	const int w = PARAMS.getImageSize().width;
+	const int h = PARAMS.getImageSize().height;
+
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
+
+	if (!cap.open(camera_id, cv::CAP_V4L2)) {
+		std::cout << "Failed to open camera!" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+bool capture_frames(cv::VideoCapture& cap, bool reverse, std::vector<cv::Mat>& frames) {
+	for (size_t i = 0; i < NUMBER_OF_CAPS; i++) {
+		cv::Mat frame;
+		if (!capture_frame(cap, frame)) {
+			std::cout << "ERROR: Failed to capture a frame!" << std::endl;
+			// continue;
+			return false;
+		}
+		frames.push_back(frame);
+		
+		if (i != NUMBER_OF_CAPS - 1) {
+			if (reverse) {
+				rotate_camera(-ASSUMED_FOV);
+			} else {
+				rotate_camera(ASSUMED_FOV);
+			}
+		}
+	}
+	return true;
 }
 
 bool save_frame(const cv::Mat& frame) {
