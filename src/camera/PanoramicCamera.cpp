@@ -22,6 +22,7 @@ extern "C" {
 // standard library imports
 #include <iostream>
 #include <vector>
+#include <thread>
 
 // CONSTANTS
 #define DEFAULT_CONFIG_PATH "~/Resurgence/camera-config/MastCameraCalibration.yml"
@@ -177,9 +178,10 @@ bool capture_frame(cv::VideoCapture& cap, cv::Mat& frame) {
 }
 
 void rotate_camera(uint8_t angle) {
+	using namespace std::chrono_literals;
     CANPacket p;
     uint8_t science_group = static_cast<int>(can::devicegroup_t::science);
-
 	AssembleScienceStepperTurnAnglePacket(&p, science_group, 0x0, STEPPER_ID, angle, 3);
     can::sendCANPacket(p);
+	std::this_thread::sleep_for(500ms);  // make sure it's done spinning
 }
