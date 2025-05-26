@@ -130,7 +130,6 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		}
 	} else if (joint == jointid_t::fourBarLinkage) {
     robot::types::DataPoint<int32_t> angle = getMotorPos(motorid_t::fourbar1);
-    std::cout << "In degrees" << angle.getData() / 1000 << std::endl;
 		return angle;
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
@@ -206,8 +205,28 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
     //   setMotorPower(motorid_t::fourbar1, power * 1.2);
     //   setMotorPower(motorid_t::fourbar2, power * 1.2);
     // }
-      setMotorPower(motorid_t::fourbar1, power * 1.2);
-      setMotorPower(motorid_t::fourbar2, power * 1.2);
+	int currAngle = getJointPos(jointid_t::fourBarLinkage).getData();
+	currAngle = currAngle / 1000;
+std::cout << "In degrees" << currAngle << std::endl;
+		if(currAngle > 300 || 
+			currAngle < 50) {
+			std::cout <<"slow" <<std::endl;
+			setMotorPower(motorid_t::fourbar1, power * 1);
+			setMotorPower(motorid_t::fourbar2, power * 1);
+		} 
+		else if (currAngle > 280){
+			std::cout <<"counter" <<std::endl;
+			setMotorPower(motorid_t::fourbar1, -power * 3);
+			setMotorPower(motorid_t::fourbar2, -power * 3);
+		}
+		else
+		{
+			std::cout <<"else" <<std::endl;
+
+			setMotorPower(motorid_t::fourbar1, power);
+			setMotorPower(motorid_t::fourbar2, power);
+		}		
+
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());
