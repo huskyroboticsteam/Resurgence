@@ -287,15 +287,14 @@ void sendCANPacket(const CANPacket& packet) {
 
 void printCANPacket(const CANPacket& packet) {
   std::stringstream ss;
-  ss << "CAN: p" << ((packet.id >> 10) & 0x1);
-  ss << " g" << ((packet.id & 0x03C0) >> 6);
-  ss << " s" << ((packet.id & 0x003F));
-  ss << " pid" << (packet.data[0]);
+  ss << "CAN: p" << std::hex << ((packet.id >> 10) & 0x1);
+  ss << " g" << std::hex << ((packet.id & 0x03C0) >> 6);
+  ss << " s" << std::hex << ((packet.id & 0x003F));
+  ss << " pid" << std::hex << static_cast<uint>(packet.data[0]);
   ss << " data:";
-  for (int i = 3; i < packet.dlc; i++) {
-    ss << packet.data[i] << " ";
+  for (int i = 1; i < packet.dlc; i++) {
+    ss << std::hex << static_cast<uint>(packet.data[i]) << " ";
   }
-  ss << "\n";
 
   LOG_F(INFO, ss.str().c_str());
 }

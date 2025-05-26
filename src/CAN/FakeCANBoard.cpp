@@ -298,7 +298,7 @@ int main() {
       int angle = prompt("Enter angle");
 
       CANPacket p;
-      AssembleScienceServoPacket(&p, 0x7, 0x3, stepper, angle);
+      AssembleScienceStepperTurnAnglePacket(&p, 0x7, 0x4, stepper, angle, 0x3);
       can::sendCANPacket(p);
       can::printCANPacket(p);
     }
