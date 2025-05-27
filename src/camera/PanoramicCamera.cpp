@@ -32,12 +32,12 @@ extern "C" {
 #include <cmath>
 
 // CONSTANTS
-#define PANO_THRESHOLD 0.3f  // panoramic confidence threshold
-#define MATCH_CONFIDENCE 0.3f  // match confidence
+#define PANO_THRESHOLD 1.0f  // panoramic confidence threshold, 1.0 is default (.1)
+#define MATCH_CONFIDENCE 0.3f  // match confidence, 0.3 is default (.5)
 #define ASSUMED_FOV 30  // TODO: tune this value
 #define CAMERA_FOV 78
-#define CAPTURE_ANGLE 270
-#define NUMBER_OF_CAPS CAPTURE_ANGLE / ASSUMED_FOV
+#define NUMBER_OF_CAPS 9
+#define CAPTURE_ANGLE ASSUMED_FOV * NUMBER_OF_CAPS
 #define STEPPER_ID 1
 #define HOME_DIRECTORY "/home/husky/"  // for the rover
 // #define HOME_DIRECTORY "/home/huskyrobotics/"  // for the laptops
