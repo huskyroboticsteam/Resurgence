@@ -23,6 +23,7 @@ extern "C" {
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/stitching.hpp>
+#include <opencv2/stitching/detail/matchers.hpp>
 
 // standard library imports
 #include <iostream>
@@ -31,7 +32,8 @@ extern "C" {
 #include <cmath>
 
 // CONSTANTS
-#define PANO_THRESHOLD 0.5  // panoramic confidence threshold
+#define PANO_THRESHOLD 0.3f  // panoramic confidence threshold
+#define MATCH_CONFIDENCE 0.3f  // match confidence
 #define ASSUMED_FOV 30  // TODO: tune this value
 #define CAMERA_FOV 78
 #define CAPTURE_ANGLE 270
@@ -307,6 +309,8 @@ bool save_frame(const cv::Mat& frame, const std::string& filename) {
 
 bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched) {
 	auto stitcher = cv::Stitcher::create();  // default mode is panoramic
+	cv::Ptr<cv::detail::FeaturesMatcher> matcher = cv::makePtr<cv::detail::BestOf2NearestRangeMatcher>(1, true, MATCH_CONFIDENCE);
+	stitcher->setFeaturesMatcher(matcher);
 	stitcher->setPanoConfidenceThresh(PANO_THRESHOLD);
 	cv::Stitcher::Status status = stitcher->stitch(frames, stitched);
 	switch (status) {
