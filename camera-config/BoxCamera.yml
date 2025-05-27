@@ -1,6 +1,6 @@
 %YAML:1.0
 ---
-name: "CJ2"
+name: "box"
 description: "Box Camera"
 # Make sure that this camera_id matches the one defined in the udev rules.
 camera_id: 520
