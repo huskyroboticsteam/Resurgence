@@ -149,7 +149,7 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, -1.0},
-												   {motorid_t::fourbar1, 0.15},
-												   {motorid_t::fourbar2, 0.15}});
+												   {motorid_t::fourbar1, 0.3},
+												   {motorid_t::fourbar2, 0.3}});
 
 } // namespace robot
