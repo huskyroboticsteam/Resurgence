@@ -36,9 +36,16 @@ kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+  double posScale = 0;
+  double negScale = 0;
+
 	// get scales for motor
-	double posScale = positive_pwm_scales.at(motor);
-	double negScale = negative_pwm_scales.at(motor);
+  try {
+    posScale = positive_pwm_scales.at(motor);
+    negScale = negative_pwm_scales.at(motor);
+  } catch (const std::out_of_range& err) {
+    LOG_F(ERROR, "Couldn't find PWM scales for motor 0x%x", static_cast<uint8_t>(motor));
+  }
 
 	// create ptr and insert in map
 	std::shared_ptr<robot::base_motor> ptr =
@@ -136,6 +143,10 @@ void world_interface_init(
 	}
 	can::initCAN();
 	initMotors();
+
+  // Initialize Science Servo Board
+
+  // For now, we can consider the board as a motor and just use it for its serial
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -286,6 +297,22 @@ types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
+}
+
+void setServoPos(robot::types::servoid_t servo, int32_t position) {
+  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
+  auto servo_num = servoid_to_servo_num.find(servo);
+  if (servo_num != servoid_to_servo_num.end()) {
+  	servo_board->setServoPos(servo_num->second, position);
+  }
+}
+
+void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
+  std::shared_ptr<robot::base_motor> stepper_board = getMotor(motorid_t::scienceStepperBoard);
+  auto stepper_num = stepperid_to_stepper_num.find(stepper);
+  if (stepper_num != stepperid_to_stepper_num.end()) {
+    stepper_board->setStepperTurnAngle(stepper_num->second, angle);
+  }
 }
 
 // TODO: implement

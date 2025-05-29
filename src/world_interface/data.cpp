@@ -86,4 +86,23 @@ std::string to_string(robot::types::mountedperipheral_t peripheral) {
 	}
 }
 
+std::string to_string(robot::types::servoid_t servo) {
+	using robot::types::servoid_t;
+
+	switch (servo) {
+		case servoid_t::microscope:
+			return "microscope";
+		case servoid_t::syringe:
+			return "syringe";
+		case servoid_t::cuvette:
+			return "cuvette";
+		case servoid_t::filter:
+			return "filter";
+		case servoid_t::soilBox:
+			return "soilBox";
+		default:
+			return "<unknown>";
+	}
+}
+
 } // namespace util

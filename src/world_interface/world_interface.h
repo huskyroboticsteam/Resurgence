@@ -234,6 +234,9 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
  */
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
 
+void setServoPos(robot::types::servoid_t servo, int32_t position);
+void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle);
+
 using callbackid_t = unsigned long long;
 
 callbackid_t addLimitSwitchCallback(

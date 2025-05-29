@@ -43,6 +43,9 @@ void initCAN();
  */
 void sendCANPacket(const CANPacket& packet);
 
+// Print packet for debugging purposes
+void printCANPacket(const CANPacket& packet);
+
 /**
  * @brief Get the latest telemetry from a CAN device.
  *

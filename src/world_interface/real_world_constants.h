@@ -94,7 +94,9 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},
 	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
 	 {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
-	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2}});
+	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},
+   {motorid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO},
+   {motorid_t::scienceStepperBoard, DEVICE_SERIAL_SCIENCE_STEPPER}});
 
 constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
 	{{motorid_t::leftTread, can::devicegroup_t::motor},
@@ -109,7 +111,9 @@ constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::device
 	 {motorid_t::drillActuator, can::devicegroup_t::science},
 	 {motorid_t::drillMotor, can::devicegroup_t::science},
 	 {motorid_t::fourbar1, can::devicegroup_t::science},
-	 {motorid_t::fourbar2, can::devicegroup_t::science}});
+	 {motorid_t::fourbar2, can::devicegroup_t::science},
+   {motorid_t::scienceServoBoard, can::devicegroup_t::science},
+   {motorid_t::scienceStepperBoard, can::devicegroup_t::science}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
@@ -132,7 +136,9 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, -1.0},
 												   {motorid_t::fourbar1, 0.3},
-												   {motorid_t::fourbar2, 0.3}});
+												   {motorid_t::fourbar2, 0.3},
+                           {motorid_t::scienceServoBoard, 0},
+                           {motorid_t::scienceStepperBoard, 0}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
@@ -149,7 +155,9 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::hand, -0.75},
 												   {motorid_t::drillActuator, -0.5},
 												   {motorid_t::drillMotor, -1.0},
-												   {motorid_t::fourbar1, 0.3},
-												   {motorid_t::fourbar2, 0.3}});
+												   {motorid_t::fourbar1, 0.15},
+												   {motorid_t::fourbar2, 0.15},
+                           {motorid_t::scienceServoBoard, 0},
+                           {motorid_t::scienceStepperBoard, 0}});
 
 } // namespace robot
