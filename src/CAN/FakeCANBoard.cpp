@@ -293,6 +293,7 @@ int main() {
 			AssembleScienceServoPacket(&p, 0x7, 0x5, (uint8_t)servo_no,
 									   (uint8_t)degrees);
 			can::sendCANPacket(p);
+      can::printCANPacket(p);
 		} else if (testMode == TestMode::Stepper) {
       int stepper = prompt("Enter stepper");
       int angle = prompt("Enter angle");

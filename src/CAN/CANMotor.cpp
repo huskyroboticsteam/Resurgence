@@ -11,6 +11,7 @@ extern "C" {
 #include <HindsightCAN/CANCommon.h>
 #include <HindsightCAN/CANMotorUnit.h>
 #include <HindsightCAN/CANPacket.h>
+#include <HindsightCAN/CANScience.h>
 }
 
 using namespace std::chrono_literals;
@@ -121,7 +122,7 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
 
 void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle) {
 	CANPacket p;
-	AssemblePCAServoPacket(&p, static_cast<uint8_t>(group), serial, servoNum, angle);
+	AssembleScienceServoPacket(&p, static_cast<uint8_t>(group), serial, servoNum, angle);
 	sendCANPacket(p);
 }
 

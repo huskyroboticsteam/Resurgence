@@ -137,7 +137,7 @@ constexpr auto servoid_to_servo_num = frozen::make_unordered_map<servoid_t, int>
   {{servoid_t::microscope, 0},
    {servoid_t::syringe, 1},
    {servoid_t::cuvette, 2},
-   {servoid_t::filter, 3},
+   {servoid_t::filter, 8},
    {servoid_t::soilBox, 4}});
 
 class bad_datapoint_access : public std::runtime_error {

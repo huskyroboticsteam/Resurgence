@@ -201,12 +201,11 @@ static bool validateServoPositionRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleServoPositionRequest(const json& j) {
-  LOG_F(INFO, "mc handle");
   std::string servoName = j["servo"];
   int32_t position = j["position"];
   auto servo = name_to_servoid.find(util::freezeStr(servoName));
   if (servo != name_to_servoid.end()) {
-	robot::setServoPos(servo->second, position);
+	  robot::setServoPos(servo->second, position);
   }
 }
 
