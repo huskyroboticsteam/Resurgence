@@ -152,6 +152,8 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
  */
 void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle);
 
+void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t stepper, int16_t angle);
+
 /**
  * @brief Get the last reported position of a motor.
  *

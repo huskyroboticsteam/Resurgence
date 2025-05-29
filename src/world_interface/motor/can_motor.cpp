@@ -42,6 +42,11 @@ void can_motor::setServoPos(uint8_t servo, int32_t position) {
 	can::motor::setServoPos(device_group, serial_id, servo, position);
 }
 
+// Hack for Science Stepper Board
+void can_motor::setStepperTurnAngle(uint8_t stepper, int16_t angle) {
+  can::motor::setStepperTurnAngle(device_group, serial_id, stepper, angle);
+}
+
 can::deviceserial_t can_motor::getMotorSerial() {
 	return serial_id;
 }

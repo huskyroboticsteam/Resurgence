@@ -63,6 +63,8 @@ public:
 
 	virtual void setServoPos(uint8_t servo, int32_t position) = 0;
 
+  virtual void setStepperTurnAngle(uint8_t stepper, int16_t angle) = 0;
+
 	/**
 	 * @brief Delete the copy constructor.
 	 *

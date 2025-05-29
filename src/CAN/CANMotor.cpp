@@ -126,6 +126,12 @@ void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, i
 	sendCANPacket(p);
 }
 
+void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t stepper, int16_t angle) {
+  CANPacket p;
+  AssembleScienceStepperTurnAnglePacket(&p, static_cast<uint8_t>(group), serial, stepper, angle, 0x3);
+  sendCANPacket(p);
+}
+
 DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }

@@ -17,6 +17,7 @@ constexpr const char* CAMERA_STREAM_CLOSE_REQ_TYPE = "cameraStreamCloseRequest";
 constexpr const char* CAMERA_FRAME_REQ_TYPE = "cameraFrameRequest";
 constexpr const char* WAYPOINT_NAV_REQ_TYPE = "waypointNavRequest";
 constexpr const char* SERVO_POSITION_REQ_TYPE = "servoPositionRequest";
+constexpr const char* STEPPER_TURN_ANGLE_REQ_TYPE = "stepperTurnAngleRequest";
 
 // report keys
 constexpr const char* CAMERA_STREAM_REP_TYPE = "cameraStreamReport";

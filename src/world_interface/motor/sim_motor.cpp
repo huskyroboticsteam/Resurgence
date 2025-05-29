@@ -39,6 +39,9 @@ void sim_motor::setServoPos(uint8_t servo, int32_t position) {
 	sendJSON(msg);
 }
 
+void sim_motor::setStepperTurnAngle(uint8_t stepper, int16_t angle) {
+}
+
 void sim_motor::sendJSON(const json& obj) {
 	Globals::websocketServer.sendJSON(protocol_path, obj);
 }
