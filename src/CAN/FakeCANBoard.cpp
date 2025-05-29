@@ -12,6 +12,7 @@
 #include <vector>
 
 extern "C" {
+#include <HindsightCAN/CANPower.h>
 #include <HindsightCAN/CANScience.h>
 }
 
@@ -29,7 +30,8 @@ enum class TestMode {
 	LimitSwitch,
 	Telemetry,
 	ScienceServos,
-  Stepper
+  Stepper,
+  RawCAN
 };
 
 std::unordered_set<int> modes = {
@@ -37,7 +39,7 @@ std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::PID),	   static_cast<int>(TestMode::Encoder),
 	static_cast<int>(TestMode::PIDVel),	   static_cast<int>(TestMode::LimitSwitch),
 	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos),
-  static_cast<int>(TestMode::Stepper)};
+  static_cast<int>(TestMode::Stepper), static_cast<int>(TestMode::RawCAN)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -70,6 +72,7 @@ int main() {
 	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
   ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
+  ss << static_cast<int>(TestMode::RawCAN) << " for CAN\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
@@ -300,6 +303,23 @@ int main() {
 
       CANPacket p;
       AssembleScienceStepperTurnAnglePacket(&p, 0x7, 0x4, stepper, angle, 0x3);
+      can::sendCANPacket(p);
+      can::printCANPacket(p);
+    } else if (testMode == TestMode::RawCAN) {
+      uint8_t pr = prompt("priority");
+      uint8_t g = prompt("group");
+      uint8_t s = prompt("serial");
+      uint8_t pid = prompt("pid");
+      uint8_t dlc = prompt("add'l. data bits");
+      uint8_t data[dlc+1];
+      data[0] = pid;
+
+      for (int i = 1; i <= dlc; i++) {
+        data[i] = prompt("bit");
+      }
+
+      CANPacket p;
+      AssembleCANPacket(&p, pr, g, s, pid, dlc+1, data);
       can::sendCANPacket(p);
       can::printCANPacket(p);
     }
