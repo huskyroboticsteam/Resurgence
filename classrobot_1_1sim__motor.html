@@ -136,6 +136,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a07ff50c316cc1c2bf96e4ea3d93fb0ef" id="r_a07ff50c316cc1c2bf96e4ea3d93fb0ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07ff50c316cc1c2bf96e4ea3d93fb0ef">setMotorPos</a> (<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> targetPos) override</td></tr>
 <tr class="memdesc:a07ff50c316cc1c2bf96e4ea3d93fb0ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the target position of the motor.  <br /></td></tr>
 <tr class="separator:a07ff50c316cc1c2bf96e4ea3d93fb0ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fba6d4fc26f908aa467c9a06f5d6860" id="r_a1fba6d4fc26f908aa467c9a06f5d6860"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1fba6d4fc26f908aa467c9a06f5d6860">setServoPos</a> (<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a> servo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> position) override</td></tr>
+<tr class="separator:a1fba6d4fc26f908aa467c9a06f5d6860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a403749ff6542f3bb160901b45803c84e" id="r_a403749ff6542f3bb160901b45803c84e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a403749ff6542f3bb160901b45803c84e">setStepperTurnAngle</a> (<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a> stepper, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#af4c7df4eb83784f8746e143ee9792ad4">int16_t</a> angle) override</td></tr>
+<tr class="separator:a403749ff6542f3bb160901b45803c84e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac851461753d761164a7bf43d56477030" id="r_ac851461753d761164a7bf43d56477030"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac851461753d761164a7bf43d56477030">getMotorPos</a> () const override</td></tr>
 <tr class="memdesc:ac851461753d761164a7bf43d56477030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last reported position of the specified motor.  <br /></td></tr>
 <tr class="separator:ac851461753d761164a7bf43d56477030"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -330,6 +334,68 @@ static <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++
 </dl>
 
 <p>Implements <a class="el" href="classrobot_1_1base__motor.html#a50ed7e9cd52824ea7f565f3d19cf2c6d">robot::base_motor</a>.</p>
+
+</div>
+</div>
+<a id="a1fba6d4fc26f908aa467c9a06f5d6860" name="a1fba6d4fc26f908aa467c9a06f5d6860"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fba6d4fc26f908aa467c9a06f5d6860">&#9670;&#160;</a></span>setServoPos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void robot::sim_motor::setServoPos </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a></td>          <td class="paramname"><span class="paramname"><em>servo</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a></td>          <td class="paramname"><span class="paramname"><em>position</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classrobot_1_1base__motor.html">robot::base_motor</a>.</p>
+
+</div>
+</div>
+<a id="a403749ff6542f3bb160901b45803c84e" name="a403749ff6542f3bb160901b45803c84e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a403749ff6542f3bb160901b45803c84e">&#9670;&#160;</a></span>setStepperTurnAngle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void robot::sim_motor::setStepperTurnAngle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a></td>          <td class="paramname"><span class="paramname"><em>stepper</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#af4c7df4eb83784f8746e143ee9792ad4">int16_t</a></td>          <td class="paramname"><span class="paramname"><em>angle</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classrobot_1_1base__motor.html">robot::base_motor</a>.</p>
 
 </div>
 </div>

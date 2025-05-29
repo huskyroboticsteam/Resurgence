@@ -168,6 +168,9 @@ Functions</h2></td></tr>
 <tr class="separator:a5ff9ee8b672b7ae2f67fd199236328d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f7f6a213f9815daf709cdfb8aa975fe" id="r_a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">types::DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f7f6a213f9815daf709cdfb8aa975fe">getJointPos</a> (robot::types::jointid_t joint)</td></tr>
 <tr class="separator:a0f7f6a213f9815daf709cdfb8aa975fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99e8681fff1638b177366aebfe55981e" id="r_a99e8681fff1638b177366aebfe55981e"><td class="memItemLeft" align="right" valign="top"><a id="a99e8681fff1638b177366aebfe55981e" name="a99e8681fff1638b177366aebfe55981e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setScienceServoPos</b> (<a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a> servoNum, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> angle)</td></tr>
+<tr class="separator:a99e8681fff1638b177366aebfe55981e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa11e482ffaef27ea65955d70d7eaa6a9" id="r_aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa11e482ffaef27ea65955d70d7eaa6a9">readIMUHeading</a> ()</td></tr>
 <tr class="memdesc:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the current heading in the global map frame based on an IMU measurement.  <br /></td></tr>
 <tr class="separator:aa11e482ffaef27ea65955d70d7eaa6a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,6 +251,12 @@ constexpr <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstd
 template&lt;typename T&gt; </td></tr>
 <tr class="memitem:a33cb8b052d5e3d7667019df5526b5fef"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><b>getIndex</b> (const <a class="elRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector</a>&lt; T &gt; &amp;vec, const T &amp;val)</td></tr>
 <tr class="separator:a33cb8b052d5e3d7667019df5526b5fef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33c1f3092ded123e2804ac88d186f733" id="r_a33c1f3092ded123e2804ac88d186f733"><td class="memItemLeft" align="right" valign="top"><a id="a33c1f3092ded123e2804ac88d186f733" name="a33c1f3092ded123e2804ac88d186f733"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setServoPos</b> (robot::types::servoid_t servo, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> position)</td></tr>
+<tr class="separator:a33c1f3092ded123e2804ac88d186f733"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae74d42e7a279c4e8e6b6ad5c1b4e0b49" id="r_ae74d42e7a279c4e8e6b6ad5c1b4e0b49"><td class="memItemLeft" align="right" valign="top"><a id="ae74d42e7a279c4e8e6b6ad5c1b4e0b49" name="ae74d42e7a279c4e8e6b6ad5c1b4e0b49"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setRequestedStepperTurnAngle</b> (robot::types::stepperid_t stepper, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#af4c7df4eb83784f8746e143ee9792ad4">int16_t</a> angle)</td></tr>
+<tr class="separator:ae74d42e7a279c4e8e6b6ad5c1b4e0b49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b58b5557c06caa8eb3d64c510042a26" id="r_a3b58b5557c06caa8eb3d64c510042a26"><td class="memItemLeft" align="right" valign="top"><a id="a3b58b5557c06caa8eb3d64c510042a26" name="a3b58b5557c06caa8eb3d64c510042a26"></a>
 callbackid_t&#160;</td><td class="memItemRight" valign="bottom"><b>addLimitSwitchCallback</b> (<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, const std::function&lt; void(<a class="el" href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a> motor, <a class="el" href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a>&lt; <a class="el" href="classrobot_1_1types_1_1LimitSwitchData.html">robot::types::LimitSwitchData</a> &gt; limitSwitchData)&gt; &amp;callback)</td></tr>
 <tr class="separator:a3b58b5557c06caa8eb3d64c510042a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1121,7 +1130,9 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">     {motorid_t::drillActuator, can::devicegroup_t::science},</div>
 <div class="line">     {motorid_t::drillMotor, can::devicegroup_t::science},</div>
 <div class="line">     {motorid_t::fourbar1, can::devicegroup_t::science},</div>
-<div class="line">     {motorid_t::fourbar2, can::devicegroup_t::science}})</div>
+<div class="line">     {motorid_t::fourbar2, can::devicegroup_t::science},</div>
+<div class="line">   {motorid_t::scienceServoBoard, can::devicegroup_t::science},</div>
+<div class="line">   {motorid_t::scienceStepperBoard, can::devicegroup_t::science}})</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1183,7 +1194,9 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">     {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},</div>
 <div class="line">     {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},</div>
 <div class="line">     {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},</div>
-<div class="line">     {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2}})</div>
+<div class="line">     {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},</div>
+<div class="line">   {motorid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO},</div>
+<div class="line">   {motorid_t::scienceStepperBoard, DEVICE_SERIAL_SCIENCE_STEPPER}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to their corresponding serial number. </p>
 
@@ -1220,8 +1233,10 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">                                                   {motorid_t::hand, -0.75},</div>
 <div class="line">                                                   {motorid_t::drillActuator, -0.5},</div>
 <div class="line">                                                   {motorid_t::drillMotor, -1.0},</div>
-<div class="line">                                                   {motorid_t::fourbar1, 0.3},</div>
-<div class="line">                                                   {motorid_t::fourbar2, 0.3}})</div>
+<div class="line">                                                   {motorid_t::fourbar1, 0.15},</div>
+<div class="line">                                                   {motorid_t::fourbar2, 0.15},</div>
+<div class="line">                           {motorid_t::scienceServoBoard, 0},</div>
+<div class="line">                           {motorid_t::scienceStepperBoard, 0}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to power scale factors when commanded with negative power. </p>
 <p>Negative values mean that the motor is inverted. </p>
@@ -1260,7 +1275,9 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">                                                   {motorid_t::drillActuator, -0.5},</div>
 <div class="line">                                                   {motorid_t::drillMotor, -1.0},</div>
 <div class="line">                                                   {motorid_t::fourbar1, 0.3},</div>
-<div class="line">                                                   {motorid_t::fourbar2, 0.3}})</div>
+<div class="line">                                                   {motorid_t::fourbar2, 0.3},</div>
+<div class="line">                           {motorid_t::scienceServoBoard, 0},</div>
+<div class="line">                           {motorid_t::scienceStepperBoard, 0}})</div>
 </div><!-- fragment -->
 <p>A mapping of motorids to power scale factors when commanded with positive power. </p>
 <p>Negative values mean that the motor is inverted. </p>

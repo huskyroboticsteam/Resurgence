@@ -156,6 +156,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a4b37f1b4af620938ec6ddde28b91d573" id="r_a4b37f1b4af620938ec6ddde28b91d573"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b37f1b4af620938ec6ddde28b91d573">setServoPos</a> (<a class="el" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">devicegroup_t</a> group, <a class="el" href="namespacecan.html#ad9e11e8dde365a609487743b3ebf7cd0">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a> servoNum, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> angle)</td></tr>
 <tr class="memdesc:a4b37f1b4af620938ec6ddde28b91d573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the angle of the PCA servo.  <br /></td></tr>
 <tr class="separator:a4b37f1b4af620938ec6ddde28b91d573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a667774f0931a8570a889941afaf9ae9a" id="r_a667774f0931a8570a889941afaf9ae9a"><td class="memItemLeft" align="right" valign="top"><a id="a667774f0931a8570a889941afaf9ae9a" name="a667774f0931a8570a889941afaf9ae9a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setStepperTurnAngle</b> (<a class="el" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">devicegroup_t</a> group, <a class="el" href="namespacecan.html#ad9e11e8dde365a609487743b3ebf7cd0">deviceserial_t</a> serial, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a5637fae091197126a031b7594cccc9fe">uint8_t</a> stepper, <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#af4c7df4eb83784f8746e143ee9792ad4">int16_t</a> angle)</td></tr>
+<tr class="separator:a667774f0931a8570a889941afaf9ae9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae09a1fb79556a26fec0dd91abce0c9ed" id="r_ae09a1fb79556a26fec0dd91abce0c9ed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrobot_1_1types_1_1DataPoint.html">DataPoint</a>&lt; <a class="elRef" href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#ad5ed0491058a71efd30a0f28ad1d3f05">int32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae09a1fb79556a26fec0dd91abce0c9ed">getMotorPosition</a> (<a class="el" href="namespacecan.html#a1b499367fdbe137b795e3bde15a57e86">devicegroup_t</a> group, <a class="el" href="namespacecan.html#ad9e11e8dde365a609487743b3ebf7cd0">deviceserial_t</a> serial)</td></tr>
 <tr class="memdesc:ae09a1fb79556a26fec0dd91abce0c9ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last reported position of a motor.  <br /></td></tr>
 <tr class="separator:ae09a1fb79556a26fec0dd91abce0c9ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -727,7 +730,7 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">serial</td><td>The CAN serial number of the motor board. </td></tr>
     <tr><td class="paramname">servoNum</td><td>the servo number. </td></tr>
-    <tr><td class="paramname">angle</td><td>the angle of the servo in millidegrees. </td></tr>
+    <tr><td class="paramname">position</td><td>the position of the servo in degrees. </td></tr>
   </table>
   </dd>
 </dl>

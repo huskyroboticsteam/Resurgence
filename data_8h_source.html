@@ -156,158 +156,214 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    drillActuator,</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    drillMotor,</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    fourbar1,</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    fourbar2</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>};</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    fourbar2,</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  <span class="comment">// Hack, see real_world_interface.cpp for details</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  scienceServoBoard,</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  scienceStepperBoard,</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>};</div>
 </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span></div>
-<div class="foldopen" id="foldopen00074" data-start="{" data-end="};">
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">   74</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">mountedperipheral_t</a> {</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    none,</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    arm,</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    armServo,</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    scienceStation,</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>};</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span></div>
+<div class="foldopen" id="foldopen00077" data-start="{" data-end="};">
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">   77</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">mountedperipheral_t</a> {</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    none,</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    arm,</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    armServo,</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    scienceStation,</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>};</div>
 </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keyword">enum class</span> jointid_t {</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    armBase,</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    shoulder,</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    elbow,</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    forearm,</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    wristPitch,</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    wristRoll,</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    hand,</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    ikForward,</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    ikUp,</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    fourBarLinkage,</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    drillActuator,</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    drillMotor</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>};</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> all_jointid_t = frozen::make_unordered_set&lt;jointid_t&gt;(</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    {jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>     jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::ikForward,</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>   jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor});</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> name_to_jointid = frozen::make_unordered_map&lt;frozen::string, jointid_t&gt;(</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    {{<span class="stringliteral">&quot;armBase&quot;</span>, jointid_t::armBase},</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>     {<span class="stringliteral">&quot;shoulder&quot;</span>, jointid_t::shoulder},</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>     {<span class="stringliteral">&quot;elbow&quot;</span>, jointid_t::elbow},</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>     {<span class="stringliteral">&quot;forearm&quot;</span>, jointid_t::forearm},</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>     {<span class="stringliteral">&quot;wristPitch&quot;</span>, jointid_t::wristPitch},</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>     {<span class="stringliteral">&quot;wristRoll&quot;</span>, jointid_t::wristRoll},</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>     {<span class="stringliteral">&quot;hand&quot;</span>, jointid_t::hand},</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>     {<span class="stringliteral">&quot;ikForward&quot;</span>, jointid_t::ikForward},</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>     {<span class="stringliteral">&quot;ikUp&quot;</span>, jointid_t::ikUp},</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>     {<span class="stringliteral">&quot;fourBarLinkage&quot;</span>, jointid_t::fourBarLinkage},</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>     {<span class="stringliteral">&quot;drillActuator&quot;</span>, jointid_t::drillActuator},</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>     {<span class="stringliteral">&quot;drillMotor&quot;</span>, jointid_t::drillMotor}});</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
-<div class="foldopen" id="foldopen00115" data-start="{" data-end="};">
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1bad__datapoint__access.html">  115</a></span><span class="keyword">class </span>bad_datapoint_access : <span class="keyword">public</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02811.html">std::runtime_error</a> {</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    bad_datapoint_access() : <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02811.html">std::runtime_error</a>(<span class="stringliteral">&quot;bad_datapoint_access&quot;</span>) {}</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>};</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="keyword">enum class</span> jointid_t {</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    armBase,</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    shoulder,</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    elbow,</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    forearm,</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    wristPitch,</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    wristRoll,</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    hand,</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    ikForward,</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    ikUp,</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    fourBarLinkage,</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    drillActuator,</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    drillMotor</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>};</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> all_jointid_t = frozen::make_unordered_set&lt;jointid_t&gt;(</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    {jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>     jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::ikForward,</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>   jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor});</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> name_to_jointid = frozen::make_unordered_map&lt;frozen::string, jointid_t&gt;(</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    {{<span class="stringliteral">&quot;armBase&quot;</span>, jointid_t::armBase},</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>     {<span class="stringliteral">&quot;shoulder&quot;</span>, jointid_t::shoulder},</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>     {<span class="stringliteral">&quot;elbow&quot;</span>, jointid_t::elbow},</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>     {<span class="stringliteral">&quot;forearm&quot;</span>, jointid_t::forearm},</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>     {<span class="stringliteral">&quot;wristPitch&quot;</span>, jointid_t::wristPitch},</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>     {<span class="stringliteral">&quot;wristRoll&quot;</span>, jointid_t::wristRoll},</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>     {<span class="stringliteral">&quot;hand&quot;</span>, jointid_t::hand},</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>     {<span class="stringliteral">&quot;ikForward&quot;</span>, jointid_t::ikForward},</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>     {<span class="stringliteral">&quot;ikUp&quot;</span>, jointid_t::ikUp},</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>     {<span class="stringliteral">&quot;fourBarLinkage&quot;</span>, jointid_t::fourBarLinkage},</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>     {<span class="stringliteral">&quot;drillActuator&quot;</span>, jointid_t::drillActuator},</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>     {<span class="stringliteral">&quot;drillMotor&quot;</span>, jointid_t::drillMotor}});</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="keyword">enum class</span> servoid_t {</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>  microscope,</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>  syringe,</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>  cuvette,</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>  filter,</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>  soilBox,</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>};</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> all_servoid_t = frozen::make_unordered_set&lt;servoid_t&gt;(</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  {servoid_t::microscope, servoid_t::syringe, servoid_t::soilBox,</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>   servoid_t::cuvette, servoid_t::filter});</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> name_to_servoid = frozen::make_unordered_map&lt;frozen::string, servoid_t&gt;(</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  {{<span class="stringliteral">&quot;microscope&quot;</span>, servoid_t::microscope},</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>   {<span class="stringliteral">&quot;syringe&quot;</span>, servoid_t::syringe},</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>   {<span class="stringliteral">&quot;cuvette&quot;</span>, servoid_t::cuvette},</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>   {<span class="stringliteral">&quot;filter&quot;</span>, servoid_t::filter},</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>   {<span class="stringliteral">&quot;soilBox&quot;</span>, servoid_t::soilBox}});</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> servoid_to_servo_num = frozen::make_unordered_map&lt;servoid_t, int&gt;(</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>  {{servoid_t::microscope, 7},</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>   {servoid_t::syringe, 9},</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>   {servoid_t::cuvette, 5},</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>   {servoid_t::filter, 8},</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>   {servoid_t::soilBox, 6}});</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="keyword">enum class</span> stepperid_t {</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>  plunger,</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>  judges,</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  mast,</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>  lock,</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  lazySusan,</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>};</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> all_stepperid_t = frozen::make_unordered_set&lt;stepperid_t&gt;(</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>  {stepperid_t::plunger, stepperid_t::judges, stepperid_t::mast,</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>   stepperid_t::lock, stepperid_t::lazySusan});</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> name_to_stepperid = frozen::make_unordered_map&lt;frozen::string, stepperid_t&gt;(</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>  {{<span class="stringliteral">&quot;plunger&quot;</span>, stepperid_t::plunger},</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>   {<span class="stringliteral">&quot;judges&quot;</span>, stepperid_t::judges},</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>   {<span class="stringliteral">&quot;mast&quot;</span>, stepperid_t::mast},</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>   {<span class="stringliteral">&quot;lock&quot;</span>, stepperid_t::lock},</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>   {<span class="stringliteral">&quot;lazySusan&quot;</span>, stepperid_t::lazySusan}});</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span> </div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span><span class="keyword">constexpr</span> <span class="keyword">auto</span> stepperid_to_stepper_num = frozen::make_unordered_map&lt;stepperid_t, uint8_t&gt;(</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  {{stepperid_t::plunger, 4},</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>   {stepperid_t::judges, 5},</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>   {stepperid_t::mast, 2},</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>   {stepperid_t::lock, 1},</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>   {stepperid_t::lazySusan, 6}});</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span> </div>
+<div class="foldopen" id="foldopen00170" data-start="{" data-end="};">
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1bad__datapoint__access.html">  170</a></span><span class="keyword">class </span>bad_datapoint_access : <span class="keyword">public</span> <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02811.html">std::runtime_error</a> {</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    bad_datapoint_access() : <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02811.html">std::runtime_error</a>(<span class="stringliteral">&quot;bad_datapoint_access&quot;</span>) {}</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>};</div>
 </div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="foldopen" id="foldopen00126" data-start="{" data-end="};">
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno"><a class="line" href="classDataPoint.html">  126</a></span><span class="keyword">class </span><a class="code hl_function" href="classDataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint</a> {</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">  131</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint</a>() : datapoint() {}</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span></div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a2ad044a12fa674b131ab0a9ba0528481">  138</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a2ad044a12fa674b131ab0a9ba0528481">DataPoint</a>(T data) : <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint</a>(<a class="code hl_typedef" href="namespacerobot_1_1types.html#ae853854e1c1dbbb2dc44e06838c4cf54">dataclock</a>::now(), data) {}</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span></div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a5e1f88b845b3194f26540bf6acc351b8">  146</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5e1f88b845b3194f26540bf6acc351b8">DataPoint</a>(<a class="code hl_typedef" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">datatime_t</a> time, T data) : datapoint({time, data}) {}</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span></div>
-<div class="foldopen" id="foldopen00153" data-start="{" data-end="}">
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a7bd06f1a8e8aa9a2b8c40a0f49aeb9b0">  153</a></span>    <span class="keyword">operator</span> bool()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>();</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    }</div>
-</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span></div>
-<div class="foldopen" id="foldopen00164" data-start="{" data-end="}">
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a170f57107f592540c5fc6a548a0621e9">  164</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a170f57107f592540c5fc6a548a0621e9">isFresh</a>(<a class="code hl_typedefRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> duration)<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>() &amp;&amp; dataclock::now() - duration &lt;= <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">getTime</a>();</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    }</div>
-</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span></div>
-<div class="foldopen" id="foldopen00173" data-start="{" data-end="}">
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">  173</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        <span class="keywordflow">return</span> datapoint.has_value();</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    }</div>
-</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span></div>
-<div class="foldopen" id="foldopen00183" data-start="{" data-end="}">
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">  183</a></span>    <a class="code hl_typedef" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">datatime_t</a> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">getTime</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>        <span class="keywordflow">return</span> datapoint.value().first;</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    }</div>
-</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span></div>
-<div class="foldopen" id="foldopen00193" data-start="{" data-end="}">
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">  193</a></span>    T <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">getData</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>()) {</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            <span class="keywordflow">return</span> datapoint.value().second;</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>            <span class="keywordflow">throw</span> <a class="code hl_class" href="classrobot_1_1types_1_1bad__datapoint__access.html">bad_datapoint_access</a>();</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        }</div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    }</div>
-</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00181" data-start="{" data-end="};">
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno"><a class="line" href="classDataPoint.html">  181</a></span><span class="keyword">class </span><a class="code hl_function" href="classDataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint</a> {</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">  186</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint</a>() : datapoint() {}</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a2ad044a12fa674b131ab0a9ba0528481">  193</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a2ad044a12fa674b131ab0a9ba0528481">DataPoint</a>(T data) : <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint</a>(<a class="code hl_typedef" href="namespacerobot_1_1types.html#ae853854e1c1dbbb2dc44e06838c4cf54">dataclock</a>::now(), data) {}</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a5e1f88b845b3194f26540bf6acc351b8">  201</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5e1f88b845b3194f26540bf6acc351b8">DataPoint</a>(<a class="code hl_typedef" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">datatime_t</a> time, T data) : datapoint({time, data}) {}</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span></div>
 <div class="foldopen" id="foldopen00208" data-start="{" data-end="}">
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a9eb4f657f3e8e37011d6c27dbcc160b1">  208</a></span>    T <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a9eb4f657f3e8e37011d6c27dbcc160b1">getDataOrElse</a>(T defaultData) {</div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>() ? <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">getData</a>() : defaultData;</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a7bd06f1a8e8aa9a2b8c40a0f49aeb9b0">  208</a></span>    <span class="keyword">operator</span> bool()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>();</div>
 <div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    }</div>
 </div>
 <div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span></div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> F&gt;</div>
-<div class="foldopen" id="foldopen00222" data-start="{" data-end="}">
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a8650e0e36ef570694b8cddd666c12b9e">  222</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint&lt;std::invoke_result_t&lt;F, T&gt;</a>&gt; <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a8650e0e36ef570694b8cddd666c12b9e">transform</a>(<span class="keyword">const</span> F&amp; f) {</div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>()) {</div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>            <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint&lt;std::invoke_result_t&lt;F, T&gt;</a>&gt;(<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">getTime</a>(), f(<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">getData</a>()));</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>            <span class="keywordflow">return</span> {};</div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        }</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    }</div>
+<div class="foldopen" id="foldopen00219" data-start="{" data-end="}">
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a170f57107f592540c5fc6a548a0621e9">  219</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a170f57107f592540c5fc6a548a0621e9">isFresh</a>(<a class="code hl_typedefRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01559.html#a979a98673e4244630e142461b1026d74">std::chrono::milliseconds</a> duration)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>() &amp;&amp; dataclock::now() - duration &lt;= <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">getTime</a>();</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    }</div>
 </div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    std::optional&lt;std::pair&lt;datatime_t, T&gt;&gt; datapoint;</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>};</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span></div>
+<div class="foldopen" id="foldopen00228" data-start="{" data-end="}">
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">  228</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordflow">return</span> datapoint.has_value();</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    }</div>
 </div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span></div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno"><a class="line" href="namespacerobot_1_1types.html#ae97c57e01b5bad73f687df87ce66b4b9">  240</a></span><span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> <a class="code hl_variable" href="namespacerobot_1_1types.html#ae97c57e01b5bad73f687df87ce66b4b9">N_LIMIT_SWITCH</a> = 8;</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span> </div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LIMIT_SWITCH_LIM_MIN_IDX = 0;</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LIMIT_SWITCH_LIM_MAX_IDX = 1;</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span></div>
-<div class="foldopen" id="foldopen00248" data-start="{" data-end="};">
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno"><a class="line" href="classLimitSwitchData.html">  248</a></span><span class="keyword">class </span><a class="code hl_function" href="classLimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">LimitSwitchData</a> {</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">LimitSwitchData</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> data);</div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span></div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#ae5a9ddf4a720f8023c6387646b0f8b67">isOpen</a>(<span class="keywordtype">size_t</span> idx);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span></div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#ae50bfaab487c0f45a2b9d9d85f3d6429">isClosed</a>(<span class="keywordtype">size_t</span> idx);</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span></div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#ab321d51e5d4db4ab8b69e0a74198fd00">isAnyOpen</a>();</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span></div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#a7a12a083516bc8cc9821a922dc3934c3">isAnyClosed</a>();</div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span></div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>    <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01823.html">std::bitset&lt;N_LIMIT_SWITCH&gt;</a> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#a00f300a3253cff50c47a4054d485fcab">diff</a>(<span class="keyword">const</span> <a class="code hl_function" href="classLimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">LimitSwitchData</a>&amp; other);</div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span> </div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01823.html">std::bitset&lt;N_LIMIT_SWITCH&gt;</a> data;</div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>};</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span></div>
+<div class="foldopen" id="foldopen00238" data-start="{" data-end="}">
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">  238</a></span>    <a class="code hl_typedef" href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">datatime_t</a> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">getTime</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        <span class="keywordflow">return</span> datapoint.value().first;</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    }</div>
 </div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span> </div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>} <span class="comment">// namespace robot::types</span></div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span> </div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceutil.html">util</a> {</div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> to_string(robot::types::jointid_t joint);</div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> to_string(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacerobot_1_1types.html#add39bf4059de53554504f535bab93bba">robot::types::CameraID</a>&amp; <span class="keywordtype">id</span>);</div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> to_string(<a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a> peripheral);</div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>} <span class="comment">// namespace util</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span></div>
+<div class="foldopen" id="foldopen00248" data-start="{" data-end="}">
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">  248</a></span>    T <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">getData</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>()) {</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>            <span class="keywordflow">return</span> datapoint.value().second;</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>            <span class="keywordflow">throw</span> <a class="code hl_class" href="classrobot_1_1types_1_1bad__datapoint__access.html">bad_datapoint_access</a>();</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        }</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    }</div>
+</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span></div>
+<div class="foldopen" id="foldopen00263" data-start="{" data-end="}">
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a9eb4f657f3e8e37011d6c27dbcc160b1">  263</a></span>    T <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a9eb4f657f3e8e37011d6c27dbcc160b1">getDataOrElse</a>(T defaultData) {</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>() ? <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">getData</a>() : defaultData;</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    }</div>
+</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span></div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> F&gt;</div>
+<div class="foldopen" id="foldopen00277" data-start="{" data-end="}">
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno"><a class="line" href="classrobot_1_1types_1_1DataPoint.html#a8650e0e36ef570694b8cddd666c12b9e">  277</a></span>    <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint&lt;std::invoke_result_t&lt;F, T&gt;</a>&gt; <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a8650e0e36ef570694b8cddd666c12b9e">transform</a>(<span class="keyword">const</span> F&amp; f) {</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">isValid</a>()) {</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>            <span class="keywordflow">return</span> <a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint&lt;std::invoke_result_t&lt;F, T&gt;</a>&gt;(<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">getTime</a>(), f(<a class="code hl_function" href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">getData</a>()));</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>            <span class="keywordflow">return</span> {};</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>        }</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    }</div>
+</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    std::optional&lt;std::pair&lt;datatime_t, T&gt;&gt; datapoint;</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>};</div>
+</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno"><a class="line" href="namespacerobot_1_1types.html#ae97c57e01b5bad73f687df87ce66b4b9">  295</a></span><span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> <a class="code hl_variable" href="namespacerobot_1_1types.html#ae97c57e01b5bad73f687df87ce66b4b9">N_LIMIT_SWITCH</a> = 8;</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span> </div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LIMIT_SWITCH_LIM_MIN_IDX = 0;</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="keyword">constexpr</span> <span class="keywordtype">int</span> LIMIT_SWITCH_LIM_MAX_IDX = 1;</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span></div>
+<div class="foldopen" id="foldopen00303" data-start="{" data-end="};">
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno"><a class="line" href="classLimitSwitchData.html">  303</a></span><span class="keyword">class </span><a class="code hl_function" href="classLimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">LimitSwitchData</a> {</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">LimitSwitchData</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> data);</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span></div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#ae5a9ddf4a720f8023c6387646b0f8b67">isOpen</a>(<span class="keywordtype">size_t</span> idx);</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#ae50bfaab487c0f45a2b9d9d85f3d6429">isClosed</a>(<span class="keywordtype">size_t</span> idx);</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span></div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#ab321d51e5d4db4ab8b69e0a74198fd00">isAnyOpen</a>();</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span></div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#a7a12a083516bc8cc9821a922dc3934c3">isAnyClosed</a>();</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span></div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01823.html">std::bitset&lt;N_LIMIT_SWITCH&gt;</a> <a class="code hl_function" href="classrobot_1_1types_1_1LimitSwitchData.html#a00f300a3253cff50c47a4054d485fcab">diff</a>(<span class="keyword">const</span> <a class="code hl_function" href="classLimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">LimitSwitchData</a>&amp; other);</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span> </div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    <a class="code hl_classRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01823.html">std::bitset&lt;N_LIMIT_SWITCH&gt;</a> data;</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>};</div>
+</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span> </div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>} <span class="comment">// namespace robot::types</span></div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span> </div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceutil.html">util</a> {</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> to_string(robot::types::jointid_t joint);</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> to_string(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacerobot_1_1types.html#add39bf4059de53554504f535bab93bba">robot::types::CameraID</a>&amp; <span class="keywordtype">id</span>);</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> to_string(<a class="code hl_enumeration" href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a> peripheral);</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span><a class="code hl_variableRef" href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a01516.html#gaa5dbcd13c2fb305025ac6784482d05a5">std::string</a> to_string(robot::types::servoid_t servo);</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>} <span class="comment">// namespace util</span></div>
 <div class="ttc" id="aa00047_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00047.html">bitset</a></div></div>
 <div class="ttc" id="aa00050_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00050.html">chrono</a></div></div>
 <div class="ttc" id="aa00146_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a00146.html">stdexcept</a></div></div>
@@ -321,26 +377,26 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="aa02811_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a02811.html">std::runtime_error</a></div></div>
 <div class="ttc" id="aa07803_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07803.html">std::pair</a></div></div>
 <div class="ttc" id="aa07967_html"><div class="ttname"><a href="https://gcc.gnu.org/onlinedocs/gcc-9.3.0/libstdc++/api/a07967.html">std::vector</a></div></div>
-<div class="ttc" id="aclassDataPoint_html_a81904e68e4e9e64bb541bcb2f3f8247c"><div class="ttname"><a href="classDataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint()</div><div class="ttdoc">Construct an invalid DataPoint, holding no data.</div><div class="ttdef"><b>Definition</b> data.h:131</div></div>
+<div class="ttc" id="aclassDataPoint_html_a81904e68e4e9e64bb541bcb2f3f8247c"><div class="ttname"><a href="classDataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint()</div><div class="ttdoc">Construct an invalid DataPoint, holding no data.</div><div class="ttdef"><b>Definition</b> data.h:186</div></div>
 <div class="ttc" id="aclassLimitSwitchData_html_a1fd3d2cee4b3b5ea416d651b9255ba24"><div class="ttname"><a href="classLimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">LimitSwitchData::LimitSwitchData</a></div><div class="ttdeci">LimitSwitchData(unsigned long long data)</div><div class="ttdoc">Construct a new LimitSwitchData object, from the given bits.</div><div class="ttdef"><b>Definition</b> data.cpp:5</div></div>
 <div class="ttc" id="aclasscv_1_1Mat_html"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d3/d63/classcv_1_1Mat.html">cv::Mat</a></div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a></div><div class="ttdoc">Represents data measured using a sensor at a given time.</div><div class="ttdef"><b>Definition</b> data.h:126</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a170f57107f592540c5fc6a548a0621e9"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a170f57107f592540c5fc6a548a0621e9">robot::types::DataPoint::isFresh</a></div><div class="ttdeci">bool isFresh(std::chrono::milliseconds duration) const</div><div class="ttdoc">Check if this measurement was taken recently.</div><div class="ttdef"><b>Definition</b> data.h:164</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a2ad044a12fa674b131ab0a9ba0528481"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a2ad044a12fa674b131ab0a9ba0528481">robot::types::DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(T data)</div><div class="ttdoc">Construct a new DataPoint object, measured now.</div><div class="ttdef"><b>Definition</b> data.h:138</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a5ded7fcaf2981bad5b342af6923227c9"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">robot::types::DataPoint::getData</a></div><div class="ttdeci">T getData() const</div><div class="ttdoc">Get the value of this data point.</div><div class="ttdef"><b>Definition</b> data.h:193</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a5e1f88b845b3194f26540bf6acc351b8"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a5e1f88b845b3194f26540bf6acc351b8">robot::types::DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(datatime_t time, T data)</div><div class="ttdoc">Construct a new DataPoint object, measured at the given time.</div><div class="ttdef"><b>Definition</b> data.h:146</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a604dad271e5135914c425c50f234f9fd"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">robot::types::DataPoint::getTime</a></div><div class="ttdeci">datatime_t getTime() const</div><div class="ttdoc">Get the time at which the measurement was taken.</div><div class="ttdef"><b>Definition</b> data.h:183</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a6b0c843157658cd21cfd94808042cd7c"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">robot::types::DataPoint::isValid</a></div><div class="ttdeci">bool isValid() const</div><div class="ttdoc">Check if this measurement is valid.</div><div class="ttdef"><b>Definition</b> data.h:173</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a81904e68e4e9e64bb541bcb2f3f8247c"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">robot::types::DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint()</div><div class="ttdoc">Construct an invalid DataPoint, holding no data.</div><div class="ttdef"><b>Definition</b> data.h:131</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a8650e0e36ef570694b8cddd666c12b9e"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a8650e0e36ef570694b8cddd666c12b9e">robot::types::DataPoint::transform</a></div><div class="ttdeci">DataPoint&lt; std::invoke_result_t&lt; F, T &gt; &gt; transform(const F &amp;f)</div><div class="ttdoc">Transforms the data in this datapoint by the given function.</div><div class="ttdef"><b>Definition</b> data.h:222</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a9eb4f657f3e8e37011d6c27dbcc160b1"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a9eb4f657f3e8e37011d6c27dbcc160b1">robot::types::DataPoint::getDataOrElse</a></div><div class="ttdeci">T getDataOrElse(T defaultData)</div><div class="ttdoc">Get the value of this data point, defaulting to a given value if this data point is invalid.</div><div class="ttdef"><b>Definition</b> data.h:208</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html">robot::types::DataPoint</a></div><div class="ttdoc">Represents data measured using a sensor at a given time.</div><div class="ttdef"><b>Definition</b> data.h:181</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a170f57107f592540c5fc6a548a0621e9"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a170f57107f592540c5fc6a548a0621e9">robot::types::DataPoint::isFresh</a></div><div class="ttdeci">bool isFresh(std::chrono::milliseconds duration) const</div><div class="ttdoc">Check if this measurement was taken recently.</div><div class="ttdef"><b>Definition</b> data.h:219</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a2ad044a12fa674b131ab0a9ba0528481"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a2ad044a12fa674b131ab0a9ba0528481">robot::types::DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(T data)</div><div class="ttdoc">Construct a new DataPoint object, measured now.</div><div class="ttdef"><b>Definition</b> data.h:193</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a5ded7fcaf2981bad5b342af6923227c9"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a5ded7fcaf2981bad5b342af6923227c9">robot::types::DataPoint::getData</a></div><div class="ttdeci">T getData() const</div><div class="ttdoc">Get the value of this data point.</div><div class="ttdef"><b>Definition</b> data.h:248</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a5e1f88b845b3194f26540bf6acc351b8"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a5e1f88b845b3194f26540bf6acc351b8">robot::types::DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint(datatime_t time, T data)</div><div class="ttdoc">Construct a new DataPoint object, measured at the given time.</div><div class="ttdef"><b>Definition</b> data.h:201</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a604dad271e5135914c425c50f234f9fd"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a604dad271e5135914c425c50f234f9fd">robot::types::DataPoint::getTime</a></div><div class="ttdeci">datatime_t getTime() const</div><div class="ttdoc">Get the time at which the measurement was taken.</div><div class="ttdef"><b>Definition</b> data.h:238</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a6b0c843157658cd21cfd94808042cd7c"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a6b0c843157658cd21cfd94808042cd7c">robot::types::DataPoint::isValid</a></div><div class="ttdeci">bool isValid() const</div><div class="ttdoc">Check if this measurement is valid.</div><div class="ttdef"><b>Definition</b> data.h:228</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a81904e68e4e9e64bb541bcb2f3f8247c"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a81904e68e4e9e64bb541bcb2f3f8247c">robot::types::DataPoint::DataPoint</a></div><div class="ttdeci">DataPoint()</div><div class="ttdoc">Construct an invalid DataPoint, holding no data.</div><div class="ttdef"><b>Definition</b> data.h:186</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a8650e0e36ef570694b8cddd666c12b9e"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a8650e0e36ef570694b8cddd666c12b9e">robot::types::DataPoint::transform</a></div><div class="ttdeci">DataPoint&lt; std::invoke_result_t&lt; F, T &gt; &gt; transform(const F &amp;f)</div><div class="ttdoc">Transforms the data in this datapoint by the given function.</div><div class="ttdef"><b>Definition</b> data.h:277</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1DataPoint_html_a9eb4f657f3e8e37011d6c27dbcc160b1"><div class="ttname"><a href="classrobot_1_1types_1_1DataPoint.html#a9eb4f657f3e8e37011d6c27dbcc160b1">robot::types::DataPoint::getDataOrElse</a></div><div class="ttdeci">T getDataOrElse(T defaultData)</div><div class="ttdoc">Get the value of this data point, defaulting to a given value if this data point is invalid.</div><div class="ttdef"><b>Definition</b> data.h:263</div></div>
 <div class="ttc" id="aclassrobot_1_1types_1_1LimitSwitchData_html_a00f300a3253cff50c47a4054d485fcab"><div class="ttname"><a href="classrobot_1_1types_1_1LimitSwitchData.html#a00f300a3253cff50c47a4054d485fcab">robot::types::LimitSwitchData::diff</a></div><div class="ttdeci">std::bitset&lt; N_LIMIT_SWITCH &gt; diff(const LimitSwitchData &amp;other)</div><div class="ttdoc">Check which indices differ between this data and other.</div><div class="ttdef"><b>Definition</b> data.cpp:23</div></div>
 <div class="ttc" id="aclassrobot_1_1types_1_1LimitSwitchData_html_a1fd3d2cee4b3b5ea416d651b9255ba24"><div class="ttname"><a href="classrobot_1_1types_1_1LimitSwitchData.html#a1fd3d2cee4b3b5ea416d651b9255ba24">robot::types::LimitSwitchData::LimitSwitchData</a></div><div class="ttdeci">LimitSwitchData(unsigned long long data)</div><div class="ttdoc">Construct a new LimitSwitchData object, from the given bits.</div><div class="ttdef"><b>Definition</b> data.cpp:5</div></div>
 <div class="ttc" id="aclassrobot_1_1types_1_1LimitSwitchData_html_a7a12a083516bc8cc9821a922dc3934c3"><div class="ttname"><a href="classrobot_1_1types_1_1LimitSwitchData.html#a7a12a083516bc8cc9821a922dc3934c3">robot::types::LimitSwitchData::isAnyClosed</a></div><div class="ttdeci">bool isAnyClosed()</div><div class="ttdoc">Check if any index is closed.</div><div class="ttdef"><b>Definition</b> data.cpp:15</div></div>
 <div class="ttc" id="aclassrobot_1_1types_1_1LimitSwitchData_html_ab321d51e5d4db4ab8b69e0a74198fd00"><div class="ttname"><a href="classrobot_1_1types_1_1LimitSwitchData.html#ab321d51e5d4db4ab8b69e0a74198fd00">robot::types::LimitSwitchData::isAnyOpen</a></div><div class="ttdeci">bool isAnyOpen()</div><div class="ttdoc">Check if any index is open.</div><div class="ttdef"><b>Definition</b> data.cpp:19</div></div>
 <div class="ttc" id="aclassrobot_1_1types_1_1LimitSwitchData_html_ae50bfaab487c0f45a2b9d9d85f3d6429"><div class="ttname"><a href="classrobot_1_1types_1_1LimitSwitchData.html#ae50bfaab487c0f45a2b9d9d85f3d6429">robot::types::LimitSwitchData::isClosed</a></div><div class="ttdeci">bool isClosed(size_t idx)</div><div class="ttdoc">Check if the given index is closed.</div><div class="ttdef"><b>Definition</b> data.cpp:11</div></div>
 <div class="ttc" id="aclassrobot_1_1types_1_1LimitSwitchData_html_ae5a9ddf4a720f8023c6387646b0f8b67"><div class="ttname"><a href="classrobot_1_1types_1_1LimitSwitchData.html#ae5a9ddf4a720f8023c6387646b0f8b67">robot::types::LimitSwitchData::isOpen</a></div><div class="ttdeci">bool isOpen(size_t idx)</div><div class="ttdoc">Check if the given index is open.</div><div class="ttdef"><b>Definition</b> data.cpp:7</div></div>
-<div class="ttc" id="aclassrobot_1_1types_1_1bad__datapoint__access_html"><div class="ttname"><a href="classrobot_1_1types_1_1bad__datapoint__access.html">robot::types::bad_datapoint_access</a></div><div class="ttdef"><b>Definition</b> data.h:115</div></div>
+<div class="ttc" id="aclassrobot_1_1types_1_1bad__datapoint__access_html"><div class="ttname"><a href="classrobot_1_1types_1_1bad__datapoint__access.html">robot::types::bad_datapoint_access</a></div><div class="ttdef"><b>Definition</b> data.h:170</div></div>
 <div class="ttc" id="anamespacecv_html"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html">cv</a></div></div>
 <div class="ttc" id="anamespacecv_html_a2e2bf34f6d75c7c4bd05605e1c5e33e1"><div class="ttname"><a href="https://docs.opencv.org/4.2.0/d2/d75/namespacecv.html#a2e2bf34f6d75c7c4bd05605e1c5e33e1">uint32_t</a></div><div class="ttdeci">::uint32_t uint32_t</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html"><div class="ttname"><a href="namespacerobot_1_1types.html">robot::types</a></div><div class="ttdoc">Types for use in the world interface.</div><div class="ttdef"><b>Definition</b> data.cpp:3</div></div>
@@ -348,11 +404,11 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="anamespacerobot_1_1types_html_a35269b68b316ac7d17d073a5d1a419b7"><div class="ttname"><a href="namespacerobot_1_1types.html#a35269b68b316ac7d17d073a5d1a419b7">robot::types::datatime_t</a></div><div class="ttdeci">std::chrono::time_point&lt; dataclock &gt; datatime_t</div><div class="ttdoc">A point in time as measured by dataclock.</div><div class="ttdef"><b>Definition</b> data.h:31</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_a7278b81a300fa12b4b6525bff976f190"><div class="ttname"><a href="namespacerobot_1_1types.html#a7278b81a300fa12b4b6525bff976f190">robot::types::motorid_t</a></div><div class="ttdeci">motorid_t</div><div class="ttdoc">The motors on the robot.</div><div class="ttdef"><b>Definition</b> data.h:57</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_a7d864cb4085b3ebb76a5d844bded14b5"><div class="ttname"><a href="namespacerobot_1_1types.html#a7d864cb4085b3ebb76a5d844bded14b5">robot::types::landmarks_t</a></div><div class="ttdeci">std::vector&lt; DataPoint&lt; navtypes::point_t &gt; &gt; landmarks_t</div><div class="ttdoc">A data structure that represents when each landmark was seen.</div><div class="ttdef"><b>Definition</b> data.h:41</div></div>
-<div class="ttc" id="anamespacerobot_1_1types_html_aa93c10246999d2fdb71ba7bdb792c235"><div class="ttname"><a href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a></div><div class="ttdeci">mountedperipheral_t</div><div class="ttdoc">the mounted peripheral on the robot.</div><div class="ttdef"><b>Definition</b> data.h:74</div></div>
+<div class="ttc" id="anamespacerobot_1_1types_html_aa93c10246999d2fdb71ba7bdb792c235"><div class="ttname"><a href="namespacerobot_1_1types.html#aa93c10246999d2fdb71ba7bdb792c235">robot::types::mountedperipheral_t</a></div><div class="ttdeci">mountedperipheral_t</div><div class="ttdoc">the mounted peripheral on the robot.</div><div class="ttdef"><b>Definition</b> data.h:77</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_aca6679b197c5bb4ea8e72ce486d97ab7"><div class="ttname"><a href="namespacerobot_1_1types.html#aca6679b197c5bb4ea8e72ce486d97ab7">robot::types::CameraFrame</a></div><div class="ttdeci">std::pair&lt; cv::Mat, uint32_t &gt; CameraFrame</div><div class="ttdoc">A pair of a camera frame and its corresponding frame number.</div><div class="ttdef"><b>Definition</b> data.h:44</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_add39bf4059de53554504f535bab93bba"><div class="ttname"><a href="namespacerobot_1_1types.html#add39bf4059de53554504f535bab93bba">robot::types::CameraID</a></div><div class="ttdeci">uint32_t CameraID</div><div class="ttdoc">The type of a camera id.</div><div class="ttdef"><b>Definition</b> data.h:46</div></div>
 <div class="ttc" id="anamespacerobot_1_1types_html_ae853854e1c1dbbb2dc44e06838c4cf54"><div class="ttname"><a href="namespacerobot_1_1types.html#ae853854e1c1dbbb2dc44e06838c4cf54">robot::types::dataclock</a></div><div class="ttdeci">std::chrono::steady_clock dataclock</div><div class="ttdoc">The clock used for time measurements for data.</div><div class="ttdef"><b>Definition</b> data.h:29</div></div>
-<div class="ttc" id="anamespacerobot_1_1types_html_ae97c57e01b5bad73f687df87ce66b4b9"><div class="ttname"><a href="namespacerobot_1_1types.html#ae97c57e01b5bad73f687df87ce66b4b9">robot::types::N_LIMIT_SWITCH</a></div><div class="ttdeci">constexpr size_t N_LIMIT_SWITCH</div><div class="ttdoc">The maximum number of limit switches associated with any motor.</div><div class="ttdef"><b>Definition</b> data.h:240</div></div>
+<div class="ttc" id="anamespacerobot_1_1types_html_ae97c57e01b5bad73f687df87ce66b4b9"><div class="ttname"><a href="namespacerobot_1_1types.html#ae97c57e01b5bad73f687df87ce66b4b9">robot::types::N_LIMIT_SWITCH</a></div><div class="ttdeci">constexpr size_t N_LIMIT_SWITCH</div><div class="ttdoc">The maximum number of limit switches associated with any motor.</div><div class="ttdef"><b>Definition</b> data.h:295</div></div>
 <div class="ttc" id="anamespaceutil_html"><div class="ttname"><a href="namespaceutil.html">util</a></div><div class="ttdoc">A collection of utility functions and classes with common use-cases.</div><div class="ttdef"><b>Definition</b> SwerveController.cpp:145</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

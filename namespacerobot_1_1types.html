@@ -169,6 +169,8 @@ Enumerations</h2></td></tr>
 , <b>fourbar1</b>
 , <br />
 &#160;&#160;<b>fourbar2</b>
+, <b>scienceServoBoard</b>
+, <b>scienceStepperBoard</b>
 <br />
  }</td></tr>
 <tr class="memdesc:a7278b81a300fa12b4b6525bff976f190"><td class="mdescLeft">&#160;</td><td class="mdescRight">The motors on the robot. <br /></td></tr>
@@ -198,6 +200,26 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:a4e0fafe7d1af6624074f9dbb7402fdbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bd1fd976c3b9db42d91ea5c12e80710" id="r_a7bd1fd976c3b9db42d91ea5c12e80710"><td class="memItemLeft" align="right" valign="top"><a id="a7bd1fd976c3b9db42d91ea5c12e80710" name="a7bd1fd976c3b9db42d91ea5c12e80710"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>servoid_t</b> { <br />
+&#160;&#160;<b>microscope</b>
+, <b>syringe</b>
+, <b>cuvette</b>
+, <b>filter</b>
+, <br />
+&#160;&#160;<b>soilBox</b>
+<br />
+ }</td></tr>
+<tr class="separator:a7bd1fd976c3b9db42d91ea5c12e80710"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2835244c24dacc3db62d349b0b39e9df" id="r_a2835244c24dacc3db62d349b0b39e9df"><td class="memItemLeft" align="right" valign="top"><a id="a2835244c24dacc3db62d349b0b39e9df" name="a2835244c24dacc3db62d349b0b39e9df"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>stepperid_t</b> { <br />
+&#160;&#160;<b>plunger</b>
+, <b>judges</b>
+, <b>mast</b>
+, <b>lock</b>
+, <br />
+&#160;&#160;<b>lazySusan</b>
+<br />
+ }</td></tr>
+<tr class="separator:a2835244c24dacc3db62d349b0b39e9df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -205,6 +227,18 @@ Variables</h2></td></tr>
 <tr class="separator:a791ab8f14a728bd3122b51444d0bb158"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98231f677dcd844641e6a4290424f9cc" id="r_a98231f677dcd844641e6a4290424f9cc"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a98231f677dcd844641e6a4290424f9cc">name_to_jointid</a></td></tr>
 <tr class="separator:a98231f677dcd844641e6a4290424f9cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad37a197ce8eaa10312b58ad36575b141" id="r_ad37a197ce8eaa10312b58ad36575b141"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad37a197ce8eaa10312b58ad36575b141">all_servoid_t</a></td></tr>
+<tr class="separator:ad37a197ce8eaa10312b58ad36575b141"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21b2a5453c7f06625542f540a2baa2b7" id="r_a21b2a5453c7f06625542f540a2baa2b7"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a21b2a5453c7f06625542f540a2baa2b7">name_to_servoid</a></td></tr>
+<tr class="separator:a21b2a5453c7f06625542f540a2baa2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3536311b1ed50d98b0c97053a703993" id="r_ac3536311b1ed50d98b0c97053a703993"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3536311b1ed50d98b0c97053a703993">servoid_to_servo_num</a></td></tr>
+<tr class="separator:ac3536311b1ed50d98b0c97053a703993"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dd4c6fcac5a1fe07a9f65911f184dcb" id="r_a4dd4c6fcac5a1fe07a9f65911f184dcb"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4dd4c6fcac5a1fe07a9f65911f184dcb">all_stepperid_t</a></td></tr>
+<tr class="separator:a4dd4c6fcac5a1fe07a9f65911f184dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae73263022e75e8bd1d57c70af4f054de" id="r_ae73263022e75e8bd1d57c70af4f054de"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae73263022e75e8bd1d57c70af4f054de">name_to_stepperid</a></td></tr>
+<tr class="separator:ae73263022e75e8bd1d57c70af4f054de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b3f4bd4e4f9cc85320d19645751d0ce" id="r_a9b3f4bd4e4f9cc85320d19645751d0ce"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9b3f4bd4e4f9cc85320d19645751d0ce">stepperid_to_stepper_num</a></td></tr>
+<tr class="separator:a9b3f4bd4e4f9cc85320d19645751d0ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae97c57e01b5bad73f687df87ce66b4b9" id="r_ae97c57e01b5bad73f687df87ce66b4b9"><td class="memItemLeft" align="right" valign="top"><a id="ae97c57e01b5bad73f687df87ce66b4b9" name="ae97c57e01b5bad73f687df87ce66b4b9"></a>
 constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>N_LIMIT_SWITCH</b> = 8</td></tr>
 <tr class="memdesc:ae97c57e01b5bad73f687df87ce66b4b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum number of limit switches associated with any motor. <br /></td></tr>
@@ -263,6 +297,56 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 </div><!-- fragment -->
 </div>
 </div>
+<a id="ad37a197ce8eaa10312b58ad36575b141" name="ad37a197ce8eaa10312b58ad36575b141"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad37a197ce8eaa10312b58ad36575b141">&#9670;&#160;</a></span>all_servoid_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto robot::types::all_servoid_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;servoid_t&gt;(</div>
+<div class="line">  {servoid_t::microscope, servoid_t::syringe, servoid_t::soilBox,</div>
+<div class="line">   servoid_t::cuvette, servoid_t::filter})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4dd4c6fcac5a1fe07a9f65911f184dcb" name="a4dd4c6fcac5a1fe07a9f65911f184dcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dd4c6fcac5a1fe07a9f65911f184dcb">&#9670;&#160;</a></span>all_stepperid_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto robot::types::all_stepperid_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_set&lt;stepperid_t&gt;(</div>
+<div class="line">  {stepperid_t::plunger, stepperid_t::judges, stepperid_t::mast,</div>
+<div class="line">   stepperid_t::lock, stepperid_t::lazySusan})</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a98231f677dcd844641e6a4290424f9cc" name="a98231f677dcd844641e6a4290424f9cc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a98231f677dcd844641e6a4290424f9cc">&#9670;&#160;</a></span>name_to_jointid</h2>
 
@@ -295,6 +379,118 @@ constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>LIMIT_SWITCH
 <div class="line">     {<span class="stringliteral">&quot;fourBarLinkage&quot;</span>, jointid_t::fourBarLinkage},</div>
 <div class="line">     {<span class="stringliteral">&quot;drillActuator&quot;</span>, jointid_t::drillActuator},</div>
 <div class="line">     {<span class="stringliteral">&quot;drillMotor&quot;</span>, jointid_t::drillMotor}})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a21b2a5453c7f06625542f540a2baa2b7" name="a21b2a5453c7f06625542f540a2baa2b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21b2a5453c7f06625542f540a2baa2b7">&#9670;&#160;</a></span>name_to_servoid</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto robot::types::name_to_servoid</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;frozen::string, servoid_t&gt;(</div>
+<div class="line">  {{<span class="stringliteral">&quot;microscope&quot;</span>, servoid_t::microscope},</div>
+<div class="line">   {<span class="stringliteral">&quot;syringe&quot;</span>, servoid_t::syringe},</div>
+<div class="line">   {<span class="stringliteral">&quot;cuvette&quot;</span>, servoid_t::cuvette},</div>
+<div class="line">   {<span class="stringliteral">&quot;filter&quot;</span>, servoid_t::filter},</div>
+<div class="line">   {<span class="stringliteral">&quot;soilBox&quot;</span>, servoid_t::soilBox}})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ae73263022e75e8bd1d57c70af4f054de" name="ae73263022e75e8bd1d57c70af4f054de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae73263022e75e8bd1d57c70af4f054de">&#9670;&#160;</a></span>name_to_stepperid</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto robot::types::name_to_stepperid</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;frozen::string, stepperid_t&gt;(</div>
+<div class="line">  {{<span class="stringliteral">&quot;plunger&quot;</span>, stepperid_t::plunger},</div>
+<div class="line">   {<span class="stringliteral">&quot;judges&quot;</span>, stepperid_t::judges},</div>
+<div class="line">   {<span class="stringliteral">&quot;mast&quot;</span>, stepperid_t::mast},</div>
+<div class="line">   {<span class="stringliteral">&quot;lock&quot;</span>, stepperid_t::lock},</div>
+<div class="line">   {<span class="stringliteral">&quot;lazySusan&quot;</span>, stepperid_t::lazySusan}})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ac3536311b1ed50d98b0c97053a703993" name="ac3536311b1ed50d98b0c97053a703993"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3536311b1ed50d98b0c97053a703993">&#9670;&#160;</a></span>servoid_to_servo_num</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto robot::types::servoid_to_servo_num</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;servoid_t, int&gt;(</div>
+<div class="line">  {{servoid_t::microscope, 7},</div>
+<div class="line">   {servoid_t::syringe, 9},</div>
+<div class="line">   {servoid_t::cuvette, 5},</div>
+<div class="line">   {servoid_t::filter, 8},</div>
+<div class="line">   {servoid_t::soilBox, 6}})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a9b3f4bd4e4f9cc85320d19645751d0ce" name="a9b3f4bd4e4f9cc85320d19645751d0ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b3f4bd4e4f9cc85320d19645751d0ce">&#9670;&#160;</a></span>stepperid_to_stepper_num</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto robot::types::stepperid_to_stepper_num</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= frozen::make_unordered_map&lt;stepperid_t, uint8_t&gt;(</div>
+<div class="line">  {{stepperid_t::plunger, 4},</div>
+<div class="line">   {stepperid_t::judges, 5},</div>
+<div class="line">   {stepperid_t::mast, 2},</div>
+<div class="line">   {stepperid_t::lock, 1},</div>
+<div class="line">   {stepperid_t::lazySusan, 6}})</div>
 </div><!-- fragment -->
 </div>
 </div>
