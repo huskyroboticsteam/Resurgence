@@ -87,7 +87,11 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
+static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
+	return nullptr;
+}
+
+static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
 					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
 	if (list1d) {
 		json msg = {{"type", "simCameraStreamOpenRequest"},
@@ -106,13 +110,15 @@ static void openCamera(CameraID cam, std::optional<std::vector<double>> list1d =
 					{"intrinsics", nullptr}};
 		sendJSON(msg);
 	}
+
+	return nullptr;
 }
 
 void initCameras() {
-	auto cfg = cam::readConfigFromFile(Constants::MAST_CAMERA_CONFIG_PATH);
+	auto cfg = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(Constants::MAST_CAMERA_ID));
 	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
 	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::FOREARM_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
+	openCamera(Constants::WRIST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 }
 
@@ -144,7 +150,7 @@ void handleIMU(json msg) {
 }
 
 void handleCamFrame(json msg) {
-	std::string cam = msg["camera"];
+	CameraID cam = msg["camera"];
 	std::string b64 = msg["data"];
 	cv::Mat mat = base64::decodeMat(b64);
 

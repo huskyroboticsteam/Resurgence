@@ -1,0 +1,10 @@
+%YAML:1.0
+---
+name: "drill"
+description: "Drill Camera"
+# Make sure that this camera_id matches the one defined in the udev rules.
+camera_id: 540
+format: "image/jpeg"
+image_width: 1024
+image_height: 768
+framerate: 30
