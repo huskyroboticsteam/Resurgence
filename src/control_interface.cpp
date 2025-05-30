@@ -179,8 +179,8 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		}
 	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
 		setJointPowerValue(joint, power);
-		kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristPitch),
-										getJointPowerValue(jointid_t::wristRoll));
+		kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristRoll),
+										getJointPowerValue(jointid_t::wristPitch));
 		kinematics::gearpos_t gearPwr =
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
