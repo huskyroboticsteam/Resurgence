@@ -38,7 +38,7 @@ void AutonomousTask::navigate() {
 
 	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
 
-  robot::setIndicator(indication_t::autonomous);
+  robot::setIndicator(robot::types::indication_t::autonomous);
 
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
@@ -70,7 +70,7 @@ void AutonomousTask::navigate() {
 		}
 	}
 
-  robot::setIndicator(indication_t::arrivedAtDest);
+  robot::setIndicator(robot::types::indication_t::arrivedAtDest);
 }
 
 void AutonomousTask::kill() {

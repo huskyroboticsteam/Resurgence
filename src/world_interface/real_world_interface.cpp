@@ -148,7 +148,7 @@ void world_interface_init(
 
   // For now, we can consider the board as a motor and just use it for its serial
 
-  setIndicator(indication_t::off);
+  setIndicator(robot::types::indication_t::off);
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -317,27 +317,32 @@ void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t ang
   }
 }
 
-void setIndicator(indication_t signal) {
+void setActuator(uint8_t value) {
+  can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
+}
+
+void setIndicator(robot::types::indication_t signal) {
+  using robot::types::indication_t;
   switch (signal) {
     case indication_t::off:
-      can::motor::setLED(0x7, 0x6, 1, 0);
-      can::motor::setLED(0x7, 0x6, 2, 0);
-      can::motor::setLED(0x7, 0x6, 3, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 0);
       break;
     case indication_t::autonomous:
-      can::motor::setLED(0x7, 0x6, 1, 1);
-      can::motor::setLED(0x7, 0x6, 2, 0);
-      can::motor::setLED(0x7, 0x6, 3, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 1);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 0);
       break;
     case indication_t::teleop:
-      can::motor::setLED(0x7, 0x6, 1, 0);
-      can::motor::setLED(0x7, 0x6, 2, 0);
-      can::motor::setLED(0x7, 0x6, 3, 1);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 1);
       break;
     case indication_t::arrivedAtDest:
-      can::motor::setLED(0x7, 0x6, 1, 0);
-      can::motor::setLED(0x7, 0x6, 2, 1);
-      can::motor::setLED(0x7, 0x6, 3, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 0);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 1);
+      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 0);
       break;
   }
 }

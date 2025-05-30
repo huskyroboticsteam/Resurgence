@@ -156,6 +156,8 @@ void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t ste
 
 void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t value);
 
+void setActuator(devicegroup_t group, deviceserial_t serial, uint8_t value);
+
 /**
  * @brief Get the last reported position of a motor.
  *
