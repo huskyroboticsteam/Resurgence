@@ -77,6 +77,7 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		_autonomous_task.kill();
 		// if we have left autonomous mode, we need to start the power repeater again.
 		_power_repeat_task.start();
+    robot::setIndicator(indication_t::teleop);
 	}
 }
 

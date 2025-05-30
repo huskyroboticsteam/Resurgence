@@ -132,6 +132,11 @@ void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t ste
   sendCANPacket(p);
 }
 
+void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t value) {
+  CANPacket p;
+  AssembleCANPacket(&p, 0x1, static_cast<uint8_t>(group), serial, 0xFA, 3, LED, value);
+}
+
 DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }

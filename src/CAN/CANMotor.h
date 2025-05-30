@@ -154,6 +154,8 @@ void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, i
 
 void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t stepper, int16_t angle);
 
+void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t value);
+
 /**
  * @brief Get the last reported position of a motor.
  *

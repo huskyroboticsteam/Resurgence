@@ -147,6 +147,8 @@ void world_interface_init(
   // Initialize Science Servo Board
 
   // For now, we can consider the board as a motor and just use it for its serial
+
+  setIndicator(indication_t::off);
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -315,8 +317,30 @@ void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t ang
   }
 }
 
-// TODO: implement
-void setIndicator(indication_t signal) {}
+void setIndicator(indication_t signal) {
+  switch (signal) {
+    case indication_t::off:
+      can::motor::setLED(0x7, 0x6, 1, 0);
+      can::motor::setLED(0x7, 0x6, 2, 0);
+      can::motor::setLED(0x7, 0x6, 3, 0);
+      break;
+    case indication_t::autonomous:
+      can::motor::setLED(0x7, 0x6, 1, 1);
+      can::motor::setLED(0x7, 0x6, 2, 0);
+      can::motor::setLED(0x7, 0x6, 3, 0);
+      break;
+    case indication_t::teleop:
+      can::motor::setLED(0x7, 0x6, 1, 0);
+      can::motor::setLED(0x7, 0x6, 2, 0);
+      can::motor::setLED(0x7, 0x6, 3, 1);
+      break;
+    case indication_t::arrivedAtDest:
+      can::motor::setLED(0x7, 0x6, 1, 0);
+      can::motor::setLED(0x7, 0x6, 2, 1);
+      can::motor::setLED(0x7, 0x6, 3, 0);
+      break;
+  }
+}
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
