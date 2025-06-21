@@ -269,6 +269,11 @@ void world_interface_init(
 	initMotors();
 }
 
+std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
+  // Temporary open camera method
+	return nullptr;
+}
+
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
 	auto itr = motor_ptrs.find(motor);
 
@@ -390,6 +395,14 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
+}
+
+void setServoPos(robot::types::servoid_t servo, int32_t position) {
+  // Temporary void method as the simulator does not have servos yet
+}
+
+void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
+  // Temporary void method as the simulator does not have stepper yet
 }
 
 callbackid_t addLimitSwitchCallback(
