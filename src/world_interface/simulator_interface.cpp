@@ -384,17 +384,16 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 }
 
 void setServoPos(robot::types::servoid_t servo, int32_t position) {
-
+	// Implement when Servos are added to Simulator
 }
 
 void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-
+	// Implement when Steppers are added to Simulator
 }
 
 void setActuator(uint8_t value) {
-
+	// Implement when Actuators are added to Simulator
 }
-
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,

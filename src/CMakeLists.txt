@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22) # Latest versions of Ubuntu should have at least 3.16;
+cmake_minimum_required(VERSION 3.13) # Latest versions of Ubuntu should have at least 3.16;
                                      # argparse library requires 3.12.4 currently
 
 set(CMAKE_CXX_STANDARD 17) # 11 For the json library, 17 for std library features
@@ -85,7 +85,6 @@ link_libraries(frozen::frozen)
 # Find argparse, library used for parsing command line arguments
 find_package(argparse REQUIRED)
 
-
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
@@ -93,9 +92,9 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   # Find the CAN library; contains packet and protocol definitions and does not
   # actually require physical CAN to be present.
   FetchContent_Declare(
-      HindsightCAN
-      GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-      GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
+    HindsightCAN
+    GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
+    GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
   )
   FetchContent_MakeAvailable(HindsightCAN)
 endif()
