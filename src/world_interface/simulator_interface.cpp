@@ -87,10 +87,6 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
-	return nullptr;
-}
-
 static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
 					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
 	if (list1d) {
@@ -112,14 +108,6 @@ static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std:
 	}
 
 	return nullptr;
-}
-
-void initCameras() {
-	auto cfg = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(Constants::MAST_CAMERA_ID));
-	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
-	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::WRIST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 }
 
 void initMotors() {
@@ -265,7 +253,6 @@ void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors) {
 	initSimServer(wsServer.value());
-	initCameras();
 	initMotors();
 }
 
@@ -296,6 +283,10 @@ bool isEmergencyStopped() {
 std::unordered_set<CameraID> getCameras() {
 	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
 	return util::keySet(cameraLastFrameIdxMap);
+}
+
+std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
+	return nullptr;
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
@@ -391,6 +382,19 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
 }
+
+void setServoPos(robot::types::servoid_t servo, int32_t position) {
+
+}
+
+void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
+
+}
+
+void setActuator(uint8_t value) {
+
+}
+
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
