@@ -85,18 +85,19 @@ link_libraries(frozen::frozen)
 # Find argparse, library used for parsing command line arguments
 find_package(argparse REQUIRED)
 
-
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
-# Find the CAN library; contains packet and protocol definitions and does not
-# actually require physical CAN to be present.
-FetchContent_Declare(
+if(WORLD_INTERFACE STREQUAL "REAL")
+  # Find the CAN library; contains packet and protocol definitions and does not
+  # actually require physical CAN to be present.
+  FetchContent_Declare(
     HindsightCAN
     GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
     GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
-)
-FetchContent_MakeAvailable(HindsightCAN)
+  )
+  FetchContent_MakeAvailable(HindsightCAN)
+endif()
 
 FetchContent_Declare(LoguruGitRepo
 	GIT_REPOSITORY "https://github.com/emilk/loguru"
@@ -154,30 +155,32 @@ add_library(utils SHARED
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
-## ====== CAN Interfaces =======
-# Stub CAN interface is used for the tests (and for the Rover if
-# CAN is disabled) and the real CAN interface is used for the Rover if CAN is
-# enabled.
+if(WORLD_INTERFACE STREQUAL "REAL")
+  ## ====== CAN Interfaces =======
+  # Stub CAN interface is used for the tests (and for the Rover if
+  # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
+  # enabled.
 
-# Common CAN source files
+  # Common CAN source files
 
-# **DON'T MAKE THIS SHARED**
-# Making this library shared causes some memory fuckery
-# No clue why but CAN I/O goes to shit. Don't do it.
-add_library(can_interface STATIC)
-target_sources(can_interface PRIVATE
-  CAN/CANMotor.cpp
-  CAN/CANUtils.cpp
-)
+  # **DON'T MAKE THIS SHARED**
+  # Making this library shared causes some memory fuckery
+  # No clue why but CAN I/O goes to shit. Don't do it.
+  add_library(can_interface STATIC)
+  target_sources(can_interface PRIVATE
+    CAN/CANMotor.cpp
+    CAN/CANUtils.cpp
+  )
 
-# Hardware specific source files
-target_sources(can_interface PRIVATE
-  CAN/CAN.cpp)
-target_link_libraries(can_interface PUBLIC
-  HindsightCAN
-  Threads::Threads
-  utils
-)
+  # Hardware specific source files
+  target_sources(can_interface PRIVATE
+    CAN/CAN.cpp)
+  target_link_libraries(can_interface PUBLIC
+    HindsightCAN
+    Threads::Threads
+    utils
+  )
+endif()
 
 ## GPS Implementations
 
@@ -208,31 +211,27 @@ add_library(world_interface_core STATIC
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
 
-# CAN library (above) requires some utilities from this
-target_link_libraries(can_interface PUBLIC utils)
-
-add_library(stub_world_interface STATIC
-  world_interface/noop_world.cpp)
-
-add_library(real_world_interface STATIC
-  world_interface/real_world_interface.cpp
-  world_interface/motor/can_motor.cpp
-)
-
-add_library(simulator_interface STATIC
-  world_interface/simulator_interface.cpp
-  world_interface/motor/sim_motor.cpp
-)
-
-target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
-target_link_libraries(simulator_interface world_interface_core)
-target_link_libraries(stub_world_interface world_interface_core)
-
 if(WORLD_INTERFACE STREQUAL "REAL")
+  # CAN library (above) requires some utilities from this
+  target_link_libraries(can_interface PUBLIC utils)
+
+  add_library(real_world_interface STATIC
+    world_interface/real_world_interface.cpp
+    world_interface/motor/can_motor.cpp
+  )
+  target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
   add_library(world_interface ALIAS real_world_interface)
 elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
+  add_library(simulator_interface STATIC
+    world_interface/simulator_interface.cpp
+    world_interface/motor/sim_motor.cpp
+  )
+  target_link_libraries(simulator_interface world_interface_core)
   add_library(world_interface ALIAS simulator_interface)
 else()
+  add_library(stub_world_interface STATIC
+    world_interface/noop_world.cpp)
+  target_link_libraries(stub_world_interface world_interface_core)
   add_library(world_interface ALIAS stub_world_interface)
 endif()
 
@@ -273,7 +272,7 @@ add_executable(Rover Rover.cpp)
 add_library(rover_common STATIC
   Globals.cpp
   control_interface.cpp
-  )
+)
 target_link_libraries(rover_common
   utils
   websocket_utils
@@ -295,13 +294,6 @@ target_link_libraries(Rover
   world_interface
   ${vision_libs}
 )
-
-add_executable(TunePID TunePID.cpp)
-target_link_libraries(TunePID
-  ${rover_libs}
-  can_interface
-)
-target_link_libraries(TunePID ${vision_libs})
 
 if(WITH_TESTS)
   add_executable(tests
@@ -359,6 +351,13 @@ if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration
     LimitCalib.cpp)
   target_link_libraries(LimitSwitchCalibration real_world_interface)
+
+  add_executable(TunePID TunePID.cpp)
+  target_link_libraries(TunePID
+    ${rover_libs}
+    can_interface
+  )
+  target_link_libraries(TunePID ${vision_libs})
 endif()
 
 add_compile_options(
