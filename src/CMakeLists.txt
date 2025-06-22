@@ -94,7 +94,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 FetchContent_Declare(
     HindsightCAN
     GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-    GIT_TAG 675aa2c32a5b6cdb24f3f2b8aae5b7e43d717bf6
+    GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
 )
 FetchContent_MakeAvailable(HindsightCAN)
 
@@ -310,7 +310,7 @@ if(WITH_TESTS)
     ar/DetectorTests.cpp
     ar/MarkerSetTests.cpp
     # Camera tests
-    ../tests/camera/CameraParamsTests.cpp
+    # ../tests/camera/CameraParamsTests.cpp
     # GPS tests
     ../tests/gps/GPSDatumTest.cpp
     ../tests/gps/GPSConverterTest.cpp

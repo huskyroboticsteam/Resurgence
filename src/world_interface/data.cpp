@@ -48,6 +48,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "ikUp";
 		case jointid_t::ikForward:
 			return "ikForward";
+		case jointid_t::fourBarLinkage:
+			return "fourBarLinkage";
 		case jointid_t::drillActuator:
 			return "drillActuator";
 		case jointid_t::drillMotor:
@@ -59,7 +61,7 @@ std::string to_string(robot::types::jointid_t joint) {
 }
 
 std::string to_string(const robot::types::CameraID& id) {
-	return id;
+	return std::to_string(id);
 }
 
 std::string to_string(robot::types::mountedperipheral_t peripheral) {
@@ -80,6 +82,25 @@ std::string to_string(robot::types::mountedperipheral_t peripheral) {
 
 		default:
 			// should never happen
+			return "<unknown>";
+	}
+}
+
+std::string to_string(robot::types::servoid_t servo) {
+	using robot::types::servoid_t;
+
+	switch (servo) {
+		case servoid_t::microscope:
+			return "microscope";
+		case servoid_t::syringe:
+			return "syringe";
+		case servoid_t::cuvette:
+			return "cuvette";
+		case servoid_t::filter:
+			return "filter";
+		case servoid_t::soilBox:
+			return "soilBox";
+		default:
 			return "<unknown>";
 	}
 }

@@ -51,6 +51,8 @@ private:
 	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
+  void handleServoPositionRequest(const json& j);
+  void handleStepperTurnAngleRequest(const json& j);
 	void sendArmIKEnabledReport(bool enabled);
 	void handleConnection();
 	void handleHeartbeatTimedOut();

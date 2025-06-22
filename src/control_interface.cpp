@@ -124,6 +124,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
+	} else if (joint == jointid_t::fourBarLinkage) {
+		return getMotorPos(motorid_t::fourbar1);
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
@@ -183,6 +185,26 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
+	} else if (joint == jointid_t::fourBarLinkage) {
+    auto dp = getJointPos(jointid_t::fourBarLinkage);
+    if (dp.isValid()) {
+      int currAngle = dp.getData();
+      currAngle = currAngle / 1000;
+      if(currAngle > 320 || 
+        currAngle < 50) {
+        setMotorPower(motorid_t::fourbar1, power * 0.7);
+        setMotorPower(motorid_t::fourbar2, power * 0.7);
+      } else if (currAngle < 265 && power < 0){
+        setMotorPower(motorid_t::fourbar1, -power);
+        setMotorPower(motorid_t::fourbar2, -power);
+      } else {
+        setMotorPower(motorid_t::fourbar1, power);
+        setMotorPower(motorid_t::fourbar2, power);
+      }
+    } else {
+			setMotorPower(motorid_t::fourbar1, power);
+			setMotorPower(motorid_t::fourbar2, power);
+		}
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

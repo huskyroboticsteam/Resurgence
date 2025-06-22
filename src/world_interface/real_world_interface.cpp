@@ -36,13 +36,21 @@ kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+  double posScale = 0;
+  double negScale = 0;
+
 	// get scales for motor
-	double posScale = positive_pwm_scales.at(motor);
-	double negScale = negative_pwm_scales.at(motor);
+  try {
+    posScale = positive_pwm_scales.at(motor);
+    negScale = negative_pwm_scales.at(motor);
+  } catch (const std::out_of_range& err) {
+    LOG_F(ERROR, "Couldn't find PWM scales for motor 0x%x", static_cast<uint8_t>(motor));
+  }
 
 	// create ptr and insert in map
-	std::shared_ptr<robot::base_motor> ptr = std::make_shared<can_motor>(
-		motor, hasPosSensor, motorSerialIDMap.at(motor), posScale, negScale);
+	std::shared_ptr<robot::base_motor> ptr =
+		std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
+									motorGroupMap.at(motor), posScale, negScale);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace
@@ -53,26 +61,29 @@ const kinematics::DiffDriveKinematics& driveKinematics() {
 
 namespace {
 // map that associates camera id to the camera object
-std::unordered_map<CameraID, std::shared_ptr<cam::Camera>> cameraMap;
+std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 
 callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
 	for (const auto& it : motorSerialIDMap) {
-		can::motor::initMotor(it.second);
-		bool hasPosSensor = robot::potMotors.find(it.first) != robot::potMotors.end() ||
-							robot::encMotors.find(it.first) != robot::encMotors.end();
-		addMotorMapping(it.first, hasPosSensor);
+		motorid_t motor = it.first;
+		auto group = motorGroupMap.at(motor);
+		can::motor::initMotor(group, it.second);
+		bool hasPosSensor = robot::potMotors.find(motor) != robot::potMotors.end() ||
+							robot::encMotors.find(motor) != robot::encMotors.end();
+		addMotorMapping(motor, hasPosSensor);
 	}
 
 	for (const auto& pot_motor_pair : robot::potMotors) {
 		motorid_t motor_id = pot_motor_pair.first;
 		potparams_t pot_params = pot_motor_pair.second;
 
+		can::devicegroup_t group = motorGroupMap.at(motor_id);
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initPotentiometer(serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
+		can::motor::initPotentiometer(group, serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
 	}
 
@@ -80,28 +91,36 @@ void initMotors() {
 		motorid_t motor_id = enc_motor_pair.first;
 		encparams_t enc_params = enc_motor_pair.second;
 
+		can::devicegroup_t group = motorGroupMap.at(motor_id);
 		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
 
-		can::motor::initEncoder(serial, enc_params.isInverted, true, enc_params.ppjr,
+		can::motor::initEncoder(group, serial, enc_params.isInverted, true, enc_params.ppjr,
 								TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(serial, enc_params.limitSwitchLow,
+		can::motor::setLimitSwitchLimits(group, serial, enc_params.limitSwitchLow,
 										 enc_params.limitSwitchHigh);
 	}
 
 	for (const auto& pair : robot::motorPIDMap) {
 		motorid_t motor = pair.first;
+		can::devicegroup_t group = motorGroupMap.at(motor);
 		can::deviceserial_t serial = motorSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
-		can::motor::setMotorPIDConstants(serial, pid.kP, pid.kI, pid.kD);
+		can::motor::setMotorPIDConstants(group, serial, pid.kP, pid.kI, pid.kD);
 	}
 }
 
-void openCamera(CameraID camID, const char* cameraPath) {
+std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
+	auto it = cameraMap.find(camID);
+	if (it != cameraMap.end()) {
+		auto cam = it->second.lock();
+		if (cam) { return cam; }
+	}
 	try {
 		auto cam = std::make_shared<cam::Camera>();
-		bool success = cam->openFromConfigFile(cameraPath);
+		bool success = cam->open(camID);
 		if (success) {
 			cameraMap[camID] = cam;
+			return cam;
 		} else {
 			LOG_F(ERROR, "Failed to open camera with id %s", util::to_string(camID).c_str());
 		}
@@ -109,12 +128,8 @@ void openCamera(CameraID camID, const char* cameraPath) {
 		LOG_F(ERROR, "Error opening camera with id %s:\n%s", util::to_string(camID).c_str(),
 			  e.what());
 	}
-}
 
-void setupCameras() {
-	openCamera(Constants::MAST_CAMERA_ID, Constants::MAST_CAMERA_CONFIG_PATH);
-	openCamera(Constants::FOREARM_CAMERA_ID, Constants::FOREARM_CAMERA_CONFIG_PATH);
-	openCamera(Constants::HAND_CAMERA_ID, Constants::HAND_CAMERA_CONFIG_PATH);
+	return nullptr;
 }
 } // namespace
 
@@ -122,13 +137,21 @@ void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors) {
 	if (!initOnlyMotors) {
-		setupCameras();
 		if (wsServer.has_value()) {
 			ardupilot::initArduPilotProtocol(wsServer.value());
 		}
 	}
 	can::initCAN();
 	initMotors();
+
+  // Initialize Science Servo Board
+
+  // For now, we can consider the board as a motor and just use it for its serial
+}
+
+std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
+	std::shared_ptr<cam::Camera> cam = openCamera_(cameraID);
+	return cam ? std::make_shared<types::CameraHandle>(cam) : nullptr;
 }
 
 std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
@@ -160,9 +183,16 @@ std::unordered_set<CameraID> getCameras() {
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
-		return itr->second->hasNext(oldFrameNum);
+		// return itr->second->hasNext(oldFrameNum);
+		auto cam = itr->second.lock();
+		if (cam) {
+			return cam->hasNext(oldFrameNum);
+		} else {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return false;
+		}
 	} else {
-		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
+		// LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return false;
 	}
 }
@@ -170,10 +200,15 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
+		auto cam = itr->second.lock();
+		if (!cam) {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return DataPoint<CameraFrame>{};
+		}
 		cv::Mat mat;
 		uint32_t frameNum;
 		datatime_t time;
-		bool success = itr->second->next(mat, frameNum, time);
+		bool success = cam->next(mat, frameNum, time);
 		if (success) {
 			return DataPoint<CameraFrame>{time, {mat, frameNum}};
 		} else {
@@ -188,9 +223,14 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
-		auto camera = itr->second;
-		return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
-											: std::optional<cam::CameraParams>{};
+		auto camera = itr->second.lock();
+		if (camera) {
+			return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
+												: std::optional<cam::CameraParams>{};
+		} else {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return {};
+		}
 	} else {
 		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return {};
@@ -200,9 +240,14 @@ std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
-		auto camera = itr->second;
-		return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
-											: std::optional<cv::Mat>{};
+		auto camera = itr->second.lock();
+		if (camera) {
+			return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
+												: std::optional<cv::Mat>{};
+		} else {
+			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			return {};
+		}
 	} else {
 		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
 		return {};
@@ -254,6 +299,22 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	motor_ptr->setMotorVel(targetVel);
 }
 
+void setServoPos(robot::types::servoid_t servo, int32_t position) {
+  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
+  auto servo_num = servoid_to_servo_num.find(servo);
+  if (servo_num != servoid_to_servo_num.end()) {
+  	servo_board->setServoPos(servo_num->second, position);
+  }
+}
+
+void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
+  std::shared_ptr<robot::base_motor> stepper_board = getMotor(motorid_t::scienceStepperBoard);
+  auto stepper_num = stepperid_to_stepper_num.find(stepper);
+  if (stepper_num != stepperid_to_stepper_num.end()) {
+    stepper_board->setStepperTurnAngle(stepper_num->second, angle);
+  }
+}
+
 // TODO: implement
 void setIndicator(indication_t signal) {}
 
@@ -262,10 +323,10 @@ callbackid_t addLimitSwitchCallback(
 	const std::function<void(robot::types::motorid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
-	auto func = [=](can::deviceserial_t serial, DataPoint<LimitSwitchData> data) {
-		callback(motor, data);
-	};
-	auto id = can::motor::addLimitSwitchCallback(motorSerialIDMap.at(motor), func);
+	auto func = [=](can::devicegroup_t group, can::deviceserial_t serial,
+					DataPoint<LimitSwitchData> data) { callback(motor, data); };
+	auto id = can::motor::addLimitSwitchCallback(motorGroupMap.at(motor),
+												 motorSerialIDMap.at(motor), func);
 	auto nextID = nextCallbackID++;
 	callbackIDMap.insert({nextID, id});
 	return nextID;
