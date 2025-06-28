@@ -43,7 +43,11 @@ void initCAN();
  */
 void sendCANPacket(const CANPacket& packet);
 
-// Print packet for debugging purposes
+/**
+ * @brief Print a CAN packet.
+ * 
+ * @param packet The CAN packet to print.
+ */
 void printCANPacket(const CANPacket& packet);
 
 /**

@@ -144,9 +144,10 @@ void setMotorPower(devicegroup_t group, deviceserial_t serial, int16_t power);
 void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t target);
 
 /**
- * @brief Set the angle of the PCA servo
+ * @brief Set the angle of a servo
  *
- * @param serial The CAN serial number of the motor board.
+ * @param group The CAN device group of the servo board.
+ * @param serial The CAN serial number of the servo board.
  * @param servoNum the servo number.
  * @param position the position of the servo in degrees.
  */
