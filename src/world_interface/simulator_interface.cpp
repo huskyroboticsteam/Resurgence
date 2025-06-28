@@ -286,6 +286,23 @@ std::unordered_set<CameraID> getCameras() {
 }
 
 std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
+	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
+	if (!fs.isOpened()) {
+		throw std::invalid_argument("Configuration file for Camera ID" + std::to_string(cam) + " does not exist");
+	}
+
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+		throw std::invalid_argument("Configuration file missing key(s)");
+	}
+
+	json msg = {{"type", "simCameraStreamOpenRequest"},
+			{"camera", cam},
+			{"fps", static_cast<int>(fs[KEY_FRAMERATE])},
+			{"width", static_cast<int>(fs[KEY_IMAGE_WIDTH])},
+			{"height", static_cast<int>(fs[KEY_IMAGE_HEIGHT])},
+			{"intrinsics", nullptr}};
+	sendJSON(msg);
+
 	return nullptr;
 }
 
