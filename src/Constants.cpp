@@ -58,15 +58,15 @@ const robot::types::CameraID DRILL_CAMERA_ID = 540;
 const robot::types::CameraID MICROSCOPE_ID = 500;
 
 const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
-   {HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"},
-   {WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
-   {MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
-   {RAND_CAMERA_ID, "../camera-config/RandCameraCalibration.yml"},
-   {CJ1_CAMERA_ID, "../camera-config/CJ1.yml"},
-   {BOX_CAMERA_ID, "../camera-config/BoxCamera.yml"},
-   {CJ3_CAMERA_ID, "../camera-config/CJ3.yml"},
-   {DRILL_CAMERA_ID, "../camera-config/DrillCamera.yml"},
-   {MICROSCOPE_ID, "../camera-config/Microscope.yml"},
+	{HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"},
+	{WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
+	{MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
+	{RAND_CAMERA_ID, "../camera-config/RandCameraCalibration.yml"},
+	{CJ1_CAMERA_ID, "../camera-config/CJ1.yml"},
+	{BOX_CAMERA_ID, "../camera-config/BoxCamera.yml"},
+	{CJ3_CAMERA_ID, "../camera-config/CJ3.yml"},
+	{DRILL_CAMERA_ID, "../camera-config/DrillCamera.yml"},
+	{MICROSCOPE_ID, "../camera-config/Microscope.yml"},
 };
 
 /**

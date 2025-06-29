@@ -186,22 +186,21 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
 	} else if (joint == jointid_t::fourBarLinkage) {
-    auto dp = getJointPos(jointid_t::fourBarLinkage);
-    if (dp.isValid()) {
-      int currAngle = dp.getData();
-      currAngle = currAngle / 1000;
-      if(currAngle > 320 || 
-        currAngle < 50) {
-        setMotorPower(motorid_t::fourbar1, power * 0.7);
-        setMotorPower(motorid_t::fourbar2, power * 0.7);
-      } else if (currAngle < 265 && power < 0){
-        setMotorPower(motorid_t::fourbar1, -power);
-        setMotorPower(motorid_t::fourbar2, -power);
-      } else {
-        setMotorPower(motorid_t::fourbar1, power);
-        setMotorPower(motorid_t::fourbar2, power);
-      }
-    } else {
+		auto dp = getJointPos(jointid_t::fourBarLinkage);
+		if (dp.isValid()) {
+			int currAngle = dp.getData();
+			currAngle = currAngle / 1000;
+			if (currAngle > 320 || currAngle < 50) {
+				setMotorPower(motorid_t::fourbar1, power * 0.7);
+				setMotorPower(motorid_t::fourbar2, power * 0.7);
+			} else if (currAngle < 265 && power < 0) {
+				setMotorPower(motorid_t::fourbar1, -power);
+				setMotorPower(motorid_t::fourbar2, -power);
+			} else {
+				setMotorPower(motorid_t::fourbar1, power);
+				setMotorPower(motorid_t::fourbar2, power);
+			}
+		} else {
 			setMotorPower(motorid_t::fourbar1, power);
 			setMotorPower(motorid_t::fourbar2, power);
 		}
