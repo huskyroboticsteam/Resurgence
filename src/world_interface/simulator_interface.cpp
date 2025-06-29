@@ -106,7 +106,6 @@ static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std:
 					{"intrinsics", nullptr}};
 		sendJSON(msg);
 	}
-
 	return nullptr;
 }
 
@@ -302,8 +301,9 @@ std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
 			{"height", static_cast<int>(fs[KEY_IMAGE_HEIGHT])},
 			{"intrinsics", nullptr}};
 	sendJSON(msg);
-
-	return nullptr;
+	auto camObject = std::make_shared<cam::Camera>();
+	// Just need to return a value so that we can append the camera stream
+	return camObject ? std::make_shared<types::CameraHandle>(camObject) : nullptr;
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
