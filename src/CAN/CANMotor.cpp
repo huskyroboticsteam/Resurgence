@@ -13,6 +13,7 @@ extern "C" {
 #include <HindsightCAN/CANPacket.h>
 #include <HindsightCAN/CANPower.h>
 #include <HindsightCAN/CANScience.h>
+}
 
 using namespace std::chrono_literals;
 using robot::types::DataPoint;
