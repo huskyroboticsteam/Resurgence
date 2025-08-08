@@ -77,8 +77,7 @@ enum class motorid_t {
 enum class mountedperipheral_t {
 	none,
 	arm,
-	armServo,
-	scienceStation,
+	science,
 };
 
 enum class jointid_t {

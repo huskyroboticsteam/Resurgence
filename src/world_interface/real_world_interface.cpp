@@ -147,8 +147,6 @@ void world_interface_init(
   // Initialize Science Servo Board
 
   // For now, we can consider the board as a motor and just use it for its serial
-
-  setIndicator(robot::types::indication_t::off);
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -319,32 +317,6 @@ void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t ang
 
 void setActuator(uint8_t value) {
   can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
-}
-
-void setIndicator(robot::types::indication_t signal) {
-  using robot::types::indication_t;
-  switch (signal) {
-    case indication_t::off:
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 0);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 0);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 0);
-      break;
-    case indication_t::autonomous:
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 1);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 0);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 0);
-      break;
-    case indication_t::teleop:
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 0);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 0);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 1);
-      break;
-    case indication_t::arrivedAtDest:
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 1, 0);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 2, 1);
-      can::motor::setLED(can::devicegroup_t::science, 0x6, 3, 0);
-      break;
-  }
 }
 
 callbackid_t addLimitSwitchCallback(

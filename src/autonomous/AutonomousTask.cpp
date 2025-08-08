@@ -38,8 +38,6 @@ void AutonomousTask::navigate() {
 
 	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
 
-  robot::setIndicator(robot::types::indication_t::autonomous);
-
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
 		auto latestGPS = robot::readGPS();
@@ -69,8 +67,6 @@ void AutonomousTask::navigate() {
 			return;
 		}
 	}
-
-  robot::setIndicator(robot::types::indication_t::arrivedAtDest);
 }
 
 void AutonomousTask::kill() {
