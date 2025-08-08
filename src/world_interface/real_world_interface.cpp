@@ -319,6 +319,9 @@ void setActuator(uint8_t value) {
   can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
 }
 
+// TODO: implement
+void setIndicator(indication_t signal) {}
+
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
 	const std::function<void(robot::types::motorid_t motor,

@@ -13,7 +13,6 @@ extern "C" {
 #include <HindsightCAN/CANPacket.h>
 #include <HindsightCAN/CANPower.h>
 #include <HindsightCAN/CANScience.h>
-}
 
 using namespace std::chrono_literals;
 using robot::types::DataPoint;
@@ -152,7 +151,7 @@ void setActuator(devicegroup_t group, deviceserial_t serial, uint8_t value) {
   AssembleCANPacket(&p, 0x1, static_cast<uint8_t>(group), serial, 0x13, 3, data);
   sendCANPacket(p);
 }
-
+  
 DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }

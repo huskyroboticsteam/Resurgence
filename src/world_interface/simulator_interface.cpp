@@ -87,10 +87,6 @@ void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
-	return nullptr;
-}
-
 static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
 					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
 	if (list1d) {
@@ -112,14 +108,6 @@ static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std:
 	}
 
 	return nullptr;
-}
-
-void initCameras() {
-	auto cfg = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(Constants::MAST_CAMERA_ID));
-	cameraConfigMap[Constants::MAST_CAMERA_ID] = cfg;
-	openCamera(Constants::HAND_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::WRIST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
-	openCamera(Constants::MAST_CAMERA_ID, cfg.intrinsicParams->getIntrinsicList());
 }
 
 void initMotors() {
@@ -265,7 +253,6 @@ void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors) {
 	initSimServer(wsServer.value());
-	initCameras();
 	initMotors();
 }
 
@@ -296,6 +283,28 @@ bool isEmergencyStopped() {
 std::unordered_set<CameraID> getCameras() {
 	std::shared_lock<std::shared_mutex> lock(cameraFrameMapMutex);
 	return util::keySet(cameraLastFrameIdxMap);
+}
+
+std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
+	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
+	if (!fs.isOpened()) {
+		throw std::invalid_argument("Configuration file for Camera ID" + std::to_string(cam) + " does not exist");
+	}
+
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+		throw std::invalid_argument("Configuration file missing key(s)");
+	}
+
+	json msg = {{"type", "simCameraStreamOpenRequest"},
+			{"camera", cam},
+			{"fps", static_cast<int>(fs[KEY_FRAMERATE])},
+			{"width", static_cast<int>(fs[KEY_IMAGE_WIDTH])},
+			{"height", static_cast<int>(fs[KEY_IMAGE_HEIGHT])},
+			{"intrinsics", nullptr}};
+	sendJSON(msg);
+	auto camObject = std::make_shared<cam::Camera>();
+	// Just need to return a value so that we can append the camera stream
+	return std::make_shared<types::CameraHandle>(camObject);
 }
 
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
@@ -390,6 +399,18 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
+}
+
+void setServoPos(robot::types::servoid_t servo, int32_t position) {
+	// Implement when Servos are added to Simulator
+}
+
+void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
+	// Implement when Steppers are added to Simulator
+}
+
+void setActuator(uint8_t value) {
+	// Implement when Actuators are added to Simulator
 }
 
 callbackid_t addLimitSwitchCallback(
