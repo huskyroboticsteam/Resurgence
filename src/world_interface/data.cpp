@@ -40,6 +40,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "forearm";
 		case jointid_t::hand:
 			return "hand";
+    case jointid_t::handActuator:
+      return "handActuator";
 		case jointid_t::wristPitch:
 			return "wristPitch";
 		case jointid_t::wristRoll:
@@ -74,11 +76,8 @@ std::string to_string(robot::types::mountedperipheral_t peripheral) {
 		case mountedperipheral_t::arm:
 			return "arm";
 
-		case mountedperipheral_t::armServo:
-			return "armServo";
-
-		case mountedperipheral_t::scienceStation:
-			return "scienceStation";
+		case mountedperipheral_t::science:
+			return "science";
 
 		default:
 			// should never happen

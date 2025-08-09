@@ -28,7 +28,7 @@ using std::placeholders::_1;
 
 namespace net::mc {
 namespace {
-const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
+const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 30000ms;
 } // namespace
 
 /**

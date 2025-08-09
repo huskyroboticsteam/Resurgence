@@ -315,6 +315,10 @@ void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t ang
   }
 }
 
+void setActuator(uint8_t value) {
+  can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
+}
+
 // TODO: implement
 void setIndicator(indication_t signal) {}
 

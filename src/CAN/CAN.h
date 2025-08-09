@@ -47,6 +47,13 @@ void sendCANPacket(const CANPacket& packet);
 void printCANPacket(const CANPacket& packet);
 
 /**
+ * @brief Print a CAN packet.
+ * 
+ * @param packet The CAN packet to print.
+ */
+void printCANPacket(const CANPacket& packet);
+
+/**
  * @brief Get the latest telemetry from a CAN device.
  *
  * This method does NOT query for new data, it just returns the last reported value.

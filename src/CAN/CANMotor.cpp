@@ -11,6 +11,7 @@ extern "C" {
 #include <HindsightCAN/CANCommon.h>
 #include <HindsightCAN/CANMotorUnit.h>
 #include <HindsightCAN/CANPacket.h>
+#include <HindsightCAN/CANPower.h>
 #include <HindsightCAN/CANScience.h>
 }
 
@@ -132,6 +133,26 @@ void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t ste
   sendCANPacket(p);
 }
 
+void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t value) {
+  CANPacket p;
+  uint8_t data[3];
+  data[0] = 0xFA;
+  data[1] = LED;
+  data[2] = value;
+  AssembleCANPacket(&p, 0x1, static_cast<uint8_t>(group), serial, 0xFA, 3, data);
+  sendCANPacket(p);
+}
+
+void setActuator(devicegroup_t group, deviceserial_t serial, uint8_t value) {
+  CANPacket p;
+  uint8_t data[3];
+  data[0] = 0xFA;
+  data[1] = 2;
+  data[2] = value;
+  AssembleCANPacket(&p, 0x1, static_cast<uint8_t>(group), serial, 0x13, 3, data);
+  sendCANPacket(p);
+}
+  
 DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }
