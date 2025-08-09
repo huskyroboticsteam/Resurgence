@@ -4,6 +4,8 @@
 
 #include <loguru.hpp>
 
+#include <opencv2/aruco.hpp>
+
 using cv::Mat;
 using cv::Size;
 using std::string;
@@ -103,11 +105,31 @@ void Camera::captureLoop() {
 		bool success = _capture->read(frame);
 		_capture_lock->unlock();
 		if (success && !frame.empty()) {
-			_frame_lock->lock();
-			frame.copyTo(*(this->_frame));
-			(*_frame_num)++;
-			*_frame_time = dataclock::now();
-			_frame_lock->unlock();
+      if (std::strcmp(_name.c_str(), "hand") == 0) {
+        cv::Ptr<cv::aruco::Dictionary> dictionary =
+          cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
+        std::vector<std::vector<cv::Point2f>> markerCorners;
+        cv::Mat frameCopy;
+        std::vector<int> markerIds;
+        cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds);
+        frame.copyTo(frameCopy);
+        if(!markerIds.empty()) {
+          cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds);
+        }
+
+        _frame_lock->lock();
+        frameCopy.copyTo(*(this->_frame));
+        (*_frame_num)++;
+        *_frame_time = dataclock::now();
+        _frame_lock->unlock();
+      } else {
+        _frame_lock->lock();
+        frame.copyTo(*(this->_frame));
+        (*_frame_num)++;
+        *_frame_time = dataclock::now();
+        _frame_lock->unlock();
+      }
+
 		}
 	}
 }
