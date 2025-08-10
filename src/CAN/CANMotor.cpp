@@ -146,9 +146,9 @@ void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t val
 void setActuator(devicegroup_t group, deviceserial_t serial, uint8_t value) {
   CANPacket p;
   uint8_t data[3];
-  data[0] = 0xFA;
+  data[0] = 0x13;
   data[1] = 2;
-  data[2] = value;
+  data[2] = (value == 1) ? 1 : 255;
   AssembleCANPacket(&p, 0x1, static_cast<uint8_t>(group), serial, 0x13, 3, data);
   sendCANPacket(p);
 }
