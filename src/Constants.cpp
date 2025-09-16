@@ -61,7 +61,7 @@ const std::unordered_map<std::string, robot::types::CameraID> CAMERA_IDS = {
 	{"hand", HAND_CAMERA_ID},
 	{"wrist", WRIST_CAMERA_ID},
 	{"mast", MAST_CAMERA_ID},
-}
+};
 
 /**
    @deprecated No need for this constant once we fully switch over the Mission Control PlanViz
