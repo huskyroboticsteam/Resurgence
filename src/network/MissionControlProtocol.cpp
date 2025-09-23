@@ -254,11 +254,11 @@ static bool validateCameraStreamOpenRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
-	CameraID cam = j["camera"];
-	//std::unordered_set<CameraID> supported_cams = robot::getCameras();
-	//if (supported_cams.find(cam) != supported_cams.end()) {
-		_camera_stream_task.openStream(cam, j["fps"]);
-	//}
+  std::string name = j["camera"];
+  auto cam = Constants::CAMERA_IDS.find(name);
+  if (cam != Constants::CAMERA_IDS.end()) {
+		_camera_stream_task.openStream(cam->second, j["fps"]);
+  }
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
@@ -267,8 +267,11 @@ static bool validateCameraStreamCloseRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
-	CameraID cam = j["camera"];
-	_camera_stream_task.closeStream(cam);
+  std::string name = j["camera"];
+  auto cam = Constants::CAMERA_IDS.find(name);
+  if (cam != Constants::CAMERA_IDS.end()) {
+  	_camera_stream_task.closeStream(cam->second);
+  }
 }
 
 static bool validateCameraFrameRequest(const json& j) {
@@ -277,15 +280,18 @@ static bool validateCameraFrameRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
-	CameraID cam = j["camera"];
-	auto camDP = robot::readCamera(cam);
-	if (camDP) {
-		auto data = camDP.getData();
-		cv::Mat frame = data.first;
-		std::string b64_data = base64::encodeMat(frame, ".jpg");
-		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
-		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-	}
+  std::string name = j["camera"];
+  auto cam = Constants::CAMERA_IDS.find(name);
+  if (cam != Constants::CAMERA_IDS.end()) {
+    auto camDP = robot::readCamera(cam->second);
+    if (camDP) {
+      auto data = camDP.getData();
+      cv::Mat frame = data.first;
+      std::string b64_data = base64::encodeMat(frame, ".jpg");
+      json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam->second}, {"data", b64_data}};
+      _server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+    }
+  }
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
