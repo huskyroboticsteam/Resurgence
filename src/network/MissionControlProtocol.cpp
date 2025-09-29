@@ -254,7 +254,8 @@ static bool validateCameraStreamOpenRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
-	_camera_stream_task.openStream(j["camera"], j["fps"]);
+	CameraID cam = j["camera"];
+	_camera_stream_task.openStream(cam, j["fps"]);
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
@@ -263,7 +264,8 @@ static bool validateCameraStreamCloseRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
-  	_camera_stream_task.closeStream(j["camera"]);
+	CameraID cam = j["camera"];
+  	_camera_stream_task.closeStream(cam);
 }
 
 static bool validateCameraFrameRequest(const json& j) {
@@ -272,12 +274,13 @@ static bool validateCameraFrameRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
-    auto camDP = robot::readCamera(j["camera"]);
+	CameraID cam = j["camera"];
+    auto camDP = robot::readCamera(cam);
     if (camDP) {
       auto data = camDP.getData();
       cv::Mat frame = data.first;
       std::string b64_data = base64::encodeMat(frame, ".jpg");
-      json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", j["camera"]}, {"data", b64_data}};
+      json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
       _server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
     }
 }
