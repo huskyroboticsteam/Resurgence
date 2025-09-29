@@ -47,20 +47,14 @@ const double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
 const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 							  .wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
-const robot::types::CameraID HAND_CAMERA_ID = 20;
-const robot::types::CameraID WRIST_CAMERA_ID = 30;
-const robot::types::CameraID MAST_CAMERA_ID = 40;
+const robot::types::CameraID HAND_CAMERA_ID = "hand";
+const robot::types::CameraID WRIST_CAMERA_ID = "wrist";
+const robot::types::CameraID MAST_CAMERA_ID = "mast";
 
 const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
 	{HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"},
 	{WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
 	{MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
-};
-
-const std::unordered_map<std::string, robot::types::CameraID> CAMERA_IDS = {
-	{"hand", HAND_CAMERA_ID},
-	{"wrist", WRIST_CAMERA_ID},
-	{"mast", MAST_CAMERA_ID},
 };
 
 /**

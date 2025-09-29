@@ -62,7 +62,6 @@ extern const CameraID WRIST_CAMERA_ID;
 extern const CameraID HAND_CAMERA_ID;
 
 extern const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS;
-extern const std::unordered_map<std::string, robot::types::CameraID> CAMERA_IDS;
 
 
 extern const uint16_t WS_SERVER_PORT;

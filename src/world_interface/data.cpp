@@ -62,10 +62,6 @@ std::string to_string(robot::types::jointid_t joint) {
 	}
 }
 
-std::string to_string(const robot::types::CameraID& id) {
-	return std::to_string(id);
-}
-
 std::string to_string(robot::types::mountedperipheral_t peripheral) {
 	using robot::types::mountedperipheral_t;
 
