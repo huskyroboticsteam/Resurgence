@@ -4,6 +4,8 @@
 
 #include <loguru.hpp>
 
+#include <opencv2/aruco.hpp>
+
 using cv::Mat;
 using cv::Size;
 using std::string;
@@ -27,7 +29,7 @@ bool Camera::open(CameraID camera_id, CameraParams intrinsic_params, Mat extrins
 	this->_capture = std::make_shared<cv::VideoCapture>(gstr, cv::CAP_GSTREAMER);
 	bool result = this->_capture->isOpened();
 	_capture_lock->unlock();
-	LOG_F(INFO, "Opening camera %d... %s", camera_id, result ? "success" : "failed");
+	LOG_F(INFO, "Opening %s camera... %s", camera_id.c_str(), result ? "success" : "failed");
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
 	return result; 
@@ -71,7 +73,7 @@ Camera::Camera(const Camera& other)
 std::string Camera::getGSTPipe(CameraID camera_id) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID" + std::to_string(camera_id) + " does not exist");
+		throw std::invalid_argument("Configuration file for Camera ID" + camera_id + " does not exist");
 	}
 
 	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
@@ -79,17 +81,17 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	}
 
 	std::stringstream gstr_ss;
-  std::string format = fs[KEY_FORMAT];
+  	std::string format = fs[KEY_FORMAT];
 
-	gstr_ss << "v4l2src device=/dev/video" << camera_id << " ! ";
-  gstr_ss << format << ",";
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
+  	gstr_ss << format << ",";
 	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-  if (format == "image/jpeg") {
-    gstr_ss << "jpegdec ! ";
-  }
+	if (format == "image/jpeg") {
+		gstr_ss << "jpegdec ! ";
+	}
 	gstr_ss << "videoconvert ! appsink";
 
 	return gstr_ss.str();
@@ -103,11 +105,22 @@ void Camera::captureLoop() {
 		bool success = _capture->read(frame);
 		_capture_lock->unlock();
 		if (success && !frame.empty()) {
-			_frame_lock->lock();
-			frame.copyTo(*(this->_frame));
-			(*_frame_num)++;
-			*_frame_time = dataclock::now();
-			_frame_lock->unlock();
+      cv::Ptr<cv::aruco::Dictionary> dictionary =
+        cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
+      std::vector<std::vector<cv::Point2f>> markerCorners;
+      cv::Mat frameCopy;
+      std::vector<int> markerIds;
+      cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds);
+      frame.copyTo(frameCopy);
+      if(!markerIds.empty()) {
+        cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds);
+      }
+
+      _frame_lock->lock();
+      frameCopy.copyTo(*(this->_frame));
+      (*_frame_num)++;
+      *_frame_time = dataclock::now();
+      _frame_lock->unlock();
 		}
 	}
 }

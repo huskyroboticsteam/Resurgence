@@ -122,11 +122,10 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 			cameraMap[camID] = cam;
 			return cam;
 		} else {
-			LOG_F(ERROR, "Failed to open camera with id %s", util::to_string(camID).c_str());
+			LOG_F(ERROR, "Failed to open %s camera", camID.c_str());
 		}
 	} catch (const std::exception& e) {
-		LOG_F(ERROR, "Error opening camera with id %s:\n%s", util::to_string(camID).c_str(),
-			  e.what());
+		LOG_F(ERROR, "Error opening %s camera:\n%s", camID.c_str(), e.what());
 	}
 
 	return nullptr;
@@ -188,7 +187,7 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 		if (cam) {
 			return cam->hasNext(oldFrameNum);
 		} else {
-			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			LOG_F(WARNING, "Cam %s not available", cameraID.c_str());
 			return false;
 		}
 	} else {
@@ -202,7 +201,7 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 	if (itr != cameraMap.end()) {
 		auto cam = itr->second.lock();
 		if (!cam) {
-			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			LOG_F(WARNING, "Cam %s not available", cameraID.c_str());
 			return DataPoint<CameraFrame>{};
 		}
 		cv::Mat mat;
@@ -215,7 +214,7 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 			return DataPoint<CameraFrame>{};
 		}
 	} else {
-		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
+		LOG_F(WARNING, "Invalid camera id: %s", cameraID.c_str());
 		return DataPoint<CameraFrame>{};
 	}
 }
@@ -228,11 +227,11 @@ std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 			return camera->hasIntrinsicParams() ? camera->getIntrinsicParams()
 												: std::optional<cam::CameraParams>{};
 		} else {
-			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			LOG_F(WARNING, "Cam %s not available", cameraID.c_str());
 			return {};
 		}
 	} else {
-		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
+		LOG_F(WARNING, "Invalid camera id: %s", cameraID.c_str());
 		return {};
 	}
 }
@@ -245,11 +244,11 @@ std::optional<cv::Mat> getCameraExtrinsicParams(CameraID cameraID) {
 			return camera->hasExtrinsicParams() ? camera->getExtrinsicParams()
 												: std::optional<cv::Mat>{};
 		} else {
-			LOG_F(WARNING, "Cam %s not available", util::to_string(cameraID).c_str());
+			LOG_F(WARNING, "Cam %s not available", cameraID.c_str());
 			return {};
 		}
 	} else {
-		LOG_F(WARNING, "Invalid camera id: %s", util::to_string(cameraID).c_str());
+		LOG_F(WARNING, "Invalid camera id: %s", cameraID.c_str());
 		return {};
 	}
 }
