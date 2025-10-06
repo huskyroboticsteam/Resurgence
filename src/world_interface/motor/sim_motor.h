@@ -38,4 +38,4 @@ private:
 	std::string protocol_path;
 	void sendJSON(const nlohmann::json& obj);
 }; // class sim_motor
-} // namespace robotsim_motor
+} // namespace robot
