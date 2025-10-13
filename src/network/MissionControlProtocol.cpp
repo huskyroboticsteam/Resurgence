@@ -228,7 +228,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
@@ -237,7 +237,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
@@ -246,7 +246,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 static bool validateCameraFrameRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
