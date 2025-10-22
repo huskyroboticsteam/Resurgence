@@ -1,5 +1,6 @@
-#include "../Constants.h"
 #include "Camera.h"
+
+#include "../Constants.h"
 #include "CameraConfig.h"
 
 #include <loguru.hpp>
@@ -15,8 +16,7 @@ using namespace robot::types;
 namespace cam {
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_time(std::make_shared<datatime_t>()),
-	  _frame_lock(std::make_shared<std::mutex>()),
+	  _frame_time(std::make_shared<datatime_t>()), _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
 bool Camera::open(CameraID camera_id, CameraParams intrinsic_params, Mat extrinsic_params) {
@@ -32,18 +32,18 @@ bool Camera::open(CameraID camera_id, CameraParams intrinsic_params, Mat extrins
 	LOG_F(INFO, "Opening %s camera... %s", camera_id.c_str(), result ? "success" : "failed");
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
-	return result; 
+	return result;
 }
 
-Camera::Camera(CameraID camera_id, string name, string description, CameraParams intrinsic_params,
-			   Mat extrinsic_params)
+Camera::Camera(CameraID camera_id, string name, string description,
+			   CameraParams intrinsic_params, Mat extrinsic_params)
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>(getGSTPipe(camera_id), cv::CAP_GSTREAMER)), _name(name),
-	  _description(description), _frame_lock(std::make_shared<std::mutex>()),
+	  _capture(std::make_shared<cv::VideoCapture>(getGSTPipe(camera_id), cv::CAP_GSTREAMER)),
+	  _name(name), _description(description), _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _intrinsic_params(intrinsic_params),
 	  _running(std::make_shared<bool>(false)) {
-	init(extrinsic_params); 
+	init(extrinsic_params);
 }
 
 void Camera::init(const Mat& extrinsic_params) {
@@ -73,29 +73,41 @@ Camera::Camera(const Camera& other)
 std::string Camera::getGSTPipe(CameraID camera_id) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID" + camera_id + " does not exist");
+		throw std::invalid_argument("Configuration file for Camera ID " + camera_id +
+									" does not exist");
 	}
 
-	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() ||
+		fs[KEY_FRAMERATE].empty()) {
 		throw std::invalid_argument("Configuration file missing key(s)");
 	}
 
+	int cam_id    = static_cast<int>(fs[KEY_CAMERA_ID]);
+	int width     = static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	int height    = static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	int framerate = static_cast<int>(fs[KEY_FRAMERATE]);
+	std::string format = fs[KEY_FORMAT];
+
 	std::stringstream gstr_ss;
-  	std::string format = fs[KEY_FORMAT];
 
-	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
-  	gstr_ss << format << ",";
-	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
-	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
-	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+	// Base source
+	gstr_ss << "v4l2src device=/dev/video" << cam_id << " ! ";
 
+	// Format caps (MJPEG, etc.)
+	gstr_ss << format << ",width=" << width << ",height=" << height
+			<< ",framerate=" << framerate << "/1 ! ";
+
+	// Hardware-accelerated JPEG decode and color conversion
 	if (format == "image/jpeg") {
-		gstr_ss << "jpegdec ! ";
+		gstr_ss << "nvjpegdec ! ";
 	}
-	gstr_ss << "videoconvert ! appsink";
+
+	// Keep the frames in GPU memory (NVMM) and ready for OpenCV appsink
+	gstr_ss << "nvvidconv ! video/x-raw(memory:NVMM),format=NV12 ! appsink";
 
 	return gstr_ss.str();
 }
+
 
 void Camera::captureLoop() {
 	loguru::set_thread_name(_name.c_str());
@@ -105,22 +117,22 @@ void Camera::captureLoop() {
 		bool success = _capture->read(frame);
 		_capture_lock->unlock();
 		if (success && !frame.empty()) {
-      cv::Ptr<cv::aruco::Dictionary> dictionary =
-        cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
-      std::vector<std::vector<cv::Point2f>> markerCorners;
-      cv::Mat frameCopy;
-      std::vector<int> markerIds;
-      cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds);
-      frame.copyTo(frameCopy);
-      if(!markerIds.empty()) {
-        cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds);
-      }
+			cv::Ptr<cv::aruco::Dictionary> dictionary =
+				cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
+			std::vector<std::vector<cv::Point2f>> markerCorners;
+			cv::Mat frameCopy;
+			std::vector<int> markerIds;
+			cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds);
+			frame.copyTo(frameCopy);
+			if (!markerIds.empty()) {
+				cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds);
+			}
 
-      _frame_lock->lock();
-      frameCopy.copyTo(*(this->_frame));
-      (*_frame_num)++;
-      *_frame_time = dataclock::now();
-      _frame_lock->unlock();
+			_frame_lock->lock();
+			frameCopy.copyTo(*(this->_frame));
+			(*_frame_num)++;
+			*_frame_time = dataclock::now();
+			_frame_lock->unlock();
 		}
 	}
 }
