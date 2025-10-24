@@ -71,34 +71,35 @@ Camera::Camera(const Camera& other)
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
 std::string Camera::getGSTPipe(CameraID camera_id) {
-    cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
-    if (!fs.isOpened()) {
-        throw std::invalid_argument("Configuration file for Camera ID " + camera_id +
-                                    " does not exist");
-    }
+	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
+	if (!fs.isOpened()) {
+		throw std::invalid_argument("Configuration file for Camera ID " + camera_id + " does not exist");
+	}
 
-    if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() ||
-        fs[KEY_FRAMERATE].empty()) {
-        throw std::invalid_argument("Configuration file missing key(s)");
-    }
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+		throw std::invalid_argument("Configuration file missing key(s)");
+	}
 
-    std::stringstream gstr_ss;
-    std::string format = fs[KEY_FORMAT];
-    int device_id = static_cast<int>(fs[KEY_CAMERA_ID]);
-    int width = static_cast<int>(fs[KEY_IMAGE_WIDTH]);
-    int height = static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
-    int framerate = static_cast<int>(fs[KEY_FRAMERATE]);
+	std::stringstream gstr_ss;
+	std::string format = fs[KEY_FORMAT];
 
-    // --- Jetson hardware-accelerated MJPEG → BGR appsink pipeline ---
-    gstr_ss << "v4l2src device=/dev/video" << device_id << " io-mode=2 ! "
-            << "image/jpeg, width=" << width << ", height=" << height << ", framerate=" << framerate << "/1 ! "
-            << "nvjpegdec ! "
-            << "nvvidconv ! 'video/x-raw(memory:NVMM),format=NV12' ! "
-            << "nvvidconv ! 'video/x-raw,format=BGR' ! "
-            << "appsink max-buffers=1 drop=true sync=false";
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
+	gstr_ss << format << ",";
+	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-    return gstr_ss.str();
+	// --- Only swap jpegdec -> nvjpegdec (hardware decode) ---
+	if (format == "image/jpeg") {
+		gstr_ss << "nvjpegdec ! ";
+	}
+
+	// --- Keep final conversion identical to old version ---
+	gstr_ss << "videoconvert ! appsink";
+
+	return gstr_ss.str();
 }
+
 
 
 
