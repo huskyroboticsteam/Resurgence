@@ -89,16 +89,17 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
     int height = static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
     int framerate = static_cast<int>(fs[KEY_FRAMERATE]);
 
-    // --- Hardware-accelerated MJPEG decode pipeline for Jetson ---
+    // --- Jetson hardware-accelerated MJPEG → BGR appsink pipeline ---
     gstr_ss << "v4l2src device=/dev/video" << device_id << " io-mode=2 ! "
             << "image/jpeg, width=" << width << ", height=" << height << ", framerate=" << framerate << "/1 ! "
             << "nvjpegdec ! "
             << "nvvidconv ! 'video/x-raw(memory:NVMM),format=NV12' ! "
-            << "nvvidconv ! 'video/x-raw,format=BGRx' ! "
-            << "videoconvert ! appsink";
+            << "nvvidconv ! 'video/x-raw,format=BGR' ! "
+            << "appsink max-buffers=1 drop=true sync=false";
 
     return gstr_ss.str();
 }
+
 
 
 void Camera::captureLoop() {
