@@ -90,7 +90,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
 	if (format == "image/jpeg") {
-		gstr_ss << "jpegdec ! ";
+		gstr_ss << "nvjpegdec ! ";
 	}
 	gstr_ss << "videoconvert ! appsink";
 
