@@ -73,8 +73,8 @@ Camera::Camera(const Camera& other)
 std::string Camera::getGSTPipe(CameraID camera_id) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID " + std::to_string(camera_id) +
-									" does not exist");
+		throw std::invalid_argument("Configuration file for Camera ID " + camera_id +
+							" does not exist");
 	}
 
 	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() ||
