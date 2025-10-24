@@ -73,7 +73,7 @@ Camera::Camera(const Camera& other)
 std::string Camera::getGSTPipe(CameraID camera_id) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID" + camera_id +
+		throw std::invalid_argument("Configuration file for Camera ID " + std::to_string(camera_id) +
 									" does not exist");
 	}
 
@@ -84,20 +84,30 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
 	std::stringstream gstr_ss;
 	std::string format = fs[KEY_FORMAT];
+	int device_id = static_cast<int>(fs[KEY_CAMERA_ID]);
+	int width = static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	int height = static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	int framerate = static_cast<int>(fs[KEY_FRAMERATE]);
 
-	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
-	gstr_ss << format << ",";
-	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
-	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
-	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+	// --- Base input ---
+	gstr_ss << "v4l2src device=/dev/video" << device_id << " ! ";
 
-	if (format == "image/jpeg") {
-		gstr_ss << "jpegdec ! ";
-	}
-	gstr_ss << "videoconvert ! appsink";
+	// --- Input caps ---
+	gstr_ss << "image/jpeg, ";
+	gstr_ss << "width=" << width << ", ";
+	gstr_ss << "height=" << height << ", ";
+	gstr_ss << "framerate=" << framerate << "/1 ! ";
+
+	// --- Hardware-accelerated decode + conversion ---
+	gstr_ss << "nvjpegdec ! "
+	        << "nvvidconv ! "
+	        << "video/x-raw, format=BGRx ! "
+	        << "videoconvert ! "
+	        << "appsink";
 
 	return gstr_ss.str();
 }
+
 
 void Camera::captureLoop() {
 	loguru::set_thread_name(_name.c_str());
