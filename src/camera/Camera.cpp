@@ -83,18 +83,14 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	std::stringstream gstr_ss;
 	std::string format = fs[KEY_FORMAT];
 
-	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[20]) << " ! ";
 	gstr_ss << format << ",";
-	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
-	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
-	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+	gstr_ss << "width=" << static_cast<int>(1280);
+	gstr_ss << ",height=" << static_cast<int>(720);
+	gstr_ss << ",framerate=" << static_cast<int>(60) << "/1 ! ";
 
-	// --- Only swap jpegdec -> nvjpegdec (hardware decode) ---
-	if (format == "image/jpeg") {
-		gstr_ss << "nvjpegdec ! ";
-	}
+	gstr_ss << "nvjpegdec ! ";
 
-	// --- Keep final conversion identical to old version ---
 	gstr_ss << "videoconvert ! appsink";
 
 	return gstr_ss.str();
