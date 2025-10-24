@@ -73,7 +73,7 @@ Camera::Camera(const Camera& other)
 std::string Camera::getGSTPipe(CameraID camera_id) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID " + camera_id + " does not exist");
+		throw std::invalid_argument("Configuration file for Camera ID" + camera_id + " does not exist");
 	}
 
 	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
@@ -81,16 +81,17 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	}
 
 	std::stringstream gstr_ss;
-	std::string format = fs[KEY_FORMAT];
+  	std::string format = fs[KEY_FORMAT];
 
-	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[20]) << " ! ";
-	gstr_ss << format << ",";
-	gstr_ss << "width=" << static_cast<int>(1280);
-	gstr_ss << ",height=" << static_cast<int>(720);
-	gstr_ss << ",framerate=" << static_cast<int>(60) << "/1 ! ";
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
+  	gstr_ss << format << ",";
+	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	gstr_ss << "nvjpegdec ! ";
-
+	if (format == "image/jpeg") {
+		gstr_ss << "jpegdec ! ";
+	}
 	gstr_ss << "videoconvert ! appsink";
 
 	return gstr_ss.str();
