@@ -74,8 +74,14 @@ private:
 	CameraParams _intrinsic_params;
 	cv::Mat _extrinsic_params;
 	std::shared_ptr<bool> _running;
+	// [Changed]: Added undistortion support - flag to enable/disable automatic undistortion
+	std::shared_ptr<bool> _undistort;
+	// [Changed]: Added undistortion support - precomputed maps for efficient undistortion
+	cv::Mat _map1, _map2;
 	void captureLoop();
 	void init(const cv::Mat& extrinsic_params);
+	// [Changed]: Added method to initialize undistortion maps from intrinsic parameters
+	void initUndistortMaps();
 
 public:
 	/**
@@ -206,6 +212,23 @@ public:
 	   @param new_description The new description for the camera.
 	 */
 	void setDescription(std::string new_description);
+	// [Changed]: Added undistortion control methods to enable automatic frame undistortion
+	/**
+	   @brief Enables or disables undistortion of captured frames.
+	   
+	   If enabled, frames retrieved via next() will be automatically undistorted
+	   using the camera's intrinsic parameters. Requires that the camera has
+	   intrinsic parameters (see hasIntrinsicParams()).
+	   
+	   @param enable true to enable undistortion, false to disable.
+	   @returns true if successful, false if intrinsic parameters are not available.
+	 */
+	bool setUndistort(bool enable);
+	/**
+	   @brief Returns whether undistortion is currently enabled.
+	   @returns true if undistortion is enabled, false otherwise.
+	 */
+	bool isUndistortEnabled() const;
 };
 
 /** @} */
