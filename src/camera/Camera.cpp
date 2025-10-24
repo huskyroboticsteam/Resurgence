@@ -73,7 +73,7 @@ Camera::Camera(const Camera& other)
 std::string Camera::getGSTPipe(CameraID camera_id) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID " + camera_id +
+		throw std::invalid_argument("Configuration file for Camera ID" + camera_id +
 									" does not exist");
 	}
 
@@ -82,32 +82,22 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 		throw std::invalid_argument("Configuration file missing key(s)");
 	}
 
-	int cam_id    = static_cast<int>(fs[KEY_CAMERA_ID]);
-	int width     = static_cast<int>(fs[KEY_IMAGE_WIDTH]);
-	int height    = static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
-	int framerate = static_cast<int>(fs[KEY_FRAMERATE]);
+	std::stringstream gstr_ss;
 	std::string format = fs[KEY_FORMAT];
 
-	std::stringstream gstr_ss;
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
+	gstr_ss << format << ",";
+	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	// Base source
-	gstr_ss << "v4l2src device=/dev/video" << cam_id << " ! ";
-
-	// Format caps (MJPEG, etc.)
-	gstr_ss << format << ",width=" << width << ",height=" << height
-			<< ",framerate=" << framerate << "/1 ! ";
-
-	// Hardware-accelerated JPEG decode and color conversion
 	if (format == "image/jpeg") {
-		gstr_ss << "nvjpegdec ! ";
+		gstr_ss << "jpegdec ! ";
 	}
-
-	// Keep the frames in GPU memory (NVMM) and ready for OpenCV appsink
-	gstr_ss << "nvvidconv ! video/x-raw(memory:NVMM),format=NV12 ! appsink";
+	gstr_ss << "videoconvert ! appsink";
 
 	return gstr_ss.str();
 }
-
 
 void Camera::captureLoop() {
 	loguru::set_thread_name(_name.c_str());
