@@ -279,6 +279,40 @@ getMotorPositionsRad(const std::array<types::motorid_t, N>& motors) {
 	}
 	return types::DataPoint<navtypes::Vectord<N>>(timestamp.value(), motorPositions);
 }
+	
+
+/**
+ * @brief Initialize the given GPIO pin.
+
+ *
+ * @param pin The module pin number to initialize.
+ * @param input If true, initialize as an output. Otherwise, as an input.
+ */
+void initGPIOPin(int pin, bool output);
+
+/**
+ * @brief Set an output pin to high or low.
+
+ *
+ * This pin should have been initialized as an output.
+ *
+
+ * @param pin The pin to set.
+ * @param high If true, set to high. Otherwise, set to low.
+ */
+void writeGPIOPin(int pin, bool high);
+
+/**
+ * @brief Read the value of an input pin.
+
+ *
+ * This pin should have been initialized as an input.
+ *
+
+ * @param pin The pin to read.
+ * @return true iff the pin is pulled high, false otherwise.
+ */
+bool readGPIOPin(int pin);
 
 } // namespace robot
 
