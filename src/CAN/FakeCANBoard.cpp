@@ -30,7 +30,6 @@ enum class TestMode {
 	LimitSwitch,
 	Telemetry,
 	ScienceServos,
-  Stepper,
   RawCAN
 };
 
@@ -39,7 +38,7 @@ std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::PID),	   static_cast<int>(TestMode::Encoder),
 	static_cast<int>(TestMode::PIDVel),	   static_cast<int>(TestMode::LimitSwitch),
 	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos),
-  static_cast<int>(TestMode::Stepper), static_cast<int>(TestMode::RawCAN)};
+  static_cast<int>(TestMode::RawCAN)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -71,7 +70,6 @@ int main() {
 	ss << static_cast<int>(TestMode::LimitSwitch) << " for LIMIT SWITCH\n";
 	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
-  ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
   ss << static_cast<int>(TestMode::RawCAN) << " for CAN\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
@@ -296,16 +294,7 @@ int main() {
 			AssembleScienceServoPacket(&p, 0x7, 0x5, (uint8_t)servo_no,
 									   (uint8_t)degrees);
 			can::sendCANPacket(p);
-      can::printCANPacket(p);
-		} else if (testMode == TestMode::Stepper) {
-      int stepper = prompt("Enter stepper");
-      int angle = prompt("Enter angle");
-
-      CANPacket p;
-      AssembleScienceStepperTurnAnglePacket(&p, 0x7, 0x4, stepper, angle, 0x3);
-      can::sendCANPacket(p);
-      can::printCANPacket(p);
-    } else if (testMode == TestMode::RawCAN) {
+		} else if (testMode == TestMode::RawCAN) {
       uint8_t pr = prompt("priority");
       uint8_t g = prompt("group");
       uint8_t s = prompt("serial");
@@ -321,7 +310,6 @@ int main() {
       CANPacket p;
       AssembleCANPacket(&p, pr, g, s, pid, dlc+1, data);
       can::sendCANPacket(p);
-      can::printCANPacket(p);
     }
 	}
 }

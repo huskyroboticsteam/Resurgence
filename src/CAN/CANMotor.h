@@ -148,16 +148,10 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
  *
  * @param group The CAN device group of the servo board.
  * @param serial The CAN serial number of the servo board.
- * @param servoNum the servo number.
- * @param position the position of the servo in degrees.
+ * @param servoNum The servo number.
+ * @param position The position of the servo in degrees.
  */
 void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle);
-
-void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t stepper, int16_t angle);
-
-void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t value);
-
-void setActuator(devicegroup_t group, deviceserial_t serial, uint8_t value);
 
 /**
  * @brief Get the last reported position of a motor.

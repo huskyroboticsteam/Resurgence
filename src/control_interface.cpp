@@ -126,7 +126,6 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		}
 	} else if (joint == jointid_t::fourBarLinkage) {
 		return getMotorPos(motorid_t::fourbar1);
-  } else if (joint == jointid_t::handActuator) {
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
@@ -205,8 +204,6 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			setMotorPower(motorid_t::fourbar1, power);
 			setMotorPower(motorid_t::fourbar2, power);
 		}
-  } else if (joint == jointid_t::handActuator) {
-    robot::setActuator(power);
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

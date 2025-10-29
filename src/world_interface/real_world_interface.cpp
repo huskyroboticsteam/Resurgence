@@ -306,18 +306,6 @@ void setServoPos(robot::types::servoid_t servo, int32_t position) {
   }
 }
 
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-  std::shared_ptr<robot::base_motor> stepper_board = getMotor(motorid_t::scienceStepperBoard);
-  auto stepper_num = stepperid_to_stepper_num.find(stepper);
-  if (stepper_num != stepperid_to_stepper_num.end()) {
-    stepper_board->setStepperTurnAngle(stepper_num->second, angle);
-  }
-}
-
-void setActuator(uint8_t value) {
-  can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
-}
-
 // TODO: implement
 void setIndicator(indication_t signal) {}
 

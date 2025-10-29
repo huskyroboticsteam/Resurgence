@@ -70,7 +70,6 @@ enum class motorid_t {
 	fourbar2,
   // Hack, see real_world_interface.cpp for details
   scienceServoBoard,
-  scienceStepperBoard,
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -141,32 +140,6 @@ constexpr auto servoid_to_servo_num = frozen::make_unordered_map<servoid_t, int>
    {servoid_t::cuvette, 5},
    {servoid_t::filter, 8},
    {servoid_t::soilBox, 6}});
-
-enum class stepperid_t {
-  plunger,
-  judges,
-  mast,
-  lock,
-  lazySusan,
-};
-
-constexpr auto all_stepperid_t = frozen::make_unordered_set<stepperid_t>(
-  {stepperid_t::plunger, stepperid_t::judges, stepperid_t::mast,
-   stepperid_t::lock, stepperid_t::lazySusan});
-
-constexpr auto name_to_stepperid = frozen::make_unordered_map<frozen::string, stepperid_t>(
-  {{"plunger", stepperid_t::plunger},
-   {"judges", stepperid_t::judges},
-   {"mast", stepperid_t::mast},
-   {"lock", stepperid_t::lock},
-   {"lazySusan", stepperid_t::lazySusan}});
-
-constexpr auto stepperid_to_stepper_num = frozen::make_unordered_map<stepperid_t, uint8_t>(
-  {{stepperid_t::plunger, 4},
-   {stepperid_t::judges, 5},
-   {stepperid_t::mast, 2},
-   {stepperid_t::lock, 1},
-   {stepperid_t::lazySusan, 6}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:

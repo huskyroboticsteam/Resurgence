@@ -219,7 +219,7 @@ void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
 /**
  * @brief Sets the velocity of the given motor.
  *
- * @param motor The motor to set the target position of.
+ * @param motor The motor to set the target velocity of.
  * @param targetVel The target velocity, in millidegrees per second.
  */
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
@@ -234,9 +234,13 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
  */
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
 
+/**
+ * @brief Sets the position of the given servo.
+ *
+ * @param servo The servo to set the target position of.
+ * @param position The target position, in degrees.
+ */
 void setServoPos(robot::types::servoid_t servo, int32_t position);
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle);
-void setActuator(uint8_t value);
 
 using callbackid_t = unsigned long long;
 

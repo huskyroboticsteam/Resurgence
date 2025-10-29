@@ -34,8 +34,6 @@ public:
 
   void setServoPos(uint8_t servo, int32_t position) override;
 
-  void setStepperTurnAngle(uint8_t stepper, int16_t angle) override;
-
 	/**
 	 * @brief Returns the motor's serial id.
 	 */
