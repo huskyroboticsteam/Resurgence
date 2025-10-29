@@ -65,8 +65,6 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
 		.zeroCalibrationPower = 0.4}},
 });
-
-constexpr double FOURBAR_GEAR_RATIO = 71.71875;
 // clang-format on
 
 // TODO: find appropriate bounds
@@ -77,7 +75,6 @@ constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{motorid_t::wristDiffRight,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
-	{motorid_t::fourbar1, {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
 });
 
 /** @brief A mapping of motorids to their corresponding serial number. */
@@ -90,12 +87,7 @@ constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::dev
 	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
 	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
 	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
-	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
-	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},
-	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
-	 {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
-	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},
-   {motorid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO}});
+	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND}});
 
 constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
 	{{motorid_t::leftTread, can::devicegroup_t::motor},
@@ -106,12 +98,7 @@ constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::device
 	 {motorid_t::forearm, can::devicegroup_t::motor},
 	 {motorid_t::wristDiffLeft, can::devicegroup_t::motor},
 	 {motorid_t::wristDiffRight, can::devicegroup_t::motor},
-	 {motorid_t::hand, can::devicegroup_t::motor},
-	 {motorid_t::drillActuator, can::devicegroup_t::science},
-	 {motorid_t::drillMotor, can::devicegroup_t::science},
-	 {motorid_t::fourbar1, can::devicegroup_t::science},
-	 {motorid_t::fourbar2, can::devicegroup_t::science},
-   {motorid_t::scienceServoBoard, can::devicegroup_t::science}});
+	 {motorid_t::hand, can::devicegroup_t::motor}});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
@@ -130,12 +117,7 @@ constexpr auto positive_pwm_scales =
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::leftTread, 0.7},
 												   {motorid_t::rightTread, -0.7},
-												   {motorid_t::hand, -0.75},
-												   {motorid_t::drillActuator, -0.5},
-												   {motorid_t::drillMotor, -1.0},
-												   {motorid_t::fourbar1, 0.3},
-												   {motorid_t::fourbar2, 0.3},
-                           {motorid_t::scienceServoBoard, 0}});
+												   {motorid_t::hand, -0.75}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
@@ -149,11 +131,6 @@ constexpr auto negative_pwm_scales =
 												   {motorid_t::wristDiffRight, 0.1},
 												   {motorid_t::leftTread, 0.7},
 												   {motorid_t::rightTread, -0.7},
-												   {motorid_t::hand, -0.75},
-												   {motorid_t::drillActuator, -0.5},
-												   {motorid_t::drillMotor, -1.0},
-												   {motorid_t::fourbar1, 0.15},
-												   {motorid_t::fourbar2, 0.15},
-                           {motorid_t::scienceServoBoard, 0}});
+												   {motorid_t::hand, -0.75}});
 
 } // namespace robot

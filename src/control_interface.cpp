@@ -98,19 +98,6 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
 		return getMotorPos(Constants::JOINT_MOTOR_MAP.at(joint));
-	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-		if (armJointPositions.isValid()) {
-			Eigen::Vector2d eePos = Globals::planarArmController.kinematics().jointPosToEEPos(
-				armJointPositions.getData());
-			Eigen::Vector2i eePosInt = (1000 * eePos).array().round().cast<int>();
-			return DataPoint<int32_t>(armJointPositions.getTime(),
-									  joint == jointid_t::ikForward ? eePosInt.x()
-																	: eePosInt.y());
-		} else {
-			return {};
-		}
 	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
 		auto mdegToRad = [](int32_t mdeg) { return (mdeg / 1000.0) * (M_PI / 180.0); };
 		auto lPos = getMotorPos(motorid_t::wristDiffLeft).transform(mdegToRad);
@@ -124,8 +111,6 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
-	} else if (joint == jointid_t::fourBarLinkage) {
-		return getMotorPos(motorid_t::fourbar1);
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
@@ -155,28 +140,9 @@ double getJointPowerValue(types::jointid_t joint) {
 
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
+
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
-		bool isIKMotor = std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
-								   Constants::arm::IK_MOTOR_JOINTS.end(),
-								   joint) != Constants::arm::IK_MOTOR_JOINTS.end();
-		if (!Globals::armIKEnabled || !isIKMotor) {
-			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
-		}
-	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-		if (Globals::armIKEnabled) {
-			auto ikMotorPos = robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-			if (ikMotorPos.isValid()) {
-				if (joint == jointid_t::ikForward) {
-					Globals::planarArmController.set_x_vel(dataclock::now(),
-														   power * Constants::arm::MAX_EE_VEL,
-														   ikMotorPos.getData());
-				} else {
-					Globals::planarArmController.set_y_vel(dataclock::now(),
-														   power * Constants::arm::MAX_EE_VEL,
-														   ikMotorPos.getData());
-				}
-			}
-		}
+    setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
 	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
 		setJointPowerValue(joint, power);
 		kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristRoll),
@@ -185,25 +151,6 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
 		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
-	} else if (joint == jointid_t::fourBarLinkage) {
-		auto dp = getJointPos(jointid_t::fourBarLinkage);
-		if (dp.isValid()) {
-			int currAngle = dp.getData();
-			currAngle = currAngle / 1000;
-			if (currAngle > 320 || currAngle < 50) {
-				setMotorPower(motorid_t::fourbar1, power * 0.7);
-				setMotorPower(motorid_t::fourbar2, power * 0.7);
-			} else if (currAngle < 265 && power < 0) {
-				setMotorPower(motorid_t::fourbar1, -power);
-				setMotorPower(motorid_t::fourbar2, -power);
-			} else {
-				setMotorPower(motorid_t::fourbar1, power);
-				setMotorPower(motorid_t::fourbar2, power);
-			}
-		} else {
-			setMotorPower(motorid_t::fourbar1, power);
-			setMotorPower(motorid_t::fourbar2, power);
-		}
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

@@ -142,10 +142,6 @@ void world_interface_init(
 	}
 	can::initCAN();
 	initMotors();
-
-  // Initialize Science Servo Board
-
-  // For now, we can consider the board as a motor and just use it for its serial
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -299,11 +295,7 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 }
 
 void setServoPos(robot::types::servoid_t servo, int32_t position) {
-  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
-  auto servo_num = servoid_to_servo_num.find(servo);
-  if (servo_num != servoid_to_servo_num.end()) {
-  	servo_board->setServoPos(servo_num->second, position);
-  }
+  // Implement again once we have servos
 }
 
 // TODO: implement

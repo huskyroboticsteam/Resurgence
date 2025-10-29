@@ -102,4 +102,5 @@ protected:
 	 */
 	void unscheduleVelocityEvent();
 }; // abstract class base_motor
+
 } // namespace robot

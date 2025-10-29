@@ -29,6 +29,7 @@ namespace util {
 
 std::string to_string(robot::types::jointid_t joint) {
 	using robot::types::jointid_t;
+
 	switch (joint) {
 		case jointid_t::armBase:
 			return "armBase";
@@ -38,24 +39,12 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "elbow";
 		case jointid_t::forearm:
 			return "forearm";
-		case jointid_t::hand:
-			return "hand";
-    case jointid_t::handActuator:
-      return "handActuator";
 		case jointid_t::wristPitch:
 			return "wristPitch";
 		case jointid_t::wristRoll:
 			return "wristRoll";
-		case jointid_t::ikUp:
-			return "ikUp";
-		case jointid_t::ikForward:
-			return "ikForward";
-		case jointid_t::fourBarLinkage:
-			return "fourBarLinkage";
-		case jointid_t::drillActuator:
-			return "drillActuator";
-		case jointid_t::drillMotor:
-			return "drillMotor";
+    case jointid_t::hand:
+			return "hand";
 		default:
 			// should never happen
 			return "<unknown>";
@@ -68,13 +57,10 @@ std::string to_string(robot::types::mountedperipheral_t peripheral) {
 	switch (peripheral) {
 		case mountedperipheral_t::none:
 			return "none";
-
 		case mountedperipheral_t::arm:
 			return "arm";
-
 		case mountedperipheral_t::science:
 			return "science";
-
 		default:
 			// should never happen
 			return "<unknown>";
@@ -85,16 +71,6 @@ std::string to_string(robot::types::servoid_t servo) {
 	using robot::types::servoid_t;
 
 	switch (servo) {
-		case servoid_t::microscope:
-			return "microscope";
-		case servoid_t::syringe:
-			return "syringe";
-		case servoid_t::cuvette:
-			return "cuvette";
-		case servoid_t::filter:
-			return "filter";
-		case servoid_t::soilBox:
-			return "soilBox";
 		default:
 			return "<unknown>";
 	}

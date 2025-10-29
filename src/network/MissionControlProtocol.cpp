@@ -200,13 +200,8 @@ static bool validateServoPositionRequest(const json& j) {
   return validateServo(j);// && util::validateKey(j, "position", val_t::number_integer);
 }
 
-void MissionControlProtocol::handleServoPositionRequest(const json& j) {
-  std::string servoName = j["servo"];
-  int32_t position = j["position"];
-  auto servo = name_to_servoid.find(util::freezeStr(servoName));
-  if (servo != name_to_servoid.end()) {
-	  robot::setServoPos(servo->second, position);
-  }
+void MissionControlProtocol::handleServoPositionRequest([[maybe_unused]] const json& j) {
+  // Re-implement once servos are back
 }
 
 static bool validateWaypointNavRequest(const json& j) {

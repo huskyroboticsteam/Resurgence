@@ -64,12 +64,6 @@ enum class motorid_t {
 	wristDiffRight,
 	wristDiffLeft,
 	hand,
-	drillActuator,
-	drillMotor,
-	fourbar1,
-	fourbar2,
-  // Hack, see real_world_interface.cpp for details
-  scienceServoBoard,
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -87,18 +81,11 @@ enum class jointid_t {
 	wristPitch,
 	wristRoll,
 	hand,
-  handActuator,
-	ikForward,
-	ikUp,
-	fourBarLinkage,
-	drillActuator,
-	drillMotor
 };
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::handActuator, jointid_t::ikForward,
-   jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor});
+	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -107,39 +94,15 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"forearm", jointid_t::forearm},
 	 {"wristPitch", jointid_t::wristPitch},
 	 {"wristRoll", jointid_t::wristRoll},
-	 {"hand", jointid_t::hand},
-   {"handActuator", jointid_t::handActuator},
-	 {"ikForward", jointid_t::ikForward},
-	 {"ikUp", jointid_t::ikUp},
-	 {"fourBarLinkage", jointid_t::fourBarLinkage},
-	 {"drillActuator", jointid_t::drillActuator},
-	 {"drillMotor", jointid_t::drillMotor}});
+	 {"hand", jointid_t::hand}});
 
-enum class servoid_t {
-  microscope,
-  syringe,
-  cuvette,
-  filter,
-  soilBox,
-};
+enum class servoid_t {};
 
-constexpr auto all_servoid_t = frozen::make_unordered_set<servoid_t>(
-  {servoid_t::microscope, servoid_t::syringe, servoid_t::soilBox,
-   servoid_t::cuvette, servoid_t::filter});
+// constexpr auto all_servoid_t = frozen::make_unordered_set<servoid_t>();
 
-constexpr auto name_to_servoid = frozen::make_unordered_map<frozen::string, servoid_t>(
-  {{"microscope", servoid_t::microscope},
-   {"syringe", servoid_t::syringe},
-   {"cuvette", servoid_t::cuvette},
-   {"filter", servoid_t::filter},
-   {"soilBox", servoid_t::soilBox}});
+// constexpr auto name_to_servoid = frozen::make_unordered_map<frozen::string, servoid_t>();
 
-constexpr auto servoid_to_servo_num = frozen::make_unordered_map<servoid_t, int>(
-  {{servoid_t::microscope, 7},
-   {servoid_t::syringe, 9},
-   {servoid_t::cuvette, 5},
-   {servoid_t::filter, 8},
-   {servoid_t::soilBox, 6}});
+// constexpr auto servoid_to_servo_num = frozen::make_unordered_map<servoid_t, int>();
 
 class bad_datapoint_access : public std::runtime_error {
 public:
