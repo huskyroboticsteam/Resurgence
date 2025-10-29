@@ -168,15 +168,8 @@ void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const j
 	// setMotorPos(motor, position_mdeg);
 }
 
-static bool validateServo(const json& j) {
-	return util::validateKey(j, "servo", val_t::string);/* &&
-		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
-			   return j["joint"].get<std::string>() == util::to_string(joint);
-		   });*/
-}
-
 static bool validateServoPositionRequest(const json& j) {
-  return validateServo(j) && util::validateKey(j, "position", val_t::number_integer);
+  return util::validateKey(j, "servo", val_t::string) && util::validateKey(j, "position", val_t::number_integer);
 }
 
 void MissionControlProtocol::handleServoPositionRequest(const json& j) {
@@ -189,7 +182,7 @@ void MissionControlProtocol::handleServoPositionRequest(const json& j) {
 }
 
 static bool validateStepperTurnAngleRequest(const json& j) {
-  return util::hasKey(j, "stepper");
+  return util::validateKey(j, "stepper", val_t::string) && util::validateKey(j, "angle", val_t::number_integer);
 }
 
 void MissionControlProtocol::handleStepperTurnAngleRequest(const json& j) {
