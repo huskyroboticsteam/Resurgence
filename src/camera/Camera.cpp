@@ -91,8 +91,8 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
 	if (format == "image/jpeg") {
     gstr_ss << "jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
-}
-gstr_ss << "appsink";
+	}
+	gstr_ss << "appsink";
 
 	return gstr_ss.str();
 }
