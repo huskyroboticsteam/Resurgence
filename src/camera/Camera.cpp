@@ -28,7 +28,7 @@ bool Camera::open(CameraID camera_id, CameraParams intrinsic_params, Mat extrins
 		return false;
 	}
 	_capture_lock->lock();
-	std::string gstr = getGSTPipe(camera_id);
+	std::string gstr = getGSTPipe();
 	LOG_F(INFO, "GST: %s", gstr.c_str());
 	this->_capture = std::make_shared<cv::VideoCapture>(gstr, cv::CAP_GSTREAMER);
 	bool result = this->_capture->isOpened();
@@ -43,7 +43,7 @@ Camera::Camera(CameraID camera_id, string name, string description,
 			   CameraParams intrinsic_params, Mat extrinsic_params)
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>(getGSTPipe(camera_id), cv::CAP_GSTREAMER)),
+	  _capture(std::make_shared<cv::VideoCapture>(getGSTPipe(), cv::CAP_GSTREAMER)),
 	  _name(name), _description(description), _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _intrinsic_params(intrinsic_params),
 	  _running(std::make_shared<bool>(false)) {
@@ -80,7 +80,7 @@ Camera::Camera(const Camera& other)
 #include <sstream>
 #include <stdexcept>
 
-std::string Camera::getGSTPipe(CameraID camera_id) {
+std::string Camera::getGSTPipe() {
     // Shared flag across all threads — ensures only one camera opens
     static std::atomic<bool> camera_in_use{false};
 
@@ -89,7 +89,6 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
     // Skip if camera already opened successfully
     if (camera_in_use.load()) {
-        LOG_F(WARNING, "Camera already in use — skipping for CameraID" + camera_id);
         return "";
     }
 
