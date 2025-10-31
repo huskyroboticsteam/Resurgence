@@ -103,7 +103,12 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
     gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
     gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-    gstr_ss << "h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! appsink";
+    if (format == "image/jpeg") {
+        // GPU hardware MJPEG decode path
+        gstr_ss << "jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
+    
+
+    gstr_ss << "appsink";
     return gstr_ss.str();
 }
 
