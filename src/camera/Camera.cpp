@@ -75,6 +75,11 @@ Camera::Camera(const Camera& other)
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
 std::string Camera::getGSTPipe(CameraID camera_id) {
+	static std::atomic<bool> camera_opened{false};
+	if (camera_opened.load()) {
+        LOG_F(WARNING, "Camera %s already opened — skipping duplicate initialization.", device_path.c_str());
+        return "";
+    }
     // Open configuration file (still optional for now)
     cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
     if (!fs.isOpened()) {
@@ -103,6 +108,8 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
     gstr_ss << "video/x-h264,width=1920,height=1080,framerate=30/1 ! ";
     gstr_ss << "h264parse ! nvv4l2decoder ! nvvidconv ! ";
     gstr_ss << "video/x-raw,format=BGRx ! videoconvert ! appsink";
+
+	camera_opened.store(true);
 
     return gstr_ss.str();
 }
