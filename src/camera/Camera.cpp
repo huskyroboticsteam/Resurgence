@@ -74,44 +74,77 @@ Camera::Camera(const Camera& other)
 	  _thread(other._thread), _intrinsic_params(other._intrinsic_params),
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
-
-
 std::string Camera::getGSTPipe(CameraID camera_id) {
+    // Open configuration file (still optional for now)
     cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
     if (!fs.isOpened()) {
         throw std::invalid_argument("Configuration file for Camera ID " + camera_id + " does not exist");
     }
 
+    // Sanity check
     if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
         throw std::invalid_argument("Configuration file missing key(s)");
     }
 
     std::stringstream gstr_ss;
-    std::string format = fs[KEY_FORMAT];
-    int cam_id = 2;
+
+    // Hardcoded camera settings (for now)
+    int cam_id = 2;  // /dev/video2 (your working H.264 camera)
     std::string device_path = "/dev/video" + std::to_string(cam_id);
 
-    // ✅ Check camera device existence first
+    // ✅ Check if the device exists
     if (access(device_path.c_str(), F_OK) == -1) {
         LOG_F(WARNING, "Camera device not found: %s — skipping pipeline creation.", device_path.c_str());
         return "";
     }
 
+    // ✅ Build the H.264 GPU pipeline
     gstr_ss << "v4l2src device=" << device_path << " io-mode=2 ! ";
-    gstr_ss << format << ",";
-    gstr_ss << "width=" << 1920;
-    gstr_ss << ",height=" << 1080;
-    gstr_ss << ",framerate=" << 60 << "/1 ! ";
+    gstr_ss << "video/x-h264,width=1920,height=1080,framerate=30/1 ! ";
+    gstr_ss << "h264parse ! nvv4l2decoder ! nvvidconv ! ";
+    gstr_ss << "video/x-raw,format=BGRx ! videoconvert ! appsink";
 
-    if (format == "image/jpeg") {
-        // GPU hardware MJPEG decode path
-        gstr_ss << "h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
-
-    
-
-    gstr_ss << "appsink";
     return gstr_ss.str();
 }
+
+// std::string Camera::getGSTPipe(CameraID camera_id) {
+//     cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
+//     if (!fs.isOpened()) {
+//         throw std::invalid_argument("Configuration file for Camera ID " + camera_id + " does not exist");
+//     }
+
+//     if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+//         throw std::invalid_argument("Configuration file missing key(s)");
+//     }
+
+//     std::stringstream gstr_ss;
+//     std::string format = fs[KEY_FORMAT];
+//     int cam_id = static_cast<int>(fs[KEY_CAMERA_ID]);
+//     std::string device_path = "/dev/video" + std::to_string(cam_id);
+
+//     // ✅ Check camera device existence first
+//     if (access(device_path.c_str(), F_OK) == -1) {
+//         LOG_F(WARNING, "Camera device not found: %s — skipping pipeline creation.", device_path.c_str());
+//         return "";
+//     }
+
+//     gstr_ss << "v4l2src device=" << device_path << " io-mode=2 ! ";
+//     gstr_ss << format << ",";
+//     gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+//     gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+//     gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+
+//     if (format == "image/jpeg") {
+//         // GPU hardware MJPEG decode path
+//         gstr_ss << "jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
+//     } else {
+//         // Non-MJPEG fallback
+//         gstr_ss << "videoconvert ! ";
+//     }
+
+//     gstr_ss << "appsink";
+//     return gstr_ss.str();
+// }
 
 
 
