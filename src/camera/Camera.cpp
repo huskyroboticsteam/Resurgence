@@ -88,7 +88,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
     std::stringstream gstr_ss;
     std::string format = fs[KEY_FORMAT];
-    int cam_id = static_cast<int>(fs[KEY_CAMERA_ID]);
+    int cam_id = 2;
     std::string device_path = "/dev/video" + std::to_string(cam_id);
 
     // ✅ Check camera device existence first
@@ -99,13 +99,14 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
     gstr_ss << "v4l2src device=" << device_path << " io-mode=2 ! ";
     gstr_ss << format << ",";
-    gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
-    gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
-    gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+    gstr_ss << "width=" << 1920;
+    gstr_ss << ",height=" << 1080;
+    gstr_ss << ",framerate=" << 60 << "/1 ! ";
 
     if (format == "image/jpeg") {
         // GPU hardware MJPEG decode path
-        gstr_ss << "jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
+        gstr_ss << "h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
+
     
 
     gstr_ss << "appsink";
