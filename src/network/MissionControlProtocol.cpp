@@ -195,28 +195,44 @@ void MissionControlProtocol::handleStepperTurnAngleRequest(const json& j) {
 }
 
 static bool validateWaypointNavRequest(const json& j) {
-	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
-	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
-	return (lat_is_unsigned || util::validateKey(j, "latitude", val_t::number_float)) &&
-		   (lon_is_unsigned || util::validateKey(j, "longitude", val_t::number_float)) &&
-		   util::validateKey(j, "isApproximate", val_t::boolean) &&
-		   util::validateKey(j, "isGate", val_t::boolean);
+	bool validPoints = util::validateKey(j, "points", val_t::array);
+	if (!validPoints) return false;
+
+	// check validity of each point
+	for (const auto& point : j["points"]) {
+		// make sure each point is an array of two values
+		if (!point.is_array() || point.size() != 2) {
+			return false;
+		}
+		bool validPoint = (point[0].is_number_integer() || point[0].is_number_float()) &&
+						  (point[1].is_number_integer() || point[1].is_number_float());
+		if (!validPoint) return false;
+	} 
+	// all points validated at this point
+
+	bool validIsApproximate = util::validateKey(j, "isApproximate", val_t::boolean);
+	bool validIsGate = util::validateKey(j, "isGate", val_t::boolean);
+
+	return validIsApproximate && validIsGate;
 }
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
-	float latitude = j["latitude"];
-	float longitude = j["longitude"];
 	bool isApproximate = j["isApproximate"];
 	bool isGate = j["isGate"];
+
 	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
-		// gpsToMeters will not use altitude
-		navtypes::gpscoords_t coords = {latitude, longitude, 0};
-		auto target = robot::gpsToMeters(coords);
-		if (target) {
-			_autonomous_task.start(target.value());
-		} else {
-			LOG_F(WARNING, "No GPS converter initialized!");
+		std::vector<navtypes::point_t> finalTargets;
+
+		for (const auto& point : j["points"]) {
+			navtypes::gpscoords_t coord = {point[0], point[1], 0}; // make point into type gpscoords
+																   // gpsToMeters won't use altitude
+			auto target = robot::gpsToMeters(coord);
+			if (!target) {
+				LOG_F(WARNING, "No GPS converter initialized!");
+			}
+			finalTargets.push_back(target);
 		}
+		_autonomous_task.start(finalTargets);
 	}
 }
 
