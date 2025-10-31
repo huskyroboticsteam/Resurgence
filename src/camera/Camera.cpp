@@ -7,6 +7,10 @@
 
 #include <opencv2/aruco.hpp>
 
+#include <unistd.h> 
+#include <loguru.hpp> 
+
+
 using cv::Mat;
 using cv::Size;
 using std::string;
@@ -70,7 +74,7 @@ Camera::Camera(const Camera& other)
 	  _thread(other._thread), _intrinsic_params(other._intrinsic_params),
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
-#include <sys/stat.h> // for access()
+
 
 std::string Camera::getGSTPipe(CameraID camera_id) {
     cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
