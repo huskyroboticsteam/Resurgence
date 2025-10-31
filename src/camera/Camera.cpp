@@ -10,6 +10,10 @@
 #include <unistd.h> 
 #include <loguru.hpp> 
 
+#include <atomic>
+#include <sstream>
+#include <stdexcept>
+
 
 using cv::Mat;
 using cv::Size;
@@ -74,11 +78,6 @@ Camera::Camera(const Camera& other)
 	  _thread(other._thread), _intrinsic_params(other._intrinsic_params),
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
-#include <unistd.h>     // for access(), F_OK
-#include <loguru.hpp>   // for LOG_F
-#include <atomic>
-#include <sstream>
-#include <stdexcept>
 
 std::string Camera::getGSTPipe(CameraID camera_id) {
     // Shared flag across all threads — ensures only one camera opens
@@ -89,7 +88,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
     // Skip if camera already opened successfully
     if (camera_in_use.load()) {
-        LOG_F(WARNING, "Camera already in use — skipping for CameraID %d", static_cast<int>(camera_id));
+        LOG_F(WARNING, "Camera already in use — skipping for CameraID %s", camera_id.c_str());
         return "";
     }
 
@@ -113,6 +112,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
     return gstr_ss.str();
 }
+
 
 
 // std::string Camera::getGSTPipe(CameraID camera_id) {
