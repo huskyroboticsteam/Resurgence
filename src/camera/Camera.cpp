@@ -74,45 +74,46 @@ Camera::Camera(const Camera& other)
 	  _thread(other._thread), _intrinsic_params(other._intrinsic_params),
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
+#include <unistd.h>     // for access(), F_OK
+#include <loguru.hpp>   // for LOG_F
+#include <atomic>
+#include <sstream>
+#include <stdexcept>
+
 std::string Camera::getGSTPipe(CameraID camera_id) {
-	static std::atomic<bool> camera_opened{false};
-	if (camera_opened.load()) {
-        LOG_F(WARNING, "Camera %s already opened — skipping duplicate initialization.", device_path.c_str());
-        return "";
-    }
-    // Open configuration file (still optional for now)
-    cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
-    if (!fs.isOpened()) {
-        throw std::invalid_argument("Configuration file for Camera ID " + camera_id + " does not exist");
-    }
+    // Shared flag across all threads — ensures only one camera opens
+    static std::atomic<bool> camera_in_use{false};
 
-    // Sanity check
-    if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
-        throw std::invalid_argument("Configuration file missing key(s)");
-    }
-
-    std::stringstream gstr_ss;
-
-    // Hardcoded camera settings (for now)
-    int cam_id = 2;  // /dev/video2 (your working H.264 camera)
+    int cam_id = 2;  // hardcoded to your working /dev/video2
     std::string device_path = "/dev/video" + std::to_string(cam_id);
 
-    // ✅ Check if the device exists
+    // Skip if camera already opened successfully
+    if (camera_in_use.load()) {
+        LOG_F(WARNING, "Camera already in use — skipping for CameraID %d", static_cast<int>(camera_id));
+        return "";
+    }
+
+    // Check if the camera device exists
     if (access(device_path.c_str(), F_OK) == -1) {
         LOG_F(WARNING, "Camera device not found: %s — skipping pipeline creation.", device_path.c_str());
         return "";
     }
 
-    // ✅ Build the H.264 GPU pipeline
+    // Build GPU-accelerated H.264 GStreamer pipeline
+    std::stringstream gstr_ss;
     gstr_ss << "v4l2src device=" << device_path << " io-mode=2 ! ";
     gstr_ss << "video/x-h264,width=1920,height=1080,framerate=30/1 ! ";
     gstr_ss << "h264parse ! nvv4l2decoder ! nvvidconv ! ";
     gstr_ss << "video/x-raw,format=BGRx ! videoconvert ! appsink";
 
-	camera_opened.store(true);
+    LOG_F(INFO, "Opening camera on %s with GPU pipeline", device_path.c_str());
+
+    // Mark the camera as in use (prevents other threads from trying again)
+    camera_in_use.store(true);
 
     return gstr_ss.str();
 }
+
 
 // std::string Camera::getGSTPipe(CameraID camera_id) {
 //     cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
