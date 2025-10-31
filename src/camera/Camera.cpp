@@ -91,10 +91,10 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
     int cam_id = static_cast<int>(fs[KEY_CAMERA_ID]);
     std::string device_path = "/dev/video" + std::to_string(cam_id);
 
-    // ✅ Check camera device existence before building pipeline
+    // ✅ Check camera device existence first
     if (access(device_path.c_str(), F_OK) == -1) {
-        LOG(WARNING) << "Camera device not found: " << device_path << " — skipping pipeline creation.";
-        return "";  // returning empty pipeline string avoids crash
+        LOG_F(WARNING, "Camera device not found: %s — skipping pipeline creation.", device_path.c_str());
+        return "";
     }
 
     gstr_ss << "v4l2src device=" << device_path << " io-mode=2 ! ";
@@ -104,10 +104,10 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
     gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
     if (format == "image/jpeg") {
-        // ✅ GPU hardware decode path
+        // GPU hardware MJPEG decode path
         gstr_ss << "jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
     } else {
-        // ✅ Non-MJPEG fallback (e.g. YUYV)
+        // Non-MJPEG fallback
         gstr_ss << "videoconvert ! ";
     }
 
