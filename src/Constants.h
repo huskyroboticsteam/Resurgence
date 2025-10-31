@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cmath>
 #include <string>
+#include <unordered_set>
 
 #include <frozen/unordered_map.h>
 
@@ -60,6 +61,8 @@ extern const double MAX_DTHETA;
 extern const CameraID MAST_CAMERA_ID;
 extern const CameraID WRIST_CAMERA_ID;
 extern const CameraID HAND_CAMERA_ID;
+
+extern const std::unordered_set<robot::types::CameraID> CAMERA_SET;
 
 extern const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS;
 

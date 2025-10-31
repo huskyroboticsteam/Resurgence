@@ -51,6 +51,12 @@ const robot::types::CameraID HAND_CAMERA_ID = "hand";
 const robot::types::CameraID WRIST_CAMERA_ID = "wrist";
 const robot::types::CameraID MAST_CAMERA_ID = "mast";
 
+const std::unordered_set<robot::types::CameraID> CAMERA_SET = {
+   HAND_CAMERA_ID,
+   WRIST_CAMERA_ID,
+   MAST_CAMERA_ID
+};
+
 const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
 	{HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"},
 	{WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
