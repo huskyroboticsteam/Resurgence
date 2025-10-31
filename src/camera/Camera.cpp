@@ -89,7 +89,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
     // Skip if camera already opened successfully
     if (camera_in_use.load()) {
-        LOG_F(WARNING, "Camera already in use — skipping for CameraID %d", camera_id);
+        LOG_F(WARNING, "Camera already in use — skipping for CameraID" + camera_id);
         return "";
     }
 
