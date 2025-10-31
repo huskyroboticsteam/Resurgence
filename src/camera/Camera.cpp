@@ -70,32 +70,47 @@ Camera::Camera(const Camera& other)
 	  _thread(other._thread), _intrinsic_params(other._intrinsic_params),
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
+#include <sys/stat.h> // for access()
+
 std::string Camera::getGSTPipe(CameraID camera_id) {
-	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
-	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID" + camera_id + " does not exist");
-	}
+    cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
+    if (!fs.isOpened()) {
+        throw std::invalid_argument("Configuration file for Camera ID " + camera_id + " does not exist");
+    }
 
-	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
-		throw std::invalid_argument("Configuration file missing key(s)");
-	}
+    if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+        throw std::invalid_argument("Configuration file missing key(s)");
+    }
 
-	std::stringstream gstr_ss;
-  	std::string format = fs[KEY_FORMAT];
+    std::stringstream gstr_ss;
+    std::string format = fs[KEY_FORMAT];
+    int cam_id = static_cast<int>(fs[KEY_CAMERA_ID]);
+    std::string device_path = "/dev/video" + std::to_string(cam_id);
 
-	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
-  	gstr_ss << format << ",";
-	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
-	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
-	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+    // ✅ Check camera device existence before building pipeline
+    if (access(device_path.c_str(), F_OK) == -1) {
+        LOG(WARNING) << "Camera device not found: " << device_path << " — skipping pipeline creation.";
+        return "";  // returning empty pipeline string avoids crash
+    }
 
-	if (format == "image/jpeg") {
-    gstr_ss << "jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
-	}
-	gstr_ss << "appsink";
+    gstr_ss << "v4l2src device=" << device_path << " io-mode=2 ! ";
+    gstr_ss << format << ",";
+    gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+    gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+    gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	return gstr_ss.str();
+    if (format == "image/jpeg") {
+        // ✅ GPU hardware decode path
+        gstr_ss << "jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! ";
+    } else {
+        // ✅ Non-MJPEG fallback (e.g. YUYV)
+        gstr_ss << "videoconvert ! ";
+    }
+
+    gstr_ss << "appsink";
+    return gstr_ss.str();
 }
+
 
 
 
