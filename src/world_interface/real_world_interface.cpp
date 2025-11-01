@@ -11,6 +11,7 @@
 #include "real_world_constants.h"
 #include "world_interface.h"
 
+#include "JetsonGPIO.h"
 #include <future>
 #include <iostream>
 #include <loguru.hpp>
@@ -130,6 +131,9 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 
 	return nullptr;
 }
+void world_interface_cleanup() {
+	GPIO::cleanup();
+}
 } // namespace
 
 void world_interface_init(
@@ -142,6 +146,12 @@ void world_interface_init(
 	}
 	can::initCAN();
 	initMotors();
+	GPIO::setmode(GPIO::BOARD);
+	std::atexit(world_interface_cleanup);
+
+  // Initialize Science Servo Board
+
+  // For now, we can consider the board as a motor and just use it for its serial
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -319,4 +329,21 @@ void removeLimitSwitchCallback(callbackid_t id) {
 	return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
 }
 
+
+void initGPIOPin(int pin, bool output) {
+	if (output) {
+		GPIO::setup(pin, GPIO::Directions::OUT, GPIO::LOW);
+	} else {
+		GPIO::setup(pin, GPIO::Directions::IN);
+	}
+
+}
+
+void writeGPIOPin(int pin, bool high) {
+	GPIO::output(pin, high ? GPIO::HIGH : GPIO::LOW);
+}
+
+bool readGPIOPin(int pin) {
+	return GPIO::input(pin) == GPIO::HIGH;
+}
 } // namespace robot

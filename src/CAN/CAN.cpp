@@ -277,12 +277,12 @@ void sendCANPacket(const CANPacket& packet) {
 		success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
 		tcdrain(can_fd);
 	}
-
+/*
 	if (!success) {
 		LOG_F(ERROR, "Failed to send CAN packet to group=%x, id=%x: %s",
 			  static_cast<int>(getDeviceGroup(packet)), getDeviceSerial(packet),
 			  std::strerror(errno));
-	}
+	}*/
 }
 
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {

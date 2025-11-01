@@ -99,6 +99,14 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   FetchContent_MakeAvailable(HindsightCAN)
 endif()
 
+# Find JetsonGPIO, GPIO configuration C++ library for Jetson.
+FetchContent_Declare(
+  JetsonGPIO 
+  GIT_REPOSITORY https://github.com/pjueon/JetsonGPIO.git 
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(JetsonGPIO)
+
 FetchContent_Declare(LoguruGitRepo
 	GIT_REPOSITORY "https://github.com/emilk/loguru"
 	GIT_TAG        "master"
@@ -219,7 +227,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     world_interface/real_world_interface.cpp
     world_interface/motor/can_motor.cpp
   )
-  target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
+  target_link_libraries(real_world_interface gps_interface can_interface world_interface_core JetsonGPIO::JetsonGPIO)
   add_library(world_interface ALIAS real_world_interface)
 elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
   add_library(simulator_interface STATIC
@@ -359,6 +367,13 @@ if (WORLD_INTERFACE STREQUAL "REAL")
   )
   target_link_libraries(TunePID ${vision_libs})
 endif()
+
+add_executable(GPIOTest GPIOTest.cpp)
+target_link_libraries(GPIOTest
+  ${rover_libs}
+  can_interface
+  real_world_interface
+)
 
 add_compile_options(
   -Wall
