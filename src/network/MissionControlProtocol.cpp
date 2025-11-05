@@ -226,13 +226,16 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 		for (const auto& point : j["points"]) {
 			navtypes::gpscoords_t coord = {point[0], point[1], 0}; // make point into type gpscoords
 																   // gpsToMeters won't use altitude
-			auto target = robot::gpsToMeters(coord);
-			if (!target) {
+			auto optTarget = robot::gpsToMeters(coord);
+			
+			// check if target was sent back by gpsToMeters
+			if (!optTarget) {
 				LOG_F(WARNING, "No GPS converter initialized!");
+				return;
 			}
-			finalTargets.push_back(target);
+			finalTargets.push_back(*optTarget);
 		}
-		_autonomous_task.start(finalTargets);
+		_autonomous_task.start(finalTargets[0]);
 	}
 }
 
