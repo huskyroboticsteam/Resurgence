@@ -21,7 +21,8 @@ public:
 	 * value shouldn't be below 21 as values below this have essentially the same quality while
 	 * having much larger encoded frame sizes.
 	 */
-	H264Encoder(int fps, int rf);
+	//H264Encoder(int fps, int rf);
+  H264Encoder(int fps, int rf, uint32_t bitrate)
 	/**
 	 * First frame will set the resolution and subsequent frames must match the resolution
 	 * @param frame A reference to an OpenCV 2D Matrix representing the frame to be encoded.
@@ -36,5 +37,6 @@ private:
 	int fps;
 	// the rf constant for rate control compression
 	int rf;
+  uint32_t bitrate;
 };
 } // namespace video

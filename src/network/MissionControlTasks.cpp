@@ -93,7 +93,9 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 			std::lock_guard lock(_mutex);
 			auto it = Constants::video::STREAM_RFS.find(cam);
 			int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second : Constants::video::H264_RF_CONSTANT;
-			auto enc = std::make_shared<video::H264Encoder>(fps, rf);
+			//autouto enc = std::make_shared<video::H264Encoder>(fps, rf);
+      uint32_t bitrate = 4000000;
+			auto enc = std::make_shared<video::H264Encoder>(fps, rf, bitrate);
 			auto cam_handle = robot::openCamera(cam);
 			if (cam_handle) {
 				_open_streams.insert_or_assign(cam, stream_data_t(enc, cam_handle));
