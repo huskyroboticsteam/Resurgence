@@ -14,7 +14,6 @@
 
 namespace AR {
 
-// [Changed]: Initialize enabled flag to true by default
 Detector::Detector() : enabled_(true) {
 }
 
@@ -49,7 +48,6 @@ std::vector<Tag> Detector::detectTags(const cv::Mat& input,
 std::vector<Tag> Detector::_detectTagsImpl(const cv::Mat& input,
 										   std::vector<std::vector<cv::Point2f>>* rejected,
 										   bool undistort) {
-	// [Added]: Return empty vector if detection is disabled
 	if (!enabled_ || this->empty()) {
 		return {};
 	}
@@ -69,8 +67,6 @@ std::vector<Tag> Detector::_detectTagsImpl(const cv::Mat& input,
 	if (undistort) {
 	}
 
-	// [Changed]: Replaced deprecated estimatePoseSingleMarkers with cv::solvePnP
-	// This ensures compatibility with future OpenCV versions
 	std::vector<cv::Vec3d> rvecs, tvecs;
 	float markerSize = this->marker_set_->getPhysicalSize();
 	
@@ -89,7 +85,8 @@ std::vector<Tag> Detector::_detectTagsImpl(const cv::Mat& input,
 		cv::solvePnP(objPoints, corners[i], 
 					 this->camera_params_.getCameraMatrix(),
 					 this->camera_params_.getDistCoeff(), 
-					 rvecs[i], tvecs[i]);
+					 rvecs[i], tvecs[i],
+					 false, cv::SOLVEPNP_IPPE_SQUARE);
 	}
 
 	std::vector<Tag> tags;
@@ -111,12 +108,10 @@ void Detector::setDetectorParams(cv::aruco::DetectorParameters params) {
 	*detector_params_ = params;
 }
 
-// [Added]: Method to enable or disable AR detection
 void Detector::setEnabled(bool enabled) {
 	enabled_ = enabled;
 }
 
-// [Added]: Method to check if AR detection is enabled
 bool Detector::isEnabled() const {
 	return enabled_;
 }

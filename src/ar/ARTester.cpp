@@ -130,7 +130,6 @@ int main(int argc, char* argv[]) {
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
 	std::cout << "Set image dimensions to " << w << " x " << h << std::endl;
 
-	// [Added]: Print keyboard controls
 	std::cout << "\n=== Keyboard Controls ===" << std::endl;
 	std::cout << "  Q - Quit" << std::endl;
 	std::cout << "  A - Toggle AR detection on/off" << std::endl;
@@ -152,7 +151,6 @@ int main(int argc, char* argv[]) {
 	bool show_grid = false;
 	int grid_spacing = 20;
 	bool show_rejected = false;
-	// [Added]: Toggle for enabling/disabling AR detection at runtime
 	bool ar_detection_enabled = true;
 
 	bool loop = true;
@@ -171,7 +169,6 @@ int main(int argc, char* argv[]) {
 
 		// Passes frame to the detector class.
 		// Tags will be located and returned.
-		// [Changed]: Only detect tags if AR detection is enabled
 		std::vector<std::vector<cv::Point2f>> rejected;
 		std::vector<AR::Tag> tags;
 		if (ar_detection_enabled) {
@@ -241,7 +238,6 @@ int main(int argc, char* argv[]) {
 				show_rejected = false;
 				std::cout << "Rejected points off" << std::endl;
 				break;
-			// [Added]: Toggle AR detection on/off
 			case 'a':
 				ar_detection_enabled = !ar_detection_enabled;
 				std::cout << "AR detection " << (ar_detection_enabled ? "ON" : "OFF") << std::endl;

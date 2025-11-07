@@ -3,6 +3,7 @@
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"
 #include "world_interface/world_interface.h"
+#include "ar/read_landmarks.h"
 
 #include <array>
 #include <chrono>
@@ -154,6 +155,18 @@ int main(int argc, char** argv) {
 	Globals::websocketServer.addProtocol(std::move(mcProto));
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
+	
+	// Open mast camera to load its configuration before initializing AR
+	LOG_F(INFO, "Opening mast camera...");
+	auto mastCam = robot::openCamera(Constants::MAST_CAMERA_ID);
+	
+	// Initialize AR landmark detection
+	LOG_F(INFO, "Initializing AR landmark detection...");
+	if (AR::initializeLandmarkDetection()) {
+		LOG_F(INFO, "AR landmark detection initialized successfully");
+	} else {
+		LOG_F(WARNING, "Failed to initialize AR landmark detection");
+	}
 
 	while (true) {
 		std::this_thread::sleep_for(std::chrono::seconds(60));
