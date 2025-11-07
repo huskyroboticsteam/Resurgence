@@ -4,7 +4,6 @@
 
 #include <loguru.hpp>
 
-// [Changed]: Added OpenCV headers for undistortion and remapping functions
 #include <opencv2/calib3d.hpp>
 #include <opencv2/imgproc.hpp>
 
@@ -15,7 +14,6 @@ using std::string;
 using namespace robot::types;
 
 namespace cam {
-// [Changed]: Updated constructor to initialize undistortion flag (disabled by default)
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _frame_time(std::make_shared<datatime_t>()),
@@ -39,7 +37,6 @@ bool Camera::open(CameraID camera_id, CameraParams intrinsic_params, Mat extrins
 	return result; 
 }
 
-// [Changed]: Updated constructor to initialize undistortion flag (disabled by default)
 Camera::Camera(CameraID camera_id, string name, string description, CameraParams intrinsic_params,
 			   Mat extrinsic_params)
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
@@ -68,7 +65,6 @@ void Camera::init(const Mat& extrinsic_params) {
 		});
 }
 
-// [Changed]: Updated copy constructor to copy undistortion flag and maps
 Camera::Camera(const Camera& other)
 	: _frame(other._frame), _frame_num(other._frame_num), _frame_time(other._frame_time),
 	  _capture(other._capture), _name(other._name), _description(other._description),
@@ -104,8 +100,6 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	return gstr_ss.str();
 }
 
-// [Changed]: Removed hardcoded ArUco detection from captureLoop
-// [Changed]: Added optional undistortion using precomputed maps
 // Camera now only captures and optionally undistorts frames; ArUco detection
 // should be done separately using AR::Detector with the camera's intrinsic parameters
 void Camera::captureLoop() {
@@ -199,7 +193,6 @@ void Camera::setDescription(std::string new_description) {
 	this->_description = new_description;
 }
 
-// [Changed]: New method to initialize undistortion maps from camera's intrinsic parameters
 // Uses OpenCV's initUndistortRectifyMap for efficient remapping during capture
 void Camera::initUndistortMaps() {
 	if (!hasIntrinsicParams()) {
@@ -219,7 +212,6 @@ void Camera::initUndistortMaps() {
 	LOG_F(INFO, "Initialized undistort maps for camera: %s", _name.c_str());
 }
 
-// [Changed]: New method to enable/disable automatic undistortion of captured frames
 // Returns false if intrinsic parameters are not available
 bool Camera::setUndistort(bool enable) {
 	if (enable && !hasIntrinsicParams()) {
@@ -236,7 +228,6 @@ bool Camera::setUndistort(bool enable) {
 	return true;
 }
 
-// [Changed]: New method to check if undistortion is currently enabled
 bool Camera::isUndistortEnabled() const {
 	return *_undistort;
 }
