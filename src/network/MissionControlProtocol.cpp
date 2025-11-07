@@ -210,17 +210,11 @@ static bool validateWaypointNavRequest(const json& j) {
 	} 
 	// all points validated at this point
 
-	bool validIsApproximate = util::validateKey(j, "isApproximate", val_t::boolean);
-	bool validIsGate = util::validateKey(j, "isGate", val_t::boolean);
-
-	return validIsApproximate && validIsGate;
+	return true;
 }
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
-	bool isApproximate = j["isApproximate"];
-	bool isGate = j["isGate"];
-
-	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
+	if (Globals::AUTONOMOUS) {
 		std::vector<navtypes::point_t> finalTargets;
 
 		for (const auto& point : j["points"]) {
