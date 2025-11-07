@@ -25,7 +25,7 @@ private:
     guint64 frame_duration_ns = 0;
 
     // OpenCV input format info
-    AVPixelFormat cam_pixel_fmt = AV_PIX_FMT_BGR24; // kept only for API parity
+    //AVPixelFormat cam_pixel_fmt = AV_PIX_FMT_BGR24; // kept only for API parity
 
 public:
     std::vector<x264_nal_t_simple> nals_simple; // NOTE: pointers inside must not outlive map

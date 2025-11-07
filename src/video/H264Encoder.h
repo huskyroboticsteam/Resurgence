@@ -22,7 +22,7 @@ public:
 	 * having much larger encoded frame sizes.
 	 */
 	//H264Encoder(int fps, int rf);
-  H264Encoder(int fps, int rf, uint32_t bitrate)
+  H264Encoder(int fps, int rf, uint32_t bitrate);
 	/**
 	 * First frame will set the resolution and subsequent frames must match the resolution
 	 * @param frame A reference to an OpenCV 2D Matrix representing the frame to be encoded.

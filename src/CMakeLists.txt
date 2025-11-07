@@ -240,12 +240,19 @@ add_library(filters SHARED
 )
 target_link_libraries(filters utils)
 
+# Find and configure GStreamer
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GST REQUIRED gstreamer-1.0>=1.16 gstreamer-app-1.0>=1.16)
+
 add_library(video STATIC
   video/H264Encoder.cpp
   video/encoder.cpp
 )
 
+target_include_directories(video PRIVATE ${GST_INCLUDE_DIRS})
+
 target_link_libraries(video
+  ${GST_LIBRARIES}
   ${OpenCV_LIBS}
   x264 avutil avcodec avformat swscale
 )

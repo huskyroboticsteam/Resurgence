@@ -2,9 +2,7 @@
 
 namespace video {
 //H264Encoder::H264Encoder(int fps, int rf) : fps(fps), rf(rf) {}
-H264Encoder::H264Encoder(int fps, int rf, uint32_t bitrate) : fps(fps), rf(rf), bitrate(bitrate) {
-  gst_init();
-}
+H264Encoder::H264Encoder(int fps, int rf, uint32_t bitrate) : fps(fps), rf(rf), bitrate(bitrate) {}
 
 std::vector<std::basic_string<uint8_t>> H264Encoder::encode_frame(const cv::Mat& frame) {
 	if (!encoder) {
