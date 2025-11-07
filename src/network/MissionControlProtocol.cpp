@@ -227,7 +227,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 			navtypes::gpscoords_t coord = {point[0], point[1], 0}; // make point into type gpscoords
 																   // gpsToMeters won't use altitude
 			auto optTarget = robot::gpsToMeters(coord);
-			
+		
 			// check if target was sent back by gpsToMeters
 			if (!optTarget) {
 				LOG_F(WARNING, "No GPS converter initialized!");
@@ -235,7 +235,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 			}
 			finalTargets.push_back(*optTarget);
 		}
-		_autonomous_task.start(finalTargets[0]);
+		_autonomous_task.start(finalTargets);
 	}
 }
 
