@@ -21,18 +21,23 @@ AutonomousTask::~AutonomousTask() {
 	}
 }
 
-void AutonomousTask::start(const navtypes::point_t& waypointCoords) {
-	if (_autonomous_task_thread.joinable()) {
+void AutonomousTask::start(const std::vector<navtypes::point_t>& waypointCoords) {
+	if (_autonomous_task_thread.joinable()) { 
 		kill();
 	}
 
-	_waypoint_coords = waypointCoords;
+	_waypoint_coords_list = waypointCoords;
 	_kill_called = false;
-	_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigate, this);
+	
+	// / / / IN PROGRESS / / / (trying to process points via enhanced for loop to see if it works with threading)
+	for (navtypes::point_t& point : _waypoint_coords_list) {
+		_waypoint_coord = point;
+		_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigate, this);
+	}
 }
 
 void AutonomousTask::navigate() {
-	commands::DriveToWaypointCommand cmd(_waypoint_coords, THETA_KP, DRIVE_VEL,
+	commands::DriveToWaypointCommand cmd(_waypoint_coord, THETA_KP, DRIVE_VEL,
 										 SLOW_DRIVE_THRESHOLD, DONE_THRESHOLD,
 										 CLOSE_TO_TARGET_DUR_VAL);
 
@@ -52,7 +57,7 @@ void AutonomousTask::navigate() {
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
 				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
-			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coords;
+			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coord;
 			LOG_F(INFO, "Relative Target: (%lf, %lf)", relTarget(0), relTarget(1));
 			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));
 			LOG_F(INFO, "xVel: %lf", scaledVels(0));
