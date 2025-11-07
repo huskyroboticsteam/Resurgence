@@ -29,7 +29,7 @@ public:
 	 *
 	 * @param navtypes::pose_t The waypoint to navigate to
 	 */
-	void start(const navtypes::point_t&);
+	void start(const std::vector<navtypes::point_t>&);
 
 	/*
 	 * @brief Halts autonomous navigation by exiting the navigate() function and joining the
@@ -43,7 +43,9 @@ private:
 	 */
 	void navigate();
 
-	navtypes::point_t _waypoint_coords;
+	navtypes::point_t _waypoint_coord;
+	std::vector<navtypes::point_t> _waypoint_coords_list;
+	
 	std::mutex _autonomous_task_mutex;
 	std::thread _autonomous_task_thread;
 	std::condition_variable _autonomous_task_cv;

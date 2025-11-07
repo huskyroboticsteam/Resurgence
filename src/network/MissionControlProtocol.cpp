@@ -235,7 +235,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 			}
 			finalTargets.push_back(*optTarget);
 		}
-		_autonomous_task.start(finalTargets[0]);
+		_autonomous_task.start(finalTargets);
 	}
 }
 
