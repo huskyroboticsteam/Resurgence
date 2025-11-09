@@ -156,10 +156,6 @@ int main(int argc, char** argv) {
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
 	
-	// Open mast camera to load its configuration before initializing AR
-	LOG_F(INFO, "Opening mast camera...");
-	auto mastCam = robot::openCamera(Constants::MAST_CAMERA_ID);
-	
 	// Initialize AR landmark detection
 	LOG_F(INFO, "Initializing AR landmark detection...");
 	if (AR::initializeLandmarkDetection()) {

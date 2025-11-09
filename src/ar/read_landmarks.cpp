@@ -2,6 +2,7 @@
 
 #include "../Constants.h"
 #include "../camera/Camera.h"
+#include "../camera/CameraConfig.h"
 #include "../world_interface/world_interface.h"
 #include "Detector.h"
 
@@ -100,19 +101,27 @@ void detectLandmarksLoop() {
 }
 
 bool initializeLandmarkDetection() {
-	auto intrinsic = robot::getCameraIntrinsicParams(Constants::MAST_CAMERA_ID);
-	if (intrinsic) {
-		ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
+	// Load camera intrinsic parameters directly from config file
+	// This avoids opening the camera just to get its parameters
+	try {
+		auto config = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(Constants::MAST_CAMERA_ID));
+		if (!config.intrinsicParams || config.intrinsicParams->empty()) {
+			LOG_F(ERROR, "Camera configuration does not have intrinsic parameters! "
+						 "AR tag detection cannot be performed.");
+			return false;
+		}
+		ar_detector = Detector(Markers::URC_MARKERS(), config.intrinsicParams.value());
 		landmark_thread = std::thread(&detectLandmarksLoop);
-	} else {
-		LOG_F(ERROR, "Camera does not have intrinsic parameters! AR tag detection "
-					 "cannot be performed.");
+		
+		if (!config.extrinsicParams || config.extrinsicParams->empty()) {
+			LOG_F(WARNING, "Camera configuration does not have extrinsic parameters! "
+						   "Coordinates returned for AR tags will be relative to camera");
+		}
+	} catch (const std::exception& e) {
+		LOG_F(ERROR, "Failed to load camera configuration: %s", e.what());
 		return false;
 	}
-	if (!robot::getCameraExtrinsicParams(Constants::MAST_CAMERA_ID)) {
-		LOG_F(WARNING, "Camera does not have extrinsic parameters! Coordinates returned "
-					   "for AR tags will be relative to camera");
-	}
+	
 	initialized = true;
 	return true;
 }

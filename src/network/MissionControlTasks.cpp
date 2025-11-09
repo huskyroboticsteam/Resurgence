@@ -11,7 +11,6 @@
 
 #include <loguru.hpp>
 #include <map>
-#include <cstdio>
 
 #include <nlohmann/json.hpp>
 #include <opencv2/aruco.hpp>
@@ -25,6 +24,10 @@ using nlohmann::json;
 namespace net::mc::tasks {
 namespace {
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
+
+// Reusable ArUco detector parameters and marker set
+cv::Ptr<cv::aruco::DetectorParameters> aruco_detector_params = cv::aruco::DetectorParameters::create();
+std::shared_ptr<AR::MarkerSet> aruco_marker_set = AR::Markers::URC_MARKERS();
 }
 
 
@@ -137,22 +140,21 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						stream_data.frame_num = new_frame_num;
 						const auto& encoder = stream_data.encoder;
 
-						// Detect and log AR markers if this is the mast camera
-						if (cam == Constants::MAST_CAMERA_ID && AR::isLandmarkDetectionInitialized()) {
+						// Detect and log AR markers if AR detection is initialized
+						if (AR::isLandmarkDetectionInitialized()) {
 							// Get camera parameters for projection
 							auto intrinsics = robot::getCameraIntrinsicParams(cam);
 							if (intrinsics) {
-								// Detect markers using OpenCV's ArUco directly
+								// Detect markers using configured marker set
 								std::vector<std::vector<cv::Point2f>> corners, rejectedPoints;
 								std::vector<int> ids;
-								cv::Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
-								cv::aruco::detectMarkers(frame, AR::Markers::URC_MARKERS()->getDict(), 
-								                         corners, ids, params, rejectedPoints);
+								cv::aruco::detectMarkers(frame, aruco_marker_set->getDict(), 
+								                         corners, ids, aruco_detector_params, rejectedPoints);
 								
 								if (!ids.empty()) {
 									// Use a map to store only the first occurrence of each marker ID
 									std::map<int, cv::Vec3d> uniqueMarkers;
-									float markerSize = AR::Markers::URC_MARKERS()->getPhysicalSize();
+									float markerSize = aruco_marker_set->getPhysicalSize();
 									
 									for (size_t i = 0; i < ids.size(); i++) {
 										// Only process if we haven't seen this marker ID yet
@@ -172,26 +174,17 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 										}
 									}
 									
-									// Print each unique detected marker with clear formatting
+									// Log each unique detected marker
 									for (const auto& pair : uniqueMarkers) {
 										int id = pair.first;
 										const cv::Vec3d& tvec = pair.second;
 										double distance = cv::norm(tvec);
 										
-										// Direct output to stdout with clear formatting
-										printf("\n");
-										printf("=================================================\n");
-										printf("  DETECTED ARUCO MARKER\n");
-										printf("=================================================\n");
-										printf("  Marker ID:    %d\n", id);
-										printf("  Distance:     %.2f m  (%.0f cm)\n", distance, distance * 100.0);
-										printf("  Position (camera frame):\n");
-										printf("    X: %+.3f m\n", tvec[0]);
-										printf("    Y: %+.3f m\n", tvec[1]);
-										printf("    Z: %+.3f m\n", tvec[2]);
-										printf("=================================================\n");
-										printf("\n");
-										fflush(stdout);
+										LOG_F(INFO, "Detected ArUco marker on camera %s:", cam.c_str());
+										LOG_F(INFO, "  Marker ID: %d", id);
+										LOG_F(INFO, "  Distance: %.2f m (%.0f cm)", distance, distance * 100.0);
+										LOG_F(INFO, "  Position (camera frame): X=%+.3f m, Y=%+.3f m, Z=%+.3f m", 
+										      tvec[0], tvec[1], tvec[2]);
 									}
 								}
 							}
