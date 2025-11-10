@@ -25,11 +25,11 @@ public:
 	~AutonomousTask();
 
 	/*
-	 * @brief Starts an autonomous task to the provided waypoint
+	 * @brief Starts an autonomous task to the provided waypoints
 	 *
-	 * @param navtypes::pose_t The waypoint to navigate to
+	 * @param std::vector<navtypes::point_t> The list of waypoints to navigate to
 	 */
-	void start(const std::vector<navtypes::point_t>&);
+	void start(const navtypes::points_t&);
 
 	/*
 	 * @brief Halts autonomous navigation by exiting the navigate() function and joining the
@@ -39,12 +39,17 @@ public:
 
 private:
 	/*
-	 * @brief Handles navigation to waypoint, called by start()
+	 * @brief Handles sequential navigation to a list of a waypoints, called by start()
+	 */
+	void navigateAll();
+
+	/*
+	 * @brief Handles navigation to a single waypoint, called by navigateAll()
 	 */
 	void navigate();
 
 	navtypes::point_t _waypoint_coord;
-	std::vector<navtypes::point_t> _waypoint_coords_list;
+	navtypes::points_t _waypoint_coords_list;
 	
 	std::mutex _autonomous_task_mutex;
 	std::thread _autonomous_task_thread;

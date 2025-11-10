@@ -21,7 +21,7 @@ AutonomousTask::~AutonomousTask() {
 	}
 }
 
-void AutonomousTask::start(const std::vector<navtypes::point_t>& waypointCoords) {
+void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 	if (_autonomous_task_thread.joinable()) {
 		kill();
 	}
@@ -29,10 +29,14 @@ void AutonomousTask::start(const std::vector<navtypes::point_t>& waypointCoords)
 	_waypoint_coords_list = waypointCoords;
 	_kill_called = false;
 	
-	// / / / IN PROGRESS / / / (trying to process points via enhanced for loop to see if it works with threading)
+	_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
+}
+
+void AutonomousTask::navigateAll() {
+	std::thread currWaypoint;
 	for (navtypes::point_t& point : _waypoint_coords_list) {
 		_waypoint_coord = point;
-		_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigate, this);
+		navigate();
 	}
 }
 
@@ -66,6 +70,7 @@ void AutonomousTask::navigate() {
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
 		sleepUntil += 500ms;
+
 		// Wait 500ms or return out of while loop if kill called
 		if (_autonomous_task_cv.wait_until(autonomousTaskLock, sleepUntil,
 										   [&] { return _kill_called; })) {
