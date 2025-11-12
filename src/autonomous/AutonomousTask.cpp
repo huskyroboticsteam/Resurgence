@@ -33,10 +33,18 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 }
 
 void AutonomousTask::navigateAll() {
-	std::thread currWaypoint;
+	int i = 1;
 	for (navtypes::point_t& point : _waypoint_coords_list) {
 		_waypoint_coord = point;
+
+		// nlohmann::json msg = { {"type", "target_update"},
+		// 			 {"numTarget", i},
+		// 			 {"latitude", point[0]},
+		// 			 {"longitude", point[1]}  };
+		// _server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+
 		navigate();
+		i++;
 	}
 }
 
@@ -77,6 +85,8 @@ void AutonomousTask::navigate() {
 			return;
 		}
 	}
+	auto gpsData = robot::readGPS().getData();
+	LOG_SCOPE_F(INFO, "Arrived, (%lf, %lf)", gpsData.x(), gpsData.y());
 }
 
 void AutonomousTask::kill() {

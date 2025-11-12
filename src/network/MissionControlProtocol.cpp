@@ -206,7 +206,9 @@ static bool validateWaypointNavRequest(const json& j) {
 		}
 		bool validPoint = (point[0].is_number_integer() || point[0].is_number_float()) &&
 						  (point[1].is_number_integer() || point[1].is_number_float());
-		if (!validPoint) return false;
+		if (!validPoint) {
+			return false;
+		}
 	} 
 	// all points validated at this point
 
