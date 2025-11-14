@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../navtypes.h"
+#include "../network/websocket/WebSocketServer.h"
+
 
 #include <cmath>
 #include <condition_variable>
@@ -17,7 +19,7 @@ public:
 	/*
 	 * @brief Constructs a new AutonomousTask
 	 */
-	AutonomousTask();
+	AutonomousTask(net::websocket::SingleClientWSServer&);
 
 	/*
 	 * @brief Destructs AutonomousTask object, joins _autonomous_task_thread
@@ -48,7 +50,9 @@ private:
 	 */
 	void navigate();
 
-	navtypes::point_t _waypoint_coord;
+	net::websocket::SingleClientWSServer& _server;
+
+	navtypes::point_t _waypoint_coord; // current coord
 	navtypes::points_t _waypoint_coords_list;
 	
 	std::mutex _autonomous_task_mutex;

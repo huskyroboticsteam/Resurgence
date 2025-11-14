@@ -6,14 +6,18 @@
 #include "../utils/transform.h"
 #include "../world_interface/world_interface.h"
 
+
 #include <loguru.hpp>
 
 using namespace std::chrono_literals;
 using namespace Constants::autonomous;
 
+
+using nlohmann::json;
+
 namespace autonomous {
 
-AutonomousTask::AutonomousTask(){};
+AutonomousTask::AutonomousTask(net::websocket::SingleClientWSServer& server): _server(server) {};
 
 AutonomousTask::~AutonomousTask() {
 	if (_autonomous_task_thread.joinable()) {
@@ -33,18 +37,13 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 }
 
 void AutonomousTask::navigateAll() {
-	int i = 1;
 	for (navtypes::point_t& point : _waypoint_coords_list) {
 		_waypoint_coord = point;
-
-		// nlohmann::json msg = { {"type", "target_update"},
-		// 			 {"numTarget", i},
-		// 			 {"latitude", point[0]},
-		// 			 {"longitude", point[1]}  };
-		// _server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-
+		json msg = {{"type", "auto_target_update"},
+					{"latitude", point[0]},
+					{"longitude", point[1]}};
+		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 		navigate();
-		i++;
 	}
 }
 
