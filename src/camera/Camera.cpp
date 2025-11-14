@@ -109,7 +109,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
     // Mark the camera as in use (prevents other threads from trying again)
     camera_in_use.store(true);
-
+	
     return gstr_ss.str();
 }
 
