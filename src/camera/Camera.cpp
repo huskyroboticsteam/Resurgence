@@ -1,7 +1,6 @@
 #include "../Constants.h"
 #include "Camera.h"
 #include "CameraConfig.h"
-#include "CameraStreamProperties.h"
 
 #include <loguru.hpp>
 
@@ -72,17 +71,25 @@ Camera::Camera(const Camera& other)
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
 std::string Camera::getGSTPipe(CameraID camera_id) {
-	const auto& configPath = Constants::CAMERA_CONFIG_PATHS.at(camera_id);
-	CameraStreamProperties props = readCameraStreamProperties(configPath);
+	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
+	if (!fs.isOpened()) {
+		throw std::invalid_argument("Configuration file for Camera ID" + camera_id + " does not exist");
+	}
+
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+		throw std::invalid_argument("Configuration file missing key(s)");
+	}
 
 	std::stringstream gstr_ss;
-	gstr_ss << "v4l2src device=/dev/video" << props.cameraId << " ! ";
-	gstr_ss << props.format << ",";
-	gstr_ss << "width=" << props.width;
-	gstr_ss << ",height=" << props.height;
-	gstr_ss << ",framerate=" << props.framerate << "/1 ! ";
+	std::string format = fs[KEY_FORMAT];
 
-	if (props.format == "image/jpeg") {
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
+	gstr_ss << format << ",";
+	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+
+	if (format == "image/jpeg") {
 		gstr_ss << "jpegdec ! ";
 	}
 	gstr_ss << "videoconvert ! appsink";

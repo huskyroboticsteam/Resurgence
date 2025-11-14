@@ -1,7 +1,5 @@
 #pragma once
 
-#include "CameraStreamProperties.h"
-
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -10,6 +8,14 @@
 typedef struct _GstElement GstElement;
 
 namespace cam {
+
+struct CameraStreamProperties {
+	int cameraId;
+	std::string format;
+	int width;
+	int height;
+	int framerate;
+};
 
 class H264PassthroughSource {
 public:
