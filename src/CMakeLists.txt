@@ -141,6 +141,10 @@ link_libraries(loguru::loguru -ldl)
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
+# Find LibTorch for object detection
+set(CMAKE_PREFIX_PATH "/home/thomas/libtorch")
+find_package(Torch REQUIRED)
+
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
 endif()
@@ -316,6 +320,7 @@ list(APPEND rover_libs
   control
   commands
   utils
+  object_detection
 )
 target_link_libraries(Rover
   ${rover_libs}
@@ -397,5 +402,6 @@ add_compile_options(
 
 add_subdirectory(ar)
 add_subdirectory(camera)
+add_subdirectory(object-detection)
 add_subdirectory(CAN)
 add_subdirectory(network)

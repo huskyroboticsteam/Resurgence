@@ -50,4 +50,5 @@ const kinematics::DiffWristKinematics wristKinematics;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);
 std::atomic<bool> armIKEnabled = false;
+std::atomic<bool> objectDetectionEnabled = false;
 } // namespace Globals
