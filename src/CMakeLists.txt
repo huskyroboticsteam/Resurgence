@@ -113,8 +113,17 @@ find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
 # Find LibTorch for object detection
-set(CMAKE_PREFIX_PATH "/home/thomas/libtorch")
+# Users can specify LibTorch path via:
+# 1. Environment variable: export LIBTORCH_PATH=/path/to/libtorch
+# 2. CMake argument: cmake -DCMAKE_PREFIX_PATH=/path/to/libtorch
+# 3. System-wide installation
+if(DEFINED ENV{LIBTORCH_PATH})
+  list(APPEND CMAKE_PREFIX_PATH "$ENV{LIBTORCH_PATH}")
+  message(STATUS "Using LibTorch from LIBTORCH_PATH: $ENV{LIBTORCH_PATH}")
+endif()
+
 find_package(Torch REQUIRED)
+message(STATUS "Found Torch: ${TORCH_LIBRARIES}")
 
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
