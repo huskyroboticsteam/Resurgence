@@ -4,12 +4,14 @@
 #include "network/MissionControlProtocol.h"
 #include "world_interface/world_interface.h"
 #include "ar/read_landmarks.h"
+#include "object-detection/read_objects.h"
 
 #include <array>
 #include <chrono>
 #include <csignal>
 #include <ctime>
 #include <filesystem>
+#include <iostream>
 #include <loguru.cpp>
 #include <sstream>
 #include <thread>
@@ -31,6 +33,37 @@ void closeRover(int) {
 	robot::emergencyStop();
 	Globals::websocketServer.stop();
 	raise(SIGTERM);
+}
+
+void keyboardControlLoop() {
+	std::cout << "\n=== Keyboard Controls ===" << std::endl;
+	std::cout << "  O - Toggle object detection on/off" << std::endl;
+	std::cout << "  Q - Quit" << std::endl;
+	std::cout << "========================\n" << std::endl;
+	
+	while (true) {
+		char input;
+		std::cin >> input;
+		
+		switch (input) {
+			case 'o':
+			case 'O':
+				Globals::objectDetectionEnabled = !Globals::objectDetectionEnabled;
+				LOG_F(INFO, "Object detection %s", 
+					  Globals::objectDetectionEnabled ? "ENABLED" : "DISABLED");
+				std::cout << "Object detection " 
+						  << (Globals::objectDetectionEnabled ? "ON" : "OFF") 
+						  << std::endl;
+				break;
+			case 'q':
+			case 'Q':
+				LOG_F(INFO, "Quit requested from keyboard");
+				closeRover(0);
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 void parseCommandLine(int argc, char** argv) {
@@ -163,6 +196,18 @@ int main(int argc, char** argv) {
 	} else {
 		LOG_F(WARNING, "Failed to initialize AR landmark detection");
 	}
+	
+	// Initialize object detection
+	LOG_F(INFO, "Initializing object detection...");
+	if (ObjDet::initializeObjectDetection()) {
+		LOG_F(INFO, "Object detection initialized successfully");
+	} else {
+		LOG_F(WARNING, "Failed to initialize object detection");
+	}
+	
+	// Start keyboard control thread
+	std::thread keyboard_thread(keyboardControlLoop);
+	keyboard_thread.detach();
 
 	while (true) {
 		std::this_thread::sleep_for(std::chrono::seconds(60));

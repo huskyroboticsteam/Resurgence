@@ -12,3 +12,8 @@ CMakeFiles
 *.swp
 .DS_Store
 /docs/
+
+# Object detection large files
+src/object-detection/*.pt
+src/object-detection/*.jpg
+src/object-detection/*.png
