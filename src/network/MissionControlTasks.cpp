@@ -89,7 +89,6 @@ CameraStreamTask::CameraStreamTask(websocket::SingleClientWSServer& server)
 	: util::AsyncTask<>("MCP_Stream"), _server(server) {}
 
 void CameraStreamTask::openStream(const CameraID& cam, int fps) {
-	LOG_F("Starting camera stream task for %s at %d fps", cam.c_str(), fps);
 //	std::lock_guard lock(_mutex);
 //	_open_streams[cam] = 0;
 //	auto it = Constants::video::STREAM_RFS.find(cam);
