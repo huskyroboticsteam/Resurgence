@@ -140,8 +140,8 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						stream_data.frame_num = new_frame_num;
 						const auto& encoder = stream_data.encoder;
 
-						// Detect and log AR markers if AR detection is initialized
-						if (AR::isLandmarkDetectionInitialized()) {
+						// Detect and log AR markers if AR detection is initialized AND enabled
+						if (AR::isLandmarkDetectionInitialized() && Globals::arucoDetectionEnabled.load()) {
 							// Get camera parameters for projection
 							auto intrinsics = robot::getCameraIntrinsicParams(cam);
 							if (intrinsics) {

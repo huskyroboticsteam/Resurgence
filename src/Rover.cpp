@@ -38,6 +38,7 @@ void closeRover(int) {
 void keyboardControlLoop() {
 	std::cout << "\n=== Keyboard Controls ===" << std::endl;
 	std::cout << "  O - Toggle object detection on/off" << std::endl;
+	std::cout << "  R - Toggle ArUco detection on/off" << std::endl;
 	std::cout << "  Q - Quit" << std::endl;
 	std::cout << "========================\n" << std::endl;
 	
@@ -53,6 +54,15 @@ void keyboardControlLoop() {
 					  Globals::objectDetectionEnabled ? "ENABLED" : "DISABLED");
 				std::cout << "Object detection " 
 						  << (Globals::objectDetectionEnabled ? "ON" : "OFF") 
+						  << std::endl;
+				break;
+			case 'r':
+			case 'R':
+				Globals::arucoDetectionEnabled = !Globals::arucoDetectionEnabled;
+				LOG_F(INFO, "ArUco detection %s", 
+					  Globals::arucoDetectionEnabled ? "ENABLED" : "DISABLED");
+				std::cout << "ArUco detection " 
+						  << (Globals::arucoDetectionEnabled ? "ON" : "OFF") 
 						  << std::endl;
 				break;
 			case 'q':
