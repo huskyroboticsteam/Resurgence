@@ -442,23 +442,6 @@ void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double powe
 	robot::setJointPower(joint, power);
 }
 
-void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
-	_power_repeat_task.setCmdVel(dtheta, dx);
-	robot::setCmdVel(dtheta, dx);
-}
-
-void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
-	_power_repeat_task.setTankCmdVel(left, right);
-	robot::setTankCmdVel(left, right);
-}
-
-static bool validateJoint(const json& j) {
-	return util::validateKey(j, "joint", val_t::string) &&
-		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
-			   return j["joint"].get<std::string>() == util::to_string(joint);
-		   });
-}
-
 static void stopAllJoints() {
 	for (jointid_t current : robot::types::all_jointid_t) {
 		robot::setJointPower(current, 0.0);
