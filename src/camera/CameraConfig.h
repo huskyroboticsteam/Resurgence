@@ -62,14 +62,6 @@ const std::string KEY_FORMAT = "format";
    Config file key for enabling OpenCV processing.
  */
 const std::string KEY_OPENCV_ENABLED = "opencv_enabled";
-/**
-   Config file key for camera image width.
- */
-const std::string KEY_IMAGE_WIDTH = "image_width";
-/**
-   Config file key for camera image height.
- */
-const std::string KEY_IMAGE_HEIGHT = "image_height";
 /**@}*/
 
 /**
