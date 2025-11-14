@@ -4,7 +4,9 @@
 #include "network/MissionControlProtocol.h"
 #include "world_interface/world_interface.h"
 #include "ar/read_landmarks.h"
+#ifdef ENABLE_OBJECT_DETECTION
 #include "object-detection/read_objects.h"
+#endif
 
 #include <array>
 #include <chrono>
@@ -37,7 +39,9 @@ void closeRover(int) {
 
 void keyboardControlLoop() {
 	std::cout << "\n=== Keyboard Controls ===" << std::endl;
+#ifdef ENABLE_OBJECT_DETECTION
 	std::cout << "  O - Toggle object detection on/off" << std::endl;
+#endif
 	std::cout << "  R - Toggle ArUco detection on/off" << std::endl;
 	std::cout << "  Q - Quit" << std::endl;
 	std::cout << "========================\n" << std::endl;
@@ -49,12 +53,17 @@ void keyboardControlLoop() {
 		switch (input) {
 			case 'o':
 			case 'O':
+#ifdef ENABLE_OBJECT_DETECTION
 				Globals::objectDetectionEnabled = !Globals::objectDetectionEnabled;
 				LOG_F(INFO, "Object detection %s", 
 					  Globals::objectDetectionEnabled ? "ENABLED" : "DISABLED");
 				std::cout << "Object detection " 
 						  << (Globals::objectDetectionEnabled ? "ON" : "OFF") 
 						  << std::endl;
+#else
+				LOG_F(WARNING, "Object detection not available (LibTorch not found)");
+				std::cout << "Object detection not available (LibTorch not found)" << std::endl;
+#endif
 				break;
 			case 'r':
 			case 'R':
@@ -207,6 +216,7 @@ int main(int argc, char** argv) {
 		LOG_F(WARNING, "Failed to initialize AR landmark detection");
 	}
 	
+#ifdef ENABLE_OBJECT_DETECTION
 	// Initialize object detection
 	LOG_F(INFO, "Initializing object detection...");
 	if (ObjDet::initializeObjectDetection()) {
@@ -214,6 +224,7 @@ int main(int argc, char** argv) {
 	} else {
 		LOG_F(WARNING, "Failed to initialize object detection");
 	}
+#endif
 	
 	// Start keyboard control thread
 	std::thread keyboard_thread(keyboardControlLoop);
