@@ -137,7 +137,6 @@ add_library(camera SHARED
   camera/Camera.cpp
   camera/CameraParams.cpp
   camera/CameraConfig.cpp
-  camera/CameraStreamProperties.cpp
   camera/H264PassthroughSource.cpp
 )
 target_include_directories(camera PUBLIC ${GSTREAMER_INCLUDE_DIRS})
