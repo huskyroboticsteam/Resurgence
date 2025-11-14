@@ -112,7 +112,7 @@ link_libraries(loguru::loguru -ldl)
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 
-# Find LibTorch for object detection
+# Find LibTorch for object detection (optional)
 # Users can specify LibTorch path via:
 # 1. Environment variable: export LIBTORCH_PATH=/path/to/libtorch
 # 2. CMake argument: cmake -DCMAKE_PREFIX_PATH=/path/to/libtorch
@@ -122,8 +122,18 @@ if(DEFINED ENV{LIBTORCH_PATH})
   message(STATUS "Using LibTorch from LIBTORCH_PATH: $ENV{LIBTORCH_PATH}")
 endif()
 
-find_package(Torch REQUIRED)
-message(STATUS "Found Torch: ${TORCH_LIBRARIES}")
+find_package(Torch QUIET)
+if(Torch_FOUND)
+  message(STATUS "Found Torch: ${TORCH_LIBRARIES}")
+  set(ENABLE_OBJECT_DETECTION ON)
+  add_compile_definitions(ENABLE_OBJECT_DETECTION)
+else()
+  message(WARNING "LibTorch not found. Object detection will be DISABLED.")
+  message(WARNING "To enable object detection, install LibTorch and set LIBTORCH_PATH:")
+  message(WARNING "  export LIBTORCH_PATH=/path/to/libtorch")
+  message(WARNING "Or use: cmake -DCMAKE_PREFIX_PATH=/path/to/libtorch")
+  set(ENABLE_OBJECT_DETECTION OFF)
+endif()
 
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
@@ -300,8 +310,10 @@ list(APPEND rover_libs
   control
   commands
   utils
-  object_detection
 )
+if(ENABLE_OBJECT_DETECTION)
+  list(APPEND rover_libs object_detection)
+endif()
 target_link_libraries(Rover
   ${rover_libs}
   mission_control_interface
@@ -382,6 +394,8 @@ add_compile_options(
 
 add_subdirectory(ar)
 add_subdirectory(camera)
-add_subdirectory(object-detection)
+if(ENABLE_OBJECT_DETECTION)
+  add_subdirectory(object-detection)
+endif()
 add_subdirectory(CAN)
 add_subdirectory(network)
