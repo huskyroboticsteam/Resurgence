@@ -26,6 +26,12 @@ ObjectDetector::ObjectDetector(const std::vector<std::string>& class_names,
       enabled_(true),
       device_(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU) {
     
+    // Disable JIT optimizations to avoid CUDA nvrtc compilation issues
+    // This prevents "__ldg" undefined identifier errors on some CUDA versions
+    torch::jit::setGraphExecutorOptimize(false);
+    torch::jit::FusionStrategy strategy = {{torch::jit::FusionBehavior::STATIC, 0}};
+    torch::jit::setFusionStrategy(strategy);
+    
     // Load the model
     try {
         model_ = torch::jit::load(model_path);

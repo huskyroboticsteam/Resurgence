@@ -8,6 +8,7 @@
 #include "ObjectDetector.h"
 
 #include <atomic>
+#include <filesystem>
 #include <loguru.hpp>
 #include <mutex>
 #include <thread>
@@ -19,12 +20,38 @@ using namespace robot::types;
 namespace ObjDet {
 
 // Model and class configuration
-const std::string MODEL_PATH = "owlvit-cpp.pt";
 const std::vector<std::string> DEFAULT_CLASSES = {
     "no object",
     "orange mallet or hammer",
     "water bottle"
 };
+
+// Find model file by checking multiple possible locations
+std::string findModelPath() {
+    // 1. Check environment variable
+    const char* env_path = std::getenv("OWLVIT_MODEL_PATH");
+    if (env_path && std::filesystem::exists(env_path)) {
+        return env_path;
+    }
+    
+    // 2. Check current directory (for backward compatibility)
+    if (std::filesystem::exists("owlvit-cpp.pt")) {
+        return "owlvit-cpp.pt";
+    }
+    
+    // 3. Check in ../src/object-detection/ (when running from build/)
+    if (std::filesystem::exists("../src/object-detection/owlvit-cpp.pt")) {
+        return "../src/object-detection/owlvit-cpp.pt";
+    }
+    
+    // 4. Check in src/object-detection/ (when running from project root)
+    if (std::filesystem::exists("src/object-detection/owlvit-cpp.pt")) {
+        return "src/object-detection/owlvit-cpp.pt";
+    }
+    
+    throw std::runtime_error("Could not find owlvit-cpp.pt model file. "
+                           "Please set OWLVIT_MODEL_PATH environment variable or place the model in the current directory.");
+}
 
 // Global detector instance
 ObjectDetector obj_detector;
@@ -108,10 +135,14 @@ bool initializeObjectDetection() {
             return false;
         }
         
+        // Find model file
+        std::string model_path = findModelPath();
+        LOG_F(INFO, "Using OWL-ViT model from: %s", model_path.c_str());
+        
         // Initialize detector
         obj_detector = ObjectDetector(
             DEFAULT_CLASSES,
-            MODEL_PATH,
+            model_path,
             0.6f,  // Default confidence threshold
             config.intrinsicParams.value()
         );
