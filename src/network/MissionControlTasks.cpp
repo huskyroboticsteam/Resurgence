@@ -112,11 +112,11 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 			}
 
 			bool openCVEnabled = false;
-			// if (!configFs[cam::KEY_OPENCV_ENABLED].empty()) {
-			// 	openCVEnabled = static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == 1;
-			// }
+			if (!configFs[cam::KEY_OPENCV_ENABLED].empty()) {
+				openCVEnabled = static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == true;
+			}
 
-			// LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), openCVEnabled ? "true" : "false");
+			LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), openCVEnabled ? "true" : "false");
 			
 
 			bool opened = false;
@@ -125,10 +125,9 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 					!configFs[cam::KEY_IMAGE_WIDTH].empty() && !configFs[cam::KEY_IMAGE_HEIGHT].empty() &&
 					!configFs[cam::KEY_FRAMERATE].empty()) {
 					std::string format = static_cast<std::string>(configFs[cam::KEY_FORMAT]);
-					std::string formatLower = format;
-					std::transform(formatLower.begin(), formatLower.end(), formatLower.begin(),
+					std::transform(format.begin(), format.end(), format.begin(),
 								   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
-					if (formatLower.find("264") != std::string::npos) {
+					if (format.find("264") != std::string::npos) {
 						cam::CameraStreamProperties streamProps{
 							.cameraId = static_cast<int>(configFs[cam::KEY_CAMERA_ID]),
 							.format = format,
