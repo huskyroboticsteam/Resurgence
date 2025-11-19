@@ -183,13 +183,22 @@ types::DataPoint<Eigen::Quaterniond> readIMU();
 types::DataPoint<navtypes::pose_t> getTruePose();
 
 /**
- * @brief Convert GPS coordinates into a coordinate on the map frame.
+ * @brief Convert GPS coordinates into a position coordinate on the map frame.
  *
  * @param coord The coord to transform into map space.
  * @return std::optional<point_t> The transformed point, or an empty datapoint
  * if the GPS does not have a fix.
  */
 std::optional<navtypes::point_t> gpsToMeters(const navtypes::gpscoords_t& coord);
+
+/**
+ * @brief Convert position coordinate into GPS coordinate on the map frame.
+ *
+ * @param pos The position to transform into (lat, lon) gps coordinate.
+ * @return std::optional<gpscoords_t> The transformed point, or an empty datapoint
+ * if the GPS does not have a fix.
+ */
+std::optional<navtypes::gpscoords_t> metersToGPS(const navtypes::point_t& pos);
 
 /**
  * @brief Set the robot indicator to indicate the given signal.
