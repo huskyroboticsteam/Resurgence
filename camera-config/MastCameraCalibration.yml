@@ -7,7 +7,7 @@ camera_id: 0
 format: "image/jpeg"
 image_width: 320
 image_height: 240
-framerate: 120
+framerate: 120.101
 opencv_enabled: true
 # calib_info:
 #    calibration_time: "Sat 01 May 2021 01:54:16 PM PDT"
