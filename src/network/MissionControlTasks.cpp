@@ -119,7 +119,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 			LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), openCVEnabled ? "true" : "false");
 			
 
-			//bool opened = false;
+			bool opened = false;
 			if (!openCVEnabled) {
 				if (!configFs[cam::KEY_CAMERA_ID].empty() && !configFs[cam::KEY_FORMAT].empty() &&
 					!configFs[cam::KEY_IMAGE_WIDTH].empty() && !configFs[cam::KEY_IMAGE_HEIGHT].empty() &&
@@ -141,7 +141,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 							_open_streams.insert_or_assign(
 								cam, stream_data_t(passthrough_stream_t{std::move(passthrough)}));
 							LOG_F(INFO, "Opened H264 pass-through stream for %s", cam.c_str());
-							//opened = true;
+							opened = true;
 						} catch (const std::exception& e) {
 							LOG_F(ERROR, "Failed to initialize H264 pass-through for %s: %s",
 								  cam.c_str(), e.what());
@@ -159,7 +159,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 				}
 			}
 
-			else {
+			if (!opened) {
 				auto it = Constants::video::STREAM_RFS.find(cam);
 				int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second
 																   : Constants::video::H264_RF_CONSTANT;
