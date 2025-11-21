@@ -141,7 +141,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 							_open_streams.insert_or_assign(
 								cam, stream_data_t(passthrough_stream_t{std::move(passthrough)}));
 							LOG_F(INFO, "Opened H264 pass-through stream for %s", cam.c_str());
-							opened = true;
+							//opened = true;
 						} catch (const std::exception& e) {
 							LOG_F(ERROR, "Failed to initialize H264 pass-through for %s: %s",
 								  cam.c_str(), e.what());
