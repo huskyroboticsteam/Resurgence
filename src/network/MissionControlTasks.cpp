@@ -172,6 +172,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 				} else {
 					LOG_F(ERROR, "Failed to open %s camera for CPU encoding", cam.c_str());
 				}
+				
 			}
 		}).detach();
 	}
