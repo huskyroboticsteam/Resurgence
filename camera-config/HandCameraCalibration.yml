@@ -3,7 +3,7 @@
 name: "hand"
 description: "Camera located on the hand of the rover."
 # Make sure that this camera_id matches the one defined in the udev rules.
-camera_id: 2
+camera_id: 4
 format: "video/x-h264"
 image_width: 1920
 image_height: 1080

@@ -8,7 +8,7 @@ format: "image/jpeg"
 image_width: 1024
 image_height: 768
 framerate: 30
-opencv_enabled: false
+opencv_enabled: true
 # calib_info:
 #    calibration_time: "Sat 01 May 2021 01:54:16 PM PDT"
 #    board_width: 11
