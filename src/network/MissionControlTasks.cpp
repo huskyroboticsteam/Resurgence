@@ -119,7 +119,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 			LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), openCVEnabled ? "true" : "false");
 			
 
-			bool opened = false;
+			//bool opened = false;
 			if (!openCVEnabled) {
 				if (!configFs[cam::KEY_CAMERA_ID].empty() && !configFs[cam::KEY_FORMAT].empty() &&
 					!configFs[cam::KEY_IMAGE_WIDTH].empty() && !configFs[cam::KEY_IMAGE_HEIGHT].empty() &&
