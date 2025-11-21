@@ -159,7 +159,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 				}
 			}
 
-			if (!opened && openCVEnabled) {
+			else {
 				auto it = Constants::video::STREAM_RFS.find(cam);
 				int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second
 																   : Constants::video::H264_RF_CONSTANT;
