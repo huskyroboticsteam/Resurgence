@@ -4,6 +4,7 @@
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
+#include "../camera/CameraConfig.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
@@ -63,6 +64,15 @@ namespace {
 // map that associates camera id to the camera object
 std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 
+int getDeviceIdForCamera(const CameraID& camID) {
+	const auto& path = Constants::CAMERA_CONFIG_PATHS.at(camID);
+	cv::FileStorage fs(path, cv::FileStorage::READ);
+	if (!fs.isOpened() || fs[cam::KEY_CAMERA_ID].empty()) {
+		throw std::invalid_argument("Configuration file missing camera_id for " + camID);
+	}
+	return static_cast<int>(fs[cam::KEY_CAMERA_ID]);
+}
+
 callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
@@ -114,6 +124,23 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 	if (it != cameraMap.end()) {
 		auto cam = it->second.lock();
 		if (cam) { return cam; }
+	}
+
+	int requestedDeviceId = getDeviceIdForCamera(camID);
+	for (const auto& entry : cameraMap) {
+		auto existingCam = entry.second.lock();
+		if (!existingCam) { continue; }
+		try {
+			int existingDeviceId = getDeviceIdForCamera(entry.first);
+			if (existingDeviceId == requestedDeviceId) {
+				LOG_F(WARNING, "Device /dev/video%d already opened for camera %s", requestedDeviceId,
+					   entry.first.c_str());
+				return existingCam;
+			}
+		} catch (const std::exception& e) {
+			LOG_F(WARNING, "Could not read device id for camera %s: %s", entry.first.c_str(), e.what());
+			continue;
+		}
 	}
 	try {
 		auto cam = std::make_shared<cam::Camera>();
