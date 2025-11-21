@@ -90,7 +90,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	if (format == "/image/jpeg") {
+	if (format == "image/jpeg") {
 		gstr_ss << "jpegdec ! ";
 	}
 	gstr_ss << "queue max-size-buffers=1 leaky=downstream ! ";
