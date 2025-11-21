@@ -5,8 +5,8 @@ description: "Camera located on the hand of the rover."
 # Make sure that this camera_id matches the one defined in the udev rules.
 camera_id: 4
 format: "video/x-h264"
-image_width: 1280
-image_height: 720
+image_width: 800
+image_height: 600
 framerate: 25
 opencv_enabled: false
 # calib_info:
