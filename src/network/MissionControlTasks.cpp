@@ -100,11 +100,13 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 		std::thread([this, cam, fps]() {
 			std::lock_guard lock(_mutex);
 			auto cfgIt = Constants::CAMERA_CONFIG_PATHS.find(cam);
+			// check if we have a config for this camera
 			if (cfgIt == Constants::CAMERA_CONFIG_PATHS.end()) {
 				LOG_F(WARNING, "No camera configuration found for %s", cam.c_str());
 				return;
 			}
 
+			// load the config file
 			cv::FileStorage configFs(cfgIt->second, cv::FileStorage::READ);
 			if (!configFs.isOpened()) {
 				LOG_F(ERROR, "Failed to open camera config file %s", cfgIt->second.c_str());
@@ -112,8 +114,9 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 			}
 
 			bool openCVEnabled = false;
+			// check if OpenCV processing is enabled
 			if (!configFs[cam::KEY_OPENCV_ENABLED].empty()) {
-				openCVEnabled = static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == true;
+				openCVEnabled = static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]);
 			}
 
 			LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), openCVEnabled ? "true" : "false");
@@ -135,6 +138,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 							.height = static_cast<int>(configFs[cam::KEY_IMAGE_HEIGHT]),
 							.framerate = static_cast<int>(configFs[cam::KEY_FRAMERATE]),
 						};
+						// try to create H264 passthrough source
 						try {
 							auto passthrough =
 								std::make_unique<cam::H264PassthroughSource>(streamProps);
