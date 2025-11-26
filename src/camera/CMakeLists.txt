@@ -1,12 +1,17 @@
 find_package(OpenCV REQUIRED)
 find_package(Threads REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-app-1.0)
 
 add_executable(calibration
-  calibration.cpp)
+  calibration.cpp
+)
 
-target_link_libraries(calibration ${OpenCV_LIBS})
+target_link_libraries(calibration
+  ${OpenCV_LIBS}
+)
 
-if(WORLD_INTERFACE STREQUAL "REAL")
+if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(panoramic
     CameraParams.cpp
     Camera.cpp
