@@ -129,6 +129,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 					std::string format = static_cast<std::string>(configFs[cam::KEY_FORMAT]);
 					std::transform(format.begin(), format.end(), format.begin(),
 								   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+					// creates passthrough source only if format is H264
 					if (format.find("264") != std::string::npos) {
 						cam::CameraStreamProperties streamProps{
 							.cameraId = static_cast<int>(configFs[cam::KEY_CAMERA_ID]),
@@ -161,7 +162,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 						  cam.c_str());
 				}
 			}
-
+			// if passthrough source was not opened, fall back to CPU encoding
 			if (!opened) {
 				auto it = Constants::video::STREAM_RFS.find(cam);
 				int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second
