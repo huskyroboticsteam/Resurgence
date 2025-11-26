@@ -13,7 +13,7 @@
 
 using robot::types::CameraID;
 using robot::types::jointid_t;
-using robot::types::motorid_t;
+using robot::types::boardid_t;
 
 namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
@@ -129,14 +129,14 @@ extern const std::unordered_map<CameraID, int> STREAM_RFS;
  * A map that pairs each of the joints to its corresponding motor.
  * (one-to-one pairs only)
  */
-constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, motorid_t>(
-	{{jointid_t::armBase, motorid_t::armBase},
-	 {jointid_t::shoulder, motorid_t::shoulder},
-	 {jointid_t::elbow, motorid_t::elbow},
-	 {jointid_t::forearm, motorid_t::forearm},
-	 {jointid_t::hand, motorid_t::hand},
-	 {jointid_t::drillActuator, motorid_t::drillActuator},
-	 {jointid_t::drillMotor, motorid_t::drillMotor}});
+constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, boardid_t>(
+	{{jointid_t::armBase, boardid_t::armBase},
+	 {jointid_t::shoulder, boardid_t::shoulder},
+	 {jointid_t::elbow, boardid_t::elbow},
+	 {jointid_t::forearm, boardid_t::forearm},
+	 {jointid_t::hand, boardid_t::hand},
+	 {jointid_t::drillActuator, boardid_t::drillActuator},
+	 {jointid_t::drillMotor, boardid_t::drillMotor}});
 
 // Arm inverse kinematics
 namespace arm {
@@ -163,19 +163,19 @@ extern const std::array<jointid_t, 2> IK_MOTOR_JOINTS;
  * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
  * element of `IK_MOTOR_JOINTS`
  */
-extern const std::array<motorid_t, 2> IK_MOTORS;
+extern const std::array<boardid_t, 2> IK_MOTORS;
 
 /**
  * Map from motor ids to min and max joint limits in millidegrees
  */
-constexpr frozen::unordered_map<motorid_t, std::pair<int, int>, IK_MOTORS.size()> JOINT_LIMITS{
-	{motorid_t::shoulder, {18200, 152500}}, {motorid_t::elbow, {-169100, 0}}};
+constexpr frozen::unordered_map<boardid_t, std::pair<int, int>, IK_MOTORS.size()> JOINT_LIMITS{
+	{boardid_t::shoulder, {18200, 152500}}, {boardid_t::elbow, {-169100, 0}}};
 
 /**
  * Map from motor ids to segment length in meters
  */
-constexpr frozen::unordered_map<motorid_t, double, IK_MOTORS.size()> SEGMENT_LENGTHS{
-	{motorid_t::shoulder, 0.3848608}, {motorid_t::elbow, 0.461264}};
+constexpr frozen::unordered_map<boardid_t, double, IK_MOTORS.size()> SEGMENT_LENGTHS{
+	{boardid_t::shoulder, 0.3848608}, {boardid_t::elbow, 0.461264}};
 } // namespace arm
 
 namespace autonomous {

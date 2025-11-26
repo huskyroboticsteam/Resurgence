@@ -29,13 +29,13 @@ namespace robot {
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
 // A mapping of (motor_id, shared pointer to object of the motor)
-std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+std::unordered_map<robot::types::boardid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
 namespace {
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
-void addMotorMapping(motorid_t motor, bool hasPosSensor) {
+void addMotorMapping(boardid_t motor, bool hasPosSensor) {
   double posScale = 0;
   double negScale = 0;
 
@@ -49,8 +49,8 @@ void addMotorMapping(motorid_t motor, bool hasPosSensor) {
 
 	// create ptr and insert in map
 	std::shared_ptr<robot::base_motor> ptr =
-		std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
-									motorGroupMap.at(motor), posScale, negScale);
+		std::make_shared<can_motor>(motor, hasPosSensor, boardSerialIDMap.at(motor),
+									boardGroupMap.at(motor), posScale, negScale);
 	motor_ptrs.insert({motor, ptr});
 }
 } // namespace
@@ -67,9 +67,9 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
-	for (const auto& it : motorSerialIDMap) {
-		motorid_t motor = it.first;
-		auto group = motorGroupMap.at(motor);
+	for (const auto& it : boardSerialIDMap) {
+		boardid_t motor = it.first;
+		auto group = boardGroupMap.at(motor);
 		can::motor::initMotor(group, it.second);
 		bool hasPosSensor = robot::potMotors.find(motor) != robot::potMotors.end() ||
 							robot::encMotors.find(motor) != robot::encMotors.end();
@@ -77,22 +77,22 @@ void initMotors() {
 	}
 
 	for (const auto& pot_motor_pair : robot::potMotors) {
-		motorid_t motor_id = pot_motor_pair.first;
+		boardid_t motor_id = pot_motor_pair.first;
 		potparams_t pot_params = pot_motor_pair.second;
 
-		can::devicegroup_t group = motorGroupMap.at(motor_id);
-		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
+		can::devicegroup_t group = boardGroupMap.at(motor_id);
+		can::deviceserial_t serial = boardSerialIDMap.at(motor_id);
 
 		can::motor::initPotentiometer(group, serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
 									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
 	}
 
 	for (const auto& enc_motor_pair : robot::encMotors) {
-		motorid_t motor_id = enc_motor_pair.first;
+		boardid_t motor_id = enc_motor_pair.first;
 		encparams_t enc_params = enc_motor_pair.second;
 
-		can::devicegroup_t group = motorGroupMap.at(motor_id);
-		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
+		can::devicegroup_t group = boardGroupMap.at(motor_id);
+		can::deviceserial_t serial = boardSerialIDMap.at(motor_id);
 
 		can::motor::initEncoder(group, serial, enc_params.isInverted, true, enc_params.ppjr,
 								TELEM_PERIOD);
@@ -101,9 +101,9 @@ void initMotors() {
 	}
 
 	for (const auto& pair : robot::motorPIDMap) {
-		motorid_t motor = pair.first;
-		can::devicegroup_t group = motorGroupMap.at(motor);
-		can::deviceserial_t serial = motorSerialIDMap.at(motor);
+		boardid_t motor = pair.first;
+		can::devicegroup_t group = boardGroupMap.at(motor);
+		can::deviceserial_t serial = boardSerialIDMap.at(motor);
 		pidcoef_t pid = motorPIDMap.at(motor);
 		can::motor::setMotorPIDConstants(group, serial, pid.kP, pid.kI, pid.kD);
 	}
@@ -153,7 +153,7 @@ std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
 	return cam ? std::make_shared<types::CameraHandle>(cam) : nullptr;
 }
 
-std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+std::shared_ptr<robot::base_motor> getMotor(robot::types::boardid_t motor) {
 	auto itr = motor_ptrs.find(motor);
 
 	if (itr == motor_ptrs.end()) {
@@ -278,58 +278,35 @@ int getIndex(const std::vector<T>& vec, const T& val) {
 	return itr == vec.end() ? -1 : itr - vec.begin();
 }
 
-void setMotorPower(robot::types::motorid_t motor, double power) {
+void setMotorPower(robot::types::boardid_t motor, double power) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPower(power);
 }
 
-void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
+void setMotorPos(robot::types::boardid_t motor, int32_t targetPos) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
 }
 
-types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t motor) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	return motor_ptr->getMotorPos();
 }
 
-void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
+void setMotorVel(robot::types::boardid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
 }
 
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
-  auto servo_num = servoid_to_servo_num.find(servo);
-  if (servo_num != servoid_to_servo_num.end()) {
-  	servo_board->setServoPos(servo_num->second, position);
-  }
-}
-
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-  std::shared_ptr<robot::base_motor> stepper_board = getMotor(motorid_t::scienceStepperBoard);
-  auto stepper_num = stepperid_to_stepper_num.find(stepper);
-  if (stepper_num != stepperid_to_stepper_num.end()) {
-    stepper_board->setStepperTurnAngle(stepper_num->second, angle);
-  }
-}
-
-void setActuator(uint8_t value) {
-  can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
-}
-
-// TODO: implement
-void setIndicator(indication_t signal) {}
-
 callbackid_t addLimitSwitchCallback(
-	robot::types::motorid_t motor,
-	const std::function<void(robot::types::motorid_t motor,
+	robot::types::boardid_t motor,
+	const std::function<void(robot::types::boardid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
 	auto func = [=](can::devicegroup_t group, can::deviceserial_t serial,
 					DataPoint<LimitSwitchData> data) { callback(motor, data); };
-	auto id = can::motor::addLimitSwitchCallback(motorGroupMap.at(motor),
-												 motorSerialIDMap.at(motor), func);
+	auto id = can::motor::addLimitSwitchCallback(boardGroupMap.at(motor),
+												 boardSerialIDMap.at(motor), func);
 	auto nextID = nextCallbackID++;
 	callbackIDMap.insert({nextID, id});
 	return nextID;

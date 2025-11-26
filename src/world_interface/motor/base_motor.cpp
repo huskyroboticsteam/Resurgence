@@ -3,7 +3,7 @@
 using namespace std::chrono_literals;
 
 namespace robot {
-base_motor::base_motor(robot::types::motorid_t motor, bool hasPosSensor)
+base_motor::base_motor(robot::types::boardid_t motor, bool hasPosSensor)
 	: motor_id(motor), posSensor(hasPosSensor) {
 	// create scheduler if needed
 	std::lock_guard<std::mutex> lg(schedulerMutex);

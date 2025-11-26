@@ -1,4 +1,3 @@
-
 #include "../world_interface/motor/can_motor.h"
 #include "CAN.h"
 #include "CANMotor.h"
@@ -144,7 +143,7 @@ int main() {
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = std::make_shared<robot::can_motor>(motorid_t::leftTread, true, serial,
+				motor = std::make_shared<robot::can_motor>(boardid_t::leftTread, true, serial,
 														   group, posScale, negScale);
 
 				// get initial motor position

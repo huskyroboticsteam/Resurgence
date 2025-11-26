@@ -54,7 +54,7 @@ enum class indication_t {
 };
 
 /** @brief The motors on the robot. */
-enum class motorid_t {
+enum class boardid_t {
 	leftTread,
 	rightTread,
 	armBase,

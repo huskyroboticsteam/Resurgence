@@ -28,20 +28,20 @@ using namespace cam;
 
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
-const std::map<motorid_t, std::string> motorNameMap = {
-	{motorid_t::leftTread, "leftTread"},
-	{motorid_t::rightTread, "rightTread"},
-	{motorid_t::armBase, "armBase"},
-	{motorid_t::shoulder, "shoulder"},
-	{motorid_t::elbow, "elbow"},
-	{motorid_t::forearm, "forearm"},
-	{motorid_t::wristDiffLeft, "wristDiffLeft"},
-	{motorid_t::wristDiffRight, "wristDiffRight"},
-	{motorid_t::hand, "hand"},
-	{motorid_t::drillActuator, "drillActuator"},
-	{motorid_t::drillMotor, "drillMotor"},
-	{motorid_t::fourbar1, "fourbar1"},
-	{motorid_t::fourbar2, "fourbar2"}};
+const std::map<boardid_t, std::string> motorNameMap = {
+	{boardid_t::leftTread, "leftTread"},
+	{boardid_t::rightTread, "rightTread"},
+	{boardid_t::armBase, "armBase"},
+	{boardid_t::shoulder, "shoulder"},
+	{boardid_t::elbow, "elbow"},
+	{boardid_t::forearm, "forearm"},
+	{boardid_t::wristDiffLeft, "wristDiffLeft"},
+	{boardid_t::wristDiffRight, "wristDiffRight"},
+	{boardid_t::hand, "hand"},
+	{boardid_t::drillActuator, "drillActuator"},
+	{boardid_t::drillMotor, "drillMotor"},
+	{boardid_t::fourbar1, "fourbar1"},
+	{boardid_t::fourbar2, "fourbar2"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 
@@ -60,13 +60,13 @@ std::shared_mutex motorPosMapMutex;
 bool is_emergency_stopped = false;
 
 // A mapping of (motor_id, shared pointer to object of the motor)
-std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+std::unordered_map<robot::types::boardid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
 using lscallback_t =
 	std::function<void(robot::types::DataPoint<LimitSwitchData> limitSwitchData)>;
 std::map<std::string, std::map<robot::callbackid_t, lscallback_t>> limitSwitchCallbackMap;
 robot::callbackid_t nextCallbackID = 0;
-std::map<robot::callbackid_t, motorid_t> lsCallbackToMotorMap;
+std::map<robot::callbackid_t, boardid_t> lsCallbackToMotorMap;
 std::mutex limitSwitchCallbackMapMutex; // protects both maps and nextCallbackID
 
 // stores the last camera frame for each camera
@@ -256,7 +256,7 @@ void world_interface_init(
 	initMotors();
 }
 
-std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+std::shared_ptr<robot::base_motor> getMotor(robot::types::boardid_t motor) {
 	auto itr = motor_ptrs.find(motor);
 
 	if (itr == motor_ptrs.end()) {
@@ -370,17 +370,31 @@ DataPoint<pose_t> getTruePose() {
 	return lastTruePose;
 }
 
-void setMotorPower(motorid_t motor, double normalizedPWM) {
+void setMotorPower(boardid_t motor, double normalizedPWM) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPower(normalizedPWM);
+
+	json msg = {
+		{"type", "simMotorPowerRequest"}, 
+		{"motor", motor_name}, 
+		{"power", power}
+	};
+	sendJSON(msg);
 }
 
-void setMotorPos(motorid_t motor, int32_t targetPos) {
+void setMotorPos(boardid_t motor, int32_t targetPos) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
+
+	json msg = {
+		{"type", "simMotorPositionRequest"}, 
+		{"motor", motor_name}, 
+		{"position", targetPos}
+	};
+	sendJSON(msg);
 }
 
-DataPoint<int32_t> getMotorPos(motorid_t motor) {
+DataPoint<int32_t> getMotorPos(boardid_t motor) {
 	auto itr = motorNameMap.find(motor);
 	if (itr != motorNameMap.end()) {
 		std::string motorName = itr->second;
@@ -396,26 +410,14 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 	}
 }
 
-void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
+void setMotorVel(robot::types::boardid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
 }
 
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-	// Implement when Servos are added to Simulator
-}
-
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-	// Implement when Steppers are added to Simulator
-}
-
-void setActuator(uint8_t value) {
-	// Implement when Actuators are added to Simulator
-}
-
 callbackid_t addLimitSwitchCallback(
-	robot::types::motorid_t motor,
-	const std::function<void(robot::types::motorid_t motor,
+	robot::types::boardid_t motor,
+	const std::function<void(robot::types::boardid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
 	auto itr = motorNameMap.find(motor);

@@ -83,14 +83,14 @@ void setLimitSwitchLimits(devicegroup_t group, deviceserial_t serial, int32_t lo
 void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP, int32_t kI,
 						  int32_t kD) {
 	CANPacket p;
-	auto motorGroupCode = static_cast<uint8_t>(group);
-	AssemblePSetPacket(&p, motorGroupCode, serial, kP);
+	auto boardGroupCode = static_cast<uint8_t>(group);
+	AssemblePSetPacket(&p, boardGroupCode, serial, kP);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1ms);
-	AssembleISetPacket(&p, motorGroupCode, serial, kI);
+	AssembleISetPacket(&p, boardGroupCode, serial, kI);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1ms);
-	AssembleDSetPacket(&p, motorGroupCode, serial, kD);
+	AssembleDSetPacket(&p, boardGroupCode, serial, kD);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1ms);
 }
@@ -121,38 +121,6 @@ void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t targe
 	sendCANPacket(p);
 }
 
-void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle) {
-	CANPacket p;
-	AssembleScienceServoPacket(&p, static_cast<uint8_t>(group), serial, servoNum, angle);
-	sendCANPacket(p);
-}
-
-void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t stepper, int16_t angle) {
-  CANPacket p;
-  AssembleScienceStepperTurnAnglePacket(&p, static_cast<uint8_t>(group), serial, stepper, angle, 0x3);
-  sendCANPacket(p);
-}
-
-void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t value) {
-  CANPacket p;
-  uint8_t data[3];
-  data[0] = 0xFA;
-  data[1] = LED;
-  data[2] = value;
-  AssembleCANPacket(&p, 0x1, static_cast<uint8_t>(group), serial, 0xFA, 3, data);
-  sendCANPacket(p);
-}
-
-void setActuator(devicegroup_t group, deviceserial_t serial, uint8_t value) {
-  CANPacket p;
-  uint8_t data[3];
-  data[0] = 0x13;
-  data[1] = 2;
-  data[2] = (value == 1) ? 1 : 255;
-  AssembleCANPacket(&p, 0x1, static_cast<uint8_t>(group), serial, 0x13, 3, data);
-  sendCANPacket(p);
-}
-  
 DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial) {
 	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }

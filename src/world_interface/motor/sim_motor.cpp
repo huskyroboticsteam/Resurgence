@@ -6,7 +6,7 @@
 using nlohmann::json;
 
 namespace robot {
-sim_motor::sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name,
+sim_motor::sim_motor(robot::types::boardid_t motor, bool hasPosSensor, const std::string& name,
 					 const std::string& path)
 	: base_motor(motor, hasPosSensor), motor_name(name), protocol_path(path) {}
 
@@ -30,16 +30,6 @@ void sim_motor::setMotorPos(int32_t targetPos) {
 types::DataPoint<int32_t> sim_motor::getMotorPos() const {
 	// this calles the method implementation in world interface
 	return robot::getMotorPos(motor_id);
-}
-
-// Do we want to leave this as servo number?
-void sim_motor::setServoPos(uint8_t servo, int32_t position) {
-	json msg = {
-		{"type", "simServoPositionRequest", {"servo", servo}, {"position", position}}};
-	sendJSON(msg);
-}
-
-void sim_motor::setStepperTurnAngle(uint8_t stepper, int16_t angle) {
 }
 
 void sim_motor::sendJSON(const json& obj) {

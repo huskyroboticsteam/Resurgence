@@ -20,7 +20,7 @@ public:
 	 * @param motor The motor id to manipulate.
 	 * @param hasPosSensor Boolean to indicate if the motor has a position sensor.
 	 */
-	base_motor(robot::types::motorid_t motor, bool hasPosSensor);
+	base_motor(robot::types::boardid_t motor, bool hasPosSensor);
 
 	/**
 	 * @brief Returns the status of the motor position sensor.
@@ -61,10 +61,6 @@ public:
 	 */
 	virtual void setMotorVel(int32_t targetVel);
 
-	virtual void setServoPos(uint8_t servo, int32_t position) = 0;
-
-  virtual void setStepperTurnAngle(uint8_t stepper, int16_t angle) = 0;
-
 	/**
 	 * @brief Delete the copy constructor.
 	 *
@@ -80,7 +76,7 @@ public:
 	base_motor& operator=(const base_motor&) = delete;
 
 protected:
-	robot::types::motorid_t motor_id;
+	robot::types::boardid_t motor_id;
 	bool posSensor;
 	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
 	std::optional<JacobianVelController<1, 1>> velController;

@@ -21,7 +21,7 @@ public:
 	 * @param pos_pwm_scale The positive pwm scale for the motor power.
 	 * @param neg_pwm_scale The positive pwm scale for the motor power.
 	 */
-	can_motor(robot::types::motorid_t motor, bool hasPosSensor, can::deviceserial_t serial,
+	can_motor(robot::types::boardid_t motor, bool hasPosSensor, can::deviceserial_t serial,
 			  can::devicegroup_t group, double pos_pwm_scale, double neg_pwm_scale);
 
 	void setMotorPower(double power) override;
@@ -32,21 +32,18 @@ public:
 
 	void setMotorVel(int32_t targetVel) override;
 
-  void setServoPos(uint8_t servo, int32_t position) override;
-
-  void setStepperTurnAngle(uint8_t stepper, int16_t angle) override;
-
 	/**
 	 * @brief Returns the motor's serial id.
 	 */
-	can::deviceserial_t getMotorSerial();
+	can::deviceserial_t getboardSerial();
 
+	// remove below?
 private:
 	can::deviceserial_t serial_id;
 	can::devicegroup_t device_group;
 	std::optional<can::motor::motormode_t> motor_mode;
 	double positive_scale;
 	double negative_scale;
-	void ensureMotorMode(robot::types::motorid_t motor, can::motor::motormode_t mode);
+	void ensureMotorMode(robot::types::boardid_t motor, can::motor::motormode_t mode);
 }; // class can_motor
 } // namespace robot

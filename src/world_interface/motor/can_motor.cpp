@@ -1,7 +1,7 @@
 #include "can_motor.h"
 
 namespace robot {
-can_motor::can_motor(robot::types::motorid_t motor, bool hasPosSensor,
+can_motor::can_motor(robot::types::boardid_t motor, bool hasPosSensor,
 					 can::deviceserial_t serial, can::devicegroup_t group,
 					 double pos_pwm_scale, double neg_pwm_scale)
 	: base_motor(motor, hasPosSensor), serial_id(serial), device_group(group),
@@ -37,21 +37,11 @@ void can_motor::setMotorVel(int32_t targetVel) {
 	base_motor::setMotorVel(targetVel);
 }
 
-// Hack for Science Servo Board
-void can_motor::setServoPos(uint8_t servo, int32_t position) {
-	can::motor::setServoPos(device_group, serial_id, servo, position);
-}
-
-// Hack for Science Stepper Board
-void can_motor::setStepperTurnAngle(uint8_t stepper, int16_t angle) {
-  can::motor::setStepperTurnAngle(device_group, serial_id, stepper, angle);
-}
-
-can::deviceserial_t can_motor::getMotorSerial() {
+can::deviceserial_t can_motor::getboardSerial() {
 	return serial_id;
 }
 
-void can_motor::ensureMotorMode(robot::types::motorid_t motor, can::motor::motormode_t mode) {
+void can_motor::ensureMotorMode(robot::types::boardid_t motor, can::motor::motormode_t mode) {
 	if (!motor_mode || motor_mode.value() != mode) {
 		// update the motor mode
 		motor_mode.emplace(mode);

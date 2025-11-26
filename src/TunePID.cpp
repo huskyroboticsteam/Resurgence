@@ -35,20 +35,20 @@ std::map<V, K> reverseMap(const std::map<K, V>& map) {
 	return reversed;
 }
 
-const std::map<motorid_t, std::string> motorNameMap = {
-	{motorid_t::leftTread, "leftTread"},
-	{motorid_t::rightTread, "rightTread"},
-	{motorid_t::armBase, "armBase"},
-	{motorid_t::shoulder, "shoulder"},
-	{motorid_t::elbow, "elbow"},
-	{motorid_t::forearm, "forearm"},
-	{motorid_t::wristDiffRight, "wristDiffRight"},
-	{motorid_t::wristDiffLeft, "wristDiffLeft"},
-	{motorid_t::hand, "hand"},
-	{motorid_t::drillActuator, "drillActuator"},
-	{motorid_t::drillMotor, "drillMotor"}};
+const std::map<boardid_t, std::string> motorNameMap = {
+	{boardid_t::leftTread, "leftTread"},
+	{boardid_t::rightTread, "rightTread"},
+	{boardid_t::armBase, "armBase"},
+	{boardid_t::shoulder, "shoulder"},
+	{boardid_t::elbow, "elbow"},
+	{boardid_t::forearm, "forearm"},
+	{boardid_t::wristDiffRight, "wristDiffRight"},
+	{boardid_t::wristDiffLeft, "wristDiffLeft"},
+	{boardid_t::hand, "hand"},
+	{boardid_t::drillActuator, "drillActuator"},
+	{boardid_t::drillMotor, "drillMotor"}};
 
-const std::map<std::string, motorid_t> nameToMotorMap = reverseMap(motorNameMap);
+const std::map<std::string, boardid_t> nameToMotorMap = reverseMap(motorNameMap);
 
 const uint8_t motor_group_id = DEVICE_GROUP_MOTOR_CONTROL;
 
@@ -58,9 +58,9 @@ void cleanup(int signum) {
 	exit(0);
 }
 
-bool initMotor(motorid_t motor) {
-	can::devicegroup_t group = robot::motorGroupMap.at(motor);
-	uint8_t serial = robot::motorSerialIDMap.at(motor);
+bool initMotor(boardid_t motor) {
+	can::devicegroup_t group = robot::boardGroupMap.at(motor);
+	uint8_t serial = robot::boardSerialIDMap.at(motor);
 
 	if (robot::potMotors.find(motor) != robot::potMotors.end()) {
 		std::cout << "Initializing potentiometer parameters...\n";
@@ -100,9 +100,9 @@ int main(int argc, char** argv) {
 	std::cout << "Enter motor name > ";
 	std::string motor_name;
 	std::getline(std::cin, motor_name);
-	motorid_t motor = nameToMotorMap.at(motor_name);
-	can::devicegroup_t group = robot::motorGroupMap.at(motor);
-	uint8_t serial = robot::motorSerialIDMap.at(motor);
+	boardid_t motor = nameToMotorMap.at(motor_name);
+	can::devicegroup_t group = robot::boardGroupMap.at(motor);
+	uint8_t serial = robot::boardSerialIDMap.at(motor);
 
 	std::cout << "Enter amplitude (deg) > ";
 	std::string ampl_str;

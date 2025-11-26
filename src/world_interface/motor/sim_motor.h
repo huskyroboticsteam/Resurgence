@@ -20,16 +20,12 @@ public:
 	 * @param name The name of the motor.
 	 * @param protocol_path Websocket protocol path.
 	 */
-	sim_motor(robot::types::motorid_t motor, bool hasPosSensor, const std::string& name,
+	sim_motor(robot::types::boardid_t motor, bool hasPosSensor, const std::string& name,
 			  const std::string& path);
 
 	void setMotorPower(double power) override;
 
 	void setMotorPos(int32_t targetPos) override;
-
-	void setServoPos(uint8_t servo, int32_t position) override;
-
-  void setStepperTurnAngle(uint8_t stepper, int16_t angle) override;
 
 	types::DataPoint<int32_t> getMotorPos() const override;
 

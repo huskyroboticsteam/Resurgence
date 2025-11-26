@@ -67,7 +67,7 @@ void world_interface_init(
  * @param motor The motor id to manipulate.
  * @return A shared pointer to the motor object
  */
-std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor);
+std::shared_ptr<robot::base_motor> getMotor(robot::types::boardid_t motor);
 
 /**
  * @brief Emergency stop all motors.
@@ -204,7 +204,7 @@ void setIndicator(types::indication_t signal);
  * @param motor The motor to set the PWM of.
  * @param power The power command, in the range [-1, 1]
  */
-void setMotorPower(robot::types::motorid_t motor, double power);
+void setMotorPower(robot::types::boardid_t motor, double power);
 
 /**
  * @brief Set the target position of the motor. This will have no effect if the motor
@@ -214,7 +214,7 @@ void setMotorPower(robot::types::motorid_t motor, double power);
  * @param targetPos The target position, in millidegrees. Refer to the specific motor for more
  * information.
  */
-void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
+void setMotorPos(robot::types::boardid_t motor, int32_t targetPos);
 
 /**
  * @brief Sets the velocity of the given motor.
@@ -222,7 +222,7 @@ void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
  * @param motor The motor to set the target position of.
  * @param targetVel The target velocity, in millidegrees per second.
  */
-void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
+void setMotorVel(robot::types::boardid_t motor, int32_t targetVel);
 
 /**
  * @brief Get the last reported position of the specified motor.
@@ -232,18 +232,14 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
  * if it exists. If the motor has not reported a position (because it hasn't been received yet
  * or if it doesn't have an encoder) then an empty data point is returned.
  */
-types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
-
-void setServoPos(robot::types::servoid_t servo, int32_t position);
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle);
-void setActuator(uint8_t value);
+types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t motor);
 
 using callbackid_t = unsigned long long;
 
 callbackid_t addLimitSwitchCallback(
-	robot::types::motorid_t motor,
+	robot::types::boardid_t motor,
 	const std::function<void(
-		robot::types::motorid_t motor,
+		robot::types::boardid_t motor,
 		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
 void removeLimitSwitchCallback(callbackid_t id);
@@ -261,7 +257,7 @@ void removeLimitSwitchCallback(callbackid_t id);
  */
 template <unsigned long int N>
 types::DataPoint<navtypes::Vectord<N>>
-getMotorPositionsRad(const std::array<types::motorid_t, N>& motors) {
+getMotorPositionsRad(const std::array<types::boardid_t, N>& motors) {
 	navtypes::Vectord<N> motorPositions;
 	std::optional<types::datatime_t> timestamp;
 	for (size_t i = 0; i < motors.size(); i++) {

@@ -8,7 +8,7 @@
 #include <atomic>
 #include <vector>
 
-using robot::types::motorid_t;
+using robot::types::boardid_t;
 using namespace Constants::arm;
 
 namespace {
