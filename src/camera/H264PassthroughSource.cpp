@@ -1,6 +1,4 @@
 #include "H264PassthroughSource.h"
-
-#include <gst/app/gstappsink.h>
 #include <gst/gst.h>
 
 #include <atomic>
