@@ -122,34 +122,39 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 			LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == 0 ? "true" : "false");
 
 			bool opened = false;
-			if (!openCVEnabled && format.find("264") != std::string::npos) {
+			if (!openCVEnabled) {
 				if (!configFs[cam::KEY_CAMERA_ID].empty() && !configFs[cam::KEY_FORMAT].empty() &&
 					!configFs[cam::KEY_IMAGE_WIDTH].empty() && !configFs[cam::KEY_IMAGE_HEIGHT].empty() &&
 					!configFs[cam::KEY_FRAMERATE].empty()) {
 					std::string format = static_cast<std::string>(configFs[cam::KEY_FORMAT]);
 					std::transform(format.begin(), format.end(), format.begin(),
 								   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
-
-					cam::CameraStreamProperties streamProps{
-						.cameraId = static_cast<int>(configFs[cam::KEY_CAMERA_ID]),
-						.format = format,
-						.width = static_cast<int>(configFs[cam::KEY_IMAGE_WIDTH]),
-						.height = static_cast<int>(configFs[cam::KEY_IMAGE_HEIGHT]),
-						.framerate = static_cast<int>(configFs[cam::KEY_FRAMERATE]),
-					};
-					// try to create H264 passthrough source
-					try {
-						auto passthrough =
-							std::make_unique<cam::H264PassthroughSource>(streamProps);
-						_open_streams.insert_or_assign(
-							cam, stream_data_t(passthrough_stream_t{std::move(passthrough)}));
-						LOG_F(INFO, "Opened H264 pass-through stream for %s", cam.c_str());
-						opened = true;
-					} catch (const std::exception& e) {
-						LOG_F(ERROR, "Failed to initialize H264 pass-through for %s: %s",
-								cam.c_str(), e.what());
+					if (format.find("264") != std::string::npos) {
+						cam::CameraStreamProperties streamProps{
+							.cameraId = static_cast<int>(configFs[cam::KEY_CAMERA_ID]),
+							.format = format,
+							.width = static_cast<int>(configFs[cam::KEY_IMAGE_WIDTH]),
+							.height = static_cast<int>(configFs[cam::KEY_IMAGE_HEIGHT]),
+							.framerate = static_cast<int>(configFs[cam::KEY_FRAMERATE]),
+						};
+						// try to create H264 passthrough source
+						try {
+							auto passthrough =
+								std::make_unique<cam::H264PassthroughSource>(streamProps);
+							_open_streams.insert_or_assign(
+								cam, stream_data_t(passthrough_stream_t{std::move(passthrough)}));
+							LOG_F(INFO, "Opened H264 pass-through stream for %s", cam.c_str());
+							opened = true;
+						} catch (const std::exception& e) {
+							LOG_F(ERROR, "Failed to initialize H264 pass-through for %s: %s",
+								  cam.c_str(), e.what());
+						}
+					} else {
+						LOG_F(INFO,
+							  "Camera %s format %s does not provide H264, falling back to CPU "
+							  "encoding",
+							  cam.c_str(), format.c_str());
 					}
-
 				} else {
 					LOG_F(WARNING,
 						  "Camera %s config missing stream properties; falling back to CPU encoding",
