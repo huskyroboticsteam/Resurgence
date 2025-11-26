@@ -4,7 +4,7 @@ name: "mast"
 description: "Camera located on the mast of the rover."
 # Make sure that this camera_id matches the one defined in the udev rules.
 camera_id: 8
-format: "image/h264"
+format: "video/x-h264"
 image_width: 1280
 image_height: 720
 framerate: 30
