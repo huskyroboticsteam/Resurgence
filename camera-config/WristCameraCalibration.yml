@@ -5,8 +5,8 @@ description: "Camera located on the wrist of the rover arm."
 # Make sure that this camera_id matches the one defined in the udev rules.
 camera_id: 30
 format: "image/jpeg"
-image_width: 1024
-image_height: 768
+image_width: 1280
+image_height: 720
 framerate: 30
 opencv_enabled: true
 # calib_info:
