@@ -15,6 +15,7 @@ struct CameraStreamProperties {
 	int width;
 	int height;
 	int framerate;
+	bool openCVEnabled;
 };
 
 class H264PassthroughSource {
