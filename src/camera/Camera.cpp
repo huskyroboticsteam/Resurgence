@@ -84,7 +84,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	std::string format = fs[KEY_FORMAT];
 	std::string formatLower = format;
 	std::transform(formatLower.begin(), formatLower.end(), formatLower.begin(),
-				   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+				[](unsigned char c){ return static_cast<char>(std::tolower(c)); });
 
 	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID])
 			<< " io-mode=dmabuf ! ";
@@ -94,15 +94,19 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	} else {
 		gstr_ss << format << ",";
 	}
+
 	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	if (formatLower.find("jpeg") != std::string::npos) {
+	if (formatLower.find("h264") != std::string::npos) {
+		gstr_ss << "h264parse ! avdec_h264 ! ";
+	} else if (formatLower.find("jpeg") != std::string::npos) {
 		gstr_ss << "jpegdec ! ";
 	}
-	gstr_ss << "queue max-size-buffers=1 leaky=downstream ! ";
-	gstr_ss << "videoconvert ! appsink drop=true max-buffers=1 sync=false";
+
+	gstr_ss << "queue max-size-buffers=1 leaky=downstream ! "
+        << "videoconvert ! appsink drop=true max-buffers=1 sync=false";
 
 	return gstr_ss.str();
 }
