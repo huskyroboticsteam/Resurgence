@@ -1,5 +1,4 @@
 #include "H264PassthroughSource.h"
-#include <gst/gst.h>
 
 #include <atomic>
 #include <mutex>
