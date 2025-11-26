@@ -3,8 +3,8 @@
 name: "wrist"
 description: "Camera located on the wrist of the rover arm."
 # Make sure that this camera_id matches the one defined in the udev rules.
-camera_id: 30
-format: "image/jpeg"
+camera_id: 4
+format: "image/yuyv"
 image_width: 1280
 image_height: 720
 framerate: 30
