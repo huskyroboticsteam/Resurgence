@@ -82,15 +82,23 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 
 	std::stringstream gstr_ss;
 	std::string format = fs[KEY_FORMAT];
+	std::string formatLower = format;
+	std::transform(formatLower.begin(), formatLower.end(), formatLower.begin(),
+				   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
 
 	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID])
 			<< " io-mode=dmabuf ! ";
-	gstr_ss << format << ",";
+
+	if (formatLower.find("yuy") != std::string::npos) {
+		gstr_ss << "video/x-raw,format=YUY2,";
+	} else {
+		gstr_ss << format << ",";
+	}
 	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	if (format == "image/jpeg") {
+	if (formatLower.find("jpeg") != std::string::npos) {
 		gstr_ss << "jpegdec ! ";
 	}
 	gstr_ss << "queue max-size-buffers=1 leaky=downstream ! ";
