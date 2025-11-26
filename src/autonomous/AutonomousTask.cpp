@@ -70,16 +70,20 @@ void AutonomousTask::navigate() {
 			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coord;
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
 
-			// Logging current location
-			auto gpsCoordData = robot::metersToGPS(gpsPosData);
-			if (!gpsCoordData) {
+			// Logging current and target location
+			auto gpsCoord = robot::metersToGPS(gpsPosData);
+			auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
+			double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
+			if (!gpsCoord || ! waypointGPSCoord) {
 				LOG_F(INFO, "	Coordinates are not getting logged.");
 			} else {
-				LOG_F(INFO, "	Current coordinates: (%lf, %lf)", gpsCoordData->lat, gpsCoordData->lon);
+				LOG_F(INFO, "	Target: (%lf, %lf)", waypointGPSCoord->lat, waypointGPSCoord->lon);
+				LOG_F(INFO, "	Current coords: (%lf, %lf)", gpsCoord->lat, gpsCoord->lon);
 			}
 
-			LOG_F(INFO, "		Heading velocity: %lf, ", scaledVels(2));
+			LOG_F(INFO, "		Heading velocity: %lf ", scaledVels(2));
 			LOG_F(INFO, "		Foward velocity: %lf", scaledVels(0));
+			LOG_F(INFO, "		Distance: %lf", dist);
 		}
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
