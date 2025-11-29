@@ -35,12 +35,15 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 }
 
 void AutonomousTask::navigateAll() {
+	LOG_SCOPE_F(INFO, "AutoNav");
 	for (navtypes::point_t& point : _waypoint_coords_list) {
 		_waypoint_coord = point;
-		LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", point[0], point[1]);
+		auto gpsCoord = robot::metersToGPS(point);
+
+		LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", gpsCoord->lat, gpsCoord->lon);
 		json msg = {{"type", "auto_target_update"},
-					{"latitude", point[0]},
-					{"longitude", point[1]}};
+					{"latitude", gpsCoord->lat},
+					{"longitude", gpsCoord->lon}};
 		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 		navigate();
 	}
@@ -59,7 +62,6 @@ void AutonomousTask::navigate() {
 		auto latestHeading = robot::readIMUHeading();
 
 		if (latestGPS.isFresh(2000ms) && latestHeading.isFresh(2000ms)) {
-			LOG_SCOPE_F(INFO, "AutoNav");
 			auto gpsPosData = latestGPS.getData();
 			navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), latestHeading.getData());
 			cmd.setState(latestPos, robot::types::dataclock::now());
