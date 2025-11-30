@@ -28,14 +28,33 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 		kill();
 	}
 
-	_waypoint_coords_list = waypointCoords;
+	// _waypoint_coords_list = waypointCoords;
 	_kill_called = false;
+	AutonomousTask::circleAroundPoint(waypointCoords[0], 7.5);
 	
+	// _autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
+}
+
+void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, double radius) {
+	LOG_SCOPE_F(INFO, "AutoNav:Circle");
+
+	int numPoints = round(2 * M_PI * radius / 0.5); // find number of points necessary to get 0.5m
+													// distance between points
+	double angleIncrement = 2 * M_PI / numPoints;												
+	navtypes::points_t circlePoints;
+
+	for (int i = 1; i <= numPoints; i++) {
+		double angle = i * angleIncrement;
+		double x = center[0] + radius * cos(angle);
+		double y = center[1] + radius * sin(angle);
+		circlePoints.push_back({x, y, 1});
+	}
+	_waypoint_coords_list = circlePoints;
 	_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
 }
 
 void AutonomousTask::navigateAll() {
-	LOG_SCOPE_F(INFO, "AutoNav");
+	// LOG_SCOPE_F(INFO, "AutoNav:List");
 	for (navtypes::point_t& point : _waypoint_coords_list) {
 		_waypoint_coord = point;
 		auto gpsCoord = robot::metersToGPS(point);
@@ -89,7 +108,7 @@ void AutonomousTask::navigate() {
 		}
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
-		sleepUntil += 500ms;
+		sleepUntil += 20ms;
 
 		// Wait 500ms or return out of while loop if kill called
 		if (_autonomous_task_cv.wait_until(autonomousTaskLock, sleepUntil,

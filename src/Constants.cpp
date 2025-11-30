@@ -151,7 +151,7 @@ const std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() {
 namespace autonomous {
 const double THETA_KP = 2.0;
 const double DRIVE_VEL = 1.5;
-const double SLOW_DRIVE_THRESHOLD = 8.0;
+const double SLOW_DRIVE_THRESHOLD = 5.0;
 const double DONE_THRESHOLD = 3.0;
 // Duration long enough to confirm we are there, not so long that time is wasted
 const util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::milliseconds(750);

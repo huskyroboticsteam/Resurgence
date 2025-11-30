@@ -29,19 +29,18 @@ command_t DriveToWaypointCommand::getOutput() {
 	}
 
 	this->setStateCalledBeforeOutput = false;
-	Eigen::Vector2d toTarget = target.topRows<2>() - pose.topRows<2>();
-	double targetAngle = std::atan2(toTarget(1), toTarget(0));
-	double angleDelta = targetAngle - pose(2);
-	double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
-	double thetaVel = thetaKP * thetaErr;
 
+	double thetaVel = 0;
 	double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
-	double xVel = driveVel;
-	if (dist <= slowDriveThresh) {
-		xVel *= dist / slowDriveThresh;
+	if (dist > slowDriveThresh) {
+		Eigen::Vector2d toTarget = target.topRows<2>() - pose.topRows<2>();
+		double targetAngle = std::atan2(toTarget(1), toTarget(0));
+		double angleDelta = targetAngle - pose(2);
+		double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
+		double thetaVel = thetaKP * thetaErr;
 	}
-
-	return {.thetaVel = thetaVel, .xVel = xVel};
+	
+	return {.thetaVel = thetaVel, .xVel = driveVel};
 }
 
 bool DriveToWaypointCommand::isDone() {

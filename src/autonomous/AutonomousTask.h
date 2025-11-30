@@ -16,36 +16,44 @@ namespace autonomous {
  */
 class AutonomousTask {
 public:
-	/*
+	/**
 	 * @brief Constructs a new AutonomousTask
 	 */
 	AutonomousTask(net::websocket::SingleClientWSServer&);
 
-	/*
+	/**
 	 * @brief Destructs AutonomousTask object, joins _autonomous_task_thread
 	 */
 	~AutonomousTask();
 
-	/*
+	/**
 	 * @brief Starts an autonomous task to the provided waypoints
 	 *
-	 * @param std::vector<navtypes::point_t> The list of waypoints to navigate to
+	 * @param waypointCoords the list of waypoints to navigate to
 	 */
-	void start(const navtypes::points_t&);
+	void start(const navtypes::points_t& waypointCoords);
 
-	/*
+	/**
+	 * @brief Starts an autonomous task to circle around at a given radius around a given point.
+	 *
+	 * @param center the center of desired circle
+	 * @param radius the radius of desired circle
+	 */
+	void circleAroundPoint(const navtypes::point_t& center, double radius);
+
+	/**
 	 * @brief Halts autonomous navigation by exiting the navigate() function and joining the
 	 *        autonomous task thread
 	 */
 	void kill();
 
 private:
-	/*
+	/**
 	 * @brief Handles sequential navigation to a list of a waypoints, called by start()
 	 */
 	void navigateAll();
 
-	/*
+	/** 
 	 * @brief Handles navigation to a single waypoint, called by navigateAll()
 	 */
 	void navigate();
