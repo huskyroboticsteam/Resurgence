@@ -37,7 +37,7 @@ command_t DriveToWaypointCommand::getOutput() {
 		double targetAngle = std::atan2(toTarget(1), toTarget(0));
 		double angleDelta = targetAngle - pose(2);
 		double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
-		double thetaVel = thetaKP * thetaErr;
+		thetaVel = thetaKP * thetaErr;
 	}
 	
 	return {.thetaVel = thetaVel, .xVel = driveVel};

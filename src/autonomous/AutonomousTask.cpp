@@ -38,12 +38,12 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, double radius) {
 	LOG_SCOPE_F(INFO, "AutoNav:Circle");
 
-	int numPoints = round(2 * M_PI * radius / 0.5); // find number of points necessary to get 0.5m
-													// distance between points
+	int numPoints = std::max(1, (int)round(2 * M_PI * radius / 0.5)); // find number of points necessary to get 0.5m
+																	  // distance between points
 	double angleIncrement = 2 * M_PI / numPoints;												
 	navtypes::points_t circlePoints;
-
-	for (int i = 1; i <= numPoints; i++) {
+ 
+	for (int i = 0; i <= numPoints; i++) {
 		double angle = i * angleIncrement;
 		double x = center[0] + radius * cos(angle);
 		double y = center[1] + radius * sin(angle);
@@ -58,8 +58,11 @@ void AutonomousTask::navigateAll() {
 	for (navtypes::point_t& point : _waypoint_coords_list) {
 		_waypoint_coord = point;
 		auto gpsCoord = robot::metersToGPS(point);
-
-		LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", gpsCoord->lat, gpsCoord->lon);
+		if(!gpsCoord) {
+			LOG_F(WARNING, "No GPS converter initialized!");
+			return;
+		}
+		LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", point[0], point[1]);
 		json msg = {{"type", "auto_target_update"},
 					{"latitude", gpsCoord->lat},
 					{"longitude", gpsCoord->lon}};
@@ -74,7 +77,7 @@ void AutonomousTask::navigate() {
 										 CLOSE_TO_TARGET_DUR_VAL);
 
 	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
-
+	auto start = std::chrono::steady_clock::now();
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
 		auto latestGPS = robot::readGPS();
@@ -91,20 +94,21 @@ void AutonomousTask::navigate() {
 			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coord;
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
 
+		
 			// Logging current and target location
-			auto gpsCoord = robot::metersToGPS(gpsPosData);
-			auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
-			double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
-			if (!gpsCoord || ! waypointGPSCoord) {
-				LOG_F(INFO, "	Coordinates are not getting logged.");
-			} else {
-				LOG_F(INFO, "	Target: (%lf, %lf)", waypointGPSCoord->lat, waypointGPSCoord->lon);
-				LOG_F(INFO, "	Current coords: (%lf, %lf)", gpsCoord->lat, gpsCoord->lon);
-			}
+			// auto gpsCoord = robot::metersToGPS(gpsPosData);
+			// auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
+			// double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
+			// if (!gpsCoord || ! waypointGPSCoord) {
+			// 	LOG_F(INFO, "	Coordinates are not getting logged.");
+			// } else {
+			// 	LOG_F(INFO, "	Target: (%lf, %lf)", waypointGPSCoord->lat, waypointGPSCoord->lon);
+			// 	LOG_F(INFO, "	Current coords: (%lf, %lf)", gpsCoord->lat, gpsCoord->lon);
+			// }
 
-			LOG_F(INFO, "		Heading velocity: %lf ", scaledVels(2));
-			LOG_F(INFO, "		Foward velocity: %lf", scaledVels(0));
-			LOG_F(INFO, "		Distance: %lf", dist);
+			// LOG_F(INFO, "		Heading velocity: %lf ", scaledVels(2));
+			// LOG_F(INFO, "		Foward velocity: %lf", scaledVels(0));
+			//sssLOG_F(INFO, "		Distance: %lf", dist);
 		}
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
@@ -116,6 +120,19 @@ void AutonomousTask::navigate() {
 			return;
 		}
 	}
+	auto latestGPS = robot::readGPS();
+		auto gpsPosData = latestGPS.getData();
+        navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
+
+        auto gpsCoord = robot::metersToGPS(gpsPosData);
+        auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
+        double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
+ 
+        auto end = std::chrono::steady_clock().now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        LOG_F(INFO, "*** Reached target waypoint! ***");
+        //LOG_F(INFO, "Distance to target on arrival: %lf", dist);
+        //LOG_F(INFO, "Time taken to reach waypoint: %lf seconds", elapsed_seconds.count());
 }
 
 void AutonomousTask::kill() {
