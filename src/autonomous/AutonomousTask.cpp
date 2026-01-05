@@ -30,15 +30,16 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 
 	// _waypoint_coords_list = waypointCoords;
 	_kill_called = false;
-	AutonomousTask::circleAroundPoint(waypointCoords[0], 7.5);
+	// AutonomousTask::circleAroundPoint(waypointCoords[0], 7.5);
 	
-	// _autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
+	_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
 }
 
 void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, double radius) {
 	LOG_SCOPE_F(INFO, "AutoNav:Circle");
 
-	int numPoints = std::max(1, (int)round(2 * M_PI * radius / 0.5)); // find number of points necessary to get 0.5m
+	// *** 0.5 fixed distance maybe not best idea for smaller radii
+	int numPoints = std::max(1, (int)round(2 * M_PI * radius / 2)); // / 0.5 find number of points necessary to get 0.5m
 																	  // distance between points
 	double angleIncrement = 2 * M_PI / numPoints;												
 	navtypes::points_t circlePoints;
@@ -96,15 +97,15 @@ void AutonomousTask::navigate() {
 
 		
 			// Logging current and target location
-			// auto gpsCoord = robot::metersToGPS(gpsPosData);
-			// auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
-			// double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
-			// if (!gpsCoord || ! waypointGPSCoord) {
-			// 	LOG_F(INFO, "	Coordinates are not getting logged.");
-			// } else {
-			// 	LOG_F(INFO, "	Target: (%lf, %lf)", waypointGPSCoord->lat, waypointGPSCoord->lon);
-			// 	LOG_F(INFO, "	Current coords: (%lf, %lf)", gpsCoord->lat, gpsCoord->lon);
-			// }
+			auto gpsCoord = robot::metersToGPS(gpsPosData);
+			auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
+			double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
+			if (!gpsCoord || ! waypointGPSCoord) {
+				LOG_F(INFO, "	Coordinates are not getting logged.");
+			} else {
+				// LOG_F(INFO, "	Target: (%lf, %lf)", waypointGPSCoord->lat, waypointGPSCoord->lon);
+				LOG_F(INFO, "	Current coords: (%lf, %lf)", gpsPosData.x(), gpsPosData.y());
+			}
 
 			// LOG_F(INFO, "		Heading velocity: %lf ", scaledVels(2));
 			// LOG_F(INFO, "		Foward velocity: %lf", scaledVels(0));
@@ -121,18 +122,18 @@ void AutonomousTask::navigate() {
 		}
 	}
 	auto latestGPS = robot::readGPS();
-		auto gpsPosData = latestGPS.getData();
-        navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
+	auto gpsPosData = latestGPS.getData();
+	navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
 
-        auto gpsCoord = robot::metersToGPS(gpsPosData);
-        auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
-        double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
- 
-        auto end = std::chrono::steady_clock().now();
-        std::chrono::duration<double> elapsed_seconds = end - start;
-        LOG_F(INFO, "*** Reached target waypoint! ***");
-        //LOG_F(INFO, "Distance to target on arrival: %lf", dist);
-        //LOG_F(INFO, "Time taken to reach waypoint: %lf seconds", elapsed_seconds.count());
+	auto gpsCoord = robot::metersToGPS(gpsPosData);
+	auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
+	double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
+
+	auto end = std::chrono::steady_clock().now();
+	std::chrono::duration<double> elapsed_seconds = end - start;
+	LOG_F(INFO, "*** Reached target waypoint! ***");
+	LOG_F(INFO, "Distance to target on arrival: %lf", dist);
+	//LOG_F(INFO, "Time taken to reach waypoint: %lf seconds", elapsed_seconds.count());
 }
 
 void AutonomousTask::kill() {
