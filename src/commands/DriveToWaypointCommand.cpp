@@ -37,9 +37,13 @@ command_t DriveToWaypointCommand::getOutput() {
 
 	double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
 	double xVel = driveVel;
-	if (dist <= slowDriveThresh) {
-		xVel *= dist / slowDriveThresh;
-	}
+	//  if (dist <= slowDriveThresh / 2) {
+	// 	xVel *= dist / slowDriveThresh;
+	// }
+
+	// if (dist <= 0.25) {
+	// 	thetaVel = 0;
+	// }
 
 	return {.thetaVel = thetaVel, .xVel = xVel};
 }
