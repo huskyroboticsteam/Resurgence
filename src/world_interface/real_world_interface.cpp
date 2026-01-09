@@ -7,7 +7,6 @@
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
-#include "motor/can_motor.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
 
@@ -32,6 +31,68 @@ extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 std::unordered_map<robot::types::boardid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
 namespace {
+
+class CANBoard : public robot::base_motor {
+public:
+	CANBoard(robot::types::boardid_t motor, bool hasPosSensor,
+					can::deviceserial_t serial, can::devicegroup_t group,
+					double pos_pwm_scale, double neg_pwm_scale)
+	: base_motor(motor, hasPosSensor), 
+	serial_id(serial), 
+	device_group(group),
+	positive_scale(pos_pwm_scale), 
+	negative_scale(neg_pwm_scale) {}
+
+	void setMotorPower(double power) override {
+		ensureMotorMode(motor_id, can::motor::motormode_t::pwm);
+
+		// unschedule velocity event if exists
+		unscheduleVelocityEvent();
+
+		// scale the power
+		double scale = power < 0 ? negative_scale : positive_scale;
+		power *= scale;
+		can::motor::setMotorPower(device_group, serial_id, power);
+	}
+
+	void setMotorPos(int32_t targetPos) override {
+		ensureMotorMode(motor_id, can::motor::motormode_t::pid);
+
+		// unschedule velocity event if exists
+		unscheduleVelocityEvent();
+
+		can::motor::setMotorPIDTarget(device_group, serial_id, targetPos);
+	}
+
+	types::DataPoint<int32_t> getMotorPos() const override {
+		return can::motor::getMotorPosition(device_group, serial_id);
+	}
+
+	void setMotorVel(int32_t targetVel) override {
+		ensureMotorMode(motor_id, can::motor::motormode_t::pid);
+		base_motor::setMotorVel(targetVel);
+	}
+
+	can::deviceserial_t getMotorSerial() {
+		return serial_id;
+	}
+
+private:
+	can::deviceserial_t serial_id;
+	can::devicegroup_t device_group;
+	std::optional<can::motor::motormode_t> motor_mode;
+	double positive_scale;
+	double negative_scale;
+
+	void ensureMotorMode(robot::types::boardid_t motor, can::motor::motormode_t mode) {
+		if (!motor_mode || motor_mode.value() != mode) {
+			// update the motor mode
+			motor_mode.emplace(mode);
+			can::motor::setMotorMode(device_group, serial_id, mode);
+		}
+	}	
+};
+
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
@@ -49,7 +110,7 @@ void addMotorMapping(boardid_t motor, bool hasPosSensor) {
 
 	// create ptr and insert in map
 	std::shared_ptr<robot::base_motor> ptr =
-		std::make_shared<can_motor>(motor, hasPosSensor, boardSerialIDMap.at(motor),
+		std::make_shared<CANBoard>(motor, hasPosSensor, boardSerialIDMap.at(motor),
 									boardGroupMap.at(motor), posScale, negScale);
 	motor_ptrs.insert({motor, ptr});
 }
@@ -281,19 +342,28 @@ int getIndex(const std::vector<T>& vec, const T& val) {
 void setMotorPower(robot::types::boardid_t motor, double power) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPower(power);
+
+	// the 2 lines above calls base_motor and uses the extended functions from can motor,
+	// so add the functionality from can motor here instead
+	// can::motor::setMotorPower(device_group, serial_id, power)
 }
 
 void setMotorPos(robot::types::boardid_t motor, int32_t targetPos) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
+
+	// can::motor::setMotorPIDTarget(device_group, serial_id, targetPos);
 }
 
 types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t motor) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	return motor_ptr->getMotorPos();
+
+	// return can::motor::getMotorPosition(device_group, serial_id);
 }
 
 void setMotorVel(robot::types::boardid_t motor, int32_t targetVel) {
+	// ensureMotorMode(motor_id, can::motor::motormode_t::pid)
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
 }

@@ -7,7 +7,6 @@
 #include "../network/websocket/WebSocketProtocol.h"
 #include "../utils/core.h"
 #include "../utils/transform.h"
-#include "motor/sim_motor.h"
 #include "world_interface.h"
 
 #include <atomic>

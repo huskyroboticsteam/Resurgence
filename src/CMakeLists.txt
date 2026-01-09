@@ -217,14 +217,12 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 
   add_library(real_world_interface STATIC
     world_interface/real_world_interface.cpp
-    world_interface/motor/can_motor.cpp
   )
   target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
   add_library(world_interface ALIAS real_world_interface)
 elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
   add_library(simulator_interface STATIC
     world_interface/simulator_interface.cpp
-    world_interface/motor/sim_motor.cpp
   )
   target_link_libraries(simulator_interface world_interface_core)
   add_library(world_interface ALIAS simulator_interface)

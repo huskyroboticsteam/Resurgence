@@ -1,4 +1,4 @@
-#include "../world_interface/motor/can_motor.h"
+#include "../world_interface/motor/base_motor.h"
 #include "CAN.h"
 #include "CANMotor.h"
 #include "CANUtils.h"
@@ -32,6 +32,70 @@ enum class TestMode {
   Stepper,
   RawCAN
 };
+
+namespace {
+
+class CANBoard : public robot::base_motor {
+public:
+	CANBoard(robot::types::boardid_t motor, bool hasPosSensor,
+					can::deviceserial_t serial, can::devicegroup_t group,
+					double pos_pwm_scale, double neg_pwm_scale)
+	: base_motor(motor, hasPosSensor), 
+	serial_id(serial), 
+	device_group(group),
+	positive_scale(pos_pwm_scale), 
+	negative_scale(neg_pwm_scale) {}
+
+	void setMotorPower(double power) override {
+		ensureMotorMode(motor_id, can::motor::motormode_t::pwm);
+
+		// unschedule velocity event if exists
+		unscheduleVelocityEvent();
+
+		// scale the power
+		double scale = power < 0 ? negative_scale : positive_scale;
+		power *= scale;
+		can::motor::setMotorPower(device_group, serial_id, power);
+	}
+
+	void setMotorPos(int32_t targetPos) override {
+		ensureMotorMode(motor_id, can::motor::motormode_t::pid);
+
+		// unschedule velocity event if exists
+		unscheduleVelocityEvent();
+
+		can::motor::setMotorPIDTarget(device_group, serial_id, targetPos);
+	}
+
+	robot::types::DataPoint<int32_t> getMotorPos() const override {
+		return can::motor::getMotorPosition(device_group, serial_id);
+	}
+
+	void setMotorVel(int32_t targetVel) override {
+		ensureMotorMode(motor_id, can::motor::motormode_t::pid);
+		CANBoard::setMotorVel(targetVel);
+	}
+
+	can::deviceserial_t getMotorSerial() {
+		return serial_id;
+	}
+
+private:
+	can::deviceserial_t serial_id;
+	can::devicegroup_t device_group;
+	std::optional<can::motor::motormode_t> motor_mode;
+	double positive_scale;
+	double negative_scale;
+
+	void ensureMotorMode(robot::types::boardid_t, can::motor::motormode_t mode) {
+		if (!motor_mode || motor_mode.value() != mode) {
+			// update the motor mode
+			motor_mode.emplace(mode);
+			can::motor::setMotorMode(device_group, serial_id, mode);
+		}
+	}	
+};
+} // namespace robot
 
 std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::ModeSet),   static_cast<int>(TestMode::PWM),
@@ -118,7 +182,7 @@ int main() {
 		} else if (testMode == TestMode::PIDVel) {
 			static robot::types::datatime_t startTime;
 			static int32_t targetVel;
-			static std::shared_ptr<robot::can_motor> motor;
+			static std::shared_ptr<CANBoard> motor;
 			static robot::types::DataPoint<int32_t> initialMotorPos;
 			static double vel_timeout;
 
@@ -143,7 +207,7 @@ int main() {
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = std::make_shared<robot::can_motor>(boardid_t::leftTread, true, serial,
+				motor = std::make_shared<CANBoard>(boardid_t::leftTread, true, serial,
 														   group, posScale, negScale);
 
 				// get initial motor position
