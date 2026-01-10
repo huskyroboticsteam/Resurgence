@@ -9,6 +9,10 @@
 #include <mutex>
 #include <thread>
 
+#include <iostream>
+#include <fstream>
+#include <string>
+
 namespace autonomous {
 
 /*
@@ -67,6 +71,8 @@ private:
 	std::thread _autonomous_task_thread;
 	std::condition_variable _autonomous_task_cv;
 	bool _kill_called;
+
+	std::ofstream _logFile;
 };
 
 } // namespace autonomous

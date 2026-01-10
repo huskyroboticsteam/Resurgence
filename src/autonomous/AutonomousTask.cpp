@@ -8,6 +8,10 @@
 
 #include <loguru.hpp>
 
+#include <iostream>
+#include <fstream>
+#include <string>
+
 using namespace std::chrono_literals;
 using namespace Constants::autonomous;
 
@@ -28,11 +32,16 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 		kill();
 	}
 
+	std::ofstream _logFile("application.csv");
+	_logFile << "test" << std::endl;
+	_logFile.close();
+
+
 	// _waypoint_coords_list = waypointCoords;
 	_kill_called = false;
-	// AutonomousTask::circleAroundPoint(waypointCoords[0], 7.5);
+	AutonomousTask::circleAroundPoint(waypointCoords[0], 7.5);
 	
-	_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
+	// _autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
 }
 
 void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, double radius) {
