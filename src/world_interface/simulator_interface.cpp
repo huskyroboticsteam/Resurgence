@@ -170,20 +170,21 @@ void handleMotorStatus(json msg) {
 }
 
 void handleLimitSwitch(json msg) {
-	std::string motorName = msg["motor"];
-	uint8_t data;
-	std::string limit = msg["limit"];
-	if (limit == "maximum") {
-		data = 1 << LIMIT_SWITCH_LIM_MAX_IDX;
-	} else if (limit == "minimum") {
-		data = 1 << LIMIT_SWITCH_LIM_MIN_IDX;
-	}
-	DataPoint<LimitSwitchData> lsData(data);
+	std::cout << "limit" << std::endl; 
+	// std::string motorName = msg["motor"];
+	// uint8_t data;
+	// std::string limit = msg["limit"];
+	// if (limit == "maximum") {
+	// 	data = 1 << LIMIT_SWITCH_LIM_MAX_IDX;
+	// } else if (limit == "minimum") {
+	// 	data = 1 << LIMIT_SWITCH_LIM_MIN_IDX;
+	// }
+	// DataPoint<LimitSwitchData> lsData(data);
 
-	std::lock_guard lock(limitSwitchCallbackMapMutex);
-	for (const auto& entry : limitSwitchCallbackMap.at(motorName)) {
-		entry.second(lsData);
-	}
+	// std::lock_guard lock(limitSwitchCallbackMapMutex);
+	// for (const auto& entry : limitSwitchCallbackMap.at(motorName)) {
+	// 	entry.second(lsData);
+	// }
 }
 
 void handleTruePose(json msg) {
@@ -220,7 +221,7 @@ void initSimServer(net::websocket::SingleClientWSServer& ws) {
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
-	protocol->addMessageHandler("simLimitSwitchAlert", handleLimitSwitch);
+	protocol->addMessageHandler("simLimitSwitchReport", handleLimitSwitch);
 	protocol->addMessageHandler("simRoverTruePoseReport", handleTruePose);
 	protocol->addConnectionHandler(clientConnected);
 	protocol->addDisconnectionHandler(clientDisconnected);
