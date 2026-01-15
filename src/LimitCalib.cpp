@@ -35,6 +35,7 @@ void cleanup(int signum) {
 int main() {
 	// init motors.
 	robot::world_interface_init(std::nullopt, true);
+	std::cout << "start limit switch calibration" << std::endl;
 
 	signal(SIGINT, cleanup);
 

@@ -83,6 +83,14 @@ std::condition_variable connectionCV;
 std::mutex connectionMutex;
 bool simConnected = false;
 
+/**
+ * @brief Limit switch handler. Called when limit switch status is updated
+ *
+ * @param motor The motor to set the target position of.
+ * @param limitSwitchData new data regarding the limit switch represented as a data point
+ */
+void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData);
+
 void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
@@ -117,6 +125,10 @@ void initMotors() {
 			std::make_shared<robot::sim_motor>(x.first, true, x.second, PROTOCOL_PATH);
 		motor_ptrs.insert({x.first, ptr});
 	}
+
+	// initialize limit switches
+	robot::addLimitSwitchCallback(robot::types::motorid_t::elbow, handleLim);
+	robot::addLimitSwitchCallback(robot::types::motorid_t::shoulder, handleLim);
 }
 
 void handleGPS(json msg) {
@@ -135,6 +147,10 @@ void handleIMU(json msg) {
 	q.normalize();
 	std::lock_guard<std::mutex> guard(orientationMutex);
 	lastOrientation = q;
+}
+
+void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
+	std::cout << "test" << std::endl;
 }
 
 void handleCamFrame(json msg) {
@@ -170,21 +186,20 @@ void handleMotorStatus(json msg) {
 }
 
 void handleLimitSwitch(json msg) {
-	std::cout << "limit" << std::endl; 
-	// std::string motorName = msg["motor"];
-	// uint8_t data;
-	// std::string limit = msg["limit"];
-	// if (limit == "maximum") {
-	// 	data = 1 << LIMIT_SWITCH_LIM_MAX_IDX;
-	// } else if (limit == "minimum") {
-	// 	data = 1 << LIMIT_SWITCH_LIM_MIN_IDX;
-	// }
-	// DataPoint<LimitSwitchData> lsData(data);
+	std::string motorName = msg["motor"];
+	uint8_t data;
+	std::string limit = msg["limit"];
+	if (limit == "maximum") {
+		data = 1 << LIMIT_SWITCH_LIM_MAX_IDX;
+	} else if (limit == "minimum") {
+		data = 1 << LIMIT_SWITCH_LIM_MIN_IDX;
+	}
+	DataPoint<LimitSwitchData> lsData(data);
 
-	// std::lock_guard lock(limitSwitchCallbackMapMutex);
-	// for (const auto& entry : limitSwitchCallbackMap.at(motorName)) {
-	// 	entry.second(lsData);
-	// }
+	std::lock_guard lock(limitSwitchCallbackMapMutex);
+	for (const auto& entry : limitSwitchCallbackMap.at(motorName)) {
+		entry.second(lsData);
+	}
 }
 
 void handleTruePose(json msg) {
