@@ -32,8 +32,12 @@ command_t DriveToWaypointCommand::getOutput() {
 	Eigen::Vector2d toTarget = target.topRows<2>() - pose.topRows<2>();
 	double targetAngle = std::atan2(toTarget(1), toTarget(0));
 	double angleDelta = targetAngle - pose(2);
-	double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
-	double thetaVel = thetaKP * thetaErr;
+
+	// p-controller (https://x-engineer.org/proportional-controller/)
+	// wrap angleDelta to [-pi, pi] to prevent 90+ degree turns
+	angleDelta = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
+
+	double thetaVel = thetaKP * angleDelta;
 
 	double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
 	double xVel = driveVel;
