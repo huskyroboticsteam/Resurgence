@@ -9,6 +9,7 @@
 #include "../utils/transform.h"
 #include "motor/sim_motor.h"
 #include "world_interface.h"
+#include "../Globals.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -150,7 +151,15 @@ void handleIMU(json msg) {
 }
 
 void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
-	std::cout << "test" << std::endl;
+	if (!motorid_to_name.count(motor)) {
+		LOG_F(ERROR, "ERROR: Tried to handle limit switch from motor that does not exist!");
+		return;
+	}
+	json msg = {{"type", "LimitAlert"},
+				{"motor", motorid_to_name.at(motor).data()}};
+	std::cout << motorid_to_name.at(motor).data() << std::endl;
+
+	Globals::websocketServer.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
 void handleCamFrame(json msg) {

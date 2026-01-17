@@ -107,6 +107,12 @@ constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, moto
 	 {"elbow", motorid_t::elbow},
 	 {"forearm", motorid_t::forearm}});
 
+constexpr auto motorid_to_name = frozen::make_unordered_map<motorid_t, frozen::string>(
+	{{motorid_t::armBase, "armBase"},
+	 {motorid_t::shoulder, "shoulder"},
+	 {motorid_t::elbow, "elbow"},
+	 {motorid_t::forearm, "forearm"}});
+
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
 	 {"shoulder", jointid_t::shoulder},
