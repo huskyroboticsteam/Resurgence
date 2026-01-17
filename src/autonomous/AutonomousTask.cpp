@@ -31,16 +31,13 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 	if (_autonomous_task_thread.joinable()) {
 		kill();
 	}
-	_logFile.open("log.csv", std::ios::out | std::ios::app);
+	_logFile.open("log1.csv", std::ios::out | std::ios::app);
 	//std::ofstream _logFile("application.csv", std::ios_base::out);
 	LOG_F(INFO, "file is open %d\n", _logFile.is_open());
 
-	_logFile << "bob" << std::endl;
-	_logFile.flush();
-
 	// _waypoint_coords_list = waypointCoords;
 	_kill_called = false;
-	AutonomousTask::circleAroundPoint(waypointCoords[0], 5);
+	AutonomousTask::circleAroundPoint(waypointCoords[0], 15);
 	
 	// _autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
 }
@@ -49,7 +46,8 @@ void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, double r
 	LOG_SCOPE_F(INFO, "AutoNav:Circle");
 
 	// *** 0.5 fixed distance maybe not best idea for smaller radii
-	int numPoints = std::max(1, (int)round(2 * M_PI * radius / 2)); // / 0.5 find number of points necessary to get 0.5m
+	double distanceBetweenPoints = radius / 20;
+	int numPoints = std::max(1, (int)round(2 * M_PI * radius / distanceBetweenPoints)); // / 0.5 find number of points necessary to get 0.5m
 																	  // distance between points
 	double angleIncrement = 2 * M_PI / numPoints;												
 	navtypes::points_t circlePoints;
@@ -130,7 +128,7 @@ void AutonomousTask::navigate() {
 		}
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
-		sleepUntil += 100ms;
+		sleepUntil += 20ms;
 
 		// Wait 500ms or return out of while loop if kill called
 		if (_autonomous_task_cv.wait_until(autonomousTaskLock, sleepUntil,
