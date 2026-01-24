@@ -35,11 +35,11 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords) {
 	//std::ofstream _logFile("application.csv", std::ios_base::out);
 	LOG_F(INFO, "file is open %d\n", _logFile.is_open());
 
-	// _waypoint_coords_list = waypointCoords;
+	_waypoint_coords_list = waypointCoords;
 	_kill_called = false;
-	AutonomousTask::circleAroundPoint(waypointCoords[0], 15);
+	// AutonomousTask::circleAroundPoint(waypointCoords[0], 15);
 	
-	// _autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
+	_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
 }
 
 void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, double radius) {

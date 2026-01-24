@@ -53,21 +53,23 @@ command_t DriveToWaypointCommand::getOutput() {
 }
 
 bool DriveToWaypointCommand::isDone() {
-	if (!lastRecordedTime.has_value()) {
-		return false;
-	}
+	// if (!lastRecordedTime.has_value()) {
+	// 	return false;
+	// }
 
+	// double distance = (pose.topRows<2>() - target.topRows<2>()).norm();
+	// if (distance <= doneThresh) {
+	// 	if (!closeToTargetStartTime.has_value()) {
+	// 		closeToTargetStartTime = lastRecordedTime;
+	// 	}
+
+	// 	return lastRecordedTime.value() - closeToTargetStartTime.value() >= closeToTargetDur;
+	// } else {
+	// 	closeToTargetStartTime.reset();
+	// }
+	// return false;
 	double distance = (pose.topRows<2>() - target.topRows<2>()).norm();
-	if (distance <= doneThresh) {
-		if (!closeToTargetStartTime.has_value()) {
-			closeToTargetStartTime = lastRecordedTime;
-		}
-
-		return lastRecordedTime.value() - closeToTargetStartTime.value() >= closeToTargetDur;
-	} else {
-		closeToTargetStartTime.reset();
-	}
-	return false;
+	return distance <= doneThresh;
 }
 
 } // namespace commands

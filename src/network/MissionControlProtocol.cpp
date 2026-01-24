@@ -217,11 +217,18 @@ static bool validateWaypointNavRequest(const json& j) {
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	if (Globals::AUTONOMOUS) {
+
+		// add option to choose circle path!
+		// 		option inside point?
+		// 		option in handler?
+		//			+-> need validate to check for circle as well?
+		
 		navtypes::points_t finalTargets;
 
 		for (const auto& point : j["points"]) {
 			navtypes::gpscoords_t coord = {point[0], point[1], 0}; // make point into type gpscoords
 																   // gpsToMeters won't use altitude
+			
 			auto optTarget = robot::gpsToMeters(coord);
 			
 			// check if target was sent back by gpsToMeters
