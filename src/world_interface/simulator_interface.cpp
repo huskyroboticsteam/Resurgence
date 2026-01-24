@@ -11,6 +11,8 @@
 #include "world_interface.h"
 #include "../Globals.h"
 #include "../utils/scheduler.h"
+#include "../control_interface.h"
+
 
 #include <chrono>										// For ms and time
 #include <atomic>
@@ -210,6 +212,12 @@ void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 	std::unique_lock guard(limitSwitchMapMutex);		
 	limSwitchMap[motor].first = true;
 	limSwitchMap[motor].second = std::chrono::steady_clock::now();
+
+	jointid_t jointID = Constants::MOTOR_JOINT_MAP.at(motor);
+
+	// set both joint and motor power to 0
+	robot::setJointPower(jointID, 0.0);
+	robot::setMotorPower(motor, 0.0);
 
 	// Create a general watchdog reference, fires every 0.1 seconds (Very fast poll to handle multiple limit
 	// at once)
@@ -466,6 +474,10 @@ void setMotorPower(motorid_t motor, double normalizedPWM) {
 void setMotorPos(motorid_t motor, int32_t targetPos) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
+}
+
+bool getMotorLimStatus(robot::types::motorid_t motor) {
+	return limSwitchMap.at(motor).first;
 }
 
 DataPoint<int32_t> getMotorPos(motorid_t motor) {
