@@ -80,6 +80,32 @@ constexpr auto potMotors = frozen::make_unordered_map<boardid_t, potparams_t>({
 	{boardid_t::fourbar1, {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
 });
 
+/** @brief A mapping of board UUID (boardid_t) to their corresponding uuid and domains. */
+
+constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, can::deviceinfo_t>(
+	{
+		// Masters (0x0X)
+
+		// High Priority (0x1X)
+
+		// Power Distro and Management (0x2X)
+
+		// BLDC Motor (0x3X)
+		
+		// DC Motor (0x4X)
+        {boardid_t::leftTread, {.uuid = 0x40, .domains = static_cast<uint8_t>(can::domain_t::motor)}},
+
+		// Sensor (0x5X)
+
+		// Misc (0x6X)
+
+		// Low Priority (0x7X)
+	});
+ 
+// ===========
+// DEPRECATED:
+// ===========
+
 /** @brief A mapping of motorids to their corresponding serial number. */
 constexpr auto boardSerialIDMap = frozen::make_unordered_map<boardid_t, can::deviceserial_t>(
 	{{boardid_t::leftTread, DEVICE_SERIAL_TREAD_LEFT},
@@ -114,6 +140,10 @@ constexpr auto boardGroupMap = frozen::make_unordered_map<boardid_t, can::device
 	 {boardid_t::fourbar2, can::devicegroup_t::science},
    {boardid_t::scienceServoBoard, can::devicegroup_t::science},
    {boardid_t::scienceStepperBoard, can::devicegroup_t::science}});
+
+// ===========
+// END OF DEPRECATED
+// ===========
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
