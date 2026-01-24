@@ -173,7 +173,7 @@ void handleIMU(json msg) {
 	lastOrientation = q;
 }
 
-void callBackTest() {
+void limitSwitchPoll() {
 	// Check whether any of the limit switches have timed out and reset their status
 	// You must then update the mission control that the limit switch has timed out
 	// and has been reset
@@ -223,7 +223,7 @@ void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 	// at once)
 	if (watchDogPointer == nullptr) {
 		watchDogPointer = std::make_unique<util::Watchdog<std::chrono::_V2::steady_clock>>
-			("LimitSwitch WatchDog timer", std::chrono::milliseconds(100), callBackTest, true);
+			("LimitSwitch WatchDog timer", std::chrono::milliseconds(100), limitSwitchPoll, true);
 	}
 
 	json msg = {{"type", "LimitUpdate"},
