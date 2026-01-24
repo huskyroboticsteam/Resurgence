@@ -7,8 +7,8 @@
 #include "../camera/CameraParams.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
-#include "motor/base_motor.h"
 
+#include <Eigen/Geometry>
 #include <array>
 #include <optional>
 #include <unordered_set>
@@ -67,7 +67,8 @@ void world_interface_init(
  * @param motor The motor id to manipulate.
  * @return A shared pointer to the motor object
  */
-std::shared_ptr<robot::base_motor> getMotor(robot::types::boardid_t motor);
+class CANBoard;
+std::shared_ptr<CANBoard> getMotor(robot::types::boardid_t motor);
 
 /**
  * @brief Emergency stop all motors.

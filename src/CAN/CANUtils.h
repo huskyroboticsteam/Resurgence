@@ -11,6 +11,99 @@ extern "C" {
 #include <utility>
 
 namespace can {
+// ===========
+// UPDATED:
+// ===========
+/*
+ * @brief The possible domain bits for CAN2026. 
+ * 
+ * Every board UUID can belong to one or multiple domains.
+ */
+ enum class domain_t : uint8_t {
+	none = 0x00,
+	power = 0x01,
+	motor = 0x02,
+	peripheral = 0x04
+ };
+
+/**
+  * @brief The UUID type.
+  *
+  * Every device's unique identifier.
+  */
+using uuid_t = uint8_t;
+
+/**
+  * @brief The domain mask type.
+  *
+  * A bitmask representing the domains a device belongs to.
+  */
+using domainmask_t = uint8_t;
+
+/**
+  * @brief The device info structure.
+  * 
+  * Every device contains a UUID and what domains it belongs to.
+  */
+struct deviceinfo_t {
+	uuid_t uuid;
+	domainmask_t domains;
+};
+
+/**
+ * @brief Construct CAN ID
+ *
+ * @param packet The packet to extract the device group from.
+ * @return uint16_t The constructed CAN ID
+ */
+uint16_t constructCAN(uint8_t priority, uuid_t uuid, domainmask_t domains);
+
+/**
+ * @brief Get UUID from a packet ID
+ *
+ * @param packet The packet to extract the UUID from.
+ * @return uuid_t The UUID of the sender.
+ */
+uuid_t getUUIDFromPacket(const CANPacket& packet);
+
+/**
+ * @brief Get the domain(s) of the sender of the given packet.
+ *
+ * @param packet The packet to extract the domain(s) from.
+ * @return domainmask_t The domain(s) of the packet.
+ */
+domainmask_t getDomainsFromPacket(const CANPacket& packet);
+
+/**
+ * @brief Get whether or not a domain is of the given packet.
+ *
+ * @param packet The packet to extract the domain from.
+ * @return bool The domain is in the packet.
+ */
+bool deviceInDomain(const CANPacket& packet, domainmask_t domain);
+
+/**
+ * @brief Get the sender UUID of the given packet.
+ *
+ * @param packet The packet to extract the sender UUID from.
+ * @return uuid_t The device UUID.
+ */
+uuid_t getSenderUUID(const CANPacket& packet);
+
+/**
+ * @brief Get the device group of the sender of the given packet.
+ *
+ * @param commandID The Command ID of the packet data.
+ * @param senderUUID The Sender UUID of the packet data.
+ * @param requestACK The Acknowledgement bit.
+ * @param data The 6 data bytes of the packet data.
+ * @return devicegroup_t The device group of the sender.
+ */
+int writeCANHeader(uint8_t* data, uint8_t commandID, uuid_t senderUUID, bool requestACK);
+
+// ===========
+// DEPRECATED:
+// ===========
 
 /**
  * @brief The possible device group codes.
