@@ -10,7 +10,9 @@
 #include "motor/sim_motor.h"
 #include "world_interface.h"
 #include "../Globals.h"
+#include "../utils/scheduler.h"
 
+#include <chrono>										// For ms and time
 #include <atomic>
 #include <condition_variable>
 #include <loguru.hpp>
@@ -62,6 +64,14 @@ bool is_emergency_stopped = false;
 
 // A mapping of (motor_id, shared pointer to object of the motor)
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+
+std::shared_mutex limitSwitchMapMutex;
+
+// Map correlating limit switch to it's status where false is not triggered
+// and true is triggered
+std::map<motorid_t, bool> limSwitchMap;
+
+std::unique_ptr<util::Watchdog<>> watchDogPointer;
 
 using lscallback_t =
 	std::function<void(robot::types::DataPoint<LimitSwitchData> limitSwitchData)>;
@@ -130,6 +140,11 @@ void initMotors() {
 	// initialize limit switches
 	robot::addLimitSwitchCallback(robot::types::motorid_t::elbow, handleLim);
 	robot::addLimitSwitchCallback(robot::types::motorid_t::shoulder, handleLim);
+
+	// first: callback, second: motor id
+	for (const auto& x : lsCallbackToMotorMap) {
+		limSwitchMap[x.second] = false;
+	}
 }
 
 void handleGPS(json msg) {
@@ -150,6 +165,10 @@ void handleIMU(json msg) {
 	lastOrientation = q;
 }
 
+void callBackTest() {
+	std::cout << "TEST TIMER CALLBACK" << std::endl; 
+}
+
 void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 	if (!motorid_to_name.count(motor)) {
 		LOG_F(ERROR, "ERROR: Tried to handle limit switch from motor that does not exist!");
@@ -158,6 +177,11 @@ void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 	json msg = {{"type", "LimitAlert"},
 				{"motor", motorid_to_name.at(motor).data()}};
 	std::cout << motorid_to_name.at(motor).data() << std::endl;
+
+	std::unique_lock guard(limitSwitchMapMutex);		
+	limSwitchMap[motor] = true;
+
+	watchDogPointer = std::make_unique<util::Watchdog<std::chrono::_V2::steady_clock>>("LimitSwitch WatchDog timer", std::chrono::milliseconds(5000), callBackTest, false);
 
 	Globals::websocketServer.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
