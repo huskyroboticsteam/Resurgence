@@ -36,6 +36,46 @@ struct sensor_t {
  */
 void emergencyStopMotors();
 
+
+// ===========
+// UPDATED:
+// ===========
+
+void initMotor(uuid_t uuid, domainmask_t domains);
+
+void initEncoder(uuid_t uuid, domainmask_t domains, bool invertEncoder,
+				 bool zeroEncoder, int32_t pulsesPerJointRev,
+				 std::optional<std::chrono::milliseconds> telemetryPeriod);
+
+void initPotentiometer(uuid_t uuid, domainmask_t domains, int32_t posLo,
+					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
+					   std::optional<std::chrono::milliseconds> telemetryPeriod);
+
+void setLimitSwitchLimits(uuid_t uuid, domainmask_t domains, int32_t lo, int32_t hi);
+
+void setMotorPIDConstants(uuid_t uuid, domainmask_t domains, int32_t kP, int32_t kI,
+						  int32_t kD);
+
+void setMotorMode(uuid_t uuid, domainmask_t domains, motormode_t mode);
+
+void setMotorPower(uuid_t uuid, domainmask_t domains, double power);
+
+void setMotorPower(uuid_t uuid, domainmask_t domains, int16_t power);
+
+void setMotorPIDTarget(uuid_t uuid, domainmask_t domains, int32_t target);
+
+robot::types::DataPoint<int32_t> getMotorPosition(uuid_t uuid, domainmask_t domains);
+
+void pullMotorPosition(uuid_t uuid, domainmask_t domains);
+
+callbackid_t addLimitSwitchCallback(uuid_t uuid, domainmask_t domains,
+	const std::function<void(uuid_t uuid, domainmask_t domains,
+							 robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
+
+// ===========
+// DEPRECATED:
+// ===========
+
 /**
  * @brief Initialize a motor.
  *
