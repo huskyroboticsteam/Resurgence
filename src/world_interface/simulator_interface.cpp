@@ -67,10 +67,16 @@ std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> 
 
 std::shared_mutex limitSwitchMapMutex;
 
-// Map correlating limit switch to it's status where false is not triggered
-// and true is triggered
-std::map<motorid_t, bool> limSwitchMap;
+const std::chrono::milliseconds LIMIT_SWITCH_TIMEOUT = std::chrono::milliseconds(1000);
 
+// Map correlating limit switch to it's status where false is not triggered
+// and true is triggered. The second value of the pair corresponds to the most
+// timestamp that this limit switch has been triggered at
+std::map<motorid_t, std::pair<bool, std::chrono::time_point<std::chrono::steady_clock>>> limSwitchMap;
+
+// Watch doing reference. Whenever this watchdog timer goes off regardless for what limit
+// switch we will check whether any of the limit switches have timed out from the limit switch
+// timer map
 std::unique_ptr<util::Watchdog<>> watchDogPointer;
 
 using lscallback_t =
@@ -143,7 +149,7 @@ void initMotors() {
 
 	// first: callback, second: motor id
 	for (const auto& x : lsCallbackToMotorMap) {
-		limSwitchMap[x.second] = false;
+		limSwitchMap[x.second] = {false, std::chrono::steady_clock::now()};
 	}
 }
 
@@ -167,6 +173,33 @@ void handleIMU(json msg) {
 
 void callBackTest() {
 	std::cout << "TEST TIMER CALLBACK" << std::endl; 
+
+	// Check whether any of the limit switches have timed out and reset their status
+	// You must then update the mission control that the limit switch has timed out
+	// and has been reset
+	int limitSwitchesNotReset = 0;
+	for (const auto& [key, value] : limSwitchMap) {
+		
+		// Check if the limit switch is currently being marked as active, then check if
+		// timeout
+		if (value.first) {
+			if (std::chrono::steady_clock::now() - value.second >= LIMIT_SWITCH_TIMEOUT) {
+				limSwitchMap[key].first = false;
+				std::cout << " had its limit switch reset" << std::endl;
+			}
+			else {
+				limitSwitchesNotReset++;
+			}
+		}
+	}
+
+	// No limit switch activity delete thread and object to use less resources
+	if (limitSwitchesNotReset == 0 && watchDogPointer != nullptr) {
+		watchDogPointer = nullptr;
+		if (watchDogPointer == nullptr) {
+			std::cout << "this should be right" << std::endl;
+		}
+	}
 }
 
 void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
@@ -179,9 +212,16 @@ void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 	std::cout << motorid_to_name.at(motor).data() << std::endl;
 
 	std::unique_lock guard(limitSwitchMapMutex);		
-	limSwitchMap[motor] = true;
+	limSwitchMap[motor].first = true;
+	limSwitchMap[motor].second = std::chrono::steady_clock::now();
 
-	watchDogPointer = std::make_unique<util::Watchdog<std::chrono::_V2::steady_clock>>("LimitSwitch WatchDog timer", std::chrono::milliseconds(5000), callBackTest, false);
+	// Create a general watchdog reference, fires every 0.1 seconds (Very fast poll to handle multiple limit
+	// at once)
+	if (watchDogPointer == nullptr) {
+		std::cout << "making new timer" << std::endl;
+		watchDogPointer = std::make_unique<util::Watchdog<std::chrono::_V2::steady_clock>>
+			("LimitSwitch WatchDog timer", std::chrono::milliseconds(100), callBackTest, true);
+	}
 
 	Globals::websocketServer.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }

@@ -8,7 +8,9 @@
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
 #include "motor/base_motor.h"
+#include "../utils/scheduler.h"
 
+#include <chrono>
 #include <array>
 #include <optional>
 #include <unordered_set>
