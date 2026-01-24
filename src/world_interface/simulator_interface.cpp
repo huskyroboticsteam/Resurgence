@@ -172,8 +172,6 @@ void handleIMU(json msg) {
 }
 
 void callBackTest() {
-	std::cout << "TEST TIMER CALLBACK" << std::endl; 
-
 	// Check whether any of the limit switches have timed out and reset their status
 	// You must then update the mission control that the limit switch has timed out
 	// and has been reset
@@ -185,7 +183,11 @@ void callBackTest() {
 		if (value.first) {
 			if (std::chrono::steady_clock::now() - value.second >= LIMIT_SWITCH_TIMEOUT) {
 				limSwitchMap[key].first = false;
-				std::cout << " had its limit switch reset" << std::endl;
+					json msg = {{"type", "LimitUpdate"},
+								{"motor", motorid_to_name.at(key).data()},
+								{"status", false}};	
+
+				Globals::websocketServer.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 			}
 			else {
 				limitSwitchesNotReset++;
@@ -196,9 +198,6 @@ void callBackTest() {
 	// No limit switch activity delete thread and object to use less resources
 	if (limitSwitchesNotReset == 0 && watchDogPointer != nullptr) {
 		watchDogPointer = nullptr;
-		if (watchDogPointer == nullptr) {
-			std::cout << "this should be right" << std::endl;
-		}
 	}
 }
 
@@ -207,9 +206,6 @@ void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 		LOG_F(ERROR, "ERROR: Tried to handle limit switch from motor that does not exist!");
 		return;
 	}
-	json msg = {{"type", "LimitAlert"},
-				{"motor", motorid_to_name.at(motor).data()}};
-	std::cout << motorid_to_name.at(motor).data() << std::endl;
 
 	std::unique_lock guard(limitSwitchMapMutex);		
 	limSwitchMap[motor].first = true;
@@ -218,10 +214,13 @@ void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 	// Create a general watchdog reference, fires every 0.1 seconds (Very fast poll to handle multiple limit
 	// at once)
 	if (watchDogPointer == nullptr) {
-		std::cout << "making new timer" << std::endl;
 		watchDogPointer = std::make_unique<util::Watchdog<std::chrono::_V2::steady_clock>>
 			("LimitSwitch WatchDog timer", std::chrono::milliseconds(100), callBackTest, true);
 	}
+
+	json msg = {{"type", "LimitUpdate"},
+				{"motor", motorid_to_name.at(motor).data()},
+				{"status", true}};	
 
 	Globals::websocketServer.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
