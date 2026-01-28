@@ -72,6 +72,7 @@ private:
 	std::condition_variable _autonomous_task_cv;
 	bool _kill_called;
 
+	bool _debug = false; // toggle debugging logs 
 	std::ofstream _logFile;
 };
 

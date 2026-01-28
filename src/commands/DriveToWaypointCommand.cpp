@@ -9,18 +9,13 @@ using namespace std::chrono_literals;
 namespace commands {
 
 DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double thetaKP,
-											   double driveVel, double slowDriveThresh,
-											   double doneThresh,
-											   util::dseconds closeToTargetDur)
-	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
-	  slowDriveThresh(slowDriveThresh), doneThresh(doneThresh),
-	  setStateCalledBeforeOutput(false), closeToTargetDur(closeToTargetDur) {}
+											   double driveVel, double doneThresh)
+					: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
+					  doneThresh(doneThresh), setStateCalledBeforeOutput(false) {}
 
-void DriveToWaypointCommand::setState(const navtypes::pose_t& pose,
-									  robot::types::datatime_t time) {
+void DriveToWaypointCommand::setState(const navtypes::pose_t& pose) {
 	this->pose = pose;
 	this->setStateCalledBeforeOutput = true;
-	this->lastRecordedTime = time;
 }
 
 command_t DriveToWaypointCommand::getOutput() {
@@ -41,33 +36,10 @@ command_t DriveToWaypointCommand::getOutput() {
 
 	double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
 	double xVel = driveVel;
-	//  if (dist <= slowDriveThresh / 2) {
-	// 	xVel *= dist / slowDriveThresh;
-	// }
-
-	// if (dist <= 0.25) {
-	// 	thetaVel = 0;
-	// }
-
 	return {.thetaVel = thetaVel, .xVel = xVel};
 }
 
 bool DriveToWaypointCommand::isDone() {
-	// if (!lastRecordedTime.has_value()) {
-	// 	return false;
-	// }
-
-	// double distance = (pose.topRows<2>() - target.topRows<2>()).norm();
-	// if (distance <= doneThresh) {
-	// 	if (!closeToTargetStartTime.has_value()) {
-	// 		closeToTargetStartTime = lastRecordedTime;
-	// 	}
-
-	// 	return lastRecordedTime.value() - closeToTargetStartTime.value() >= closeToTargetDur;
-	// } else {
-	// 	closeToTargetStartTime.reset();
-	// }
-	// return false;
 	double distance = (pose.topRows<2>() - target.topRows<2>()).norm();
 	return distance <= doneThresh;
 }
