@@ -51,14 +51,6 @@ struct deviceinfo_t {
 };
 
 /**
- * @brief Construct CAN ID
- *
- * @param packet The packet to extract the device group from.
- * @return uint16_t The constructed CAN ID
- */
-uint16_t constructCAN(uint8_t priority, uuid_t uuid, domainmask_t domains);
-
-/**
  * @brief Get UUID from a packet ID
  *
  * @param packet The packet to extract the UUID from.
@@ -89,17 +81,6 @@ bool deviceInDomain(const CANPacket& packet, domainmask_t domain);
  * @return uuid_t The device UUID.
  */
 uuid_t getSenderUUID(const CANPacket& packet);
-
-/**
- * @brief Get the device group of the sender of the given packet.
- *
- * @param commandID The Command ID of the packet data.
- * @param senderUUID The Sender UUID of the packet data.
- * @param requestACK The Acknowledgement bit.
- * @param data The 6 data bytes of the packet data.
- * @return devicegroup_t The device group of the sender.
- */
-int writeCANHeader(uint8_t* data, uint8_t commandID, uuid_t senderUUID, bool requestACK);
 
 // ===========
 // DEPRECATED:
