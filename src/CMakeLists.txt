@@ -40,7 +40,9 @@ set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
 set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
+set(OFFLINE_MODE_STATES "TRUE" "FALSE")
 set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
+set_property(CACHE OFFLINE_MODE PROPERTY STRINGS ${OFFLINE_MODE})
 
 if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
   message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${WORLD_INTERFACE}\n\
@@ -57,6 +59,7 @@ Module settings:")
 message("  GPS:\t\t\t${GPS}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
+message("  Offline mode:\t\t${OFFLINE_MODE}")
 message("========================================")
 
 ##====== Dependencies ======
@@ -99,10 +102,16 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   FetchContent_MakeAvailable(HindsightCAN)
 endif()
 
-FetchContent_Declare(LoguruGitRepo
-	GIT_REPOSITORY "https://github.com/emilk/loguru"
-	GIT_TAG        "master"
-)
+# Check if offline mode flag waas passed in
+if(OFFLINE_MODE STREQUAL "FALSE")
+  message("Ignoring refetch of loguru")
+  FetchContent_Declare(
+    LoguruGitRepo
+    GIT_REPOSITORY "https://github.com/emilk/loguru"
+    GIT_TAG        "master"
+  )
+endif()
+
 # set any loguru compile-time flags before calling MakeAvailable()
 set(LOGURU_WITH_STREAMS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
