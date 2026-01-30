@@ -1,11 +1,16 @@
-#include "../world_interface/motor/base_motor.h"
 #include "CAN.h"
 #include "CANMotor.h"
 #include "CANUtils.h"
+#include "../control/JacobianVelController.h"
+#include "../navtypes.h"
+#include "../utils/core.h"
+#include "../utils/scheduler.h"
+#include "../world_interface/data.h"
 
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include <unordered_set>
 #include <vector>
@@ -35,65 +40,129 @@ enum class TestMode {
 
 namespace {
 
-class CANBoard : public robot::base_motor {
+class CANBoard {
 public:
 	CANBoard(robot::types::boardid_t motor, bool hasPosSensor,
-					can::deviceserial_t serial, can::devicegroup_t group,
+					can::uuid_t uuid, can::domainmask_t domains,
 					double pos_pwm_scale, double neg_pwm_scale)
-	: base_motor(motor, hasPosSensor), 
-	serial_id(serial), 
-	device_group(group),
-	positive_scale(pos_pwm_scale), 
-	negative_scale(neg_pwm_scale) {}
+	: motor_id(motor),
+	has_pos_sensor(hasPosSensor),
+	board_uuid(uuid),
+	board_domains(domains),
+	positive_scale(pos_pwm_scale),
+	negative_scale(neg_pwm_scale) {
+		// create scheduler if needed
+		std::lock_guard<std::mutex> lg(schedulerMutex);
+		if (!pSched) {
+			pSched.emplace("MotorVelSched");
+		}
+	}
 
-	void setMotorPower(double power) override {
-		ensureMotorMode(motor_id, can::motor::motormode_t::pwm);
-
-		// unschedule velocity event if exists
-		unscheduleVelocityEvent();
+	void setMotorPower(double power) {
+		ensureMotorMode(can::motor::motormode_t::pwm);
 
 		// scale the power
 		double scale = power < 0 ? negative_scale : positive_scale;
 		power *= scale;
-		can::motor::setMotorPower(device_group, serial_id, power);
+		can::motor::setMotorPower(board_uuid, board_domains, power);
 	}
 
-	void setMotorPos(int32_t targetPos) override {
-		ensureMotorMode(motor_id, can::motor::motormode_t::pid);
+	void setMotorPos(int32_t targetPos) {
+		ensureMotorMode(can::motor::motormode_t::pid);
+		can::motor::setMotorPIDTarget(board_uuid, board_domains, targetPos);
+	}
 
-		// unschedule velocity event if exists
+	robot::types::DataPoint<int32_t> getMotorPos() const {
+		return can::motor::getMotorPosition(board_uuid, board_domains);
+	}
+
+	void setMotorVel(int32_t targetVel) {
+		ensureMotorMode(can::motor::motormode_t::pid);
+		if (!velController) {
+			constructVelController();
+		}
+		// set velocity target
+		navtypes::Vectord<1> velocityVector{targetVel};
+		robot::types::datatime_t currTime = robot::types::dataclock::now();
+		velController->setTarget(currTime, velocityVector);
+
+		// check to see if the event exists. if yes, unschedule it
 		unscheduleVelocityEvent();
 
-		can::motor::setMotorPIDTarget(device_group, serial_id, targetPos);
+		// schedule position event
+		velEventID = pSched->scheduleEvent(100ms, [this]() -> void {
+			robot::types::datatime_t currTime = robot::types::dataclock::now();
+			auto motorPos = getMotorPos();
+			if (motorPos.isValid()) {
+				const navtypes::Vectord<1> currPos(motorPos.getData());
+				navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
+				setMotorPos(posCommand.coeff(0, 0));
+			}
+		});
+	}
+	
+	void unscheduleVelocityEvent() {
+		if (velEventID) {
+			pSched->removeEvent(velEventID.value());
+			velEventID.reset();
+		}
 	}
 
-	robot::types::DataPoint<int32_t> getMotorPos() const override {
-		return can::motor::getMotorPosition(device_group, serial_id);
+	can::uuid_t getMotorUUID() const {
+		return board_uuid;
 	}
 
-	void setMotorVel(int32_t targetVel) override {
-		ensureMotorMode(motor_id, can::motor::motormode_t::pid);
-		CANBoard::setMotorVel(targetVel);
-	}
-
-	can::deviceserial_t getMotorSerial() {
-		return serial_id;
+	robot::types::boardid_t getMotorID() const {
+		return motor_id;
 	}
 
 private:
-	can::deviceserial_t serial_id;
-	can::devicegroup_t device_group;
+	robot::types::boardid_t motor_id;
+	bool has_pos_sensor;
+	can::uuid_t board_uuid;
+	can::domainmask_t board_domains;
 	std::optional<can::motor::motormode_t> motor_mode;
 	double positive_scale;
 	double negative_scale;
+	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
+	std::optional<JacobianVelController<1, 1>> velController;
+	
+	inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
+	inline static std::mutex schedulerMutex;
 
-	void ensureMotorMode(robot::types::boardid_t, can::motor::motormode_t mode) {
+	void ensureMotorMode(can::motor::motormode_t mode) {
 		if (!motor_mode || motor_mode.value() != mode) {
 			// update the motor mode
 			motor_mode.emplace(mode);
-			can::motor::setMotorMode(device_group, serial_id, mode);
+			can::motor::setMotorMode(board_uuid, board_domains, mode);
 		}
 	}	
+
+	void constructVelController() {
+		// define dimensions
+		constexpr int32_t inputDim = 1;
+		constexpr int32_t outputDim = 1;
+
+		// create kinematics function (input and output will both be the current motor
+		// position)
+		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>&
+			kinematicsFunct = [](const navtypes::Vectord<inputDim>& inputVec) {
+				// returns a copy of the input vector
+				return inputVec;
+			};
+
+		// create jacobian function (value will be 1 since it's the derivative of the
+		// kinematics function)
+		const std::function<navtypes::Matrixd<outputDim, inputDim>(
+			const navtypes::Vectord<inputDim>&)>& jacobianFunct =
+			[](const navtypes::Vectord<inputDim>&) {
+				navtypes::Matrixd<outputDim, inputDim> res =
+					navtypes::Matrixd<outputDim, inputDim>::Identity();
+				return res;
+			};
+
+		velController.emplace(kinematicsFunct, jacobianFunct);
+	}
 };
 } // namespace robot
 
@@ -187,11 +256,12 @@ int main() {
 			static double vel_timeout;
 
 			if (!mode_has_been_set) {
-				auto group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
-				int serial = prompt("Enter motor serial");
+				can::uuid_t uuid = static_cast<can::uuid_t>(prompt("Enter device UUID"));
+				can::domainmask_t domains = static_cast<can::domainmask_t>(prompt("Enter domain mask"));
 
 				// set pid mode
-				can::motor::setMotorMode(group, serial, motormode_t::pid);
+				can::motor::setMotorMode(uuid, domains, motormode_t::pid);
+				// can::motor::setMotorMode(group, serial, motormode_t::pid);
 				mode_has_been_set = true;
 
 				// get pid coeffs
@@ -200,15 +270,16 @@ int main() {
 				int d_coeff = prompt("D");
 
 				// set pid coeffs
-				can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
+				can::motor::setMotorPIDConstants(uuid, domains, p_coeff, i_coeff, d_coeff);
+				// can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
 
 				// create can motor
 				double posScale =
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = std::make_shared<CANBoard>(boardid_t::leftTread, true, serial,
-														   group, posScale, negScale);
+				motor = std::make_shared<CANBoard>(boardid_t::leftTread, true, uuid,
+														   domains, posScale, negScale);
 
 				// get initial motor position
 				DataPoint<int32_t> dataPoint = motor->getMotorPos();
