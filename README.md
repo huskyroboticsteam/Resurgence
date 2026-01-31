@@ -139,3 +139,12 @@ cd build
 cmake ../src -DWORLD_INTERFACE=REAL
 make -j Rover
 ```
+
+### Building with no internet
+
+Since the Rover has to go outside there is the case of not having internet. Use the following flag to build from local libraries
+```bash
+cd build
+cmake ../src -DWORLD_INTERFACE=REAL -DOFFLINE_MODE=TRUE
+make -j Rover
+```
