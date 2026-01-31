@@ -108,6 +108,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     )
   else()
     message("-- Offline mode enabled, using cached hindsight CAN")
+    # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
     FetchContent_Declare(
         HindsightCAN
         SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
@@ -124,6 +125,7 @@ if(OFFLINE_MODE STREQUAL "FALSE")
   )
 else()
   message("-- Offline mode enabled, using cached loguru")
+  # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
   FetchContent_Declare(
       LoguruGitRepo
       SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src"
