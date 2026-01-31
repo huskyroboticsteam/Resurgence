@@ -106,7 +106,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
       GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
       GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
     )
-    FetchContent_MakeAvailable(HindsightCAN)
   else()
     message("-- Offline mode enabled, using cached hindsight CAN")
     FetchContent_Declare(
@@ -114,6 +113,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
         SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
     )
   endif()
+  FetchContent_MakeAvailable(HindsightCAN)
 endif()
 
 # Check if offline mode flag waas passed in
