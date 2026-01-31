@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Constants.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketServer.h"
 
@@ -12,6 +13,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
+using namespace Constants::autonomous;
 
 namespace autonomous {
 
@@ -35,7 +38,8 @@ public:
 	 *
 	 * @param waypointCoords the list of waypoints to navigate to
 	 */
-	void start(const navtypes::points_t& waypointCoords);
+	void start(const navtypes::points_t& waypointCoords, const bool circleMode,
+			   const std::optional<double> radius, const std::optional<TaskType> type);
 
 	/**
 	 * @brief Starts an autonomous task to circle around at a given radius around a given point.
@@ -43,7 +47,7 @@ public:
 	 * @param center the center of desired circle
 	 * @param radius the radius of desired circle
 	 */
-	void circleAroundPoint(const navtypes::point_t& center, double radius);
+	void circleAroundPoint(const navtypes::point_t& center, const double radius);
 
 	/**
 	 * @brief Halts autonomous navigation by exiting the navigate() function and joining the
@@ -66,13 +70,18 @@ private:
 
 	navtypes::point_t _waypoint_coord; // current coord
 	navtypes::points_t _waypoint_coords_list;
-	
+	bool _target_found = false;
+
 	std::mutex _autonomous_task_mutex;
 	std::thread _autonomous_task_thread;
 	std::condition_variable _autonomous_task_cv;
 	bool _kill_called;
 
-	bool _debug = false; // toggle debugging logs 
+	bool _debug = false; // toggle debugging logs
+	/*
+	 *  if _debug is true, a _logFile called "log.csv" is created in the build directory
+	 *	and populated with the actual rover path.
+	 */
 	std::ofstream _logFile;
 };
 
