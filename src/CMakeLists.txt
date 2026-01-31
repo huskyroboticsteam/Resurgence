@@ -40,13 +40,19 @@ set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
 set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
-set(OFFLINE_MODE_STATES "TRUE" "FALSE")
+set(OFFLINE_MODE "FALSE" CACHE STRING "Status of offline building")
+set(AVAILABLE_OFFLINE_MODE "TRUE" "FALSE")
 set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
-set_property(CACHE OFFLINE_MODE PROPERTY STRINGS ${OFFLINE_MODE})
+set_property(CACHE OFFLINE_MODE PROPERTY STRINGS ${AVAILABLE_OFFLINE_MODE})
 
 if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
   message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${WORLD_INTERFACE}\n\
 Valid values are ${AVAILABLE_WORLD_INTERFACES}")
+endif()
+
+if(NOT OFFLINE_MODE IN_LIST AVAILABLE_OFFLINE_MODE)
+  message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${OFFLINE_MODE}\n\
+Valid values are ${AVAILABLE_OFFLINE_MODE}")
 endif()
 
 if(NOT GPS IN_LIST AVAILABLE_GPS)
@@ -92,23 +98,35 @@ find_package(argparse REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  # Find the CAN library; contains packet and protocol definitions and does not
-  # actually require physical CAN to be present.
-  FetchContent_Declare(
-    HindsightCAN
-    GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-    GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
-  )
-  FetchContent_MakeAvailable(HindsightCAN)
+  if(OFFLINE_MODE STREQUAL "FALSE")
+    # Find the CAN library; contains packet and protocol definitions and does not
+    # actually require physical CAN to be present.
+    FetchContent_Declare(
+      HindsightCAN
+      GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
+      GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
+    )
+    FetchContent_MakeAvailable(HindsightCAN)
+  else()
+    message("-- Offline mode enabled, using cached hindsight CAN")
+    FetchContent_Declare(
+        HindsightCAN
+        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
+    )
+  endif()
 endif()
 
 # Check if offline mode flag waas passed in
 if(OFFLINE_MODE STREQUAL "FALSE")
-  message("Ignoring refetch of loguru")
-  FetchContent_Declare(
-    LoguruGitRepo
+  FetchContent_Declare(LoguruGitRepo
     GIT_REPOSITORY "https://github.com/emilk/loguru"
     GIT_TAG        "master"
+  )
+else()
+  message("-- Offline mode enabled, using cached loguru")
+  FetchContent_Declare(
+      LoguruGitRepo
+      SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src"
   )
 endif()
 
