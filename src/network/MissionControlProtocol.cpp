@@ -217,23 +217,17 @@ static bool validateWaypointNavRequest(const json& j) {
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	if (Globals::AUTONOMOUS) {
-
-		// add option to choose circle path!
-		// 		option inside point?
-		// 		option in handler?
-		//			+-> need validate to check for circle as well?
-		
-		std::optional<Constants::autonomous::TaskType> type;
-		if (j.get<TaskType>() != Constants::autonomous::TaskType::INVALID) {
-			type = j.get<TaskType>();
-		}
+		// std::optional<Constants::autonomous::TaskType> type;
+		// if (j.get<TaskType>() != Constants::autonomous::TaskType::INVALID) {
+		// 	type = j.get<TaskType>();
+		// }
 
 		std::optional<double> radius;
 		if (util::validateKey(j, "radius", val_t::boolean)) {
 			radius = j["radius"];
 		}
 
-		bool circleMode = j["circleMode"];
+		// bool circleMode = j["circleMode"];
 		
 		navtypes::points_t finalTargets;
 
@@ -250,7 +244,8 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 			}
 			finalTargets.push_back(*optTarget);
 		}
-		_autonomous_task.start(finalTargets, circleMode, radius, type);
+		//_autonomous_task.start(finalTargets, circleMode, radius, type);
+		_autonomous_task.start(finalTargets, true, std::nullopt, Constants::autonomous::TaskType::TAG1);
 	}
 }
 

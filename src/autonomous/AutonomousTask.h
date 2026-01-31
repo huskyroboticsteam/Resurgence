@@ -47,7 +47,7 @@ public:
 	 * @param center the center of desired circle
 	 * @param radius the radius of desired circle
 	 */
-	void circleAroundPoint(const navtypes::point_t& center, const double radius);
+	void circleNavigation(const navtypes::point_t& center, const double radius);
 
 	/**
 	 * @brief Halts autonomous navigation by exiting the navigate() function and joining the

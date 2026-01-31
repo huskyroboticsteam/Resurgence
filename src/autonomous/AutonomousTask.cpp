@@ -34,7 +34,7 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 	}
 
 	if (_debug) {
-		_logFile.open("log1.csv", std::ios::out | std::ios::app);
+		_logFile.open("log.csv", std::ios::out | std::ios::app);
 		LOG_F(INFO, "file is open %d\n", _logFile.is_open());
 	}
 	_kill_called = false;
@@ -43,14 +43,14 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 		if (type) {
 			switch (type.value()) {
 				case TaskType::TAG1:
-					circleAroundPoint(waypointCoords[0], 7.5);
+					_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 7.5);
 				case TaskType::TAG2:
-					circleAroundPoint(waypointCoords[0], 15.0);
+					_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 15);
 			}
 		} else if (radius) {
-			circleAroundPoint(waypointCoords[0], *radius);
+			_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], *radius);
 		} else { // if no circle type or radius specified, default to radius 10
-			circleAroundPoint(waypointCoords[0], 10);
+			_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 10);
 		}
 	} else {
 		_waypoint_coords_list = waypointCoords;
@@ -58,7 +58,7 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 	}
 }
 
-void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, const double radius) {
+void AutonomousTask::circleNavigation(const navtypes::point_t& center, const double radius) {
 	LOG_SCOPE_F(INFO, "AutoNav:Circle");
 	double distanceBetweenPoints = radius / 10; // proportionally assign distance between points
 	int numPoints = std::max(1, (int)round(2 * M_PI * radius / distanceBetweenPoints));
@@ -72,7 +72,10 @@ void AutonomousTask::circleAroundPoint(const navtypes::point_t& center, const do
 		circlePoints.push_back({x, y, 1});
 	}
 	_waypoint_coords_list = circlePoints;
-	_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::navigateAll, this);
+
+	while (!_target_found) {
+		navigateAll();
+	}
 }
 
 void AutonomousTask::navigateAll() {
@@ -92,6 +95,8 @@ void AutonomousTask::navigateAll() {
 					{"longitude", gpsCoord->lon}};
 		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 		navigate();
+
+		if (_target_found) return;
 	}
 
 	if (_debug) _logFile.close();
@@ -105,9 +110,7 @@ void AutonomousTask::navigate() {
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
 		if (_target_found) {
-			_kill_called = true;
-			// _waypoint_coord = [{0, 0, 1}]
-			// navigate()
+			return;
 		}
 		auto latestGPS = robot::readGPS();
 		auto latestHeading = robot::readIMUHeading();
