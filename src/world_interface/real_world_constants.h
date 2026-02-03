@@ -1,5 +1,8 @@
 #pragma once
 
+// new
+#include <CAN26/CANDevices.h>
+
 #include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "data.h"
@@ -80,26 +83,22 @@ constexpr auto potMotors = frozen::make_unordered_map<boardid_t, potparams_t>({
 	{boardid_t::fourbar1, {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
 });
 
-/** @brief A mapping of board UUID (boardid_t) to their corresponding uuid and domains. */
+/** @brief A mapping of board UUID (boardid_t) to their corresponding uuid. */
 
-constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, can::deviceinfo_t>(
-	{
-		// Masters (0x0X)
-
-		// High Priority (0x1X)
-
-		// Power Distro and Management (0x2X)
-
-		// BLDC Motor (0x3X)
-		
-		// DC Motor (0x4X)
-        {boardid_t::leftTread, {.uuid = 0x40, .domains = static_cast<uint8_t>(can::domain_t::motor)}},
-
-		// Sensor (0x5X)
-
-		// Misc (0x6X)
-
-		// Low Priority (0x7X)
+constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, can2026::CANDeviceUUID_t>(
+	{	
+		// BLDC Motors - Use BLDC commands
+		{boardid_t::leftTread, CAN_UUID_BLDC_FRONT_TIRE_LEFT},
+		{boardid_t::rightTread, CAN_UUID_BLDC_FRONT_TIRE_RIGHT},
+		{boardid_t::armBase, CAN_UUID_BLDC_BASE},
+		{boardid_t::shoulder, CAN_UUID_BLDC_SHOULDER},
+		{boardid_t::elbow, CAN_UUID_BLDC_ELBOW},
+		{boardid_t::forearm, CAN_UUID_BLDC_FOREARM},
+		{boardid_t::wristDiffLeft, CAN_UUID_BLDC_WRIST_LEFT},
+		{boardid_t::wristDiffRight, CAN_UUID_BLDC_WRIST_RIGHT},
+	
+		// Hand (0x60)
+		{boardid_t::hand, CAN_UUID_HAND}
 	});
  
 // ===========
