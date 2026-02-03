@@ -97,6 +97,14 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
   )
   FetchContent_MakeAvailable(HindsightCAN)
+
+  # CAN26 library - new CAN protocol definitions
+  FetchContent_Declare(
+    CAN26
+    GIT_REPOSITORY https://github.com/huskyroboticsteam/CAN26.git
+    GIT_TAG main  # TODO: Placeholder, add CAN26 tag when release available
+  )
+  FetchContent_MakeAvailable(CAN26)
 endif()
 
 FetchContent_Declare(LoguruGitRepo
@@ -172,11 +180,18 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     CAN/CANUtils.cpp
   )
 
-  # Hardware specific source files
+  # Hardware specific source files - DEPRECATED
   target_sources(can_interface PRIVATE
     CAN/CAN.cpp)
   target_link_libraries(can_interface PUBLIC
     HindsightCAN
+    Threads::Threads
+    utils
+  )
+
+  # Hardware specific source files - UPDATED
+  target_link_libraries(can_interface PUBLIC
+    CAN26
     Threads::Threads
     utils
   )
