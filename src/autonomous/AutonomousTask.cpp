@@ -74,8 +74,12 @@ void AutonomousTask::circleNavigation(const navtypes::point_t& center, const dou
 	_waypoint_coords_list = circlePoints;
 
 	while (!_target_found) {
+		RAW_LOG_F("trying another circle, target not found");
 		navigateAll();
 	}
+
+	_waypoint_coords_list = {{0, 0, 1}};
+	RAW_LOG_F("yay! found it!");
 }
 
 void AutonomousTask::navigateAll() {
