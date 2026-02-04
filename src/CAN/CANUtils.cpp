@@ -4,6 +4,11 @@
 #include <sstream>
 
 extern "C" {
+// new 
+#include <CAN26/CANPacket.h>
+#include <CAN26/CANDevices.h>
+
+// old
 #include <HindsightCAN/CANPacket.h>
 }
 
@@ -12,20 +17,36 @@ namespace can {
 // UPDATED:
 // ===========
 
-uuid_t getUUIDFromPacket(const CANPacket& packet) {
-    return (packet.id >> 3) & 0x7F;
+CANDevice_t getDeviceFromPacket(const CANPacket_t& packet) {
+	return packet->device;
 }
 
-domainmask_t getDomainsFromPacket(const CANPacket& packet) {
-    return packet.id & 0x07;
-}
-
-bool deviceInDomain(const CANPacket& packet, domain_t domain) {
-    return (getDomainsFromPacket(packet) & static_cast<uint8_t>(domain)) != 0;
+uuid_t getUUIDFromPacket(const CANPacket_t& packet) {
+    return packet->device.deviceUUID;
 }
 
 uuid_t getSenderUUID(const CANPacket& packet) {
-    return packet.data[1];
+    return packet->senderUUID;
+}
+
+bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, 
+                           bool motorDomain, bool powerDomain) {
+	if (peripheralDomain && packet->device.peripheralDomain) return true;
+	if (motorDomain && packet->device.motorDomain) return true;
+	if (powerDomain && packet->device.powerDomain) return true;
+	return false;
+}
+
+bool isMotorDomain(const CANPacket_t* packet) {
+	return packet->device.motorDomain;
+}
+
+bool isPeripheralDomain(const CANPacket_t* packet) {
+	return packet->device.peripheralDomain;
+}
+
+bool isPowerDomain(const CANPacket_t* packet) {
+	return packet->device.powerDomain;
 }
 
 // ===========

@@ -14,41 +14,21 @@ namespace can {
 // ===========
 // UPDATED:
 // ===========
-/*
- * @brief The possible domain bits for CAN2026. 
- * 
- * Every board UUID can belong to one or multiple domains.
+
+/**
+ * @brief Use CAN26's CANDevice_t directly for device information
  */
- enum class domain_t : uint8_t {
-	none = 0x00,
-	power = 0x01,
-	motor = 0x02,
-	peripheral = 0x04
- };
+using deviceinfo_t = CANDevice_t;
 
 /**
-  * @brief The UUID type.
-  *
-  * Every device's unique identifier.
-  */
-using uuid_t = uint8_t;
+ * @brief Use CAN26's CANDeviceUUID_t for device UUIDs
+ */
+using uuid_t = CANDeviceUUID_t;
 
 /**
-  * @brief The domain mask type.
-  *
-  * A bitmask representing the domains a device belongs to.
-  */
-using domainmask_t = uint8_t;
-
-/**
-  * @brief The device info structure.
-  * 
-  * Every device contains a UUID and what domains it belongs to.
-  */
-struct deviceinfo_t {
-	uuid_t uuid;
-	domainmask_t domains;
-};
+ * @brief Get the device information from the given packet.
+ */
+uuid_t getDeviceFromPacket(const CANPacket_t& packet);
 
 /**
  * @brief Get UUID from a packet ID
@@ -59,28 +39,33 @@ struct deviceinfo_t {
 uuid_t getUUIDFromPacket(const CANPacket& packet);
 
 /**
- * @brief Get the domain(s) of the sender of the given packet.
- *
- * @param packet The packet to extract the domain(s) from.
- * @return domainmask_t The domain(s) of the packet.
- */
-domainmask_t getDomainsFromPacket(const CANPacket& packet);
-
-/**
- * @brief Get whether or not a domain is of the given packet.
- *
- * @param packet The packet to extract the domain from.
- * @return bool The domain is in the packet.
- */
-bool deviceInDomain(const CANPacket& packet, domainmask_t domain);
-
-/**
  * @brief Get the sender UUID of the given packet.
  *
  * @param packet The packet to extract the sender UUID from.
  * @return uuid_t The device UUID.
  */
 uuid_t getSenderUUID(const CANPacket& packet);
+
+/**
+ * @brief Check if device is in a specific domain
+ */
+bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, 
+                           bool motorDomain, bool powerDomain);
+
+/**
+ * @brief Check if device is in motor domain
+ */
+bool isMotorDomain(const CANPacket_t* packet);
+
+/**
+ * @brief Check if device is in peripheral domain
+ */
+bool isPeripheralDomain(const CANPacket_t* packet);
+
+/**
+ * @brief Check if device is in power domain
+ */
+bool isPowerDomain(const CANPacket_t* packet);
 
 // ===========
 // DEPRECATED:

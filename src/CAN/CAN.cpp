@@ -23,6 +23,15 @@
 #include <sys/types.h>
 
 extern "C" {
+// new
+#include <CAN26/CANPacket.h>
+#include <CAN26/CANCommandIDs.h>
+#include <CAN26/Packets/DecodeMotor.h>
+#include <CAN26/Packets/DecodePeripheral.h>
+#include <CAN26/Packets/DecodePower.h>
+#include <CAN26/Packets/DecodeUniversal.h>
+
+// old
 #include <HindsightCAN/CANCommon.h>
 }
 
@@ -57,6 +66,7 @@ std::unordered_map<std::pair<deviceid_t, telemtype_t>, util::PeriodicScheduler<>
 using telemetrycode_t = uint8_t;
 
 const std::unordered_map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
+	// TODO: these definiations are from HindsightCAN's CANCommon.h
 	{PACKET_TELEMETRY_VOLTAGE, telemtype_t::voltage},
 	{PACKET_TELEMETRY_CURRENT, telemtype_t::current},
 	{PACKET_TELEMETRY_PWR_RAIL_STATE, telemtype_t::pwr_rail},
@@ -81,19 +91,19 @@ using devicemap_t =
 			  std::shared_ptr<std::unordered_map<telemetrycode_t, DataPoint<telemetry_t>>>>;
 
 // holds telemetry data for each device
-std::unordered_map<deviceid_t, devicemap_t> telemMap;
+std::unordered_map<CANDeviceUUID_t, devicemap_t> telemMap;
 std::shared_mutex telemMapMutex;
 
 std::unordered_map<
-	std::pair<deviceid_t, telemetrycode_t>,
-	std::unordered_map<uint32_t, std::function<void(deviceid_t, telemtype_t,
+	std::pair<CANDeviceUUID_t, telemetrycode_t>,
+	std::unordered_map<uint32_t, std::function<void(CANDeviceUUID_t, telemtype_t,
 													robot::types::DataPoint<telemetry_t>)>>>
 	telemetryCallbackMap;
 uint32_t nextCallbackID = 0;
 std::mutex telemetryCallbackMapMutex; // protects callbackMap and callbackID
 
 // not thread-safe wrt file descriptor
-bool receivePacket(int fd, CANPacket& packet) {
+bool receivePacket(int fd, CANPacket_t& packet) {
 	int ret;
 	can_frame frame;
 	ret = read(fd, &frame, sizeof(can_frame));
@@ -114,7 +124,7 @@ bool mapHasKey(std::shared_mutex& mutex, const std::unordered_map<K, V>& map, co
 	return map.find(key) != map.end();
 }
 
-void invokeTelemCallback(deviceid_t id, telemetrycode_t telemCode,
+void invokeTelemCallback(CANDeviceUUID_t uuid, telemetrycode_t telemCode,
 						 DataPoint<telemetry_t> data) {
 	// first convert the telemetry code into a telemetry type
 	auto telemTypeEntry = telemCodeToTypeMap.find(telemCode);
@@ -122,7 +132,7 @@ void invokeTelemCallback(deviceid_t id, telemetrycode_t telemCode,
 		telemtype_t telemType = telemTypeEntry->second;
 		std::lock_guard lock(telemetryCallbackMapMutex);
 		// get callback (checking if it exists)
-		auto entry = telemetryCallbackMap.find(std::make_pair(id, telemCode));
+		auto entry = telemetryCallbackMap.find(std::make_pair(uuid, telemCode));
 		if (entry != telemetryCallbackMap.end()) {
 			// invoke all callbacks
 			for (auto callbackEntry : entry->second) {
@@ -132,18 +142,19 @@ void invokeTelemCallback(deviceid_t id, telemetrycode_t telemCode,
 	}
 }
 
-void handleTelemetryPacket(CANPacket& packet) {
+
+void handleTelemetryPacket(CANPacket_t& packet) {
 	// extract necessary information
-	deviceid_t id = getSenderDeviceGroupAndSerial(packet);
+	CANDeviceUUID_t uuid = getDeviceFromPacket(packet);
 	telemetrycode_t telemCode = DecodeTelemetryType(&packet);
 	telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
 	DataPoint<telemetry_t> data(telemData);
 
 	// check if telemetry data is already in map
-	if (mapHasKey(telemMapMutex, telemMap, id)) {
+	if (mapHasKey(telemMapMutex, telemMap, uuid)) {
 		// acquire read lock of entire map
 		std::shared_lock mapLock(telemMapMutex);
-		auto& pair = telemMap.at(id);
+		auto& pair = telemMap.at(uuid);
 		std::shared_mutex& deviceMutex = *pair.first;
 		auto& deviceMap = *pair.second;
 		// acquire write lock of the map for this device
@@ -162,11 +173,11 @@ void handleTelemetryPacket(CANPacket& packet) {
 	}
 
 	// now fire off callback, if it exists
-	invokeTelemCallback(id, telemCode, data);
+	invokeTelemCallback(uuid, telemCode, data);
 }
 
 // returns a file descriptor, or -1 on failure
-int createCANSocket(std::optional<can::deviceid_t> id) {
+int createCANSocket(std::optional<can::CANDeviceUUID_t> uuid) {
 	int fd;
 	if ((fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
 		LOG_F(ERROR, "Failed to initialize CAN bus: %s", std::strerror(errno));
@@ -197,8 +208,8 @@ int createCANSocket(std::optional<can::deviceid_t> id) {
 	}
 
 	// enable reception at the given id, if provided
-	if (id) {
-		int canID = ConstructCANID(0, static_cast<uint8_t>(id->first), id->second);
+	if (uuid) {
+		int canID = ConstructCANID(0, static_cast<uint8_t>(uuid->first), uuid->second);
 		can_filter filters[1];
 		filters[0].can_id = canID;
 		filters[0].can_mask = CAN_MASK;
@@ -263,6 +274,29 @@ void initCAN() {
 	receiveThread.detach();
 }
 
+// new
+void sendCANPacket(const CANPacket_t& packet) {
+	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
+	canfd_frame frame;
+	std::memset(&frame, 0, sizeof(frame));
+	frame.can_id = CANGetPacketHeader(&mutablePacket);
+	frame.len = CANGetDlc(&mutablePacket);
+	std::memcpy(frame.data, CANGetData(&mutablePacket), frame.len);
+	bool success;
+	{
+		std::lock_guard lock(socketMutex);
+		// note that frame is a canfd_frame but we're using sizeof(can_frame)
+		// not sure why this is required to work
+		success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
+		tcdrain(can_fd);
+	}
+
+	if (!success) {
+		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", getUUIDFromPacket(packet), std::strerror(errno));
+	}
+}
+
+/* old
 void sendCANPacket(const CANPacket& packet) {
 	canfd_frame frame;
 	std::memset(&frame, 0, sizeof(frame));
@@ -284,7 +318,24 @@ void sendCANPacket(const CANPacket& packet) {
 			  std::strerror(errno));
 	}
 }
+*/
+// new
+void printCANPacket(const CANPacket_t& packet) {
+	CANPacket_t mutablePacket = packet; // same as sendCANPacket
+	std::stringstream ss;
+	ss << "CAN: p" << std::hex << ((CANGetPacketHeader(&mutablePacket) >> 10) & 0x1);
+	ss << " id" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x03C0) >> 6);
+	ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x003F));	
+	ss << " pid" << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[0]);
+	ss << " data:";
+	for (int i = 1; i < CANGetDlc(&mutablePacket); i++) {
+		ss << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[i]) << " ";
+	}
 
+	LOG_F(INFO, ss.str().c_str());
+}
+
+/* old
 void printCANPacket(const CANPacket& packet) {
   std::stringstream ss;
   ss << "CAN: p" << std::hex << ((packet.id >> 10) & 0x1);
@@ -298,11 +349,12 @@ void printCANPacket(const CANPacket& packet) {
 
   LOG_F(INFO, ss.str().c_str());
 }
+*/
 
-robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
+robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t uuid, telemtype_t telemType) {
 	std::shared_lock mapLock(telemMapMutex); // acquire read lock
 	// find entry for device in map
-	auto entry = telemMap.find(id);
+	auto entry = telemMap.find(uuid);
 	if (entry != telemMap.end()) {
 		auto& devMutex = *entry->second.first;
 		auto& devMap = *entry->second.second;
@@ -320,16 +372,16 @@ robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype
 	}
 }
 
-void pullDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
-	CANPacket p;
-	auto groupCode = static_cast<uint8_t>(id.first);
-	auto serial = static_cast<uint8_t>(id.second);
-	auto telemCode = static_cast<uint8_t>(telemType);
+void pullDeviceTelemetry(CANDeviceUUID_t uuid, telemtype_t telemType) {
+	CANPacket_t p;
+	/*
+	TODO: CAN26 implementation
 	AssembleTelemetryPullPacket(&p, groupCode, serial, telemCode);
 	sendCANPacket(p);
+	*/
 }
 
-void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
+void scheduleTelemetryPull(CANDeviceUUID_t uuid, telemtype_t telemType,
 						   std::chrono::milliseconds period) {
 	if (!telemScheduler) {
 		telemScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_TelemPullSched");
@@ -348,15 +400,15 @@ void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
 	telemEventIDMap.insert_or_assign(mapKey, eventID);
 
 	// pull immediately since scheduling does not send right now
-	pullDeviceTelemetry(id, telemType);
+	pullDeviceTelemetry(uuid, telemType);
 }
 
-void unscheduleTelemetryPull(deviceid_t id, telemtype_t telemType) {
+void unscheduleTelemetryPull(CANDeviceUUID_t uuid, telemtype_t telemType) {
 	if (!telemScheduler) {
 		return;
 	}
 
-	auto mapKey = std::make_pair(id, telemType);
+	auto mapKey = std::make_pair(uuid, telemType);
 	auto it = telemEventIDMap.find(mapKey);
 	if (it != telemEventIDMap.end()) {
 		auto eventID = it->second;
@@ -375,15 +427,15 @@ void unscheduleAllTelemetryPulls() {
 }
 
 callbackid_t addDeviceTelemetryCallback(
-	deviceid_t id, telemtype_t telemType,
-	const std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
+	CANDeviceUUID_t uuid, telemtype_t telemType,
+	const std::function<void(CANDeviceUUID_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
 		callback) {
 	telemetrycode_t code = static_cast<telemetrycode_t>(telemType);
-	auto key = std::make_pair(id, code);
+	auto key = std::make_pair(uuid, code);
 
 	std::lock_guard lock(telemetryCallbackMapMutex);
 	uint32_t callbackIDCode = nextCallbackID++;
-	callbackid_t callbackID = {id, telemType, callbackIDCode};
+	callbackid_t callbackID = {uuid, telemType, callbackIDCode};
 
 	telemetryCallbackMap.insert({key, {}});
 	telemetryCallbackMap.at(key).insert({callbackIDCode, callback});
@@ -392,10 +444,10 @@ callbackid_t addDeviceTelemetryCallback(
 }
 
 void removeDeviceTelemetryCallback(callbackid_t id) {
-	deviceid_t deviceID = std::get<0>(id);
+	CANDeviceUUID_t uuid = std::get<0>(id);
 	telemetrycode_t telemCode = static_cast<telemetrycode_t>(std::get<1>(id));
 	uint32_t code = std::get<2>(id);
-	auto key = std::make_pair(deviceID, telemCode);
+	auto key = std::make_pair(uuid, telemCode);
 
 	std::lock_guard lock(telemetryCallbackMapMutex);
 	auto entry = telemetryCallbackMap.find(key);

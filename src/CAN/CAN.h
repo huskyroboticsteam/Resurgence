@@ -9,6 +9,8 @@
 
 extern "C" {
 #include <HindsightCAN/CANPacket.h>
+#include <CAN26/CANDevices.h>
+#include <CAN26/CANPacket.h>
 }
 
 /**
@@ -22,7 +24,8 @@ namespace can {
  *
  * Users should not construct these themselves.
  */
-using callbackid_t = std::tuple<deviceid_t, telemtype_t, uint32_t>;
+using callbackid_t = std::tuple<uuid_t, telemtype_t, uin32t>;
+// using callbackid_t = std::tuple<deviceid_t, telemtype_t, uint32_t>;
 
 /**
  * @brief Initialize the CAN interface.
@@ -41,17 +44,20 @@ void initCAN();
  *
  * @param packet The CAN packet to send.
  */
-void sendCANPacket(const CANPacket& packet);
+void sendCANPacket(const CANPacket_t& packet);
+// void sendCANPacket(const CANPacket& packet);
 
 // Print packet for debugging purposes
-void printCANPacket(const CANPacket& packet);
+void printCANPacket(const CANPacket_t& packet);
 
 /**
  * @brief Print a CAN packet.
  * 
  * @param packet The CAN packet to print.
  */
-void printCANPacket(const CANPacket& packet);
+// new
+void printCANPacket(const CANPacket_t& packet);
+// void printCANPacket(const CANPacket& packet);
 
 /**
  * @brief Get the latest telemetry from a CAN device.
@@ -64,7 +70,7 @@ void printCANPacket(const CANPacket& packet);
  * it was received. If no data is available for the given telemetry type, an empty data point
  * is returned.
  */
-robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType);
+robot::types:DataPoint<telemetry_t> getDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
 
 /**
  * @brief Ping the given CAN device to send the given telemetry data.
@@ -75,7 +81,7 @@ robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype
  * @param id The device group and serial number of the device.
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
  */
-void pullDeviceTelemetry(deviceid_t id, telemtype_t telemType);
+void pullDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
 
 /**
  * @brief Periodically pull the latest telemetry data from the specified CAN device
@@ -87,8 +93,7 @@ void pullDeviceTelemetry(deviceid_t id, telemtype_t telemType);
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
  * @param period The period to wait in between sending pull requests.
  */
-void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
-						   std::chrono::milliseconds period);
+void scheduleTelemtryPull(uuid_t uuid, telemtype_t telemType, std::chrono::milliseconds period);
 
 /**
  * @brief Stop pulling the latest telemetry data from the given device.
@@ -98,7 +103,7 @@ void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
  * @param id The device group and serial number of the device.
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
  */
-void unscheduleTelemetryPull(deviceid_t id, telemtype_t telemType);
+void unscheduleTelemtryPull(uuid_t uuid, telemtype_t telemType);
 
 /**
  * @brief Stop pulling the latest telemetry data from all currently scheduled devices.
@@ -121,8 +126,8 @@ void unscheduleAllTelemetryPulls();
  * to remove a callback.
  */
 callbackid_t addDeviceTelemetryCallback(
-	deviceid_t id, telemtype_t telemType,
-	const std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
+	uuid_t uuid, telemtype_t telemType,
+	const std::function<void(uuid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
 		callback);
 
 /**
