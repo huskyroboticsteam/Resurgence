@@ -44,8 +44,10 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 			switch (type.value()) {
 				case TaskType::TAG1:
 					_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 7.5);
+					break;
 				case TaskType::TAG2:
 					_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 15);
+					break;
 			}
 		} else if (radius) {
 			_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], *radius);
@@ -74,12 +76,12 @@ void AutonomousTask::circleNavigation(const navtypes::point_t& center, const dou
 	_waypoint_coords_list = circlePoints;
 
 	while (!_target_found) {
-		RAW_LOG_F("trying another circle, target not found");
+		RAW_LOG_F(INFO, "trying another circle, target not found");
 		navigateAll();
 	}
 
 	_waypoint_coords_list = {{0, 0, 1}};
-	RAW_LOG_F("yay! found it!");
+	RAW_LOG_F(INFO, "yay! found it!");
 }
 
 void AutonomousTask::navigateAll() {

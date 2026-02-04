@@ -198,8 +198,8 @@ static bool validateWaypointNavRequest(const json& j) {
 	bool validPoints = util::validateKey(j, "points", val_t::array);
 	if (!validPoints) return false;
 
-	bool validCircleMode = util::validateKey(j, "circleMode", val_t::boolean);
-	if (!validCircleMode) return false;
+	// bool validCircleMode = util::validateKey(j, "circleMode", val_t::boolean);
+	// if (!validCircleMode) return false;
 
 	// check validity of each point
 	for (const auto& point : j["points"]) {
