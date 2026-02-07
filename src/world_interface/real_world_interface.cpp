@@ -31,18 +31,16 @@ namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
-namespace {
-
+// CANBoard class definition
 class CANBoard {
 public:
-	// CAN constructor
+	// CAN26 constructor (UUID + domain bits)
 	CANBoard(robot::types::boardid_t motor, bool hasPosSensor,
-			 can::uuid_t uuid, can::domainmask_t domains,
+			 CANDevice_t device,
 			 double pos_pwm_scale, double neg_pwm_scale)
 		: motor_id(motor),
 		  has_pos_sensor(hasPosSensor),
-		  board_uuid(uuid),
-		  board_domains(domains),
+		  board_device(device),
 		  positive_scale(pos_pwm_scale),
 		  negative_scale(neg_pwm_scale) {
 		// create scheduler if needed
@@ -75,18 +73,18 @@ public:
 		// scale the power
 		double scale = power < 0 ? negative_scale : positive_scale;
 		power *= scale;
-		can::motor::setMotorPower(board_uuid, board_domains, power);
+		can::motor::setMotorPower(board_device, power);
 		// LEGACY: can::motor::setMotorPower(device_group, serial_id, power);
 	}
 
 	void setMotorPos(int32_t targetPos) {
 		ensureMotorMode(can::motor::motormode_t::pid);
-		can::motor::setMotorPIDTarget(board_uuid, board_domains, targetPos);
+		can::motor::setMotorPIDTarget(board_device, targetPos);
 		// LEGACY: can::motor::setMotorPIDTarget(device_group, serial_id, targetPos);
 	}
 
 	types::DataPoint<int32_t> getMotorPos() const {
-		return can::motor::getMotorPosition(board_uuid, board_domains);
+		return can::motor::getMotorPosition(board_device);
 		// LEGACY: return can::motor::getMotorPosition(device_group, serial_id);
 	}
 
@@ -126,15 +124,14 @@ public:
 		return motor_id;
 	}
 
-	can::uuid_t getMotorUUID() const {
-		return board_uuid;
+	CANDevice_t getDevice() const {
+		return board_device;
 	}
 
 private:
 	robot::types::boardid_t motor_id;
 	bool has_pos_sensor;
-	can::uuid_t board_uuid;
-	can::domainmask_t board_domains;
+	CANDevice_t board_device;
 	/* LEGACY:
 	can::deviceserial_t serial_id;
 	can::devicegroup_t device_group;
@@ -152,7 +149,7 @@ private:
 		if (!motor_mode || motor_mode.value() != mode) {
 			// update the motor mode
 			motor_mode.emplace(mode);
-			can::motor::setMotorMode(board_uuid, board_domains, mode);
+			can::motor::setMotorMode(board_device, mode);
 			// LEGACY: can::motor::setMotorMode(device_group, serial_id, mode);
 		}
 	}	
@@ -184,8 +181,10 @@ private:
 	}
 };
 
+namespace {
+
 // A mapping of (motor_id, shared pointer to object of the motor)
-std::unordered_map<robot::types::boardid_t, std::shared_ptr<CANBoard>> motor_ptrs;
+std::unordered_map<robot::types::boardid_t, std::shared_ptr<robot::CANBoard>> motor_ptrs;
 
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
@@ -202,20 +201,19 @@ void addMotorMapping(boardid_t motor, bool hasPosSensor) {
 		LOG_F(ERROR, "Couldn't find PWM scales for motor 0x%x", static_cast<uint8_t>(motor));
 	}
 
-	// get UUID and domains from boardUUIDMap
-	can::deviceinfo_t deviceInfo;
+	// get CANDevice_t from boardUUIDMap
+	CANDevice_t device;
 	try {
-		// deviceInfo = boardUUIDMap.at(motor);
+		device = boardUUIDMap.at(motor);
 	} catch (const std::out_of_range& err) {
 		LOG_F(ERROR, "Couldn't find UUID mapping for motor 0x%x", static_cast<uint8_t>(motor));
 		return;
 	}
 
 	// create ptr and insert in map
-	std::shared_ptr<CANBoard> ptr =
-		std::make_shared<CANBoard>(motor, hasPosSensor, deviceInfo.uuid, deviceInfo.domains,
-								   posScale, negScale);
-	/* 
+	std::shared_ptr<robot::CANBoard> ptr =
+		std::make_shared<robot::CANBoard>(motor, hasPosSensor, device, posScale, negScale);
+	/*
 	LEGACY:
 	std::shared_ptr<CANBoard> ptr =
 		std::make_shared<CANBoard>(motor, hasPosSensor, boardSerialIDMap.at(motor),
@@ -224,7 +222,7 @@ void addMotorMapping(boardid_t motor, bool hasPosSensor) {
 	motor_ptrs.insert({motor, ptr});
 }
 
-std::shared_ptr<CANBoard> getMotor_(robot::types::boardid_t motor) {
+std::shared_ptr<robot::CANBoard> getMotor_(robot::types::boardid_t motor) {
 	auto itr = motor_ptrs.find(motor);
 
 	if (itr == motor_ptrs.end()) {
@@ -236,13 +234,7 @@ std::shared_ptr<CANBoard> getMotor_(robot::types::boardid_t motor) {
 		return itr->second;
 	}
 }
-} // namespace
 
-const kinematics::DiffDriveKinematics& driveKinematics() {
-	return drive_kinematics;
-}
-
-namespace {
 // map that associates camera id to the camera object
 std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 
@@ -250,64 +242,15 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initMotors() {
-	// CAN2026: Initialize motors using UUID-based addressing
-	/* for (const auto& it : boardUUIDMap) {
-		boardid_t motor = it.first;
-		can::deviceinfo_t info = it.second;
-		can::motor::initMotor(info.uuid, info.domains);
+	// CAN26: Initialize motors using CANDevice_t from boardUUIDMap
+	for (const auto& [motor, device] : boardUUIDMap) {
+		can::motor::initMotor(device);
 		bool hasPosSensor = robot::potMotors.find(motor) != robot::potMotors.end() ||
 							robot::encMotors.find(motor) != robot::encMotors.end();
 		addMotorMapping(motor, hasPosSensor);
 	}
 
-	for (const auto& pot_motor_pair : robot::potMotors) {
-		boardid_t motor_id = pot_motor_pair.first;
-		potparams_t pot_params = pot_motor_pair.second;
-
-		// CAN2026: Use UUID-based addressing
-		can::deviceinfo_t info = boardUUIDMap.at(motor_id);
-		can::motor::initPotentiometer(info.uuid, info.domains, pot_params.mdeg_lo, pot_params.mdeg_hi,
-									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD); */
-		/* LEGACY:
-		can::devicegroup_t group = boardGroupMap.at(motor_id);
-		can::deviceserial_t serial = boardSerialIDMap.at(motor_id);
-		can::motor::initPotentiometer(group, serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
-									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
-	}
-	*/
-
-	for (const auto& enc_motor_pair : robot::encMotors) {
-		boardid_t motor_id = enc_motor_pair.first;
-		encparams_t enc_params = enc_motor_pair.second;
-
-		// CAN2026: Use UUID-based addressing
-/* 		can::deviceinfo_t info = boardUUIDMap.at(motor_id);
-		can::motor::initEncoder(info.uuid, info.domains, enc_params.isInverted, true, enc_params.ppjr,
-								TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(info.uuid, info.domains, enc_params.limitSwitchLow,
-										 enc_params.limitSwitchHigh); */
-		/* LEGACY:
-		can::devicegroup_t group = boardGroupMap.at(motor_id);
-		can::deviceserial_t serial = boardSerialIDMap.at(motor_id);
-		can::motor::initEncoder(group, serial, enc_params.isInverted, true, enc_params.ppjr,
-								TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(group, serial, enc_params.limitSwitchLow,
-										 enc_params.limitSwitchHigh);
-		*/
-	}
-
-	for (const auto& pair : robot::motorPIDMap) {
-		boardid_t motor = pair.first;
-		pidcoef_t pid = motorPIDMap.at(motor);
-		// CAN2026: Use UUID-based addressing
-/* 		can::deviceinfo_t info = boardUUIDMap.at(motor);
-		can::motor::setMotorPIDConstants(info.uuid, info.domains, pid.kP, pid.kI, pid.kD); */
-		/* LEGACY:
-		can::devicegroup_t group = boardGroupMap.at(motor);
-		can::deviceserial_t serial = boardSerialIDMap.at(motor);
-		can::motor::setMotorPIDConstants(group, serial, pid.kP, pid.kI, pid.kD);
-		*/
-	}
+	// The pot/encoder/PID loops from HindsightCAN are no longer needed thanks to ODrive, im pretty sure
 }
 
 std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
@@ -332,6 +275,10 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 	return nullptr;
 }
 } // namespace
+
+const kinematics::DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
 
 void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
@@ -467,33 +414,32 @@ int getIndex(const std::vector<T>& vec, const T& val) {
 }
 
 void setMotorPower(robot::types::boardid_t motor, double power) {
-/* 	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
+	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
 	if (motor_ptr) {
 		motor_ptr->setMotorPower(power);
-	} */
+	}
 }
 
 void setMotorPos(robot::types::boardid_t motor, int32_t targetPos) {
-/* 	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
+	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
 	if (motor_ptr) {
 		motor_ptr->setMotorPos(targetPos);
-	} */
+	}
 }
 
 types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t motor) {
-/* 	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
+	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
 	if (motor_ptr) {
 		return motor_ptr->getMotorPos();
 	}
-	return {}; */
+	return {};
 }
 
 void setMotorVel(robot::types::boardid_t motor, int32_t targetVel) {
-/* 	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
-	motor_ptr->setMotorVel(targetVel);
+	std::shared_ptr<CANBoard> motor_ptr = getMotor_(motor);
 	if (motor_ptr) {
 		motor_ptr->setMotorVel(targetVel);
-	} */
+	}
 }
 
 callbackid_t addLimitSwitchCallback(
@@ -501,17 +447,12 @@ callbackid_t addLimitSwitchCallback(
 	const std::function<void(robot::types::boardid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
-	// CAN2026: Use UUID-based addressing for limit switch callbacks
- 	can::deviceinfo_t info = boardUUIDMap.at(motor);
-	auto func = [=](can::uuid_t uuid, can::domainmask_t domains,
-					DataPoint<LimitSwitchData> data) { callback(motor, data); };
-	auto id = can::motor::addLimitSwitchCallback(info.uuid, info.domains, func);
-	/* LEGACY:
-	auto func = [=](can::devicegroup_t group, can::deviceserial_t serial,
-					DataPoint<LimitSwitchData> data) { callback(motor, data); };
-	auto id = can::motor::addLimitSwitchCallback(boardGroupMap.at(motor),
-												 boardSerialIDMap.at(motor), func);
-	*/
+	// CAN26: Use CANDevice_t for limit switch callbacks
+	CANDevice_t device = boardUUIDMap.at(motor);
+	auto func = [=](CANDevice_t, DataPoint<LimitSwitchData> data) {
+		callback(motor, data);
+	};
+	auto id = can::motor::addLimitSwitchCallback(device, func);
 	auto nextID = nextCallbackID++;
 	callbackIDMap.insert({nextID, id});
 	return nextID;

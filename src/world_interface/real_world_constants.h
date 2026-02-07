@@ -1,7 +1,7 @@
 #pragma once
 
 // new
-#include <CAN26/CANDevices.h>
+#include <CANDevices.h>
 
 #include "../CAN/CANUtils.h"
 #include "../Constants.h"
@@ -85,20 +85,20 @@ constexpr auto potMotors = frozen::make_unordered_map<boardid_t, potparams_t>({
 
 /** @brief A mapping of board UUID (boardid_t) to their corresponding uuid. */
 
-constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, can2026::CANDeviceUUID_t>(
+constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>(
 	{	
 		// BLDC Motors - Use BLDC commands
-		{boardid_t::leftTread, CAN_UUID_BLDC_FRONT_TIRE_LEFT},
-		{boardid_t::rightTread, CAN_UUID_BLDC_FRONT_TIRE_RIGHT},
-		{boardid_t::armBase, CAN_UUID_BLDC_BASE},
-		{boardid_t::shoulder, CAN_UUID_BLDC_SHOULDER},
-		{boardid_t::elbow, CAN_UUID_BLDC_ELBOW},
-		{boardid_t::forearm, CAN_UUID_BLDC_FOREARM},
-		{boardid_t::wristDiffLeft, CAN_UUID_BLDC_WRIST_LEFT},
-		{boardid_t::wristDiffRight, CAN_UUID_BLDC_WRIST_RIGHT},
+		{boardid_t::leftTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
+		{boardid_t::rightTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
+		{boardid_t::armBase, CANDevice_t{0, 1, 0,CAN_UUID_BLDC_BASE}},
+		{boardid_t::shoulder, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_SHOULDER}},
+		{boardid_t::elbow, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_ELBOW}},
+		{boardid_t::forearm, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FOREARM}},
+		{boardid_t::wristDiffLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_LEFT}},
+		{boardid_t::wristDiffRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}},
 	
 		// Hand (0x60)
-		{boardid_t::hand, CAN_UUID_HAND}
+		{boardid_t::hand, CANDevice_t{1, 0, 0, CAN_UUID_HAND}}
 	});
  
 // ===========
