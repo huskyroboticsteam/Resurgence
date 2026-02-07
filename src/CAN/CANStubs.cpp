@@ -41,14 +41,6 @@ callbackid_t addDeviceTelemetryCallback(
 }
 /*
 callbackid_t addDeviceTelemetryCallback(
-	CANDeviceUUID_t uuid, telemtype_t telemType,
-	const std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
-		callback) {
-	return {uuid, telemType, callbackID++};
-}
-*/
-/*
-callbackid_t addDeviceTelemetryCallback(
 	deviceid_t id, telemtype_t telemType,
 	const std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
 		callback) {

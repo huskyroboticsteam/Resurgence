@@ -226,7 +226,6 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
