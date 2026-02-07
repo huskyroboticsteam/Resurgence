@@ -63,7 +63,7 @@ private:
 	void navigateAll();
 
 	/** 
-	 * @brief Handles navigation to a single waypoint, called by navigateAll()
+	 * @brief Handles navigation to a single waypoint
 	 */
 	void navigate();
 

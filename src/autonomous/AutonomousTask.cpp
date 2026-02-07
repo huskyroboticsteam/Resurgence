@@ -35,7 +35,7 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 
 	if (_debug) {
 		_logFile.open("log.csv", std::ios::out | std::ios::app);
-		LOG_F(INFO, "file is open %d\n", _logFile.is_open());
+		LOG_F(INFO, "log file is open: %d\n", _logFile.is_open());
 	}
 	_kill_called = false;
 	
@@ -87,20 +87,27 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 void AutonomousTask::circleNavigation(const navtypes::point_t& center,
 	 								  const double radius, const std::optional<double> radius2) {
 	LOG_SCOPE_F(INFO, "AutoNav:Circle");
+	if (radius == 0) {
+		LOG_F(WARNING, "Unable to generate circle of radius 0. Enter a radius > 0!");
+		return;
+	}
 	_waypoint_coords_list = generateCirclePoints(center, radius);
 
+	// if 2nd radius is given, generate circle for it and append to coords list.
 	if (radius2) {
 		auto circle2Points = generateCirclePoints(center, *radius2);
 		_waypoint_coords_list.insert(_waypoint_coords_list.end(), circle2Points.begin(), circle2Points.end());
 	} 
 
 	while (!_target_found) {
-		RAW_LOG_F(INFO, "trying another circle, target not found");
+		LOG_F(INFO, "trying another circle, target not found");
 		navigateAll();
 	}
-
-	_waypoint_coords_list = {{0, 0, 1}};
-	RAW_LOG_F(INFO, "yay! found it!");
+	
+	// hard coding coord for now
+	_waypoint_coord = {10, 10, 1};
+	LOG_F(INFO, "yay! found aruco tag!");
+	navigate();
 }
 
 navtypes::points_t AutonomousTask::generateCirclePoints(
@@ -120,7 +127,6 @@ navtypes::points_t AutonomousTask::generateCirclePoints(
 	return circlePoints;
 }
 
-
 void AutonomousTask::navigateAll() {
 	LOG_SCOPE_F(INFO, "AutoNav:List");
 	for (navtypes::point_t& point : _waypoint_coords_list) {
@@ -138,8 +144,6 @@ void AutonomousTask::navigateAll() {
 					{"longitude", gpsCoord->lon}};
 		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 		navigate();
-
-		if (_target_found) return;
 	}
 
 	if (_debug) _logFile.close();
@@ -152,9 +156,15 @@ void AutonomousTask::navigate() {
 	auto start = std::chrono::steady_clock::now();
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
-		if (_target_found) {
-			return;
-		}
+		/*
+		 * planned pseudo-code
+		 * if (!_target_found && target pinpointed) {
+		 * 	   _target_found = true;
+		 *     _waypoint_coords = {} // necessary?
+		 * 	   _waypoint_coord = new coord
+		 * 	   return; 
+		 * }
+		 */
 		auto latestGPS = robot::readGPS();
 		auto latestHeading = robot::readIMUHeading();
 
@@ -173,16 +183,6 @@ void AutonomousTask::navigate() {
 			if (_debug) {
 				_logFile << gpsPosData.x() << "," << gpsPosData.y() << std::endl;
 				_logFile.flush();
-
-				// navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
-
-				// auto gpsCoord = robot::metersToGPS(gpsPosData);
-				// auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
-				// double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
-
-				// LOG_F(INFO, "		Heading velocity: %lf ", scaledVels(2));
-				// LOG_F(INFO, "		Foward velocity: %lf", scaledVels(0));
-				// LOG_F(INFO, "		Distance: %lf", dist);
 			}			
 		}
 
