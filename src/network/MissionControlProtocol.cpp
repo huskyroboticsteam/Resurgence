@@ -28,13 +28,8 @@ using std::placeholders::_1;
 
 namespace net::mc {
 namespace {
-const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 3000ms;
+const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 30000ms;
 } // namespace
-
-/**
-   Set power for all joints to zero.
- */
-static void stopAllJoints();
 
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
 
@@ -81,17 +76,8 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 }
 
 static bool validateDriveRequest(const json& j) {
-	return util::hasKey(j, "straight") && util::validateRange(j, "straight", -1, 1) &&
-		   util::hasKey(j, "steer") && util::validateRange(j, "steer", -1, 1);
-}
-
-static bool validateTankDriveRequest(const json& j) {
-	return util::hasKey(j, "left") && util::validateRange(j, "left", -1, 1) &&
-		   util::hasKey(j, "right") && util::validateRange(j, "right", -1, 1);
-}
-
-static bool validateArmIKEnable(const json& j) {
-	return util::validateKey(j, "enabled", val_t::boolean);
+	return util::validateRange(j, "straight", -1, 1) &&
+		   util::validateRange(j, "steer", -1, 1);
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
@@ -108,6 +94,11 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	this->setRequestedCmdVel(dtheta, dx);
 }
 
+static bool validateTankDriveRequest(const json& j) {
+	return util::validateRange(j, "left", -1, 1) &&
+		   util::validateRange(j, "right", -1, 1);
+}
+
 void MissionControlProtocol::handleTankDriveRequest(const json& j) {
 	double left = j["left"];
 	double right = j["right"];
@@ -116,6 +107,11 @@ void MissionControlProtocol::handleTankDriveRequest(const json& j) {
 	LOG_F(1, "{left=%.2f, right=%.2f} -> setTankCmdVel(%.4f, %.4f)", left, right, leftVel,
 		  rightVel);
 	this->setRequestedTankCmdVel(leftVel, rightVel);
+}
+
+
+static bool validateArmIKEnable(const json& j) {
+	return util::validateKey(j, "enabled", val_t::boolean);
 }
 
 void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
@@ -142,23 +138,6 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 	}
 }
 
-void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
-	_power_repeat_task.setCmdVel(dtheta, dx);
-	robot::setCmdVel(dtheta, dx);
-}
-
-void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
-	_power_repeat_task.setTankCmdVel(left, right);
-	robot::setTankCmdVel(left, right);
-}
-
-static bool validateJoint(const json& j) {
-	return util::validateKey(j, "joint", val_t::string) &&
-		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
-			   return j["joint"].get<std::string>() == util::to_string(joint);
-		   });
-}
-
 static bool validateJointPowerRequest(const json& j) {
 	return validateJoint(j) && util::validateRange(j, "power", -1, 1);
 }
@@ -174,6 +153,45 @@ void MissionControlProtocol::handleJointPowerRequest(const json& j) {
 		jointid_t joint_id = it->second;
 		setRequestedJointPower(joint_id, power);
 	}
+}
+
+static bool validateJointPositionRequest(const json& j) {
+	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
+}
+
+void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const json& j) {
+	// TODO: ignore this message if we are in autonomous mode.
+	// std::string motor = j["joint"];
+	// double position_deg = j["position"];
+	// int32_t position_mdeg = std::round(position_deg * 1000);
+	// TODO: actually implement joint position requests
+	// setMotorPos(motor, position_mdeg);
+}
+
+static bool validateServoPositionRequest(const json& j) {
+  return util::validateKey(j, "servo", val_t::string) && util::validateKey(j, "position", val_t::number_integer);
+}
+
+void MissionControlProtocol::handleServoPositionRequest(const json& j) {
+  std::string servoName = j["servo"];
+  int32_t position = j["position"];
+  auto servo = name_to_servoid.find(util::freezeStr(servoName));
+  if (servo != name_to_servoid.end()) {
+	  robot::setServoPos(servo->second, position);
+  }
+}
+
+static bool validateStepperTurnAngleRequest(const json& j) {
+  return util::validateKey(j, "stepper", val_t::string) && util::validateKey(j, "angle", val_t::number_integer);
+}
+
+void MissionControlProtocol::handleStepperTurnAngleRequest(const json& j) {
+  std::string stepperName = j["stepper"];
+  int16_t angle = j["angle"];
+  auto stepper = name_to_stepperid.find(util::freezeStr(stepperName));
+  if (stepper != name_to_stepperid.end()) {
+    robot::setRequestedStepperTurnAngle(stepper->second, angle);
+  }
 }
 
 static bool validateWaypointNavRequest(const json& j) {
@@ -202,42 +220,26 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	}
 }
 
-static bool validateJointPositionRequest(const json& j) {
-	return validateJoint(j) && util::validateKey(j, "position", val_t::number_integer);
-}
-
-static void handleJointPositionRequest([[maybe_unused]] const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
-	// std::string motor = j["joint"];
-	// double position_deg = j["position"];
-	// int32_t position_mdeg = std::round(position_deg * 1000);
-	// TODO: actually implement joint position requests
-	// setMotorPos(motor, position_mdeg);
-}
-
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 	CameraID cam = j["camera"];
-	std::unordered_set<CameraID> supported_cams = robot::getCameras();
-	if (supported_cams.find(cam) != supported_cams.end()) {
-		_camera_stream_task.openStream(cam, j["fps"]);
-	}
+	_camera_stream_task.openStream(cam, j["fps"]);
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
-	_camera_stream_task.closeStream(cam);
+  	_camera_stream_task.closeStream(cam);
 }
 
 static bool validateCameraFrameRequest(const json& j) {
-	return util::validateKey(j, "camera", val_t::string);
+	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
@@ -245,20 +247,27 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 	auto imu = robot::readIMU();
 	CameraID cam = j["camera"];
 	auto camDP = robot::readCamera(cam);
+
 	Eigen::Quaterniond quat = imu.getData();
 	double lon = 0, lat = 0, alt = 0;
+  double w = 0, x = 0, y = 0, z = 0;
 	if (gps.isValid()) {
 		lon = gps.getData().lon;
 		lat = gps.getData().lat;
 		alt = gps.getData().alt;
+    w = quat.w();
+    x = quat.x();
+    y = quat.y();
+    z = quat.z();
 	}
+
 	if (camDP) {
 		auto data = camDP.getData();
 		cv::Mat frame = data.first;
 		std::string b64_data = base64::encodeMat(frame, ".jpg");
 		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}, 
-		{"orientW", quat.w()}, {"orientX", quat.x()}, {"orientY", quat.y()},
-		{"orientZ", quat.z()}, {"lon", lon}, {"lat", lat}, {"alt", alt}};
+		{"orientW", w}, {"orientX", x}, {"orientY", y}, {"orientZ", z},
+		{"lon", lon}, {"lat", lat}, {"alt", alt}};
 		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
 }
@@ -311,10 +320,6 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),
 	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server),
 	  _autonomous_task() {
-	// TODO: Add support for tank drive requests
-	// TODO: add support for science station requests (lazy susan, lazy susan lid, drill,
-	// syringe)
-
 	// emergency stop and operation mode handlers need the class for context since they must
 	// be able to access the methods to start and stop the power repeater thread
 	this->addMessageHandler(
@@ -327,9 +332,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateOperationModeRequest);
 	// drive and joint power handlers need the class for context since they must modify
 	// _last_joint_power and _last_cmd_vel (for the repeater thread)
-	this->addMessageHandler(DRIVE_REQ_TYPE,
-							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
-							validateDriveRequest);
+	this->addMessageHandler(
+		DRIVE_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
+		validateDriveRequest);
 	this->addMessageHandler(
 		DRIVE_TANK_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleTankDriveRequest, this, _1),
@@ -342,8 +348,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		JOINT_POWER_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
 		validateJointPowerRequest);
-	this->addMessageHandler(JOINT_POSITION_REQ_TYPE, handleJointPositionRequest,
-							validateJointPositionRequest);
+	this->addMessageHandler(
+		JOINT_POSITION_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleJointPositionRequest, this, _1),
+		validateJointPositionRequest);
 	this->addMessageHandler(
 		CAMERA_STREAM_OPEN_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleCameraStreamOpenRequest, this, _1),
@@ -360,7 +368,17 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		WAYPOINT_NAV_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
 		validateWaypointNavRequest);
+	this->addMessageHandler(
+    		SERVO_POSITION_REQ_TYPE,
+    		std::bind(&MissionControlProtocol::handleServoPositionRequest, this, _1),
+    		validateServoPositionRequest);
+	this->addMessageHandler(
+    		STEPPER_TURN_ANGLE_REQ_TYPE,
+    		std::bind(&MissionControlProtocol::handleStepperTurnAngleRequest, this, _1),
+    		validateStepperTurnAngleRequest);
+
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
+
 	this->addDisconnectionHandler(
 		std::bind(&MissionControlProtocol::stopAndShutdownPowerRepeat, this, false));
 
@@ -376,6 +394,7 @@ MissionControlProtocol::~MissionControlProtocol() {
 	this->stopAndShutdownPowerRepeat(true);
 }
 
+///// UTILITY FUNCTIONS //////
 void MissionControlProtocol::setArmIKEnabled(bool enabled, bool sendReport) {
 	Globals::armIKEnabled = enabled;
 	if (enabled) {
@@ -394,7 +413,22 @@ void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double powe
 	robot::setJointPower(joint, power);
 }
 
-///// UTILITY FUNCTIONS //////
+void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
+	_power_repeat_task.setCmdVel(dtheta, dx);
+	robot::setCmdVel(dtheta, dx);
+}
+
+void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
+	_power_repeat_task.setTankCmdVel(left, right);
+	robot::setTankCmdVel(left, right);
+}
+
+static bool validateJoint(const json& j) {
+	return util::validateKey(j, "joint", val_t::string) &&
+		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
+			   return j["joint"].get<std::string>() == util::to_string(joint);
+		   });
+}
 
 static void stopAllJoints() {
 	for (jointid_t current : robot::types::all_jointid_t) {

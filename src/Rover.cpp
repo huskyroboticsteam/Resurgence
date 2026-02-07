@@ -42,8 +42,7 @@ void parseCommandLine(int argc, char** argv) {
 			std::unordered_map<std::string, mountedperipheral_t> allowed{
 				{"none", mountedperipheral_t::none},
 				{"arm", mountedperipheral_t::arm},
-				{"armServo", mountedperipheral_t::armServo},
-				{"science", mountedperipheral_t::scienceStation}};
+				{"science", mountedperipheral_t::science}};
 
 			if (allowed.find(value) != allowed.end()) {
 				Globals::mountedPeripheral = allowed[value];

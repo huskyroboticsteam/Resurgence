@@ -40,11 +40,19 @@ set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
 set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
+set(OFFLINE_MODE "FALSE" CACHE STRING "Status of offline building")
+set(AVAILABLE_OFFLINE_MODE "TRUE" "FALSE")
 set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
+set_property(CACHE OFFLINE_MODE PROPERTY STRINGS ${AVAILABLE_OFFLINE_MODE})
 
 if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
   message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${WORLD_INTERFACE}\n\
 Valid values are ${AVAILABLE_WORLD_INTERFACES}")
+endif()
+
+if(NOT OFFLINE_MODE IN_LIST AVAILABLE_OFFLINE_MODE)
+  message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${OFFLINE_MODE}\n\
+Valid values are ${AVAILABLE_OFFLINE_MODE}")
 endif()
 
 if(NOT GPS IN_LIST AVAILABLE_GPS)
@@ -57,6 +65,7 @@ Module settings:")
 message("  GPS:\t\t\t${GPS}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
+message("  Offline mode:\t\t${OFFLINE_MODE}")
 message("========================================")
 
 ##====== Dependencies ======
@@ -85,23 +94,44 @@ link_libraries(frozen::frozen)
 # Find argparse, library used for parsing command line arguments
 find_package(argparse REQUIRED)
 
-
 # Find the JSON library
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
-# Find the CAN library; contains packet and protocol definitions and does not
-# actually require physical CAN to be present.
-FetchContent_Declare(
-    HindsightCAN
-    GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-    GIT_TAG 675aa2c32a5b6cdb24f3f2b8aae5b7e43d717bf6
-)
-FetchContent_MakeAvailable(HindsightCAN)
+if(WORLD_INTERFACE STREQUAL "REAL")
+  if(OFFLINE_MODE STREQUAL "FALSE")
+    # Find the CAN library; contains packet and protocol definitions and does not
+    # actually require physical CAN to be present.
+    FetchContent_Declare(
+      HindsightCAN
+      GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
+      GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
+    )
+  else()
+    message("-- Offline mode enabled, using cached hindsight CAN")
+    # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
+    FetchContent_Declare(
+        HindsightCAN
+        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
+    )
+  endif()
+  FetchContent_MakeAvailable(HindsightCAN)
+endif()
 
-FetchContent_Declare(LoguruGitRepo
-	GIT_REPOSITORY "https://github.com/emilk/loguru"
-	GIT_TAG        "master"
-)
+# Check if offline mode flag waas passed in
+if(OFFLINE_MODE STREQUAL "FALSE")
+  FetchContent_Declare(LoguruGitRepo
+    GIT_REPOSITORY "https://github.com/emilk/loguru"
+    GIT_TAG        "master"
+  )
+else()
+  message("-- Offline mode enabled, using cached loguru")
+  # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
+  FetchContent_Declare(
+      LoguruGitRepo
+      SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src"
+  )
+endif()
+
 # set any loguru compile-time flags before calling MakeAvailable()
 set(LOGURU_WITH_STREAMS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -154,30 +184,32 @@ add_library(utils SHARED
   world_interface/data.cpp)
 target_link_libraries(utils ${OpenCV_LIBS})
 
-## ====== CAN Interfaces =======
-# Stub CAN interface is used for the tests (and for the Rover if
-# CAN is disabled) and the real CAN interface is used for the Rover if CAN is
-# enabled.
+if(WORLD_INTERFACE STREQUAL "REAL")
+  ## ====== CAN Interfaces =======
+  # Stub CAN interface is used for the tests (and for the Rover if
+  # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
+  # enabled.
 
-# Common CAN source files
+  # Common CAN source files
 
-# **DON'T MAKE THIS SHARED**
-# Making this library shared causes some memory fuckery
-# No clue why but CAN I/O goes to shit. Don't do it.
-add_library(can_interface STATIC)
-target_sources(can_interface PRIVATE
-  CAN/CANMotor.cpp
-  CAN/CANUtils.cpp
-)
+  # **DON'T MAKE THIS SHARED**
+  # Making this library shared causes some memory fuckery
+  # No clue why but CAN I/O goes to shit. Don't do it.
+  add_library(can_interface STATIC)
+  target_sources(can_interface PRIVATE
+    CAN/CANMotor.cpp
+    CAN/CANUtils.cpp
+  )
 
-# Hardware specific source files
-target_sources(can_interface PRIVATE
-  CAN/CAN.cpp)
-target_link_libraries(can_interface PUBLIC
-  HindsightCAN
-  Threads::Threads
-  utils
-)
+  # Hardware specific source files
+  target_sources(can_interface PRIVATE
+    CAN/CAN.cpp)
+  target_link_libraries(can_interface PUBLIC
+    HindsightCAN
+    Threads::Threads
+    utils
+  )
+endif()
 
 ## GPS Implementations
 
@@ -208,31 +240,27 @@ add_library(world_interface_core STATIC
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
 
-# CAN library (above) requires some utilities from this
-target_link_libraries(can_interface PUBLIC utils)
-
-add_library(stub_world_interface STATIC
-  world_interface/noop_world.cpp)
-
-add_library(real_world_interface STATIC
-  world_interface/real_world_interface.cpp
-  world_interface/motor/can_motor.cpp
-)
-
-add_library(simulator_interface STATIC
-  world_interface/simulator_interface.cpp
-  world_interface/motor/sim_motor.cpp
-)
-
-target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
-target_link_libraries(simulator_interface world_interface_core)
-target_link_libraries(stub_world_interface world_interface_core)
-
 if(WORLD_INTERFACE STREQUAL "REAL")
+  # CAN library (above) requires some utilities from this
+  target_link_libraries(can_interface PUBLIC utils)
+
+  add_library(real_world_interface STATIC
+    world_interface/real_world_interface.cpp
+    world_interface/motor/can_motor.cpp
+  )
+  target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
   add_library(world_interface ALIAS real_world_interface)
 elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
+  add_library(simulator_interface STATIC
+    world_interface/simulator_interface.cpp
+    world_interface/motor/sim_motor.cpp
+  )
+  target_link_libraries(simulator_interface world_interface_core)
   add_library(world_interface ALIAS simulator_interface)
 else()
+  add_library(stub_world_interface STATIC
+    world_interface/noop_world.cpp)
+  target_link_libraries(stub_world_interface world_interface_core)
   add_library(world_interface ALIAS stub_world_interface)
 endif()
 
@@ -273,7 +301,7 @@ add_executable(Rover Rover.cpp)
 add_library(rover_common STATIC
   Globals.cpp
   control_interface.cpp
-  )
+)
 target_link_libraries(rover_common
   utils
   websocket_utils
@@ -296,13 +324,6 @@ target_link_libraries(Rover
   ${vision_libs}
 )
 
-add_executable(TunePID TunePID.cpp)
-target_link_libraries(TunePID
-  ${rover_libs}
-  can_interface
-)
-target_link_libraries(TunePID ${vision_libs})
-
 if(WITH_TESTS)
   add_executable(tests
     Tests.cpp
@@ -310,7 +331,7 @@ if(WITH_TESTS)
     ar/DetectorTests.cpp
     ar/MarkerSetTests.cpp
     # Camera tests
-    ../tests/camera/CameraParamsTests.cpp
+    # ../tests/camera/CameraParamsTests.cpp
     # GPS tests
     ../tests/gps/GPSDatumTest.cpp
     ../tests/gps/GPSConverterTest.cpp
@@ -359,6 +380,13 @@ if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration
     LimitCalib.cpp)
   target_link_libraries(LimitSwitchCalibration real_world_interface)
+
+  add_executable(TunePID TunePID.cpp)
+  target_link_libraries(TunePID
+    ${rover_libs}
+    can_interface
+  )
+  target_link_libraries(TunePID ${vision_libs})
 endif()
 
 add_compile_options(

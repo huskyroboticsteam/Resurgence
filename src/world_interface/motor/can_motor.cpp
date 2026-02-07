@@ -2,9 +2,10 @@
 
 namespace robot {
 can_motor::can_motor(robot::types::motorid_t motor, bool hasPosSensor,
-					 can::deviceserial_t serial, double pos_pwm_scale, double neg_pwm_scale)
-	: base_motor(motor, hasPosSensor), serial_id(serial), positive_scale(pos_pwm_scale),
-	  negative_scale(neg_pwm_scale) {}
+					 can::deviceserial_t serial, can::devicegroup_t group,
+					 double pos_pwm_scale, double neg_pwm_scale)
+	: base_motor(motor, hasPosSensor), serial_id(serial), device_group(group),
+	  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale) {}
 
 void can_motor::setMotorPower(double power) {
 	ensureMotorMode(motor_id, can::motor::motormode_t::pwm);
@@ -15,7 +16,7 @@ void can_motor::setMotorPower(double power) {
 	// scale the power
 	double scale = power < 0 ? negative_scale : positive_scale;
 	power *= scale;
-	can::motor::setMotorPower(serial_id, power);
+	can::motor::setMotorPower(device_group, serial_id, power);
 }
 
 void can_motor::setMotorPos(int32_t targetPos) {
@@ -24,16 +25,26 @@ void can_motor::setMotorPos(int32_t targetPos) {
 	// unschedule velocity event if exists
 	unscheduleVelocityEvent();
 
-	can::motor::setMotorPIDTarget(serial_id, targetPos);
+	can::motor::setMotorPIDTarget(device_group, serial_id, targetPos);
 }
 
 types::DataPoint<int32_t> can_motor::getMotorPos() const {
-	return can::motor::getMotorPosition(serial_id);
+	return can::motor::getMotorPosition(device_group, serial_id);
 }
 
 void can_motor::setMotorVel(int32_t targetVel) {
 	ensureMotorMode(motor_id, can::motor::motormode_t::pid);
 	base_motor::setMotorVel(targetVel);
+}
+
+// Hack for Science Servo Board
+void can_motor::setServoPos(uint8_t servo, int32_t position) {
+	can::motor::setServoPos(device_group, serial_id, servo, position);
+}
+
+// Hack for Science Stepper Board
+void can_motor::setStepperTurnAngle(uint8_t stepper, int16_t angle) {
+  can::motor::setStepperTurnAngle(device_group, serial_id, stepper, angle);
 }
 
 can::deviceserial_t can_motor::getMotorSerial() {
@@ -44,7 +55,7 @@ void can_motor::ensureMotorMode(robot::types::motorid_t motor, can::motor::motor
 	if (!motor_mode || motor_mode.value() != mode) {
 		// update the motor mode
 		motor_mode.emplace(mode);
-		can::motor::setMotorMode(serial_id, mode);
+		can::motor::setMotorMode(device_group, serial_id, mode);
 	}
 }
 } // namespace robot

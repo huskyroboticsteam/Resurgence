@@ -47,15 +47,21 @@ const double MAX_WHEEL_VEL = WHEEL_RADIUS * MAX_DRIVE_PWM / PWM_PER_RAD_PER_SEC;
 const double MAX_DTHETA = kinematics::DiffDriveKinematics(EFF_WHEEL_BASE)
 							  .wheelVelToRobotVel(-MAX_WHEEL_VEL, MAX_WHEEL_VEL)(2);
 
-// TODO: We need to recalibrate the camera, since we replaced it with a different one.
-const char* MAST_CAMERA_CONFIG_PATH = "../camera-config/MastCameraCalibration.yml";
+const robot::types::CameraID HAND_CAMERA_ID = "hand";
+const robot::types::CameraID WRIST_CAMERA_ID = "wrist";
 const robot::types::CameraID MAST_CAMERA_ID = "mast";
 
-const char* FOREARM_CAMERA_CONFIG_PATH = "../camera-config/WristCameraCalibration.yml";
-const robot::types::CameraID FOREARM_CAMERA_ID = "wrist";
+const std::unordered_set<robot::types::CameraID> CAMERA_SET = {
+   HAND_CAMERA_ID,
+   WRIST_CAMERA_ID,
+   MAST_CAMERA_ID
+};
 
-const char* HAND_CAMERA_CONFIG_PATH = "../camera-config/HandCameraCalibration.yml";
-const robot::types::CameraID HAND_CAMERA_ID = "hand";
+const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATHS = {
+	{HAND_CAMERA_ID, "../camera-config/HandCameraCalibration.yml"},
+	{WRIST_CAMERA_ID, "../camera-config/WristCameraCalibration.yml"},
+	{MAST_CAMERA_ID, "../camera-config/MastCameraCalibration.yml"},
+};
 
 /**
    @deprecated No need for this constant once we fully switch over the Mission Control PlanViz
@@ -145,8 +151,8 @@ const std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() {
 namespace autonomous {
 const double THETA_KP = 2.0;
 const double DRIVE_VEL = 1.5;
-const double SLOW_DRIVE_THRESHOLD = 3.0;
-const double DONE_THRESHOLD = 0.5;
+const double SLOW_DRIVE_THRESHOLD = 8.0;
+const double DONE_THRESHOLD = 3.0;
 // Duration long enough to confirm we are there, not so long that time is wasted
 const util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::milliseconds(750);
 } // namespace autonomous

@@ -1,8 +1,10 @@
+#include "../Constants.h"
 #include "Camera.h"
-
 #include "CameraConfig.h"
 
 #include <loguru.hpp>
+
+#include <opencv2/aruco.hpp>
 
 using cv::Mat;
 using cv::Size;
@@ -14,55 +16,34 @@ namespace cam {
 Camera::Camera()
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>()),
 	  _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _running(std::make_shared<bool>(false)) {}
 
-bool Camera::open(int camera_id, CameraParams intrinsic_params, Mat extrinsic_params) {
+bool Camera::open(CameraID camera_id, CameraParams intrinsic_params, Mat extrinsic_params) {
 	if (*_running) {
 		return false;
 	}
 	_capture_lock->lock();
-	bool result = this->_capture->open(camera_id);
+	std::string gstr = getGSTPipe(camera_id);
+	LOG_F(INFO, "GST: %s", gstr.c_str());
+	this->_capture = std::make_shared<cv::VideoCapture>(gstr, cv::CAP_GSTREAMER);
+	bool result = this->_capture->isOpened();
 	_capture_lock->unlock();
-	LOG_F(INFO, "Opening camera %d... %s", camera_id, result ? "success" : "failed");
+	LOG_F(INFO, "Opening %s camera... %s", camera_id.c_str(), result ? "success" : "failed");
 	this->_intrinsic_params = intrinsic_params;
 	init(extrinsic_params);
-	return result;
+	return result; 
 }
 
-bool Camera::open(string filename, CameraParams intrinsic_params, Mat extrinsic_params) {
-	if (*_running) {
-		return false;
-	}
-	_capture_lock->lock();
-	bool result = this->_capture->open(filename);
-	_capture_lock->unlock();
-	this->_intrinsic_params = intrinsic_params;
-	init(extrinsic_params);
-	return result;
-}
-
-Camera::Camera(string filename, string name, string description, CameraParams intrinsic_params,
+Camera::Camera(CameraID camera_id, string name, string description, CameraParams intrinsic_params,
 			   Mat extrinsic_params)
 	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
 	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>(filename)), _name(name),
+	  _capture(std::make_shared<cv::VideoCapture>(getGSTPipe(camera_id), cv::CAP_GSTREAMER)), _name(name),
 	  _description(description), _frame_lock(std::make_shared<std::mutex>()),
 	  _capture_lock(std::make_shared<std::mutex>()), _intrinsic_params(intrinsic_params),
 	  _running(std::make_shared<bool>(false)) {
-	init(extrinsic_params);
-}
-
-Camera::Camera(int camera_id, string name, string description, CameraParams intrinsic_params,
-			   Mat extrinsic_params)
-	: _frame(std::make_shared<cv::Mat>()), _frame_num(std::make_shared<uint32_t>(0)),
-	  _frame_time(std::make_shared<datatime_t>()),
-	  _capture(std::make_shared<cv::VideoCapture>(camera_id)), _name(name),
-	  _description(description), _frame_lock(std::make_shared<std::mutex>()),
-	  _capture_lock(std::make_shared<std::mutex>()), _intrinsic_params(intrinsic_params),
-	  _running(std::make_shared<bool>(false)) {
-	init(extrinsic_params);
+	init(extrinsic_params); 
 }
 
 void Camera::init(const Mat& extrinsic_params) {
@@ -89,52 +70,57 @@ Camera::Camera(const Camera& other)
 	  _thread(other._thread), _intrinsic_params(other._intrinsic_params),
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
-bool Camera::openFromConfigFile(std::string filename) {
-	CameraConfig cfg = readConfigFromFile(filename);
-
-	cv::Mat extrinsics;
-	if (cfg.extrinsicParams) {
-		extrinsics = cfg.extrinsicParams.value();
+std::string Camera::getGSTPipe(CameraID camera_id) {
+	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
+	if (!fs.isOpened()) {
+		throw std::invalid_argument("Configuration file for Camera ID" + camera_id + " does not exist");
 	}
 
-	CameraParams intrinsics;
-	if (cfg.intrinsicParams) {
-		intrinsics = cfg.intrinsicParams.value();
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+		throw std::invalid_argument("Configuration file missing key(s)");
 	}
 
-	if (std::holds_alternative<std::string>(cfg.filenameOrID)) {
-		return this->open(std::get<std::string>(cfg.filenameOrID), intrinsics, extrinsics);
-	} else if (std::holds_alternative<int>(cfg.filenameOrID)) {
-		return this->open(std::get<int>(cfg.filenameOrID), intrinsics, extrinsics);
-	} else {
-		// this should never happen
-		throw invalid_camera_config("One of " + KEY_FILENAME + " or " + KEY_CAMERA_ID +
-									" must be present");
+	std::stringstream gstr_ss;
+  	std::string format = fs[KEY_FORMAT];
+
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
+  	gstr_ss << format << ",";
+	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
+	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
+	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
+
+	if (format == "image/jpeg") {
+		gstr_ss << "jpegdec ! ";
 	}
+	gstr_ss << "videoconvert ! appsink";
+
+	return gstr_ss.str();
 }
 
 void Camera::captureLoop() {
 	loguru::set_thread_name(_name.c_str());
-	cv::Size image_size(640, 480);
-	if (!_intrinsic_params.empty()) {
-		image_size = _intrinsic_params.getImageSize();
-	}
-	_capture_lock->lock();
-	_capture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-	_capture->set(cv::CAP_PROP_FRAME_WIDTH, image_size.width);
-	_capture->set(cv::CAP_PROP_FRAME_HEIGHT, image_size.height);
-	_capture_lock->unlock();
 	cv::Mat frame;
 	while (*_running) {
 		_capture_lock->lock();
 		bool success = _capture->read(frame);
 		_capture_lock->unlock();
 		if (success && !frame.empty()) {
-			_frame_lock->lock();
-			frame.copyTo(*(this->_frame));
-			(*_frame_num)++;
-			*_frame_time = dataclock::now();
-			_frame_lock->unlock();
+      cv::Ptr<cv::aruco::Dictionary> dictionary =
+        cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
+      std::vector<std::vector<cv::Point2f>> markerCorners;
+      cv::Mat frameCopy;
+      std::vector<int> markerIds;
+      cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds);
+      frame.copyTo(frameCopy);
+      if(!markerIds.empty()) {
+        cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds);
+      }
+
+      _frame_lock->lock();
+      frameCopy.copyTo(*(this->_frame));
+      (*_frame_num)++;
+      *_frame_time = dataclock::now();
+      _frame_lock->unlock();
 		}
 	}
 }

@@ -3,6 +3,8 @@
 #include "../gps/gps_util.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
+#include "../camera/Camera.h"
+#include "../camera/CameraParams.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
 #include "motor/base_motor.h"
@@ -11,17 +13,20 @@
 #include <optional>
 #include <unordered_set>
 
-// forward declare cam::CameraParams instead of including it
-// we do this to avoid unnecessarily including OpenCV in all build targets
-namespace cam {
-class CameraParams;
-}
-
 /**
  * @namespace robot
  * @brief Collection of functions that allows interfacing with the hardware and the world.
  */
 namespace robot {
+
+namespace types {
+class CameraHandle {
+public:
+	CameraHandle(std::shared_ptr<cam::Camera> cam) : camera(cam) {}
+private:
+	std::shared_ptr<cam::Camera> camera;
+};
+}
 
 /**
  * @brief An enum which defines the possible types of world interfaces.
@@ -85,6 +90,14 @@ bool isEmergencyStopped();
  * std::unordered_set.
  */
 std::unordered_set<types::CameraID> getCameras();
+
+/**
+ * @brief Opens Camera with id camID.
+ *
+ * @param camID The camera id to open.
+ * @return A shared pointer to the camera object
+ */
+std::shared_ptr<types::CameraHandle> openCamera(types::CameraID camID);
 
 /**
  * @brief Check if a new camera frame from the specified camera is available.
@@ -220,6 +233,10 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
  * or if it doesn't have an encoder) then an empty data point is returned.
  */
 types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor);
+
+void setServoPos(robot::types::servoid_t servo, int32_t position);
+void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle);
+void setActuator(uint8_t value);
 
 using callbackid_t = unsigned long long;
 

@@ -50,4 +50,5 @@ void setJointPos(types::jointid_t joint, int32_t targetPos);
  */
 types::DataPoint<int32_t> getJointPos(types::jointid_t joint);
 
+void setScienceServoPos(uint8_t servoNum, int32_t angle);
 } // namespace robot

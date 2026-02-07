@@ -27,6 +27,10 @@ public:
 
 	void setMotorPos(int32_t targetPos) override;
 
+	void setServoPos(uint8_t servo, int32_t position) override;
+
+  void setStepperTurnAngle(uint8_t stepper, int16_t angle) override;
+
 	types::DataPoint<int32_t> getMotorPos() const override;
 
 private:

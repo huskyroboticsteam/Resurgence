@@ -32,6 +32,16 @@ types::DataPoint<int32_t> sim_motor::getMotorPos() const {
 	return robot::getMotorPos(motor_id);
 }
 
+// Do we want to leave this as servo number?
+void sim_motor::setServoPos(uint8_t servo, int32_t position) {
+	json msg = {
+		{"type", "simServoPositionRequest", {"servo", servo}, {"position", position}}};
+	sendJSON(msg);
+}
+
+void sim_motor::setStepperTurnAngle(uint8_t stepper, int16_t angle) {
+}
+
 void sim_motor::sendJSON(const json& obj) {
 	Globals::websocketServer.sendJSON(protocol_path, obj);
 }

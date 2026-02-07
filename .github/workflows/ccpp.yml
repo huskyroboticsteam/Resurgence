@@ -2,9 +2,6 @@ name: C/C++ CI
 
 on:
   push:
-  pull_request:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
@@ -24,5 +21,12 @@ jobs:
         cd ${{ github.workspace }}
         mkdir build && cd build && cmake ../src && cmake --build . -j$(nproc)
     - name: Run tests
+      run: |
+        cd build && ./tests
+    - name: Build codebase (for sim)
+      run: |
+        cd ${{ github.workspace }}
+        cd build && cmake ../src -DWORLD_INTERFACE=SIMULATOR && cmake --build . -j$(nproc)
+    - name: Run tests (for sim)
       run: |
         cd build && ./tests
