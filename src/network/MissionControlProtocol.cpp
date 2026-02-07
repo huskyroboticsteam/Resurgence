@@ -250,15 +250,15 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 
 	Eigen::Quaterniond quat = imu.getData();
 	double lon = 0, lat = 0, alt = 0;
-  double w = 0, x = 0, y = 0, z = 0;
+	double w = 0, x = 0, y = 0, z = 0;
 	if (gps.isValid()) {
 		lon = gps.getData().lon;
 		lat = gps.getData().lat;
 		alt = gps.getData().alt;
-    w = quat.w();
-    x = quat.x();
-    y = quat.y();
-    z = quat.z();
+    	w = quat.w();
+    	x = quat.x();
+    	y = quat.y();
+    	z = quat.z();
 	}
 
 	if (camDP) {
