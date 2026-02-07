@@ -17,9 +17,15 @@ namespace can::motor {
 
 /** @brief The possible motor modes. */
 enum class motormode_t {
+	pwm = BLDC_VELOCITY_CONTROL,
+	pid = BLDC_POSITION_CONTROL
+};
+/*
+enum class motormode_t {
 	pwm = MOTOR_UNIT_MODE_PWM,
 	pid = MOTOR_UNIT_MODE_PID
 };
+*/
 
 /** @brief The supported motor position sensors. */
 struct sensor_t {
@@ -36,40 +42,75 @@ struct sensor_t {
  */
 void emergencyStopMotors();
 
+/**
+ * @brief Remove a previously registered limit switch callback.
+ *
+ * @param id The callback ID that was returned when the callback was registered with
+ * addLimitSwitchCallback().
+ */
+void removeLimitSwitchCallback(callbackid_t id);
 
 // ===========
 // UPDATED:
 // ===========
 
-void initMotor(uuid_t uuid, domainmask_t domains);
+void initEncoder();
 
-void initEncoder(uuid_t uuid, domainmask_t domains, bool invertEncoder,
-				 bool zeroEncoder, int32_t pulsesPerJointRev,
-				 std::optional<std::chrono::milliseconds> telemetryPeriod);
+/**
+ * @brief Initialize a motor using CAN26 protocol.
+ * @param device The target CAN device.
+ */
+void initMotor(CANDevice_t device);
 
-void initPotentiometer(uuid_t uuid, domainmask_t domains, int32_t posLo,
-					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
-					   std::optional<std::chrono::milliseconds> telemetryPeriod);
+/**
+ * @brief Set the motor mode using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param mode The motor mode to set.
+ */
+void setMotorMode(CANDevice_t device, motormode_t mode);
 
-void setLimitSwitchLimits(uuid_t uuid, domainmask_t domains, int32_t lo, int32_t hi);
+/**
+ * @brief Set motor power using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param power Power level in range [-1.0, 1.0].
+ */
+void setMotorPower(CANDevice_t device, double power);
 
-void setMotorPIDConstants(uuid_t uuid, domainmask_t domains, int32_t kP, int32_t kI,
-						  int32_t kD);
+/**
+ * @brief Set motor power using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param power Power level as int16_t.
+ */
+void setMotorPower(CANDevice_t device, int16_t power);
 
-void setMotorMode(uuid_t uuid, domainmask_t domains, motormode_t mode);
+/**
+ * @brief Set PID position target using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param target Target position in millidegrees.
+ */
+void setMotorPIDTarget(CANDevice_t device, int32_t target);
 
-void setMotorPower(uuid_t uuid, domainmask_t domains, double power);
+/**
+ * @brief Get the last reported motor position.
+ * @param device The target CAN device.
+ * @return The cached position data, or empty if not available.
+ */
+robot::types::DataPoint<int32_t> getMotorPosition(CANDevice_t device);
 
-void setMotorPower(uuid_t uuid, domainmask_t domains, int16_t power);
+/**
+ * @brief Request encoder position from a motor.
+ * @param device The target CAN device.
+ */
+void pullMotorPosition(CANDevice_t device);
 
-void setMotorPIDTarget(uuid_t uuid, domainmask_t domains, int32_t target);
-
-robot::types::DataPoint<int32_t> getMotorPosition(uuid_t uuid, domainmask_t domains);
-
-void pullMotorPosition(uuid_t uuid, domainmask_t domains);
-
-callbackid_t addLimitSwitchCallback(uuid_t uuid, domainmask_t domains,
-	const std::function<void(uuid_t uuid, domainmask_t domains,
+/**
+ * @brief Add a callback for limit switch events.
+ * @param device The target CAN device.
+ * @param callback The callback function.
+ * @return Callback ID for removal.
+ */
+callbackid_t addLimitSwitchCallback(CANDevice_t device,
+	const std::function<void(CANDevice_t device,
 							 robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
 // ===========
@@ -218,12 +259,4 @@ callbackid_t addLimitSwitchCallback(
 	const std::function<void(
 		devicegroup_t group, deviceserial_t serial,
 		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
-
-/**
- * @brief Remove a previously registered limit switch callback.
- *
- * @param id The callback ID that was returned when the callback was registered with
- * addLimitSwitchCallback().
- */
-void removeLimitSwitchCallback(callbackid_t id);
 } // namespace can::motor

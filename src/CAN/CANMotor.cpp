@@ -1,5 +1,4 @@
 #include "CANMotor.h"
-
 #include "CAN.h"
 #include "CANUtils.h"
 
@@ -8,6 +7,13 @@
 #include <thread>
 
 extern "C" {
+// new
+#include <CANPacket.h>
+#include <Packets/Motor.h>
+#include <Packets/Universal.h>
+#include <CANDevices.h>
+
+// old
 #include <HindsightCAN/CANCommon.h>
 #include <HindsightCAN/CANMotorUnit.h>
 #include <HindsightCAN/CANPacket.h>
@@ -25,143 +31,109 @@ namespace can::motor {
 // UPDATED:
 // ===========
 
-void initEncoder(uuid_t uuid, domainmask_t domains, bool invertEncoder,
-				 bool zeroEncoder, int32_t pulsesPerJointRev,
-				 std::optional<std::chrono::milliseconds> telemetryPeriod);
+// Jetson device as sender
+static const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
 
-void initMotor(uuid_t uuid, domainmask_t domains) {
-	setMotorMode(uuid, domains, motormode_t::pwm);
+void initEncoder() {
+	// TO DO
+}
+
+void initMotor(CANDevice_t device) {
+	setMotorMode(device, motormode_t::pwm);
 	std::this_thread::sleep_for(1000us);
 }
 
-void setLimitSwitchLimits(uuid_t uuid, domainmask_t domains, int32_t lo, int32_t hi) {
-	/*
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
+void setMotorMode(CANDevice_t device, motormode_t mode) {
+	// Map motormode_t to BLDC control/input modes
+	uint8_t controlMode = (mode == motormode_t::pid) ? BLDC_POSITION_CONTROL : BLDC_VELOCITY_CONTROL;
+	uint8_t inputMode = BLDC_PASSTHROUGH_INPUT;
 
-	CANPacket p;
-	auto groupCode = static_cast<uint8_t>(group);
-
-	// 0 is low limit, 1 is high limit.
-	AssembleLimSwEncoderBoundPacket(&p, groupCode, serial, 0, lo);
-	sendCANPacket(p);
-	std::this_thread::sleep_for(1ms);
-	AssembleLimSwEncoderBoundPacket(&p, groupCode, serial, 1, hi);
-	sendCANPacket(p);
-	*/
-}
-
-void setMotorPIDConstants(uuid_t uuid, domainmask_t domains, int32_t kP, int32_t kI,
-						  int32_t kD) {
-	/*
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
-
-	CANPacket p;
-	auto boardGroupCode = static_cast<uint8_t>(group);
-	AssemblePSetPacket(&p, boardGroupCode, serial, kP);
-	sendCANPacket(p);
-	std::this_thread::sleep_for(1ms);
-	AssembleISetPacket(&p, boardGroupCode, serial, kI);
-	sendCANPacket(p);
-	std::this_thread::sleep_for(1ms);
-	AssembleDSetPacket(&p, boardGroupCode, serial, kD);
-	sendCANPacket(p);
-	std::this_thread::sleep_for(1ms);
-	*/
-}
-
-void setMotorMode(uuid_t uuid, domainmask_t domains, motormode_t mode) {
-	/*
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
-
-	CANPacket p;
-	AssembleModeSetPacket(&p, static_cast<uint8_t>(group), serial, static_cast<uint8_t>(mode));
+	CANPacket_t p = CANMotorPacket_BLDC_SetInputMode(JETSON_DEVICE, device, controlMode, inputMode);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
-	*/
 }
 
-void setMotorPower(uuid_t uuid, domainmask_t domains, double power) {
-	/*
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
-
+void setMotorPower(CANDevice_t device, double power) {
+	// Clamp power to [-1.0, 1.0]
 	power = std::min(std::max(power, -1.0), 1.0);
-	int powerInt = std::round(power * std::numeric_limits<int16_t>::max());
-	int16_t dutyCycle = static_cast<int16_t>(powerInt);
-	setMotorPower(uuid, domains, dutyCycle);
-	*/
-}
 
-void setMotorPower(uuid_t uuid, domainmask_t domains, int16_t power) {
-	/*
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
+	// Use BLDC velocity control: convert power [-1, 1] to velocity in rev/s
+	// adjust as needed
+	float velocity = static_cast<float>(power * 10.0);  // 10 rev/s at full power
+	float feedForwardTorque = 0.0f;
 
-	CANPacket p;
-	AssemblePWMDirSetPacket(&p, static_cast<uint8_t>(group), serial, power);
+	CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(JETSON_DEVICE, device, velocity, feedForwardTorque);
 	sendCANPacket(p);
-	*/
 }
 
-void setMotorPIDTarget(uuid_t uuid, domainmask_t domains, int32_t target) {
-	/* 	
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
-
-	CANPacket p;
-	AssemblePIDTargetSetPacket(&p, static_cast<uint8_t>(group), serial, target);
-	sendCANPacket(p); 
-	*/
+void setMotorPower(CANDevice_t device, int16_t power) {
+	// Convert int16_t power to double [-1.0, 1.0]
+	double powerDouble = static_cast<double>(power) / std::numeric_limits<int16_t>::max();
+	setMotorPower(device, powerDouble);
 }
 
-DataPoint<int32_t> getMotorPosition(uuid_t uuid, domainmask_t domains) {
-	/* 
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
+void setMotorPIDTarget(CANDevice_t device, int32_t target) {
+	// Convert millidegrees to revolutions
+	float positionRev = static_cast<float>(target) / 360000.0f;
+	float feedForwardVelocity = 0.0f;
 
-	return getDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle); 
-	*/
+	CANPacket_t p = CANMotorPacket_BLDC_SetInputPosition(JETSON_DEVICE, device, positionRev, feedForwardVelocity);
+	sendCANPacket(p);
 }
 
-void pullMotorPosition(uuid_t uuid, domainmask_t domains) {
-	/* 	
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
+DataPoint<int32_t> getMotorPosition(CANDevice_t device) {
+	// Retrieve cached encoder position from the telemetry map
+	return getDeviceTelemetry(device.deviceUUID, telemtype_t::angle);
+}
 
-	pullDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle); 
-	*/
+void pullMotorPosition(CANDevice_t device) {
+	// Request encoder estimates from the device
+	uint8_t encoderID = 0;  // Default encoder ID
+
+	CANPacket_t p = CANMotorPacket_BLDC_GetEncoderEstimates(JETSON_DEVICE, device, encoderID);
+	sendCANPacket(p);
+}
+
+void emergencyStopMotors() {
+	// Broadcast e-stop to all domains
+	CANDevice_t broadcast = {1, 1, 1, CAN_UUID_BROADCAST};
+	CANPacket_t p = CANUniversalPacket_EStop(JETSON_DEVICE, broadcast);
+	can::sendCANPacket(p);
+	std::this_thread::sleep_for(1000us);
 }
 
 callbackid_t addLimitSwitchCallback(
-	uuid_t uuid, domainmask_t domains,
-	const std::function<void(uuid_t uuid, domainmask_t domains,
+	CANDevice_t device,
+	const std::function<void(CANDevice_t device,
 							 DataPoint<LimitSwitchData> limitSwitchData)>& callback) {
-	/* 	
-	TODO: Uncomment once HindsightCAN is updated for CAN2026
-	
-	devicegroup_t group = (domains & static_cast<uint8_t>(domain_t::motor))
-						  ? devicegroup_t::motor
-						  : devicegroup_t::science;
-	deviceserial_t serial = uuid;
-
-	auto id = std::make_pair(group, serial);
-	auto func = [callback, uuid, domains](deviceid_t deviceID, telemtype_t,
-										  DataPoint<telemetry_t> telemData) {
+	auto func = [device, callback](CANDeviceUUID_t, telemtype_t,
+								   DataPoint<telemetry_t> telemData) {
 		if (telemData) {
 			LimitSwitchData data = telemData.getData();
-			callback(uuid, domains, {telemData.getTime(), data});
+			callback(device, DataPoint<LimitSwitchData>(telemData.getTime(), data));
 		} else {
-			callback(uuid, domains, {});
+			callback(device, DataPoint<LimitSwitchData>());
 		}
 	};
-	return addDeviceTelemetryCallback(id, telemtype_t::limit_switch, func); 
-	*/
+	return addDeviceTelemetryCallback(device.deviceUUID, telemtype_t::limit_switch, func);
+}
+
+
+
+void removeLimitSwitchCallback(callbackid_t id) {
+	removeDeviceTelemetryCallback(id);
 }
 
 // ===========
 // DEPRECATED:
 // ===========
 
+/*
 void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder,
 				 bool zeroEncoder, int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod) {
 	auto groupCode = static_cast<uint8_t>(group);
-	CANPacket p;
+	CANPacket_t p;
 	AssembleEncoderInitializePacket(&p, groupCode, serial, sensor_t::encoder, invertEncoder,
 									zeroEncoder);
 	sendCANPacket(p);
@@ -189,14 +161,6 @@ void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo
 		scheduleTelemetryPull(std::make_pair(group, serial), telemtype_t::angle,
 							  telemetryPeriod.value());
 	}
-}
-
-void emergencyStopMotors() {
-	CANPacket p;
-	AssembleGroupBroadcastingEmergencyStopPacket(&p, static_cast<uint8_t>(0x0),
-												 ESTOP_ERR_GENERAL);
-	can::sendCANPacket(p);
-	std::this_thread::sleep_for(1000us);
 }
 
 void initMotor(devicegroup_t group, deviceserial_t serial) {
@@ -282,8 +246,5 @@ callbackid_t addLimitSwitchCallback(
 	};
 	return addDeviceTelemetryCallback(id, telemtype_t::limit_switch, func);
 }
-
-void removeLimitSwitchCallback(callbackid_t id) {
-	removeDeviceTelemetryCallback(id);
-}
+*/
 } // namespace can::motor

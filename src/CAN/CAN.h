@@ -8,9 +8,9 @@
 #include <optional>
 
 extern "C" {
-#include <HindsightCAN/CANPacket.h>
-#include <CAN26/CANDevices.h>
-#include <CAN26/CANPacket.h>
+#include <CANDevices.h>
+#include <CANPacket.h>
+#include <Packets/Motor.h>
 }
 
 /**
@@ -24,7 +24,7 @@ namespace can {
  *
  * Users should not construct these themselves.
  */
-using callbackid_t = std::tuple<uuid_t, telemtype_t, uin32t>;
+using callbackid_t = std::tuple<uuid_t, telemtype_t, uint32_t>;
 // using callbackid_t = std::tuple<deviceid_t, telemtype_t, uint32_t>;
 
 /**
@@ -45,7 +45,7 @@ void initCAN();
  * @param packet The CAN packet to send.
  */
 void sendCANPacket(const CANPacket_t& packet);
-// void sendCANPacket(const CANPacket& packet);
+void sendCANPacket(const CANPacket& packet);
 
 // Print packet for debugging purposes
 void printCANPacket(const CANPacket_t& packet);
@@ -70,7 +70,7 @@ void printCANPacket(const CANPacket_t& packet);
  * it was received. If no data is available for the given telemetry type, an empty data point
  * is returned.
  */
-robot::types:DataPoint<telemetry_t> getDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
+robot::types::DataPoint<telemetry_t> getDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
 
 /**
  * @brief Ping the given CAN device to send the given telemetry data.
@@ -93,7 +93,7 @@ void pullDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
  * @param period The period to wait in between sending pull requests.
  */
-void scheduleTelemtryPull(uuid_t uuid, telemtype_t telemType, std::chrono::milliseconds period);
+void scheduleTelemetryPull(uuid_t uuid, telemtype_t telemType, std::chrono::milliseconds period);
 
 /**
  * @brief Stop pulling the latest telemetry data from the given device.
@@ -103,7 +103,7 @@ void scheduleTelemtryPull(uuid_t uuid, telemtype_t telemType, std::chrono::milli
  * @param id The device group and serial number of the device.
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
  */
-void unscheduleTelemtryPull(uuid_t uuid, telemtype_t telemType);
+void unscheduleTelemetryPull(uuid_t uuid, telemtype_t telemType);
 
 /**
  * @brief Stop pulling the latest telemetry data from all currently scheduled devices.

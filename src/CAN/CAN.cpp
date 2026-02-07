@@ -24,12 +24,12 @@
 
 extern "C" {
 // new
-#include <CAN26/CANPacket.h>
-#include <CAN26/CANCommandIDs.h>
-#include <CAN26/Packets/DecodeMotor.h>
-#include <CAN26/Packets/DecodePeripheral.h>
-#include <CAN26/Packets/DecodePower.h>
-#include <CAN26/Packets/DecodeUniversal.h>
+#include <CANPacket.h>
+#include <CANCommandIDs.h>
+#include <Packets/DecodeMotor.h>
+#include <Packets/DecodePeripheral.h>
+#include <Packets/DecodePower.h>
+#include <Packets/DecodeUniversal.h>
 
 // old
 #include <HindsightCAN/CANCommon.h>
@@ -53,14 +53,15 @@ namespace can {
 namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
-// receive all messages on the given group
-constexpr uint32_t CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
+// CAN26 11-bit ID layout: [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
+// Match on UUID field (bits 3-9) to filter for packets addressed to this device
+constexpr uint32_t CAN_MASK = 0x3F8; // bits 3-9 = UUID field
 
 int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
 
 std::shared_ptr<util::PeriodicScheduler<>> telemScheduler;
-std::unordered_map<std::pair<deviceid_t, telemtype_t>, util::PeriodicScheduler<>::eventid_t>
+std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>, util::PeriodicScheduler<>::eventid_t>
 	telemEventIDMap;
 
 using telemetrycode_t = uint8_t;
@@ -108,9 +109,25 @@ bool receivePacket(int fd, CANPacket_t& packet) {
 	can_frame frame;
 	ret = read(fd, &frame, sizeof(can_frame));
 	if (ret >= 0) {
-		packet.id = frame.can_id;
-		packet.dlc = frame.can_dlc;
-		std::memcpy(packet.data, frame.data, frame.can_dlc);
+		// Parse 11-bit CAN ID into CANDevice_t + priority
+		// [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
+		uint16_t canID = frame.can_id & 0x7FF; // extract the 11-bit CAN ID from frame
+		uint16_t deviceBits = canID & 0x3FF; // extract lower 10 bits (device info)
+		std::memcpy(&packet.device, &deviceBits, sizeof(uint16_t));
+		packet.priority = (canID & 0x400) ? CAN_PRIORITY_LOW : CAN_PRIORITY_HIGH;
+
+		// Parse 8-byte CAN data
+		// [command:1][senderUUID:1][contents:0-6]
+		if (frame.can_dlc >= 2) {
+			packet.command = frame.data[0];
+			packet.senderUUID = frame.data[1];
+			packet.contentsLength = frame.can_dlc - 2;
+			std::memcpy(packet.contents, frame.data + 2, packet.contentsLength);
+		} else {
+			packet.command = 0;
+			packet.senderUUID = 0;
+			packet.contentsLength = 0;
+		}
 		return true;
 	} else {
 		LOG_F(ERROR, "Failed to receive CAN packet: %s", std::strerror(errno));
@@ -136,20 +153,16 @@ void invokeTelemCallback(CANDeviceUUID_t uuid, telemetrycode_t telemCode,
 		if (entry != telemetryCallbackMap.end()) {
 			// invoke all callbacks
 			for (auto callbackEntry : entry->second) {
-				callbackEntry.second(id, telemType, data);
+				callbackEntry.second(uuid, telemType, data);
 			}
 		}
 	}
 }
 
 
-void handleTelemetryPacket(CANPacket_t& packet) {
-	// extract necessary information
-	CANDeviceUUID_t uuid = getDeviceFromPacket(packet);
-	telemetrycode_t telemCode = DecodeTelemetryType(&packet);
-	telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
-	DataPoint<telemetry_t> data(telemData);
-
+// Store telemetry data in the thread-safe map and fire callbacks
+void storeTelemetry(CANDeviceUUID_t uuid, telemetrycode_t telemCode,
+					DataPoint<telemetry_t> data) {
 	// check if telemetry data is already in map
 	if (mapHasKey(telemMapMutex, telemMap, uuid)) {
 		// acquire read lock of entire map
@@ -169,15 +182,43 @@ void handleTelemetryPacket(CANPacket_t& packet) {
 		deviceMapPtr->emplace(telemCode, data);
 		// acquire write lock of the entire map to insert a new device map
 		std::unique_lock mapLock(telemMapMutex);
-		telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
+		telemMap.emplace(uuid, std::make_pair(mutexPtr, deviceMapPtr));
 	}
-
 	// now fire off callback, if it exists
 	invokeTelemCallback(uuid, telemCode, data);
 }
 
+// CAN26 command-specific handlers (replace old handleTelemetryPacket)
+
+void handleEncoderEstimates(CANPacket_t& packet) {
+	auto decoded = CANMotorPacket_BLDC_EncoderEstimates_Decode(&packet);
+	CANDeviceUUID_t uuid = packet.senderUUID;
+	// Convert position from revolutions to millidegrees
+	int32_t positionMdeg = static_cast<int32_t>(decoded.position * 360000.0f);
+	telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::angle);
+	storeTelemetry(uuid, telemCode, DataPoint<telemetry_t>(positionMdeg));
+}
+
+void handleLimitSwitchAlert(CANPacket_t& packet) {
+	auto decoded = CANMotorPacket_LimitSwitchAlert_Decode(&packet);
+	CANDeviceUUID_t uuid = packet.senderUUID;
+	telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::limit_switch);
+	storeTelemetry(uuid, telemCode,
+				   DataPoint<telemetry_t>(static_cast<telemetry_t>(decoded.switchStatus)));
+}
+
+/* old - replaced by command-specific handlers above
+void handleTelemetryPacket(CANPacket_t& packet) {
+	CANDeviceUUID_t uuid = getDeviceFromPacket(packet);
+	telemetrycode_t telemCode = DecodeTelemetryType(&packet);
+	telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
+	DataPoint<telemetry_t> data(telemData);
+	storeTelemetry(uuid, telemCode, data);
+}
+*/
+
 // returns a file descriptor, or -1 on failure
-int createCANSocket(std::optional<can::CANDeviceUUID_t> uuid) {
+int createCANSocket(std::optional<CANDevice_t> device) {
 	int fd;
 	if ((fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
 		LOG_F(ERROR, "Failed to initialize CAN bus: %s", std::strerror(errno));
@@ -207,9 +248,13 @@ int createCANSocket(std::optional<can::CANDeviceUUID_t> uuid) {
 		return -1;
 	}
 
-	// enable reception at the given id, if provided
-	if (uuid) {
-		int canID = ConstructCANID(0, static_cast<uint8_t>(uuid->first), uuid->second);
+	// enable reception at the given device, if provided
+	if (device) {
+		// Build CAN ID from CANDevice_t using CAN26's packet header format
+		CANPacket_t dummy = {};
+		dummy.device = *device;
+		dummy.priority = CAN_PRIORITY_LOW;
+		uint16_t canID = CANGetPacketHeader(&dummy);
 		can_filter filters[1];
 		filters[0].can_id = canID;
 		filters[0].can_mask = CAN_MASK;
@@ -225,33 +270,40 @@ int createCANSocket(std::optional<can::CANDeviceUUID_t> uuid) {
 
 void receiveThreadFn() {
 	loguru::set_thread_name("CAN_Receive");
-	CANPacket packet;
+	CANPacket_t packet;
 	// create dedicated CAN socket for reading
-	int recvFD = createCANSocket({{devicegroup_t::master, DEVICE_SERIAL_JETSON}});
+	CANDevice_t jetsonDevice = {0, 0, 0, CAN_UUID_JETSON};
+	int recvFD = createCANSocket(jetsonDevice);
 	if (recvFD < 0) {
 		LOG_F(ERROR, "Unable to open CAN connection!");
 		return;
 	}
 
 	while (true) {
-		// no sychronization necessary, since this thread owns the FD
+		// no synchronization necessary, since this thread owns the FD
 		bool received = receivePacket(recvFD, packet);
 		if (received) {
-			uint8_t packetType = packet.data[0];
-			switch (packetType) {
-				case packettype_t::telemetry:
-					handleTelemetryPacket(packet);
+			// dispatch on CAN26 command ID
+			switch (packet.command) {
+				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
+					handleEncoderEstimates(packet);
 					break;
 
-				case packettype_t::limit_alert:
-					invokeTelemCallback(
-						getSenderDeviceGroupAndSerial(packet),
-						static_cast<telemetrycode_t>(telemtype_t::limit_switch),
-						{packet.data[3]});
+				case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
+					handleLimitSwitchAlert(packet);
+					break;
+
+				case CAN_COMMAND_ID__HEARTBEAT:
+					LOG_F(INFO, "Heartbeat from UUID 0x%x", packet.senderUUID);
+					break;
+
+				case CAN_COMMAND_ID__E_STOP:
+					LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
 					break;
 
 				default:
-					LOG_F(WARNING, "Unrecognized CAN packet type: %x", packetType);
+					LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x",
+						  packet.command, packet.senderUUID);
 					break;
 			}
 		} else {
@@ -274,7 +326,7 @@ void initCAN() {
 	receiveThread.detach();
 }
 
-// new
+// new for CAN26
 void sendCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
 	canfd_frame frame;
@@ -296,7 +348,7 @@ void sendCANPacket(const CANPacket_t& packet) {
 	}
 }
 
-/* old
+// old for backwards compatibility with HindsightCAN
 void sendCANPacket(const CANPacket& packet) {
 	canfd_frame frame;
 	std::memset(&frame, 0, sizeof(frame));
@@ -318,8 +370,8 @@ void sendCANPacket(const CANPacket& packet) {
 			  std::strerror(errno));
 	}
 }
-*/
-// new
+
+// new for CAN26
 void printCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // same as sendCANPacket
 	std::stringstream ss;
@@ -373,12 +425,14 @@ robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t uuid, te
 }
 
 void pullDeviceTelemetry(CANDeviceUUID_t uuid, telemtype_t telemType) {
-	CANPacket_t p;
-	/*
-	TODO: CAN26 implementation
-	AssembleTelemetryPullPacket(&p, groupCode, serial, telemCode);
-	sendCANPacket(p);
-	*/
+	static const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
+	CANDevice_t target = {0, 1, 0, uuid}; // assume motor for now?
+
+	if (telemType == telemtype_t::angle) {
+		// Request encoder position from the device
+		CANPacket_t p = CANMotorPacket_BLDC_GetEncoderEstimates(JETSON_DEVICE, target, 0);
+		sendCANPacket(p);
+	}
 }
 
 void scheduleTelemetryPull(CANDeviceUUID_t uuid, telemtype_t telemType,
@@ -387,7 +441,7 @@ void scheduleTelemetryPull(CANDeviceUUID_t uuid, telemtype_t telemType,
 		telemScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_TelemPullSched");
 	}
 
-	auto mapKey = std::make_pair(id, telemType);
+	auto mapKey = std::make_pair(uuid, telemType);
 	auto it = telemEventIDMap.find(mapKey);
 	if (it != telemEventIDMap.end()) {
 		auto eventID = it->second;
@@ -396,7 +450,7 @@ void scheduleTelemetryPull(CANDeviceUUID_t uuid, telemtype_t telemType,
 	}
 
 	auto eventID =
-		telemScheduler->scheduleEvent(period, [=]() { pullDeviceTelemetry(id, telemType); });
+		telemScheduler->scheduleEvent(period, [=]() { pullDeviceTelemetry(uuid, telemType); });
 	telemEventIDMap.insert_or_assign(mapKey, eventID);
 
 	// pull immediately since scheduling does not send right now
