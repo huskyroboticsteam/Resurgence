@@ -106,8 +106,9 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   )
   FetchContent_MakeAvailable(CAN26)
 
-  add_library(CAN26 INTERFACE)
-  target_include_directories(CAN26 INTERFACE ${can26_SOURCE_DIR})
+  add_library(CAN26 STATIC ${can26_SOURCE_DIR}/CANPacket.c)
+  target_include_directories(CAN26 SYSTEM PUBLIC ${can26_SOURCE_DIR})
+  target_compile_options(CAN26 PRIVATE -Wno-missing-field-initializers)
 endif()
 
 FetchContent_Declare(LoguruGitRepo
