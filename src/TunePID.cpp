@@ -58,6 +58,7 @@ void cleanup(int signum) {
 	exit(0);
 }
 
+/* No longer exists for CAN26
 bool initMotor(boardid_t motor) {
 	can::devicegroup_t group = robot::boardGroupMap.at(motor);
 	uint8_t serial = robot::boardSerialIDMap.at(motor);
@@ -81,6 +82,7 @@ bool initMotor(boardid_t motor) {
 	}
 	return true;
 }
+*/
 
 int main(int argc, char** argv) {
 	can::initCAN();
@@ -101,8 +103,7 @@ int main(int argc, char** argv) {
 	std::string motor_name;
 	std::getline(std::cin, motor_name);
 	boardid_t motor = nameToMotorMap.at(motor_name);
-	can::devicegroup_t group = robot::boardGroupMap.at(motor);
-	uint8_t serial = robot::boardSerialIDMap.at(motor);
+	CANDevice_t device = robot::boardUUIDMap.at(motor);
 
 	std::cout << "Enter amplitude (deg) > ";
 	std::string ampl_str;
@@ -114,11 +115,9 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, mode_name);
 	targetmode_t mode = static_cast<targetmode_t>(std::stoi(mode_name));
 
-	if (!initMotor(motor)) {
-		return 1;
-	}
+	can::motor::initMotor(device);
 
-	printf("Enter coefficients for motor [%s] (serial 0x%x):\n", motor_name.c_str(), serial);
+	printf("Enter coefficients for motor [%s]:\n", motor_name.c_str());
 	std::string str;
 	std::cout << "P > ";
 	std::getline(std::cin, str);
@@ -130,13 +129,18 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, str);
 	int d_coeff = std::stoi(str);
 
-	can::motor::setMotorMode(group, serial, can::motor::motormode_t::pid);
-	can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
+	can::motor::setMotorMode(device, can::motor::motormode_t::pid);
+	// can::motor::setMotorMode(group, serial, can::motor::motormode_t::pid);
+
+	// can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
 
 	double period = 8.0;
 
 	std::this_thread::sleep_for(300ms); // wait for encoder position data to arrive
-	int32_t starting_angle = can::motor::getMotorPosition(group, serial);
+
+	int32_t starting_angle = can::motor::getMotorPosition(device);
+	// int32_t starting_angle = can::motor::getMotorPosition(group, serial);
+
 	int32_t angle_target = starting_angle;
 	double acc_error = 0.0;
 	int total_steps = 0;
@@ -145,7 +149,9 @@ int main(int argc, char** argv) {
 	time_point<steady_clock> startTime = tp;
 	while (steady_clock::now() - startTime <
 		   3 * milliseconds(static_cast<int>(period * 1000))) {
-		int32_t current_angle = can::motor::getMotorPosition(group, serial).getData();
+		int32_t current_angle = can::motor::getMotorPosition(device).getData();
+		// int32_t current_angle = can::motor::getMotorPosition(group, serial).getData();
+
 		double difference = (current_angle - angle_target) / 1000.0;
 		acc_error += difference * difference;
 		printf("Step %02d: target %05d actual %05d\n", total_steps, angle_target,
@@ -160,13 +166,17 @@ int main(int argc, char** argv) {
 		}
 		angle_target = (int32_t)round(amplitude * prescaled_target) + starting_angle;
 
-		can::motor::setMotorPIDTarget(group, serial, angle_target);
+		can::motor::setMotorPIDTarget(device, angle_target);
+		// can::motor::setMotorPIDTarget(group, serial, angle_target);
 
 		tp += 20ms;
 		std::this_thread::sleep_until(tp);
 	}
-	can::motor::setMotorMode(group, serial, can::motor::motormode_t::pwm);
-	can::motor::setMotorPower(group, serial, 0.0);
+	can::motor::setMotorMode(device, can::motor::motormode_t::pwm);
+	// can::motor::setMotorMode(group, serial, can::motor::motormode_t::pwm);
+
+	can::motor::setMotorPower(device, 0.0);
+	// can::motor::setMotorPower(group, serial, 0.0);
 	std::cout << "RMSE: " << sqrt(acc_error / total_steps) << std::endl;
 	return 0;
 }
