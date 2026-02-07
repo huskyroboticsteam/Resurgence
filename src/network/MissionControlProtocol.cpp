@@ -247,7 +247,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 		//_autonomous_task.start(finalTargets, circleMode, radius, type);
 
 		// temporary hard coded values
-		_autonomous_task.start(finalTargets, true, std::nullopt, Constants::autonomous::TaskType::TAG1);
+		_autonomous_task.start(finalTargets, true, std::nullopt, Constants::autonomous::TaskType::TAG2);
 	}
 }
 

@@ -43,16 +43,40 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 		if (type) {
 			switch (type.value()) {
 				case TaskType::TAG1:
-					_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 7.5);
+					_autonomous_task_thread = std::thread(
+								&autonomous::AutonomousTask::circleNavigation, 
+								this, 
+								waypointCoords[0], 
+								7.5,
+								std::nullopt
+							);
 					break;
 				case TaskType::TAG2:
-					_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 15);
+					_autonomous_task_thread = std::thread(
+								&autonomous::AutonomousTask::circleNavigation, 
+								this, 
+								waypointCoords[0], 
+								13,
+								16							
+							);
 					break;
 			}
 		} else if (radius) {
-			_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], *radius);
+			_autonomous_task_thread = std::thread(
+						&autonomous::AutonomousTask::circleNavigation, 
+						this, 
+						waypointCoords[0], 
+						*radius,
+						std::nullopt
+					);
 		} else { // if no circle type or radius specified, default to radius 10
-			_autonomous_task_thread = std::thread(&autonomous::AutonomousTask::circleNavigation, this, waypointCoords[0], 10);
+			_autonomous_task_thread = std::thread(
+						&autonomous::AutonomousTask::circleNavigation, 
+						this, 
+						waypointCoords[0], 
+						10,
+						std::nullopt
+					);
 		}
 	} else {
 		_waypoint_coords_list = waypointCoords;
@@ -60,8 +84,27 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 	}
 }
 
-void AutonomousTask::circleNavigation(const navtypes::point_t& center, const double radius) {
+void AutonomousTask::circleNavigation(const navtypes::point_t& center,
+	 								  const double radius, const std::optional<double> radius2) {
 	LOG_SCOPE_F(INFO, "AutoNav:Circle");
+	_waypoint_coords_list = generateCirclePoints(center, radius);
+
+	if (radius2) {
+		auto circle2Points = generateCirclePoints(center, *radius2);
+		_waypoint_coords_list.insert(_waypoint_coords_list.end(), circle2Points.begin(), circle2Points.end());
+	} 
+
+	while (!_target_found) {
+		RAW_LOG_F(INFO, "trying another circle, target not found");
+		navigateAll();
+	}
+
+	_waypoint_coords_list = {{0, 0, 1}};
+	RAW_LOG_F(INFO, "yay! found it!");
+}
+
+navtypes::points_t AutonomousTask::generateCirclePoints(
+									const navtypes::point_t& center, const double radius) {
 	double distanceBetweenPoints = radius / 10; // proportionally assign distance between points
 	int numPoints = std::max(1, (int)round(2 * M_PI * radius / distanceBetweenPoints));
 	double angleIncrement = 2 * M_PI / numPoints;												
@@ -73,16 +116,10 @@ void AutonomousTask::circleNavigation(const navtypes::point_t& center, const dou
 		double y = center[1] + radius * sin(angle);
 		circlePoints.push_back({x, y, 1});
 	}
-	_waypoint_coords_list = circlePoints;
-
-	while (!_target_found) {
-		RAW_LOG_F(INFO, "trying another circle, target not found");
-		navigateAll();
-	}
-
-	_waypoint_coords_list = {{0, 0, 1}};
-	RAW_LOG_F(INFO, "yay! found it!");
+	
+	return circlePoints;
 }
+
 
 void AutonomousTask::navigateAll() {
 	LOG_SCOPE_F(INFO, "AutoNav:List");
@@ -137,15 +174,15 @@ void AutonomousTask::navigate() {
 				_logFile << gpsPosData.x() << "," << gpsPosData.y() << std::endl;
 				_logFile.flush();
 
-				navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
+				// navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
 
-				auto gpsCoord = robot::metersToGPS(gpsPosData);
-				auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
-				double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
+				// auto gpsCoord = robot::metersToGPS(gpsPosData);
+				// auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
+				// double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
 
-				LOG_F(INFO, "		Heading velocity: %lf ", scaledVels(2));
-				LOG_F(INFO, "		Foward velocity: %lf", scaledVels(0));
-				LOG_F(INFO, "		Distance: %lf", dist);
+				// LOG_F(INFO, "		Heading velocity: %lf ", scaledVels(2));
+				// LOG_F(INFO, "		Foward velocity: %lf", scaledVels(0));
+				// LOG_F(INFO, "		Distance: %lf", dist);
 			}			
 		}
 
