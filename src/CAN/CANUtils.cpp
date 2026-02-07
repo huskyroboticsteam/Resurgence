@@ -4,9 +4,9 @@
 #include <sstream>
 
 extern "C" {
-// new 
-#include <CAN26/CANPacket.h>
-#include <CAN26/CANDevices.h>
+// new
+#include <CANPacket.h>
+#include <CANDevices.h>
 
 // old
 #include <HindsightCAN/CANPacket.h>
@@ -17,16 +17,16 @@ namespace can {
 // UPDATED:
 // ===========
 
-CANDevice_t getDeviceFromPacket(const CANPacket_t& packet) {
-	return packet->device;
+uuid_t getDeviceFromPacket(const CANPacket_t& packet) {
+	return packet.device.deviceUUID;
 }
 
 uuid_t getUUIDFromPacket(const CANPacket_t& packet) {
-    return packet->device.deviceUUID;
+    return packet.device.deviceUUID;
 }
 
-uuid_t getSenderUUID(const CANPacket& packet) {
-    return packet->senderUUID;
+uuid_t getSenderUUID(const CANPacket_t& packet) {
+    return packet.senderUUID;
 }
 
 bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, 

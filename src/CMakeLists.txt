@@ -102,9 +102,12 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   FetchContent_Declare(
     CAN26
     GIT_REPOSITORY https://github.com/huskyroboticsteam/CAN26.git
-    GIT_TAG main  # TODO: Placeholder, add CAN26 tag when release available
+    GIT_TAG "main"
   )
   FetchContent_MakeAvailable(CAN26)
+
+  add_library(CAN26 INTERFACE)
+  target_include_directories(CAN26 INTERFACE ${can26_SOURCE_DIR})
 endif()
 
 FetchContent_Declare(LoguruGitRepo
@@ -190,6 +193,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   )
 
   # Hardware specific source files - UPDATED
+  target_sources(can_interface PRIVATE CAN/CAN.cpp)
   target_link_libraries(can_interface PUBLIC
     CAN26
     Threads::Threads

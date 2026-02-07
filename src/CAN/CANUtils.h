@@ -1,6 +1,9 @@
 #pragma once
 
 extern "C" {
+#include <CANPacket.h>
+#include <CANDevices.h>
+
 #include <HindsightCAN/CANCommon.h>
 #include <HindsightCAN/CANMotorUnit.h>
 #include <HindsightCAN/CANPacket.h>
@@ -36,7 +39,7 @@ uuid_t getDeviceFromPacket(const CANPacket_t& packet);
  * @param packet The packet to extract the UUID from.
  * @return uuid_t The UUID of the sender.
  */
-uuid_t getUUIDFromPacket(const CANPacket& packet);
+uuid_t getUUIDFromPacket(const CANPacket_t& packet);
 
 /**
  * @brief Get the sender UUID of the given packet.
@@ -44,7 +47,7 @@ uuid_t getUUIDFromPacket(const CANPacket& packet);
  * @param packet The packet to extract the sender UUID from.
  * @return uuid_t The device UUID.
  */
-uuid_t getSenderUUID(const CANPacket& packet);
+uuid_t getSenderUUID(const CANPacket_t& packet);
 
 /**
  * @brief Check if device is in a specific domain
