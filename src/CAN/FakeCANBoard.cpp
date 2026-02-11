@@ -1,4 +1,3 @@
-/*
 #include "CAN.h"
 #include "CANMotor.h"
 #include "CANUtils.h"
@@ -17,6 +16,10 @@
 #include <vector>
 
 extern "C" {
+#include <CANPacket.h>
+#include <CANCommandIDs.h>
+#include <Packets/Universal.h>
+
 #include <HindsightCAN/CANPower.h>
 #include <HindsightCAN/CANScience.h>
 }
@@ -44,12 +47,11 @@ namespace {
 class CANBoard {
 public:
 	CANBoard(robot::types::boardid_t motor, bool hasPosSensor,
-					can::uuid_t uuid, can::domainmask_t domains,
+					CANDevice_t device,
 					double pos_pwm_scale, double neg_pwm_scale)
 	: motor_id(motor),
 	has_pos_sensor(hasPosSensor),
-	board_uuid(uuid),
-	board_domains(domains),
+	device_(device),
 	positive_scale(pos_pwm_scale),
 	negative_scale(neg_pwm_scale) {
 		// create scheduler if needed
@@ -65,16 +67,16 @@ public:
 		// scale the power
 		double scale = power < 0 ? negative_scale : positive_scale;
 		power *= scale;
-		can::motor::setMotorPower(board_uuid, board_domains, power);
+		can::motor::setMotorPower(device_, power);
 	}
 
 	void setMotorPos(int32_t targetPos) {
 		ensureMotorMode(can::motor::motormode_t::pid);
-		can::motor::setMotorPIDTarget(board_uuid, board_domains, targetPos);
+		can::motor::setMotorPIDTarget(device_, targetPos);
 	}
 
 	robot::types::DataPoint<int32_t> getMotorPos() const {
-		return can::motor::getMotorPosition(board_uuid, board_domains);
+		return can::motor::getMotorPosition(device_);
 	}
 
 	void setMotorVel(int32_t targetVel) {
@@ -110,7 +112,7 @@ public:
 	}
 
 	can::uuid_t getMotorUUID() const {
-		return board_uuid;
+		return device_.deviceUUID;
 	}
 
 	robot::types::boardid_t getMotorID() const {
@@ -120,8 +122,7 @@ public:
 private:
 	robot::types::boardid_t motor_id;
 	bool has_pos_sensor;
-	can::uuid_t board_uuid;
-	can::domainmask_t board_domains;
+	can::CANDevice_t device;
 	std::optional<can::motor::motormode_t> motor_mode;
 	double positive_scale;
 	double negative_scale;
@@ -135,7 +136,7 @@ private:
 		if (!motor_mode || motor_mode.value() != mode) {
 			// update the motor mode
 			motor_mode.emplace(mode);
-			can::motor::setMotorMode(board_uuid, board_domains, mode);
+			can::motor::setMotorMode(device, mode);
 		}
 	}	
 
@@ -216,28 +217,25 @@ int main() {
 
 	while (true) {
 		if (testMode == TestMode::ModeSet) {
-			auto group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
-			int serial = prompt("Enter motor serial");
+			can::CANDevice_t device = prompt("Enter device");
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
-			std::cout << "got " << serial << " and " << mode << std::endl;
-			can::motor::setMotorMode(group, serial,
+			std::cout << "got " << device << std::endl;
+			can::motor::setMotorMode(device,
 									 mode == 0 ? motormode_t::pwm : motormode_t::pid);
 		} else if (testMode == TestMode::PWM) {
-			auto group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
-			int serial = prompt("Enter motor serial");
+			can::CANDevice_t device = prompt("Enter device");
 			int pwm = prompt("Enter PWM");
-			can::motor::setMotorMode(group, serial, motormode_t::pwm);
-			can::motor::setMotorPower(group, serial, static_cast<int16_t>(pwm));
+			can::motor::setMotorMode(device, motormode_t::pwm);
+			can::motor::setMotorPower(device, static_cast<int16_t>(pwm));
 		} else if (testMode == TestMode::PID) {
-			static can::devicegroup_t group;
-			static int serial;
+			static can::CANDevice_t device;
+			/*
 			if (!mode_has_been_set) {
-				group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
-				serial = prompt("Enter motor serial");
+				device = prompt("Enter device");
 				// AVR board firmware resets the angle target every time it receives a
 				// mode set packet, so we only want to send this once.
 				// TODO: do we need to set the PPJR?
-				can::motor::setMotorMode(group, serial, motormode_t::pid);
+				can::motor::setMotorMode(device, motormode_t::pid);
 				mode_has_been_set = true;
 			}
 
@@ -245,24 +243,23 @@ int main() {
 			int i_coeff = prompt("I");
 			int d_coeff = prompt("D");
 
-			can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
+			can::motor::setMotorPIDConstants(device, p_coeff, i_coeff, d_coeff);
 
 			int angle_target = prompt("Enter PID target (in 1000ths of degrees)");
-			can::motor::setMotorPIDTarget(group, serial, angle_target);
+			can::motor::setMotorPIDTarget(device, angle_target);
+			*/
 		} else if (testMode == TestMode::PIDVel) {
 			static robot::types::datatime_t startTime;
 			static int32_t targetVel;
 			static std::shared_ptr<CANBoard> motor;
 			static robot::types::DataPoint<int32_t> initialMotorPos;
 			static double vel_timeout;
-
+			/*
 			if (!mode_has_been_set) {
-				can::uuid_t uuid = static_cast<can::uuid_t>(prompt("Enter device UUID"));
-				can::domainmask_t domains = static_cast<can::domainmask_t>(prompt("Enter domain mask"));
+				can::CANDevice_t device = prompt("Enter device UUID");
 
 				// set pid mode
-				can::motor::setMotorMode(uuid, domains, motormode_t::pid);
-				// can::motor::setMotorMode(group, serial, motormode_t::pid);
+				can::motor::setMotorMode(device, motormode_t::pid);
 				mode_has_been_set = true;
 
 				// get pid coeffs
@@ -271,16 +268,15 @@ int main() {
 				int d_coeff = prompt("D");
 
 				// set pid coeffs
-				can::motor::setMotorPIDConstants(uuid, domains, p_coeff, i_coeff, d_coeff);
-				// can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
+				can::motor::setMotorPIDConstants(device, p_coeff, i_coeff, d_coeff);
+				// can::motor::setMotorPIDConstants(device, p_coeff, i_coeff, d_coeff);
 
 				// create can motor
 				double posScale =
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = std::make_shared<CANBoard>(boardid_t::leftTread, true, uuid,
-														   domains, posScale, negScale);
+				motor = std::make_shared<CANBoard>(boardid_t::leftTread, true, device, posScale, negScale);
 
 				// get initial motor position
 				DataPoint<int32_t> dataPoint = motor->getMotorPos();
@@ -316,12 +312,11 @@ int main() {
 				// stop arm movement: set power to 0
 				motor->setMotorPower(0.0);
 			}
+			*/
 		} else if (testMode == TestMode::Encoder) {
-			static can::devicegroup_t group;
-			static int serial;
+			static can::CANDevice_t device;
 			if (!mode_has_been_set) {
-				group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
-				serial = prompt("Enter motor serial");
+				device = prompt("Enter device");
 
 				int sensorType;
 				do {
@@ -331,22 +326,22 @@ int main() {
 
 				std::chrono::milliseconds telemPeriod(prompt("Telemetry period (ms)"));
 
-				can::motor::initMotor(group, serial);
+				can::motor::initMotor(device);
 				if (sensorType == 0) {
 					int ppjr = prompt("Pulses per joint revolution");
 					bool invert = prompt("Invert? 1=yes, 0=no") == 1;
-					can::motor::initEncoder(group, serial, invert, true, ppjr, telemPeriod);
+					can::motor::initEncoder(device, invert, true, ppjr, telemPeriod);
 				} else if (sensorType == 1) {
 					int posLo = prompt("Pos Lo");
 					int posHi = prompt("Pos Hi");
 					int adcLo = prompt("ADC Lo");
 					int adcHi = prompt("ADC Hi");
-					can::motor::initPotentiometer(group, serial, posLo, posHi, adcLo, adcHi,
+					can::motor::initPotentiometer(device, posLo, posHi, adcLo, adcHi,
 												  telemPeriod);
 				}
 				mode_has_been_set = true;
 			}
-			auto encoderData = can::motor::getMotorPosition(group, serial);
+			auto encoderData = can::motor::getMotorPosition(device);
 			std::string encoderStr =
 				encoderData ? std::to_string(encoderData.getData()) : "null";
 			// \33[2k is the ANSI escape sequence for erasing the current console line
@@ -354,12 +349,11 @@ int main() {
 			std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
 			std::this_thread::sleep_for(20ms);
 		} else if (testMode == TestMode::LimitSwitch) {
+			/*
 			static bool testLimits = false;
-			static can::devicegroup_t group;
-			static int serial;
+			static can::CANDevice_t device;
 			if (!mode_has_been_set) {
-				group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
-				serial = prompt("Enter motor serial");
+				can::CANDevice_t device = prompt("Enter device");
 				testLimits = static_cast<bool>(prompt("Set limits? 1=yes,0=no"));
 				if (testLimits) {
 					int lo = prompt("Low position");
@@ -390,14 +384,13 @@ int main() {
 				std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
 				std::this_thread::sleep_for(20ms);
 			}
+			*/
 		} else if (testMode == TestMode::Telemetry) {
 			if (!mode_has_been_set) {
-				auto group = static_cast<can::devicegroup_t>(prompt("Enter group code"));
-				int serial = prompt("Enter serial");
-				can::deviceid_t deviceID = std::make_pair(group, serial);
+				can::CANDeviceUUID_t uuid = prompt("Enter device uuid");
 				auto telemType = static_cast<can::telemtype_t>(prompt("Enter telemetry type"));
 				can::addDeviceTelemetryCallback(
-					deviceID, telemType,
+					uuid, telemType,
 					[](can::deviceid_t id, can::telemtype_t telemType,
 					   DataPoint<can::telemetry_t> data) {
 						std::cout << "Telemetry: group=" << std::hex
@@ -412,12 +405,14 @@ int main() {
 											 "for telemetry timing packet"));
 				if (useTimingPacket) {
 					CANPacket packet;
+					/*
 					AssembleTelemetryTimingPacket(
 						&packet, static_cast<uint8_t>(deviceID.first), deviceID.second,
 						static_cast<uint8_t>(telemType), telemPeriod);
 					can::sendCANPacket(packet);
+					*/
 				} else {
-					can::scheduleTelemetryPull(deviceID, telemType,
+					can::scheduleTelemetryPull(uuid, telemType,
 											   std::chrono::milliseconds(telemPeriod));
 				}
 				mode_has_been_set = true;
@@ -442,8 +437,7 @@ int main() {
       can::printCANPacket(p);
     } else if (testMode == TestMode::RawCAN) {
       uint8_t pr = prompt("priority");
-      uint8_t g = prompt("group");
-      uint8_t s = prompt("serial");
+      uint8_t d = prompt("device");
       uint8_t pid = prompt("pid");
       uint8_t dlc = prompt("add'l. data bits");
       uint8_t data[dlc+1];
@@ -453,11 +447,10 @@ int main() {
         data[i] = prompt("bit");
       }
 
-      CANPacket p;
-      AssembleCANPacket(&p, pr, g, s, pid, dlc+1, data);
+      CANPacket_t p;
+      AssembleCANPacket(&p, pr, d, pid, dlc+1, data);
       can::sendCANPacket(p);
       can::printCANPacket(p);
     }
 	}
 }
-*/

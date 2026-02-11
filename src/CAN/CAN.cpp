@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include <unordered_map>
 #include <utility>
+// temp for printing
+#include <iostream>
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -54,8 +56,8 @@ namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 // CAN26 11-bit ID layout: [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
-// Match on UUID field (bits 3-9) to filter for packets addressed to this device
-constexpr uint32_t CAN_MASK = 0x3F8; // bits 3-9 = UUID field
+// Match on UUID field to filter for packets addressed to this device
+constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
 
 int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
@@ -259,6 +261,11 @@ int createCANSocket(std::optional<CANDevice_t> device) {
 		filters[0].can_id = canID;
 		filters[0].can_mask = CAN_MASK;
 
+		// for testing
+		std::cout << "CAN packet: " << canID << std::endl;
+		std::cout << "CAN uuid: " << (canID & CAN_MASK) << std::endl;
+		std::cout << "Filters: " << filters[0].can_id << ", " << filters[0].can_mask << std::endl;
+		
 		setsockopt(fd, SOL_CAN_RAW, CAN_RAW_FILTER, &filters, sizeof(filters));
 	} else {
 		// disable reception on this socket.
