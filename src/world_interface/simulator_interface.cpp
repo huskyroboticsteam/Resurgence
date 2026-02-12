@@ -295,6 +295,17 @@ std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
 		throw std::invalid_argument("Configuration file missing key(s)");
 	}
 
+	// Load camera configuration including intrinsic and extrinsic parameters
+	cam::CameraConfig config = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(cam));
+	
+	// Store the configuration for later retrieval
+	cameraConfigMap[cam] = config;
+	
+	LOG_F(INFO, "Loaded camera config for %s - has intrinsics: %s, has extrinsics: %s",
+	      cam.c_str(),
+	      config.intrinsicParams.has_value() ? "yes" : "no",
+	      config.extrinsicParams.has_value() ? "yes" : "no");
+
 	json msg = {{"type", "simCameraStreamOpenRequest"},
 			{"camera", cam},
 			{"fps", static_cast<int>(fs[KEY_FRAMERATE])},

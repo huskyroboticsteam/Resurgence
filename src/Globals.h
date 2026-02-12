@@ -31,4 +31,6 @@ extern robot::types::mountedperipheral_t mountedPeripheral;
 extern control::PlanarArmController<2> planarArmController;
 extern const kinematics::DiffWristKinematics wristKinematics;
 extern std::atomic<bool> armIKEnabled;
+extern std::atomic<bool> objectDetectionEnabled;
+extern std::atomic<bool> arucoDetectionEnabled;
 } // namespace Globals

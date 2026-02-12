@@ -251,6 +251,14 @@ saveCameraParams(const std::string& filename, cv::Size imageSize, cv::Size board
 					"at the given path.");
 	fs << "filename"
 	   << "/path/to/camera/device";
+	
+	fs.writeComment("Video format: typically 'image/jpeg' or 'video/x-raw'.");
+	fs << "format" << "image/jpeg";
+	fs.writeComment("Framerate in frames per second.");
+	fs << "framerate" << 30;
+	fs.writeComment("Image dimensions (must match calibration resolution).");
+	fs << "image_width" << imageSize.width;
+	fs << "image_height" << imageSize.height;
 
 	time_t tt;
 	time(&tt);

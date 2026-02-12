@@ -4,6 +4,7 @@
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
+#include "../camera/CameraConfig.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
@@ -116,8 +117,14 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 		if (cam) { return cam; }
 	}
 	try {
+		// Load camera configuration to get intrinsic and extrinsic parameters
+		auto config = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(camID));
+		
 		auto cam = std::make_shared<cam::Camera>();
-		bool success = cam->open(camID);
+		// Extract values from optional before passing to open()
+		cam::CameraParams intrinsics = config.intrinsicParams.value_or(cam::CameraParams());
+		cv::Mat extrinsics = config.extrinsicParams.value_or(cv::Mat());
+		bool success = cam->open(camID, intrinsics, extrinsics);
 		if (success) {
 			cameraMap[camID] = cam;
 			return cam;

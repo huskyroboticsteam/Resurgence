@@ -80,6 +80,10 @@ static bool validateDriveRequest(const json& j) {
 		   util::validateRange(j, "steer", -1, 1);
 }
 
+static bool validateObjectDetectionEnable(const json& j) {
+	return util::validateKey(j, "enabled", val_t::boolean);
+}
+
 void MissionControlProtocol::handleDriveRequest(const json& j) {
 	// TODO: ignore this message if we are in autonomous mode.
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
@@ -136,6 +140,28 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 	} else {
 		this->setArmIKEnabled(false);
 	}
+}
+
+void MissionControlProtocol::handleRequestObjectDetectionEnabled(const json& j) {
+	bool enabled = j["enabled"];
+	this->setObjectDetectionEnabled(enabled);
+}
+
+void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
+	_power_repeat_task.setCmdVel(dtheta, dx);
+	robot::setCmdVel(dtheta, dx);
+}
+
+void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
+	_power_repeat_task.setTankCmdVel(left, right);
+	robot::setTankCmdVel(left, right);
+}
+
+static bool validateJoint(const json& j) {
+	return util::validateKey(j, "joint", val_t::string) &&
+		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
+			   return j["joint"].get<std::string>() == util::to_string(joint);
+		   });
 }
 
 static bool validateJointPowerRequest(const json& j) {
@@ -277,9 +303,17 @@ void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
 	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
+void MissionControlProtocol::sendObjectDetectionEnabledReport(bool enabled) {
+	json msg = {{"type", OBJECT_DETECTION_ENABLED_REP_TYPE}, {"enabled", enabled}};
+	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+}
+
 void MissionControlProtocol::handleConnection() {
 	// Turn off inverse kinematics on connection
 	this->setArmIKEnabled(false);
+	
+	// Turn off object detection on connection
+	this->setObjectDetectionEnabled(false);
 
 	// TODO: send the actual mounted peripheral, as specified by the command-line parameter
 	json j = {{"type", MOUNTED_PERIPHERAL_REP_TYPE}};
@@ -345,6 +379,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		std::bind(&MissionControlProtocol::handleRequestArmIKEnabled, this, _1),
 		validateArmIKEnable);
 	this->addMessageHandler(
+		OBJECT_DETECTION_ENABLED_TYPE,
+		std::bind(&MissionControlProtocol::handleRequestObjectDetectionEnabled, this, _1),
+		validateObjectDetectionEnable);
+	this->addMessageHandler(
 		JOINT_POWER_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleJointPowerRequest, this, _1),
 		validateJointPowerRequest);
@@ -408,26 +446,18 @@ void MissionControlProtocol::setArmIKEnabled(bool enabled, bool sendReport) {
 	}
 }
 
+void MissionControlProtocol::setObjectDetectionEnabled(bool enabled, bool sendReport) {
+	Globals::objectDetectionEnabled = enabled;
+	LOG_F(INFO, "Object detection %s", enabled ? "ENABLED" : "DISABLED");
+
+	if (sendReport) {
+		sendObjectDetectionEnabledReport(enabled);
+	}
+}
+
 void MissionControlProtocol::setRequestedJointPower(jointid_t joint, double power) {
 	_power_repeat_task.setJointPower(joint, power);
 	robot::setJointPower(joint, power);
-}
-
-void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
-	_power_repeat_task.setCmdVel(dtheta, dx);
-	robot::setCmdVel(dtheta, dx);
-}
-
-void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
-	_power_repeat_task.setTankCmdVel(left, right);
-	robot::setTankCmdVel(left, right);
-}
-
-static bool validateJoint(const json& j) {
-	return util::validateKey(j, "joint", val_t::string) &&
-		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
-			   return j["joint"].get<std::string>() == util::to_string(joint);
-		   });
 }
 
 static void stopAllJoints() {

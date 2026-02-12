@@ -3,12 +3,17 @@
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"
 #include "world_interface/world_interface.h"
+#include "ar/read_landmarks.h"
+#ifdef ENABLE_OBJECT_DETECTION
+#include "object-detection/read_objects.h"
+#endif
 
 #include <array>
 #include <chrono>
 #include <csignal>
 #include <ctime>
 #include <filesystem>
+#include <iostream>
 #include <loguru.cpp>
 #include <sstream>
 #include <thread>
@@ -30,6 +35,54 @@ void closeRover(int) {
 	robot::emergencyStop();
 	Globals::websocketServer.stop();
 	raise(SIGTERM);
+}
+
+void keyboardControlLoop() {
+	std::cout << "\n=== Keyboard Controls ===" << std::endl;
+#ifdef ENABLE_OBJECT_DETECTION
+	std::cout << "  O - Toggle object detection on/off" << std::endl;
+#endif
+	std::cout << "  R - Toggle ArUco detection on/off" << std::endl;
+	std::cout << "  Q - Quit" << std::endl;
+	std::cout << "========================\n" << std::endl;
+	
+	while (true) {
+		char input;
+		std::cin >> input;
+		
+		switch (input) {
+			case 'o':
+			case 'O':
+#ifdef ENABLE_OBJECT_DETECTION
+				Globals::objectDetectionEnabled = !Globals::objectDetectionEnabled;
+				LOG_F(INFO, "Object detection %s", 
+					  Globals::objectDetectionEnabled ? "ENABLED" : "DISABLED");
+				std::cout << "Object detection " 
+						  << (Globals::objectDetectionEnabled ? "ON" : "OFF") 
+						  << std::endl;
+#else
+				LOG_F(WARNING, "Object detection not available (LibTorch not found)");
+				std::cout << "Object detection not available (LibTorch not found)" << std::endl;
+#endif
+				break;
+			case 'r':
+			case 'R':
+				Globals::arucoDetectionEnabled = !Globals::arucoDetectionEnabled;
+				LOG_F(INFO, "ArUco detection %s", 
+					  Globals::arucoDetectionEnabled ? "ENABLED" : "DISABLED");
+				std::cout << "ArUco detection " 
+						  << (Globals::arucoDetectionEnabled ? "ON" : "OFF") 
+						  << std::endl;
+				break;
+			case 'q':
+			case 'Q':
+				LOG_F(INFO, "Quit requested from keyboard");
+				closeRover(0);
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 void parseCommandLine(int argc, char** argv) {
@@ -154,6 +207,28 @@ int main(int argc, char** argv) {
 	Globals::websocketServer.addProtocol(std::move(mcProto));
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
+	
+	// Initialize AR landmark detection
+	LOG_F(INFO, "Initializing AR landmark detection...");
+	if (AR::initializeLandmarkDetection()) {
+		LOG_F(INFO, "AR landmark detection initialized successfully");
+	} else {
+		LOG_F(WARNING, "Failed to initialize AR landmark detection");
+	}
+	
+#ifdef ENABLE_OBJECT_DETECTION
+	// Initialize object detection
+	LOG_F(INFO, "Initializing object detection...");
+	if (ObjDet::initializeObjectDetection()) {
+		LOG_F(INFO, "Object detection initialized successfully");
+	} else {
+		LOG_F(WARNING, "Failed to initialize object detection");
+	}
+#endif
+	
+	// Start keyboard control thread
+	std::thread keyboard_thread(keyboardControlLoop);
+	keyboard_thread.detach();
 
 	while (true) {
 		std::this_thread::sleep_for(std::chrono::seconds(60));
