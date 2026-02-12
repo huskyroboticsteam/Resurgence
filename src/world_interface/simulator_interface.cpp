@@ -9,7 +9,12 @@
 #include "../utils/transform.h"
 #include "motor/sim_motor.h"
 #include "world_interface.h"
+#include "../Globals.h"
+#include "../utils/scheduler.h"
+#include "../control_interface.h"
 
+
+#include <chrono>										// For ms and time
 #include <atomic>
 #include <condition_variable>
 #include <loguru.hpp>
@@ -62,6 +67,20 @@ bool is_emergency_stopped = false;
 // A mapping of (motor_id, shared pointer to object of the motor)
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
+std::shared_mutex limitSwitchMapMutex;
+
+const std::chrono::milliseconds LIMIT_SWITCH_TIMEOUT = std::chrono::milliseconds(1000);
+
+// Map correlating limit switch to it's status where false is not triggered
+// and true is triggered. The second value of the pair corresponds to the most
+// timestamp that this limit switch has been triggered at
+std::map<motorid_t, std::pair<bool, std::chrono::time_point<std::chrono::steady_clock>>> limSwitchMap;
+
+// Watch doing reference. Whenever this watchdog timer goes off regardless for what limit
+// switch we will check whether any of the limit switches have timed out from the limit switch
+// timer map
+std::unique_ptr<util::Watchdog<>> watchDogPointer;
+
 using lscallback_t =
 	std::function<void(robot::types::DataPoint<LimitSwitchData> limitSwitchData)>;
 std::map<std::string, std::map<robot::callbackid_t, lscallback_t>> limitSwitchCallbackMap;
@@ -82,6 +101,14 @@ std::unordered_map<CameraID, cam::CameraConfig> cameraConfigMap;
 std::condition_variable connectionCV;
 std::mutex connectionMutex;
 bool simConnected = false;
+
+/**
+ * @brief Limit switch handler. Called when limit switch status is updated
+ *
+ * @param motor The motor to set the target position of.
+ * @param limitSwitchData new data regarding the limit switch represented as a data point
+ */
+void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData);
 
 void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
@@ -117,6 +144,15 @@ void initMotors() {
 			std::make_shared<robot::sim_motor>(x.first, true, x.second, PROTOCOL_PATH);
 		motor_ptrs.insert({x.first, ptr});
 	}
+
+	// initialize limit switches
+	robot::addLimitSwitchCallback(robot::types::motorid_t::elbow, handleLim);
+	robot::addLimitSwitchCallback(robot::types::motorid_t::shoulder, handleLim);
+
+	// first: callback, second: motor id
+	for (const auto& x : lsCallbackToMotorMap) {
+		limSwitchMap[x.second] = {false, std::chrono::steady_clock::now()};
+	}
 }
 
 void handleGPS(json msg) {
@@ -135,6 +171,66 @@ void handleIMU(json msg) {
 	q.normalize();
 	std::lock_guard<std::mutex> guard(orientationMutex);
 	lastOrientation = q;
+}
+
+void limitSwitchPoll() {
+	// Check whether any of the limit switches have timed out and reset their status
+	// You must then update the mission control that the limit switch has timed out
+	// and has been reset
+	int limitSwitchesNotReset = 0;
+	for (const auto& [key, value] : limSwitchMap) {
+		
+		// Check if the limit switch is currently being marked as active, then check if
+		// timeout
+		if (value.first) {
+			if (std::chrono::steady_clock::now() - value.second >= LIMIT_SWITCH_TIMEOUT) {
+				limSwitchMap[key].first = false;
+					json msg = {{"type", "LimitUpdate"},
+								{"motor", motorid_to_name.at(key).data()},
+								{"status", false}};	
+
+				Globals::websocketServer.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+			}
+			else {
+				limitSwitchesNotReset++;
+			}
+		}
+	}
+
+	// No limit switch activity delete thread and object to use less resources
+	if (limitSwitchesNotReset == 0 && watchDogPointer != nullptr) {
+		watchDogPointer = nullptr;
+	}
+}
+
+void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
+	if (!motorid_to_name.count(motor)) {
+		LOG_F(ERROR, "ERROR: Tried to handle limit switch from motor that does not exist!");
+		return;
+	}
+
+	std::unique_lock guard(limitSwitchMapMutex);		
+	limSwitchMap[motor].first = true;
+	limSwitchMap[motor].second = std::chrono::steady_clock::now();
+
+	jointid_t jointID = Constants::MOTOR_JOINT_MAP.at(motor);
+
+	// set both joint and motor power to 0
+	robot::setJointPower(jointID, 0.0);
+	robot::setMotorPower(motor, 0.0);
+
+	// Create a general watchdog reference, fires every 0.1 seconds (Very fast poll to handle multiple limit
+	// at once)
+	if (watchDogPointer == nullptr) {
+		watchDogPointer = std::make_unique<util::Watchdog<std::chrono::_V2::steady_clock>>
+			("LimitSwitch WatchDog timer", std::chrono::milliseconds(100), limitSwitchPoll, true);
+	}
+
+	json msg = {{"type", "LimitUpdate"},
+				{"motor", motorid_to_name.at(motor).data()},
+				{"status", true}};	
+
+	Globals::websocketServer.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 }
 
 void handleCamFrame(json msg) {
@@ -220,7 +316,7 @@ void initSimServer(net::websocket::SingleClientWSServer& ws) {
 	protocol->addMessageHandler("simGpsPositionReport", handleGPS);
 	protocol->addMessageHandler("simCameraStreamReport", handleCamFrame);
 	protocol->addMessageHandler("simMotorStatusReport", handleMotorStatus);
-	protocol->addMessageHandler("simLimitSwitchAlert", handleLimitSwitch);
+	protocol->addMessageHandler("simLimitSwitchReport", handleLimitSwitch);
 	protocol->addMessageHandler("simRoverTruePoseReport", handleTruePose);
 	protocol->addConnectionHandler(clientConnected);
 	protocol->addDisconnectionHandler(clientDisconnected);
@@ -378,6 +474,10 @@ void setMotorPower(motorid_t motor, double normalizedPWM) {
 void setMotorPos(motorid_t motor, int32_t targetPos) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorPos(targetPos);
+}
+
+bool getMotorLimStatus(robot::types::motorid_t motor) {
+	return limSwitchMap.at(motor).first;
 }
 
 DataPoint<int32_t> getMotorPos(motorid_t motor) {

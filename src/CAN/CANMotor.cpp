@@ -161,6 +161,12 @@ void pullMotorPosition(devicegroup_t group, deviceserial_t serial) {
 	pullDeviceTelemetry(std::make_pair(group, serial), telemtype_t::angle);
 }
 
+DataPoint<int32_t> getMotorLimits(deviceserial_t serial) {
+	return getDeviceTelemetry(std::make_pair(devicegroup_t::motor, serial),
+							  telemtype_t::limit_switch);
+}
+
+
 callbackid_t addLimitSwitchCallback(
 	devicegroup_t group, deviceserial_t serial,
 	const std::function<void(devicegroup_t group, deviceserial_t serial,

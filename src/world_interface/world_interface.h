@@ -8,7 +8,9 @@
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
 #include "motor/base_motor.h"
+#include "../utils/scheduler.h"
 
+#include <chrono>
 #include <array>
 #include <optional>
 #include <unordered_set>
@@ -223,6 +225,14 @@ void setMotorPos(robot::types::motorid_t motor, int32_t targetPos);
  * @param targetVel The target velocity, in millidegrees per second.
  */
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel);
+
+/**
+ * @brief Sets the velocity of the given motor.
+ *
+ * @param motor The motor to set the target position of.
+ * @param targetVel The target velocity, in millidegrees per second.
+ */
+bool getMotorLimStatus(robot::types::motorid_t motor);
 
 /**
  * @brief Get the last reported position of the specified motor.
