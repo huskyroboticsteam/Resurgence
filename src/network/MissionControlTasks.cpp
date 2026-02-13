@@ -118,14 +118,17 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 				const CameraID& cam = stream.first;
 				stream_data_t& stream_data = stream.second;
 				uint32_t frame_num = stream_data.frame_num;
-				if (robot::hasNewCameraFrame(cam, frame_num)) {
-					// if there is a new frame, grab it
-					auto camDP = robot::readCamera(cam);
 
-					if (camDP) {
-						auto data = camDP.getData();
-						uint32_t& new_frame_num = data.second;
-						cv::Mat frame = data.first;
+				// if there is a new frame, grab it
+				auto camDP = robot::readCamera(cam);
+
+				if (camDP) {
+					auto data = camDP.getData();
+					uint32_t& new_frame_num = data.second;
+					cv::Mat frame = data.first;
+
+					// Verify that frame to be sent is actually new
+					if (new_frame_num > frame_num) {
 						// update the previous frame number
 						stream_data.frame_num = new_frame_num;
 						const auto& encoder = stream_data.encoder;
