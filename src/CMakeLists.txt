@@ -140,6 +140,8 @@ link_libraries(loguru::loguru -ldl)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-app-1.0)
 
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
@@ -164,8 +166,10 @@ add_library(camera SHARED
   camera/Camera.cpp
   camera/CameraParams.cpp
   camera/CameraConfig.cpp
+  camera/H264PassthroughSource.cpp
 )
-target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
+target_include_directories(camera PUBLIC ${GSTREAMER_INCLUDE_DIRS})
+target_link_libraries(camera PUBLIC ${OpenCV_LIBS} ${GSTREAMER_LIBRARIES})
 
 # shared library for utility code
 add_library(utils SHARED

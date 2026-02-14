@@ -2,13 +2,16 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../camera/CameraConfig.h"
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../world_interface/world_interface.h"
 #include "MissionControlMessages.h"
 
+#include <algorithm>
+#include <cctype>
 #include <loguru.hpp>
-
+#include <vector>
 #include <nlohmann/json.hpp>
 
 using namespace robot::types;
@@ -19,7 +22,12 @@ using nlohmann::json;
 namespace net::mc::tasks {
 namespace {
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
-}
+
+template <class... Ts> struct overloaded : Ts... {
+	using Ts::operator()...;
+};
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+} // namespace
 
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
@@ -91,12 +99,84 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 	if (_open_streams.find(cam) == _open_streams.end()) {
 		std::thread([this, cam, fps]() {
 			std::lock_guard lock(_mutex);
-			auto it = Constants::video::STREAM_RFS.find(cam);
-			int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second : Constants::video::H264_RF_CONSTANT;
-			auto enc = std::make_shared<video::H264Encoder>(fps, rf);
-			auto cam_handle = robot::openCamera(cam);
-			if (cam_handle) {
-				_open_streams.insert_or_assign(cam, stream_data_t(enc, cam_handle));
+			auto cfgIt = Constants::CAMERA_CONFIG_PATHS.find(cam);
+			// check if we have a config for this camera
+			if (cfgIt == Constants::CAMERA_CONFIG_PATHS.end()) {
+				LOG_F(WARNING, "No camera configuration found for %s", cam.c_str());
+				return;
+			}
+
+			// load the config file
+			cv::FileStorage configFs(cfgIt->second, cv::FileStorage::READ);
+			if (!configFs.isOpened()) {
+				LOG_F(ERROR, "Failed to open camera config file %s", cfgIt->second.c_str());
+				return;
+			}
+
+			bool openCVEnabled = false;
+			// check if OpenCV processing is enabled
+			if (!configFs[cam::KEY_OPENCV_ENABLED].empty()) {
+				openCVEnabled = static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == 0;
+			}
+
+			LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == 0 ? "true" : "false");
+
+			bool opened = false;
+			if (!openCVEnabled) {
+				if (!configFs[cam::KEY_CAMERA_ID].empty() && !configFs[cam::KEY_FORMAT].empty() &&
+					!configFs[cam::KEY_IMAGE_WIDTH].empty() && !configFs[cam::KEY_IMAGE_HEIGHT].empty() &&
+					!configFs[cam::KEY_FRAMERATE].empty()) {
+					std::string format = static_cast<std::string>(configFs[cam::KEY_FORMAT]);
+					std::transform(format.begin(), format.end(), format.begin(),
+								   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+					// creates passthrough source only if format is H264
+					if (format.find("264") != std::string::npos) {
+						cam::CameraStreamProperties streamProps{
+							.cameraId = static_cast<int>(configFs[cam::KEY_CAMERA_ID]),
+							.format = format,
+							.width = static_cast<int>(configFs[cam::KEY_IMAGE_WIDTH]),
+							.height = static_cast<int>(configFs[cam::KEY_IMAGE_HEIGHT]),
+							.framerate = static_cast<int>(configFs[cam::KEY_FRAMERATE]),
+						};
+						// try to create H264 passthrough source
+						try {
+							auto passthrough =
+								std::make_unique<cam::H264PassthroughSource>(streamProps);
+							_open_streams.insert_or_assign(
+								cam, stream_data_t(passthrough_stream_t{std::move(passthrough)}));
+							LOG_F(INFO, "Opened H264 pass-through stream for %s", cam.c_str());
+							opened = true;
+						} catch (const std::exception& e) {
+							LOG_F(ERROR, "Failed to initialize H264 pass-through for %s: %s",
+								  cam.c_str(), e.what());
+						}
+					} else {
+						LOG_F(INFO,
+							  "Camera %s format %s does not provide H264, falling back to CPU "
+							  "encoding",
+							  cam.c_str(), format.c_str());
+					}
+				} else {
+					LOG_F(WARNING,
+						  "Camera %s config missing stream properties; falling back to CPU encoding",
+						  cam.c_str());
+				}
+			}
+			// if passthrough source was not opened, fall back to CPU encoding
+			if (!opened) {
+				auto it = Constants::video::STREAM_RFS.find(cam);
+				int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second
+																   : Constants::video::H264_RF_CONSTANT;
+				auto enc = std::make_shared<video::H264Encoder>(fps, rf);
+				auto cam_handle = robot::openCamera(cam);
+				if (cam_handle) {
+					_open_streams.insert_or_assign(
+						cam, stream_data_t(decoded_stream_t{enc, cam_handle}));
+					LOG_F(INFO, "Opened CPU-encoded stream for %s", cam.c_str());
+				} else {
+					LOG_F(ERROR, "Failed to open %s camera for CPU encoding", cam.c_str());
+				}
+				
 			}
 		}).detach();
 	}
@@ -114,30 +194,44 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 		{
 			std::lock_guard lg(_mutex);
 			// for all open streams, check if there is a new frame
-			for (auto& stream : _open_streams) {
-				const CameraID& cam = stream.first;
-				stream_data_t& stream_data = stream.second;
-				uint32_t frame_num = stream_data.frame_num;
-				if (robot::hasNewCameraFrame(cam, frame_num)) {
-					// if there is a new frame, grab it
-					auto camDP = robot::readCamera(cam);
+			for (auto& [cam, stream_data] : _open_streams) {
+				std::visit(
+					overloaded{
+						[this, &stream_data, &cam](decoded_stream_t& decoded) {
+							uint32_t frame_num = stream_data.frame_num;
+							if (robot::hasNewCameraFrame(cam, frame_num)) {
+								auto camDP = robot::readCamera(cam);
+								if (camDP) {
+									auto data = camDP.getData();
+									uint32_t& new_frame_num = data.second;
+									cv::Mat frame = data.first;
+									stream_data.frame_num = new_frame_num;
+									const auto& encoder = decoded.encoder;
 
-					if (camDP) {
-						auto data = camDP.getData();
-						uint32_t& new_frame_num = data.second;
-						cv::Mat frame = data.first;
-						// update the previous frame number
-						stream_data.frame_num = new_frame_num;
-						const auto& encoder = stream_data.encoder;
-
-						// convert frame to encoded data and send it
-						auto data_vector = encoder->encode_frame(frame);
-						json msg = {{"type", CAMERA_STREAM_REP_TYPE},
-									{"camera", cam},
-									{"data", data_vector}};
-						_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-					}
-				}
+									auto data_vector = encoder->encode_frame(frame);
+									json msg = {{"type", CAMERA_STREAM_REP_TYPE},
+												{"camera", cam},
+												{"data", data_vector}};
+									_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+								}
+							}
+						},
+						[this, &stream_data, &cam](passthrough_stream_t& passthrough) {
+							if (!passthrough.source) {
+								return;
+							}
+							std::vector<std::basic_string<uint8_t>> data_vector;
+							uint32_t new_frame_num = stream_data.frame_num;
+							if (passthrough.source->next(data_vector, new_frame_num) &&
+								!data_vector.empty()) {
+								stream_data.frame_num = new_frame_num;
+								json msg = {{"type", CAMERA_STREAM_REP_TYPE},
+											{"camera", cam},
+											{"data", data_vector}};
+								_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+							}
+						}},
+					stream_data.stream);
 			}
 		}
 		std::this_thread::yield();
