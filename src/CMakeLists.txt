@@ -147,7 +147,11 @@ endif()
 set(LOGURU_WITH_STREAMS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 FetchContent_MakeAvailable(LoguruGitRepo) # defines target 'loguru::loguru'
+
+# We only want to use certain system libraries (mainly and only nlohmann_json)
+set(USE_SYSTEM_JSON ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(libdatachannel)
+set(USE_SYSTEM_JSON OFF CACHE BOOL "" FORCE)
 link_libraries(loguru::loguru -ldl)
 
 find_package(Threads REQUIRED)
