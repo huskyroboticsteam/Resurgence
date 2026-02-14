@@ -123,6 +123,12 @@ if(OFFLINE_MODE STREQUAL "FALSE")
     GIT_REPOSITORY "https://github.com/emilk/loguru"
     GIT_TAG        "master"
   )
+
+  # Fetch WebRTC library (libdatachannel)
+  FetchContent_Declare(libdatachannel
+    GIT_REPOSITORY "https://github.com/paullouisageneau/libdatachannel"
+    GIT_TAG        "master"
+  )
 else()
   message("-- Offline mode enabled, using cached loguru")
   # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
@@ -130,12 +136,18 @@ else()
       LoguruGitRepo
       SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src"
   )
+
+  FetchContent_Declare(
+      libdatachannel
+      SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/libdatachannel-src"
+  )
 endif()
 
 # set any loguru compile-time flags before calling MakeAvailable()
 set(LOGURU_WITH_STREAMS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 FetchContent_MakeAvailable(LoguruGitRepo) # defines target 'loguru::loguru'
+FetchContent_MakeAvailable(libdatachannel)
 link_libraries(loguru::loguru -ldl)
 
 find_package(Threads REQUIRED)
