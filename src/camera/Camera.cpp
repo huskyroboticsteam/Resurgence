@@ -84,7 +84,8 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
   	std::string format = fs[KEY_FORMAT];
 
 	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
-  	gstr_ss << format << ",";
+  	//gstr_ss << format << ",";
+	gstr_ss << "video/x-raw,format=YUY2,";
 	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
@@ -92,7 +93,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	if (format == "image/jpeg") {
 		gstr_ss << "jpegdec ! ";
 	}
-	gstr_ss << "videoconvert ! appsink";
+	gstr_ss << "queue max-size-buffers=1 leaky=downstream ! videoconvert ! appsink drop=true max-buffers=1 sync=false";
 
 	return gstr_ss.str();
 }
