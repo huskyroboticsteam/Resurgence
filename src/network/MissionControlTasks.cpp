@@ -91,8 +91,8 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 	if (_open_streams.find(cam) == _open_streams.end()) {
 		std::thread([this, cam, fps]() {
 			std::lock_guard lock(_mutex);
-			auto it = Constants::video::STREAM_RFS.find(cam);
-			int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second : Constants::video::H264_RF_CONSTANT;
+			auto it = Constants::Camera::STREAM_RFS.find(cam);
+			int rf = (it != Constants::Camera::STREAM_RFS.end()) ? it->second : Constants::Camera::H264_RF_CONSTANT;
 			auto enc = std::make_shared<video::H264Encoder>(fps, rf);
 			auto cam_handle = robot::openCamera(cam);
 			if (cam_handle) {
@@ -135,7 +135,7 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						json msg = {{"type", CAMERA_STREAM_REP_TYPE},
 									{"camera", cam},
 									{"data", data_vector}};
-						_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+						_server.sendJSON(Constants::Network::MC_PROTOCOL_NAME, msg);
 					}
 				}
 			}
@@ -159,7 +159,7 @@ void TelemReportTask::sendTelemetry() {
 			json msg = {{"type", JOINT_POSITION_REP_TYPE},
 						{"joint", jointNameStdStr},
 						{"position", static_cast<double>(jpos.getData()) / 1000.0}};
-			this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+			this->_server.sendJSON(Constants::Network::MC_PROTOCOL_NAME, msg);
 		}
 	}
 
@@ -191,7 +191,7 @@ void TelemReportTask::sendTelemetry() {
 					{"lat", lat},
 					{"alt", alt},
 					{"recency", recency}};
-		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+		_server.sendJSON(Constants::Network::MC_PROTOCOL_NAME, msg);
 	}
 }
 
@@ -201,15 +201,15 @@ ArmIKTask::ArmIKTask(websocket::SingleClientWSServer& server)
 	  _server(server) {}
 
 void ArmIKTask::updateArmIK() {
-	DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-		robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+	DataPoint<navtypes::Vectord<Constants::Arm::IK_MOTORS.size()>> armJointPositions =
+		robot::getMotorPositionsRad(Constants::Arm::IK_MOTORS);
 	if (armJointPositions.isValid()) {
-		navtypes::Vectord<Constants::arm::IK_MOTORS.size()> targetJointPositions =
+		navtypes::Vectord<Constants::Arm::IK_MOTORS.size()> targetJointPositions =
 			Globals::planarArmController.getCommand(dataclock::now(),
 													armJointPositions.getData());
 		targetJointPositions /= M_PI / 180.0 / 1000.0; // convert from radians to millidegrees
-		for (size_t i = 0; i < Constants::arm::IK_MOTORS.size(); i++) {
-			robot::setMotorPos(Constants::arm::IK_MOTORS[i],
+		for (size_t i = 0; i < Constants::Arm::IK_MOTORS.size(); i++) {
+			robot::setMotorPos(Constants::Arm::IK_MOTORS[i],
 							   static_cast<int32_t>(targetJointPositions(i)));
 		}
 	}

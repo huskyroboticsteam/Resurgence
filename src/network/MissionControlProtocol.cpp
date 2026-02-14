@@ -18,6 +18,7 @@
 
 using namespace robot::types;
 using namespace std::chrono_literals;
+using namespace Constants::Network;
 
 using val_t = nlohmann::json::value_t;
 using net::websocket::connhandler_t;
@@ -87,8 +88,8 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	double straight = j["straight"];
 	double steer = -j["steer"].get<double>();
 	double norm = std::hypot(straight, steer);
-	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
-	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
+	double dx = Constants::Drive::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
+	double dtheta = Constants::Drive::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
 	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
 		  dx);
 	this->setRequestedCmdVel(dtheta, dx);
@@ -102,8 +103,8 @@ static bool validateTankDriveRequest(const json& j) {
 void MissionControlProtocol::handleTankDriveRequest(const json& j) {
 	double left = j["left"];
 	double right = j["right"];
-	double leftVel = Constants::MAX_WHEEL_VEL * left;
-	double rightVel = Constants::MAX_WHEEL_VEL * right;
+	double leftVel = Constants::Drive::MAX_WHEEL_VEL * left;
+	double rightVel = Constants::Drive::MAX_WHEEL_VEL * right;
 	LOG_F(1, "{left=%.2f, right=%.2f} -> setTankCmdVel(%.4f, %.4f)", left, right, leftVel,
 		  rightVel);
 	this->setRequestedTankCmdVel(leftVel, rightVel);
@@ -118,8 +119,8 @@ void MissionControlProtocol::handleRequestArmIKEnabled(const json& j) {
 	bool enabled = j["enabled"];
 	if (enabled) {
 		if (!Globals::armIKEnabled) {
-			DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-				robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+			DataPoint<navtypes::Vectord<Constants::Arm::IK_MOTORS.size()>> armJointPositions =
+				robot::getMotorPositionsRad(Constants::Arm::IK_MOTORS);
 
 			bool success =
 				armJointPositions.isValid() &&
@@ -221,7 +222,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 }
 
 static bool validateCameraStreamOpenRequest(const json& j) {
-	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
+	return util::validateOneOf(j, "camera", Constants::Camera::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
@@ -230,7 +231,7 @@ void MissionControlProtocol::handleCameraStreamOpenRequest(const json& j) {
 }
 
 static bool validateCameraStreamCloseRequest(const json& j) {
-	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
+	return util::validateOneOf(j, "camera", Constants::Camera::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
@@ -239,7 +240,7 @@ void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 }
 
 static bool validateCameraFrameRequest(const json& j) {
-	return util::validateOneOf(j, "camera", Constants::CAMERA_SET);
+	return util::validateOneOf(j, "camera", Constants::Camera::CAMERA_SET);
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
@@ -268,13 +269,13 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}, 
 		{"orientW", w}, {"orientX", x}, {"orientY", y}, {"orientZ", z},
 		{"lon", lon}, {"lat", lat}, {"alt", alt}};
-		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+		_server.sendJSON(MC_PROTOCOL_NAME, msg);
 	}
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
 	json msg = {{"type", ARM_IK_ENABLED_REP_TYPE}, {"enabled", enabled}};
-	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	this->_server.sendJSON(MC_PROTOCOL_NAME, msg);
 }
 
 void MissionControlProtocol::handleConnection() {
@@ -290,7 +291,7 @@ void MissionControlProtocol::handleConnection() {
 		j["peripheral"] = util::to_string(Globals::mountedPeripheral);
 	}
 
-	this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, j);
+	this->_server.sendJSON(MC_PROTOCOL_NAME, j);
 
 	if (!Globals::AUTONOMOUS) {
 		// start power repeat thread (if not already running)
@@ -317,7 +318,7 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 }
 
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
-	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),
+	: WebSocketProtocol(MC_PROTOCOL_NAME), _server(server),
 	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server),
 	  _autonomous_task() {
 	// emergency stop and operation mode handlers need the class for context since they must

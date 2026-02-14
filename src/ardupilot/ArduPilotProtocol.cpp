@@ -25,7 +25,7 @@ ArduPilotProtocol::~ArduPilotProtocol() {}
 
 void ArduPilotProtocol::initArduPilotServer(SingleClientWSServer& websocketServer) {
 	auto ardupilot_protocol = std::make_unique<net::websocket::WebSocketProtocol>(
-		Constants::ARDUPILOT_PROTOCOL_NAME);
+		Constants::Network::ARDUPILOT_PROTOCOL_NAME);
 	ardupilot_protocol->addMessageHandler(
 		"gps", std::bind(&ArduPilotProtocol::handleGPSRequest, this, _1), validateGPSRequest);
 	ardupilot_protocol->addMessageHandler(

@@ -9,7 +9,7 @@
 #include <vector>
 
 using robot::types::motorid_t;
-using namespace Constants::arm;
+using namespace Constants::Arm;
 
 namespace {
 
@@ -31,7 +31,7 @@ navtypes::Vectord<IK_MOTORS.size()> getJointLimits(bool getLow) {
 	return ret;
 }
 
-kinematics::ArmKinematics<2, Constants::arm::IK_MOTORS.size()> createArmKinematics() {
+kinematics::ArmKinematics<2, IK_MOTORS.size()> createArmKinematics() {
 	auto fk = std::make_shared<kinematics::PlanarArmFK<2>>(getSegLens(), getJointLimits(true),
 														   getJointLimits(false));
 	auto ik = std::make_shared<kinematics::FabrikSolver2D<2>>(fk, IK_SOLVER_THRESH,
@@ -43,11 +43,11 @@ kinematics::ArmKinematics<2, Constants::arm::IK_MOTORS.size()> createArmKinemati
 namespace Globals {
 RoverState curr_state;
 net::websocket::SingleClientWSServer websocketServer("DefaultServer",
-													 Constants::WS_SERVER_PORT);
+													 Constants::Network::WS_SERVER_PORT);
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 const kinematics::DiffWristKinematics wristKinematics;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
-													Constants::arm::SAFETY_FACTOR);
+													SAFETY_FACTOR);
 std::atomic<bool> armIKEnabled = false;
 } // namespace Globals

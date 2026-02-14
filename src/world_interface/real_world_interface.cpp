@@ -32,7 +32,7 @@ extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
 namespace {
-kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+kinematics::DiffDriveKinematics drive_kinematics(Constants::Drive::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {

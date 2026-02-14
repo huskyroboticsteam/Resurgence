@@ -61,12 +61,10 @@ constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
 	{motorid_t::shoulder,
 		{.isInverted = true,
 		.ppjr = 4590 * 1024 * 4,
-		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
-		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
+		.limitSwitchLow = Constants::Arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
+		.limitSwitchHigh = Constants::Arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
 		.zeroCalibrationPower = 0.4}},
 });
-
-constexpr double FOURBAR_GEAR_RATIO = 71.71875;
 // clang-format on
 
 // TODO: find appropriate bounds

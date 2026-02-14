@@ -39,8 +39,8 @@ double setCmdVel(double dtheta, double dx) {
 	}
 
 	kinematics::wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
-	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
-	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
+	double lPWM = wheelVels.lVel / Constants::Drive::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::Drive::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
 	if (maxAbsPWM > 1) {
 		lPWM /= maxAbsPWM;
@@ -59,8 +59,8 @@ double setTankCmdVel(double left, double right) {
 	}
 
 	kinematics::wheelvel_t wheelVels = {left, right};
-	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
-	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
+	double lPWM = wheelVels.lVel / Constants::Drive::MAX_WHEEL_VEL;
+	double rPWM = wheelVels.rVel / Constants::Drive::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
 	if (maxAbsPWM > 1) {
 		lPWM /= maxAbsPWM;
@@ -99,8 +99,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
 		return getMotorPos(Constants::JOINT_MOTOR_MAP.at(joint));
 	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+		DataPoint<navtypes::Vectord<Constants::Arm::IK_MOTORS.size()>> armJointPositions =
+			robot::getMotorPositionsRad(Constants::Arm::IK_MOTORS);
 		if (armJointPositions.isValid()) {
 			Eigen::Vector2d eePos = Globals::planarArmController.kinematics().jointPosToEEPos(
 				armJointPositions.getData());
@@ -157,23 +157,23 @@ double getJointPowerValue(types::jointid_t joint) {
 void setJointMotorPower(robot::types::jointid_t joint, double power) {
 	using robot::types::jointid_t;
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
-		bool isIKMotor = std::find(Constants::arm::IK_MOTOR_JOINTS.begin(),
-								   Constants::arm::IK_MOTOR_JOINTS.end(),
-								   joint) != Constants::arm::IK_MOTOR_JOINTS.end();
+		bool isIKMotor = std::find(Constants::Arm::IK_MOTOR_JOINTS.begin(),
+								   Constants::Arm::IK_MOTOR_JOINTS.end(),
+								   joint) != Constants::Arm::IK_MOTOR_JOINTS.end();
 		if (!Globals::armIKEnabled || !isIKMotor) {
 			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
 		}
 	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
 		if (Globals::armIKEnabled) {
-			auto ikMotorPos = robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+			auto ikMotorPos = robot::getMotorPositionsRad(Constants::Arm::IK_MOTORS);
 			if (ikMotorPos.isValid()) {
 				if (joint == jointid_t::ikForward) {
 					Globals::planarArmController.set_x_vel(dataclock::now(),
-														   power * Constants::arm::MAX_EE_VEL,
+														   power * Constants::Arm::MAX_EE_VEL,
 														   ikMotorPos.getData());
 				} else {
 					Globals::planarArmController.set_y_vel(dataclock::now(),
-														   power * Constants::arm::MAX_EE_VEL,
+														   power * Constants::Arm::MAX_EE_VEL,
 														   ikMotorPos.getData());
 				}
 			}
