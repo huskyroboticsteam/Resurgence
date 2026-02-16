@@ -3,6 +3,10 @@
 #include "kinematics/DiffDriveKinematics.h"
 
 namespace Constants {
+const double CONTROL_HZ = 10.0;
+
+const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
+const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
 namespace Arm {
 const double SHOULDER_LENGTH = 0.6;
@@ -93,10 +97,5 @@ const double DONE_THRESHOLD = 3.0;
 const util::dseconds CLOSE_TO_TARGET_DUR_VAL = std::chrono::milliseconds(750);
 
 } // namespace Nav
-
-const double CONTROL_HZ = 10.0;
-
-const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
-const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
 } // namespace Constants
