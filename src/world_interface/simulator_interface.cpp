@@ -240,7 +240,7 @@ void initSimServer(net::websocket::SingleClientWSServer& ws) {
 namespace robot {
 
 namespace {
-kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+kinematics::DiffDriveKinematics drive_kinematics(Constants::Drive::EFF_WHEEL_BASE);
 } // namespace
 
 const kinematics::DiffDriveKinematics& driveKinematics() {
@@ -286,7 +286,7 @@ std::unordered_set<CameraID> getCameras() {
 }
 
 std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
-	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
+	cv::FileStorage fs(Constants::Camera::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
 		throw std::invalid_argument("Configuration file for Camera ID" + cam + " does not exist");
 	}
