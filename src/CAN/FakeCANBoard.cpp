@@ -1,11 +1,11 @@
-#include "CAN.h"
-#include "CANMotor.h"
-#include "CANUtils.h"
 #include "../control/JacobianVelController.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
 #include "../utils/scheduler.h"
 #include "../world_interface/data.h"
+#include "CAN.h"
+#include "CANMotor.h"
+#include "CANUtils.h"
 
 #include <algorithm>
 #include <chrono>
@@ -16,12 +16,12 @@
 #include <vector>
 
 extern "C" {
-#include <CANPacket.h>
 #include <CANCommandIDs.h>
-#include <Packets/Universal.h>
+#include <CANPacket.h>
 
 #include <HindsightCAN/CANPower.h>
 #include <HindsightCAN/CANScience.h>
+#include <Packets/Universal.h>
 }
 
 using namespace std::chrono_literals;
@@ -38,22 +38,18 @@ enum class TestMode {
 	LimitSwitch,
 	Telemetry,
 	ScienceServos,
-  Stepper,
-  RawCAN
+	Stepper,
+	RawCAN
 };
 
 namespace {
 
 class CANBoard {
 public:
-	CANBoard(robot::types::boardid_t motor, bool hasPosSensor,
-					CANDevice_t device,
-					double pos_pwm_scale, double neg_pwm_scale)
-	: motor_id(motor),
-	has_pos_sensor(hasPosSensor),
-	device(device),
-	positive_scale(pos_pwm_scale),
-	negative_scale(neg_pwm_scale) {
+	CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
+			 double pos_pwm_scale, double neg_pwm_scale)
+		: motor_id(motor), has_pos_sensor(hasPosSensor), device(device),
+		  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale) {
 		// create scheduler if needed
 		std::lock_guard<std::mutex> lg(schedulerMutex);
 		if (!pSched) {
@@ -103,7 +99,7 @@ public:
 			}
 		});
 	}
-	
+
 	void unscheduleVelocityEvent() {
 		if (velEventID) {
 			pSched->removeEvent(velEventID.value());
@@ -128,7 +124,7 @@ private:
 	double negative_scale;
 	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
 	std::optional<JacobianVelController<1, 1>> velController;
-	
+
 	inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
 	inline static std::mutex schedulerMutex;
 
@@ -138,7 +134,7 @@ private:
 			motor_mode.emplace(mode);
 			can::motor::setMotorMode(device, mode);
 		}
-	}	
+	}
 
 	void constructVelController() {
 		// define dimensions
@@ -166,14 +162,14 @@ private:
 		velController.emplace(kinematicsFunct, jacobianFunct);
 	}
 };
-} // namespace robot
+} // namespace
 
 std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::ModeSet),   static_cast<int>(TestMode::PWM),
 	static_cast<int>(TestMode::PID),	   static_cast<int>(TestMode::Encoder),
 	static_cast<int>(TestMode::PIDVel),	   static_cast<int>(TestMode::LimitSwitch),
 	static_cast<int>(TestMode::Telemetry), static_cast<int>(TestMode::ScienceServos),
-  static_cast<int>(TestMode::Stepper), static_cast<int>(TestMode::RawCAN)};
+	static_cast<int>(TestMode::Stepper),   static_cast<int>(TestMode::RawCAN)};
 
 int prompt(std::string_view message) {
 	std::string str;
@@ -205,8 +201,8 @@ int main() {
 	ss << static_cast<int>(TestMode::LimitSwitch) << " for LIMIT SWITCH\n";
 	ss << static_cast<int>(TestMode::Telemetry) << " for TELEMETRY\n";
 	ss << static_cast<int>(TestMode::ScienceServos) << " for SCIENCE SERVOS\n";
-  ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
-  ss << static_cast<int>(TestMode::RawCAN) << " for CAN\n";
+	ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
+	ss << static_cast<int>(TestMode::RawCAN) << " for CAN\n";
 	int test_type = prompt(ss.str().c_str());
 	if (modes.find(test_type) == modes.end()) {
 		std::cout << "Unrecognized response: " << test_type << std::endl;
@@ -223,12 +219,11 @@ int main() {
 			CANDevice_t device;
 			device.deviceUUID = uuid;
 			std::cout << "got " << device.deviceUUID << std::endl;
-			can::motor::setMotorMode(device,
-									 mode == 0 ? motormode_t::pwm : motormode_t::pid);
+			can::motor::setMotorMode(device, mode == 0 ? motormode_t::pwm : motormode_t::pid);
 		} else if (testMode == TestMode::PWM) {
 			int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 			int pwm = prompt("Enter PWM");
-	
+
 			CANDevice_t device;
 			device.deviceUUID = uuid;
 			can::motor::setMotorMode(device, motormode_t::pwm);
@@ -256,7 +251,7 @@ int main() {
 			int angle_target = prompt("Enter PID target (in 1000ths of degrees)");
 			can::motor::setMotorPIDTarget(device, angle_target);
 			*/
-			
+
 		} else if (testMode == TestMode::PIDVel) {
 			/*
 			static robot::types::datatime_t startTime;
@@ -286,7 +281,8 @@ int main() {
 					prompt("Enter the positive scale for the motor (double value)\n");
 				double negScale =
 					prompt("Enter the negative scale for the motor (double value)\n");
-				motor = std::make_shared<CANBoard>(boardid_t::leftTread, true, device, posScale, negScale);
+				motor = std::make_shared<CANBoard>(boardid_t::leftTread, true, device,
+			posScale, negScale);
 
 				// get initial motor position
 				DataPoint<int32_t> dataPoint = motor->getMotorPos();
@@ -339,11 +335,11 @@ int main() {
 				std::chrono::milliseconds telemPeriod(prompt("Telemetry period (ms)"));
 
 				can::motor::initMotor(device);
-				
+
 				if (sensorType == 0) {
 					int ppjr = prompt("Pulses per joint revolution");
 					bool invert = prompt("Invert? 1=yes, 0=no") == 1;
-					
+
 					can::motor::initEncoder(device, invert, true, ppjr, telemPeriod);
 					can::motor::initEncoder(device, invert, true, telemePeriod);
 
@@ -353,7 +349,7 @@ int main() {
 					int adcLo = prompt("ADC Lo");
 					int adcHi = prompt("ADC Hi");
 					can::motor::initPotentiometer(device, posLo, posHi, adcLo, adcHi,
-												  telemPeriod);												  
+												  telemPeriod);
 				}
 				mode_has_been_set = true;
 			}
@@ -413,8 +409,7 @@ int main() {
 					   DataPoint<can::telemetry_t> data) {
 						std::cout << "Telemetry: uuid=" << static_cast<int>(uuid)
 								  << ", type=" << static_cast<int>(telemType)
-								  << static_cast<int>(telemType)
-								  << ", data=" << std::dec
+								  << static_cast<int>(telemType) << ", data=" << std::dec
 								  << data.getDataOrElse(0) << std::endl;
 					});
 				int telemPeriod = prompt("Telemetry timing (ms)");
@@ -423,7 +418,7 @@ int main() {
 											 "for telemetry timing packet"));
 				if (useTimingPacket) {
 					/* TO DO: Telemetry Packets
-					
+
 					CANPacket packet;
 					AssembleTelemetryTimingPacket(
 						&packet, static_cast<uint8_t>(deviceID.first), deviceID.second,
@@ -447,42 +442,42 @@ int main() {
 			AssembleScienceServoPacket(&p, 0x7, 0x5, (uint8_t)servo_no,
 									   (uint8_t)degrees);
 			can::sendCANPacket(p);
-      		can::printCANPacket(p); */
+			can::printCANPacket(p); */
 		} else if (testMode == TestMode::Stepper) {
-      	/*
-			int stepper = prompt("Enter stepper");
-      int angle = prompt("Enter angle");
+			/*
+				int stepper = prompt("Enter stepper");
+		  int angle = prompt("Enter angle");
 
-      CANPacket_t p;
-      AssembleScienceStepperTurnAnglePacket(&p, 0x7, 0x4, stepper, angle, 0x3);
-      can::sendCANPacket(p);
-      can::printCANPacket(p);
-	  */
-    } else if (testMode == TestMode::RawCAN) {
-      uint8_t pr = prompt("priority");
-      uint8_t uuid = prompt("uuid");
-      uint8_t command = prompt("command");
-      uint8_t dlc = prompt("add'l. data bits");
-      uint8_t data[dlc+1];
-      data[0] = command;
+		  CANPacket_t p;
+		  AssembleScienceStepperTurnAnglePacket(&p, 0x7, 0x4, stepper, angle, 0x3);
+		  can::sendCANPacket(p);
+		  can::printCANPacket(p);
+		  */
+		} else if (testMode == TestMode::RawCAN) {
+			uint8_t pr = prompt("priority");
+			uint8_t uuid = prompt("uuid");
+			uint8_t command = prompt("command");
+			uint8_t dlc = prompt("add'l. data bits");
+			uint8_t data[dlc + 1];
+			data[0] = command;
 
-      for (int i = 1; i <= dlc; i++) {
-        data[i] = prompt("bit");
-      }
+			for (int i = 1; i <= dlc; i++) {
+				data[i] = prompt("bit");
+			}
 
-	  // manual construction of a generic packet
-      CANPacket_t p = {};
-	  p.device.deviceUUID = uuid;
-	  p.priority = static_cast<CANPriority_t>(pr);
-	  p.command = command;
-	  p.senderUUID = CAN_UUID_JETSON;
-	  p.contentsLength = dlc;
-	  for (int i = 0; i < p.contentsLength && i < 6; i++) {
-		p.contents[i] = data[i + 1];
-	  }
+			// manual construction of a generic packet
+			CANPacket_t p = {};
+			p.device.deviceUUID = uuid;
+			p.priority = static_cast<CANPriority_t>(pr);
+			p.command = command;
+			p.senderUUID = CAN_UUID_JETSON;
+			p.contentsLength = dlc;
+			for (int i = 0; i < p.contentsLength && i < 6; i++) {
+				p.contents[i] = data[i + 1];
+			}
 
-      can::sendCANPacket(p);
-      can::printCANPacket(p);
-    }
+			can::sendCANPacket(p);
+			can::printCANPacket(p);
+		}
 	}
 }

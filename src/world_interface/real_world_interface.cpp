@@ -35,14 +35,10 @@ extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 class CANBoard {
 public:
 	// CAN26 constructor (UUID + domain bits)
-	CANBoard(robot::types::boardid_t motor, bool hasPosSensor,
-			 CANDevice_t device,
+	CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
 			 double pos_pwm_scale, double neg_pwm_scale)
-		: motor_id(motor),
-		  has_pos_sensor(hasPosSensor),
-		  board_device(device),
-		  positive_scale(pos_pwm_scale),
-		  negative_scale(neg_pwm_scale) {
+		: motor_id(motor), has_pos_sensor(hasPosSensor), board_device(device),
+		  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale) {
 		// create scheduler if needed
 		std::lock_guard<std::mutex> lg(schedulerMutex);
 		if (!pSched) {
@@ -112,7 +108,7 @@ public:
 			}
 		});
 	}
-	
+
 	void unscheduleVelocityEvent() {
 		if (velEventID) {
 			pSched->removeEvent(velEventID.value());
@@ -141,7 +137,7 @@ private:
 	double negative_scale;
 	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
 	std::optional<JacobianVelController<1, 1>> velController;
-	
+
 	inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
 	inline static std::mutex schedulerMutex;
 
@@ -152,7 +148,7 @@ private:
 			can::motor::setMotorMode(board_device, mode);
 			// LEGACY: can::motor::setMotorMode(device_group, serial_id, mode);
 		}
-	}	
+	}
 
 	void constructVelController() {
 		// define dimensions
@@ -250,14 +246,17 @@ void initMotors() {
 		addMotorMapping(motor, hasPosSensor);
 	}
 
-	// The pot/encoder/PID loops from HindsightCAN are no longer needed thanks to ODrive, im pretty sure
+	// The pot/encoder/PID loops from HindsightCAN are no longer needed thanks to ODrive, im
+	// pretty sure
 }
 
 std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 	auto it = cameraMap.find(camID);
 	if (it != cameraMap.end()) {
 		auto cam = it->second.lock();
-		if (cam) { return cam; }
+		if (cam) {
+			return cam;
+		}
 	}
 	try {
 		auto cam = std::make_shared<cam::Camera>();
@@ -291,9 +290,9 @@ void world_interface_init(
 	can::initCAN();
 	initMotors();
 
-  // Initialize Science Servo Board
+	// Initialize Science Servo Board
 
-  // For now, we can consider the board as a motor and just use it for its serial
+	// For now, we can consider the board as a motor and just use it for its serial
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -449,9 +448,7 @@ callbackid_t addLimitSwitchCallback(
 		callback) {
 	// CAN26: Use CANDevice_t for limit switch callbacks
 	CANDevice_t device = boardUUIDMap.at(motor);
-	auto func = [=](CANDevice_t, DataPoint<LimitSwitchData> data) {
-		callback(motor, data);
-	};
+	auto func = [=](CANDevice_t, DataPoint<LimitSwitchData> data) { callback(motor, data); };
 	auto id = can::motor::addLimitSwitchCallback(device, func);
 	auto nextID = nextCallbackID++;
 	callbackIDMap.insert({nextID, id});

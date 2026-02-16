@@ -1,8 +1,8 @@
 #pragma once
 
 extern "C" {
-#include <CANPacket.h>
 #include <CANDevices.h>
+#include <CANPacket.h>
 
 #include <HindsightCAN/CANCommon.h>
 #include <HindsightCAN/CANMotorUnit.h>
@@ -52,8 +52,8 @@ uuid_t getSenderUUID(const CANPacket_t& packet);
 /**
  * @brief Check if device is in a specific domain
  */
-bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, 
-                           bool motorDomain, bool powerDomain);
+bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, bool motorDomain,
+					bool powerDomain);
 
 /**
  * @brief Check if device is in motor domain

@@ -26,8 +26,9 @@
 
 extern "C" {
 // new
-#include <CANPacket.h>
 #include <CANCommandIDs.h>
+#include <CANPacket.h>
+
 #include <Packets/DecodeMotor.h>
 #include <Packets/DecodePeripheral.h>
 #include <Packets/DecodePower.h>
@@ -63,7 +64,8 @@ int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
 
 std::shared_ptr<util::PeriodicScheduler<>> telemScheduler;
-std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>, util::PeriodicScheduler<>::eventid_t>
+std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>,
+				   util::PeriodicScheduler<>::eventid_t>
 	telemEventIDMap;
 
 using telemetrycode_t = uint8_t;
@@ -114,7 +116,7 @@ bool receivePacket(int fd, CANPacket_t& packet) {
 		// Parse 11-bit CAN ID into CANDevice_t + priority
 		// [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
 		uint16_t canID = frame.can_id & 0x7FF; // extract the 11-bit CAN ID from frame
-		uint16_t deviceBits = canID & 0x3FF; // extract lower 10 bits (device info)
+		uint16_t deviceBits = canID & 0x3FF;   // extract lower 10 bits (device info)
 		std::memcpy(&packet.device, &deviceBits, sizeof(uint16_t));
 		packet.priority = (canID & 0x400) ? CAN_PRIORITY_LOW : CAN_PRIORITY_HIGH;
 
@@ -160,7 +162,6 @@ void invokeTelemCallback(CANDeviceUUID_t uuid, telemetrycode_t telemCode,
 		}
 	}
 }
-
 
 // Store telemetry data in the thread-safe map and fire callbacks
 void storeTelemetry(CANDeviceUUID_t uuid, telemetrycode_t telemCode,
@@ -264,8 +265,9 @@ int createCANSocket(std::optional<CANDevice_t> device) {
 		// for testing
 		std::cout << "CAN packet: " << canID << std::endl;
 		std::cout << "CAN uuid: " << (canID & CAN_MASK) << std::endl;
-		std::cout << "Filters: " << filters[0].can_id << ", " << filters[0].can_mask << std::endl;
-		
+		std::cout << "Filters: " << filters[0].can_id << ", " << filters[0].can_mask
+				  << std::endl;
+
 		setsockopt(fd, SOL_CAN_RAW, CAN_RAW_FILTER, &filters, sizeof(filters));
 	} else {
 		// disable reception on this socket.
@@ -351,7 +353,8 @@ void sendCANPacket(const CANPacket_t& packet) {
 	}
 
 	if (!success) {
-		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", getUUIDFromPacket(packet), std::strerror(errno));
+		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", getUUIDFromPacket(packet),
+			  std::strerror(errno));
 	}
 }
 
@@ -384,7 +387,7 @@ void printCANPacket(const CANPacket_t& packet) {
 	std::stringstream ss;
 	ss << "CAN: p" << std::hex << ((CANGetPacketHeader(&mutablePacket) >> 10) & 0x1);
 	ss << " id" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x03C0) >> 6);
-	ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x003F));	
+	ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x003F));
 	ss << " pid" << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[0]);
 	ss << " data:";
 	for (int i = 1; i < CANGetDlc(&mutablePacket); i++) {
@@ -403,14 +406,15 @@ void printCANPacket(const CANPacket& packet) {
   ss << " pid" << std::hex << static_cast<uint>(packet.data[0]);
   ss << " data:";
   for (int i = 1; i < packet.dlc; i++) {
-    ss << std::hex << static_cast<uint>(packet.data[i]) << " ";
+	ss << std::hex << static_cast<uint>(packet.data[i]) << " ";
   }
 
   LOG_F(INFO, ss.str().c_str());
 }
 */
 
-robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t uuid, telemtype_t telemType) {
+robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t uuid,
+														telemtype_t telemType) {
 	std::shared_lock mapLock(telemMapMutex); // acquire read lock
 	// find entry for device in map
 	auto entry = telemMap.find(uuid);
@@ -489,8 +493,8 @@ void unscheduleAllTelemetryPulls() {
 
 callbackid_t addDeviceTelemetryCallback(
 	CANDeviceUUID_t uuid, telemtype_t telemType,
-	const std::function<void(CANDeviceUUID_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
-		callback) {
+	const std::function<void(CANDeviceUUID_t, telemtype_t,
+							 robot::types::DataPoint<telemetry_t>)>& callback) {
 	telemetrycode_t code = static_cast<telemetrycode_t>(telemType);
 	auto key = std::make_pair(uuid, code);
 

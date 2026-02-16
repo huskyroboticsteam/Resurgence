@@ -109,9 +109,11 @@ void pullMotorPosition(CANDevice_t device);
  * @param callback The callback function.
  * @return Callback ID for removal.
  */
-callbackid_t addLimitSwitchCallback(CANDevice_t device,
-	const std::function<void(CANDevice_t device,
-							 robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
+callbackid_t addLimitSwitchCallback(
+	CANDevice_t device,
+	const std::function<void(
+		CANDevice_t device,
+		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
 // ===========
 // DEPRECATED:

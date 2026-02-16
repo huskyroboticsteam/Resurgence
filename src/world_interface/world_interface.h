@@ -1,17 +1,18 @@
 #pragma once
 
+#include "../camera/Camera.h"
+#include "../camera/CameraParams.h"
 #include "../gps/gps_util.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
-#include "../camera/Camera.h"
-#include "../camera/CameraParams.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
 
-#include <Eigen/Geometry>
 #include <array>
 #include <optional>
 #include <unordered_set>
+
+#include <Eigen/Geometry>
 
 /**
  * @namespace robot
@@ -23,10 +24,11 @@ namespace types {
 class CameraHandle {
 public:
 	CameraHandle(std::shared_ptr<cam::Camera> cam) : camera(cam) {}
+
 private:
 	std::shared_ptr<cam::Camera> camera;
 };
-}
+} // namespace types
 
 /**
  * @brief An enum which defines the possible types of world interfaces.

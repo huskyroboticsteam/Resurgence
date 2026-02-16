@@ -1,4 +1,5 @@
 #include "CANMotor.h"
+
 #include "CAN.h"
 #include "CANUtils.h"
 
@@ -8,10 +9,11 @@
 
 extern "C" {
 // new
+#include <CANDevices.h>
 #include <CANPacket.h>
+
 #include <Packets/Motor.h>
 #include <Packets/Universal.h>
-#include <CANDevices.h>
 
 // old
 #include <HindsightCAN/CANCommon.h>
@@ -34,32 +36,32 @@ namespace can::motor {
 // Jetson device as sender
 static const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
 
-void initEncoder(CANDevice_t device, bool invertEncoder,
-				 bool zeroEncoder, int32_t pulsesPerJointRev,
+void initEncoder(CANDevice_t device, bool invertEncoder, bool zeroEncoder,
+				 int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod) {
 	CANPacket_t p;
-	// AssembleEncoderInitializePacket(&p, device, sensor_t::encoder, invertEncoder, zeroEncoder);
+	// AssembleEncoderInitializePacket(&p, device, sensor_t::encoder, invertEncoder,
+	// zeroEncoder);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 	if (telemetryPeriod) {
-		scheduleTelemetryPull(device.deviceUUID, telemtype_t::angle,
-							  telemetryPeriod.value());
+		scheduleTelemetryPull(device.deviceUUID, telemtype_t::angle, telemetryPeriod.value());
 	}
 }
 
-void initPotentiometer(CANDevice_t device, int32_t posLo,
-					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
+void initPotentiometer(CANDevice_t device, int32_t posLo, int32_t posHi, uint16_t adcLo,
+					   uint16_t adcHi,
 					   std::optional<std::chrono::milliseconds> telemetryPeriod) {
 	CANPacket_t p;
 	/*
 	AssemblePotHiSetPacket(&p, device, adcHi, posHi);
 	p->id = ConstructCANID(PRIO_MOTOR_UNIT_POT_INIT, targetDeviceGroup, targetDeviceSerial);
-    p->dlc = DLC_MOTOR_UNIT_POT_INIT;
+	p->dlc = DLC_MOTOR_UNIT_POT_INIT;
 
-    int idx = WritePacketIDOnly(p->data, ID_MOTOR_UNIT_POT_INIT_LO);
-    PackShortIntoDataMSBFirst(p->data, adcLo, idx);
-    idx += 2;
-    PackIntIntoDataMSBFirst(p->data, mdegLo, idx);
+	int idx = WritePacketIDOnly(p->data, ID_MOTOR_UNIT_POT_INIT_LO);
+	PackShortIntoDataMSBFirst(p->data, adcLo, idx);
+	idx += 2;
+	PackIntIntoDataMSBFirst(p->data, mdegLo, idx);
 
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1ms);
@@ -67,8 +69,7 @@ void initPotentiometer(CANDevice_t device, int32_t posLo,
 	sendCANPacket(p);
 	*/
 	if (telemetryPeriod) {
-		scheduleTelemetryPull(device.deviceUUID, telemtype_t::angle,
-							  telemetryPeriod.value());
+		scheduleTelemetryPull(device.deviceUUID, telemtype_t::angle, telemetryPeriod.value());
 	}
 }
 
@@ -79,10 +80,12 @@ void initMotor(CANDevice_t device) {
 
 void setMotorMode(CANDevice_t device, motormode_t mode) {
 	// Map motormode_t to BLDC control/input modes
-	uint8_t controlMode = (mode == motormode_t::pid) ? BLDC_POSITION_CONTROL : BLDC_VELOCITY_CONTROL;
+	uint8_t controlMode =
+		(mode == motormode_t::pid) ? BLDC_POSITION_CONTROL : BLDC_VELOCITY_CONTROL;
 	uint8_t inputMode = BLDC_PASSTHROUGH_INPUT;
 
-	CANPacket_t p = CANMotorPacket_BLDC_SetInputMode(JETSON_DEVICE, device, controlMode, inputMode);
+	CANPacket_t p =
+		CANMotorPacket_BLDC_SetInputMode(JETSON_DEVICE, device, controlMode, inputMode);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 }
@@ -93,10 +96,11 @@ void setMotorPower(CANDevice_t device, double power) {
 
 	// Use BLDC velocity control: convert power [-1, 1] to velocity in rev/s
 	// adjust as needed
-	float velocity = static_cast<float>(power * 10.0);  // 10 rev/s at full power
+	float velocity = static_cast<float>(power * 10.0); // 10 rev/s at full power
 	float feedForwardTorque = 0.0f;
 
-	CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(JETSON_DEVICE, device, velocity, feedForwardTorque);
+	CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(JETSON_DEVICE, device, velocity,
+														 feedForwardTorque);
 	sendCANPacket(p);
 }
 
@@ -111,7 +115,8 @@ void setMotorPIDTarget(CANDevice_t device, int32_t target) {
 	float positionRev = static_cast<float>(target) / 360000.0f;
 	float feedForwardVelocity = 0.0f;
 
-	CANPacket_t p = CANMotorPacket_BLDC_SetInputPosition(JETSON_DEVICE, device, positionRev, feedForwardVelocity);
+	CANPacket_t p = CANMotorPacket_BLDC_SetInputPosition(JETSON_DEVICE, device, positionRev,
+														 feedForwardVelocity);
 	sendCANPacket(p);
 }
 
@@ -122,7 +127,7 @@ DataPoint<int32_t> getMotorPosition(CANDevice_t device) {
 
 void pullMotorPosition(CANDevice_t device) {
 	// Request encoder estimates from the device
-	uint8_t encoderID = 0;  // Default encoder ID
+	uint8_t encoderID = 0; // Default encoder ID
 
 	CANPacket_t p = CANMotorPacket_BLDC_GetEncoderEstimates(JETSON_DEVICE, device, encoderID);
 	sendCANPacket(p);
@@ -138,8 +143,8 @@ void emergencyStopMotors() {
 
 callbackid_t addLimitSwitchCallback(
 	CANDevice_t device,
-	const std::function<void(CANDevice_t device,
-							 DataPoint<LimitSwitchData> limitSwitchData)>& callback) {
+	const std::function<void(CANDevice_t device, DataPoint<LimitSwitchData> limitSwitchData)>&
+		callback) {
 	auto func = [device, callback](CANDeviceUUID_t, telemtype_t,
 								   DataPoint<telemetry_t> telemData) {
 		if (telemData) {
@@ -151,8 +156,6 @@ callbackid_t addLimitSwitchCallback(
 	};
 	return addDeviceTelemetryCallback(device.deviceUUID, telemtype_t::limit_switch, func);
 }
-
-
 
 void removeLimitSwitchCallback(callbackid_t id) {
 	removeDeviceTelemetryCallback(id);

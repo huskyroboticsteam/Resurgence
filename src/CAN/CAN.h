@@ -10,6 +10,7 @@
 extern "C" {
 #include <CANDevices.h>
 #include <CANPacket.h>
+
 #include <Packets/Motor.h>
 }
 
@@ -52,7 +53,7 @@ void printCANPacket(const CANPacket_t& packet);
 
 /**
  * @brief Print a CAN packet.
- * 
+ *
  * @param packet The CAN packet to print.
  */
 // new
@@ -93,7 +94,8 @@ void pullDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
  * @param telemType The type of telemetry to get, as dictated by the specific device specs.
  * @param period The period to wait in between sending pull requests.
  */
-void scheduleTelemetryPull(uuid_t uuid, telemtype_t telemType, std::chrono::milliseconds period);
+void scheduleTelemetryPull(uuid_t uuid, telemtype_t telemType,
+						   std::chrono::milliseconds period);
 
 /**
  * @brief Stop pulling the latest telemetry data from the given device.

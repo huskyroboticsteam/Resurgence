@@ -2,14 +2,14 @@
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
+#include "../control/JacobianVelController.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketProtocol.h"
 #include "../utils/core.h"
+#include "../utils/scheduler.h"
 #include "../utils/transform.h"
 #include "world_interface.h"
-#include "../control/JacobianVelController.h"
-#include "../utils/scheduler.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -62,7 +62,8 @@ bool is_emergency_stopped = false;
 
 // velocity control state (per motor)
 std::unordered_map<boardid_t, JacobianVelController<1, 1>> velControllers;
-std::unordered_map<boardid_t, util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventIDs;
+std::unordered_map<boardid_t, util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t>
+	velEventIDs;
 std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
 std::mutex schedulerMutex;
 
@@ -88,19 +89,20 @@ std::mutex connectionMutex;
 bool simConnected = false;
 
 void unscheduleVelocityEvent(boardid_t motor) {
-    auto it = velEventIDs.find(motor);
-    if (it != velEventIDs.end()) {
-        pSched->removeEvent(it->second);
-        velEventIDs.erase(it);
-    }
+	auto it = velEventIDs.find(motor);
+	if (it != velEventIDs.end()) {
+		pSched->removeEvent(it->second);
+		velEventIDs.erase(it);
+	}
 }
 
 void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
-					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
+static std::shared_ptr<robot::types::CameraHandle>
+openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
+		   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
 	if (list1d) {
 		json msg = {{"type", "simCameraStreamOpenRequest"},
 					{"camera", cam},
@@ -277,19 +279,21 @@ std::unordered_set<CameraID> getCameras() {
 std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID" + cam + " does not exist");
+		throw std::invalid_argument("Configuration file for Camera ID" + cam +
+									" does not exist");
 	}
 
-	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() ||
+		fs[KEY_FRAMERATE].empty()) {
 		throw std::invalid_argument("Configuration file missing key(s)");
 	}
 
 	json msg = {{"type", "simCameraStreamOpenRequest"},
-			{"camera", cam},
-			{"fps", static_cast<int>(fs[KEY_FRAMERATE])},
-			{"width", static_cast<int>(fs[KEY_IMAGE_WIDTH])},
-			{"height", static_cast<int>(fs[KEY_IMAGE_HEIGHT])},
-			{"intrinsics", nullptr}};
+				{"camera", cam},
+				{"fps", static_cast<int>(fs[KEY_FRAMERATE])},
+				{"width", static_cast<int>(fs[KEY_IMAGE_WIDTH])},
+				{"height", static_cast<int>(fs[KEY_IMAGE_HEIGHT])},
+				{"intrinsics", nullptr}};
 	sendJSON(msg);
 	auto camObject = std::make_shared<cam::Camera>();
 	// Just need to return a value so that we can append the camera stream
@@ -362,22 +366,18 @@ DataPoint<pose_t> getTruePose() {
 void setMotorPower(boardid_t motor, double normalizedPWM) {
 	unscheduleVelocityEvent(motor);
 
-	json msg = {
-		{"type", "simMotorPowerRequest"}, 
-		{"motor", motorNameMap.at(motor)}, 
-		{"power", normalizedPWM}
-	};
+	json msg = {{"type", "simMotorPowerRequest"},
+				{"motor", motorNameMap.at(motor)},
+				{"power", normalizedPWM}};
 	sendJSON(msg);
 }
 
 void setMotorPos(boardid_t motor, int32_t targetPos) {
 	unscheduleVelocityEvent(motor);
 
-	json msg = {
-		{"type", "simMotorPositionRequest"}, 
-		{"motor", motorNameMap.at(motor)}, 
-		{"position", targetPos}
-	};
+	json msg = {{"type", "simMotorPositionRequest"},
+				{"motor", motorNameMap.at(motor)},
+				{"position", targetPos}};
 	sendJSON(msg);
 }
 
@@ -397,49 +397,49 @@ DataPoint<int32_t> getMotorPos(boardid_t motor) {
 	}
 }
 
-
 void setMotorVel(robot::types::boardid_t motor, int32_t targetVel) {
-    using namespace std::chrono_literals;
+	using namespace std::chrono_literals;
 
-    // ensure scheduler exists
-    {
-        std::lock_guard<std::mutex> lg(schedulerMutex);
-        if (!pSched) {
-            pSched.emplace("MotorVelSched");
-        }
-    }
+	// ensure scheduler exists
+	{
+		std::lock_guard<std::mutex> lg(schedulerMutex);
+		if (!pSched) {
+			pSched.emplace("MotorVelSched");
+		}
+	}
 
-    // create velocity controller if needed
-    if (velControllers.find(motor) == velControllers.end()) {
-        constexpr int32_t dim = 1;
-        auto kinematics = [](const navtypes::Vectord<dim>& v) { return v; };
-        auto jacobian = [](const navtypes::Vectord<dim>&) {
-            return navtypes::Matrixd<dim, dim>::Identity();
-        };
-        velControllers.emplace(motor, JacobianVelController<1, 1>(kinematics, jacobian));
-    }
+	// create velocity controller if needed
+	if (velControllers.find(motor) == velControllers.end()) {
+		constexpr int32_t dim = 1;
+		auto kinematics = [](const navtypes::Vectord<dim>& v) { return v; };
+		auto jacobian = [](const navtypes::Vectord<dim>&) {
+			return navtypes::Matrixd<dim, dim>::Identity();
+		};
+		velControllers.emplace(motor, JacobianVelController<1, 1>(kinematics, jacobian));
+	}
 
-    // set velocity target
-    auto& ctrl = velControllers.at(motor);
-    navtypes::Vectord<1> velocityVector{targetVel};
-    ctrl.setTarget(types::dataclock::now(), velocityVector);
+	// set velocity target
+	auto& ctrl = velControllers.at(motor);
+	navtypes::Vectord<1> velocityVector{targetVel};
+	ctrl.setTarget(types::dataclock::now(), velocityVector);
 
-    // unschedule existing event for this motor
-    auto it = velEventIDs.find(motor);
-    if (it != velEventIDs.end()) {
-        pSched->removeEvent(it->second);
-        velEventIDs.erase(it);
-    }
+	// unschedule existing event for this motor
+	auto it = velEventIDs.find(motor);
+	if (it != velEventIDs.end()) {
+		pSched->removeEvent(it->second);
+		velEventIDs.erase(it);
+	}
 
-    // schedule periodic position updates
-    velEventIDs[motor] = pSched->scheduleEvent(100ms, [motor, &ctrl]() {
-        auto motorPos = robot::getMotorPos(motor);
-        if (motorPos.isValid()) {
-            const navtypes::Vectord<1> currPos{motorPos.getData()};
-            navtypes::Vectord<1> posCommand = ctrl.getCommand(types::dataclock::now(), currPos);
-            robot::setMotorPos(motor, posCommand.coeff(0, 0));
-        }
-    });
+	// schedule periodic position updates
+	velEventIDs[motor] = pSched->scheduleEvent(100ms, [motor, &ctrl]() {
+		auto motorPos = robot::getMotorPos(motor);
+		if (motorPos.isValid()) {
+			const navtypes::Vectord<1> currPos{motorPos.getData()};
+			navtypes::Vectord<1> posCommand =
+				ctrl.getCommand(types::dataclock::now(), currPos);
+			robot::setMotorPos(motor, posCommand.coeff(0, 0));
+		}
+	});
 }
 
 callbackid_t addLimitSwitchCallback(

@@ -1,12 +1,11 @@
 #pragma once
 
 // new
-#include <CANDevices.h>
-
 #include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "data.h"
 
+#include <CANDevices.h>
 #include <chrono>
 #include <cstdint>
 #include <unordered_map>
@@ -86,21 +85,19 @@ constexpr auto potMotors = frozen::make_unordered_map<boardid_t, potparams_t>({
 /** @brief A mapping of board UUID (boardid_t) to their corresponding uuid. */
 
 constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>(
-	{	
-		// BLDC Motors - Use BLDC commands
-		{boardid_t::leftTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
-		{boardid_t::rightTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
-		{boardid_t::armBase, CANDevice_t{0, 1, 0,CAN_UUID_BLDC_BASE}},
-		{boardid_t::shoulder, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_SHOULDER}},
-		{boardid_t::elbow, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_ELBOW}},
-		{boardid_t::forearm, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FOREARM}},
-		{boardid_t::wristDiffLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_LEFT}},
-		{boardid_t::wristDiffRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}},
-	
-		// Hand (0x60)
-		{boardid_t::hand, CANDevice_t{1, 0, 0, CAN_UUID_HAND}}
-	});
- 
+	{// BLDC Motors - Use BLDC commands
+	 {boardid_t::leftTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
+	 {boardid_t::rightTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
+	 {boardid_t::armBase, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_BASE}},
+	 {boardid_t::shoulder, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_SHOULDER}},
+	 {boardid_t::elbow, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_ELBOW}},
+	 {boardid_t::forearm, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FOREARM}},
+	 {boardid_t::wristDiffLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_LEFT}},
+	 {boardid_t::wristDiffRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}},
+
+	 // Hand (0x60)
+	 {boardid_t::hand, CANDevice_t{1, 0, 0, CAN_UUID_HAND}}});
+
 // ===========
 // DEPRECATED:
 // ===========
@@ -120,8 +117,8 @@ constexpr auto boardSerialIDMap = frozen::make_unordered_map<boardid_t, can::dev
 	 {boardid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
 	 {boardid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
 	 {boardid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},
-   {boardid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO},
-   {boardid_t::scienceStepperBoard, DEVICE_SERIAL_SCIENCE_STEPPER}});
+	 {boardid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO},
+	 {boardid_t::scienceStepperBoard, DEVICE_SERIAL_SCIENCE_STEPPER}});
 
 constexpr auto boardGroupMap = frozen::make_unordered_map<boardid_t, can::devicegroup_t>(
 	{{boardid_t::leftTread, can::devicegroup_t::motor},
@@ -137,8 +134,8 @@ constexpr auto boardGroupMap = frozen::make_unordered_map<boardid_t, can::device
 	 {boardid_t::drillMotor, can::devicegroup_t::science},
 	 {boardid_t::fourbar1, can::devicegroup_t::science},
 	 {boardid_t::fourbar2, can::devicegroup_t::science},
-   {boardid_t::scienceServoBoard, can::devicegroup_t::science},
-   {boardid_t::scienceStepperBoard, can::devicegroup_t::science}});
+	 {boardid_t::scienceServoBoard, can::devicegroup_t::science},
+	 {boardid_t::scienceStepperBoard, can::devicegroup_t::science}});
 
 // ===========
 // END OF DEPRECATED
@@ -166,8 +163,8 @@ constexpr auto positive_pwm_scales =
 												   {boardid_t::drillMotor, -1.0},
 												   {boardid_t::fourbar1, 0.3},
 												   {boardid_t::fourbar2, 0.3},
-                           {boardid_t::scienceServoBoard, 0},
-                           {boardid_t::scienceStepperBoard, 0}});
+												   {boardid_t::scienceServoBoard, 0},
+												   {boardid_t::scienceStepperBoard, 0}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
@@ -186,7 +183,7 @@ constexpr auto negative_pwm_scales =
 												   {boardid_t::drillMotor, -1.0},
 												   {boardid_t::fourbar1, 0.15},
 												   {boardid_t::fourbar2, 0.15},
-                           {boardid_t::scienceServoBoard, 0},
-                           {boardid_t::scienceStepperBoard, 0}});
+												   {boardid_t::scienceServoBoard, 0},
+												   {boardid_t::scienceStepperBoard, 0}});
 
 } // namespace robot

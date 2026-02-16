@@ -24,7 +24,8 @@ void unscheduleTelemetryPull(CANDeviceUUID_t uuid, telemtype_t telemType) {}
 
 void unscheduleAllTelemetryPulls() {}
 
-robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t id, telemtype_t telemType) {
+robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t id,
+														telemtype_t telemType) {
 	return {};
 }
 /*
@@ -35,8 +36,8 @@ robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype
 
 callbackid_t addDeviceTelemetryCallback(
 	CANDeviceUUID_t uuid, telemtype_t telemType,
-	const std::function<void(CANDeviceUUID_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
-		callback) {
+	const std::function<void(CANDeviceUUID_t, telemtype_t,
+							 robot::types::DataPoint<telemetry_t>)>& callback) {
 	return {uuid, telemType, callbackID++};
 }
 /*

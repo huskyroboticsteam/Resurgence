@@ -5,8 +5,8 @@
 
 extern "C" {
 // new
-#include <CANPacket.h>
 #include <CANDevices.h>
+#include <CANPacket.h>
 
 // old
 #include <HindsightCAN/CANPacket.h>
@@ -22,18 +22,21 @@ uuid_t getDeviceFromPacket(const CANPacket_t& packet) {
 }
 
 uuid_t getUUIDFromPacket(const CANPacket_t& packet) {
-    return packet.device.deviceUUID;
+	return packet.device.deviceUUID;
 }
 
 uuid_t getSenderUUID(const CANPacket_t& packet) {
-    return packet.senderUUID;
+	return packet.senderUUID;
 }
 
-bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, 
-                           bool motorDomain, bool powerDomain) {
-	if (peripheralDomain && packet->device.peripheralDomain) return true;
-	if (motorDomain && packet->device.motorDomain) return true;
-	if (powerDomain && packet->device.powerDomain) return true;
+bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, bool motorDomain,
+					bool powerDomain) {
+	if (peripheralDomain && packet->device.peripheralDomain)
+		return true;
+	if (motorDomain && packet->device.motorDomain)
+		return true;
+	if (powerDomain && packet->device.powerDomain)
+		return true;
 	return false;
 }
 
