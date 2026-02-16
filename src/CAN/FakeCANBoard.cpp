@@ -51,7 +51,7 @@ public:
 					double pos_pwm_scale, double neg_pwm_scale)
 	: motor_id(motor),
 	has_pos_sensor(hasPosSensor),
-	device_(device),
+	device(device),
 	positive_scale(pos_pwm_scale),
 	negative_scale(neg_pwm_scale) {
 		// create scheduler if needed
@@ -67,16 +67,16 @@ public:
 		// scale the power
 		double scale = power < 0 ? negative_scale : positive_scale;
 		power *= scale;
-		can::motor::setMotorPower(device_, power);
+		can::motor::setMotorPower(device, power);
 	}
 
 	void setMotorPos(int32_t targetPos) {
 		ensureMotorMode(can::motor::motormode_t::pid);
-		can::motor::setMotorPIDTarget(device_, targetPos);
+		can::motor::setMotorPIDTarget(device, targetPos);
 	}
 
 	robot::types::DataPoint<int32_t> getMotorPos() const {
-		return can::motor::getMotorPosition(device_);
+		return can::motor::getMotorPosition(device);
 	}
 
 	void setMotorVel(int32_t targetVel) {
@@ -112,7 +112,7 @@ public:
 	}
 
 	can::uuid_t getMotorUUID() const {
-		return device_.deviceUUID;
+		return device.deviceUUID;
 	}
 
 	robot::types::boardid_t getMotorID() const {
@@ -122,7 +122,7 @@ public:
 private:
 	robot::types::boardid_t motor_id;
 	bool has_pos_sensor;
-	can::CANDevice_t device;
+	CANDevice_t device;
 	std::optional<can::motor::motormode_t> motor_mode;
 	double positive_scale;
 	double negative_scale;
@@ -217,24 +217,32 @@ int main() {
 
 	while (true) {
 		if (testMode == TestMode::ModeSet) {
-			can::CANDevice_t device = prompt("Enter device");
+			int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 			int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
-			std::cout << "got " << device << std::endl;
+
+			CANDevice_t device;
+			device.deviceUUID = uuid;
+			std::cout << "got " << device.deviceUUID << std::endl;
 			can::motor::setMotorMode(device,
 									 mode == 0 ? motormode_t::pwm : motormode_t::pid);
 		} else if (testMode == TestMode::PWM) {
-			can::CANDevice_t device = prompt("Enter device");
+			int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 			int pwm = prompt("Enter PWM");
+	
+			CANDevice_t device;
+			device.deviceUUID = uuid;
 			can::motor::setMotorMode(device, motormode_t::pwm);
 			can::motor::setMotorPower(device, static_cast<int16_t>(pwm));
 		} else if (testMode == TestMode::PID) {
-			static can::CANDevice_t device;
 			/*
+			static CANDevice_t device;
+
 			if (!mode_has_been_set) {
-				device = prompt("Enter device");
+				uuid = prompt("Enter device uuid");
 				// AVR board firmware resets the angle target every time it receives a
 				// mode set packet, so we only want to send this once.
 				// TODO: do we need to set the PPJR?
+				device.deviceUUID = uuid;
 				can::motor::setMotorMode(device, motormode_t::pid);
 				mode_has_been_set = true;
 			}
@@ -248,15 +256,17 @@ int main() {
 			int angle_target = prompt("Enter PID target (in 1000ths of degrees)");
 			can::motor::setMotorPIDTarget(device, angle_target);
 			*/
+			
 		} else if (testMode == TestMode::PIDVel) {
+			/*
 			static robot::types::datatime_t startTime;
 			static int32_t targetVel;
 			static std::shared_ptr<CANBoard> motor;
 			static robot::types::DataPoint<int32_t> initialMotorPos;
 			static double vel_timeout;
-			/*
+
 			if (!mode_has_been_set) {
-				can::CANDevice_t device = prompt("Enter device UUID");
+				CANDevice_t device = prompt("Enter device UUID");
 
 				// set pid mode
 				can::motor::setMotorMode(device, motormode_t::pid);
@@ -314,9 +324,11 @@ int main() {
 			}
 			*/
 		} else if (testMode == TestMode::Encoder) {
-			static can::CANDevice_t device;
+			/* TO DO: initEncoder
+
+			static CANDevice_t device;
 			if (!mode_has_been_set) {
-				device = prompt("Enter device");
+				device.deviceUUID = static_cast<uint16_t>prompt("Enter device");
 
 				int sensorType;
 				do {
@@ -327,17 +339,21 @@ int main() {
 				std::chrono::milliseconds telemPeriod(prompt("Telemetry period (ms)"));
 
 				can::motor::initMotor(device);
+				
 				if (sensorType == 0) {
 					int ppjr = prompt("Pulses per joint revolution");
 					bool invert = prompt("Invert? 1=yes, 0=no") == 1;
+					
 					can::motor::initEncoder(device, invert, true, ppjr, telemPeriod);
+					can::motor::initEncoder(device, invert, true, telemePeriod);
+
 				} else if (sensorType == 1) {
 					int posLo = prompt("Pos Lo");
 					int posHi = prompt("Pos Hi");
 					int adcLo = prompt("ADC Lo");
 					int adcHi = prompt("ADC Hi");
 					can::motor::initPotentiometer(device, posLo, posHi, adcLo, adcHi,
-												  telemPeriod);
+												  telemPeriod);												  
 				}
 				mode_has_been_set = true;
 			}
@@ -348,12 +364,14 @@ int main() {
 			// the output is a single changing line instead of flooding the console with text
 			std::cout << "\33[2K\rEncoder value: " << encoderStr << std::flush;
 			std::this_thread::sleep_for(20ms);
+			*/
 		} else if (testMode == TestMode::LimitSwitch) {
-			/*
+			/* TO DO: initEncoder, setLimitSwitchLimits
+
 			static bool testLimits = false;
-			static can::CANDevice_t device;
+			static CANDevice_t device;
 			if (!mode_has_been_set) {
-				can::CANDevice_t device = prompt("Enter device");
+				CANDevice_t device = prompt("Enter device");
 				testLimits = static_cast<bool>(prompt("Set limits? 1=yes,0=no"));
 				if (testLimits) {
 					int lo = prompt("Low position");
@@ -387,16 +405,16 @@ int main() {
 			*/
 		} else if (testMode == TestMode::Telemetry) {
 			if (!mode_has_been_set) {
-				can::CANDeviceUUID_t uuid = prompt("Enter device uuid");
+				CANDeviceUUID_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 				auto telemType = static_cast<can::telemtype_t>(prompt("Enter telemetry type"));
 				can::addDeviceTelemetryCallback(
 					uuid, telemType,
-					[](can::deviceid_t id, can::telemtype_t telemType,
+					[](can::uuid_t uuid, can::telemtype_t telemType,
 					   DataPoint<can::telemetry_t> data) {
-						std::cout << "Telemetry: group=" << std::hex
-								  << static_cast<int>(id.first) << ", serial=" << std::hex
-								  << static_cast<int>(id.second) << ", type=" << std::hex
-								  << static_cast<int>(telemType) << ", data=" << std::dec
+						std::cout << "Telemetry: uuid=" << static_cast<int>(uuid)
+								  << ", type=" << static_cast<int>(telemType)
+								  << static_cast<int>(telemType)
+								  << ", data=" << std::dec
 								  << data.getDataOrElse(0) << std::endl;
 					});
 				int telemPeriod = prompt("Telemetry timing (ms)");
@@ -404,8 +422,9 @@ int main() {
 					static_cast<bool>(prompt("What telemetry method?\n0 for pull packets\n1 "
 											 "for telemetry timing packet"));
 				if (useTimingPacket) {
+					/* TO DO: Telemetry Packets
+					
 					CANPacket packet;
-					/*
 					AssembleTelemetryTimingPacket(
 						&packet, static_cast<uint8_t>(deviceID.first), deviceID.second,
 						static_cast<uint8_t>(telemType), telemPeriod);
@@ -419,6 +438,8 @@ int main() {
 			}
 			std::this_thread::sleep_for(1s);
 		} else if (testMode == TestMode::ScienceServos) {
+			/* TO DO: Remove science-related from codebase
+
 			int servo_no = prompt("Enter servo no");
 			int degrees = prompt("Enter degrees");
 
@@ -426,29 +447,40 @@ int main() {
 			AssembleScienceServoPacket(&p, 0x7, 0x5, (uint8_t)servo_no,
 									   (uint8_t)degrees);
 			can::sendCANPacket(p);
-      can::printCANPacket(p);
+      		can::printCANPacket(p); */
 		} else if (testMode == TestMode::Stepper) {
-      int stepper = prompt("Enter stepper");
+      	/*
+			int stepper = prompt("Enter stepper");
       int angle = prompt("Enter angle");
 
-      CANPacket p;
+      CANPacket_t p;
       AssembleScienceStepperTurnAnglePacket(&p, 0x7, 0x4, stepper, angle, 0x3);
       can::sendCANPacket(p);
       can::printCANPacket(p);
+	  */
     } else if (testMode == TestMode::RawCAN) {
       uint8_t pr = prompt("priority");
-      uint8_t d = prompt("device");
-      uint8_t pid = prompt("pid");
+      uint8_t uuid = prompt("uuid");
+      uint8_t command = prompt("command");
       uint8_t dlc = prompt("add'l. data bits");
       uint8_t data[dlc+1];
-      data[0] = pid;
+      data[0] = command;
 
       for (int i = 1; i <= dlc; i++) {
         data[i] = prompt("bit");
       }
 
-      CANPacket_t p;
-      AssembleCANPacket(&p, pr, d, pid, dlc+1, data);
+	  // manual construction of a generic packet
+      CANPacket_t p = {};
+	  p.device.deviceUUID = uuid;
+	  p.priority = static_cast<CANPriority_t>(pr);
+	  p.command = command;
+	  p.senderUUID = CAN_UUID_JETSON;
+	  p.contentsLength = dlc;
+	  for (int i = 0; i < p.contentsLength && i < 6; i++) {
+		p.contents[i] = data[i + 1];
+	  }
+
       can::sendCANPacket(p);
       can::printCANPacket(p);
     }

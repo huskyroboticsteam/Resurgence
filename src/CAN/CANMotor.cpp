@@ -34,8 +34,42 @@ namespace can::motor {
 // Jetson device as sender
 static const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
 
-void initEncoder() {
-	// TO DO
+void initEncoder(CANDevice_t device, bool invertEncoder,
+				 bool zeroEncoder, int32_t pulsesPerJointRev,
+				 std::optional<std::chrono::milliseconds> telemetryPeriod) {
+	CANPacket_t p;
+	// AssembleEncoderInitializePacket(&p, device, sensor_t::encoder, invertEncoder, zeroEncoder);
+	sendCANPacket(p);
+	std::this_thread::sleep_for(1000us);
+	if (telemetryPeriod) {
+		scheduleTelemetryPull(device.deviceUUID, telemtype_t::angle,
+							  telemetryPeriod.value());
+	}
+}
+
+void initPotentiometer(CANDevice_t device, int32_t posLo,
+					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
+					   std::optional<std::chrono::milliseconds> telemetryPeriod) {
+	CANPacket_t p;
+	/*
+	AssemblePotHiSetPacket(&p, device, adcHi, posHi);
+	p->id = ConstructCANID(PRIO_MOTOR_UNIT_POT_INIT, targetDeviceGroup, targetDeviceSerial);
+    p->dlc = DLC_MOTOR_UNIT_POT_INIT;
+
+    int idx = WritePacketIDOnly(p->data, ID_MOTOR_UNIT_POT_INIT_LO);
+    PackShortIntoDataMSBFirst(p->data, adcLo, idx);
+    idx += 2;
+    PackIntIntoDataMSBFirst(p->data, mdegLo, idx);
+
+	sendCANPacket(p);
+	std::this_thread::sleep_for(1ms);
+	AssemblePotLoSetPacket(&p, device, adcLo, posLo);
+	sendCANPacket(p);
+	*/
+	if (telemetryPeriod) {
+		scheduleTelemetryPull(device.deviceUUID, telemtype_t::angle,
+							  telemetryPeriod.value());
+	}
 }
 
 void initMotor(CANDevice_t device) {
