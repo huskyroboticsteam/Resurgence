@@ -1091,10 +1091,11 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">    {motorid_t::shoulder,</div>
 <div class="line">        {.isInverted = <span class="keyword">true</span>,</div>
 <div class="line">        .ppjr = 4590 * 1024 * 4,</div>
-<div class="line">        .limitSwitchLow = Constants::Arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,</div>
-<div class="line">        .limitSwitchHigh = Constants::Arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,</div>
+<div class="line">        .limitSwitchLow = <a class="code hl_variable" href="namespaceConstants_1_1Arm.html#aefaa03df5fbe1c7b2475a56e6779da1a">Constants::Arm::JOINT_LIMITS</a>.at(robot::types::motorid_t::shoulder).first,</div>
+<div class="line">        .limitSwitchHigh = <a class="code hl_variable" href="namespaceConstants_1_1Arm.html#aefaa03df5fbe1c7b2475a56e6779da1a">Constants::Arm::JOINT_LIMITS</a>.at(robot::types::motorid_t::shoulder).second,</div>
 <div class="line">        .zeroCalibrationPower = 0.4}},</div>
 <div class="line">})</div>
+<div class="ttc" id="anamespaceConstants_1_1Arm_html_aefaa03df5fbe1c7b2475a56e6779da1a"><div class="ttname"><a href="namespaceConstants_1_1Arm.html#aefaa03df5fbe1c7b2475a56e6779da1a">Constants::Arm::JOINT_LIMITS</a></div><div class="ttdeci">constexpr frozen::unordered_map&lt; motorid_t, std::pair&lt; int, int &gt;, IK_MOTORS.size()&gt; JOINT_LIMITS</div><div class="ttdoc">Map from motor ids to min and max joint limits in millidegrees.</div><div class="ttdef"><b>Definition</b> Constants.h:67</div></div>
 </div><!-- fragment -->
 </div>
 </div>
