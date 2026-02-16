@@ -276,9 +276,6 @@ const <a class="el" href="#a81cb1706e1f0e7c0639e231446ce4c9e">WorldInterface</a>
 <tr class="separator:ad2a31e2720609dd7619fc2bbafcf441e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04b54fc9d9d5912feb6dca13bd1bf223" id="r_a04b54fc9d9d5912feb6dca13bd1bf223"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04b54fc9d9d5912feb6dca13bd1bf223">encMotors</a></td></tr>
 <tr class="separator:a04b54fc9d9d5912feb6dca13bd1bf223"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c74d29e2b056935aee0a66650677151" id="r_a3c74d29e2b056935aee0a66650677151"><td class="memItemLeft" align="right" valign="top"><a id="a3c74d29e2b056935aee0a66650677151" name="a3c74d29e2b056935aee0a66650677151"></a>
-constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>FOURBAR_GEAR_RATIO</b> = 71.71875</td></tr>
-<tr class="separator:a3c74d29e2b056935aee0a66650677151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9acbcb79337aba8f5d847566cd2d9510" id="r_a9acbcb79337aba8f5d847566cd2d9510"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9acbcb79337aba8f5d847566cd2d9510">potMotors</a></td></tr>
 <tr class="separator:a9acbcb79337aba8f5d847566cd2d9510"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa66a3a3666eb218c89671933350db78f" id="r_aa66a3a3666eb218c89671933350db78f"><td class="memItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa66a3a3666eb218c89671933350db78f">motorSerialIDMap</a></td></tr>
@@ -1094,8 +1091,8 @@ template&lt;unsigned long int N&gt; </div>
 <div class="line">    {motorid_t::shoulder,</div>
 <div class="line">        {.isInverted = <span class="keyword">true</span>,</div>
 <div class="line">        .ppjr = 4590 * 1024 * 4,</div>
-<div class="line">        .limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,</div>
-<div class="line">        .limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,</div>
+<div class="line">        .limitSwitchLow = Constants::Arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,</div>
+<div class="line">        .limitSwitchHigh = Constants::Arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,</div>
 <div class="line">        .zeroCalibrationPower = 0.4}},</div>
 <div class="line">})</div>
 </div><!-- fragment -->
