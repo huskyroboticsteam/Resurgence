@@ -23,7 +23,7 @@ namespace Constants {
 
 /**
    @namespace Constants::Arm
-   @namespace Arm constants
+   @brief Arm constants
 */
 namespace Arm {
 /**
@@ -78,6 +78,7 @@ constexpr frozen::unordered_map<motorid_t, double, IK_MOTORS.size()> SEGMENT_LEN
 
 /**
    @namespace Constants::Drive
+   @brief Drive constants
 */
 namespace Drive {
 extern const double ROBOT_LENGTH;
@@ -130,6 +131,7 @@ extern const double STEER_EPSILON;
 
 /**
    @namespace Constants::Camera
+   @brief Camera constants
 */
 namespace Camera {
 extern const CameraID MAST_CAMERA_ID;
@@ -158,6 +160,7 @@ extern const std::unordered_map<CameraID, int> STREAM_RFS;
 
 /**
    @namespace Constants::Network
+   @brief Network constants
 */
 namespace Network {
 extern const uint16_t WS_SERVER_PORT;
@@ -180,6 +183,7 @@ extern const char* ARDUPILOT_PROTOCOL_NAME;
 
 /**
    @namespace Constants::Nav
+   @brief Navigation constants
 */
 namespace Nav {
 /**
