@@ -140,7 +140,7 @@ Formatting</h2>
 <h2><a class="anchor" id="autotoc_md3"></a>
 Best Practices</h2>
 <ul>
-<li>Constants should be defined with the <code>constexpr</code> keyword wherever possible (for primitive types and some standard library classes). This allows the compiler to perform optimizations on them.</li>
+<li><a class="el" href="namespaceConstants.html" title="Collection of all constants used.">Constants</a> should be defined with the <code>constexpr</code> keyword wherever possible (for primitive types and some standard library classes). This allows the compiler to perform optimizations on them.</li>
 <li>Wherever possible, avoid <code>#define</code> macros for constants in favor of the <code>constexpr</code> keyword. For more complex macros (e.g. functions), please consider <code>constexpr</code> functions instead - they are also evaluated at compile time but are more type-safe. See <a href="https://docs.microsoft.com/en-us/cpp/cpp/constexpr-cpp?view=msvc-160#constexpr_functions">this page</a> for more information.</li>
 <li>Wherever possible, avoid the use of raw pointers in favor of smart pointers (i.e <code>shared_ptr</code>) or references. If you need to have an output parameter for a function, a reference will work more often than not.</li>
 <li>The line <code>#pragma once</code> should <em>always</em> be at the beginning of a header file - this prevents it from being included (redefining all the symbols inside) more than once.</li>
