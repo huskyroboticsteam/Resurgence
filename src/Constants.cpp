@@ -2,6 +2,9 @@
 
 #include "kinematics/DiffDriveKinematics.h"
 
+/**
+	@namespace Consants
+*/
 namespace Constants {
 
 namespace Arm {
