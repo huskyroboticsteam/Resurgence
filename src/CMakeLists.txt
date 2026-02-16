@@ -34,38 +34,24 @@ endif()
 ##====== Module settings ======
 # These variables control whether various modules are enabled or disabled. The goal is to allow
 # a user to selectively exclude modules that they do not need.
-set(GPS "ARDUPILOT" CACHE STRING "GPS interface to use.")
-set(AVAILABLE_GPS "USB" "ARDUPILOT" "NONE")
-set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
-set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
 set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
-set(OFFLINE_MODE "FALSE" CACHE STRING "Status of offline building")
-set(AVAILABLE_OFFLINE_MODE "TRUE" "FALSE")
 set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
-set_property(CACHE OFFLINE_MODE PROPERTY STRINGS ${AVAILABLE_OFFLINE_MODE})
+
+set(REFETCH FALSE CACHE BOOL "Whether or not to refetch fresh content")
+
+set(WITH_TESTS TRUE CACHE BOOL "Whether or not to build the tests.")
 
 if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
   message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${WORLD_INTERFACE}\n\
 Valid values are ${AVAILABLE_WORLD_INTERFACES}")
 endif()
 
-if(NOT OFFLINE_MODE IN_LIST AVAILABLE_OFFLINE_MODE)
-  message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${OFFLINE_MODE}\n\
-Valid values are ${AVAILABLE_OFFLINE_MODE}")
-endif()
-
-if(NOT GPS IN_LIST AVAILABLE_GPS)
-  message(FATAL_ERROR "Invalid value for GPS: ${GPS}\n\
-Valid values are ${AVAILABLE_GPS}")
-endif()
-
 message("========================================\n\
 Module settings:")
-message("  GPS:\t\t\t${GPS}")
-message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
-message("  Offline mode:\t\t${OFFLINE_MODE}")
+message("  Test Suite:\t\t${WITH_TESTS}")
+message("  Refetch content:\t${REFETCH}")
 message("========================================")
 
 ##====== Dependencies ======
@@ -98,37 +84,33 @@ find_package(argparse REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  if(OFFLINE_MODE STREQUAL "FALSE")
-    # Find the CAN library; contains packet and protocol definitions and does not
-    # actually require physical CAN to be present.
+  if(NOT REFETCH AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src")
+    message("-- Cached HindsightCAN found, skipping fetch")
+    FetchContent_Declare(
+      HindsightCAN
+      SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
+    )
+  else()
+    # Find the CAN library; contains packet and protocol definitions.
     FetchContent_Declare(
       HindsightCAN
       GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
       GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
     )
-  else()
-    message("-- Offline mode enabled, using cached hindsight CAN")
-    # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
-    FetchContent_Declare(
-        HindsightCAN
-        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
-    )
   endif()
   FetchContent_MakeAvailable(HindsightCAN)
 endif()
 
-# Check if offline mode flag waas passed in
-if(OFFLINE_MODE STREQUAL "FALSE")
-  FetchContent_Declare(LoguruGitRepo
-    GIT_REPOSITORY "https://github.com/emilk/loguru"
-    GIT_TAG        "master"
-  )
-else()
-  message("-- Offline mode enabled, using cached loguru")
-  # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
+if(NOT REFETCH AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src")
+  message("-- Cached loguru found, skipping fetch")
   FetchContent_Declare(
       LoguruGitRepo
       SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src"
+  )
+else()
+  FetchContent_Declare(LoguruGitRepo
+    GIT_REPOSITORY "https://github.com/emilk/loguru"
+    GIT_TAG        "master"
   )
 endif()
 
@@ -143,17 +125,6 @@ find_package(OpenCV REQUIRED)
 
 if(WITH_TESTS)
   find_package(Catch2 REQUIRED)
-endif()
-
-# Libraries needed to interface with real-life sensors. If we aren't using the real world
-# interface, these aren't needed.
-if(WORLD_INTERFACE STREQUAL "REAL")
-  if(GPS STREQUAL "USB")
-    # Find pkg-config (needed for libgps, as it doesn't have CMake configuration)
-    find_package(PkgConfig REQUIRED)
-    # Find the libgps USB GPS library.
-    pkg_check_modules(libgps REQUIRED libgps)
-  endif()
 endif()
 
 if(WITH_TESTS)
@@ -212,19 +183,11 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 endif()
 
 ## GPS Implementations
-
 add_library(gps_interface STATIC)
-if(GPS STREQUAL "USB")
-  target_sources(gps_interface PUBLIC gps/usb_gps/read_usb_gps.cpp)
-  target_link_libraries(gps_interface ${libgps_LIBRARIES})
-elseif(GPS STREQUAL "ARDUPILOT")
-  target_sources(gps_interface PUBLIC
-      ardupilot/ArduPilotProtocol.cpp
-      ardupilot/ArduPilotInterface.cpp)
-  target_link_libraries(gps_interface utils websocket_utils)
-else()
-  target_sources(gps_interface PUBLIC gps/dummy/dummy_gps.cpp)
-endif()
+target_sources(gps_interface PUBLIC
+    ardupilot/ArduPilotProtocol.cpp
+    ardupilot/ArduPilotInterface.cpp)
+target_link_libraries(gps_interface utils websocket_utils)
 
 ## ====== World Interfaces =======
 # hardware-agnostic utilities and common code for world interface

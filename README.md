@@ -1,18 +1,12 @@
 # Resurgence
 Main onboard codebase for the Husky Robotics rover.
 
-# Updating Dependencies
-
-Some of our dependencies are team-managed, including the CAN library and the H264Encoder. Leads can use the [ubuntu-repo](https://github.com/huskyroboticsteam/ubuntu-repo) to create new builds of these dependencies when they are updated.
-
-**IMPORTANT:** When a dependency is updated, remember to update the required version number in [CMakeLists.txt](src/CMakeLists.txt) as well as in the [CI script](.github/workflows/ccpp.yml).
-
 # Pre-Setup Notes
 
-Our codebase is developed for an NVIDIA Jetson TX2, which runs Ubuntu Linux; as such, much
+Our codebase is developed for an NVIDIA Jetson Orin NX, which runs Ubuntu Linux; as such, much
 of our code will be Unix-specific.
 
-> ⚠️ The only supported platform is Ubuntu 22.04 LTS. Other versions/distros/platforms may work, but if you want as easy as possible, go with this version. 
+> ⚠️ The only supported platform is Ubuntu 22.04 LTS. Other versions/distros/platforms may work, but if you want the smoothest time developing, go with this version. 
 
 **Windows users:** You should use either [Windows Subsystem for
 Linux](https://docs.microsoft.com/en-us/windows/wsl/about) or a VM with a Linux
@@ -20,8 +14,7 @@ distribution installed (Ubuntu recommended). Either should work fine. Whichever 
 
 **Mac users:** We recommend running an Ubuntu virtual machine via [UTM](https://mac.getutm.app/). After installing the app, set up your VM using [UTM's Ubuntu image](https://mac.getutm.app/gallery/ubuntu-20-04). Please note that UTM only supports the latest version of Ubuntu (22.04).
 
-**From here on out, the installation instructions will assume you are using Ubuntu 22.04 LTS**. Windows users should run commands in either their Linux VM or their WSL
-terminal. For Linux users, we'll assume you're running Ubuntu; users of another
+**From here on out, the installation instructions will assume you are using Ubuntu 22.04 LTS**. Windows users should run commands in either their Linux VM or their WSL terminal. For Linux users, we'll assume you're running Ubuntu; users of another
 distribution may need to change some instructions (e.g. package managers) depending on
 your distro.
 
@@ -45,7 +38,7 @@ git clone https://github.com/huskyroboticsteam/Resurgence/
 
 > To create a new SSH key, run the following command with your Github email address: `ssh-keygen -t ed25519 -C "github_email@example.com"`. You can accept all of the default configurations.
 
-> To add the SSH key to your GitHub account, run the following command, substituting in for your .pub file: `gh ssh-key add ~/.ssh/<file>.pub -t "UTM Linux" --type signing`
+> To add the SSH key to your GitHub account, run the following command, substituting in for your .pub file: `gh ssh-key add ~/.ssh/<file>.pub -t "<name>" --type signing`
 
 Install dependencies in one go:
 ```bash
@@ -87,14 +80,10 @@ cd build
 cmake ../src
 ```
 
-## Formatting the code with clang-format
-
-Run clang-format on every edited file. **Github will block your merge if you try to merge code that has not been clang-format'ed correctly!!!**
-
-```
-clang-format -i /path/to/file/<FILENAME>/
-```
-For more information about clang-format, [please see the documentation](https://clang.llvm.org/docs/ClangFormatStyleOptions.html). 
+## CMake Options
+- `-DWORLD_INTERFACE={REAL|SIMULATOR|NO-OP}`: Specifies if the code is to be made for the real-world rover, the Simulator, or a no-op robot.
+- `-DWITH_TESTS={TRUE|FALSE}`: Specifies whether or not to build the test suite.
+- `-DREFETCH={TRUE|FALSE}`: Specifies whether or not to refetch online content. Useful if a library has updated and we need to fetch new content. Otherwise, CMake will build from local libraries if cached content exists.
 
 ## Compile the code
 
@@ -106,46 +95,31 @@ Otherwise you can specify just the specific executable you would like to run, e.
 
 To run our unit tests, run `make tests` and then execute `./tests`.
 
-## Running the Simulator
+## Running the Rover
 
-You can download the latest simulator build from the [simulator releases tab](https://github.com/huskyroboticsteam/Simulator/releases/latest).
-
-### Building the rover code to work with the simulator
-
-The simulator does not have its own executable. Instead, you must configure the CMake variables and build the `Rover` target:
-
-```bash
-cd build
-cmake ../src -DWORLD_INTERFACE=SIMULATOR
-make -j Rover
-```
-
-### Launching the simulator
-
-Launch the appropriate simulator executable for your platform. Then, run the rover code, using the `p` flag to specify a peripheral:
+Run the `Rover` executable, and pass along the mounted peripheral using the `-p` option.
 
 ```bash
 ./Rover -p {none|arm|science}
 ```
 
-The programs can be started in any order, it doesn't matter.
+## Running the Simulator
 
-### Switching back to building the real rover code
+You can download the latest simulator build from the [simulator releases tab](https://github.com/huskyroboticsteam/Simulator/releases/latest).
 
-Since the `Rover` target now builds the simulator rover code instead of the real rover code, we need to reconfigure CMake to build the real rover code again:
+After launching, running the rover is the same as the real-world scenario.
 
-```bash
-cd build
-cmake ../src -DWORLD_INTERFACE=REAL
-make -j Rover
+## Formatting the code with clang-format
+
+Run clang-format on every edited file. **Github will block your merge if you try to merge code that has not been clang-format'ed correctly!!!**
+
 ```
-
-### Building with no internet
-
-Since the Rover has to go outside there is the case of not having internet. Use the following flag to build from local libraries
-
-```bash
-cd build
-cmake ../src -DWORLD_INTERFACE=REAL -DOFFLINE_MODE=TRUE
-make -j Rover
+clang-format -i /path/to/file/<FILENAME>/
 ```
+For more information about clang-format, [please see the documentation](https://clang.llvm.org/docs/ClangFormatStyleOptions.html). 
+
+# Updating Dependencies
+
+Some of our dependencies are team-managed, including the CAN library and the H264Encoder. Leads can use the [ubuntu-repo](https://github.com/huskyroboticsteam/ubuntu-repo) to create new builds of these dependencies when they are updated.
+
+**IMPORTANT:** When a dependency is updated, remember to update the required version number in [CMakeLists.txt](src/CMakeLists.txt) as well as in the [CI script](.github/workflows/ccpp.yml).
