@@ -17,11 +17,13 @@ using robot::types::motorid_t;
 
 /**
    @namespace Constants
+   @brief Collection of all constants used
 */
 namespace Constants {
 
 /**
    @namespace Constants::Arm
+   @namespace Arm constants
 */
 namespace Arm {
 /**
