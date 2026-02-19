@@ -12,6 +12,7 @@
 #include <nlohmann/json.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
+#include <rtc/rtc.hpp>							// For UDP connection
 
 namespace net {
 namespace websocket {
@@ -108,6 +109,7 @@ private:
 	std::string serverName;
 	uint16_t port;
 	websocketpp::server<websocketpp::config::asio> server;
+	rtc::WebSocket UDPServer;
 	bool isRunning;
 	// protects against race conditions modifying protocolMap
 	std::mutex protocolMapMutex;
