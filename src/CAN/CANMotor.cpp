@@ -33,9 +33,6 @@ namespace can::motor {
 // UPDATED:
 // ===========
 
-// Jetson device as sender
-static const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
-
 void initEncoder(CANDevice_t device, bool invertEncoder, bool zeroEncoder,
 				 int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod) {
@@ -74,18 +71,18 @@ void initPotentiometer(CANDevice_t device, int32_t posLo, int32_t posHi, uint16_
 }
 
 void initMotor(CANDevice_t device) {
-	setMotorMode(device, motormode_t::pwm);
+	setMotorMode(device, motormode_t::vel);
 	std::this_thread::sleep_for(1000us);
 }
 
 void setMotorMode(CANDevice_t device, motormode_t mode) {
 	// Map motormode_t to BLDC control/input modes
 	uint8_t controlMode =
-		(mode == motormode_t::pid) ? BLDC_POSITION_CONTROL : BLDC_VELOCITY_CONTROL;
+		(mode == motormode_t::pos) ? BLDC_POSITION_CONTROL : BLDC_VELOCITY_CONTROL;
 	uint8_t inputMode = BLDC_PASSTHROUGH_INPUT;
 
 	CANPacket_t p =
-		CANMotorPacket_BLDC_SetInputMode(JETSON_DEVICE, device, controlMode, inputMode);
+		CANMotorPacket_BLDC_SetInputMode(Constants::JETSON_DEVICE, device, controlMode, inputMode);
 	sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 }
@@ -99,23 +96,18 @@ void setMotorPower(CANDevice_t device, double power) {
 	float velocity = static_cast<float>(power * 10.0); // 10 rev/s at full power
 	float feedForwardTorque = 0.0f;
 
-	CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(JETSON_DEVICE, device, velocity,
+	CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, velocity,
 														 feedForwardTorque);
 	sendCANPacket(p);
 }
 
-void setMotorPower(CANDevice_t device, int16_t power) {
-	// Convert int16_t power to double [-1.0, 1.0]
-	double powerDouble = static_cast<double>(power) / std::numeric_limits<int16_t>::max();
-	setMotorPower(device, powerDouble);
-}
 
 void setMotorPIDTarget(CANDevice_t device, int32_t target) {
 	// Convert millidegrees to revolutions
 	float positionRev = static_cast<float>(target) / 360000.0f;
 	float feedForwardVelocity = 0.0f;
 
-	CANPacket_t p = CANMotorPacket_BLDC_SetInputPosition(JETSON_DEVICE, device, positionRev,
+	CANPacket_t p = CANMotorPacket_BLDC_SetInputPosition(Constants::JETSON_DEVICE, device, positionRev,
 														 feedForwardVelocity);
 	sendCANPacket(p);
 }
@@ -129,14 +121,14 @@ void pullMotorPosition(CANDevice_t device) {
 	// Request encoder estimates from the device
 	uint8_t encoderID = 0; // Default encoder ID
 
-	CANPacket_t p = CANMotorPacket_BLDC_GetEncoderEstimates(JETSON_DEVICE, device, encoderID);
+	CANPacket_t p = CANMotorPacket_BLDC_GetEncoderEstimates(Constants::JETSON_DEVICE, device, encoderID);
 	sendCANPacket(p);
 }
 
 void emergencyStopMotors() {
 	// Broadcast e-stop to all domains
 	CANDevice_t broadcast = {1, 1, 1, CAN_UUID_BROADCAST};
-	CANPacket_t p = CANUniversalPacket_EStop(JETSON_DEVICE, broadcast);
+	CANPacket_t p = CANUniversalPacket_EStop(Constants::JETSON_DEVICE, broadcast);
 	can::sendCANPacket(p);
 	std::this_thread::sleep_for(1000us);
 }

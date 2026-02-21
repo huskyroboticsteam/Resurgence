@@ -17,8 +17,8 @@ namespace can::motor {
 
 /** @brief The possible motor modes. */
 enum class motormode_t {
-	pwm = BLDC_VELOCITY_CONTROL,
-	pid = BLDC_POSITION_CONTROL
+	vel = BLDC_VELOCITY_CONTROL,
+	pos = BLDC_POSITION_CONTROL
 };
 /*
 enum class motormode_t {

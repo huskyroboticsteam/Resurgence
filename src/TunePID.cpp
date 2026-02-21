@@ -38,15 +38,17 @@ std::map<V, K> reverseMap(const std::map<K, V>& map) {
 const std::map<boardid_t, std::string> motorNameMap = {
 	{boardid_t::leftTread, "leftTread"},
 	{boardid_t::rightTread, "rightTread"},
+	{boardid_t::frontTireLeft, "frontTireLeft"},
+	{boardid_t::frontTireRight, "frontTireRight"},
+	{boardid_t::rearTireLeft, "rearTireLeft"},
+	{boardid_t::rearTireRight, "rearTireRight"},
 	{boardid_t::armBase, "armBase"},
 	{boardid_t::shoulder, "shoulder"},
 	{boardid_t::elbow, "elbow"},
 	{boardid_t::forearm, "forearm"},
 	{boardid_t::wristDiffRight, "wristDiffRight"},
 	{boardid_t::wristDiffLeft, "wristDiffLeft"},
-	{boardid_t::hand, "hand"},
-	{boardid_t::drillActuator, "drillActuator"},
-	{boardid_t::drillMotor, "drillMotor"}};
+	{boardid_t::hand, "hand"}};
 
 const std::map<std::string, boardid_t> nameToMotorMap = reverseMap(motorNameMap);
 
@@ -129,7 +131,7 @@ int main(int argc, char** argv) {
 	std::getline(std::cin, str);
 	int d_coeff = std::stoi(str);
 
-	can::motor::setMotorMode(device, can::motor::motormode_t::pid);
+	can::motor::setMotorMode(device, can::motor::motormode_t::pos);
 	// can::motor::setMotorMode(group, serial, can::motor::motormode_t::pid);
 
 	// can::motor::setMotorPIDConstants(group, serial, p_coeff, i_coeff, d_coeff);
@@ -172,7 +174,7 @@ int main(int argc, char** argv) {
 		tp += 20ms;
 		std::this_thread::sleep_until(tp);
 	}
-	can::motor::setMotorMode(device, can::motor::motormode_t::pwm);
+	can::motor::setMotorMode(device, can::motor::motormode_t::vel);
 	// can::motor::setMotorMode(group, serial, can::motor::motormode_t::pwm);
 
 	can::motor::setMotorPower(device, 0.0);

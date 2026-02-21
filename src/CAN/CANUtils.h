@@ -29,11 +29,6 @@ using deviceinfo_t = CANDevice_t;
 using uuid_t = CANDeviceUUID_t;
 
 /**
- * @brief Get the device information from the given packet.
- */
-uuid_t getDeviceFromPacket(const CANPacket_t& packet);
-
-/**
  * @brief Get UUID from a packet ID
  *
  * @param packet The packet to extract the UUID from.
@@ -48,12 +43,6 @@ uuid_t getUUIDFromPacket(const CANPacket_t& packet);
  * @return uuid_t The device UUID.
  */
 uuid_t getSenderUUID(const CANPacket_t& packet);
-
-/**
- * @brief Check if device is in a specific domain
- */
-bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, bool motorDomain,
-					bool powerDomain);
 
 /**
  * @brief Check if device is in motor domain

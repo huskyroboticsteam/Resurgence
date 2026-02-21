@@ -32,17 +32,17 @@ const std::string PROTOCOL_PATH("/simulator");
 const std::map<boardid_t, std::string> motorNameMap = {
 	{boardid_t::leftTread, "leftTread"},
 	{boardid_t::rightTread, "rightTread"},
+	{boardid_t::frontTireLeft, "frontTireLeft"},
+	{boardid_t::frontTireRight, "frontTireRight"},
+	{boardid_t::rearTireLeft, "rearTireLeft"},
+	{boardid_t::rearTireRight, "rearTireRight"},
 	{boardid_t::armBase, "armBase"},
 	{boardid_t::shoulder, "shoulder"},
 	{boardid_t::elbow, "elbow"},
 	{boardid_t::forearm, "forearm"},
 	{boardid_t::wristDiffLeft, "wristDiffLeft"},
 	{boardid_t::wristDiffRight, "wristDiffRight"},
-	{boardid_t::hand, "hand"},
-	{boardid_t::drillActuator, "drillActuator"},
-	{boardid_t::drillMotor, "drillMotor"},
-	{boardid_t::fourbar1, "fourbar1"},
-	{boardid_t::fourbar2, "fourbar2"}};
+	{boardid_t::hand, "hand"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 

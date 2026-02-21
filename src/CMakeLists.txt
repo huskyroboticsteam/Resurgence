@@ -108,7 +108,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 
   add_library(CAN26 STATIC ${can26_SOURCE_DIR}/CANPacket.c)
   target_include_directories(CAN26 SYSTEM PUBLIC ${can26_SOURCE_DIR})
-  target_compile_options(CAN26 PRIVATE -Wno-missing-field-initializers)
 endif()
 
 FetchContent_Declare(LoguruGitRepo
@@ -149,6 +148,10 @@ add_library(camera SHARED
   camera/CameraConfig.cpp
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
+if(WORLD_INTERFACE STREQUAL "REAL")
+  target_link_libraries(camera PUBLIC CAN26 HindsightCAN)
+  target_compile_definitions(camera PRIVATE REAL_WORLD_INTERFACE)
+endif()
 
 # shared library for utility code
 add_library(utils SHARED
@@ -200,6 +203,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     Threads::Threads
     utils
   )
+  target_compile_definitions(can_interface PUBLIC REAL_WORLD_INTERFACE)
 endif()
 
 ## GPS Implementations
@@ -280,6 +284,10 @@ add_library(autonomous SHARED
 target_link_libraries(autonomous commands world_interface)
 
 add_library(constants SHARED Constants.cpp)
+if(WORLD_INTERFACE STREQUAL "REAL")
+  target_link_libraries(constants PUBLIC CAN26 HindsightCAN)
+  target_compile_definitions(constants PUBLIC REAL_WORLD_INTERFACE)
+endif()
 link_libraries(constants)
 
 add_executable(Rover Rover.cpp)

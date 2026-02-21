@@ -64,7 +64,7 @@ public:
 	*/
 
 	void setMotorPower(double power) {
-		ensureMotorMode(can::motor::motormode_t::pwm);
+		ensureMotorMode(can::motor::motormode_t::vel);
 
 		// scale the power
 		double scale = power < 0 ? negative_scale : positive_scale;
@@ -74,7 +74,7 @@ public:
 	}
 
 	void setMotorPos(int32_t targetPos) {
-		ensureMotorMode(can::motor::motormode_t::pid);
+		ensureMotorMode(can::motor::motormode_t::pos);
 		can::motor::setMotorPIDTarget(board_device, targetPos);
 		// LEGACY: can::motor::setMotorPIDTarget(device_group, serial_id, targetPos);
 	}
@@ -85,7 +85,7 @@ public:
 	}
 
 	void setMotorVel(int32_t targetVel) {
-		ensureMotorMode(can::motor::motormode_t::pid);
+		ensureMotorMode(can::motor::motormode_t::pos);
 		if (!velController) {
 			constructVelController();
 		}

@@ -58,7 +58,7 @@ public:
 	}
 
 	void setMotorPower(double power) {
-		ensureMotorMode(can::motor::motormode_t::pwm);
+		ensureMotorMode(can::motor::motormode_t::vel);
 
 		// scale the power
 		double scale = power < 0 ? negative_scale : positive_scale;
@@ -67,7 +67,7 @@ public:
 	}
 
 	void setMotorPos(int32_t targetPos) {
-		ensureMotorMode(can::motor::motormode_t::pid);
+		ensureMotorMode(can::motor::motormode_t::pos);
 		can::motor::setMotorPIDTarget(device, targetPos);
 	}
 
@@ -76,7 +76,7 @@ public:
 	}
 
 	void setMotorVel(int32_t targetVel) {
-		ensureMotorMode(can::motor::motormode_t::pid);
+		ensureMotorMode(can::motor::motormode_t::pos);
 		if (!velController) {
 			constructVelController();
 		}
@@ -91,7 +91,7 @@ public:
 		// schedule position event
 		velEventID = pSched->scheduleEvent(100ms, [this]() -> void {
 			robot::types::datatime_t currTime = robot::types::dataclock::now();
-			auto motorPos = getMotorPos();
+			auto motorPos = can::motor::getMotorPosition(device);
 			if (motorPos.isValid()) {
 				const navtypes::Vectord<1> currPos(motorPos.getData());
 				navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
@@ -219,15 +219,15 @@ int main() {
 			CANDevice_t device;
 			device.deviceUUID = uuid;
 			std::cout << "got " << device.deviceUUID << std::endl;
-			can::motor::setMotorMode(device, mode == 0 ? motormode_t::pwm : motormode_t::pid);
+			can::motor::setMotorMode(device, mode == 0 ? motormode_t::vel : motormode_t::pos);
 		} else if (testMode == TestMode::PWM) {
 			int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-			int pwm = prompt("Enter PWM");
+			double pwm = static_cast<double>(prompt("Enter PWM"));
 
 			CANDevice_t device;
 			device.deviceUUID = uuid;
-			can::motor::setMotorMode(device, motormode_t::pwm);
-			can::motor::setMotorPower(device, static_cast<int16_t>(pwm));
+			can::motor::setMotorMode(device, motormode_t::vel);
+			can::motor::setMotorPower(device, pwm);
 		} else if (testMode == TestMode::PID) {
 			/*
 			static CANDevice_t device;

@@ -78,25 +78,36 @@ constexpr auto potMotors = frozen::make_unordered_map<boardid_t, potparams_t>({
 	{boardid_t::wristDiffLeft,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
 	{boardid_t::wristDiffRight,
-	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
-	{boardid_t::fourbar1, {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
+	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}}
 });
 
 /** @brief A mapping of board UUID (boardid_t) to their corresponding uuid. */
-
 constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>(
 	{// BLDC Motors - Use BLDC commands
+	 /*
 	 {boardid_t::leftTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
 	 {boardid_t::rightTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
+	 */
+	 {boardid_t::frontTireLeft, CANDevice_t{1, 0, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
+	 {boardid_t::frontTireRight, CANDevice_t{1, 0, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
+	 {boardid_t::rearTireLeft, CANDevice_t{1, 0, 0, CAN_UUID_BLDC_REAR_TIRE_LEFT}},
+	 {boardid_t::rearTireRight, CANDevice_t{1, 0, 0, CAN_UUID_BLDC_REAR_TIRE_RIGHT}},
 	 {boardid_t::armBase, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_BASE}},
 	 {boardid_t::shoulder, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_SHOULDER}},
 	 {boardid_t::elbow, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_ELBOW}},
 	 {boardid_t::forearm, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FOREARM}},
 	 {boardid_t::wristDiffLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_LEFT}},
 	 {boardid_t::wristDiffRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}},
-
+	
+	 // Telemetry (0x50)
+	 {boardid_t::telemetry, CANDevice_t{0, 0, 1, CAN_UUID_TELEMETRY}},
 	 // Hand (0x60)
-	 {boardid_t::hand, CANDevice_t{1, 0, 0, CAN_UUID_HAND}}});
+	 {boardid_t::hand, CANDevice_t{1, 0, 0, CAN_UUID_HAND}},
+	 // DEBUG (0x70, 0x71)
+	 {boardid_t::debug1, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG1}},
+	 {boardid_t::debug2, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG2}}
+	});
+
 
 // ===========
 // DEPRECATED:
@@ -111,14 +122,7 @@ constexpr auto boardSerialIDMap = frozen::make_unordered_map<boardid_t, can::dev
 	 {boardid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
 	 {boardid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
 	 {boardid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
-	 {boardid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
-	 {boardid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
-	 {boardid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},
-	 {boardid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
-	 {boardid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
-	 {boardid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},
-	 {boardid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO},
-	 {boardid_t::scienceStepperBoard, DEVICE_SERIAL_SCIENCE_STEPPER}});
+	 {boardid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},	 {boardid_t::hand, DEVICE_SERIAL_MOTOR_HAND},});
 
 constexpr auto boardGroupMap = frozen::make_unordered_map<boardid_t, can::devicegroup_t>(
 	{{boardid_t::leftTread, can::devicegroup_t::motor},
@@ -129,13 +133,7 @@ constexpr auto boardGroupMap = frozen::make_unordered_map<boardid_t, can::device
 	 {boardid_t::forearm, can::devicegroup_t::motor},
 	 {boardid_t::wristDiffLeft, can::devicegroup_t::motor},
 	 {boardid_t::wristDiffRight, can::devicegroup_t::motor},
-	 {boardid_t::hand, can::devicegroup_t::motor},
-	 {boardid_t::drillActuator, can::devicegroup_t::science},
-	 {boardid_t::drillMotor, can::devicegroup_t::science},
-	 {boardid_t::fourbar1, can::devicegroup_t::science},
-	 {boardid_t::fourbar2, can::devicegroup_t::science},
-	 {boardid_t::scienceServoBoard, can::devicegroup_t::science},
-	 {boardid_t::scienceStepperBoard, can::devicegroup_t::science}});
+	 {boardid_t::hand, can::devicegroup_t::motor}});
 
 // ===========
 // END OF DEPRECATED
@@ -158,13 +156,7 @@ constexpr auto positive_pwm_scales =
 												   {boardid_t::wristDiffRight, 0.1},
 												   {boardid_t::leftTread, 0.7},
 												   {boardid_t::rightTread, -0.7},
-												   {boardid_t::hand, -0.75},
-												   {boardid_t::drillActuator, -0.5},
-												   {boardid_t::drillMotor, -1.0},
-												   {boardid_t::fourbar1, 0.3},
-												   {boardid_t::fourbar2, 0.3},
-												   {boardid_t::scienceServoBoard, 0},
-												   {boardid_t::scienceStepperBoard, 0}});
+												   {boardid_t::hand, -0.75}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
@@ -178,12 +170,6 @@ constexpr auto negative_pwm_scales =
 												   {boardid_t::wristDiffRight, 0.1},
 												   {boardid_t::leftTread, 0.7},
 												   {boardid_t::rightTread, -0.7},
-												   {boardid_t::hand, -0.75},
-												   {boardid_t::drillActuator, -0.5},
-												   {boardid_t::drillMotor, -1.0},
-												   {boardid_t::fourbar1, 0.15},
-												   {boardid_t::fourbar2, 0.15},
-												   {boardid_t::scienceServoBoard, 0},
-												   {boardid_t::scienceStepperBoard, 0}});
+												   {boardid_t::hand, -0.75}});
 
 } // namespace robot

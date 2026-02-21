@@ -89,6 +89,11 @@ const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
+#ifdef REAL_WORLD_INTERFACE
+const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
+#endif
+
+const float MILLIDEGREES_PER_REV = 360000.0f;
 namespace Drive {
 const double STEER_EPSILON = 10000;
 }

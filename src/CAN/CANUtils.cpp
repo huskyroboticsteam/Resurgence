@@ -17,39 +17,12 @@ namespace can {
 // UPDATED:
 // ===========
 
-uuid_t getDeviceFromPacket(const CANPacket_t& packet) {
-	return packet.device.deviceUUID;
-}
-
 uuid_t getUUIDFromPacket(const CANPacket_t& packet) {
 	return packet.device.deviceUUID;
 }
 
 uuid_t getSenderUUID(const CANPacket_t& packet) {
 	return packet.senderUUID;
-}
-
-bool deviceInDomain(const CANPacket_t* packet, bool peripheralDomain, bool motorDomain,
-					bool powerDomain) {
-	if (peripheralDomain && packet->device.peripheralDomain)
-		return true;
-	if (motorDomain && packet->device.motorDomain)
-		return true;
-	if (powerDomain && packet->device.powerDomain)
-		return true;
-	return false;
-}
-
-bool isMotorDomain(const CANPacket_t* packet) {
-	return packet->device.motorDomain;
-}
-
-bool isPeripheralDomain(const CANPacket_t* packet) {
-	return packet->device.peripheralDomain;
-}
-
-bool isPowerDomain(const CANPacket_t* packet) {
-	return packet->device.powerDomain;
 }
 
 // ===========

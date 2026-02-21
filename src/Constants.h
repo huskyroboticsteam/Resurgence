@@ -2,7 +2,9 @@
 
 #include "utils/time.h"
 #include "world_interface/data.h"
-
+#ifdef REAL_WORLD_INTERFACE
+#include "CAN/CANUtils.h"
+#endif
 #include <array>
 #include <chrono>
 #include <cmath>
@@ -88,6 +90,15 @@ extern const char* ARDUPILOT_PROTOCOL_NAME;
 extern const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD;
 extern const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD;
 
+/**
+   Jetson device as sender.
+*/
+#ifdef REAL_WORLD_INTERFACE
+extern const CANDevice_t JETSON_DEVICE;
+#endif
+
+extern const float MILLIDEGREES_PER_REV;
+
 namespace Drive {
 // Represents the allowable error in millidegrees for steer motors to still process a drive
 // request. That is, we make sure all the wheels are close enough to their target rotation
@@ -134,9 +145,7 @@ constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, boardid_t
 	 {jointid_t::shoulder, boardid_t::shoulder},
 	 {jointid_t::elbow, boardid_t::elbow},
 	 {jointid_t::forearm, boardid_t::forearm},
-	 {jointid_t::hand, boardid_t::hand},
-	 {jointid_t::drillActuator, boardid_t::drillActuator},
-	 {jointid_t::drillMotor, boardid_t::drillMotor}});
+	 {jointid_t::hand, boardid_t::hand}});
 
 // Arm inverse kinematics
 namespace arm {

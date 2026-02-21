@@ -197,7 +197,7 @@ void handleEncoderEstimates(CANPacket_t& packet) {
 	auto decoded = CANMotorPacket_BLDC_EncoderEstimates_Decode(&packet);
 	CANDeviceUUID_t uuid = packet.senderUUID;
 	// Convert position from revolutions to millidegrees
-	int32_t positionMdeg = static_cast<int32_t>(decoded.position * 360000.0f);
+	int32_t positionMdeg = static_cast<int32_t>(decoded.position * Constants::MILLIDEGREES_PER_REV);
 	telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::angle);
 	storeTelemetry(uuid, telemCode, DataPoint<telemetry_t>(positionMdeg));
 }
@@ -281,8 +281,7 @@ void receiveThreadFn() {
 	loguru::set_thread_name("CAN_Receive");
 	CANPacket_t packet;
 	// create dedicated CAN socket for reading
-	CANDevice_t jetsonDevice = {0, 0, 0, CAN_UUID_JETSON};
-	int recvFD = createCANSocket(jetsonDevice);
+	int recvFD = createCANSocket(Constants::JETSON_DEVICE);
 	if (recvFD < 0) {
 		LOG_F(ERROR, "Unable to open CAN connection!");
 		return;
@@ -436,12 +435,11 @@ robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t uuid,
 }
 
 void pullDeviceTelemetry(CANDeviceUUID_t uuid, telemtype_t telemType) {
-	static const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
 	CANDevice_t target = {0, 1, 0, uuid}; // assume motor for now?
 
 	if (telemType == telemtype_t::angle) {
 		// Request encoder position from the device
-		CANPacket_t p = CANMotorPacket_BLDC_GetEncoderEstimates(JETSON_DEVICE, target, 0);
+		CANPacket_t p = CANMotorPacket_BLDC_GetEncoderEstimates(Constants::JETSON_DEVICE, target, 0);
 		sendCANPacket(p);
 	}
 }
