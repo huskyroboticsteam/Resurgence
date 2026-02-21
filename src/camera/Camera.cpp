@@ -99,9 +99,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	if (formatLower.find("h264") != std::string::npos) {
-		gstr_ss << "h264parse ! avdec_h264 ! ";
-	} else if (formatLower.find("jpeg") != std::string::npos) {
+	if (formatLower.find("jpeg") != std::string::npos) {
 		gstr_ss << "jpegdec ! ";
 	}
 
