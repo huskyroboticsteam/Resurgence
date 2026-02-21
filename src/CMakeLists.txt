@@ -247,10 +247,14 @@ target_link_libraries(filters utils)
 add_library(video STATIC
   video/H264Encoder.cpp
   video/encoder.cpp
+  video/H265NVENCEncoder.cpp
 )
+
+target_include_directories(video PUBLIC ${GSTREAMER_INCLUDE_DIRS})
 
 target_link_libraries(video
   ${OpenCV_LIBS}
+  ${GSTREAMER_LIBRARIES}
   x264 avutil avcodec avformat swscale
 )
 
