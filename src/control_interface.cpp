@@ -74,8 +74,14 @@ double setTankCmdVel(double left, double right) {
 		rPWM /= maxAbsPWM;
 	}
 
+	/*
 	setMotorPower(boardid_t::leftTread, lPWM);
 	setMotorPower(boardid_t::rightTread, rPWM);
+	*/
+	setMotorPower(boardid_t::frontTireLeft, lPWM);
+	setMotorPower(boardid_t::frontTireRight, rPWM);
+	setMotorPower(boardid_t::rearTireLeft, lPWM);
+	setMotorPower(boardid_t::rearTireRight, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
