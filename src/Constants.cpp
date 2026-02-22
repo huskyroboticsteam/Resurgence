@@ -68,6 +68,7 @@ const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONFIG_PATH
  */
 const uint16_t PLANVIZ_SERVER_PORT = 9002;
 const uint16_t WS_SERVER_PORT = 3001;
+const uint16_t WEBRTC_SERVER_PORT = 3002;
 
 /**
    WebSocket server endpoint for the mission control protocol.

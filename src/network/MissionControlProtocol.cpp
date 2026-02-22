@@ -316,9 +316,9 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 	this->setArmIKEnabled(false, sendDisableIK);
 }
 
-MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
+MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server, rtc::PeerConnection& UDPConnection)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),
-	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server),
+	  _camera_stream_task(UDPConnection), _telem_report_task(server), _arm_ik_task(server),
 	  _autonomous_task() {
 	// emergency stop and operation mode handlers need the class for context since they must
 	// be able to access the methods to start and stop the power repeater thread

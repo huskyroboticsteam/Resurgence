@@ -34,7 +34,7 @@ static void stopAllJoints();
 
 class MissionControlProtocol : public WebSocketProtocol { // TODO: add documentation
 public:
-	MissionControlProtocol(SingleClientWSServer& server);
+	MissionControlProtocol(SingleClientWSServer& server, rtc::PeerConnection& UDPConnection);
 	~MissionControlProtocol();
 	MissionControlProtocol(const MissionControlProtocol& other) = delete;
 	MissionControlProtocol& operator=(const MissionControlProtocol& other) = delete;

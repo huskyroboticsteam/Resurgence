@@ -150,7 +150,16 @@ int main(int argc, char** argv) {
 	Globals::AUTONOMOUS = false;
 	Globals::websocketServer.start();
 	robot::world_interface_init(Globals::websocketServer);
-	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
+	// Create RTC configuration for camera stream UDP
+	rtc::Configuration config;
+
+	// Define port
+	config.portRangeBegin = Constants::WEBRTC_SERVER_PORT;
+	config.portRangeEnd = Constants::WEBRTC_SERVER_PORT;
+
+	// Create ref
+	rtc::PeerConnection peerConnectRef(config);
+	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer, peerConnectRef);
 	Globals::websocketServer.addProtocol(std::move(mcProto));
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
