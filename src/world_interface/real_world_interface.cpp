@@ -240,6 +240,7 @@ std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 void initMotors() {
 	// CAN26: Initialize motors using CANDevice_t from boardUUIDMap
 	for (const auto& [motor, device] : boardUUIDMap) {
+		if (!device.motorDomain) continue;
 		can::motor::initMotor(device);
 		bool hasPosSensor = robot::potMotors.find(motor) != robot::potMotors.end() ||
 							robot::encMotors.find(motor) != robot::encMotors.end();

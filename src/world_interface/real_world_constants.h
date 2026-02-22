@@ -100,9 +100,9 @@ constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>
 	 {boardid_t::wristDiffRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}},
 	
 	 // Telemetry (0x50)
-	 {boardid_t::telemetry, CANDevice_t{0, 0, 1, CAN_UUID_TELEMETRY}},
+	 {boardid_t::telemetry, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}},
 	 // Hand (0x60)
-	 {boardid_t::hand, CANDevice_t{1, 0, 0, CAN_UUID_HAND}},
+	 {boardid_t::hand, CANDevice_t{0, 1, 0, CAN_UUID_HAND}},
 	 // DEBUG (0x70, 0x71)
 	 {boardid_t::debug1, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG1}},
 	 {boardid_t::debug2, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG2}}
@@ -154,8 +154,10 @@ constexpr auto positive_pwm_scales =
 												   {boardid_t::forearm, -0.2},
 												   {boardid_t::wristDiffLeft, -0.1},
 												   {boardid_t::wristDiffRight, 0.1},
-												   {boardid_t::leftTread, 0.7},
-												   {boardid_t::rightTread, -0.7},
+												   {boardid_t::frontTireLeft, -0.1},
+												   {boardid_t::frontTireRight, 0.1},
+												   {boardid_t::rearTireLeft, -0.1},
+												   {boardid_t::rearTireRight, 0.1},
 												   {boardid_t::hand, -0.75}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
@@ -168,8 +170,10 @@ constexpr auto negative_pwm_scales =
 												   {boardid_t::forearm, -0.2},
 												   {boardid_t::wristDiffLeft, -0.1},
 												   {boardid_t::wristDiffRight, 0.1},
-												   {boardid_t::leftTread, 0.7},
-												   {boardid_t::rightTread, -0.7},
+												   {boardid_t::frontTireLeft, 0.1},
+												   {boardid_t::frontTireRight, -0.1},
+												   {boardid_t::rearTireLeft, 0.1},
+												   {boardid_t::rearTireRight, -0.1},
 												   {boardid_t::hand, -0.75}});
 
 } // namespace robot
