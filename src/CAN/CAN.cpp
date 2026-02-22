@@ -385,8 +385,8 @@ void printCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // same as sendCANPacket
 	std::stringstream ss;
 	ss << "CAN: p" << std::hex << ((CANGetPacketHeader(&mutablePacket) >> 10) & 0x1);
-	ss << " id" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x03C0) >> 6);
-	ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x003F));
+	ss << " uuid" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x03F8) >> 3);
+	ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x0007));
 	ss << " pid" << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[0]);
 	ss << " data:";
 	for (int i = 1; i < CANGetDlc(&mutablePacket); i++) {

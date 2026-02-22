@@ -44,20 +44,6 @@ uuid_t getUUIDFromPacket(const CANPacket_t& packet);
  */
 uuid_t getSenderUUID(const CANPacket_t& packet);
 
-/**
- * @brief Check if device is in motor domain
- */
-bool isMotorDomain(const CANPacket_t* packet);
-
-/**
- * @brief Check if device is in peripheral domain
- */
-bool isPeripheralDomain(const CANPacket_t* packet);
-
-/**
- * @brief Check if device is in power domain
- */
-bool isPowerDomain(const CANPacket_t* packet);
 
 // ===========
 // DEPRECATED:

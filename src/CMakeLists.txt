@@ -216,19 +216,10 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     CAN/CANUtils.cpp
   )
 
-  # Hardware specific source files - DEPRECATED
-  target_sources(can_interface PRIVATE
-    CAN/CAN.cpp)
-  target_link_libraries(can_interface PUBLIC
-    HindsightCAN
-    Threads::Threads
-    utils
-  )
-
-  # Hardware specific source files - UPDATED
   target_sources(can_interface PRIVATE CAN/CAN.cpp)
   target_link_libraries(can_interface PUBLIC
     CAN26
+    HindsightCAN
     Threads::Threads
     utils
   )
