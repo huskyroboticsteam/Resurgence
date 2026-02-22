@@ -254,7 +254,7 @@ add_library(world_interface_core STATIC
   world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
+target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera LibDataChannel::LibDataChannel)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
   # CAN library (above) requires some utilities from this

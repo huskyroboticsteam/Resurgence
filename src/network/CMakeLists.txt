@@ -1,7 +1,6 @@
 add_library(websocket_utils STATIC
   websocket/WebSocketServer.cpp
-  websocket/WebSocketProtocol.cpp
-  rtc/rtc.hpp)
+  websocket/WebSocketProtocol.cpp)
 
 target_link_libraries(websocket_utils 
   ${BOOST_LIBRARIES}

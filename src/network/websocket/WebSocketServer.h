@@ -12,7 +12,7 @@
 #include <nlohmann/json.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
-#include <rtc/rtc.hpp>							// For UDP connection
+#include <rtc/rtc.hpp>
 
 namespace net {
 namespace websocket {
