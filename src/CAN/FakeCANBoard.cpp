@@ -116,7 +116,7 @@ int main() {
 				int dur = prompt("dur (s)");
 				p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, vel, 0);
 				p.command = CAN_ACK(p.command);
-				can::sendCANPacket(p);
+				can::sendCANPacketWithAck(p);
 				std::cout << "Lockin Spin..." << std::endl;
 				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_LOCKIN_SPIN);
 				can::sendCANPacket(p);

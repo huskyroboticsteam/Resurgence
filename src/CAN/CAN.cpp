@@ -56,6 +56,7 @@ namespace can {
 namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
+constexpr std::chrono::milliseconds ACK_TIMEOUT(50);
 // CAN26 11-bit ID layout: [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
 // Match on UUID field to filter for packets addressed to this device
 constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
@@ -67,6 +68,9 @@ std::shared_ptr<util::PeriodicScheduler<>> telemScheduler;
 std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>,
 				   util::PeriodicScheduler<>::eventid_t>
 	telemEventIDMap;
+
+std::shared_ptr<util::PeriodicScheduler<>> ackScheduler;
+std::unordered_map<CANDeviceUUID_t, util::PeriodicScheduler<>::eventid_t> ackMap;
 
 using telemetrycode_t = uint8_t;
 
@@ -213,6 +217,13 @@ void handleLimitSwitchAlert(CANPacket_t& packet) {
 void handleAcknowledgement(CANPacket_t& packet) {
 	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
 	LOG_F(INFO, "Acknowledgement received from 0x%x: %s", decoded.sender.deviceUUID, decoded.failure ? "FAIL" : "ok");
+
+	auto it = ackMap.find(decoded.sender.deviceUUID);
+	if (it != ackMap.end()) {
+		auto eventID = it->second;
+		ackMap.erase(it);
+		ackScheduler->removeEvent(eventID);
+	}
 }
 
 /* old - replaced by command-specific handlers above
@@ -341,6 +352,46 @@ void initCAN() {
 	// start thread for recieving CAN packets
 	std::thread receiveThread(receiveThreadFn);
 	receiveThread.detach();
+}
+void sendCANPacketWithAck(const CANPacket_t& packet) {
+	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
+	canfd_frame frame;
+	std::memset(&frame, 0, sizeof(frame));
+	frame.can_id = CANGetPacketHeader(&mutablePacket);
+	frame.len = CANGetDlc(&mutablePacket);
+	std::memcpy(frame.data, CANGetData(&mutablePacket), frame.len);
+
+	if (packet.command & 0x80) {
+		if (!ackScheduler) {
+			ackScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_AckSched");
+		}
+
+		CANDeviceUUID_t uuid = packet.device.deviceUUID;
+		auto it = ackMap.find(uuid);
+		if (it != ackMap.end()) {
+			LOG_F(ERROR, "0x%x ALREADY HAS A PACKET OUTGOING! IGNORING", uuid);
+		}
+
+		auto eventID =
+			ackScheduler->scheduleEvent(ACK_TIMEOUT, [=]() {
+				LOG_F(ERROR, "0x%x ACK TIMED OUT, RESENDING", uuid);
+				sendCANFrame(frame);
+			});
+
+
+		ackMap.insert_or_assign(uuid, eventID);
+	}
+
+	sendCANFrame(frame);
+}
+
+bool sendCANFrame(canfd_frame frame) {
+	std::lock_guard lock(socketMutex);
+	// note that frame is a canfd_frame but we're using sizeof(can_frame)
+	// not sure why this is required to work
+	bool success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
+	tcdrain(can_fd);
+	return success;
 }
 
 // new for CAN26
