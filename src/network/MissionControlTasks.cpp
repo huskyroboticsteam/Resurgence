@@ -251,6 +251,9 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 														uniqueMarkers[ids[i]] = tvec;
 													}
 												}
+
+												// Draw corners
+												cv::aruco::drawDetectedMarkers(frame, corners, ids);
 												
 												// Log each unique detected marker
 												for (const auto& pair : uniqueMarkers) {
