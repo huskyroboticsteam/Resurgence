@@ -69,6 +69,9 @@ void initMotor(CANDevice_t device);
  */
 void setMotorMode(CANDevice_t device, motormode_t mode);
 
+void setMotorIdle(CANDevice_t device);
+void setMotorLockinSpin(CANDevice_t device);
+
 /**
  * @brief Set motor power using CAN26 protocol.
  * @param device The target CAN device.

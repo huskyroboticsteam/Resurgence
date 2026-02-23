@@ -210,6 +210,11 @@ void handleLimitSwitchAlert(CANPacket_t& packet) {
 				   DataPoint<telemetry_t>(static_cast<telemetry_t>(decoded.switchStatus)));
 }
 
+void handleAcknowledgement(CANPacket_t& packet) {
+	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
+	LOG_F(INFO, "Acknowledgement received from 0x%x: %s", decoded.sender.deviceUUID, decoded.failure ? "FAIL" : "ok");
+}
+
 /* old - replaced by command-specific handlers above
 void handleTelemetryPacket(CANPacket_t& packet) {
 	CANDeviceUUID_t uuid = getDeviceFromPacket(packet);
@@ -293,20 +298,24 @@ void receiveThreadFn() {
 		if (received) {
 			// dispatch on CAN26 command ID
 			switch (packet.command) {
-				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
-					handleEncoderEstimates(packet);
+				case CAN_COMMAND_ID__E_STOP:
+					LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
+					break;
+				
+				case CAN_COMMAND_ID__ACKNOWLEDGE:
+					handleAcknowledgement(packet);
+					break;
+
+				case CAN_COMMAND_ID__HEARTBEAT:
+					// LOG_F(INFO, "Heartbeat from UUID 0x%x", packet.senderUUID);
 					break;
 
 				case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
 					handleLimitSwitchAlert(packet);
 					break;
 
-				case CAN_COMMAND_ID__HEARTBEAT:
-					LOG_F(INFO, "Heartbeat from UUID 0x%x", packet.senderUUID);
-					break;
-
-				case CAN_COMMAND_ID__E_STOP:
-					LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
+				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
+					handleEncoderEstimates(packet);
 					break;
 
 				default:

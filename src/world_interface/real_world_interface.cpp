@@ -38,7 +38,7 @@ public:
 	CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
 			 double pos_pwm_scale, double neg_pwm_scale)
 		: motor_id(motor), has_pos_sensor(hasPosSensor), board_device(device),
-		  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale) {
+		  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale), power(0.0) {
 		// create scheduler if needed
 		std::lock_guard<std::mutex> lg(schedulerMutex);
 		if (!pSched) {
@@ -69,7 +69,14 @@ public:
 		// scale the power
 		double scale = power < 0 ? negative_scale : positive_scale;
 		power *= scale;
-		can::motor::setMotorPower(board_device, power);
+
+		if (power == 0.0) {
+			this->power = 0.0;
+			can::motor::setMotorIdle(board_device);
+		} else if (power != this->power) {
+			this->power = power;
+			can::motor::setMotorLockinSpin(board_device);
+		}
 		// LEGACY: can::motor::setMotorPower(device_group, serial_id, power);
 	}
 
@@ -135,6 +142,7 @@ private:
 	std::optional<can::motor::motormode_t> motor_mode;
 	double positive_scale;
 	double negative_scale;
+	double power;
 	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
 	std::optional<JacobianVelController<1, 1>> velController;
 
@@ -246,6 +254,8 @@ void initMotors() {
 							robot::encMotors.find(motor) != robot::encMotors.end();
 		addMotorMapping(motor, hasPosSensor);
 	}
+
+	std::this_thread::sleep_for(5s);
 
 	// The pot/encoder/PID loops from HindsightCAN are no longer needed thanks to ODrive, im
 	// pretty sure

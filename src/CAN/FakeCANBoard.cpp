@@ -42,128 +42,6 @@ enum class TestMode {
 	RawCAN
 };
 
-namespace {
-
-class CANBoard {
-public:
-	CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
-			 double pos_pwm_scale, double neg_pwm_scale)
-		: motor_id(motor), has_pos_sensor(hasPosSensor), device(device),
-		  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale) {
-		// create scheduler if needed
-		std::lock_guard<std::mutex> lg(schedulerMutex);
-		if (!pSched) {
-			pSched.emplace("MotorVelSched");
-		}
-	}
-
-	void setMotorPower(double power) {
-		ensureMotorMode(can::motor::motormode_t::vel);
-
-		// scale the power
-		double scale = power < 0 ? negative_scale : positive_scale;
-		power *= scale;
-		can::motor::setMotorPower(device, power);
-	}
-
-	void setMotorPos(int32_t targetPos) {
-		ensureMotorMode(can::motor::motormode_t::pos);
-		can::motor::setMotorPIDTarget(device, targetPos);
-	}
-
-	robot::types::DataPoint<int32_t> getMotorPos() const {
-		return can::motor::getMotorPosition(device);
-	}
-
-	void setMotorVel(int32_t targetVel) {
-		ensureMotorMode(can::motor::motormode_t::pos);
-		if (!velController) {
-			constructVelController();
-		}
-		// set velocity target
-		navtypes::Vectord<1> velocityVector{targetVel};
-		robot::types::datatime_t currTime = robot::types::dataclock::now();
-		velController->setTarget(currTime, velocityVector);
-
-		// check to see if the event exists. if yes, unschedule it
-		unscheduleVelocityEvent();
-
-		// schedule position event
-		velEventID = pSched->scheduleEvent(100ms, [this]() -> void {
-			robot::types::datatime_t currTime = robot::types::dataclock::now();
-			auto motorPos = can::motor::getMotorPosition(device);
-			if (motorPos.isValid()) {
-				const navtypes::Vectord<1> currPos(motorPos.getData());
-				navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
-				setMotorPos(posCommand.coeff(0, 0));
-			}
-		});
-	}
-
-	void unscheduleVelocityEvent() {
-		if (velEventID) {
-			pSched->removeEvent(velEventID.value());
-			velEventID.reset();
-		}
-	}
-
-	can::uuid_t getMotorUUID() const {
-		return device.deviceUUID;
-	}
-
-	robot::types::boardid_t getMotorID() const {
-		return motor_id;
-	}
-
-private:
-	robot::types::boardid_t motor_id;
-	bool has_pos_sensor;
-	CANDevice_t device;
-	std::optional<can::motor::motormode_t> motor_mode;
-	double positive_scale;
-	double negative_scale;
-	std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
-	std::optional<JacobianVelController<1, 1>> velController;
-
-	inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
-	inline static std::mutex schedulerMutex;
-
-	void ensureMotorMode(can::motor::motormode_t mode) {
-		if (!motor_mode || motor_mode.value() != mode) {
-			// update the motor mode
-			motor_mode.emplace(mode);
-			can::motor::setMotorMode(device, mode);
-		}
-	}
-
-	void constructVelController() {
-		// define dimensions
-		constexpr int32_t inputDim = 1;
-		constexpr int32_t outputDim = 1;
-
-		// create kinematics function (input and output will both be the current motor
-		// position)
-		const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>&
-			kinematicsFunct = [](const navtypes::Vectord<inputDim>& inputVec) {
-				// returns a copy of the input vector
-				return inputVec;
-			};
-
-		// create jacobian function (value will be 1 since it's the derivative of the
-		// kinematics function)
-		const std::function<navtypes::Matrixd<outputDim, inputDim>(
-			const navtypes::Vectord<inputDim>&)>& jacobianFunct =
-			[](const navtypes::Vectord<inputDim>&) {
-				navtypes::Matrixd<outputDim, inputDim> res =
-					navtypes::Matrixd<outputDim, inputDim>::Identity();
-				return res;
-			};
-
-		velController.emplace(kinematicsFunct, jacobianFunct);
-	}
-};
-} // namespace
-
 std::unordered_set<int> modes = {
 	static_cast<int>(TestMode::ModeSet),   static_cast<int>(TestMode::PWM),
 	static_cast<int>(TestMode::PID),	   static_cast<int>(TestMode::Encoder),
@@ -222,13 +100,71 @@ int main() {
 			can::motor::setMotorMode(device, mode == 0 ? motormode_t::vel : motormode_t::pos);
 		} else if (testMode == TestMode::PWM) {
 			int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-			double pwm = static_cast<double>(prompt("Enter PWM"));
 
 			CANDevice_t device;
 			device.deviceUUID = uuid;
-			can::motor::setMotorMode(device, motormode_t::vel);
-			can::motor::setMotorPower(device, pwm);
+			// can::motor::setMotorMode(device, motormode_t::vel);
+			// can::motor::setMotorPower(device, pwm);
+
+			CANPacket_t p;
+			std::cout << "Calibrating device 0x" << std::hex << uuid << "..." << std::endl;
+			p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_MOTOR_CALIBRATION);
+			can::sendCANPacket(p);
+			std::this_thread::sleep_for(5s);
+			while (true) {
+				int vel = prompt("vel");
+				int dur = prompt("dur (s)");
+				p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, vel, 0);
+				p.command = CAN_ACK(p.command);
+				can::sendCANPacket(p);
+				std::cout << "Lockin Spin..." << std::endl;
+				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_LOCKIN_SPIN);
+				can::sendCANPacket(p);
+				std::this_thread::sleep_for(std::chrono::seconds(dur));
+				std::cout << "Stopping..." << std::endl;
+				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_IDLE);
+				can::sendCANPacket(p);
+			}
 		} else if (testMode == TestMode::PID) {
+			int mode = prompt("0=forward, 1=backward, 2=turn cw, 3=turn ccw");
+			int vel = prompt("vel");
+			CANDevice_t device;
+			CANPacket_t p;
+
+			CANDeviceUUID_t uuids[] = {CAN_UUID_BLDC_FRONT_TIRE_LEFT, CAN_UUID_BLDC_FRONT_TIRE_RIGHT, CAN_UUID_BLDC_REAR_TIRE_LEFT, CAN_UUID_BLDC_REAR_TIRE_RIGHT};
+			int vels[4] = {-vel, vel, -vel, vel};
+			switch (mode) {
+				case 0:
+					break;
+				case 1:
+					for (int i = 0; i < 4; i++) {
+						vels[i] = -vels[i];
+					}
+					break;
+				case 2:
+					for (int i = 0; i < 4; i++) {
+						vels[i] = -vel;
+					}
+					break;
+				case 3:
+					for (int i = 0; i < 4; i++) {
+						vels[i] = vel;
+					}
+					break;
+				default:
+					std::cout << "Unrecognized mode: " << mode << std::endl;
+					std::exit(1);
+			}
+
+			for (int r = 0; r < 5; r++) {
+				for (int i = 0; i < 4; i++) {
+					device.deviceUUID = uuids[i];
+					p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, vels[i], 0);
+					p.command = CAN_ACK(p.command);
+					can::sendCANPacket(p);
+				}
+				std::this_thread::sleep_for(500ms);
+			}
 			/*
 			static CANDevice_t device;
 

@@ -72,7 +72,9 @@ void initPotentiometer(CANDevice_t device, int32_t posLo, int32_t posHi, uint16_
 
 void initMotor(CANDevice_t device) {
 	setMotorMode(device, motormode_t::vel);
-	std::this_thread::sleep_for(1000us);
+	CANPacket_t p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_MOTOR_CALIBRATION);
+	p.command = CAN_ACK(p.command);
+	can::sendCANPacket(p);
 }
 
 void setMotorMode(CANDevice_t device, motormode_t mode) {
@@ -87,17 +89,30 @@ void setMotorMode(CANDevice_t device, motormode_t mode) {
 	std::this_thread::sleep_for(1000us);
 }
 
+void setMotorIdle(CANDevice_t device) {
+	CANPacket_t p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_IDLE);
+	p.command = CAN_ACK(p.command);
+	sendCANPacket(p);
+}
+
+void setMotorLockinSpin(CANDevice_t device) {
+	CANPacket_t p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_LOCKIN_SPIN);
+	p.command = CAN_ACK(p.command);
+	sendCANPacket(p);
+}
+
 void setMotorPower(CANDevice_t device, double power) {
 	// Clamp power to [-1.0, 1.0]
 	power = std::min(std::max(power, -1.0), 1.0);
 
 	// Use BLDC velocity control: convert power [-1, 1] to velocity in rev/s
 	// adjust as needed
-	float velocity = static_cast<float>(power * 10.0); // 10 rev/s at full power
+	float velocity = static_cast<float>(power * 400.0); // 10 rev/s at full power
 	float feedForwardTorque = 0.0f;
 
 	CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, velocity,
 														 feedForwardTorque);
+	p.command = CAN_ACK(p.command);
 	sendCANPacket(p);
 }
 
