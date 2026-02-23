@@ -38,8 +38,6 @@ template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 // Reusable ArUco detector parameters and marker set
 cv::Ptr<cv::aruco::DetectorParameters> aruco_detector_params = cv::aruco::DetectorParameters::create();
 std::shared_ptr<AR::MarkerSet> aruco_marker_set = AR::Markers::URC_MARKERS();
-}
-
 
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
