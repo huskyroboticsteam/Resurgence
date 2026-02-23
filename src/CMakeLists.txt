@@ -66,6 +66,7 @@ message("  GPS:\t\t\t${GPS}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
 message("  Offline mode:\t\t${OFFLINE_MODE}")
+message("  Offline mode:\t\t${MY_IP}")
 message("========================================")
 
 ##====== Dependencies ======
@@ -388,6 +389,9 @@ if (WORLD_INTERFACE STREQUAL "REAL")
   )
   target_link_libraries(TunePID ${vision_libs})
 endif()
+
+# Add defintions for the IP
+add_compile_definitions(MY_IP="${MY_IP}")
 
 add_compile_options(
   -Wall

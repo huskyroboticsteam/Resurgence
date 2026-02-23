@@ -12,6 +12,11 @@
 #include <unordered_map>
 #include <utility>
 
+// For network code (Will eventually be moved to it's own object)
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
 namespace net::mc::tasks {
 
 /**
@@ -93,6 +98,8 @@ private:
 
 
 	websocket::SingleClientWSServer& _server;
+	struct sockaddr_in servaddr, cliaddr;
+	int sockfd;
 	std::mutex _mutex;
 	std::unordered_map<robot::types::CameraID, stream_data_t> _open_streams;
 };

@@ -14,7 +14,7 @@ SingleClientWSServer::ProtocolData::ProtocolData(std::unique_ptr<WebSocketProtoc
 	: protocol(std::move(protocol)) {}
 
 SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16_t port)
-	: serverName(serverName), port(port), server(), isRunning(false), protocolMap(),
+	: serverName(serverName), clientAddress("AddressUnkown"), port(port), server(), isRunning(false), protocolMap(),
 	  serverThread(), pingScheduler(serverName + "_PingSched") {
 	// disable websocket logging
 	server.set_access_channels(websocketpp::log::alevel::none);
@@ -22,7 +22,12 @@ SingleClientWSServer::SingleClientWSServer(const std::string& serverName, uint16
 	server.set_reuse_addr(true);
 	server.init_asio();
 
-	server.set_open_handler([&](connection_hdl hdl) { this->onOpen(hdl); });
+	server.set_open_handler([&](connection_hdl hdl) { 
+		this->onOpen(hdl); 
+		std::shared_ptr<websocketpp::connection<websocketpp::config::asio>> connection =
+			this->server.get_con_from_hdl(hdl);
+		clientAddress = connection->get_remote_endpoint();
+	});
 	server.set_close_handler([&](connection_hdl hdl) { this->onClose(hdl); });
 	server.set_validate_handler([&](connection_hdl hdl) { return this->validate(hdl); });
 	server.set_message_handler(
@@ -82,6 +87,10 @@ void SingleClientWSServer::stop() {
 			serverThread.join();
 		}
 	}
+}
+
+std::string SingleClientWSServer::getClientAddress() {
+	return clientAddress;
 }
 
 bool SingleClientWSServer::addProtocol(std::unique_ptr<WebSocketProtocol> protocol) {
