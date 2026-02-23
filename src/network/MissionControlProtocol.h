@@ -58,14 +58,17 @@ private:
 	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
+	void handleRequestObjectDetectionEnabled(const json& j);
 	void handleServoPositionRequest(const json& j);
 	void handleStepperTurnAngleRequest(const json& j);
 	void sendArmIKEnabledReport(bool enabled);
+	void sendObjectDetectionEnabledReport(bool enabled);
 	void handleConnection();
 	void handleHeartbeatTimedOut();
 	void stopAndShutdownPowerRepeat(bool sendDisableIK);
 
 	void setArmIKEnabled(bool enabled, bool sendReport = true);
+	void setObjectDetectionEnabled(bool enabled, bool sendReport = true);
 	void setRequestedJointPower(jointid_t joint, double power);
 	void setRequestedCmdVel(double dtheta, double dx);
 	void setRequestedTankCmdVel(double left, double right);
