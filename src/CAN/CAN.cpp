@@ -70,9 +70,13 @@ std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>,
 	telemEventIDMap;
 
 std::shared_ptr<util::PeriodicScheduler<>> ackScheduler;
-std::unordered_map<CANDeviceUUID_t, util::PeriodicScheduler<>::eventid_t> ackMap;
+std::unordered_map<std::pair<CANDeviceUUID_t, CANCommand_t>, util::PeriodicScheduler<>::eventid_t> ackMap;
 
 using telemetrycode_t = uint8_t;
+
+const std::unordered_map<uint8_t, CANCommand_t> BLDCStateToCommandID = {
+	// TODO: Add the reset of the state to commandID
+	{BLDC_AXIS_LOCKIN_SPIN, CAN_COMMAND_ID__BLDC_INPUT_VELOCITY}};
 
 const std::unordered_map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
 	// TODO: these definiations are from HindsightCAN's CANCommon.h
@@ -215,10 +219,19 @@ void handleLimitSwitchAlert(CANPacket_t& packet) {
 }
 
 void handleAcknowledgement(CANPacket_t& packet) {
+	// NOTE: I am keeping both decodes in to figure out which one is correct when running against hardware, I believe both work however we
+	//		 need heartbeat decode because it contains state						
 	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
-	LOG_F(INFO, "Acknowledgement received from 0x%x: %s", decoded.sender.deviceUUID, decoded.failure ? "FAIL" : "ok");
+	// Check if ack is a heartbeat 
+	auto heartBeatDecode = CANUniversalPacket_HeartBeat_Decode(&packet);
+	LOG_F(INFO, "Acknowledgement received from 0x%x: %s State: 0x%x", decoded.sender.deviceUUID, decoded.failure ? "FAIL" : "ok", heartBeatDecode.state);
 
-	auto it = ackMap.find(decoded.sender.deviceUUID);
+	CANDeviceUUID_t deviceUUIDCopy = decoded.sender.deviceUUID;
+
+	auto stateCommand = BLDCStateToCommandID.find(heartBeatDecode.state);
+
+	auto mapKey = std::make_pair(deviceUUIDCopy, stateCommand->second);
+	auto it = ackMap.find(mapKey);
 	if (it != ackMap.end()) {
 		auto eventID = it->second;
 		ackMap.erase(it);
@@ -367,7 +380,8 @@ void sendCANPacketWithAck(const CANPacket_t& packet) {
 		}
 
 		CANDeviceUUID_t uuid = packet.device.deviceUUID;
-		auto it = ackMap.find(uuid);
+		auto mapKey = std::make_pair(uuid, packet.command);
+		auto it = ackMap.find(mapKey);
 		if (it != ackMap.end()) {
 			LOG_F(ERROR, "0x%x ALREADY HAS A PACKET OUTGOING! IGNORING", uuid);
 		}
@@ -379,7 +393,7 @@ void sendCANPacketWithAck(const CANPacket_t& packet) {
 			});
 
 
-		ackMap.insert_or_assign(uuid, eventID);
+		ackMap.insert_or_assign(mapKey, eventID);
 	}
 
 	sendCANFrame(frame);

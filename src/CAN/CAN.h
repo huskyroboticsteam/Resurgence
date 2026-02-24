@@ -14,6 +14,10 @@ extern "C" {
 #include <CANPacket.h>
 
 #include <Packets/Motor.h>
+
+// Macros for BLDC state (temporarily defined here)
+#define BLDC_AXIS_LOCKIN_SPIN 		9
+
 }
 
 /**
