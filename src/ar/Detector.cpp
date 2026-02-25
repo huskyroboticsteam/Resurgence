@@ -14,13 +14,13 @@
 
 namespace AR {
 
-Detector::Detector() {
+Detector::Detector() : enabled_(true) {
 }
 
 Detector::Detector(std::shared_ptr<MarkerSet> marker_set, cam::CameraParams camera_params,
 				   cv::Ptr<cv::aruco::DetectorParameters> detector_params)
 	: marker_set_(marker_set), camera_params_(camera_params),
-	  detector_params_(detector_params) {
+	  detector_params_(detector_params), enabled_(true) {
 	if (!this->empty()) {
 		this->detector_params_->markerBorderBits = marker_set->getBorderSize();
 		this->detector_params_->cornerRefinementMethod = cv::aruco::CORNER_REFINE_SUBPIX;
@@ -48,7 +48,7 @@ std::vector<Tag> Detector::detectTags(const cv::Mat& input,
 std::vector<Tag> Detector::_detectTagsImpl(const cv::Mat& input,
 										   std::vector<std::vector<cv::Point2f>>* rejected,
 										   bool undistort) {
-	if (this->empty()) {
+	if (!enabled_ || this->empty()) {
 		return {};
 	}
 	std::vector<std::vector<cv::Point2f>> corners;
@@ -68,9 +68,26 @@ std::vector<Tag> Detector::_detectTagsImpl(const cv::Mat& input,
 	}
 
 	std::vector<cv::Vec3d> rvecs, tvecs;
-	cv::aruco::estimatePoseSingleMarkers(corners, this->marker_set_->getPhysicalSize(),
-										 this->camera_params_.getCameraMatrix(),
-										 this->camera_params_.getDistCoeff(), rvecs, tvecs);
+	float markerSize = this->marker_set_->getPhysicalSize();
+	
+	// Define 3D points for a single marker (assuming marker is centered at origin)
+	std::vector<cv::Point3f> objPoints;
+	objPoints.push_back(cv::Point3f(-markerSize/2.f, markerSize/2.f, 0));
+	objPoints.push_back(cv::Point3f(markerSize/2.f, markerSize/2.f, 0));
+	objPoints.push_back(cv::Point3f(markerSize/2.f, -markerSize/2.f, 0));
+	objPoints.push_back(cv::Point3f(-markerSize/2.f, -markerSize/2.f, 0));
+	
+	rvecs.resize(corners.size());
+	tvecs.resize(corners.size());
+	
+	// Estimate pose for each detected marker using solvePnP
+	for (size_t i = 0; i < corners.size(); i++) {
+		cv::solvePnP(objPoints, corners[i], 
+					 this->camera_params_.getCameraMatrix(),
+					 this->camera_params_.getDistCoeff(), 
+					 rvecs[i], tvecs[i],
+					 false, cv::SOLVEPNP_IPPE_SQUARE);
+	}
 
 	std::vector<Tag> tags;
 	for (size_t i = 0; i < ids.size(); i++) {
@@ -89,6 +106,14 @@ cv::aruco::DetectorParameters Detector::getDetectorParams() {
 
 void Detector::setDetectorParams(cv::aruco::DetectorParameters params) {
 	*detector_params_ = params;
+}
+
+void Detector::setEnabled(bool enabled) {
+	enabled_ = enabled;
+}
+
+bool Detector::isEnabled() const {
+	return enabled_;
 }
 
 } // namespace AR

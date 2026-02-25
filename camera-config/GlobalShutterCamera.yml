@@ -1,0 +1,37 @@
+%YAML:1.0
+---
+# Name and description for the camera.
+name: "global_shutter"
+description: "ELP Global Shutter Camera (USBFHD01M-L21)"
+# Camera ID: given ID N, will attempt to use /dev/videoN.
+camera_id: 1
+# Format and resolution settings
+format: "image/jpeg"
+image_width: 640
+image_height: 480
+framerate: 30
+# Information about the calibration process, such as the
+# reprojection error and board size.
+calib_info:
+   calibration_time: "2025年10月23日 (週四) 18時09分22秒"
+   board_width: 9
+   board_height: 6
+   square_size: 2.5000000372529030e-02
+   avg_reprojection_error: 1.0281659373542359e-01
+   flags: 0
+# The actual intrinsic parameters of the camera.
+intrinsic_params:
+   camera_matrix: !!opencv-matrix
+      rows: 3
+      cols: 3
+      dt: d
+      data: [ 7.0069300944622364e+02, 0., 3.2212073022806857e+02, 0.,
+          7.0067619464495601e+02, 2.8278792540936047e+02, 0., 0., 1. ]
+   distortion_coefficients: !!opencv-matrix
+      rows: 5
+      cols: 1
+      dt: d
+      data: [ 7.8997716646593275e-02, -1.4777518582085908e-01,
+          4.2178102548552388e-04, -3.1904414957130921e-03, 0. ]
+   image_width: 640
+   image_height: 480
