@@ -197,6 +197,7 @@ void limitSwitchPoll() {
 			}
 		}
 	}
+	guard.unlock();
 
 	// No limit switch activity delete thread and object to use less resources
 	if (limitSwitchesNotReset == 0 && watchDogPointer != nullptr) {
@@ -213,6 +214,7 @@ void handleLim(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) {
 	std::unique_lock guard(limitSwitchMapMutex);		
 	limSwitchMap[motor].first = true;
 	limSwitchMap[motor].second = std::chrono::steady_clock::now();
+	guard.unlock();
 
 	jointid_t jointID = Constants::MOTOR_JOINT_MAP.at(motor);
 
