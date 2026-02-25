@@ -78,7 +78,7 @@ public:
 		// 	can::motor::setMotorLockinSpin(board_device);
 		// }
 		// } else {
-		if (board_device.deviceUUID == CAN_UUID_BLDC_SHOULDER || board_device.deviceUUID == CAN_UUID_BLDC_ELBOW || board_device.deviceUUID == CAN_UUID_BLDC_BASE) {
+		if (board_device.deviceUUID != CAN_UUID_BLDC_FOREARM && board_device.deviceUUID != CAN_UUID_BLDC_WRIST_LEFT && board_device.deviceUUID != CAN_UUID_BLDC_WRIST_RIGHT) {
 			power *= 20;
 			if (power == 0.0) {
 				this->power = 0.0;
