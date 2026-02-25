@@ -14,11 +14,39 @@
 namespace ObjDet {
 
 /**
+ * @brief Available detection tasks (mutually exclusive).
+ * 
+ * Only one task can be active at a time.
+ * Each task has its own model, class names, and language prompts.
+ */
+enum class DetectionTask {
+    NONE,           ///< All detection disabled
+    ORANGE_HAMMER,  ///< Detect orange/construction mallet (Key '1')
+    ROCK_PICK,      ///< Detect rock pick hammer (Key '2')
+    WATER_BOTTLE    ///< Detect water bottle (Key '3')
+};
+
+/**
+ * @brief Configuration for a detection task.
+ * 
+ * Contains model path, class names, tokenized prompts, and object dimensions.
+ * Allows different models and prompts for each task.
+ */
+struct TaskConfig {
+    std::string model_path;                      ///< Path to the model file
+    std::vector<std::string> class_names;        ///< Class names for this task
+    torch::Tensor input_ids;                     ///< Tokenized text prompts
+    torch::Tensor attention_mask;                ///< Attention mask for prompts
+    std::map<std::string, float> object_heights; ///< Object heights in meters
+    std::map<std::string, float> object_widths;  ///< Object widths in meters
+};
+
+/**
  * @brief Object detector using OWL-ViT model for open-vocabulary object detection.
  * 
  * This class encapsulates a PyTorch-based object detection model that can detect
- * objects based on text descriptions. It provides functionality similar to AR::Detector
- * with enable/disable capability.
+ * objects based on text descriptions. It supports multiple detection tasks with
+ * different models and prompts, where only one task can be active at a time.
  */
 class ObjectDetector {
 private:
@@ -27,13 +55,21 @@ private:
     cam::CameraParams camera_params_;
     cv::Mat map1_, map2_;  // Undistortion maps
     
-    // Pre-computed tokens for text prompts
+    // Pre-computed tokens for text prompts (current active task)
     torch::Tensor input_ids_;
     torch::Tensor attention_mask_;
     
     float confidence_threshold_;
-    bool enabled_;
+    
+    // Task management (device_ must be before active_task_ for initialization order)
+    DetectionTask active_task_;
     torch::Device device_;
+    std::map<DetectionTask, TaskConfig> task_configs_;
+    
+    // Real-world object dimensions (in meters) for distance estimation
+    // These are updated when switching tasks
+    std::map<std::string, float> object_heights_;
+    std::map<std::string, float> object_widths_;
     
     /**
      * @brief Preprocess image for model input.
@@ -68,6 +104,41 @@ private:
      */
     std::vector<DetectionResult> applyNMS(const std::vector<DetectionResult>& detections, 
                                           float nms_threshold = 0.5f);
+    
+    /**
+     * @brief Calculate actual distance using pinhole camera model.
+     * 
+     * Uses both height and width for improved accuracy:
+     * - distance_h = (real_height × focal_length_y) / pixel_height
+     * - distance_w = (real_width × focal_length_x) / pixel_width
+     * - final_distance = average of both
+     * 
+     * @param bbox Bounding box of detected object
+     * @param class_name Name of the detected object class
+     * @return Estimated distance in meters (-1.0 if calculation not possible)
+     */
+    float calculateActualDistance(const cv::Rect& bbox, const std::string& class_name) const;
+    
+    /**
+     * @brief Initialize default object dimensions.
+     * 
+     * Sets typical heights for known objects (hammer, water bottle, etc.)
+     */
+    void initializeObjectDimensions();
+    
+    /**
+     * @brief Initialize task configurations.
+     * 
+     * Sets up model paths, class names, and tokenized prompts for each task.
+     */
+    void initializeTaskConfigs();
+    
+    /**
+     * @brief Load model for a specific task.
+     * 
+     * @param task The task to load the model for
+     */
+    void loadModelForTask(DetectionTask task);
 
 public:
     /**
@@ -78,24 +149,23 @@ public:
     /**
      * @brief Construct an ObjectDetector with specified parameters.
      * 
-     * @param class_names List of class names to detect (first should be "no object")
-     * @param model_path Path to the traced OWL-ViT model (.pt file)
+     * @param default_model_path Default path to the traced OWL-ViT model (.pt file)
      * @param confidence_threshold Minimum confidence threshold for detections
      * @param camera_params Camera parameters for undistortion (optional)
      */
-    ObjectDetector(const std::vector<std::string>& class_names,
-                   const std::string& model_path,
+    ObjectDetector(const std::string& default_model_path,
                    float confidence_threshold = 0.6f,
                    const cam::CameraParams& camera_params = cam::CameraParams());
     
     /**
-     * @brief Detect objects in an image.
+     * @brief Detect objects in an image using the active task.
      * 
      * @param image Input image
      * @param undistort Whether to apply undistortion before detection
-     * @return Vector of detected objects
+     * @param estimate_distance Whether to calculate actual distance using camera model
+     * @return Vector of detected objects with distance estimates in meters
      */
-    std::vector<DetectionResult> detect(const cv::Mat& image, bool undistort = false);
+    std::vector<DetectionResult> detect(const cv::Mat& image, bool undistort = false, bool estimate_distance = true);
     
     /**
      * @brief Draw bounding boxes and labels on image.
@@ -106,20 +176,78 @@ public:
     void drawDetections(cv::Mat& image, const std::vector<DetectionResult>& results) const;
     
     /**
-     * @brief Enable or disable the detector.
+     * @brief Set the active detection task.
      * 
-     * When disabled, detect() will return empty results immediately.
+     * Only one task can be active at a time. Setting a new task
+     * automatically disables the previous one.
      * 
-     * @param enabled True to enable, false to disable
+     * @param task The task to activate (use NONE to disable all)
      */
-    void setEnabled(bool enabled);
+    void setActiveTask(DetectionTask task);
     
     /**
-     * @brief Check if detector is enabled.
+     * @brief Get the currently active task.
      * 
-     * @return True if enabled, false otherwise
+     * @return The active detection task
+     */
+    DetectionTask getActiveTask() const;
+    
+    /**
+     * @brief Toggle a specific task on/off.
+     * 
+     * If the task is currently active, it will be disabled (set to NONE).
+     * If another task or NONE is active, the specified task will be activated.
+     * 
+     * @param task The task to toggle
+     */
+    void toggleTask(DetectionTask task);
+    
+    /**
+     * @brief Check if any detection task is active.
+     * 
+     * @return True if a task is active, false if NONE
      */
     bool isEnabled() const;
+    
+    /**
+     * @brief Get the name of a detection task.
+     * 
+     * @param task The task to get the name for
+     * @return Human-readable task name
+     */
+    static std::string getTaskName(DetectionTask task);
+    
+    /**
+     * @brief Calculate distance from depth image for detected objects.
+     * 
+     * Uses median depth from center region of bounding box for robustness.
+     * This is the preferred method when RealSense depth data is available.
+     * 
+     * @param depth_frame 16-bit depth image (aligned to color)
+     * @param depth_scale Depth scale factor (meters per unit, e.g., 0.001 for mm)
+     * @param bbox Bounding box of the detected object
+     * @return Distance in meters, or -1.0 if invalid
+     */
+    static float getDistanceFromDepth(const cv::Mat& depth_frame, float depth_scale,
+                                       const cv::Rect& bbox);
+    
+    /**
+     * @brief Detect objects and compute distances using depth image.
+     * 
+     * This method performs detection on the color image and uses the aligned
+     * depth image to compute actual distances, replacing the pinhole model
+     * estimation with direct depth measurement.
+     * 
+     * @param color_image Input color image (BGR)
+     * @param depth_image Input depth image (16-bit, aligned to color)
+     * @param depth_scale Depth scale factor (meters per unit)
+     * @param undistort Whether to undistort the color image before detection
+     * @return Vector of detected objects with depth-based distances
+     */
+    std::vector<DetectionResult> detectWithDepth(const cv::Mat& color_image,
+                                                  const cv::Mat& depth_image,
+                                                  float depth_scale,
+                                                  bool undistort = false);
     
     /**
      * @brief Set confidence threshold for filtering detections.

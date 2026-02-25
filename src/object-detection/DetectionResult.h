@@ -16,9 +16,10 @@ struct DetectionResult {
     std::string class_name;
     cv::Rect bounding_box;
     float confidence;
+    float actual_distance_meters;  // Estimated actual distance in meters (-1.0 = unknown)
     
-    DetectionResult(int id, const std::string& name, cv::Rect bbox, float conf)
-        : class_id(id), class_name(name), bounding_box(bbox), confidence(conf) {}
+    DetectionResult(int id, const std::string& name, cv::Rect bbox, float conf, float dist = -1.0f)
+        : class_id(id), class_name(name), bounding_box(bbox), confidence(conf), actual_distance_meters(dist) {}
     
     /**
      * @brief Get the center point of the bounding box.

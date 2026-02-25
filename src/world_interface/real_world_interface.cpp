@@ -226,6 +226,14 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 	}
 }
 
+std::optional<std::pair<cv::Mat, float>> readDepthFrame(CameraID cameraID) {
+	// TODO: Integrate with RealSenseCamera for real depth data
+	// For now, return nullopt (depth not available in basic camera interface)
+	// To use depth in real world, use RealSenseCamera directly in detection code
+	LOG_F(INFO, "readDepthFrame: Depth not available for camera %s in real_world_interface. Use RealSenseCamera directly.", cameraID.c_str());
+	return std::nullopt;
+}
+
 std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {

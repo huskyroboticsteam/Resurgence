@@ -76,6 +76,12 @@ std::unordered_map<CameraID, DataPoint<CameraFrame>> cameraFrameMap;
 // but this one is guaranteed to have indices, if there are any
 std::unordered_map<CameraID, uint32_t> cameraLastFrameIdxMap;
 std::shared_mutex cameraFrameMapMutex; // protects both of the above maps
+
+// stores the last depth frame for each camera (if available from simulator)
+std::unordered_map<CameraID, cv::Mat> depthFrameMap;
+// stores the depth scale for each camera (meters per unit)
+std::unordered_map<CameraID, float> depthScaleMap;
+std::shared_mutex depthFrameMapMutex; // protects both depth maps
 // not modified after startup, no need to synchronize
 std::unordered_map<CameraID, cam::CameraConfig> cameraConfigMap;
 
@@ -142,6 +148,20 @@ void handleCamFrame(json msg) {
 	std::string b64 = msg["data"];
 	cv::Mat mat = base64::decodeMat(b64);
 
+	// Check for depth data (optional, for RealSense-like simulation)
+	cv::Mat depth_mat;
+	if (msg.contains("depth_data") && !msg["depth_data"].is_null()) {
+		std::string depth_b64 = msg["depth_data"];
+		depth_mat = base64::decodeMat(depth_b64);
+		// Depth should be CV_16UC1 (16-bit unsigned, millimeters)
+	}
+	
+	// Get depth scale if provided (default 0.001 = 1mm per unit)
+	float depth_scale = 0.001f;
+	if (msg.contains("depth_scale") && !msg["depth_scale"].is_null()) {
+		depth_scale = msg["depth_scale"];
+	}
+
 	// acquire exclusive lock
 	std::lock_guard<std::shared_mutex> lock(cameraFrameMapMutex);
 	auto entry = cameraLastFrameIdxMap.find(cam);
@@ -154,6 +174,13 @@ void handleCamFrame(json msg) {
 	DataPoint<CameraFrame> df(cf);
 	cameraFrameMap[cam] = df;
 	cameraLastFrameIdxMap[cam] = idx;
+	
+	// Store depth data if available
+	if (!depth_mat.empty()) {
+		std::lock_guard<std::shared_mutex> depthLock(depthFrameMapMutex);
+		depthFrameMap[cam] = depth_mat;
+		depthScaleMap[cam] = depth_scale;
+	}
 }
 
 void handleMotorStatus(json msg) {
@@ -336,6 +363,17 @@ DataPoint<CameraFrame> readCamera(CameraID cameraID) {
 		return cfEntry->second;
 	} else {
 		return {};
+	}
+}
+
+std::optional<std::pair<cv::Mat, float>> readDepthFrame(CameraID cameraID) {
+	std::shared_lock<std::shared_mutex> lock(depthFrameMapMutex);
+	auto depthEntry = depthFrameMap.find(cameraID);
+	auto scaleEntry = depthScaleMap.find(cameraID);
+	if (depthEntry != depthFrameMap.end() && scaleEntry != depthScaleMap.end()) {
+		return std::make_pair(depthEntry->second.clone(), scaleEntry->second);
+	} else {
+		return std::nullopt;
 	}
 }
 

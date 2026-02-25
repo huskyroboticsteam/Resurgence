@@ -117,25 +117,19 @@ int main(int argc, char** argv) {
 
     std::cout << "Image size: " << test_image.cols << "x" << test_image.rows << std::endl;
 
-    // Create detector
-    std::vector<std::string> classes = {
-        "no object",
-        "orange mallet or hammer",
-        "water bottle"
-    };
-    
+    // Create detector with default model path
     cam::CameraParams params;  // Use default camera params
     
-    ObjDet::ObjectDetector detector(classes, model_path, 0.6f, params);
-
-    // Test 1: Detection enabled
-    std::cout << "\n=== Test 1: Detection ENABLED ===" << std::endl;
-    detector.setEnabled(true);
+    ObjDet::ObjectDetector detector(model_path, 0.6f, params);
+    
+    // Test with Orange Hammer task
+    std::cout << "\n=== Test 1: Orange Hammer Detection ===" << std::endl;
+    detector.setActiveTask(ObjDet::DetectionTask::ORANGE_HAMMER);
     detector.setConfidenceThreshold(0.6f);
     
-    auto detections_enabled = detector.detect(test_image);
-    std::cout << "Found " << detections_enabled.size() << " objects:" << std::endl;
-    for (const auto& det : detections_enabled) {
+    auto detections_orange = detector.detect(test_image);
+    std::cout << "Found " << detections_orange.size() << " objects:" << std::endl;
+    for (const auto& det : detections_orange) {
         std::cout << "  - " << det.class_name 
                   << " (confidence: " << std::fixed << std::setprecision(4) << det.confidence << ")" 
                   << " at [" << det.bounding_box.x << ", " << det.bounding_box.y 
@@ -143,11 +137,25 @@ int main(int argc, char** argv) {
                   << std::endl;
     }
 
-    // Test 2: Detection disabled
-    std::cout << "\n=== Test 2: Detection DISABLED ===" << std::endl;
-    detector.setEnabled(false);
+    // Test with Water Bottle task
+    std::cout << "\n=== Test 2: Water Bottle Detection ===" << std::endl;
+    detector.setActiveTask(ObjDet::DetectionTask::WATER_BOTTLE);
+    auto detections_bottle = detector.detect(test_image);
+    std::cout << "Found " << detections_bottle.size() << " objects:" << std::endl;
+    for (const auto& det : detections_bottle) {
+        std::cout << "  - " << det.class_name 
+                  << " (confidence: " << std::fixed << std::setprecision(4) << det.confidence << ")" 
+                  << std::endl;
+    }
+
+    // Test with Detection disabled
+    std::cout << "\n=== Test 3: Detection DISABLED ===" << std::endl;
+    detector.setActiveTask(ObjDet::DetectionTask::NONE);
     auto detections_disabled = detector.detect(test_image);
     std::cout << "Found " << detections_disabled.size() << " objects (should be 0)" << std::endl;
+    
+    // Use orange hammer detections for visualization
+    auto& detections_enabled = detections_orange;
     
     // Resize images to 50% for smaller display
     cv::Mat resized_image;
@@ -168,7 +176,7 @@ int main(int argc, char** argv) {
 
     cv::destroyAllWindows();
 
-    std::cout << "\n✅ All integration tests passed!" << std::endl;
-    std::cout << "✅ Enable/disable functionality works correctly" << std::endl;
+    std::cout << "\nAll integration tests passed!" << std::endl;
+    std::cout << "Enable/disable functionality works correctly" << std::endl;
     return 0;
 }

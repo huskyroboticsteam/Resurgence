@@ -66,6 +66,42 @@ message("  GPS:\t\t\t${GPS}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
 message("  Offline mode:\t\t${OFFLINE_MODE}")
+
+# RealSense D455 support option
+set(WITH_REALSENSE OFF CACHE BOOL "Enable RealSense D455 depth camera support")
+if(WORLD_INTERFACE STREQUAL "REAL")
+  # Try to find RealSense if enabled
+  if(WITH_REALSENSE)
+    # First try CMake config, then fall back to pkg-config
+    find_package(realsense2 QUIET CONFIG)
+    if(NOT realsense2_FOUND)
+      # Try pkg-config as fallback
+      find_package(PkgConfig QUIET)
+      if(PkgConfig_FOUND)
+        pkg_check_modules(REALSENSE2 realsense2)
+        if(REALSENSE2_FOUND)
+          set(realsense2_FOUND TRUE)
+          set(REALSENSE2_INCLUDE_DIRS ${REALSENSE2_INCLUDE_DIRS})
+          set(REALSENSE2_LIBRARIES ${REALSENSE2_LIBRARIES})
+        endif()
+      endif()
+    endif()
+    
+    if(realsense2_FOUND)
+      message("  RealSense:\t\tON")
+      add_definitions(-DWITH_REALSENSE)
+    else()
+      message(WARNING "RealSense requested but librealsense2 not found. Disabling.")
+      set(WITH_REALSENSE OFF)
+      message("  RealSense:\t\tOFF (not found)")
+    endif()
+  else()
+    message("  RealSense:\t\tOFF")
+  endif()
+else()
+  message("  RealSense:\t\tN/A (simulator mode)")
+endif()
+
 message("========================================")
 
 ##====== Dependencies ======
@@ -189,6 +225,19 @@ add_library(camera SHARED
   camera/CameraConfig.cpp
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
+
+# Add RealSense support if available
+if(WITH_REALSENSE AND realsense2_FOUND)
+  target_sources(camera PRIVATE camera/RealSenseCamera.cpp)
+  # Use either CMake target or pkg-config variables
+  if(TARGET realsense2::realsense2)
+    target_link_libraries(camera PUBLIC realsense2::realsense2)
+  else()
+    target_include_directories(camera PUBLIC ${REALSENSE2_INCLUDE_DIRS})
+    target_link_libraries(camera PUBLIC ${REALSENSE2_LIBRARIES})
+  endif()
+  target_compile_definitions(camera PUBLIC WITH_REALSENSE)
+endif()
 
 # shared library for utility code
 add_library(utils SHARED
