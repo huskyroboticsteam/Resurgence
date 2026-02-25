@@ -6,6 +6,7 @@
 #include "../camera/CameraConfig.h"
 #include "../world_interface/world_interface.h"
 #include "ObjectDetector.h"
+#include "ModelDownloader.h"
 
 #include <atomic>
 #include <filesystem>
@@ -19,40 +20,6 @@ using namespace robot::types;
 
 namespace ObjDet {
 
-// Model and class configuration
-const std::vector<std::string> DEFAULT_CLASSES = {
-    "no object",
-    "orange mallet or hammer",
-    "water bottle"
-};
-
-// Find model file by checking multiple possible locations
-std::string findModelPath() {
-    // 1. Check environment variable
-    const char* env_path = std::getenv("OWLVIT_MODEL_PATH");
-    if (env_path && std::filesystem::exists(env_path)) {
-        return env_path;
-    }
-    
-    // 2. Check current directory (for backward compatibility)
-    if (std::filesystem::exists("owlvit-cpp.pt")) {
-        return "owlvit-cpp.pt";
-    }
-    
-    // 3. Check in ../src/object-detection/ (when running from build/)
-    if (std::filesystem::exists("../src/object-detection/owlvit-cpp.pt")) {
-        return "../src/object-detection/owlvit-cpp.pt";
-    }
-    
-    // 4. Check in src/object-detection/ (when running from project root)
-    if (std::filesystem::exists("src/object-detection/owlvit-cpp.pt")) {
-        return "src/object-detection/owlvit-cpp.pt";
-    }
-    
-    throw std::runtime_error("Could not find owlvit-cpp.pt model file. "
-                           "Please set OWLVIT_MODEL_PATH environment variable or place the model in the current directory.");
-}
-
 // Global detector instance
 ObjectDetector obj_detector;
 
@@ -63,26 +30,33 @@ std::vector<DetectionResult> current_detections;
 std::thread detection_thread;
 bool initialized = false;
 
+// Track last active task for logging
+DetectionTask last_logged_task = DetectionTask::NONE;
+
 void detectObjectsLoop() {
     loguru::set_thread_name("ObjectDetection");
     cv::Mat frame;
     uint32_t last_frame_no = 0;
-    bool was_enabled = false;
     
     while (true) {
-        // Check if detection is enabled (using global flag)
-        if (!Globals::objectDetectionEnabled) {
-            if (was_enabled) {
-                LOG_F(INFO, "Object detection loop: STOPPED (disabled)");
-                was_enabled = false;
+        // Check current active task
+        DetectionTask current_task = obj_detector.getActiveTask();
+        
+        // Log task changes
+        if (current_task != last_logged_task) {
+            if (current_task == DetectionTask::NONE) {
+                LOG_F(INFO, "Object detection: DISABLED");
+            } else {
+                LOG_F(INFO, "Object detection: Switched to task '%s'", 
+                      ObjectDetector::getTaskName(current_task).c_str());
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            continue;
+            last_logged_task = current_task;
         }
         
-        if (!was_enabled) {
-            LOG_F(INFO, "Object detection loop: STARTED (enabled)");
-            was_enabled = true;
+        // Skip if no task is active
+        if (current_task == DetectionTask::NONE) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            continue;
         }
         
         // Get new camera frame
@@ -97,24 +71,30 @@ void detectObjectsLoop() {
             
             // Run object detection
             std::vector<DetectionResult> detections = obj_detector.detect(frame);
-            LOG_F(INFO, "Object detection: %ld object(s) detected", detections.size());
+            
+            if (!detections.empty()) {
+                LOG_F(INFO, "Object detection [%s]: %ld object(s) detected", 
+                      ObjectDetector::getTaskName(current_task).c_str(),
+                      detections.size());
+                
+                // Log detected objects
+                for (const auto& det : detections) {
+                    LOG_F(INFO, "  - %s (confidence: %.3f, distance: %.2fm) at [%d, %d, %dx%d]", 
+                          det.class_name.c_str(), 
+                          det.confidence,
+                          det.actual_distance_meters,
+                          det.bounding_box.x, 
+                          det.bounding_box.y,
+                          det.bounding_box.width,
+                          det.bounding_box.height);
+                }
+            }
             
             // Update shared results
             detection_lock.lock();
             current_detections = detections;
             fresh_data = true;
             detection_lock.unlock();
-            
-            // Log detected objects
-            for (const auto& det : detections) {
-                LOG_F(INFO, "  - %s (confidence: %.3f) at [%d, %d, %dx%d]", 
-                      det.class_name.c_str(), 
-                      det.confidence,
-                      det.bounding_box.x, 
-                      det.bounding_box.y,
-                      det.bounding_box.width,
-                      det.bounding_box.height);
-            }
         }
         
         // Small sleep to avoid busy waiting
@@ -136,12 +116,11 @@ bool initializeObjectDetection() {
         }
         
         // Find model file
-        std::string model_path = findModelPath();
+        std::string model_path = findOrDownloadModel();
         LOG_F(INFO, "Using OWL-ViT model from: %s", model_path.c_str());
         
-        // Initialize detector
+        // Initialize detector with task-based configuration
         obj_detector = ObjectDetector(
-            DEFAULT_CLASSES,
             model_path,
             0.6f,  // Default confidence threshold
             config.intrinsicParams.value()
@@ -151,6 +130,10 @@ bool initializeObjectDetection() {
         detection_thread = std::thread(&detectObjectsLoop);
         
         LOG_F(INFO, "Object detection initialized successfully");
+        LOG_F(INFO, "Available tasks:");
+        LOG_F(INFO, "  Key '1': Orange Hammer");
+        LOG_F(INFO, "  Key '2': Rock Pick");
+        LOG_F(INFO, "  Key '3': Water Bottle");
         
         if (!config.extrinsicParams || config.extrinsicParams->empty()) {
             LOG_F(WARNING, "Camera configuration does not have extrinsic parameters! "
@@ -185,6 +168,38 @@ std::vector<DetectionResult> readDetectedObjects() {
     }
     
     return {};
+}
+
+void setActiveTask(DetectionTask task) {
+    if (!isObjectDetectionInitialized()) {
+        return;
+    }
+    obj_detector.setActiveTask(task);
+}
+
+DetectionTask getActiveTask() {
+    if (!isObjectDetectionInitialized()) {
+        return DetectionTask::NONE;
+    }
+    return obj_detector.getActiveTask();
+}
+
+void toggleTask(DetectionTask task) {
+    if (!isObjectDetectionInitialized()) {
+        return;
+    }
+    obj_detector.toggleTask(task);
+}
+
+bool isDetectionEnabled() {
+    if (!isObjectDetectionInitialized()) {
+        return false;
+    }
+    return obj_detector.isEnabled();
+}
+
+ObjectDetector& getDetector() {
+    return obj_detector;
 }
 
 } // namespace ObjDet
