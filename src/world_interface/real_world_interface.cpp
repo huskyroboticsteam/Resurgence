@@ -386,6 +386,7 @@ void limitSwitchPoll() {
 		// timeout
 		if (value.first) {
 			if (std::chrono::steady_clock::now() - value.second >= LIMIT_SWITCH_TIMEOUT) {
+				std::unique_lock guard(limitSwitchMapMutex);
 				limSwitchMap[key].first = false;
 					json msg = {{"type", "LimitUpdate"},
 								{"motor", motorid_to_name.at(key).data()},
@@ -411,7 +412,7 @@ void limitSwtichCB(motorid_t motor, DataPoint<LimitSwitchData> limitSwitchData) 
 		return;
 	}
 
-	std::unique_lock guard(limitSwitchMapMutex);		
+	std::unique_lock guard(limitSwitchMapMutex);
 	limSwitchMap[motor].first = true;
 	limSwitchMap[motor].second = std::chrono::steady_clock::now();
 

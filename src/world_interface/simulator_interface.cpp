@@ -178,6 +178,7 @@ void limitSwitchPoll() {
 	// You must then update the mission control that the limit switch has timed out
 	// and has been reset
 	int limitSwitchesNotReset = 0;
+	std::unique_lock guard(limitSwitchMapMutex);
 	for (const auto& [key, value] : limSwitchMap) {
 		
 		// Check if the limit switch is currently being marked as active, then check if
