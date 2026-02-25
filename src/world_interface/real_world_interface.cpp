@@ -380,13 +380,13 @@ void limitSwitchPoll() {
 	// You must then update the mission control that the limit switch has timed out
 	// and has been reset
 	int limitSwitchesNotReset = 0;
+	std::unique_lock guard(limitSwitchMapMutex);
 	for (const auto& [key, value] : limSwitchMap) {
 		
 		// Check if the limit switch is currently being marked as active, then check if
 		// timeout
 		if (value.first) {
 			if (std::chrono::steady_clock::now() - value.second >= LIMIT_SWITCH_TIMEOUT) {
-				std::unique_lock guard(limitSwitchMapMutex);
 				limSwitchMap[key].first = false;
 					json msg = {{"type", "LimitUpdate"},
 								{"motor", motorid_to_name.at(key).data()},
