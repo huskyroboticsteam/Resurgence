@@ -9,6 +9,7 @@ find_package(OpenCV REQUIRED)
 add_library(object_detection
     ObjectDetector.cpp
     DetectionResult.cpp
+    ModelDownloader.cpp
     read_objects.cpp
 )
 
@@ -32,7 +33,7 @@ target_include_directories(object_detection
 # Set C++ standard
 set_property(TARGET object_detection PROPERTY CXX_STANDARD 17)
 
-# Test executable
+# Test executables
 add_executable(object_detection_test ObjectDetectionTest.cpp)
 target_link_libraries(object_detection_test 
     object_detection
@@ -45,3 +46,44 @@ target_link_libraries(object_detection_test
     -Wl,--as-needed  # Resume normal linking
 )
 set_property(TARGET object_detection_test PROPERTY CXX_STANDARD 17)
+
+# Camera test executable (for testing with real camera)
+add_executable(camera_test CameraTest.cpp)
+target_link_libraries(camera_test 
+    object_detection
+    camera
+    constants
+    ${OpenCV_LIBS}
+    ${TORCH_LIBRARIES}
+)
+set_property(TARGET camera_test PROPERTY CXX_STANDARD 17)
+
+# RealSense D455 test executable (only when RealSense is available)
+if(WITH_REALSENSE)
+    add_executable(realsense_test RealSenseTest.cpp)
+    target_link_libraries(realsense_test 
+        object_detection
+        camera
+        constants
+        ${OpenCV_LIBS}
+        ${TORCH_LIBRARIES}
+    )
+    set_property(TARGET realsense_test PROPERTY CXX_STANDARD 17)
+endif()
+
+# Camera calibration tool
+add_executable(calibrate_camera CalibrateCamera.cpp)
+target_link_libraries(calibrate_camera 
+    -Wl,--no-as-needed
+    object_detection
+    camera
+    constants
+    utils
+    world_interface
+    websocket_utils
+    rover_common
+    -Wl,--as-needed
+    ${OpenCV_LIBS}
+    ${TORCH_LIBRARIES}
+)
+set_property(TARGET calibrate_camera PROPERTY CXX_STANDARD 17)
