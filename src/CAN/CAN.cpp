@@ -278,11 +278,6 @@ int createCANSocket(std::optional<CANDevice_t> device) {
 		filters[0].can_id = canID;
 		filters[0].can_mask = CAN_MASK;
 
-		// for testing
-		std::cout << "CAN packet: " << canID << std::endl;
-		std::cout << "CAN uuid: " << (canID & CAN_MASK) << std::endl;
-		std::cout << "Filters: " << filters[0].can_id << ", " << filters[0].can_mask
-				  << std::endl;
 
 		setsockopt(fd, SOL_CAN_RAW, CAN_RAW_FILTER, &filters, sizeof(filters));
 	} else {

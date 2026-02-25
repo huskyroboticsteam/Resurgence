@@ -148,12 +148,12 @@ constexpr auto motorPIDMap =
  * Negative values mean that the motor is inverted.
  */
 constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -0.25},
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -1},
 												   {boardid_t::shoulder, -1},
-												   {boardid_t::elbow, -1},
-												   {boardid_t::forearm, -0.2},
-												   {boardid_t::wristDiffLeft, -0.1},
-												   {boardid_t::wristDiffRight, 0.1},
+												   {boardid_t::elbow, -0.5},
+												   {boardid_t::forearm, -1},
+												   {boardid_t::wristDiffLeft, -0.5},
+												   {boardid_t::wristDiffRight, -0.5},
 												   {boardid_t::frontTireLeft, -0.1},
 												   {boardid_t::frontTireRight, 0.1},
 												   {boardid_t::rearTireLeft, -0.1},
@@ -164,12 +164,12 @@ constexpr auto positive_pwm_scales =
  * Negative values mean that the motor is inverted.
  */
 constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -0.25},
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -1},
 												   {boardid_t::shoulder, -1},
-												   {boardid_t::elbow, -1},
-												   {boardid_t::forearm, -0.2},
-												   {boardid_t::wristDiffLeft, -0.1},
-												   {boardid_t::wristDiffRight, 0.1},
+												   {boardid_t::elbow, -0.5},
+												   {boardid_t::forearm, -1},
+												   {boardid_t::wristDiffLeft, -0.5},
+												   {boardid_t::wristDiffRight, -0.5},
 												   {boardid_t::frontTireLeft, 0.1},
 												   {boardid_t::frontTireRight, -0.1},
 												   {boardid_t::rearTireLeft, 0.1},

@@ -70,13 +70,42 @@ public:
 		double scale = power < 0 ? negative_scale : positive_scale;
 		power *= scale;
 
-		if (power == 0.0) {
-			this->power = 0.0;
-			can::motor::setMotorIdle(board_device);
-		} else if (power != this->power) {
-			this->power = power;
-			can::motor::setMotorLockinSpin(board_device);
+		// if (power == 0.0) {
+			// this->power = 0.0;
+			// can::motor::setMotorIdle(board_device);
+		// } else if (power != this->power) {
+		// 	this->power = power;
+		// 	can::motor::setMotorLockinSpin(board_device);
+		// }
+		// } else {
+		if (board_device.deviceUUID == CAN_UUID_BLDC_SHOULDER || board_device.deviceUUID == CAN_UUID_BLDC_ELBOW || board_device.deviceUUID == CAN_UUID_BLDC_BASE) {
+			power *= 20;
+			if (power == 0.0) {
+				this->power = 0.0;
+				// can::motor::setMotorPower
+				// can::motor::setMotorIdle(board_device);
+				// can::motor::setMotorIdle();
+				// for (int i = 0; i < 5; i++) {
+				CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, board_device, 0, 0);
+				can::sendCANPacket(p);
+					// std::this_thread::sleep_for(100ms);
+					// std::this_thread::sleep_for(100ms);
+
+				can::motor::setMotorLockinSpin(board_device);
+				// }
+			} else if (power != this->power) {
+				this->power = power;
+
+				LOG_F(INFO, "0x%x to vel %lf", board_device.deviceUUID, power);
+				CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, board_device, power, 0);
+				can::sendCANPacket(p);
+
+				can::motor::setMotorLockinSpin(board_device);
+			}
+		} else {
+			can::motor::setMotorPower(board_device, power);
 		}
+		// }
 		// LEGACY: can::motor::setMotorPower(device_group, serial_id, power);
 	}
 
@@ -256,6 +285,23 @@ void initMotors() {
 	}
 
 	std::this_thread::sleep_for(5s);
+
+	can::motor::setMotorMode(CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_LEFT}, motormode_t::vel);
+	can::motor::setMotorMode(CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}, motormode_t::vel);
+	can::motor::setMotorMode(CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FOREARM}, motormode_t::vel);
+
+	std::this_thread::sleep_for(5s);
+
+	CANPacket_t p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FOREARM}, BLDC_AXIS_CLOSED_LOOP_CONTROL);
+	can::sendCANPacket(p);
+
+	p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_LEFT}, BLDC_AXIS_CLOSED_LOOP_CONTROL);
+	// p.command = CAN_ACK(p.command);
+	can::sendCANPacket(p);
+
+	p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}, BLDC_AXIS_CLOSED_LOOP_CONTROL);
+	// p.command = CAN_ACK(p.command);
+	can::sendCANPacket(p);
 
 	// The pot/encoder/PID loops from HindsightCAN are no longer needed thanks to ODrive, im
 	// pretty sure

@@ -107,7 +107,7 @@ int main() {
 			// can::motor::setMotorPower(device, pwm);
 
 			CANPacket_t p;
-			std::cout << "Calibrating device 0x" << std::hex << uuid << "..." << std::endl;
+			// std::cout << "Calibrating device 0x" << std::hex << uuid << "..." << std::endl;
 			p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_MOTOR_CALIBRATION);
 			can::sendCANPacket(p);
 			std::this_thread::sleep_for(5s);
@@ -122,8 +122,17 @@ int main() {
 				can::sendCANPacket(p);
 				std::this_thread::sleep_for(std::chrono::seconds(dur));
 				std::cout << "Stopping..." << std::endl;
-				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_IDLE);
+				// for (int i = 0; i < 5; i++) {
+				p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, 0, 0);
 				can::sendCANPacket(p);
+				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_LOCKIN_SPIN);
+				can::sendCANPacket(p);
+				// p.command = CAN_ACK(p.command);
+				// can::sendCANPacketWithAck(p);
+				// std::this_thread::sleep_for(100ms);
+				// }
+				// p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_IDLE);
+				// can::sendCANPacket(p);
 			}
 		} else if (testMode == TestMode::PID) {
 			int mode = prompt("0=forward, 1=backward, 2=turn cw, 3=turn ccw");
