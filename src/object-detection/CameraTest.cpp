@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
     std::cout << std::endl;
 
     // Parse command line arguments
-    int camera_id = 0;  // Default to first camera
+    int camera_id = 40;  // Default to first camera
     if (argc > 1) {
         camera_id = std::atoi(argv[1]);
     }

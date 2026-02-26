@@ -2,6 +2,7 @@
 
 #include "../utils/scheduler.h"
 #include "../camera/H264PassthroughSource.h"
+#include "../object-detection/ObjectDetector.h"
 #include "../video/H264Encoder.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
@@ -104,6 +105,7 @@ private:
 	websocket::SingleClientWSServer& _server;
 	std::mutex _mutex;
 	std::unordered_map<robot::types::CameraID, stream_data_t> _open_streams;
+	std::unordered_map<robot::types::CameraID, std::shared_ptr<ObjDet::ObjectDetector>> _detectors;
 };
 
 /**

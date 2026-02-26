@@ -19,6 +19,7 @@
 #include <nlohmann/json.hpp>
 #include <opencv2/aruco.hpp>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/imgproc.hpp>
 
 using namespace robot::types;
 using namespace std::chrono_literals;
@@ -172,6 +173,17 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 						  "Camera %s config missing stream properties; falling back to CPU encoding",
 						  cam.c_str());
 				}
+			} else {
+				auto config = cam::readConfigFromFile(cfgIt->second);
+				if (config.intrinsicParams && !config.intrinsicParams->empty()) {
+					auto detector = std::make_shared<ObjDet::ObjectDetector>(
+						"../src/object-detection/owlvit-cpp.pt",
+						0.9f,
+						config.intrinsicParams.value()
+					);
+					detector->toggleTask(ObjDet::DetectionTask::ORANGE_HAMMER);
+					_detectors.insert_or_assign(cam, detector);
+				}
 			}
 			// if passthrough source was not opened, fall back to CPU encoding
 			if (!opened) {
@@ -267,6 +279,56 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 													LOG_F(INFO, "  Distance: %.2f m (%.0f cm)", distance, distance * 100.0);
 													LOG_F(INFO, "  Position (camera frame): X=%+.3f m, Y=%+.3f m, Z=%+.3f m", 
 														tvec[0], tvec[1], tvec[2]);
+												}
+											}
+										}
+									}
+									if (Globals::objectDetectionEnabled) {
+										auto it = _detectors.find(cam);
+										if (it != _detectors.end()) {
+											auto detector = it->second;
+											ObjDet::DetectionTask current_task = detector->getActiveTask();
+											if (current_task != ObjDet::DetectionTask::NONE) {
+												std::vector<ObjDet::DetectionResult> detections = detector->detect(frame, false, true);  // undistort=false, estimate_distance=true
+
+												// Draw detections
+												if (!detections.empty()) {
+													for (const auto& det : detections) {
+														// Draw bounding box
+														cv::rectangle(frame, det.bounding_box, cv::Scalar(0, 255, 0), 2);
+													
+														// Prepare label with distance
+														std::stringstream label_stream;
+														label_stream << det.class_name << " " 
+																<< std::fixed << std::setprecision(1) 
+																<< (det.confidence * 100) << "%";
+														
+														// Add distance if available
+														if (det.actual_distance_meters >= 0.0f) {
+															label_stream << " [" << std::setprecision(2) 
+																		<< det.actual_distance_meters << "m]";
+														}
+														std::string label = label_stream.str();
+													
+														// Draw label background
+														int baseline = 0;
+														cv::Size text_size = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.6, 2, &baseline);
+														
+														cv::Point text_origin(det.bounding_box.x, det.bounding_box.y - 8);
+														if (text_origin.y < text_size.height) {
+															text_origin.y = det.bounding_box.y + text_size.height + 8;
+														}
+														
+														cv::rectangle(frame,
+																	cv::Point(text_origin.x - 2, text_origin.y - text_size.height - 4),
+																	cv::Point(text_origin.x + text_size.width + 2, text_origin.y + 4),
+																	cv::Scalar(0, 255, 0),
+																	cv::FILLED);
+														
+														// Draw label text
+														cv::putText(frame, label, text_origin,
+																cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 0, 0), 2);
+													}
 												}
 											}
 										}
