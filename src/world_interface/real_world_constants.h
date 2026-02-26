@@ -148,32 +148,32 @@ constexpr auto motorPIDMap =
  * Negative values mean that the motor is inverted.
  */
 constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -1},
-												   {boardid_t::shoulder, -1},
-												   {boardid_t::elbow, -0.5},
-												   {boardid_t::forearm, -1},
-												   {boardid_t::wristDiffLeft, -0.5},
-												   {boardid_t::wristDiffRight, -0.5},
-												   {boardid_t::frontTireLeft, -0.1},
-												   {boardid_t::frontTireRight, 0.1},
-												   {boardid_t::rearTireLeft, -0.1},
-												   {boardid_t::rearTireRight, 0.1},
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 20},
+												   {boardid_t::shoulder, 20},
+												   {boardid_t::elbow, -10},
+												   {boardid_t::forearm, -20},
+												   {boardid_t::wristDiffLeft, -10},
+												   {boardid_t::wristDiffRight, -10},
+												   {boardid_t::frontTireLeft, -500},
+												   {boardid_t::frontTireRight, 500},
+												   {boardid_t::rearTireLeft, -500},
+												   {boardid_t::rearTireRight, 500},
 												   {boardid_t::hand, -0.75}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
  */
 constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -1},
-												   {boardid_t::shoulder, -1},
-												   {boardid_t::elbow, -0.5},
-												   {boardid_t::forearm, -1},
-												   {boardid_t::wristDiffLeft, -0.5},
-												   {boardid_t::wristDiffRight, -0.5},
-												   {boardid_t::frontTireLeft, 0.1},
-												   {boardid_t::frontTireRight, -0.1},
-												   {boardid_t::rearTireLeft, 0.1},
-												   {boardid_t::rearTireRight, -0.1},
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 20},
+												   {boardid_t::shoulder, 20},
+												   {boardid_t::elbow, -10},
+												   {boardid_t::forearm, -20},
+												   {boardid_t::wristDiffLeft, -10},
+												   {boardid_t::wristDiffRight, -10},
+												   {boardid_t::frontTireLeft, -500},
+												   {boardid_t::frontTireRight, 500},
+												   {boardid_t::rearTireLeft, -500},
+												   {boardid_t::rearTireRight, 500},
 												   {boardid_t::hand, -0.75}});
 
 } // namespace robot

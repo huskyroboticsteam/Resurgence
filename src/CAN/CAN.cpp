@@ -14,8 +14,6 @@
 #include <unistd.h>
 #include <unordered_map>
 #include <utility>
-// temp for printing
-#include <iostream>
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -70,7 +68,7 @@ std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>,
 	telemEventIDMap;
 
 std::shared_ptr<util::PeriodicScheduler<>> ackScheduler;
-std::unordered_map<CANDeviceUUID_t, util::PeriodicScheduler<>::eventid_t> ackMap;
+std::unordered_map<std::pair<CANDeviceUUID_t, CANCommand_t>, util::PeriodicScheduler<>::eventid_t> ackMap;
 
 using telemetrycode_t = uint8_t;
 
@@ -216,13 +214,19 @@ void handleLimitSwitchAlert(CANPacket_t& packet) {
 
 void handleAcknowledgement(CANPacket_t& packet) {
 	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
-	LOG_F(INFO, "Acknowledgement received from 0x%x: %s", decoded.sender.deviceUUID, decoded.failure ? "FAIL" : "ok");
-
-	auto it = ackMap.find(decoded.sender.deviceUUID);
-	if (it != ackMap.end()) {
-		auto eventID = it->second;
-		ackMap.erase(it);
-		ackScheduler->removeEvent(eventID);
+	CANDeviceUUID_t uuid = decoded.sender.deviceUUID;
+	CANCommand_t command = decoded.commandID;
+	if (decoded.failure) {
+		LOG_F(WARNING, "Ack received from 0x%x for command 0x%x: FAIL", uuid, command);
+	} else {
+		LOG_F(INFO, "Ack received from 0x%x for command 0x%x: ok", uuid, command);
+		auto mapKey = std::make_pair(uuid, command);
+		auto it = ackMap.find(mapKey);
+		if (it != ackMap.end()) {
+			auto eventID = it->second;
+			ackMap.erase(it);
+			ackScheduler->removeEvent(eventID);
+		}
 	}
 }
 
@@ -350,32 +354,33 @@ void initCAN() {
 }
 void sendCANPacketWithAck(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
+	mutablePacket.command = CAN_ACK(packet.command);
 	canfd_frame frame;
 	std::memset(&frame, 0, sizeof(frame));
 	frame.can_id = CANGetPacketHeader(&mutablePacket);
 	frame.len = CANGetDlc(&mutablePacket);
 	std::memcpy(frame.data, CANGetData(&mutablePacket), frame.len);
 
-	if (packet.command & 0x80) {
-		if (!ackScheduler) {
-			ackScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_AckSched");
-		}
-
-		CANDeviceUUID_t uuid = packet.device.deviceUUID;
-		auto it = ackMap.find(uuid);
-		if (it != ackMap.end()) {
-			LOG_F(ERROR, "0x%x ALREADY HAS A PACKET OUTGOING! IGNORING", uuid);
-		}
-
-		auto eventID =
-			ackScheduler->scheduleEvent(ACK_TIMEOUT, [=]() {
-				LOG_F(ERROR, "0x%x ACK TIMED OUT, RESENDING", uuid);
-				sendCANFrame(frame);
-			});
-
-
-		ackMap.insert_or_assign(uuid, eventID);
+	if (!ackScheduler) {
+		ackScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_AckSched");
 	}
+
+	CANDeviceUUID_t uuid = packet.device.deviceUUID;
+	CANCommand_t command = packet.command;
+	auto mapKey = std::make_pair(uuid, command);
+	auto it = ackMap.find(mapKey);
+	if (it != ackMap.end()) {
+		LOG_F(ERROR, "0x%x ALREADY HAS A PACKET OF COMMAND 0x%x OUTGOING! IGNORING", uuid, command);
+	}
+
+	auto eventID =
+		ackScheduler->scheduleEvent(ACK_TIMEOUT, [=]() {
+			LOG_F(ERROR, "0x%x ACK FOR COMMAND 0x%x TIMED OUT, RESENDING", uuid, command);
+			sendCANFrame(frame);
+		});
+
+
+	ackMap.insert_or_assign(mapKey, eventID);
 
 	sendCANFrame(frame);
 }
