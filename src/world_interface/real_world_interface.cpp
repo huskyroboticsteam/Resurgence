@@ -77,6 +77,7 @@ public:
 				CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, board_device, 0, 0);
 				can::sendCANPacket(p);
 
+				can::motor::setMotorIdle(board_device);
 				can::motor::setMotorLockinSpin(board_device);
 				// }
 			} else if (power != this->power && (std::abs(power - this->power)) > 50) {
@@ -86,6 +87,7 @@ public:
 				CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, board_device, power, 0);
 				can::sendCANPacketWithAck(p);
 
+				can::motor::setMotorIdle(board_device);
 				can::motor::setMotorLockinSpin(board_device);
 			}
 		} else {

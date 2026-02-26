@@ -51,9 +51,9 @@ double setCmdVel(double dtheta, double dx) {
 	setMotorPower(boardid_t::leftTread, lPWM);
 	setMotorPower(boardid_t::rightTread, rPWM);
 	*/
-	// setMotorPower(boardid_t::frontTireLeft, lPWM);
-	// setMotorPower(boardid_t::frontTireRight, rPWM);
-	// setMotorPower(boardid_t::rearTireLeft, lPWM);
+	setMotorPower(boardid_t::frontTireLeft, lPWM);
+	setMotorPower(boardid_t::frontTireRight, rPWM);
+	setMotorPower(boardid_t::rearTireLeft, lPWM);
 	setMotorPower(boardid_t::rearTireRight, rPWM);
 
 
