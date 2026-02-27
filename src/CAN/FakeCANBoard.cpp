@@ -18,6 +18,7 @@
 extern "C" {
 #include <CANCommandIDs.h>
 #include <CANPacket.h>
+#include <Packets/Peripheral.h>
 
 #include <HindsightCAN/CANPower.h>
 #include <HindsightCAN/CANScience.h>
@@ -106,6 +107,19 @@ int main() {
 
 			CANPacket_t p;
 			while (true) {
+				if (uuid == CAN_UUID_HAND) {
+					int periphID = prompt("peripheral ID");
+					if (periphID == 0) {
+						float steps = prompt("steps");
+						p = CANMotorPacket_Stepper_DriveRevolutions(Constants::JETSON_DEVICE, device, steps);
+						can::sendCANPacket(p);
+					} else {
+						float duty = prompt("duty cycle");
+						p = CANPeripheralPacket_SetPWMDutyCycle(Constants::JETSON_DEVICE, device, periphID, duty);
+						can::sendCANPacket(p);
+					}
+					continue;
+				}
 				int vel = prompt("vel");
 				if (vel == 0) {
 					p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_IDLE);
