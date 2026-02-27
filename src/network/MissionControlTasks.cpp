@@ -178,7 +178,7 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 				if (config.intrinsicParams && !config.intrinsicParams->empty()) {
 					auto detector = std::make_shared<ObjDet::ObjectDetector>(
 						"../src/object-detection/owlvit-cpp.pt",
-						0.9f,
+						0.8f,
 						config.intrinsicParams.value()
 					);
 					detector->toggleTask(ObjDet::DetectionTask::ORANGE_HAMMER);
