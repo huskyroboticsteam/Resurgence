@@ -341,10 +341,6 @@ void receiveThreadFn() {
 				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
 					handleEncoderEstimates(packet);
 					break;
-				
-				case CAN_COMMAND_ID__ACKNOWLEDGE:
-					handleAcknowledgement(packet);
-					break;
 					
 				default:
 					LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x",
