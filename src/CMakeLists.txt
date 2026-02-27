@@ -40,11 +40,19 @@ set_property(CACHE GPS PROPERTY STRINGS ${AVAILABLE_GPS})
 set(WITH_TESTS ON CACHE BOOL "Enable/Disable the tests.")
 set(WORLD_INTERFACE "REAL" CACHE STRING "The world interface implementation to use.")
 set(AVAILABLE_WORLD_INTERFACES "REAL" "SIMULATOR" "NO-OP")
+set(OFFLINE_MODE "FALSE" CACHE STRING "Status of offline building")
+set(AVAILABLE_OFFLINE_MODE "TRUE" "FALSE")
 set_property(CACHE WORLD_INTERFACE PROPERTY STRINGS ${AVAILABLE_WORLD_INTERFACES})
+set_property(CACHE OFFLINE_MODE PROPERTY STRINGS ${AVAILABLE_OFFLINE_MODE})
 
 if(NOT WORLD_INTERFACE IN_LIST AVAILABLE_WORLD_INTERFACES)
   message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${WORLD_INTERFACE}\n\
 Valid values are ${AVAILABLE_WORLD_INTERFACES}")
+endif()
+
+if(NOT OFFLINE_MODE IN_LIST AVAILABLE_OFFLINE_MODE)
+  message(FATAL_ERROR "Invalid value for WORLD_INTERFACE: ${OFFLINE_MODE}\n\
+Valid values are ${AVAILABLE_OFFLINE_MODE}")
 endif()
 
 if(NOT GPS IN_LIST AVAILABLE_GPS)
@@ -57,6 +65,7 @@ Module settings:")
 message("  GPS:\t\t\t${GPS}")
 message("  Test Suite:\t\t${WITH_TESTS}")
 message("  World Interface:\t${WORLD_INTERFACE}")
+message("  Offline mode:\t\t${OFFLINE_MODE}")
 message("========================================")
 
 ##====== Dependencies ======
@@ -89,20 +98,40 @@ find_package(argparse REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  # Find the CAN library; contains packet and protocol definitions and does not
-  # actually require physical CAN to be present.
-  FetchContent_Declare(
-    HindsightCAN
-    GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-    GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
-  )
+  if(OFFLINE_MODE STREQUAL "FALSE")
+    # Find the CAN library; contains packet and protocol definitions and does not
+    # actually require physical CAN to be present.
+    FetchContent_Declare(
+      HindsightCAN
+      GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
+      GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
+    )
+  else()
+    message("-- Offline mode enabled, using cached hindsight CAN")
+    # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
+    FetchContent_Declare(
+        HindsightCAN
+        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
+    )
+  endif()
   FetchContent_MakeAvailable(HindsightCAN)
 endif()
 
-FetchContent_Declare(LoguruGitRepo
-	GIT_REPOSITORY "https://github.com/emilk/loguru"
-	GIT_TAG        "master"
-)
+# Check if offline mode flag waas passed in
+if(OFFLINE_MODE STREQUAL "FALSE")
+  FetchContent_Declare(LoguruGitRepo
+    GIT_REPOSITORY "https://github.com/emilk/loguru"
+    GIT_TAG        "master"
+  )
+else()
+  message("-- Offline mode enabled, using cached loguru")
+  # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
+  FetchContent_Declare(
+      LoguruGitRepo
+      SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src"
+  )
+endif()
+
 # set any loguru compile-time flags before calling MakeAvailable()
 set(LOGURU_WITH_STREAMS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

@@ -243,15 +243,33 @@ static bool validateCameraFrameRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
+	auto gps = gps::readGPSCoords();
+	auto imu = robot::readIMU();
 	CameraID cam = j["camera"];
-    auto camDP = robot::readCamera(cam);
-    if (camDP) {
-      auto data = camDP.getData();
-      cv::Mat frame = data.first;
-      std::string b64_data = base64::encodeMat(frame, ".jpg");
-      json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
-      _server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-    }
+	auto camDP = robot::readCamera(cam);
+
+	Eigen::Quaterniond quat = imu.getData();
+	double lon = 0, lat = 0, alt = 0;
+	double w = 0, x = 0, y = 0, z = 0;
+	if (gps.isValid()) {
+		lon = gps.getData().lon;
+		lat = gps.getData().lat;
+		alt = gps.getData().alt;
+    	w = quat.w();
+    	x = quat.x();
+    	y = quat.y();
+    	z = quat.z();
+	}
+
+	if (camDP) {
+		auto data = camDP.getData();
+		cv::Mat frame = data.first;
+		std::string b64_data = base64::encodeMat(frame, ".jpg");
+		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}, 
+		{"orientW", w}, {"orientX", x}, {"orientY", y}, {"orientZ", z},
+		{"lon", lon}, {"lat", lat}, {"alt", alt}};
+		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
