@@ -107,21 +107,27 @@ int main() {
 			CANPacket_t p;
 			while (true) {
 				int vel = prompt("vel");
-				int dur = prompt("dur (s)");
+				if (vel == 0) {
+					p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_IDLE);
+					can::sendCANPacket(p);
+					break;
+				}
+				// int dur = prompt("dur (s)");
 
 				p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, vel, 0);
 				can::sendCANPacketWithAck(p);
 
-				std::cout << "Lockin Spin..." << std::endl;
+				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_IDLE);
+				can::sendCANPacket(p);
+				// std::cout << "Lockin Spin..." << std::endl;
 				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_LOCKIN_SPIN);
 				can::sendCANPacket(p);
-				std::this_thread::sleep_for(std::chrono::seconds(dur));
+				// std::this_thread::sleep_for(std::chrono::seconds(dur));
 
-				std::cout << "Stopping..." << std::endl;
-				p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, 0, 0);
-				can::sendCANPacket(p);
-				p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, BLDC_AXIS_LOCKIN_SPIN);
-				can::sendCANPacket(p);
+				// std::cout << "Stopping..." << std::endl;
+				// p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, device, 0, 0);
+				// can::sendCANPacket(p);
+
 			}
 		} else if (testMode == TestMode::PID) {
 			/*

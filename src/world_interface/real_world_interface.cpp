@@ -70,24 +70,27 @@ public:
 		double scale = power < 0 ? negative_scale : positive_scale;
 		power *= scale;
 
-		if (board_device.deviceUUID != CAN_UUID_BLDC_FOREARM && board_device.deviceUUID != CAN_UUID_BLDC_WRIST_LEFT && board_device.deviceUUID != CAN_UUID_BLDC_WRIST_RIGHT) {
+		auto uuid = board_device.deviceUUID;
+
+		if (uuid != CAN_UUID_BLDC_FOREARM && uuid != CAN_UUID_BLDC_WRIST_LEFT && uuid != CAN_UUID_BLDC_WRIST_RIGHT) {
 			if (power == 0.0) {
 				this->power = 0.0;
 
-				CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, board_device, 0, 0);
-				can::sendCANPacket(p);
+				if (uuid == CAN_UUID_BLDC_SHOULDER || uuid == CAN_UUID_BLDC_ELBOW) {
+					CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, board_device, 0, 0);
+					can::sendCANPacket(p);
 
-				can::motor::setMotorIdle(board_device);
-				can::motor::setMotorLockinSpin(board_device);
-				// }
+					can::motor::setMotorLockinSpin(board_device);
+				} else {
+					can::motor::setMotorIdle(board_device);
+				}			
 			} else if (power != this->power && (std::abs(power - this->power)) > 50) {
 				this->power = power;
 
-				LOG_F(INFO, "0x%x to vel %lf", board_device.deviceUUID, power);
 				CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(Constants::JETSON_DEVICE, board_device, power, 0);
 				can::sendCANPacketWithAck(p);
 
-				can::motor::setMotorIdle(board_device);
+				// can::motor::setMotorIdle(board_device);
 				can::motor::setMotorLockinSpin(board_device);
 			}
 		} else {
