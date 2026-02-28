@@ -409,6 +409,7 @@ add_compile_options(
   -Wall
   -Wextra
   -Werror
+  -Wno-psabi
 )
 
 add_subdirectory(ar)
