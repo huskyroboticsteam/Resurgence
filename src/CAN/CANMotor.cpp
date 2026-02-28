@@ -33,6 +33,105 @@ namespace can::motor {
 // UPDATED:
 // ===========
 
+CANBoard::CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
+				   double pos_pwm_scale, double neg_pwm_scale)
+	: motor_id(motor), has_pos_sensor(hasPosSensor), device(device),
+	  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale) {
+	std::lock_guard<std::mutex> lg(schedulerMutex);
+	if (!pSched) {
+		pSched.emplace("MotorVelSched");
+	}
+}
+
+void CANBoard::ensureMotorMode(can::motor::motormode_t mode) {
+	if (!motor_mode || motor_mode.value() != mode) {
+		// update the motor mode
+		motor_mode.emplace(mode);
+		can::motor::setMotorMode(device, mode);
+	}
+}
+
+void CANBoard::constructVelController() {
+	constexpr int32_t inputDim = 1;
+	constexpr int32_t outputDim = 1;
+
+	// create kinematics function (input and output will both be the current motor
+	// position)
+	const std::function<navtypes::Vectord<outputDim>(const navtypes::Vectord<inputDim>&)>&
+		kinematicsFunct = [](const navtypes::Vectord<inputDim>& inputVec) {
+			// returns a copy of the input vector
+			return inputVec;
+		};
+
+	// create jacobian function (value will be 1 since it's the derivative of the
+	// kinematics function)
+	const std::function<navtypes::Matrixd<outputDim, inputDim>(
+		const navtypes::Vectord<inputDim>&)>& jacobianFunct =
+		[](const navtypes::Vectord<inputDim>&) {
+			navtypes::Matrixd<outputDim, inputDim> res =
+				navtypes::Matrixd<outputDim, inputDim>::Identity();
+			return res;
+		};
+
+	velController.emplace(kinematicsFunct, jacobianFunct);
+}
+
+void CANBoard::setMotorPower(double power) {
+	ensureMotorMode(can::motor::motormode_t::vel);
+
+	// scale the power
+	double scale = power < 0 ? negative_scale : positive_scale;
+	power *= scale;
+	can::motor::setMotorPower(device, power);
+}
+
+void CANBoard::setMotorPos(int32_t targetPos) {
+	ensureMotorMode(can::motor::motormode_t::pos);
+	can::motor::setMotorPIDTarget(device, targetPos);
+}
+
+robot::types::DataPoint<int32_t> CANBoard::getMotorPos() const {
+	return can::motor::getMotorPosition(device);
+}
+
+void CANBoard::setMotorVel(int32_t targetVel) {
+	ensureMotorMode(can::motor::motormode_t::pos);
+	if (!velController) {
+		constructVelController();
+	}
+
+	navtypes::Vectord<1> velocityVector{targetVel};
+	robot::types::datatime_t currTime = robot::types::dataclock::now();
+	velController->setTarget(currTime, velocityVector);
+
+	unscheduleVelocityEvent();
+
+	velEventID = pSched->scheduleEvent(100ms, [this]() -> void {
+		robot::types::datatime_t currTime = robot::types::dataclock::now();
+		auto motorPos = can::motor::getMotorPosition(device);
+		if (motorPos.isValid()) {
+			const navtypes::Vectord<1> currPos(motorPos.getData());
+			navtypes::Vectord<1> posCommand = velController->getCommand(currTime, currPos);
+			setMotorPos(posCommand.coeff(0, 0));
+		}
+	});
+}
+
+void CANBoard::unscheduleVelocityEvent() {
+	if (velEventID) {
+		pSched->removeEvent(velEventID.value());
+		velEventID.reset();
+	}
+}
+
+can::uuid_t CANBoard::getMotorUUID() const {
+	return device.deviceUUID;
+}
+
+robot::types::boardid_t CANBoard::getMotorID() const {
+	return motor_id;
+}
+
 void initEncoder(CANDevice_t device, bool invertEncoder, bool zeroEncoder,
 				 int32_t pulsesPerJointRev,
 				 std::optional<std::chrono::milliseconds> telemetryPeriod) {

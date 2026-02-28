@@ -7,7 +7,6 @@
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
-
 #include <array>
 #include <optional>
 #include <unordered_set>
@@ -62,15 +61,6 @@ const kinematics::DiffDriveKinematics& driveKinematics();
 void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors = false);
-
-/**
- * @brief Get a pointer to the motor object associated with the motor id.
- *
- * @param motor The motor id to manipulate.
- * @return A shared pointer to the motor object
- */
-class CANBoard;
-std::shared_ptr<CANBoard> getMotor(robot::types::boardid_t motor);
 
 /**
  * @brief Emergency stop all motors.

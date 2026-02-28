@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../world_interface/data.h"
+#include "../control/JacobianVelController.h"
 #include "CAN.h"
 #include "CANUtils.h"
 
 #include <chrono>
+#include <mutex>
 #include <optional>
 
 /**
@@ -26,6 +28,37 @@ enum class motormode_t {
 	pid = MOTOR_UNIT_MODE_PID
 };
 */
+
+class CANBoard {
+public:
+    CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
+             double pos_pwm_scale, double neg_pwm_scale);
+
+    void setMotorPower(double power);
+    void setMotorPos(int32_t targetPos);
+    robot::types::DataPoint<int32_t> getMotorPos() const;
+    void setMotorVel(int32_t targetVel);
+    void unscheduleVelocityEvent();
+
+    can::uuid_t getMotorUUID() const;
+    robot::types::boardid_t getMotorID() const;
+
+private:
+    robot::types::boardid_t motor_id;
+    bool has_pos_sensor;
+    CANDevice_t device;
+    std::optional<motormode_t> motor_mode;
+    double positive_scale;
+    double negative_scale;
+    std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
+    std::optional<JacobianVelController<1, 1>> velController;
+
+    inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
+    inline static std::mutex schedulerMutex;
+
+    void ensureMotorMode(motormode_t mode);
+    void constructVelController();
+};
 
 /** @brief The supported motor position sensors. */
 struct sensor_t {
