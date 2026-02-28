@@ -60,6 +60,12 @@ constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 // Match on UUID field to filter for packets addressed to this device
 constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
 
+constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(500);
+
+// map each device seen to a watchdog
+std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeatWatchdogMap;
+std::mutex heartbeatWatchdogMapMutex;
+
 int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
 
@@ -210,6 +216,27 @@ void handleLimitSwitchAlert(CANPacket_t& packet) {
 				   DataPoint<telemetry_t>(static_cast<telemetry_t>(decoded.switchStatus)));
 }
 
+// Heartbeat monitoring handler: create watchdog on first heartbeat and feed it on subsequent heartbeats
+void handleHeartbeatPacket(CANPacket_t& packet) {
+	{
+		std::lock_guard lock(heartbeatWatchdogMapMutex);
+		CANDeviceUUID_t uuid = packet.senderUUID;
+		auto it = heartbeatWatchdogMap.find(uuid);
+		// if the watchdog expires, log a warning.
+		if (it == heartbeatWatchdogMap.end()) {
+			heartbeatWatchdogMap.emplace(
+				uuid, 
+				std::make_unique<util::Watchdog<>>(HEARTBEAT_TIMEOUT, [uuid]() {
+									   LOG_F(WARNING, "Heartbeat timeout for device 0x%x", uuid);	   
+				})
+			);
+		} else {
+			// feed the watchdog to reset timer
+			it->second->feed();
+		}
+	}
+}
+
 /* old - replaced by command-specific handlers above
 void handleTelemetryPacket(CANPacket_t& packet) {
 	CANDeviceUUID_t uuid = getDeviceFromPacket(packet);
@@ -302,13 +329,13 @@ void receiveThreadFn() {
 					break;
 
 				case CAN_COMMAND_ID__HEARTBEAT:
-					LOG_F(INFO, "Heartbeat from UUID 0x%x", packet.senderUUID);
+					handleHeartbeatPacket(packet);
 					break;
 
 				case CAN_COMMAND_ID__E_STOP:
 					LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
 					break;
-
+				
 				default:
 					LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x",
 						  packet.command, packet.senderUUID);
