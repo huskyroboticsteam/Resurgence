@@ -32,11 +32,11 @@ std::string buildPipelineString(int width, int height, int fps, const std::strin
 			 << ",framerate=" << fps << "/1 ! ";
 	pipeline << "queue max-size-buffers=1 leaky=downstream ! ";
 	pipeline << "videoconvert ! ";
-	pipeline << "nvh265enc ! ";
-	pipeline << "h265parse config-interval=1 disable-passthrough=false ! ";
+	pipeline << "nvh264enc ! ";
+	pipeline << "h264parse config-interval=1 disable-passthrough=false ! ";
 	pipeline << "queue max-size-buffers=1 leaky=downstream ! ";
 	pipeline << "appsink name=" << sinkName
-			 << " caps=\"video/x-h265,stream-format=byte-stream,alignment=au\" "
+			 << " caps=\"video/x-h264,stream-format=byte-stream,alignment=au\" "
 				"emit-signals=false sync=false drop=true max-buffers=1";
 	return pipeline.str();
 }
