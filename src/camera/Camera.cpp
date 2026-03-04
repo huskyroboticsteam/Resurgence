@@ -116,8 +116,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	std::transform(capsFormatLower.begin(), capsFormatLower.end(), capsFormatLower.begin(),
 				   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
-	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID])
-			<< " io-mode=dmabuf ! ";
+	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID]) << " ! ";
 
 	gstr_ss << capsFormat << ",";
 
@@ -136,7 +135,8 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	}
 
 	gstr_ss << "queue max-size-buffers=1 leaky=downstream ! "
-        << "videoconvert ! appsink drop=true max-buffers=1 sync=false";
+			<< "videoconvert ! video/x-raw,format=BGR ! "
+			<< "appsink drop=true max-buffers=1 sync=false";
 
 	return gstr_ss.str();
 }
