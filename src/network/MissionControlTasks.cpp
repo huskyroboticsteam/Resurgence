@@ -150,13 +150,13 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 					} else {
 						LOG_F(INFO,
 							  "Camera %s format %s does not provide H264, falling back to "
-							  "decoded-frame H265 NVENC encoding",
+							  "decoded-frame encoded streaming",
 							  cam.c_str(), format.c_str());
 					}
 				} else {
 					LOG_F(WARNING,
 						  "Camera %s config missing stream properties; falling back to "
-						  "decoded-frame H265 NVENC encoding",
+						  "decoded-frame encoded streaming",
 						  cam.c_str());
 				}
 			}
@@ -167,9 +167,9 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 				if (cam_handle) {
 					_open_streams.insert_or_assign(
 						cam, stream_data_t(decoded_stream_t{enc, cam_handle}));
-					LOG_F(INFO, "Opened H265 NVENC-encoded stream for %s", cam.c_str());
+					LOG_F(INFO, "Opened decoded-frame encoded stream for %s", cam.c_str());
 				} else {
-					LOG_F(ERROR, "Failed to open %s camera for H265 NVENC encoding", cam.c_str());
+					LOG_F(ERROR, "Failed to open %s camera for decoded-frame encoding", cam.c_str());
 				}
 				
 			}

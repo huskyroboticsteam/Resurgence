@@ -27,6 +27,8 @@ private:
 	int _width = 0;
 	int _height = 0;
 	uint64_t _frame_counter = 0;
+	bool _init_failed = false;
+	std::string _active_encoder_label;
 	GstElement* _pipeline = nullptr;
 	GstElement* _appsrc = nullptr;
 	GstElement* _appsink = nullptr;

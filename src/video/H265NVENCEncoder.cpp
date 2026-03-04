@@ -11,6 +11,7 @@
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 
 namespace {
 
@@ -23,8 +24,7 @@ void ensureGStreamerInitialized() {
 	});
 }
 
-std::string buildPipelineString(int width, int height, int fps, const std::string& srcName,
-								const std::string& sinkName) {
+std::string buildPipelinePrefix(int width, int height, int fps, const std::string& srcName) {
 	std::stringstream pipeline;
 	pipeline << "appsrc name=" << srcName
 			 << " is-live=true format=time do-timestamp=true block=false "
@@ -32,13 +32,50 @@ std::string buildPipelineString(int width, int height, int fps, const std::strin
 			 << ",framerate=" << fps << "/1 ! ";
 	pipeline << "queue max-size-buffers=1 leaky=downstream ! ";
 	pipeline << "videoconvert ! ";
-	pipeline << "nvh265enc ! ";
-	pipeline << "h265parse config-interval=1 disable-passthrough=false ! ";
+	return pipeline.str();
+}
+
+std::string buildPipelineSuffix(const std::string& sinkName) {
+	std::stringstream pipeline;
+	pipeline << "h264parse config-interval=1 disable-passthrough=false ! ";
 	pipeline << "queue max-size-buffers=1 leaky=downstream ! ";
 	pipeline << "appsink name=" << sinkName
-			 << " caps=\"video/x-h265,stream-format=byte-stream,alignment=au\" "
+			 << " caps=\"video/x-h264,stream-format=byte-stream,alignment=au\" "
 				"emit-signals=false sync=false drop=true max-buffers=1";
 	return pipeline.str();
+}
+
+struct EncoderCandidate {
+	std::string label;
+	std::string pipeline;
+};
+
+std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int fps,
+													  const std::string& srcName,
+													  const std::string& sinkName) {
+	const std::string prefix = buildPipelinePrefix(width, height, fps, srcName);
+	const std::string suffix = buildPipelineSuffix(sinkName);
+	return {
+		{"nvh264enc", prefix + "nvh264enc ! " + suffix},
+		{"x264enc", prefix + "x264enc tune=zerolatency speed-preset=ultrafast ! " + suffix},
+		{"openh264enc", prefix + "openh264enc ! " + suffix},
+	};
+}
+
+void cleanupPipeline(GstElement*& pipeline, GstElement*& appsrc, GstElement*& appsink) {
+	if (appsrc) {
+		gst_object_unref(appsrc);
+		appsrc = nullptr;
+	}
+	if (appsink) {
+		gst_object_unref(appsink);
+		appsink = nullptr;
+	}
+	if (pipeline) {
+		gst_element_set_state(pipeline, GST_STATE_NULL);
+		gst_object_unref(pipeline);
+		pipeline = nullptr;
+	}
 }
 
 } // namespace
@@ -68,46 +105,50 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 	_width = width;
 	_height = height;
 
-	std::string srcName = "mc_h265_src";
-	std::string sinkName = "mc_h265_sink";
-	std::string pipelineStr = buildPipelineString(width, height, _fps, srcName, sinkName);
+	const std::string srcName = "mc_h264_src";
+	const std::string sinkName = "mc_h264_sink";
+	const auto candidates = buildPipelineCandidates(width, height, _fps, srcName, sinkName);
 
-	GError* parseError = nullptr;
-	_pipeline = gst_parse_launch(pipelineStr.c_str(), &parseError);
-	if (!_pipeline) {
-		std::string errorMsg = "Failed to create H265 NVENC pipeline: ";
-		if (parseError) {
-			errorMsg += parseError->message;
-			g_error_free(parseError);
+	std::string errors;
+	for (const auto& candidate : candidates) {
+		GError* parseError = nullptr;
+		GstElement* pipeline = gst_parse_launch(candidate.pipeline.c_str(), &parseError);
+		if (!pipeline) {
+			std::string errorMsg = parseError ? parseError->message : "unknown parse failure";
+			LOG_F(WARNING, "Failed to create %s pipeline: %s", candidate.label.c_str(), errorMsg.c_str());
+			if (parseError) {
+				g_error_free(parseError);
+			}
+			errors += candidate.label + ": " + errorMsg + "; ";
+			continue;
 		}
-		throw std::runtime_error(errorMsg);
+
+		GstElement* appsrc = gst_bin_get_by_name(GST_BIN(pipeline), srcName.c_str());
+		GstElement* appsink = gst_bin_get_by_name(GST_BIN(pipeline), sinkName.c_str());
+		if (!appsrc || !appsink) {
+			LOG_F(WARNING, "Failed to locate appsrc/appsink for %s pipeline", candidate.label.c_str());
+			cleanupPipeline(pipeline, appsrc, appsink);
+			errors += candidate.label + ": missing appsrc/appsink; ";
+			continue;
+		}
+
+		if (gst_element_set_state(pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+			LOG_F(WARNING, "Failed to start %s pipeline", candidate.label.c_str());
+			cleanupPipeline(pipeline, appsrc, appsink);
+			errors += candidate.label + ": unable to start pipeline; ";
+			continue;
+		}
+
+		_pipeline = pipeline;
+		_appsrc = appsrc;
+		_appsink = appsink;
+		_active_encoder_label = candidate.label;
+		LOG_F(INFO, "Initialized camera encoder pipeline using %s (%dx%d@%d)",
+			  _active_encoder_label.c_str(), _width, _height, _fps);
+		return;
 	}
 
-	_appsrc = gst_bin_get_by_name(GST_BIN(_pipeline), srcName.c_str());
-	_appsink = gst_bin_get_by_name(GST_BIN(_pipeline), sinkName.c_str());
-	if (!_appsrc || !_appsink) {
-		if (_appsrc) {
-			gst_object_unref(_appsrc);
-			_appsrc = nullptr;
-		}
-		if (_appsink) {
-			gst_object_unref(_appsink);
-			_appsink = nullptr;
-		}
-		gst_object_unref(_pipeline);
-		_pipeline = nullptr;
-		throw std::runtime_error("Failed to locate appsrc/appsink for H265 NVENC pipeline");
-	}
-
-	if (gst_element_set_state(_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-		gst_object_unref(_appsrc);
-		gst_object_unref(_appsink);
-		gst_object_unref(_pipeline);
-		_appsrc = nullptr;
-		_appsink = nullptr;
-		_pipeline = nullptr;
-		throw std::runtime_error("Unable to start H265 NVENC pipeline");
-	}
+	throw std::runtime_error("Failed to initialize camera encoder pipeline. " + errors);
 }
 
 std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv::Mat& frame) {
@@ -117,7 +158,11 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 	}
 
 	if (frame.type() != CV_8UC3) {
-		LOG_F(WARNING, "H265 NVENC encoder expects CV_8UC3 frame, got type=%d", frame.type());
+		LOG_F(WARNING, "Camera encoder expects CV_8UC3 frame, got type=%d", frame.type());
+		return nalUnits;
+	}
+
+	if (_init_failed) {
 		return nalUnits;
 	}
 
@@ -125,14 +170,15 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 		try {
 			initializePipeline(frame.cols, frame.rows);
 		} catch (const std::exception& e) {
-			LOG_F(ERROR, "Failed to initialize H265 NVENC encoder pipeline: %s", e.what());
+			LOG_F(ERROR, "Failed to initialize camera encoder pipeline: %s", e.what());
+			_init_failed = true;
 			return nalUnits;
 		}
 	}
 
 	if (frame.cols != _width || frame.rows != _height) {
 		LOG_F(WARNING,
-			  "H265 NVENC encoder resolution changed from %dx%d to %dx%d; dropping frame",
+			  "Camera encoder resolution changed from %dx%d to %dx%d; dropping frame",
 			  _width, _height, frame.cols, frame.rows);
 		return nalUnits;
 	}
@@ -143,13 +189,13 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 
 	GstBuffer* inputBuffer = gst_buffer_new_allocate(nullptr, frameBytes, nullptr);
 	if (!inputBuffer) {
-		LOG_F(ERROR, "Failed to allocate GstBuffer for H265 NVENC frame");
+		LOG_F(ERROR, "Failed to allocate GstBuffer for camera encoder frame");
 		return nalUnits;
 	}
 
 	GstMapInfo writeMap;
 	if (!gst_buffer_map(inputBuffer, &writeMap, GST_MAP_WRITE)) {
-		LOG_F(ERROR, "Failed to map GstBuffer for H265 NVENC frame");
+		LOG_F(ERROR, "Failed to map GstBuffer for camera encoder frame");
 		gst_buffer_unref(inputBuffer);
 		return nalUnits;
 	}
@@ -164,12 +210,13 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 
 	GstFlowReturn pushStatus = gst_app_src_push_buffer(GST_APP_SRC(_appsrc), inputBuffer);
 	if (pushStatus != GST_FLOW_OK) {
-		LOG_F(ERROR, "H265 NVENC appsrc push failed with status=%d", pushStatus);
+		LOG_F(ERROR, "Camera encoder appsrc push failed with status=%d", pushStatus);
 		return nalUnits;
 	}
 
-	GstSample* sample = gst_app_sink_try_pull_sample(
-		GST_APP_SINK(_appsink), frameDuration + (10 * GST_MSECOND));
+	const GstClockTime pullTimeout =
+		std::max<GstClockTime>(frameDuration * 3, static_cast<GstClockTime>(100 * GST_MSECOND));
+	GstSample* sample = gst_app_sink_try_pull_sample(GST_APP_SINK(_appsink), pullTimeout);
 	if (!sample) {
 		return nalUnits;
 	}
