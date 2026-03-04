@@ -56,8 +56,8 @@ std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int
 	const std::string prefix = buildPipelinePrefix(width, height, fps, srcName);
 	const std::string suffix = buildPipelineSuffix(sinkName);
 	return {
-		{"nvh264enc", prefix + "nvh264enc ! " + suffix},
 		{"x264enc", prefix + "x264enc tune=zerolatency speed-preset=ultrafast ! " + suffix},
+		{"nvh264enc", prefix + "nvh264enc ! " + suffix},
 		{"openh264enc", prefix + "openh264enc ! " + suffix},
 	};
 }
@@ -214,12 +214,17 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 		return nalUnits;
 	}
 
-	const GstClockTime pullTimeout =
-		std::max<GstClockTime>(frameDuration * 3, static_cast<GstClockTime>(100 * GST_MSECOND));
-	GstSample* sample = gst_app_sink_try_pull_sample(GST_APP_SINK(_appsink), pullTimeout);
+	GstSample* sample = gst_app_sink_try_pull_sample(GST_APP_SINK(_appsink), 0);
 	if (!sample) {
+		_consecutive_empty_pulls++;
+		if ((_consecutive_empty_pulls % 120) == 0) {
+			LOG_F(WARNING,
+				  "Camera encoder (%s) produced no output for %u consecutive frames",
+				  _active_encoder_label.c_str(), _consecutive_empty_pulls);
+		}
 		return nalUnits;
 	}
+	_consecutive_empty_pulls = 0;
 
 	GstBuffer* outputBuffer = gst_sample_get_buffer(sample);
 	GstMapInfo readMap;
