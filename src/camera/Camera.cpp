@@ -90,7 +90,7 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 			<< " io-mode=dmabuf ! ";
 
 	if (formatLower.find("yuy") != std::string::npos) {
-		gstr_ss << "video/x-raw,format=YUY2,";
+		gstr_ss << "video/x-raw,format=YUYV,";
 	} else {
 		gstr_ss << format << ",";
 	}
