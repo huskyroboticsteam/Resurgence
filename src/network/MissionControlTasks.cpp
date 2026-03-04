@@ -91,10 +91,7 @@ CameraStreamTask::CameraStreamTask(websocket::SingleClientWSServer& server)
 void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 //	std::lock_guard lock(_mutex);
 //	_open_streams[cam] = 0;
-//	auto it = Constants::video::STREAM_RFS.find(cam);
-//	int rf = it != Constants::video::STREAM_RFS.end() ? it->second
-//													  : Constants::video::H264_RF_CONSTANT;
-//	_camera_encoders[cam] = std::make_shared<video::H264Encoder>(fps, rf);
+//	_camera_encoders[cam] = std::make_shared<video::H265NVENCEncoder>(fps);
 
 	if (_open_streams.find(cam) == _open_streams.end()) {
 		std::thread([this, cam, fps]() {
@@ -152,29 +149,27 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 						}
 					} else {
 						LOG_F(INFO,
-							  "Camera %s format %s does not provide H264, falling back to CPU "
-							  "encoding",
+							  "Camera %s format %s does not provide H264, falling back to "
+							  "decoded-frame H265 NVENC encoding",
 							  cam.c_str(), format.c_str());
 					}
 				} else {
 					LOG_F(WARNING,
-						  "Camera %s config missing stream properties; falling back to CPU encoding",
+						  "Camera %s config missing stream properties; falling back to "
+						  "decoded-frame H265 NVENC encoding",
 						  cam.c_str());
 				}
 			}
-			// if passthrough source was not opened, fall back to CPU encoding
+			// if passthrough source was not opened, encode decoded frames using H265 NVENC
 			if (!opened) {
-				auto it = Constants::video::STREAM_RFS.find(cam);
-				int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second
-																   : Constants::video::H264_RF_CONSTANT;
-				auto enc = std::make_shared<video::H264Encoder>(fps, rf);
+				auto enc = std::make_shared<video::H265NVENCEncoder>(fps);
 				auto cam_handle = robot::openCamera(cam);
 				if (cam_handle) {
 					_open_streams.insert_or_assign(
 						cam, stream_data_t(decoded_stream_t{enc, cam_handle}));
-					LOG_F(INFO, "Opened CPU-encoded stream for %s", cam.c_str());
+					LOG_F(INFO, "Opened H265 NVENC-encoded stream for %s", cam.c_str());
 				} else {
-					LOG_F(ERROR, "Failed to open %s camera for CPU encoding", cam.c_str());
+					LOG_F(ERROR, "Failed to open %s camera for H265 NVENC encoding", cam.c_str());
 				}
 				
 			}

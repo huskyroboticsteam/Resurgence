@@ -26,7 +26,7 @@ std::string buildPipelineString(const cam::CameraStreamProperties& props, const 
 			 << ",framerate=" << props.framerate << "/1 ! ";
 	pipeline << "h264parse config-interval=1 disable-passthrough=false ! ";
 	pipeline << "queue leaky=2 ! ";
-	pipeline << "appsink name=" << sinkName
+	pipeline << "appsink drop=true name=" << sinkName
 			 << " caps=\"video/x-h264,stream-format=byte-stream,alignment=au\" "
 				"emit-signals=false sync=false drop=true max-buffers=1";
 	return pipeline.str();

@@ -2,7 +2,7 @@
 
 #include "../utils/scheduler.h"
 #include "../camera/H264PassthroughSource.h"
-#include "../video/H264Encoder.h"
+#include "../video/H265NVENCEncoder.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
 #include "websocket/WebSocketServer.h"
@@ -84,7 +84,7 @@ protected:
 
 private:
 	struct decoded_stream_t {
-		std::shared_ptr<video::H264Encoder> encoder;
+		std::shared_ptr<video::H265NVENCEncoder> encoder;
 		std::shared_ptr<robot::types::CameraHandle> cam_handle;
 	};
 
