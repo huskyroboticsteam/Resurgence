@@ -2,6 +2,8 @@
 #include "Camera.h"
 #include "CameraConfig.h"
 
+#include <algorithm>
+#include <cctype>
 #include <loguru.hpp>
 
 #include <opencv2/aruco.hpp>
@@ -84,27 +86,52 @@ std::string Camera::getGSTPipe(CameraID camera_id) {
 	std::string format = fs[KEY_FORMAT];
 	std::string formatLower = format;
 	std::transform(formatLower.begin(), formatLower.end(), formatLower.begin(),
-				[](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+				   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+	std::string capsFormat = format;
+
+	// Allow shorthand pixel-format names (e.g. "yuyv", "uyvy") in config.
+	const bool looksLikeCaps =
+		(formatLower.find('/') != std::string::npos || formatLower.find("format=") != std::string::npos);
+	if (!looksLikeCaps) {
+		if (formatLower == "yuyv" || formatLower == "yuy2" || formatLower == "yuyuv" ||
+			formatLower == "yuy") {
+			capsFormat = "video/x-raw,format=YUY2";
+		} else if (formatLower == "uyvy") {
+			capsFormat = "video/x-raw,format=UYVY";
+		} else if (formatLower == "mjpeg" || formatLower == "jpeg") {
+			capsFormat = "image/jpeg";
+		} else if (formatLower == "h264") {
+			capsFormat = "video/x-h264";
+		} else if (formatLower == "h265" || formatLower == "hevc") {
+			capsFormat = "video/x-h265";
+		} else {
+			std::string upperFormat = formatLower;
+			std::transform(upperFormat.begin(), upperFormat.end(), upperFormat.begin(),
+						   [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+			capsFormat = "video/x-raw,format=" + upperFormat;
+		}
+	}
+
+	std::string capsFormatLower = capsFormat;
+	std::transform(capsFormatLower.begin(), capsFormatLower.end(), capsFormatLower.begin(),
+				   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 	gstr_ss << "v4l2src device=/dev/video" << static_cast<int>(fs[KEY_CAMERA_ID])
 			<< " io-mode=dmabuf ! ";
 
-	if (formatLower.find("yuy") != std::string::npos) {
-		gstr_ss << "video/x-raw,format=YUY2,";
-	} else {
-		gstr_ss << format << ",";
-	}
+	gstr_ss << capsFormat << ",";
 
 	gstr_ss << "width=" << static_cast<int>(fs[KEY_IMAGE_WIDTH]);
 	gstr_ss << ",height=" << static_cast<int>(fs[KEY_IMAGE_HEIGHT]);
 	gstr_ss << ",framerate=" << static_cast<int>(fs[KEY_FRAMERATE]) << "/1 ! ";
 
-	if (formatLower.find("h264") != std::string::npos) {
+	if (capsFormatLower.find("h264") != std::string::npos) {
 		gstr_ss << "h264parse ! avdec_h264 ! ";
-	} else if (formatLower.find("h265") != std::string::npos ||
-			   formatLower.find("hevc") != std::string::npos) {
+	} else if (capsFormatLower.find("h265") != std::string::npos ||
+			   capsFormatLower.find("hevc") != std::string::npos) {
 		gstr_ss << "h265parse ! avdec_h265 ! ";
-	} else if (formatLower.find("jpeg") != std::string::npos) {
+	} else if (capsFormatLower.find("jpeg") != std::string::npos ||
+			   capsFormatLower.find("mjpeg") != std::string::npos) {
 		gstr_ss << "jpegdec ! ";
 	}
 
