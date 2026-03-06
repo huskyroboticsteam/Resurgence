@@ -60,6 +60,9 @@ void printCANPacket(const CANPacket_t& packet);
 void printCANPacket(const CANPacket_t& packet);
 // void printCANPacket(const CANPacket& packet);
 
+void initHeartbeatWatchdog();
+void handleHeartbeatPacket(CANPacket_t& packet);
+
 /**
  * @brief Get the latest telemetry from a CAN device.
  *

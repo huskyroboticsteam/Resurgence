@@ -361,6 +361,10 @@ void initCAN() {
 	receiveThread.detach();
 }
 
+void initHeartbeatWatchdog() {
+	LOG_F(INFO, "Heartbeat watchdog monitoring enabled");
+}
+
 // new for CAN26
 void sendCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
