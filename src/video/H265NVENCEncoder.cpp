@@ -48,6 +48,7 @@ std::string buildPipelineSuffix(const std::string& sinkName) {
 struct EncoderCandidate {
 	std::string label;
 	std::string pipeline;
+	bool hardware = false;
 };
 
 std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int fps,
@@ -56,9 +57,9 @@ std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int
 	const std::string prefix = buildPipelinePrefix(width, height, fps, srcName);
 	const std::string suffix = buildPipelineSuffix(sinkName);
 	return {
-		{"x264enc", prefix + "x264enc tune=zerolatency speed-preset=ultrafast ! " + suffix},
-		{"nvh264enc", prefix + "nvh264enc ! " + suffix},
-		{"openh264enc", prefix + "openh264enc ! " + suffix},
+		{"x264enc", prefix + "x264enc tune=zerolatency speed-preset=ultrafast ! " + suffix, false},
+		{"nvh264enc", prefix + "nvh264enc ! " + suffix, true},
+		{"openh264enc", prefix + "openh264enc ! " + suffix, false},
 	};
 }
 
@@ -111,11 +112,15 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 
 	std::string errors;
 	for (const auto& candidate : candidates) {
+		const char* mode = candidate.hardware ? "hardware" : "software";
+		LOG_F(INFO, "Trying %s camera encoder candidate: %s", mode, candidate.label.c_str());
+
 		GError* parseError = nullptr;
 		GstElement* pipeline = gst_parse_launch(candidate.pipeline.c_str(), &parseError);
 		if (!pipeline) {
 			std::string errorMsg = parseError ? parseError->message : "unknown parse failure";
-			LOG_F(WARNING, "Failed to create %s pipeline: %s", candidate.label.c_str(), errorMsg.c_str());
+			LOG_F(WARNING, "Failed to create %s camera encoder pipeline (%s): %s",
+				  mode, candidate.label.c_str(), errorMsg.c_str());
 			if (parseError) {
 				g_error_free(parseError);
 			}
@@ -126,14 +131,15 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 		GstElement* appsrc = gst_bin_get_by_name(GST_BIN(pipeline), srcName.c_str());
 		GstElement* appsink = gst_bin_get_by_name(GST_BIN(pipeline), sinkName.c_str());
 		if (!appsrc || !appsink) {
-			LOG_F(WARNING, "Failed to locate appsrc/appsink for %s pipeline", candidate.label.c_str());
+			LOG_F(WARNING, "Failed to locate appsrc/appsink for %s camera encoder (%s)",
+				  mode, candidate.label.c_str());
 			cleanupPipeline(pipeline, appsrc, appsink);
 			errors += candidate.label + ": missing appsrc/appsink; ";
 			continue;
 		}
 
 		if (gst_element_set_state(pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-			LOG_F(WARNING, "Failed to start %s pipeline", candidate.label.c_str());
+			LOG_F(WARNING, "Failed to start %s camera encoder (%s)", mode, candidate.label.c_str());
 			cleanupPipeline(pipeline, appsrc, appsink);
 			errors += candidate.label + ": unable to start pipeline; ";
 			continue;
@@ -143,8 +149,11 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 		_appsrc = appsrc;
 		_appsink = appsink;
 		_active_encoder_label = candidate.label;
-		LOG_F(INFO, "Initialized camera encoder pipeline using %s (%dx%d@%d)",
-			  _active_encoder_label.c_str(), _width, _height, _fps);
+		LOG_F(INFO, "Initialized %s camera encoder: %s (%dx%d@%d)",
+			  mode, _active_encoder_label.c_str(), _width, _height, _fps);
+		if (!candidate.hardware) {
+			LOG_F(WARNING, "Camera stream is using SOFTWARE encoding (%s)", _active_encoder_label.c_str());
+		}
 		return;
 	}
 
