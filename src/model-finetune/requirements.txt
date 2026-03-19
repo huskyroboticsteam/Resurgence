@@ -1,0 +1,9 @@
+torch>=2.1.0
+torchvision>=0.16.0
+transformers>=4.39.0
+pillow>=10.0.0
+scipy>=1.11.0
+tqdm>=4.66.0
+icrawler>=0.6.6
+opencv-python>=4.8.0,<4.11
+pyrealsense2>=2.54.0

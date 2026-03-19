@@ -145,9 +145,9 @@ int main(int argc, char** argv) {
         // Load detector
         std::string model_path;
         std::vector<std::string> possible_paths = {
-            "src/object-detection/owlvit-cpp.pt",
-            "../src/object-detection/owlvit-cpp.pt",
-            "owlvit-cpp.pt"
+            "src/object-detection/owlvit_finetune.pt",
+            "../src/object-detection/owlvit_finetune.pt",
+            "owlvit_finetune.pt"
         };
 
         for (const auto& path : possible_paths) {

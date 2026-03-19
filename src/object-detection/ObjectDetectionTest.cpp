@@ -94,7 +94,7 @@ cv::Mat visualizeDetections(const cv::Mat& image, const std::vector<ObjDet::Dete
 int main(int argc, char** argv) {
     // Default paths (relative to build directory)
     std::string image_path = "../src/object-detection/test.jpg";
-    std::string model_path = "../src/object-detection/owlvit-cpp.pt";
+    std::string model_path = "../src/object-detection/owlvit_finetune.pt";
     
     // Override with command line argument if provided
     if (argc >= 2) {

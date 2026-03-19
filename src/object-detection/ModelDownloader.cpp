@@ -24,7 +24,7 @@ bool downloadModel(const std::string& destination) {
         MODEL_URL = env_url;
     } else {
         // Default: Download from Hugging Face repository
-        MODEL_URL = "https://huggingface.co/thomas0829/OWL-ViT/resolve/main/owlvit-cpp.pt";
+        MODEL_URL = "https://huggingface.co/thomas0829/OWL-ViT_Finetune/resolve/main/owlvit_finetune.pt";
     }
     
     std::cout << "Downloading from: " << MODEL_URL << std::endl;
@@ -70,18 +70,18 @@ std::string findOrDownloadModel() {
     }
     
     // 2. Check current directory (for backward compatibility)
-    if (std::filesystem::exists("owlvit-cpp.pt")) {
-        return "owlvit-cpp.pt";
+    if (std::filesystem::exists("owlvit_finetune.pt")) {
+        return "owlvit_finetune.pt";
     }
     
     // 3. Check in ../src/object-detection/ (when running from build/)
-    if (std::filesystem::exists("../src/object-detection/owlvit-cpp.pt")) {
-        return "../src/object-detection/owlvit-cpp.pt";
+    if (std::filesystem::exists("../src/object-detection/owlvit_finetune.pt")) {
+        return "../src/object-detection/owlvit_finetune.pt";
     }
     
     // 4. Check in src/object-detection/ (when running from project root)
-    if (std::filesystem::exists("src/object-detection/owlvit-cpp.pt")) {
-        return "src/object-detection/owlvit-cpp.pt";
+    if (std::filesystem::exists("src/object-detection/owlvit_finetune.pt")) {
+        return "src/object-detection/owlvit_finetune.pt";
     }
     
     // Model not found - attempt to download
@@ -90,18 +90,18 @@ std::string findOrDownloadModel() {
     // Determine best download location
     std::string download_path;
     if (std::filesystem::exists("../src/object-detection")) {
-        download_path = "../src/object-detection/owlvit-cpp.pt";
+        download_path = "../src/object-detection/owlvit_finetune.pt";
     } else if (std::filesystem::exists("src/object-detection")) {
-        download_path = "src/object-detection/owlvit-cpp.pt";
+        download_path = "src/object-detection/owlvit_finetune.pt";
     } else {
-        download_path = "owlvit-cpp.pt";
+        download_path = "owlvit_finetune.pt";
     }
     
     if (downloadModel(download_path)) {
         return download_path;
     }
     
-    throw std::runtime_error("Could not find or download owlvit-cpp.pt model file. "
+    throw std::runtime_error("Could not find or download owlvit_finetune.pt model file. "
                            "Please set OWLVIT_MODEL_PATH environment variable or manually download the model.");
 }
 

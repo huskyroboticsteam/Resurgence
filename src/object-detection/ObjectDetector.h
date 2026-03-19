@@ -23,22 +23,18 @@ enum class DetectionTask {
     NONE,           ///< All detection disabled
     ORANGE_HAMMER,  ///< Detect orange/construction mallet (Key '1')
     ROCK_PICK,      ///< Detect rock pick hammer (Key '2')
-    WATER_BOTTLE    ///< Detect water bottle (Key '3')
+    WATER_BOTTLE,   ///< Detect water bottle (Key '3')
+    ALL             ///< Detect all objects (Key '4')
 };
 
 /**
  * @brief Configuration for a detection task.
- * 
- * Contains model path, class names, tokenized prompts, and object dimensions.
- * Allows different models and prompts for each task.
+ *
+ * Each task specifies which class indices (from the global class list) to accept.
+ * The fine-tuned model always runs with all classes; tasks filter the results.
  */
 struct TaskConfig {
-    std::string model_path;                      ///< Path to the model file
-    std::vector<std::string> class_names;        ///< Class names for this task
-    torch::Tensor input_ids;                     ///< Tokenized text prompts
-    torch::Tensor attention_mask;                ///< Attention mask for prompts
-    std::map<std::string, float> object_heights; ///< Object heights in meters
-    std::map<std::string, float> object_widths;  ///< Object widths in meters
+    std::vector<int> accepted_class_indices;     ///< Which class indices this task accepts
 };
 
 /**
@@ -51,23 +47,19 @@ struct TaskConfig {
 class ObjectDetector {
 private:
     torch::jit::script::Module model_;
+    // Global class list (matches fine-tuned model: no object, orange mallet, rock pick hammer, water bottle)
     std::vector<std::string> class_names_;
     cam::CameraParams camera_params_;
     cv::Mat map1_, map2_;  // Undistortion maps
-    
-    // Pre-computed tokens for text prompts (current active task)
-    torch::Tensor input_ids_;
-    torch::Tensor attention_mask_;
-    
+
     float confidence_threshold_;
-    
+
     // Task management (device_ must be before active_task_ for initialization order)
     DetectionTask active_task_;
     torch::Device device_;
     std::map<DetectionTask, TaskConfig> task_configs_;
-    
+
     // Real-world object dimensions (in meters) for distance estimation
-    // These are updated when switching tasks
     std::map<std::string, float> object_heights_;
     std::map<std::string, float> object_widths_;
     

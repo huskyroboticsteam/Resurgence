@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
     std::cout << "  '1' - Toggle Orange Hammer detection" << std::endl;
     std::cout << "  '2' - Toggle Rock Pick detection" << std::endl;
     std::cout << "  '3' - Toggle Water Bottle detection" << std::endl;
+    std::cout << "  '4' - Toggle All Objects detection" << std::endl;
     std::cout << "  '0' - Disable all detection" << std::endl;
     std::cout << "  '+' - Increase confidence threshold" << std::endl;
     std::cout << "  '-' - Decrease confidence threshold" << std::endl;
@@ -134,11 +135,11 @@ int main(int argc, char** argv) {
             // Determine best download location
             std::string download_path;
             if (std::filesystem::exists("../src/object-detection")) {
-                download_path = "../src/object-detection/owlvit-cpp.pt";
+                download_path = "../src/object-detection/owlvit_finetune.pt";
             } else if (std::filesystem::exists("src/object-detection")) {
-                download_path = "src/object-detection/owlvit-cpp.pt";
+                download_path = "src/object-detection/owlvit_finetune.pt";
             } else {
-                download_path = "owlvit-cpp.pt";
+                download_path = "owlvit_finetune.pt";
             }
             
             // Prompt user to download
@@ -310,6 +311,9 @@ int main(int argc, char** argv) {
                 std::cout << "Task: " << ObjectDetector::getTaskName(detector.getActiveTask()) << std::endl;
             } else if (key == '3') {  // Toggle Water Bottle
                 detector.toggleTask(DetectionTask::WATER_BOTTLE);
+                std::cout << "Task: " << ObjectDetector::getTaskName(detector.getActiveTask()) << std::endl;
+            } else if (key == '4') {  // Toggle All Objects
+                detector.toggleTask(DetectionTask::ALL);
                 std::cout << "Task: " << ObjectDetector::getTaskName(detector.getActiveTask()) << std::endl;
             } else if (key == '0') {  // Disable all
                 detector.setActiveTask(DetectionTask::NONE);

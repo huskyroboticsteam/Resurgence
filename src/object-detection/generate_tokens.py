@@ -42,8 +42,10 @@ def main():
         classes = DEFAULT_CLASSES
         print(f"Using default descriptions: {classes}")
     
+    # Use fine-tuned model processor if available, otherwise base model
     model_name = "google/owlvit-base-patch32"
     processor = OwlViTProcessor.from_pretrained(model_name)
+    print(f"Model: {model_name}")
 
     # Move to GPU if available
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

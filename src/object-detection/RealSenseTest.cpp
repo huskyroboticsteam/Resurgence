@@ -1,4 +1,5 @@
 #include "ObjectDetector.h"
+#include "ModelDownloader.h"
 #include "../camera/CameraParams.h"
 
 #ifdef WITH_REALSENSE
@@ -19,6 +20,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     std::cout << "  '1' - Toggle Orange Hammer detection" << std::endl;
     std::cout << "  '2' - Toggle Rock Pick detection" << std::endl;
     std::cout << "  '3' - Toggle Water Bottle detection" << std::endl;
+    std::cout << "  '4' - Toggle All Objects detection" << std::endl;
     std::cout << "  '0' - Disable all detection" << std::endl;
     std::cout << "  'd' - Toggle depth overlay" << std::endl;
     std::cout << "  '+' - Increase confidence threshold" << std::endl;
@@ -51,35 +53,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
             std::cout << "Intrinsic parameters loaded from camera" << std::endl;
         }
 
-        // Find and load model
-        std::string model_path;
-        std::vector<std::string> possible_paths = {
-            "owlvit-cpp.pt",
-            "../owlvit-cpp.pt",
-            "../../src/object-detection/owlvit-cpp.pt",
-            "../src/object-detection/owlvit-cpp.pt",
-            "src/object-detection/owlvit-cpp.pt"
-        };
-        
-        for (const auto& path : possible_paths) {
-            if (std::ifstream(path).good()) {
-                model_path = path;
-                break;
-            }
-        }
-        
-        if (model_path.empty()) {
-            const char* env_path = std::getenv("OWLVIT_MODEL_PATH");
-            if (env_path) {
-                model_path = env_path;
-            } else {
-                std::cerr << "Error: Cannot find model file owlvit-cpp.pt" << std::endl;
-                return 1;
-            }
-        }
-        
+        // Find model (auto-downloads from HuggingFace if not found)
+        std::string model_path = findOrDownloadModel();
         std::cout << "Loading model from: " << model_path << std::endl;
-        ObjectDetector detector(model_path, 0.9f, camera_params);  // 90% confidence threshold
+        ObjectDetector detector(model_path, 0.75f, camera_params);  // 75% confidence threshold
         std::cout << "Model loaded successfully" << std::endl;
 
         // Create window (1280x720 to match camera resolution)
@@ -223,6 +200,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
                 std::cout << "Task: " << ObjectDetector::getTaskName(detector.getActiveTask()) << std::endl;
             } else if (key == '3') {
                 detector.toggleTask(DetectionTask::WATER_BOTTLE);
+                std::cout << "Task: " << ObjectDetector::getTaskName(detector.getActiveTask()) << std::endl;
+            } else if (key == '4') {
+                detector.toggleTask(DetectionTask::ALL);
                 std::cout << "Task: " << ObjectDetector::getTaskName(detector.getActiveTask()) << std::endl;
             } else if (key == '0') {
                 detector.setActiveTask(DetectionTask::NONE);

@@ -134,6 +134,7 @@ bool initializeObjectDetection() {
         LOG_F(INFO, "  Key '1': Orange Hammer");
         LOG_F(INFO, "  Key '2': Rock Pick");
         LOG_F(INFO, "  Key '3': Water Bottle");
+        LOG_F(INFO, "  Key '4': All Objects");
         
         if (!config.extrinsicParams || config.extrinsicParams->empty()) {
             LOG_F(WARNING, "Camera configuration does not have extrinsic parameters! "

@@ -26,22 +26,17 @@ ObjectDetector::ObjectDetector(const std::string& default_model_path,
       confidence_threshold_(confidence_threshold),
       active_task_(DetectionTask::NONE),
       device_(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU) {
-    
+
     // Disable JIT optimizations to avoid CUDA nvrtc compilation issues
     // This prevents "__ldg" undefined identifier errors on some CUDA versions
     torch::jit::setGraphExecutorOptimize(false);
     torch::jit::FusionStrategy strategy = {{torch::jit::FusionBehavior::STATIC, 0}};
     torch::jit::setFusionStrategy(strategy);
-    
-    // Initialize task configurations with the default model path
+
+    // Initialize global class tokens and per-task configs
     initializeTaskConfigs();
-    
-    // Override all task model paths with the provided default (for now all use same model)
-    for (auto& [task, config] : task_configs_) {
-        config.model_path = default_model_path;
-    }
-    
-    // Load the model (will be reloaded when task changes if model differs)
+
+    // Load the fine-tuned model
     try {
         model_ = torch::jit::load(default_model_path);
         model_.to(device_);
@@ -53,7 +48,7 @@ ObjectDetector::ObjectDetector(const std::string& default_model_path,
         std::cerr << e.what() << std::endl;
         throw std::runtime_error("Failed to load OWL-ViT model");
     }
-    
+
     // Initialize undistortion maps if camera parameters are provided
     if (!camera_params_.empty()) {
         initUndistortMaps();
@@ -61,97 +56,44 @@ ObjectDetector::ObjectDetector(const std::string& default_model_path,
 }
 
 void ObjectDetector::initializeTaskConfigs() {
-    // ========== Task 1: Orange Hammer ==========
-    TaskConfig orange_hammer_config;
-    orange_hammer_config.class_names = {"no object", "orange mallet"};
-    // Tokens for: ["no object", "orange mallet"]
-    orange_hammer_config.input_ids = torch::tensor({
-        {49406, 871, 14115, 49407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {49406, 4287, 1662, 1094, 49407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-    }, torch::kInt64).to(device_);
-    orange_hammer_config.attention_mask = torch::tensor({
-        {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-    }, torch::kInt64).to(device_);
-    orange_hammer_config.object_heights["orange mallet"] = 0.35f;
-    orange_hammer_config.object_widths["orange mallet"] = 0.10f;
-    task_configs_[DetectionTask::ORANGE_HAMMER] = orange_hammer_config;
-    
-    // ========== Task 2: Rock Pick Hammer ==========
-    TaskConfig rock_pick_config;
-    rock_pick_config.class_names = {"no object", "rock pick hammer"};
-    // Tokens for: ["no object", "rock pick hammer"]
-    rock_pick_config.input_ids = torch::tensor({
-        {49406, 871, 14115, 49407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {49406, 2172, 3142, 9401, 49407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-    }, torch::kInt64).to(device_);
-    rock_pick_config.attention_mask = torch::tensor({
-        {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-    }, torch::kInt64).to(device_);
-    rock_pick_config.object_heights["rock pick hammer"] = 0.30f;
-    rock_pick_config.object_widths["rock pick hammer"] = 0.08f;
-    task_configs_[DetectionTask::ROCK_PICK] = rock_pick_config;
-    
-    // ========== Task 3: Water Bottle ==========
-    TaskConfig water_bottle_config;
-    water_bottle_config.class_names = {"no object", "water bottle"};
-    // Tokens for: ["no object", "water bottle"]
-    water_bottle_config.input_ids = torch::tensor({
-        {49406, 871, 14115, 49407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {49406, 1573, 5392, 49407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-    }, torch::kInt64).to(device_);
-    water_bottle_config.attention_mask = torch::tensor({
-        {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-    }, torch::kInt64).to(device_);
-    water_bottle_config.object_heights["water bottle"] = 0.20f;
-    water_bottle_config.object_widths["water bottle"] = 0.065f;
-    task_configs_[DetectionTask::WATER_BOTTLE] = water_bottle_config;
+    // ========== Global: Class names (text embeddings are baked into the model) ==========
+    // Fine-tuned with 4 classes: ["no object", "orange mallet", "rock pick hammer", "water bottle"]
+    class_names_ = {"no object", "orange mallet", "rock pick hammer", "water bottle"};
+
+    // ========== Global: Object dimensions for distance estimation ==========
+    object_heights_["orange mallet"] = 0.35f;
+    object_widths_["orange mallet"] = 0.10f;
+    object_heights_["rock pick hammer"] = 0.30f;
+    object_widths_["rock pick hammer"] = 0.08f;
+    object_heights_["water bottle"] = 0.20f;
+    object_widths_["water bottle"] = 0.065f;
+
+    // ========== Per-task: Which class indices to accept ==========
+    task_configs_[DetectionTask::ORANGE_HAMMER] = {{1}};       // class 1: orange mallet
+    task_configs_[DetectionTask::ROCK_PICK]     = {{2}};       // class 2: rock pick hammer
+    task_configs_[DetectionTask::WATER_BOTTLE]  = {{3}};       // class 3: water bottle
+    task_configs_[DetectionTask::ALL]            = {{1, 2, 3}}; // all objects
 }
 
 void ObjectDetector::loadModelForTask(DetectionTask task) {
     if (task == DetectionTask::NONE) {
         return;
     }
-    
+
     auto it = task_configs_.find(task);
     if (it == task_configs_.end()) {
         std::cerr << "ObjectDetector: Unknown task" << std::endl;
         return;
     }
-    
-    const TaskConfig& config = it->second;
-    
-    // Check if we need to reload the model (different path)
-    // For now, all tasks use the same model, so we skip reloading
-    // In the future, uncomment this to support different models per task:
-    /*
-    if (config.model_path != current_model_path_) {
-        try {
-            model_ = torch::jit::load(config.model_path);
-            model_.to(device_);
-            model_.eval();
-            current_model_path_ = config.model_path;
-            std::cout << "ObjectDetector: Loaded model for task: " << getTaskName(task) << std::endl;
-        } catch (const c10::Error& e) {
-            std::cerr << "ObjectDetector: Error loading model for task " << getTaskName(task) << std::endl;
-            return;
-        }
-    }
-    */
-    
-    // Update class names and tokens for this task
-    class_names_ = config.class_names;
-    input_ids_ = config.input_ids;
-    attention_mask_ = config.attention_mask;
-    object_heights_ = config.object_heights;
-    object_widths_ = config.object_widths;
-    
+
+    // Tokens and class_names_ are global (set once in initializeTaskConfigs)
+    // Only the accepted class indices change per task
     std::cout << "ObjectDetector: Switched to task: " << getTaskName(task) << std::endl;
-    std::cout << "  Classes: ";
-    for (const auto& name : class_names_) {
-        std::cout << "\"" << name << "\" ";
+    std::cout << "  Accepting classes:";
+    for (int idx : it->second.accepted_class_indices) {
+        if (idx >= 0 && static_cast<size_t>(idx) < class_names_.size()) {
+            std::cout << " \"" << class_names_[idx] << "\"";
+        }
     }
     std::cout << std::endl;
 }
@@ -160,13 +102,12 @@ void ObjectDetector::setActiveTask(DetectionTask task) {
     if (task == active_task_) {
         return;
     }
-    
+
     active_task_ = task;
-    
+
     if (task != DetectionTask::NONE) {
         loadModelForTask(task);
     } else {
-        class_names_.clear();
         std::cout << "ObjectDetector: All detection tasks disabled" << std::endl;
     }
 }
@@ -195,6 +136,7 @@ std::string ObjectDetector::getTaskName(DetectionTask task) {
         case DetectionTask::ORANGE_HAMMER: return "Orange Hammer";
         case DetectionTask::ROCK_PICK:     return "Rock Pick";
         case DetectionTask::WATER_BOTTLE:  return "Water Bottle";
+        case DetectionTask::ALL:           return "All Objects";
         default:                           return "Unknown";
     }
 }
@@ -213,8 +155,9 @@ void ObjectDetector::initUndistortMaps() {
 }
 
 torch::Tensor ObjectDetector::preprocess(const cv::Mat& image) {
-    const std::vector<float> mean = {0.5f, 0.5f, 0.5f};
-    const std::vector<float> std = {0.5f, 0.5f, 0.5f};
+    // CLIP normalization (used by OWL-ViT processor during training)
+    const std::vector<float> mean = {0.48145466f, 0.4578275f, 0.40821073f};
+    const std::vector<float> std = {0.26862954f, 0.26130258f, 0.27577711f};
     
     cv::Mat resized, rgb_image;
     cv::resize(image, resized, cv::Size(768, 768));
@@ -241,24 +184,21 @@ torch::Tensor ObjectDetector::preprocess(const cv::Mat& image) {
 
 std::vector<torch::Tensor> ObjectDetector::runModel(const cv::Mat& image) {
     torch::NoGradGuard no_grad;
-    
+
     // Preprocess and move to device
     torch::Tensor pixel_values = preprocess(image).to(device_);
-    
-    // Prepare inputs
+
+    // Run inference (vision-only model: text embeddings are baked in)
     std::vector<torch::jit::IValue> inputs;
-    inputs.push_back(input_ids_);
     inputs.push_back(pixel_values);
-    inputs.push_back(attention_mask_);
-    
-    // Run inference
+
     auto outputs = model_.forward(inputs);
     auto output_tuple = outputs.toTuple()->elements();
-    
+
     // Extract logits and predicted boxes
     auto logits = output_tuple[0].toTensor();
     auto pred_boxes = output_tuple[1].toTensor();
-    
+
     return {logits, pred_boxes};
 }
 
@@ -266,76 +206,87 @@ std::vector<DetectionResult> ObjectDetector::detect(const cv::Mat& image, bool u
     if (active_task_ == DetectionTask::NONE || empty()) {
         return {};
     }
-    
+
+    // Get accepted class indices for the active task
+    auto task_it = task_configs_.find(active_task_);
+    if (task_it == task_configs_.end()) {
+        return {};
+    }
+    const auto& accepted = task_it->second.accepted_class_indices;
+
     cv::Mat processed_image = image;
-    
+
     // Apply undistortion if requested and camera params available
     if (undistort && !camera_params_.empty()) {
         cv::remap(image, processed_image, map1_, map2_, cv::INTER_LINEAR);
     }
-    
-    // Run model
+
+    // Run model (always with all 4 class tokens)
     auto outputs = runModel(processed_image);
     auto logits = outputs[0];
     auto boxes = outputs[1];
-    
-    // Convert logits to probabilities
+
+    // Convert logits to probabilities (softmax over all 4 classes, matching training)
     torch::Tensor scores = torch::softmax(logits.squeeze(0), 1);
-    
+
     std::vector<DetectionResult> results;
-    
+
     int img_width = processed_image.cols;
     int img_height = processed_image.rows;
-    cv::Size image_size(img_width, img_height);
-    
+
     // Process each detection
     for (int i = 0; i < scores.size(0); i++) {
         auto max_result = scores[i].max(0);
         float confidence = std::get<0>(max_result).item<float>();
         int class_idx = std::get<1>(max_result).item<int>();
-        
-        // Skip background class (class_idx == 0) and low confidence detections
-        if (class_idx != 0 && confidence > confidence_threshold_) {
-            auto box = boxes[0][i];
-            
-            // Extract normalized coordinates
-            float x_center = box[0].item<float>();
-            float y_center = box[1].item<float>();
-            float width = box[2].item<float>();
-            float height = box[3].item<float>();
-            
-            // Convert to pixel coordinates
-            int x1 = static_cast<int>((x_center - width / 2.0f) * img_width);
-            int y1 = static_cast<int>((y_center - height / 2.0f) * img_height);
-            int x2 = static_cast<int>((x_center + width / 2.0f) * img_width);
-            int y2 = static_cast<int>((y_center + height / 2.0f) * img_height);
-            
-            // Clamp to image boundaries
-            x1 = std::max(0, std::min(x1, img_width - 1));
-            y1 = std::max(0, std::min(y1, img_height - 1));
-            x2 = std::max(0, std::min(x2, img_width - 1));
-            y2 = std::max(0, std::min(y2, img_height - 1));
-            
-            cv::Rect bbox(x1, y1, x2 - x1, y2 - y1);
-            
-            // Get class name
-            std::string class_name = (static_cast<size_t>(class_idx) < class_names_.size()) 
-                                     ? class_names_[class_idx] 
-                                     : "unknown";
-            
-            // Calculate actual distance if requested
-            float distance = -1.0f;
-            if (estimate_distance) {
-                distance = calculateActualDistance(bbox, class_name);
-            }
-            
-            results.emplace_back(class_idx, class_name, bbox, confidence, distance);
+
+        // Skip background (class 0), low confidence, and classes not in the active task
+        if (class_idx == 0 || confidence <= confidence_threshold_) {
+            continue;
         }
+        if (std::find(accepted.begin(), accepted.end(), class_idx) == accepted.end()) {
+            continue;
+        }
+
+        auto box = boxes[0][i];
+
+        // Extract normalized coordinates
+        float x_center = box[0].item<float>();
+        float y_center = box[1].item<float>();
+        float width = box[2].item<float>();
+        float height = box[3].item<float>();
+
+        // Convert to pixel coordinates
+        int x1 = static_cast<int>((x_center - width / 2.0f) * img_width);
+        int y1 = static_cast<int>((y_center - height / 2.0f) * img_height);
+        int x2 = static_cast<int>((x_center + width / 2.0f) * img_width);
+        int y2 = static_cast<int>((y_center + height / 2.0f) * img_height);
+
+        // Clamp to image boundaries
+        x1 = std::max(0, std::min(x1, img_width - 1));
+        y1 = std::max(0, std::min(y1, img_height - 1));
+        x2 = std::max(0, std::min(x2, img_width - 1));
+        y2 = std::max(0, std::min(y2, img_height - 1));
+
+        cv::Rect bbox(x1, y1, x2 - x1, y2 - y1);
+
+        // Get class name
+        std::string class_name = (static_cast<size_t>(class_idx) < class_names_.size())
+                                     ? class_names_[class_idx]
+                                     : "unknown";
+
+        // Calculate actual distance if requested
+        float distance = -1.0f;
+        if (estimate_distance) {
+            distance = calculateActualDistance(bbox, class_name);
+        }
+
+        results.emplace_back(class_idx, class_name, bbox, confidence, distance);
     }
-    
+
     // Apply Non-Maximum Suppression to remove overlapping detections
     results = applyNMS(results, 0.5f);
-    
+
     return results;
 }
 
@@ -457,8 +408,7 @@ bool ObjectDetector::empty() const {
 }
 
 void ObjectDetector::initializeObjectDimensions() {
-    // This is now handled per-task in initializeTaskConfigs()
-    // Keeping this method for backwards compatibility
+    // Handled globally in initializeTaskConfigs()
 }
 
 float ObjectDetector::calculateActualDistance(const cv::Rect& bbox, const std::string& class_name) const {
