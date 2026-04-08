@@ -126,7 +126,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 
   add_library(CAN26 STATIC ${can26_SOURCE_DIR}/CANPacket.c)
   target_include_directories(CAN26 SYSTEM PUBLIC ${can26_SOURCE_DIR})
-endif()
+  endif()
 
 # Check if offline mode flag waas passed in
 if(OFFLINE_MODE STREQUAL "FALSE")
@@ -415,4 +415,5 @@ add_compile_options(
 add_subdirectory(ar)
 add_subdirectory(camera)
 add_subdirectory(CAN)
+add_subdirectory(odrive)
 add_subdirectory(network)

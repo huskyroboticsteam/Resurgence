@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"
+#include "network/ODriveProtocol.h"
 #include "world_interface/world_interface.h"
 
 #include <array>
@@ -152,6 +153,9 @@ int main(int argc, char** argv) {
 	robot::world_interface_init(Globals::websocketServer);
 	auto mcProto = std::make_unique<net::mc::MissionControlProtocol>(Globals::websocketServer);
 	Globals::websocketServer.addProtocol(std::move(mcProto));
+	/*
+	auto odriveProto = std:
+	*/
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
 
