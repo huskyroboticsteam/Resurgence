@@ -27,3 +27,4 @@ src/model-finetune/test_results/
 src/model-finetune/captured_images/
 __pycache__/
 *.pyc
+settings.json
