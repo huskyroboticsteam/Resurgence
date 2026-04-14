@@ -169,7 +169,74 @@ Output is ~342 MB. This is the file the C++ node loads at runtime.
 
 ---
 
-### Step 6 — Test on RealSense
+### Step 6 — Test
+
+#### Option A — Quick test with a static image (no camera needed)
+
+```bash
+cd /home/thomas/hsr/Resurgence/src/model-finetune
+python -c "
+import torch, glob
+from PIL import Image
+from transformers import OwlViTProcessor
+
+class_names = ['no object', 'orange mallet', 'rock pick hammer', 'water bottle']
+model = torch.jit.load('../object-detection/owlvit_finetune.pt', map_location='cpu')
+processor = OwlViTProcessor.from_pretrained('runs/three_class_my_run/final')
+
+img = Image.open('/path/to/your/image.jpg').convert('RGB')
+pv = processor(images=img, return_tensors='pt')['pixel_values']
+with torch.no_grad():
+    logits, boxes = model(pv)
+
+probs = logits.softmax(-1)
+max_probs, max_cls = probs[0].max(-1)
+mask = max_cls > 0
+if mask.any():
+    fp = max_probs.clone(); fp[~mask] = 0
+    top = fp.argsort(descending=True)[:5]
+    for i in top:
+        cls = max_cls[i].item()
+        conf = max_probs[i].item()
+        if conf > 0.5:
+            print(f'{class_names[cls]}: {conf:.3f}  box={[round(b,3) for b in boxes[0,i].tolist()]}')
+else:
+    print('No detection')
+"
+```
+
+You can also run against the full val set to get accuracy numbers:
+
+```bash
+python -c "
+import torch, glob
+from PIL import Image
+from transformers import OwlViTProcessor
+
+class_names = ['no object', 'orange mallet', 'rock pick hammer', 'water bottle']
+model = torch.jit.load('../object-detection/owlvit_finetune.pt', map_location='cpu')
+processor = OwlViTProcessor.from_pretrained('runs/three_class_my_run/final')
+
+for cls_name, folder, target in [('orange_mallet','orange_mallet',1),('rock_pick_hammer','rock_pick_hammer',2),('water_bottle','water_bottle',3)]:
+    imgs = sorted(glob.glob(f'datasets/web_coco/{folder}/val/data/*'))
+    correct = 0
+    for img_path in imgs:
+        img = Image.open(img_path).convert('RGB')
+        pv = processor(images=img, return_tensors='pt')['pixel_values']
+        with torch.no_grad():
+            logits, _ = model(pv)
+        probs = logits.softmax(-1)
+        max_probs, max_cls = probs[0].max(-1)
+        mask = max_cls > 0
+        if mask.any():
+            fp = max_probs.clone(); fp[~mask] = 0
+            if max_cls[fp.argmax()].item() == target:
+                correct += 1
+    print(f'{cls_name}: {correct}/{len(imgs)} ({100*correct/len(imgs):.1f}%)')
+"
+```
+
+#### Option B — Test with RealSense camera
 
 Delete the old cached model so it loads the new one:
 
