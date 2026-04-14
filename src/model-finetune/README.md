@@ -9,13 +9,34 @@ The trained model exports as a TorchScript file (`owlvit_finetune.pt`) used by t
 
 ---
 
-## Setup
+## Environment Setup
+
+### 1. Activate conda environment
 
 ```bash
 conda activate hsr
-cd src/model-finetune
+```
+
+### 2. Install dependencies
+
+```bash
+cd /home/thomas/hsr/Resurgence/src/model-finetune
 pip install -r requirements.txt
 ```
+
+`requirements.txt` includes: torch, torchvision, transformers, pillow, scipy, tqdm, opencv-python, pyrealsense2.
+
+### 3. Install Grounding DINO
+
+Grounding DINO is used to auto-annotate photos. It is pulled automatically via `transformers` — no separate install needed. The model (`IDEA-Research/grounding-dino-base`) downloads from HuggingFace the first time you run `add_real_data.py`.
+
+If you are not logged in to HuggingFace:
+
+```bash
+huggingface-cli login
+```
+
+Enter your token from https://huggingface.co/settings/tokens.
 
 ---
 
@@ -26,21 +47,50 @@ pip install -r requirements.txt
 Connect the RealSense camera, then run:
 
 ```bash
+cd /home/thomas/hsr/Resurgence/src/model-finetune
 python capture.py
 ```
 
 Controls:
 - `Space` — take a photo
-- `1` / `2` / `3` — switch between orange_mallet / rock_pick_hammer / water_bottle
+- `1` — switch to orange_mallet
+- `2` — switch to rock_pick_hammer
+- `3` — switch to water_bottle
 - `q` — quit
 
 Photos are saved to `captured_images/<class_name>/`. Aim for **200+ photos per class** at different angles, distances, and lighting conditions.
 
+Output folder structure after capture:
+```
+captured_images/
+├── orange_mallet/
+├── rock_pick_hammer/
+└── water_bottle/
+```
+
 ---
 
-### Step 2 — Add photos to the dataset
+### Step 2 — Preview annotations (optional but recommended)
 
-This annotates the photos automatically using Grounding DINO and merges them into the training dataset.
+Before adding photos to the dataset, preview what Grounding DINO detects:
+
+```bash
+python add_real_data.py --input captured_images/orange_mallet --class orange_mallet --preview
+```
+
+This creates a `captured_images/orange_mallet/_preview/` folder with bounding boxes drawn on each image. Open the folder and check that the boxes look correct before proceeding.
+
+If detections are missing, lower the threshold (default is 0.25):
+
+```bash
+python add_real_data.py --input captured_images/orange_mallet --class orange_mallet --preview --box-threshold 0.15
+```
+
+---
+
+### Step 3 — Add photos to the dataset
+
+This annotates the photos and merges them into `datasets/web_coco/`. 10% of the images are automatically split into the val set.
 
 ```bash
 python add_real_data.py --input captured_images/orange_mallet --class orange_mallet
@@ -48,25 +98,11 @@ python add_real_data.py --input captured_images/rock_pick_hammer --class rock_pi
 python add_real_data.py --input captured_images/water_bottle --class water_bottle
 ```
 
-To preview annotations before merging (generates images with bounding boxes drawn):
-
-```bash
-python add_real_data.py --input captured_images/orange_mallet --class orange_mallet --preview
-```
-
-Check the `_preview/` folder inside your input directory, then run without `--preview` to merge.
-
-If detections are missing or wrong, lower the threshold (default is 0.25):
-
-```bash
-python add_real_data.py --input captured_images/orange_mallet --class orange_mallet --box-threshold 0.15
-```
-
 ---
 
-### Step 3 — Train
+### Step 4 — Train
 
-Replace `v7` with the next version number each time you retrain.
+Replace `v7` with the next version number each time you retrain:
 
 ```bash
 python train.py \
@@ -77,11 +113,20 @@ python train.py \
   --epochs 30
 ```
 
-Training saves checkpoints every 5 epochs under `runs/three_class_v7/`. The `best` checkpoint is the one with the lowest validation loss after warmup; `final` is the last epoch.
+Training prints loss each epoch:
+```
+epoch  1/30  train=0.24  val=0.18  ★ best
+epoch  2/30  train=0.18  val=0.21
+...
+```
+
+Checkpoints are saved every 5 epochs to `runs/three_class_v7/epoch-N/`, plus `best/` and `final/`.
 
 ---
 
-### Step 4 — Export to TorchScript
+### Step 5 — Export to TorchScript
+
+Use `final` unless `best` gives clearly better results:
 
 ```bash
 python export.py \
@@ -89,37 +134,39 @@ python export.py \
   --output ../object-detection/owlvit_finetune.pt
 ```
 
-This bakes the text embeddings into the model so only the vision encoder runs at inference. The output file is ~342 MB.
+Output is ~342 MB. This is the file the C++ node loads at runtime.
 
 ---
 
-### Step 5 — Test
+### Step 6 — Test on RealSense
 
-Delete the old model file so it doesn't load the stale cached version:
+Delete the old cached model so it loads the new one:
 
 ```bash
-rm src/object-detection/owlvit_finetune.pt
+rm /home/thomas/hsr/Resurgence/src/object-detection/owlvit_finetune.pt
 ```
 
 Build and run:
 
 ```bash
-cd build
+cd /home/thomas/hsr/Resurgence/build
 cmake --build . --target realsense_test -j$(nproc)
 ./object-detection/realsense_test
 ```
 
 Controls:
-- `1` / `2` / `3` — detect orange mallet / rock pick hammer / water bottle
+- `1` — detect orange mallet only
+- `2` — detect rock pick hammer only
+- `3` — detect water bottle only
 - `4` — detect all classes
 - `+` / `-` — raise or lower confidence threshold
 - `q` — quit
 
 ---
 
-### Step 6 — Upload to HuggingFace (optional)
+### Step 7 — Upload to HuggingFace
 
-After confirming the model works, upload to `thomas0829/OWL-ViT_Finetune` so others can pull it:
+After confirming the model works, upload so others can use it:
 
 ```bash
 python -c "
@@ -129,8 +176,11 @@ HfApi().upload_file(
     path_in_repo='owlvit_finetune.pt',
     repo_id='thomas0829/OWL-ViT_Finetune',
 )
+print('Done')
 "
 ```
+
+Others pulling the project will automatically download this file when they first run `realsense_test`.
 
 ---
 
@@ -149,6 +199,8 @@ datasets/web_coco/
 └── water_bottle/
 ```
 
+---
+
 ## Files
 
 | File | Description |
@@ -157,5 +209,6 @@ datasets/web_coco/
 | `export.py` | Export trained checkpoint to TorchScript |
 | `dataset.py` | COCO dataset loader |
 | `capture.py` | Capture images from RealSense camera |
-| `add_real_data.py` | Auto-annotate photos and merge into dataset |
+| `add_real_data.py` | Auto-annotate photos with Grounding DINO and merge into dataset |
 | `collect_data.py` | Download web images and auto-annotate |
+| `requirements.txt` | Python dependencies |
