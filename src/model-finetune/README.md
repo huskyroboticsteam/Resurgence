@@ -133,14 +133,14 @@ python collect_data.py \
 
 ### Step 4 — Train
 
-Replace `v7` with the next version number each time you retrain:
+Replace `my_run` with the next version number each time you retrain:
 
 ```bash
 python train.py \
   --datasets "orange mallet=datasets/web_coco/orange_mallet" \
              "rock pick hammer=datasets/web_coco/rock_pick_hammer" \
              "water bottle=datasets/web_coco/water_bottle" \
-  --output runs/three_class_v7 \
+  --output runs/three_class_my_run \
   --epochs 30
 ```
 
@@ -151,7 +151,7 @@ epoch  2/30  train=0.18  val=0.21
 ...
 ```
 
-Checkpoints are saved every 5 epochs to `runs/three_class_v7/epoch-N/`, plus `best/` and `final/`.
+Checkpoints are saved every 5 epochs to `runs/three_class_my_run/epoch-N/`, plus `best/` and `final/`.
 
 ---
 
@@ -161,7 +161,7 @@ Use `final` unless `best` gives clearly better results:
 
 ```bash
 python export.py \
-  --checkpoint runs/three_class_v7/final \
+  --checkpoint runs/three_class_my_run/final \
   --output ../object-detection/owlvit_finetune.pt
 ```
 
