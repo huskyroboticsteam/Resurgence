@@ -98,6 +98,37 @@ python add_real_data.py --input captured_images/rock_pick_hammer --class rock_pi
 python add_real_data.py --input captured_images/water_bottle --class water_bottle
 ```
 
+You can also point `--input` at any folder of images, not just from `capture.py`. For example if you manually downloaded images from Google:
+
+```bash
+python add_real_data.py --input ~/Downloads/orange_mallet_photos --class orange_mallet
+```
+
+---
+
+### Alternative — Download web images automatically
+
+Instead of taking real photos, you can download images from the web and auto-annotate them:
+
+```bash
+python collect_data.py --preset orange_mallet
+python collect_data.py --preset rock_pick_hammer
+python collect_data.py --preset water_bottle
+```
+
+This downloads images using search queries defined in the presets, annotates them with Grounding DINO, and saves them directly into `datasets/web_coco/`. Note: the Google image crawler may be unreliable — if it fails, download images manually and use `add_real_data.py` instead.
+
+To download with a custom query:
+
+```bash
+python collect_data.py \
+  --query "orange dead blow hammer" "orange mallet tool" \
+  --prompt "orange dead blow hammer." \
+  --category "Hammer" \
+  --output datasets/web_coco/orange_mallet \
+  --max-images 100
+```
+
 ---
 
 ### Step 4 — Train
