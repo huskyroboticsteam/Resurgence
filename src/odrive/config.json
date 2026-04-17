@@ -1,0 +1,10 @@
+[
+    {
+        "endpoint": "axis0.controller.config.vel_gain",
+        "value": 0.5
+    },
+    {
+        "endpoint": "axis0.requested_state",
+        "value": 8
+    }
+]

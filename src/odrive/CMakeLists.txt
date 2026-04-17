@@ -1,10 +1,11 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.8)
 
-add_library(odrive_interface STATIC Odrive.cpp)
-target_link_libraries(odrive_interface utils)
-
+if(WORLD_INTERFACE STREQUAL "REAL")
 add_executable(FakeODrive FakeODrive.cpp)
 target_link_libraries(FakeODrive
-  odrive_interface
+  can_interface
+  ${BOOST_LIBRARIES}
   nlohmann_json::nlohmann_json
+  CAN26
 )
+endif()

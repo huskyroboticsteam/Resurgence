@@ -252,6 +252,18 @@ void removeLimitSwitchCallback(callbackid_t id) {
 	removeDeviceTelemetryCallback(id);
 }
 
+
+void write(CANDevice_t device, uint16_t endpoint, uint32_t value) {
+	CANPacket_t p = CANMotorPacket_BLDC_DirectWrite(Constants::JETSON_DEVICE, device, endpoint, value);
+	sendCANPacket(p);
+	std::this_thread::sleep_for(1000us);
+}
+
+void read(CANDevice_t device, uint16_t endpoint) {
+	CANPacket_t p = CANMotorPacket_BLDC_DirectRead(Constants::JETSON_DEVICE, device, endpoint);
+	sendCANPacket(p);
+}
+ 
 // ===========
 // DEPRECATED:
 // ===========

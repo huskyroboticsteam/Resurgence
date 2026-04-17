@@ -85,10 +85,6 @@ const char* DGPS_PROTOCOL_NAME = "/dgps";
    Websocket server endpoint for ArduPilot protocol
  */
 const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
-/**
-   Websocket server endpoint for ODrive protocol.
-*/
-const char* ODRIVE_PROTOCOL_NAME = "/odrive";
 
 const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);

@@ -148,6 +148,9 @@ callbackid_t addLimitSwitchCallback(
 		CANDevice_t device,
 		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 
+void write(CANDevice_t device, uint16_t endpoint, uint32_t value);
+void read(CANDevice_t device, uint16_t endpoint);
+
 // ===========
 // DEPRECATED:
 // ===========

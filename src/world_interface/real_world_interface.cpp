@@ -139,7 +139,6 @@ void world_interface_init(
 	if (!initOnlyMotors) {
 		if (wsServer.has_value()) {
 			ardupilot::initArduPilotProtocol(wsServer.value());
-			odrive::initODriveProtocol(wsServer.value());
 		}
 	}
 	can::initCAN();

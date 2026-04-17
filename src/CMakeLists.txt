@@ -307,6 +307,7 @@ add_library(constants SHARED Constants.cpp)
 if(WORLD_INTERFACE STREQUAL "REAL")
   target_link_libraries(constants PUBLIC CAN26 HindsightCAN)
   target_compile_definitions(constants PUBLIC REAL_WORLD_INTERFACE)
+  target_link_libraries(can_interface PUBLIC constants)
 endif()
 link_libraries(constants)
 
