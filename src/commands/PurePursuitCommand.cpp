@@ -2,13 +2,27 @@
 #include <algorithm>
 #include <cmath>
 
+#include "../utils/transform.h"
+
 using namespace navtypes;
 
 namespace commands {
 
+PurePursuitCommand::PurePursuitCommand(const points_t& waypoints, double driveVel, double doneThresh)
+					: _pose(pose_t::Zero()), _drive_vel(driveVel),
+					  _done_thresh(doneThresh), _set_state_called_before_output(false) {
+    interpolatePoints(waypoints);
+}
+
 
 command_t PurePursuitCommand::getOutput() {
+    point_t relIntersect = util::toTransform(_pose) * lineToCircleIntersection();
+    double radius = (relIntersect[0] * relIntersect[0] + relIntersect[1] * relIntersect[1]) /
+                    (2 * relIntersect[0] * relIntersect[1]);
 
+    double thetaVel = _drive_vel / radius; // curvature (1/r) times drive vel = theta vel
+
+    return { .thetaVel = thetaVel, .xVel = _drive_vel };
 }   
 
 point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
@@ -19,8 +33,6 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
     double y1 = p1[1] - _pose(1);
     double x2 = p2[0] - _pose(0);
     double y2 = p2[1] - _pose(1);
-
-    bool intersectionFound = false;
 
     double dx = x2 - x1;
     double dy = y2 - y1;
@@ -34,22 +46,24 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
     double disc = pow(_lookahead_dist, 2) * pow(dr, 2) - pow(D, 2);
 
     if (disc >= 0) {
-        double xSol1 = (D * dy + sign(dy) * dx * sqrt(disc)) / pow(dr, 2);
-        double xSol2 = (D * dy - sign(dy) * dx * sqrt(disc)) / pow(dr, 2);
-        double ySol1 = (-D * dx + abs(dy) * dx * sqrt(disc)) / pow(dr, 2);
-        double ySol2 = (-D * dx - abs(dy) * dx * sqrt(disc)) / pow(dr, 2);
+        double xSol1 = (D * dy + sgn(dy) * dx * sqrt(disc)) / (dr * dr);
+        double xSol2 = (D * dy - sgn(dy) * dx * sqrt(disc)) / (dr * dr);
+        double ySol1 = (-D * dx + abs(dy) * dx * sqrt(disc)) / (dr * dr);
+        double ySol2 = (-D * dx - abs(dy) * dx * sqrt(disc)) / (dr * dr);
 
         point_t sol1 = {xSol1 + currX, ySol1 + currY};
         point_t sol2 = {xSol2 + currX, ySol2 + currY};
 
-        double wMag1 = sqrt(pow((x1 - xSol1), 2) + pow((y1 - ySol1), 2));
-        double wMag2 = sqrt(pow((x2 - xSol1), 2) + pow((y2 - ySol1), 2));
+        double wMag1 = sqrt((x1 - xSol1) * (x1 - xSol1) + (y1 - ySol1) * (y1 - ySol1));
+        double wMag2 = sqrt((x2 - xSol1) * (x2 - xSol1) + (y2 - ySol1) * (y2 - ySol1);
 
         // Let w be the vector from p1 to sol1. The proximity of sol1 to p1
-        // can be found simply through the magnitude of w. We can scale the
-        // proximity score with the distance from p1 to p2, such that the
-        // score at p1 is 0 and the score at p2 is 1. The proximity score
-        // of a viable solution must lie in [0, 1] to progress as a candidate.
+        // can be found simply through the magnitude of w since sol1 and p1
+        // are on the same line. We can scale the proximity score with the 
+        // distance from p1 to p2, such that the score at p1 is 0 and the 
+        // score at p2 is 1. The proximity score of a viable solution must 
+        // lie in [0, 1] to be considered as a valid solution. 
+        // The same applies to sol2.
         double proxScore1 = wMag1 / dr;
         double proxScore2 = wMag2 / dr;
 
@@ -68,14 +82,22 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
     }
 }
 
-double PurePursuitCommand::wrapAngle(double angErr) {
-	return std::atan2(std::sin(angErr), std::cos(angErr));
+void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
+    if (waypoints.empty()) {
+        return;
+    }
+
+    _path.push_back();
 }
 
-// transform robo frame
+} // namespace commands
 
-// find curvature
-double sign(double num) {
+namespace {
+static double wrapAngle(double angErr) {
+    return std::atan2(std::sin(angErr), std::cos(angErr));
+}
+
+static double sgn(double num) {
     if (num < 0) {
         return -1.0;
     } else {
@@ -83,4 +105,7 @@ double sign(double num) {
     }
 }
 
-} // namespace commands
+static double distSquared(point_t& p1, point_t& p2) {
+    return (p2[0] - p1[0]) * (p2[0] - p1[0]) + (p2[1] - p1[1]) * (p2[1] - p1[1]);
+}
+}

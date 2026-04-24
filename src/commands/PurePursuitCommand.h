@@ -7,32 +7,45 @@ namespace commands {
 class PurePursuitCommand : CommandBase {
 public:
     // 
-    PurePursuitCommand();
+    PurePursuitCommand(const navtypes::points_t& waypoints, double driveVel, double doneThresh);
+
 
     command_t getOutput();
-
-    pose_t _pose;
     
 
 private:
     /** 
-     * @see https://mathworld.wolfram.com/Circle-LineIntersection.html
+     * @see c
      */
-    point_t lineToCircleIntersection(point_t& p1, point_t& p2);
+    point_t lineToCircleIntersection(navtypes::point_t& p1, navtypes::point_t& p2);
+
+    void interpolatePoints(const points_t& waypoints);
 
     /**
      * Wrap angle error to [-pi, pi] to prevent 90+ degree turns
      */
     double wrapAngle(double angErr);
-    double sign(double num);
+
+    /**
+     * Helper function to determine "sign" of a number. Treats 0 as positive.
+     * 
+     * @returns 1 if num >= 0, -1 if num < 0
+     * 
+     * @see https://mathworld.wolfram.com/Circle-LineIntersection.html
+     */
+    double sgn(double num);
 
     // transform robo frame
 
     // find curvature
 
 
+    pose_t _pose;
+    double _drive_vel;
+    double _done_thresh;
     double _lookahead_dist;
-    points_t _path;
+    bool _set_state_called_before_output;
+    navtypes:: points_t _path;
     
     
 };
