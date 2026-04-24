@@ -27,9 +27,9 @@ void ensureGStreamerInitialized() {
 
 GstClockTime samplePullTimeout(int fps) {
 	if (fps <= 0) {
-		return GST_MSECOND * 50;
+		return GST_MSECOND * 250;
 	}
-	return std::max<GstClockTime>(GST_MSECOND * 5,
+	return std::max<GstClockTime>(GST_MSECOND * 250,
 								  GST_SECOND / static_cast<GstClockTime>(fps));
 }
 
@@ -249,6 +249,16 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 			continue;
 		}
 		logBusMessages(pipeline, "encoder startup", true);
+		GstState currentState = GST_STATE_NULL;
+		GstState pendingState = GST_STATE_NULL;
+		GstStateChangeReturn getStateResult =
+			gst_element_get_state(pipeline, &currentState, &pendingState, GST_MSECOND * 500);
+		LOG_F(INFO,
+			  "Encoder startup state result (%s): result=%d current=%s pending=%s",
+			  candidate.label.c_str(),
+			  static_cast<int>(getStateResult),
+			  gst_element_state_get_name(currentState),
+			  gst_element_state_get_name(pendingState));
 
 		_pipeline = pipeline;
 		_appsrc = appsrc;
@@ -334,10 +344,17 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 	if (!sample) {
 		_consecutive_empty_pulls++;
 		logBusMessages(_pipeline, "encoder empty pull");
-		if ((_consecutive_empty_pulls % 120) == 0) {
+		if (_consecutive_empty_pulls <= 10 || (_consecutive_empty_pulls % 120) == 0) {
+			GstState currentState = GST_STATE_NULL;
+			GstState pendingState = GST_STATE_NULL;
+			gst_element_get_state(_pipeline, &currentState, &pendingState, 0);
 			LOG_F(WARNING,
-				  "Camera encoder (%s) produced no output for %u consecutive frames",
-				  _active_encoder_label.c_str(), _consecutive_empty_pulls);
+				  "Camera encoder (%s) produced no output for %u consecutive frames "
+				  "(pipeline=%s pending=%s)",
+				  _active_encoder_label.c_str(),
+				  _consecutive_empty_pulls,
+				  gst_element_state_get_name(currentState),
+				  gst_element_state_get_name(pendingState));
 		}
 		return nalUnits;
 	}
