@@ -149,10 +149,10 @@ std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int
 			   << std::max(1, fps)
 			   << " bframes=0 byte-stream=true aud=true ! ";
 	return {
-		{"x264enc", prefix + x264Config.str() + suffix, false},
 		{"nvh264enc",
 		 prefix + "nvh264enc ! video/x-h264,stream-format=byte-stream,alignment=au ! " + suffix,
 		 true},
+		{"x264enc", prefix + x264Config.str() + suffix, false},
 	};
 }
 
