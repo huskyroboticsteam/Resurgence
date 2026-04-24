@@ -37,11 +37,11 @@ std::string buildPipelinePrefix(int width, int height, int fps, const std::strin
 
 std::string buildPipelineSuffix(const std::string& sinkName) {
 	std::stringstream pipeline;
-	pipeline << "h265parse config-interval=1 disable-passthrough=false ! ";
-	pipeline << "video/x-h265,stream-format=byte-stream,alignment=au ! ";
+	pipeline << "h264parse config-interval=1 disable-passthrough=false ! ";
+	pipeline << "video/x-h264,stream-format=byte-stream,alignment=au ! ";
 	pipeline << "queue max-size-buffers=1 leaky=downstream ! ";
 	pipeline << "appsink name=" << sinkName
-			 << " caps=\"video/x-h265,stream-format=byte-stream,alignment=au\" "
+			 << " caps=\"video/x-h264,stream-format=byte-stream,alignment=au\" "
 				"emit-signals=false sync=false drop=true max-buffers=1";
 	return pipeline.str();
 }
@@ -58,9 +58,9 @@ std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int
 	const std::string prefix = buildPipelinePrefix(width, height, fps, srcName);
 	const std::string suffix = buildPipelineSuffix(sinkName);
 	return {
-		{"nvh265enc", prefix + "nvh265enc ! " + suffix, true},
-		{"x265enc",
-		 prefix + "x265enc tune=zerolatency speed-preset=ultrafast ! " + suffix,
+		{"nvh264enc", prefix + "nvh264enc ! " + suffix, true},
+		{"x264enc",
+		 prefix + "x264enc tune=zerolatency speed-preset=ultrafast ! " + suffix,
 		 false},
 	};
 }
@@ -108,8 +108,8 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 	_width = width;
 	_height = height;
 
-	const std::string srcName = "mc_h265_src";
-	const std::string sinkName = "mc_h265_sink";
+	const std::string srcName = "mc_h264_src";
+	const std::string sinkName = "mc_h264_sink";
 	const auto candidates = buildPipelineCandidates(width, height, _fps, srcName, sinkName);
 
 	std::string errors;
