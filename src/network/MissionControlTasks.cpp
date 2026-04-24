@@ -204,6 +204,9 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 									const auto& encoder = decoded.encoder;
 
 									auto data_vector = encoder->encode_frame(frame);
+									if (data_vector.empty()) {
+										return;
+									}
 									json msg = {{"type", CAMERA_STREAM_REP_TYPE},
 												{"camera", cam},
 												{"data", data_vector}};

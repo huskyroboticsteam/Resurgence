@@ -24,6 +24,14 @@ void ensureGStreamerInitialized() {
 	});
 }
 
+GstClockTime samplePullTimeout(int fps) {
+	if (fps <= 0) {
+		return GST_MSECOND * 50;
+	}
+	return std::max<GstClockTime>(GST_MSECOND * 5,
+								  GST_SECOND / static_cast<GstClockTime>(fps));
+}
+
 std::string buildPipelinePrefix(int width, int height, int fps, const std::string& srcName) {
 	std::stringstream pipeline;
 	pipeline << "appsrc name=" << srcName
@@ -57,11 +65,15 @@ std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int
 													  const std::string& sinkName) {
 	const std::string prefix = buildPipelinePrefix(width, height, fps, srcName);
 	const std::string suffix = buildPipelineSuffix(sinkName);
+	std::stringstream x264Config;
+	x264Config << "x264enc tune=zerolatency speed-preset=ultrafast key-int-max="
+			   << std::max(1, fps)
+			   << " bframes=0 byte-stream=true aud=true ! ";
 	return {
-		{"nvh264enc", prefix + "nvh264enc ! " + suffix, true},
-		{"x264enc",
-		 prefix + "x264enc tune=zerolatency speed-preset=ultrafast ! " + suffix,
-		 false},
+		{"nvh264enc",
+		 prefix + "nvh264enc ! video/x-h264,stream-format=byte-stream,alignment=au ! " + suffix,
+		 true},
+		{"x264enc", prefix + x264Config.str() + suffix, false},
 	};
 }
 
@@ -225,7 +237,8 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 		return nalUnits;
 	}
 
-	GstSample* sample = gst_app_sink_try_pull_sample(GST_APP_SINK(_appsink), 0);
+	GstSample* sample =
+		gst_app_sink_try_pull_sample(GST_APP_SINK(_appsink), samplePullTimeout(_fps));
 	if (!sample) {
 		_consecutive_empty_pulls++;
 		if ((_consecutive_empty_pulls % 120) == 0) {
