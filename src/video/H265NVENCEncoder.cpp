@@ -148,9 +148,15 @@ std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int
 	x264Config << "x264enc tune=zerolatency speed-preset=ultrafast key-int-max="
 			   << std::max(1, fps)
 			   << " bframes=0 byte-stream=true aud=true ! ";
+	std::stringstream nvh264Config;
+	nvh264Config << "video/x-raw,format=NV12 ! "
+				 << "nvh264enc zerolatency=true aud=true repeat-sequence-header=true "
+				 << "gop-size=" << std::max(1, fps)
+				 << " bframes=0 ! "
+				 << "video/x-h264,stream-format=byte-stream,alignment=au ! ";
 	return {
 		{"nvh264enc",
-		 prefix + "nvh264enc ! video/x-h264,stream-format=byte-stream,alignment=au ! " + suffix,
+		 prefix + nvh264Config.str() + suffix,
 		 true},
 		{"x264enc", prefix + x264Config.str() + suffix, false},
 	};
