@@ -8,6 +8,7 @@
 #include <gst/gst.h>
 
 #include <cstring>
+#include <cinttypes>
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
@@ -60,6 +61,84 @@ struct EncoderCandidate {
 	bool hardware = false;
 };
 
+void logBusMessages(GstElement* pipeline, const char* context, bool includeStateChanges = false) {
+	if (!pipeline) {
+		return;
+	}
+
+	GstBus* bus = gst_element_get_bus(pipeline);
+	if (!bus) {
+		return;
+	}
+
+	while (true) {
+		GstMessage* msg = gst_bus_pop(bus);
+		if (!msg) {
+			break;
+		}
+
+		switch (GST_MESSAGE_TYPE(msg)) {
+		case GST_MESSAGE_ERROR: {
+			GError* err = nullptr;
+			gchar* debug = nullptr;
+			gst_message_parse_error(msg, &err, &debug);
+			LOG_F(ERROR, "%s: GStreamer error from %s: %s%s%s",
+				  context,
+				  GST_OBJECT_NAME(msg->src),
+				  err ? err->message : "unknown",
+				  debug ? " | debug: " : "",
+				  debug ? debug : "");
+			if (err) {
+				g_error_free(err);
+			}
+			if (debug) {
+				g_free(debug);
+			}
+			break;
+		}
+		case GST_MESSAGE_WARNING: {
+			GError* err = nullptr;
+			gchar* debug = nullptr;
+			gst_message_parse_warning(msg, &err, &debug);
+			LOG_F(WARNING, "%s: GStreamer warning from %s: %s%s%s",
+				  context,
+				  GST_OBJECT_NAME(msg->src),
+				  err ? err->message : "unknown",
+				  debug ? " | debug: " : "",
+				  debug ? debug : "");
+			if (err) {
+				g_error_free(err);
+			}
+			if (debug) {
+				g_free(debug);
+			}
+			break;
+		}
+		case GST_MESSAGE_STATE_CHANGED: {
+			if (includeStateChanges && GST_MESSAGE_SRC(msg) == GST_OBJECT(pipeline)) {
+				GstState oldState;
+				GstState newState;
+				GstState pendingState;
+				gst_message_parse_state_changed(msg, &oldState, &newState, &pendingState);
+				LOG_F(INFO,
+					  "%s: pipeline state changed %s -> %s (pending=%s)",
+					  context,
+					  gst_element_state_get_name(oldState),
+					  gst_element_state_get_name(newState),
+					  gst_element_state_get_name(pendingState));
+			}
+			break;
+		}
+		default:
+			break;
+		}
+
+		gst_message_unref(msg);
+	}
+
+	gst_object_unref(bus);
+}
+
 std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int fps,
 													  const std::string& srcName,
 													  const std::string& sinkName) {
@@ -70,10 +149,10 @@ std::vector<EncoderCandidate> buildPipelineCandidates(int width, int height, int
 			   << std::max(1, fps)
 			   << " bframes=0 byte-stream=true aud=true ! ";
 	return {
+		{"x264enc", prefix + x264Config.str() + suffix, false},
 		{"nvh264enc",
 		 prefix + "nvh264enc ! video/x-h264,stream-format=byte-stream,alignment=au ! " + suffix,
 		 true},
-		{"x264enc", prefix + x264Config.str() + suffix, false},
 	};
 }
 
@@ -128,6 +207,9 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 	for (const auto& candidate : candidates) {
 		const char* mode = candidate.hardware ? "hardware" : "software";
 		LOG_F(INFO, "Trying %s camera encoder candidate: %s", mode, candidate.label.c_str());
+		LOG_F(INFO, "Encoder pipeline candidate (%s): %s",
+			  candidate.label.c_str(),
+			  candidate.pipeline.c_str());
 
 		GError* parseError = nullptr;
 		GstElement* pipeline = gst_parse_launch(candidate.pipeline.c_str(), &parseError);
@@ -152,12 +234,15 @@ void H265NVENCEncoder::initializePipeline(int width, int height) {
 			continue;
 		}
 
-		if (gst_element_set_state(pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+		GstStateChangeReturn stateChange = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+		if (stateChange == GST_STATE_CHANGE_FAILURE) {
+			logBusMessages(pipeline, "encoder startup failure", true);
 			LOG_F(WARNING, "Failed to start %s camera encoder (%s)", mode, candidate.label.c_str());
 			cleanupPipeline(pipeline, appsrc, appsink);
 			errors += candidate.label + ": unable to start pipeline; ";
 			continue;
 		}
+		logBusMessages(pipeline, "encoder startup", true);
 
 		_pipeline = pipeline;
 		_appsrc = appsrc;
@@ -233,6 +318,7 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 
 	GstFlowReturn pushStatus = gst_app_src_push_buffer(GST_APP_SRC(_appsrc), inputBuffer);
 	if (pushStatus != GST_FLOW_OK) {
+		logBusMessages(_pipeline, "encoder push failure");
 		LOG_F(ERROR, "Camera encoder appsrc push failed with status=%d", pushStatus);
 		return nalUnits;
 	}
@@ -241,6 +327,7 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 		gst_app_sink_try_pull_sample(GST_APP_SINK(_appsink), samplePullTimeout(_fps));
 	if (!sample) {
 		_consecutive_empty_pulls++;
+		logBusMessages(_pipeline, "encoder empty pull");
 		if ((_consecutive_empty_pulls % 120) == 0) {
 			LOG_F(WARNING,
 				  "Camera encoder (%s) produced no output for %u consecutive frames",
@@ -253,6 +340,13 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 	GstBuffer* outputBuffer = gst_sample_get_buffer(sample);
 	GstMapInfo readMap;
 	if (outputBuffer && gst_buffer_map(outputBuffer, &readMap, GST_MAP_READ)) {
+		if (_frame_counter <= 5) {
+			LOG_F(INFO,
+				  "Camera encoder (%s) produced sample of %zu bytes on frame %" PRIu64,
+				  _active_encoder_label.c_str(),
+				  static_cast<size_t>(readMap.size),
+				  _frame_counter);
+		}
 		nalUnits.emplace_back(readMap.data, readMap.data + readMap.size);
 		gst_buffer_unmap(outputBuffer, &readMap);
 	}
