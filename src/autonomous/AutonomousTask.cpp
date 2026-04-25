@@ -1,7 +1,7 @@
 #include "AutonomousTask.h"
 
 #include "../Constants.h"
-#include "../commands/DriveToWaypointCommand.h"
+#include "../commands/PurePursuitCommand.h"
 #include "../control_interface.h"
 #include "../utils/transform.h"
 #include "../world_interface/world_interface.h"
@@ -104,10 +104,10 @@ void AutonomousTask::circleNavigation(const navtypes::point_t& center,
 		navigateAll();
 	}
 	
-	// hard coding coord for now
-	_waypoint_coord = {10, 10, 1};
-	LOG_F(INFO, "yay! found aruco tag!");
-	navigate();
+	// // hard coding coord for now
+	// _waypoint_coord = {10, 10, 1};
+	// LOG_F(INFO, "yay! found aruco tag!");
+	// navigate();
 }
 
 navtypes::points_t AutonomousTask::generateCirclePoints(
@@ -129,6 +129,8 @@ navtypes::points_t AutonomousTask::generateCirclePoints(
 
 void AutonomousTask::navigateAll() {
 	LOG_SCOPE_F(INFO, "AutoNav:List");
+	commands::PurePursuitCommand cmd(_waypoint_coords_list, DRIVE_VEL, DONE_THRESHOLD);
+
 	for (navtypes::point_t& point : _waypoint_coords_list) {
 		_waypoint_coord = point;
 		auto gpsCoord = robot::metersToGPS(point);
@@ -136,21 +138,20 @@ void AutonomousTask::navigateAll() {
 			LOG_F(WARNING, "No GPS converter initialized!");
 			return;
 		}
-
-		if (_debug) LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", point[0], point[1]);
-
-		json msg = {{"type", "auto_target_update"},
-					{"latitude", gpsCoord->lat},
-					{"longitude", gpsCoord->lon}};
-		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-		navigate();
 	}
+	// 	if (_debug) LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", point[0], point[1]);
 
+	// 	json msg = {{"type", "auto_target_update"},
+	// 				{"latitude", gpsCoord->lat},
+	// 				{"longitude", gpsCoord->lon}};
+	// 	_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	// 		;
+	// }
+	navigate(cmd);
 	if (_debug) _logFile.close();
 }
 
-void AutonomousTask::navigate() {
-	commands::DriveToWaypointCommand cmd(_waypoint_coord, THETA_KP, DRIVE_VEL, DONE_THRESHOLD);
+void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 
 	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
 	auto start = std::chrono::steady_clock::now();
@@ -176,7 +177,6 @@ void AutonomousTask::navigate() {
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
 				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
-			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coord;
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
 			
 

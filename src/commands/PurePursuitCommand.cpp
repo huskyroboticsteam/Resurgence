@@ -1,5 +1,6 @@
 #include "PurePursuitCommand.h"
 
+#include <loguru.hpp>
 #include "../utils/transform.h"
 
 #include <algorithm>
@@ -36,7 +37,15 @@ PurePursuitCommand::PurePursuitCommand(const points_t& waypoints, double driveVe
 	interpolatePoints(waypoints);
 }
 
+void PurePursuitCommand::setState(const pose_t& pose) {
+	this->_pose = pose;
+	this->_set_state_called_before_output = true;
+}
+
 command_t PurePursuitCommand::getOutput() {
+    if (!this->_set_state_called_before_output) {
+		LOG_F(WARNING, "PurePursuitCommand: getOutput() called before setState() call!");
+	}
 	point_t relIntersect;
 	if (_curr_idx >= _path.size() - 1) {
 		relIntersect = _path.back();
@@ -53,8 +62,6 @@ command_t PurePursuitCommand::getOutput() {
 }
 
 point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
-	// refer to https://mathworld.wolfram.com/Circle-LineIntersection.html
-
 	double currX = _pose(0);
 	double currY = _pose(1);
 	double x1 = p1[0] - _pose(0);
@@ -79,8 +86,8 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 		double ySol1 = (-D * dx + abs(dy) * dx * sqrt(disc)) / (dr * dr);
 		double ySol2 = (-D * dx - abs(dy) * dx * sqrt(disc)) / (dr * dr);
 
-		point_t sol1 = {xSol1 + currX, ySol1 + currY};
-		point_t sol2 = {xSol2 + currX, ySol2 + currY};
+		point_t sol1 = { xSol1 + currX, ySol1 + currY, 1 };
+		point_t sol2 = { xSol2 + currX, ySol2 + currY, 1 };
 
 		double wMag1 = sqrt((x1 - xSol1) * (x1 - xSol1) + (y1 - ySol1) * (y1 - ySol1));
 		double wMag2 = sqrt((x2 - xSol1) * (x2 - xSol1) + (y2 - ySol1) * (y2 - ySol1));
@@ -111,9 +118,8 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 				return sol1;
 			}
 		}
-	} else {
-		return p2;
 	}
+	return p2;
 }
 
 void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
@@ -132,7 +138,7 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 
 		while (accumulatedDist + segmentLen >= numPts * _dist_between_points) {
 			double t = (numPts * _dist_between_points - accumulatedDist) / segmentLen;
-			point_t newPt = {p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1])};
+			point_t newPt = {p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1]), 1};
 			_path.push_back(newPt);
 			lastPathPoint = newPt;
 			numPts++;
@@ -141,6 +147,11 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 		accumulatedDist += segmentLen;
 	}
 	_path.push_back(waypoints.back());
+}
+
+bool PurePursuitCommand::isDone() {
+	double distance = (_pose.topRows<2>() - _path[_curr_idx].topRows<2>()).norm();
+	return distance <= _done_thresh;
 }
 
 } // namespace commands

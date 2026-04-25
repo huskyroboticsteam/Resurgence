@@ -20,7 +20,7 @@ void DriveToWaypointCommand::setState(const navtypes::pose_t& pose) {
 
 command_t DriveToWaypointCommand::getOutput() {
 	if (!this->setStateCalledBeforeOutput) {
-		LOG_F(WARNING, "DriveToWaypointCommand: getOutput() called before getState() call!");
+		LOG_F(WARNING, "DriveToWaypointCommand: getOutput() called before setState() call!");
 	}
 
 	this->setStateCalledBeforeOutput = false;

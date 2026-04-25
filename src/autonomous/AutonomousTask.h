@@ -3,6 +3,7 @@
 #include "../Constants.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketServer.h"
+#include "../commands/PurePursuitCommand.h"
 
 
 #include <cmath>
@@ -65,7 +66,7 @@ private:
 	/** 
 	 * @brief Handles navigation to a single waypoint
 	 */
-	void navigate();
+	void navigate(commands::PurePursuitCommand& cmd);
 
 	/**
 	 * @brief Helper function for circleNavigation().
