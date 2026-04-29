@@ -29,6 +29,11 @@ enum class motormode_t {
 };
 */
 
+enum class motorstate_t {
+    idle = BLDC_AXIS_IDLE,
+    control = BLDC_AXIS_CLOSED_LOOP_CONTROL,
+};
+
 class CANBoard {
 public:
     CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
@@ -48,6 +53,7 @@ private:
     bool has_pos_sensor;
     CANDevice_t device;
     std::optional<motormode_t> motor_mode;
+    std::optional<motorstate_t> motor_state;
     double positive_scale;
     double negative_scale;
     std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
@@ -57,6 +63,7 @@ private:
     inline static std::mutex schedulerMutex;
 
     void ensureMotorMode(motormode_t mode);
+    void ensureMotorMode(motormode_t mode, motorstate_t state);
     void constructVelController();
 };
 
@@ -94,6 +101,8 @@ void initEncoder();
  * @param device The target CAN device.
  */
 void initMotor(CANDevice_t device);
+
+void setMotorState(CANDevice_t device, motorstate_t state);
 
 /**
  * @brief Set the motor mode using CAN26 protocol.

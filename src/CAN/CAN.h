@@ -46,10 +46,6 @@ void initCAN();
  * @param packet The CAN packet to send.
  */
 void sendCANPacket(const CANPacket_t& packet);
-void sendCANPacket(const CANPacket& packet);
-
-// Print packet for debugging purposes
-void printCANPacket(const CANPacket_t& packet);
 
 /**
  * @brief Print a CAN packet.

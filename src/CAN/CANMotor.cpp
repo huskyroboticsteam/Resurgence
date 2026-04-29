@@ -43,6 +43,14 @@ CANBoard::CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t
 	}
 }
 
+void CANBoard::ensureMotorMode(can::motor::motormode_t mode, can::motor::motorstate_t state) {
+	ensureMotorMode(mode);
+	if (!motor_state || motor_state.value() != state) {
+		motor_state.emplace(state);
+		can::motor::setMotorState(device, state);
+	}
+}
+
 void CANBoard::ensureMotorMode(can::motor::motormode_t mode) {
 	if (!motor_mode || motor_mode.value() != mode) {
 		// update the motor mode
@@ -77,12 +85,18 @@ void CANBoard::constructVelController() {
 }
 
 void CANBoard::setMotorPower(double power) {
-	ensureMotorMode(can::motor::motormode_t::vel);
-
 	// scale the power
 	double scale = power < 0 ? negative_scale : positive_scale;
 	power *= scale;
-	can::motor::setMotorPower(device, power);
+
+	if (power == 0.0) {
+		// Why is this so jakn!<":r,!MR!!"
+		can::motor::setMotorState(device, can::motor::motorstate_t::idle);
+		motor_state.emplace(can::motor::motorstate_t::idle);
+	} else {
+		ensureMotorMode(can::motor::motormode_t::vel, can::motor::motorstate_t::control);
+		can::motor::setMotorPower(device, power);
+	}
 }
 
 void CANBoard::setMotorPos(int32_t targetPos) {
@@ -174,11 +188,18 @@ void initMotor(CANDevice_t device) {
 	std::this_thread::sleep_for(1000us);
 }
 
+void setMotorState(CANDevice_t device, motorstate_t state) {
+	uint32_t axisState = static_cast<uint32_t>(state);
+	CANPacket_t p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, axisState);
+	sendCANPacket(p);
+}
+
 void setMotorMode(CANDevice_t device, motormode_t mode) {
 	// Map motormode_t to BLDC control/input modes
 	uint8_t controlMode =
 		(mode == motormode_t::pos) ? BLDC_POSITION_CONTROL : BLDC_VELOCITY_CONTROL;
-	uint8_t inputMode = BLDC_PASSTHROUGH_INPUT;
+	// uint8_t inputMode = BLDC_PASSTHROUGH_INPUT;
+	uint8_t inputMode = BLDC_VEL_RAMP_INPUT;
 
 	CANPacket_t p =
 		CANMotorPacket_BLDC_SetInputMode(Constants::JETSON_DEVICE, device, controlMode, inputMode);

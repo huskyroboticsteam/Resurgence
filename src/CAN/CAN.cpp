@@ -60,7 +60,8 @@ constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 // Match on UUID field to filter for packets addressed to this device
 constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
 
-constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(500);
+// Heartbeats should come in every 500ms, have some leniency
+constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(550);
 
 // map each device seen to a watchdog
 std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeatWatchdogMap;
@@ -227,7 +228,7 @@ void handleHeartbeatPacket(CANPacket_t& packet) {
 			heartbeatWatchdogMap.emplace(
 				uuid, 
 				std::make_unique<util::Watchdog<>>(HEARTBEAT_TIMEOUT, [uuid]() {
-									   LOG_F(WARNING, "Heartbeat timeout for device 0x%x", uuid);	   
+									//    LOG_F(WARNING, "Heartbeat timeout for device 0x%x", uuid);	   
 				})
 			);
 		} else {
@@ -236,16 +237,6 @@ void handleHeartbeatPacket(CANPacket_t& packet) {
 		}
 	}
 }
-
-/* old - replaced by command-specific handlers above
-void handleTelemetryPacket(CANPacket_t& packet) {
-	CANDeviceUUID_t uuid = getDeviceFromPacket(packet);
-	telemetrycode_t telemCode = DecodeTelemetryType(&packet);
-	telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
-	DataPoint<telemetry_t> data(telemData);
-	storeTelemetry(uuid, telemCode, data);
-}
-*/
 
 // returns a file descriptor, or -1 on failure
 int createCANSocket(std::optional<CANDevice_t> device) {
@@ -288,12 +279,6 @@ int createCANSocket(std::optional<CANDevice_t> device) {
 		can_filter filters[1];
 		filters[0].can_id = canID;
 		filters[0].can_mask = CAN_MASK;
-
-		// for testing
-		std::cout << "CAN packet: " << canID << std::endl;
-		std::cout << "CAN uuid: " << (canID & CAN_MASK) << std::endl;
-		std::cout << "Filters: " << filters[0].can_id << ", " << filters[0].can_mask
-				  << std::endl;
 
 		setsockopt(fd, SOL_CAN_RAW, CAN_RAW_FILTER, &filters, sizeof(filters));
 	} else {
@@ -365,7 +350,6 @@ void initHeartbeatWatchdog() {
 	LOG_F(INFO, "Heartbeat watchdog monitoring enabled");
 }
 
-// new for CAN26
 void sendCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
 	canfd_frame frame;
@@ -388,30 +372,6 @@ void sendCANPacket(const CANPacket_t& packet) {
 	}
 }
 
-// old for backwards compatibility with HindsightCAN
-void sendCANPacket(const CANPacket& packet) {
-	canfd_frame frame;
-	std::memset(&frame, 0, sizeof(frame));
-	frame.can_id = packet.id;
-	frame.len = packet.dlc;
-	std::memcpy(frame.data, packet.data, packet.dlc);
-	bool success;
-	{
-		std::lock_guard lock(socketMutex);
-		// note that frame is a canfd_frame but we're using sizeof(can_frame)
-		// not sure why this is required to work
-		success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
-		tcdrain(can_fd);
-	}
-
-	if (!success) {
-		LOG_F(ERROR, "Failed to send CAN packet to group=%x, id=%x: %s",
-			  static_cast<int>(getDeviceGroup(packet)), getDeviceSerial(packet),
-			  std::strerror(errno));
-	}
-}
-
-// new for CAN26
 void printCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // same as sendCANPacket
 	std::stringstream ss;

@@ -14,11 +14,11 @@ add_executable(calibration
 
 target_link_libraries(calibration ${OpenCV_LIBS})
 
-if(WORLD_INTERFACE STREQUAL "REAL")
-  add_executable(panoramic
-    ./CameraParams.cpp
-    ./Camera.cpp
-    ./CameraConfig.cpp
-    PanoramicCamera.cpp)
-  target_link_libraries(panoramic ${OpenCV_LIBS} can_interface real_world_interface)
-endif()
+# if(WORLD_INTERFACE STREQUAL "REAL")
+#   add_executable(panoramic
+#     ./CameraParams.cpp
+#     ./Camera.cpp
+#     ./CameraConfig.cpp)
+#     PanoramicCamera.cpp)
+#   target_link_libraries(panoramic ${OpenCV_LIBS} can_interface real_world_interface)
+# endif()
