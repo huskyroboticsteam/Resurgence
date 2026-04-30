@@ -13,9 +13,6 @@ extern "C" {
 }
 
 namespace can {
-// ===========
-// UPDATED:
-// ===========
 
 uuid_t getUUIDFromPacket(const CANPacket_t& packet) {
 	return packet.device.deviceUUID;
@@ -23,36 +20,6 @@ uuid_t getUUIDFromPacket(const CANPacket_t& packet) {
 
 uuid_t getSenderUUID(const CANPacket_t& packet) {
 	return packet.senderUUID;
-}
-
-// ===========
-// DEPRECATED:
-// ===========
-
-devicegroup_t getDeviceGroup(const CANPacket& packet) {
-	uint8_t groupCode = GetDeviceGroupCode(const_cast<CANPacket*>(&packet));
-	return static_cast<devicegroup_t>(groupCode);
-}
-
-deviceserial_t getDeviceSerial(const CANPacket& packet) {
-	return GetDeviceSerialNumber(const_cast<CANPacket*>(&packet));
-}
-
-deviceid_t getDeviceGroupAndSerial(const CANPacket& packet) {
-	return std::make_pair(getDeviceGroup(packet), getDeviceSerial(packet));
-}
-
-deviceserial_t getSenderDeviceSerial(const CANPacket& packet) {
-	return GetSenderDeviceSerialNumber(const_cast<CANPacket*>(&packet));
-}
-
-devicegroup_t getSenderDeviceGroup(const CANPacket& packet) {
-	uint8_t groupCode = GetSenderDeviceGroupCode(const_cast<CANPacket*>(&packet));
-	return static_cast<devicegroup_t>(groupCode);
-}
-
-deviceid_t getSenderDeviceGroupAndSerial(const CANPacket& packet) {
-	return std::make_pair(getSenderDeviceGroup(packet), getSenderDeviceSerial(packet));
 }
 
 std::string packetToString(const CANPacket& packet) {

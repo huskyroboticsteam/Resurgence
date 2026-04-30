@@ -14,8 +14,6 @@
 #include <unistd.h>
 #include <unordered_map>
 #include <utility>
-// temp for printing
-#include <iostream>
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -386,22 +384,6 @@ void printCANPacket(const CANPacket_t& packet) {
 
 	LOG_F(INFO, ss.str().c_str());
 }
-
-/* old
-void printCANPacket(const CANPacket& packet) {
-  std::stringstream ss;
-  ss << "CAN: p" << std::hex << ((packet.id >> 10) & 0x1);
-  ss << " g" << std::hex << ((packet.id & 0x03C0) >> 6);
-  ss << " s" << std::hex << ((packet.id & 0x003F));
-  ss << " pid" << std::hex << static_cast<uint>(packet.data[0]);
-  ss << " data:";
-  for (int i = 1; i < packet.dlc; i++) {
-	ss << std::hex << static_cast<uint>(packet.data[i]) << " ";
-  }
-
-  LOG_F(INFO, ss.str().c_str());
-}
-*/
 
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t uuid,
 														telemtype_t telemType) {

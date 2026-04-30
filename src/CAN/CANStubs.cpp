@@ -11,7 +11,6 @@ uint32_t callbackID = 0;
 void initCAN() {}
 
 void sendCANPacket(const CANPacket_t& packet) {}
-// void sendCANPacket(const CANPacket& packet) {}
 
 void printCANPacket(const CANPacket_t& packet) {}
 
