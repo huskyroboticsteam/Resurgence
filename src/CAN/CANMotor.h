@@ -46,10 +46,10 @@ public:
     void unscheduleVelocityEvent();
 
     can::uuid_t getMotorUUID() const;
-    robot::types::boardid_t getMotorID() const;
+    robot::types::boardid_t getBoardID() const;
 
 private:
-    robot::types::boardid_t motor_id;
+    robot::types::boardid_t board_id;
     bool has_pos_sensor;
     CANDevice_t device;
     std::optional<motormode_t> motor_mode;

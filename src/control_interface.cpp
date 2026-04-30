@@ -47,10 +47,6 @@ double setCmdVel(double dtheta, double dx) {
 		rPWM /= maxAbsPWM;
 	}
 
-	/*
-	setMotorPower(boardid_t::leftTread, lPWM);
-	setMotorPower(boardid_t::rightTread, rPWM);
-	*/
 	setMotorPower(boardid_t::frontTireLeft, lPWM);
 	setMotorPower(boardid_t::frontTireRight, rPWM);
 	setMotorPower(boardid_t::rearTireLeft, lPWM);
@@ -74,10 +70,6 @@ double setTankCmdVel(double left, double right) {
 		rPWM /= maxAbsPWM;
 	}
 
-	/*
-	setMotorPower(boardid_t::leftTread, lPWM);
-	setMotorPower(boardid_t::rightTread, rPWM);
-	*/
 	setMotorPower(boardid_t::frontTireLeft, lPWM);
 	setMotorPower(boardid_t::frontTireRight, rPWM);
 	setMotorPower(boardid_t::rearTireLeft, lPWM);

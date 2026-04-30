@@ -33,9 +33,9 @@ namespace can::motor {
 // UPDATED:
 // ===========
 
-CANBoard::CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
+CANBoard::CANBoard(robot::types::boardid_t board, bool hasPosSensor, CANDevice_t device,
 				   double pos_pwm_scale, double neg_pwm_scale)
-	: motor_id(motor), has_pos_sensor(hasPosSensor), device(device),
+	: board_id(board), has_pos_sensor(hasPosSensor), device(device),
 	  positive_scale(pos_pwm_scale), negative_scale(neg_pwm_scale) {
 	std::lock_guard<std::mutex> lg(schedulerMutex);
 	if (!pSched) {
@@ -89,13 +89,11 @@ void CANBoard::setMotorPower(double power) {
 	double scale = power < 0 ? negative_scale : positive_scale;
 	power *= scale;
 
-	if (power == 0.0) {
-		// Why is this so jakn!<":r,!MR!!"
-		can::motor::setMotorState(device, can::motor::motorstate_t::idle);
-		motor_state.emplace(can::motor::motorstate_t::idle);
-	} else {
-		ensureMotorMode(can::motor::motormode_t::vel, can::motor::motorstate_t::control);
-		can::motor::setMotorPower(device, power);
+	ensureMotorMode(can::motor::motormode_t::vel, can::motor::motorstate_t::control);
+	can::motor::setMotorPower(device, power);
+
+	if (power == 0.0 && static_cast<int>(board_id) < 4) { // hack
+		ensureMotorMode(can::motor::motormode_t::vel, can::motor::motorstate_t::idle);
 	}
 }
 
@@ -142,8 +140,8 @@ can::uuid_t CANBoard::getMotorUUID() const {
 	return device.deviceUUID;
 }
 
-robot::types::boardid_t CANBoard::getMotorID() const {
-	return motor_id;
+robot::types::boardid_t CANBoard::getBoardID() const {
+	return board_id;
 }
 
 void initEncoder(CANDevice_t device, bool invertEncoder, bool zeroEncoder,

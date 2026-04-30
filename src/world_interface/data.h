@@ -53,10 +53,8 @@ enum class indication_t {
 	arrivedAtDest
 };
 
-/** @brief The motors on the robot. */
+/** @brief The boards on the robot. */
 enum class boardid_t {
-	leftTread,
-	rightTread,
 	frontTireLeft,
 	frontTireRight,
 	rearTireLeft,
