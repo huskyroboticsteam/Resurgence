@@ -74,10 +74,11 @@ command_t PurePursuitCommand::getOutput() {
 	double thetaVel = _drive_vel * curvature; // curvature times drive vel = theta vel
 
 	LOG_F(INFO, "%f, %f", thetaVel, driveVel);
-	return {.thetaVel = 0.5, .xVel = driveVel};
+	return {.thetaVel = thetaVel .xVel = driveVel};
 }
 
 point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
+	// Transform argument points to robot frame (center = (0,0))
 	point_t p1Robot = util::toTransform(_pose).inverse() * p1;
 	point_t p2Robot = util::toTransform(_pose).inverse() * p2;
 	double x1 = p1Robot[0];
@@ -97,6 +98,8 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 	double disc = _lookahead_dist*_lookahead_dist * dr2 - D*D;
 
 	if (disc >= 0) {
+		// There exists at least one intersection.
+		// From now on, if only one intersection exists (disc == 0), sol1 == sol2
 		double xSol1 = (D * dy + sgn(dy) * dx * sqrt(disc)) / dr2;
 		double xSol2 = (D * dy - sgn(dy) * dx * sqrt(disc)) / dr2;
 		double ySol1 = (-D * dx + abs(dy) * sqrt(disc)) / dr2;
@@ -105,15 +108,23 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 		point_t sol1 = { xSol1, ySol1, 1 };
 		point_t sol2 = { xSol2, ySol2, 1 };
 	
-		double t1 = ((xSol1 - x1)*dx + (ySol1 - y1)*dy) / dr2;
-		double t2 = ((xSol2 - x1)*dx + (ySol2 - y1)*dy) / dr2;
 
-		bool valid1 = (t1 >= 0 && t1 <= 1 && xSol1 >= 0);
-		bool valid2 = (t2 >= 0 && t2 <= 1 && xSol2 >= 0);
+		// Parameterize line that passes through p1 and p2 such that t = 0 is p1
+		// and t = 1 is p2.
+		// Find the t-values of each found intersection point on the line.
+		// Higher t-value indicates further along on line.
+
+		// These are rearranged equations of form: point - p1 = t * (p2 - p1)
+		double t1 = ((xSol1 - x1) * dx + (ySol1 - y1) * dy) / dr2;
+		double t2 = ((xSol2 - x1) * dx + (ySol2 - y1) * dy) / dr2;
+
+		// Leave room for some error for floating point
+		bool valid1 = (t1 >= 0 && t1 <= 1 && xSol1 >= -0.1);
+		bool valid2 = (t2 >= 0 && t2 <= 1 && xSol2 >= -0.1);
 
 		if (valid1 && !valid2) return sol1;
 		if (valid2 && !valid1) return sol2;
-		if (valid1 && valid2) return (t1 < t2 ? sol1 : sol2);
+		if (valid1 && valid2) return (t1 > t2 ? sol1 : sol2);
 		return p2Robot;
 	} else {
 		return p2Robot;
@@ -158,7 +169,7 @@ void PurePursuitCommand::updateCurrentIndex() {
 	double distToPrev;
 	while (_curr_idx < _path.size() - 2) {
 		distToNext = (_pose.topRows<2>() - _path[_curr_idx + 1].topRows<2>()).norm();
-		if (distToNext < _lookahead_dist) {
+		if (distToNext < _lookahead_dist * 0.5) {
 			LOG_F(INFO, "updating index");
 			_curr_idx++;
 		} else {

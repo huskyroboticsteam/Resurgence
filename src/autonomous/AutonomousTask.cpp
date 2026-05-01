@@ -99,7 +99,7 @@ void AutonomousTask::circleNavigation(const navtypes::point_t& center,
 		_waypoint_coords_list.insert(_waypoint_coords_list.end(), circle2Points.begin(), circle2Points.end());
 	} 
 
-	while (!_target_found) {
+	while (!_target_found && !_kill_called) {
 		LOG_F(INFO, "trying another circle, target not found");
 		navigateAll();
 	}
@@ -197,20 +197,24 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 			return;
 		}
 	}
+
+	// If navigation is done, send 0 velocity command.
+	robot::setCmdVel(0.0, 0.0);
+
 	auto end = std::chrono::steady_clock().now();
 	std::chrono::duration<double> elapsed_seconds = end - start;
 	
-	if (_debug) {
-		auto latestGPS = robot::readGPS();
-		auto gpsPosData = latestGPS.getData();
-		navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
+	// if (_debug) {
+	// 	auto latestGPS = robot::readGPS();
+	// 	auto gpsPosData = latestGPS.getData();
+	// 	navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
 
-		auto gpsCoord = robot::metersToGPS(gpsPosData);
-		auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
-		double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
-		LOG_F(INFO, "*** Reached target waypoint! ***");
-		LOG_F(INFO, "Distance to target on arrival: %lf", dist);
-	}
+	// 	auto gpsCoord = robot::metersToGPS(gpsPosData);
+	// 	auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
+	// 	double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
+	// 	LOG_F(INFO, "*** Reached target waypoint! ***");
+	// 	LOG_F(INFO, "Distance to target on arrival: %lf", dist);
+	// }
 }
 
 void AutonomousTask::kill() {
