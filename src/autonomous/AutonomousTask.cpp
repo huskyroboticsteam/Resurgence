@@ -131,14 +131,14 @@ void AutonomousTask::navigateAll() {
 	LOG_SCOPE_F(INFO, "AutoNav:List");
 	commands::PurePursuitCommand cmd(_waypoint_coords_list, DRIVE_VEL, DONE_THRESHOLD);
 
-	for (navtypes::point_t& point : _waypoint_coords_list) {
-		_waypoint_coord = point;
-		auto gpsCoord = robot::metersToGPS(point);
-		if(!gpsCoord) {
-			LOG_F(WARNING, "No GPS converter initialized!");
-			return;
-		}
-	}
+	// for (navtypes::point_t& point : _waypoint_coords_list) {
+	// 	_waypoint_coord = point;
+	// 	auto gpsCoord = robot::metersToGPS(point);
+	// 	if(!gpsCoord) {
+	// 		LOG_F(WARNING, "No GPS converter initialized!");
+	// 		return;
+	// 	}
+	// }
 	// 	if (_debug) LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", point[0], point[1]);
 
 	// 	json msg = {{"type", "auto_target_update"},
@@ -177,7 +177,9 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
 				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
+			LOG_F(INFO, "raw vels: %f, %f", output.xVel, output.thetaVel);
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
+			LOG_F(INFO, "scaled vels: %f, %f",scaledVels(2), scaledVels(0));
 			
 
 			if (_debug) {

@@ -43,17 +43,20 @@ private:
 	 */
 	void interpolatePoints(const navtypes::points_t& waypoints);
 
-	int _curr_idx; // current point target in path
+	void updateCurrentIndex();
+
+	int _curr_idx = 0; // current point target in path
 	navtypes::points_t _path; // list of equidistant points representing path
 
 	navtypes::pose_t _pose; // current pose, updated by caller via setState()
 
 	// set Constants --- ? could move to Constants file
-	double _drive_vel;
-	double _done_thresh;
-	double _dist_between_points;
-	double _lookahead_dist;
+	double _drive_vel = 3.0;
+	double _slow_thresh = 4.0;
+	double _done_thresh = 1.0;
+	double _dist_between_points = 1.5;
+	double _lookahead_dist = 3.0;
 
-	bool _set_state_called_before_output;
+	bool _set_state_called_before_output = false;
 };
 } // namespace commands
