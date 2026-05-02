@@ -7,21 +7,23 @@ namespace commands {
 class PurePursuitCommand : CommandBase {
 public:
 	//
-	PurePursuitCommand(const navtypes::points_t& waypoints, double driveVel,
-					   double doneThresh);
+	PurePursuitCommand(const navtypes::points_t& waypoints);
 
     void setState(const navtypes::pose_t& pose);
 
 	/**
-	 *  @brief Finds next relevant target and returns raw heading velocity and forward
+	 * @brief Finds next relevant target and returns raw heading velocity and forward
 	 * 		   velocity. There are no guarantees that the outputs will be within the 
 	 * 		   rover's physical limits.
-	 * 	@return command_t
+	 * @return command_t containing forward and angular velocities calculated by Pure Pursuit
+	 * 		   in the form { .thetaVel, .xVel }
 	 */
 	command_t getOutput();
 
 	/**
-	 * 
+	 * @brief Returns whether or not the last waypoint has been reached AND whether the waypoint
+	 * 		  has been reached for at least five iterations of the control loop.
+	 * 		  Call only once per call loop; otherwise, there will be unintended effects.
 	 */
     bool isDone();
 
@@ -52,8 +54,11 @@ private:
 
 	// set Constants --- ? could move to Constants file
 	double _drive_vel = 3.0;
-	double _slow_thresh = 4.0;
-	double _done_thresh = 1.0;
+	double _slow_thresh = 2.0;
+
+	double _done_thresh = 2.0;
+	int _done_count = 0;
+
 	double _dist_between_points = 1.5;
 	double _lookahead_dist = 3.0;
 

@@ -129,7 +129,7 @@ navtypes::points_t AutonomousTask::generateCirclePoints(
 
 void AutonomousTask::navigateAll() {
 	LOG_SCOPE_F(INFO, "AutoNav:List");
-	commands::PurePursuitCommand cmd(_waypoint_coords_list, DRIVE_VEL, DONE_THRESHOLD);
+	commands::PurePursuitCommand cmd(_waypoint_coords_list);
 
 	// for (navtypes::point_t& point : _waypoint_coords_list) {
 	// 	_waypoint_coord = point;
@@ -156,6 +156,7 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
 	auto start = std::chrono::steady_clock::now();
 	auto sleepUntil = std::chrono::steady_clock().now();
+
 	while (!cmd.isDone()) {
 		/*
 		 * planned pseudo-code
@@ -170,6 +171,9 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 		auto latestHeading = robot::readIMUHeading();
 
 		if (latestGPS.isFresh(2000ms) && latestHeading.isFresh(2000ms)) {
+			auto now = std::chrono::steady_clock::now();
+			// LOG_F(INFO, "GPS Update at: %ld", now.time_since_epoch().count());
+
 			auto gpsPosData = latestGPS.getData();
 			navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), latestHeading.getData());
 			cmd.setState(latestPos);
@@ -177,9 +181,9 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
 				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
-			LOG_F(INFO, "raw vels: %f, %f", output.xVel, output.thetaVel);
+			// LOG_F(INFO, "raw vels: %f, %f", output.xVel, output.thetaVel);
 			robot::setCmdVel(scaledVels(2), scaledVels(0));
-			LOG_F(INFO, "scaled vels: %f, %f",scaledVels(2), scaledVels(0));
+			// LOG_F(INFO, "scaled vels: %f, %f",scaledVels(2), scaledVels(0));
 			
 
 			if (_debug) {

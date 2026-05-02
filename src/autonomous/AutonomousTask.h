@@ -15,8 +15,6 @@
 #include <fstream>
 #include <string>
 
-using namespace Constants::autonomous;
-
 namespace autonomous {
 
 /*
@@ -39,8 +37,10 @@ public:
 	 *
 	 * @param waypointCoords the list of waypoints to navigate to
 	 */
-	void start(const navtypes::points_t& waypointCoords, const bool circleMode,
-			   const std::optional<double> radius, const std::optional<TaskType> type);
+	void start(const navtypes::points_t& waypointCoords, 
+			   const bool circleMode,
+			   const std::optional<double> radius,
+			   const std::optional<Constants::autonomous::TaskType> type);
 
 
 	/**
