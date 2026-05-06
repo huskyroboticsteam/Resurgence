@@ -47,15 +47,16 @@ command_t PurePursuitCommand::getOutput() {
 
     if (!this->_set_state_called_before_output) {
 		LOG_F(WARNING, "PurePursuitCommand: getOutput() called before setState() call!");
+		return;
 	}
 
 	double distToGoal = (_pose.head<2>() - _path.back().head<2>()).norm();
 
 	double driveVel = _drive_vel;
-	if (distToGoal <= _slow_thresh) {
+	if (distToGoal <= _slow_thresh && _curr_idx >= _path.size() - 2) {
 		driveVel *= distToGoal / _slow_thresh;
 	}
-	if (distToGoal <= _done_thresh) {
+	if (distToGoal <= _done_thresh && _curr_idx >= _path.size() - 2) {
         return {.thetaVel = 0.0, .xVel = 0.0};
     }
 
@@ -74,7 +75,7 @@ command_t PurePursuitCommand::getOutput() {
 	double curvature = (2 * relIntersect[1]) 
 						/ (relIntersect[0]*relIntersect[0] + relIntersect[1]*relIntersect[1]);
 
-	double thetaVel = _drive_vel * curvature; // curvature times drive vel = theta vel
+	double thetaVel = driveVel * curvature; // curvature times drive vel = theta vel
 
 	// LOG_F(INFO, "%f, %f", thetaVel, driveVel);
 	return {.thetaVel = thetaVel, .xVel = driveVel};
@@ -162,13 +163,15 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 
 		accumulatedDist += segmentLen;
 	}
-	_path.push_back(waypoints.back());
+	if (dist(_path.back(), waypoints.back()) >= 0.01) {
+		_path.push_back(waypoints.back());	
+	}
 }
 
 bool PurePursuitCommand::isDone() {
 	double distance = (_pose.topRows<2>() - _path.back().topRows<2>()).norm();
 	// LOG_F(INFO, "dist to goal %f", distance);
-	if (distance <= _done_thresh) {
+	if (distance <= _done_thresh && _curr_idx >= _path.size() - 2) {
 		LOG_F(INFO, "distance from goal: %lf", distance);
 		LOG_F(INFO, "done +1");
 		_done_count++;
@@ -183,16 +186,20 @@ bool PurePursuitCommand::isDone() {
 }
 
 void PurePursuitCommand::updateCurrentIndex() {
-	double minDist = std::numeric_limits<double>::max();
-	int closestIdx = _curr_idx;
-
-	for (int i = _curr_idx; i < _path.size() - 1; i++) {
-		double dist = (_pose.topRows<2>() - _path[i].topRows<2>()).norm();
-		if (dist < minDist) {
-			minDist = dist;
-			closestIdx = i;
+	double distToNext;
+	while (_curr_idx < _path.size() - 2) {
+		distToNext = (_pose.topRows<2>() - _path[_curr_idx + 1].topRows<2>()).norm();
+		if (distToNext < _lookahead_dist) {
+			_curr_idx++;
+		} else {
+			break;
 		}
 	}
-	_curr_idx = closestIdx;
+}
+
+void PurePursuitCommand::reset() {
+    _curr_idx = 0;
+    _done_count = 0;
+    _set_state_called_before_output = false;
 }
 } // namespace commands

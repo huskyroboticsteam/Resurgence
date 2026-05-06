@@ -27,6 +27,8 @@ public:
 	 */
     bool isDone();
 
+	void reset();
+
 private:
 	/** @internal
 	 * 	@brief Finds optimal intersection between _pose and line segment between p1 and p2.

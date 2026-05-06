@@ -33,6 +33,10 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 		kill();
 	}
 
+	if (waypointCoords.size() == 0) {
+		return;
+	}
+
 	if (_debug) {
 		_logFile.open("log.csv", std::ios::out | std::ios::app);
 		LOG_F(INFO, "log file is open: %d\n", _logFile.is_open());
@@ -40,43 +44,48 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 	_kill_called = false;
 	
 	if (circleMode) {
-		if (type) {
-			switch (type.value()) {
-				case TaskType::TAG1:
-					_autonomous_task_thread = std::thread(
-								&autonomous::AutonomousTask::circleNavigation, 
-								this, 
-								waypointCoords[0], 
-								7.5,
-								std::nullopt
-							);
-					break;
-				case TaskType::TAG2:
-					_autonomous_task_thread = std::thread(
-								&autonomous::AutonomousTask::circleNavigation, 
-								this, 
-								waypointCoords[0], 
-								13,
-								16							
-							);
-					break;
+		if (waypointCoords.size() > 1) {
+			_waypoint_coords_list = 
+					navtypes::points_t(waypointCoords.begin(), waypointCoords.end() - 1);
+			_circle_center = waypointCoords.back();
+			_autonomous_task_thread = 
+					std::thread(&AutonomousTask::navigateThenCircle, this, radius, type);
+		} else {
+			_circle_center = waypointCoords[0];
+			if (type) {
+				switch (type.value()) {
+					case TaskType::TAG1:
+						_autonomous_task_thread = std::thread(
+									&autonomous::AutonomousTask::circleNavigation, 
+									this, 
+									7.5,
+									std::nullopt
+								);
+						break;
+					case TaskType::TAG2:
+						_autonomous_task_thread = std::thread(
+									&autonomous::AutonomousTask::circleNavigation, 
+									this,
+									13,
+									16							
+								);
+						break;
+				}
+			} else if (radius) {
+				_autonomous_task_thread = std::thread(
+							&autonomous::AutonomousTask::circleNavigation, 
+							this,
+							*radius,
+							std::nullopt
+						);
+			} else { // if no circle type or radius specified, default to radius 10
+				_autonomous_task_thread = std::thread(
+							&autonomous::AutonomousTask::circleNavigation, 
+							this, 
+							10,
+							std::nullopt
+						);
 			}
-		} else if (radius) {
-			_autonomous_task_thread = std::thread(
-						&autonomous::AutonomousTask::circleNavigation, 
-						this, 
-						waypointCoords[0], 
-						*radius,
-						std::nullopt
-					);
-		} else { // if no circle type or radius specified, default to radius 10
-			_autonomous_task_thread = std::thread(
-						&autonomous::AutonomousTask::circleNavigation, 
-						this, 
-						waypointCoords[0], 
-						10,
-						std::nullopt
-					);
 		}
 	} else {
 		_waypoint_coords_list = waypointCoords;
@@ -84,43 +93,64 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 	}
 }
 
-void AutonomousTask::circleNavigation(const navtypes::point_t& center,
-	 								  const double radius, const std::optional<double> radius2) {
+void AutonomousTask::navigateThenCircle(const std::optional<double> radius,
+						    const std::optional<Constants::autonomous::TaskType> type) {
+	AutonomousTask::navigateAll();
+	if (_kill_called) return;
+
+	if (type) {
+		switch (type.value()) {
+			case TaskType::TAG1:
+				AutonomousTask::circleNavigation(7.5, std::nullopt);
+				break;
+			case TaskType::TAG2:
+				AutonomousTask::circleNavigation(13, 16);
+				break;
+		}
+	} else {
+		AutonomousTask::circleNavigation(10, std::nullopt);
+	}
+	
+	
+}
+
+void AutonomousTask::circleNavigation(const double radius, const std::optional<double> radius2) {
 	LOG_SCOPE_F(INFO, "AutoNav:Circle");
 	if (radius == 0) {
 		LOG_F(WARNING, "Unable to generate circle of radius 0. Enter a radius > 0!");
 		return;
 	}
-	_waypoint_coords_list = generateCirclePoints(center, radius);
 
-	// if 2nd radius is given, generate circle for it and append to coords list.
-	if (radius2) {
-		auto circle2Points = generateCirclePoints(center, *radius2);
-		_waypoint_coords_list.insert(_waypoint_coords_list.end(), circle2Points.begin(), circle2Points.end());
-	} 
+	commands::PurePursuitCommand cmd1(generateCirclePoints(radius));
+	auto cmd2 = radius2 ? std::optional<commands::PurePursuitCommand>(generateCirclePoints(*radius2)) : std::nullopt;
 
 	while (!_target_found && !_kill_called) {
-		LOG_F(INFO, "trying another circle, target not found");
-		navigateAll();
+		cmd1.reset();
+		navigate(cmd1);
+		if (_target_found || _kill_called) break;
+
+		if (cmd2) {
+			cmd2->reset();
+			navigate(*cmd2);
+		}
 	}
-	
-	// // hard coding coord for now
-	// _waypoint_coord = {10, 10, 1};
-	// LOG_F(INFO, "yay! found aruco tag!");
-	// navigate();
 }
 
-navtypes::points_t AutonomousTask::generateCirclePoints(
-									const navtypes::point_t& center, const double radius) {
+navtypes::points_t AutonomousTask::generateCirclePoints(const double radius) {
 	double distanceBetweenPoints = radius / 10; // proportionally assign distance between points
 	int numPoints = std::max(1, (int)round(2 * M_PI * radius / distanceBetweenPoints));
 	double angleIncrement = 2 * M_PI / numPoints;												
 	navtypes::points_t circlePoints;
  
+	auto latestGPS = robot::readGPS();
+	auto gpsPosData = latestGPS.getData();
+	double startAngle = std::atan2(gpsPosData.y() - _circle_center[1],
+								   gpsPosData.x() - _circle_center[0]);
+
 	for (int i = 0; i <= numPoints; i++) {
-		double angle = i * angleIncrement;
-		double x = center[0] + radius * cos(angle);
-		double y = center[1] + radius * sin(angle);
+		double angle = startAngle + i * angleIncrement;
+		double x = _circle_center[0] + radius * cos(angle);
+		double y = _circle_center[1] + radius * sin(angle);
 		circlePoints.push_back({x, y, 1});
 	}
 	
@@ -130,23 +160,6 @@ navtypes::points_t AutonomousTask::generateCirclePoints(
 void AutonomousTask::navigateAll() {
 	LOG_SCOPE_F(INFO, "AutoNav:List");
 	commands::PurePursuitCommand cmd(_waypoint_coords_list);
-
-	// for (navtypes::point_t& point : _waypoint_coords_list) {
-	// 	_waypoint_coord = point;
-	// 	auto gpsCoord = robot::metersToGPS(point);
-	// 	if(!gpsCoord) {
-	// 		LOG_F(WARNING, "No GPS converter initialized!");
-	// 		return;
-	// 	}
-	// }
-	// 	if (_debug) LOG_F(INFO, "*** Heading to new target: (%lf, %lf)", point[0], point[1]);
-
-	// 	json msg = {{"type", "auto_target_update"},
-	// 				{"latitude", gpsCoord->lat},
-	// 				{"longitude", gpsCoord->lon}};
-	// 	_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-	// 		;
-	// }
 	navigate(cmd);
 	if (_debug) _logFile.close();
 }
@@ -154,7 +167,6 @@ void AutonomousTask::navigateAll() {
 void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 
 	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
-	auto start = std::chrono::steady_clock::now();
 	auto sleepUntil = std::chrono::steady_clock().now();
 
 	while (!cmd.isDone()) {
@@ -204,21 +216,6 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 
 	// If navigation is done, send 0 velocity command.
 	robot::setCmdVel(0.0, 0.0);
-
-	auto end = std::chrono::steady_clock().now();
-	std::chrono::duration<double> elapsed_seconds = end - start;
-	
-	// if (_debug) {
-	// 	auto latestGPS = robot::readGPS();
-	// 	auto gpsPosData = latestGPS.getData();
-	// 	navtypes::pose_t latestPos(gpsPosData.x(), gpsPosData.y(), 0.0);
-
-	// 	auto gpsCoord = robot::metersToGPS(gpsPosData);
-	// 	auto waypointGPSCoord = robot::metersToGPS(_waypoint_coord);
-	// 	double dist = (latestPos.topRows<2>() - _waypoint_coord.topRows<2>()).norm();
-	// 	LOG_F(INFO, "*** Reached target waypoint! ***");
-	// 	LOG_F(INFO, "Distance to target on arrival: %lf", dist);
-	// }
 }
 
 void AutonomousTask::kill() {

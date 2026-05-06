@@ -11,9 +11,7 @@
 #include <mutex>
 #include <thread>
 
-#include <iostream>
 #include <fstream>
-#include <string>
 
 namespace autonomous {
 
@@ -79,14 +77,13 @@ private:
 
 	net::websocket::SingleClientWSServer& _server;
 
-	navtypes::point_t _waypoint_coord; // current coord
 	navtypes::points_t _waypoint_coords_list;
-	bool _target_found = false;
+	std::atomic<bool> _target_found = false;
 
 	std::mutex _autonomous_task_mutex;
 	std::thread _autonomous_task_thread;
 	std::condition_variable _autonomous_task_cv;
-	bool _kill_called;
+	std::atomic<bool> _kill_called;
 
 	bool _debug = true; // toggle debugging logs
 	/*
