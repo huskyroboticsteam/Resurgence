@@ -12,7 +12,7 @@ namespace video {
 
 class H265NVENCEncoder {
 public:
-	explicit H265NVENCEncoder(int fps);
+	explicit H265NVENCEncoder(int fps, int bitrate = 8000000);
 	~H265NVENCEncoder();
 
 	H265NVENCEncoder(const H265NVENCEncoder&) = delete;
@@ -24,6 +24,7 @@ private:
 	void initializePipeline(int width, int height);
 
 	int _fps;
+	int _bitrate;
 	int _width = 0;
 	int _height = 0;
 	uint64_t _frame_counter = 0;
