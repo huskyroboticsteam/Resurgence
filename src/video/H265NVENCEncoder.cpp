@@ -33,6 +33,23 @@ GstClockTime samplePullTimeout(int fps) {
 								  GST_SECOND / static_cast<GstClockTime>(fps));
 }
 
+GstSample* tryPullEncodedSample(GstElement* pipeline, GstElement* appsink, int fps) {
+	const GstClockTime timeout = samplePullTimeout(fps);
+	GstSample* sample = gst_app_sink_try_pull_sample(GST_APP_SINK(appsink), timeout);
+	if (sample) {
+		return sample;
+	}
+
+	GstState currentState = GST_STATE_NULL;
+	GstState pendingState = GST_STATE_NULL;
+	gst_element_get_state(pipeline, &currentState, &pendingState, 0);
+	if (currentState == GST_STATE_PAUSED && pendingState == GST_STATE_PLAYING) {
+		return gst_app_sink_try_pull_preroll(GST_APP_SINK(appsink), timeout);
+	}
+
+	return nullptr;
+}
+
 std::string buildPipelinePrefix(int width, int height, int fps, const std::string& srcName) {
 	std::stringstream pipeline;
 	pipeline << "appsrc name=" << srcName
@@ -339,8 +356,7 @@ std::vector<std::basic_string<uint8_t>> H265NVENCEncoder::encode_frame(const cv:
 		return nalUnits;
 	}
 
-	GstSample* sample =
-		gst_app_sink_try_pull_sample(GST_APP_SINK(_appsink), samplePullTimeout(_fps));
+	GstSample* sample = tryPullEncodedSample(_pipeline, _appsink, _fps);
 	if (!sample) {
 		_consecutive_empty_pulls++;
 		logBusMessages(_pipeline, "encoder empty pull");
