@@ -47,7 +47,6 @@ command_t PurePursuitCommand::getOutput() {
 
     if (!this->_set_state_called_before_output) {
 		LOG_F(WARNING, "PurePursuitCommand: getOutput() called before setState() call!");
-		return;
 	}
 
 	double distToGoal = (_pose.head<2>() - _path.back().head<2>()).norm();
@@ -163,7 +162,7 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 
 		accumulatedDist += segmentLen;
 	}
-	if (dist(_path.back(), waypoints.back()) >= 0.01) {
+	if ((waypoints.back().head<2>() - _path.back().head<2>()).norm() >= 0.01) {
 		_path.push_back(waypoints.back());	
 	}
 }

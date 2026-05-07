@@ -54,7 +54,10 @@ private:
 	 * @param center the center of desired circle
 	 * @param radius the radius of desired circle
 	 */
-	void circleNavigation(const navtypes::point_t& center, const double radius, const std::optional<double> radius2);
+	void circleNavigation(const double radius, const std::optional<double> radius2);
+
+	void navigateThenCircle(const std::optional<double> radius,
+						    const std::optional<Constants::autonomous::TaskType> type);
 
 	/**
 	 * @brief Handles sequential navigation to a list of a waypoints, called by start()
@@ -73,17 +76,18 @@ private:
 	 * @param radius the radius of desired circle
 	 * @return points_t filled with evenly spaced out points on circle.
 	 */
-	navtypes::points_t generateCirclePoints(const navtypes::point_t& center, const double radius);
+	navtypes::points_t generateCirclePoints(const double radius);
 
 	net::websocket::SingleClientWSServer& _server;
 
+	navtypes::point_t _circle_center;
 	navtypes::points_t _waypoint_coords_list;
-	std::atomic<bool> _target_found = false;
+	bool _target_found = false;
 
 	std::mutex _autonomous_task_mutex;
 	std::thread _autonomous_task_thread;
 	std::condition_variable _autonomous_task_cv;
-	std::atomic<bool> _kill_called;
+	bool _kill_called;
 
 	bool _debug = true; // toggle debugging logs
 	/*

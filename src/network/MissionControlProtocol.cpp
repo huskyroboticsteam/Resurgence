@@ -204,7 +204,7 @@ static bool validateWaypointNavRequest(const json& j) {
 	// check validity of each point
 	for (const auto& point : j["points"]) {
 		// make sure each point is an array of two values
-		if (!point.is_array() || point.size() != 2) {
+		if (!point.is_array() || point.size() != 3) {
 			return false;
 		}
 		bool validPoint = (point[0].is_number_integer() || point[0].is_number_float()) &&
