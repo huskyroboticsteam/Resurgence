@@ -146,8 +146,7 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 		return;
 	}
 	
-	std::vector<double> cumulativeDist;
-	cumulativeDist.reserve(waypoints.size());
+	std::vector<double> cumulativeDist(waypoints.size(), 0.0);
 
 	// Measure distance accumulated at each waypoint, e.g.
 	// [ 0.0, 1.2, 4.5, 5.0 ], where each value represents
@@ -174,7 +173,7 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 		int idx = std::clamp((int) std::distance(cumulativeDist.begin(), it) - 1, 0, (int) waypoints.size() - 2);
 
 		// Interpolate new point on segment
-		int segmentLen = cumulativeDist[idx+1] - cumulativeDist[idx];
+		double segmentLen = cumulativeDist[idx+1] - cumulativeDist[idx];
 		double t = segmentLen == 0 ? 0.0 : (targetDist - cumulativeDist[idx]) / segmentLen;
 		_path.push_back({
 					waypoints[idx][0] + t * (waypoints[idx+1][0] - waypoints[idx][0]),
