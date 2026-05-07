@@ -11,16 +11,20 @@ using navtypes::points_t;
 using navtypes::pose_t;
 
 namespace {
-static double wrapAngle(double angErr) {
+static double wrapAngle(const double angErr) {
 	return std::atan2(std::sin(angErr), std::cos(angErr));
 }
 
-static double sgn(double num) {
+static double sgn(const double num) {
 	if (num < 0) {
 		return -1.0;
 	} else {
 		return 1.0;
 	}
+}
+
+static double dist(const Eigen::Vector3d& one, const Eigen::Vector3d& two) {
+	return (one.head<2>() - two.head<2>()).norm();
 }
 } // namespace
 
@@ -138,32 +142,45 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 }
 
 void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
-	if (waypoints.empty()) {
+	if (waypoints.empty() || waypoints.size() < 2) {
 		return;
 	}
-	_path.push_back(waypoints[0]);
-	point_t lastPathPoint = waypoints[0];
-	int numPts = 1;
-	double accumulatedDist = 0;
+	
+	std::vector<double> cumulativeDist;
+	cumulativeDist.reserve(waypoints.size());
 
-	for (int i = 0; i < waypoints.size() - 1; i++) {
-		point_t p1 = waypoints[i];
-		point_t p2 = waypoints[i + 1];
-		double segmentLen = (p2.head<2>() - p1.head<2>()).norm();
-
-		while (accumulatedDist + segmentLen >= numPts * _dist_between_points) {
-			// Find new points by parameterizing slope between p1 and p2
-			double t = (numPts * _dist_between_points - accumulatedDist) / segmentLen;
-			point_t newPt = {p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1]), 1};
-			_path.push_back(newPt);
-			lastPathPoint = newPt;
-			numPts++;
-		}
-
-		accumulatedDist += segmentLen;
+	// Measure distance accumulated at each waypoint, e.g.
+	// [ 0.0, 1.2, 4.5, 5.0 ], where each value represents
+	// the accumulated distance at waypoint index i.
+	cumulativeDist[0] = 0.0;
+	for (int i = 1; i < waypoints.size(); i++) {
+		cumulativeDist[i] = cumulativeDist[i-1] + dist(waypoints[i-1], waypoints[i]);
 	}
-	if ((waypoints.back().head<2>() - _path.back().head<2>()).norm() >= 0.01) {
-		_path.push_back(waypoints.back());	
+	double totalLen = cumulativeDist.back();
+	LOG_F(INFO, "cumulative dist: %lf", totalLen);
+	
+	// Find how many points we need (at least 2 for start & end)
+	int numPts = std::max(2, (int) std::ceil(totalLen / _dist_between_points));
+
+	for (int i = 0; i < numPts; i++) {
+		// We want numPts - 1 segments (to get numPts points)
+		// targetDist gives us the desired acummulated dist for the ith point
+		double targetDist = totalLen * i / (numPts - 1);
+
+		// Goal: Find which waypoints point i will lie between
+		// Finds first waypoint cumulative distance >= to our target distance
+		auto it = std::lower_bound(cumulativeDist.begin(), cumulativeDist.end(), targetDist);
+		// Subtracts one to get start of our desired segment, with clamping to prevent illegal idx
+		int idx = std::clamp((int) std::distance(cumulativeDist.begin(), it) - 1, 0, (int) waypoints.size() - 2);
+
+		// Interpolate new point on segment
+		int segmentLen = cumulativeDist[idx+1] - cumulativeDist[idx];
+		double t = segmentLen == 0 ? 0.0 : (targetDist - cumulativeDist[idx]) / segmentLen;
+		_path.push_back({
+					waypoints[idx][0] + t * (waypoints[idx+1][0] - waypoints[idx][0]),
+					waypoints[idx][1] + t * (waypoints[idx+1][1] - waypoints[idx][1]),
+					1
+				});
 	}
 }
 
