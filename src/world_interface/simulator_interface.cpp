@@ -30,8 +30,6 @@ using namespace cam;
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
 const std::map<boardid_t, std::string> motorNameMap = {
-	{boardid_t::leftTread, "leftTread"},
-	{boardid_t::rightTread, "rightTread"},
 	{boardid_t::frontTireLeft, "frontTireLeft"},
 	{boardid_t::frontTireRight, "frontTireRight"},
 	{boardid_t::rearTireLeft, "rearTireLeft"},
