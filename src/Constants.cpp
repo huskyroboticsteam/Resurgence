@@ -149,10 +149,17 @@ const std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() {
 } // namespace arm
 
 namespace autonomous {
-const double THETA_KP = 1.5;
-const double DRIVE_VEL = 1.5;
-const double DONE_THRESHOLD = 1.0;
+
 } // namespace autonomous
+
+namespace commands {
+const double DRIVE_VEL = 3.0;
+const double DONE_THRESH = 2.0;
+const double SLOW_THRESH = 3.0;
+
+const double DIST_BETWEEN_POINTS = 1.5;
+const double LOOKAHEAD_DIST = 3.0;
+}
 
 const double CONTROL_HZ = 50.0;
 } // namespace Constants

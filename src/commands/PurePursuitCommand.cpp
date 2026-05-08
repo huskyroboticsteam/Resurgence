@@ -1,5 +1,7 @@
 #include "PurePursuitCommand.h"
 
+#include "../Constants.h"
+
 #include <loguru.hpp>
 #include "../utils/transform.h"
 
@@ -10,12 +12,15 @@ using navtypes::point_t;
 using navtypes::points_t;
 using navtypes::pose_t;
 
+namespace c_c = Constants::commands;
+
 namespace {
-static double wrapAngle(const double angErr) {
+	
+double wrapAngle(const double angErr) {
 	return std::atan2(std::sin(angErr), std::cos(angErr));
 }
 
-static double sgn(const double num) {
+double sgn(const double num) {
 	if (num < 0) {
 		return -1.0;
 	} else {
@@ -23,10 +28,11 @@ static double sgn(const double num) {
 	}
 }
 
-static double dist(const Eigen::Vector3d& one, const Eigen::Vector3d& two) {
+double dist(const Eigen::Vector3d& one, const Eigen::Vector3d& two) {
 	return (one.head<2>() - two.head<2>()).norm();
 }
-} // namespace
+
+} // namespace (anonymous)
 
 namespace commands {
 
@@ -46,36 +52,36 @@ void PurePursuitCommand::setState(const pose_t& pose) {
 }
 
 command_t PurePursuitCommand::getOutput() {
-	// LOG_F(INFO, "entering get ouput");
-	LOG_F(INFO, "curr idx: %d, path_size: %ld", _curr_idx, _path.size());
-
     if (!this->_set_state_called_before_output) {
 		LOG_F(WARNING, "PurePursuitCommand: getOutput() called before setState() call!");
 	}
 
-	double distToGoal = (_pose.head<2>() - _path.back().head<2>()).norm();
-
-	double driveVel = _drive_vel;
-	if (distToGoal <= _slow_thresh && _curr_idx >= _path.size() - 2) {
-		driveVel *= distToGoal / _slow_thresh;
+	double distToGoal = dist(_pose, _path.back());
+	double driveVel = c_c::DRIVE_VEL;
+	// Close to goal
+	// _curr_idx check is especially for circle paths where start == end.
+	// Checking makes sure that rover has completed circle and is not just
+	// starting it.
+	if (distToGoal <= c_c::SLOW_THRESH && _curr_idx >= _path.size() - 2) {
+		driveVel *= distToGoal / c_c::SLOW_THRESH;
 	}
-	if (distToGoal <= _done_thresh && _curr_idx >= _path.size() - 2) {
+	// At goal
+	if (distToGoal <= c_c::DONE_THRESH && _curr_idx >= _path.size() - 2) {
         return {.thetaVel = 0.0, .xVel = 0.0};
     }
 
-	// LOG_F(INFO, "updating index now");
+	// Try to update index
 	updateCurrentIndex();
 	point_t relIntersect;
 	if (_curr_idx >= _path.size() - 1) {
+		// Convert to robot frame
 		relIntersect = util::toTransform(_pose) * _path.back();
 	} else {
 		// lineToCircleIntersection already returns robot frame coords
 		relIntersect = lineToCircleIntersection(_path[_curr_idx], _path[_curr_idx + 1]);
 	}
 
-	LOG_F(INFO, "Intersect: x=%f y=%f", relIntersect[0], relIntersect[1]);
-
-	double curvature = (2 * relIntersect[1]) 
+	double curvature = (2 * relIntersect[1])
 						/ (relIntersect[0]*relIntersect[0] + relIntersect[1]*relIntersect[1]);
 
 	double thetaVel = driveVel * curvature; // curvature times drive vel = theta vel
@@ -84,7 +90,7 @@ command_t PurePursuitCommand::getOutput() {
 	return {.thetaVel = thetaVel, .xVel = driveVel};
 }
 
-point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
+point_t PurePursuitCommand::lineToCircleIntersection(const point_t& p1, const point_t& p2) {
 	// Transform argument points to robot frame (center = (0,0))
 	point_t p1Robot = util::toTransform(_pose) * p1;
 	point_t p2Robot = util::toTransform(_pose) * p2;
@@ -102,7 +108,7 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 	// If discriminant is 0, there is 1 intersections
 	//                 is > 0, there are 2 intersections
 	//                 is < 0, there are no intersections
-	double disc = _lookahead_dist*_lookahead_dist * dr2 - D*D;
+	double disc = c_c::LOOKAHEAD_DIST*c_c::LOOKAHEAD_DIST * dr2 - D*D;
 
 	LOG_F(INFO, "DISC only: %f", disc);
 
@@ -123,15 +129,13 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 		// Find the t-values of each found intersection point on the line.
 		// Higher t-value indicates further along on line.
 
-		// These are rearranged equations of form: point - p1 = t * (p2 - p1)
+		// These are rearranged equations of form: point - p1 = t * (p2 - p1) s.t.
+		// t = 0 is p1 and t = 1 is p2
 		double t1 = ((xSol1 - x1) * dx + (ySol1 - y1) * dy) / dr2;
 		double t2 = ((xSol2 - x1) * dx + (ySol2 - y1) * dy) / dr2;
 
-		// Leave room for some error for floating point
 		bool valid1 = (t1 >= 0 && t1 <= 1);
 		bool valid2 = (t2 >= 0 && t2 <= 1);
-
-		LOG_F(INFO, "valid1: %d, valid2: %d, disc: %f", valid1, valid2, disc);
 
 		if (valid1 && !valid2) return sol1;
 		if (valid2 && !valid1) return sol2;
@@ -159,7 +163,7 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 	LOG_F(INFO, "cumulative dist: %lf", totalLen);
 	
 	// Find how many points we need (at least 2 for start & end)
-	int numPts = std::max(2, (int) std::ceil(totalLen / _dist_between_points));
+	int numPts = std::max(2, (int) std::ceil(totalLen / c_c::DIST_BETWEEN_POINTS));
 
 	for (int i = 0; i < numPts; i++) {
 		// We want numPts - 1 segments (to get numPts points)
@@ -170,7 +174,9 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 		// Finds first waypoint cumulative distance >= to our target distance
 		auto it = std::lower_bound(cumulativeDist.begin(), cumulativeDist.end(), targetDist);
 		// Subtracts one to get start of our desired segment, with clamping to prevent illegal idx
-		int idx = std::clamp((int) std::distance(cumulativeDist.begin(), it) - 1, 0, (int) waypoints.size() - 2);
+		int idx = std::clamp((int) std::distance(cumulativeDist.begin(), it) - 1,
+												 0,
+												 (int) waypoints.size() - 2);
 
 		// Interpolate new point on segment
 		double segmentLen = cumulativeDist[idx+1] - cumulativeDist[idx];
@@ -184,9 +190,8 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 }
 
 bool PurePursuitCommand::isDone() {
-	double distance = (_pose.topRows<2>() - _path.back().topRows<2>()).norm();
-	// LOG_F(INFO, "dist to goal %f", distance);
-	if (distance <= _done_thresh && _curr_idx >= _path.size() - 2) {
+	double distance = dist(_pose, _path.back());
+	if (distance <= c_c::DONE_THRESH && _curr_idx >= _path.size() - 2) {
 		LOG_F(INFO, "distance from goal: %lf", distance);
 		LOG_F(INFO, "done +1");
 		_done_count++;
@@ -203,8 +208,8 @@ bool PurePursuitCommand::isDone() {
 void PurePursuitCommand::updateCurrentIndex() {
 	double distToNext;
 	while (_curr_idx < _path.size() - 2) {
-		distToNext = (_pose.topRows<2>() - _path[_curr_idx + 1].topRows<2>()).norm();
-		if (distToNext < _lookahead_dist) {
+		distToNext = dist(_pose, _path[_curr_idx + 1]);
+		if (distToNext < c_c::LOOKAHEAD_DIST) {
 			_curr_idx++;
 		} else {
 			break;
@@ -217,4 +222,5 @@ void PurePursuitCommand::reset() {
     _done_count = 0;
     _set_state_called_before_output = false;
 }
+
 } // namespace commands

@@ -181,21 +181,27 @@ constexpr frozen::unordered_map<motorid_t, double, IK_MOTORS.size()> SEGMENT_LEN
 } // namespace arm
 
 namespace autonomous {
-extern const double THETA_KP;
-extern const double DRIVE_VEL;
-extern const double DONE_THRESHOLD;
-   enum class TaskType {
-      INVALID = -1,
-      TAG1,
-      TAG2,
-   };
+enum class TaskType {
+   INVALID = -1,
+   TAG1,
+   TAG2,
+};
 
-   NLOHMANN_JSON_SERIALIZE_ENUM( TaskType, {
-      {TaskType::INVALID, nullptr},
-      {TaskType::TAG1, "tag1"},
-      {TaskType::TAG2, "tag2"}
-   });
+NLOHMANN_JSON_SERIALIZE_ENUM( TaskType, {
+   {TaskType::INVALID, nullptr},
+   {TaskType::TAG1, "tag1"},
+   {TaskType::TAG2, "tag2"}
+});
 } // namespace autonomous
+
+namespace commands {
+extern const double DRIVE_VEL;
+extern const double DONE_THRESH;
+extern const double SLOW_THRESH;
+
+extern const double DIST_BETWEEN_POINTS;
+extern const double LOOKAHEAD_DIST;
+} // namespace commands
 
 extern const double CONTROL_HZ;
 
