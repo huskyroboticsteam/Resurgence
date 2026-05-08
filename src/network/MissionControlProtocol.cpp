@@ -198,8 +198,8 @@ static bool validateWaypointNavRequest(const json& j) {
 	bool validPoints = util::validateKey(j, "points", val_t::array);
 	if (!validPoints) return false;
 
-	// bool validCircleMode = util::validateKey(j, "circleMode", val_t::boolean);
-	// if (!validCircleMode) return false;
+	bool validCircleMode = util::validateKey(j, "circleMode", val_t::boolean);
+	if (!validCircleMode) return false;
 
 	// check validity of each point
 	for (const auto& point : j["points"]) {
@@ -217,17 +217,17 @@ static bool validateWaypointNavRequest(const json& j) {
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	if (Globals::AUTONOMOUS) {
-		// std::optional<Constants::autonomous::TaskType> type;
-		// if (j.get<TaskType>() != Constants::autonomous::TaskType::INVALID) {
-		// 	type = j.get<TaskType>();
-		// }
+		std::optional<Constants::autonomous::TaskType> type;
+		if (j.get<TaskType>() != Constants::autonomous::TaskType::INVALID) {
+			type = j.get<TaskType>();
+		}
 
 		std::optional<double> radius;
 		if (util::validateKey(j, "radius", val_t::boolean)) {
 			radius = j["radius"];
 		}
 
-		// bool circleMode = j["circleMode"];
+		bool circleMode = j["circleMode"];
 		
 		navtypes::points_t finalTargets;
 
@@ -244,10 +244,7 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 			}
 			finalTargets.push_back(*optTarget);
 		}
-		//_autonomous_task.start(finalTargets, circleMode, radius, type);
-
-		// temporary hard coded values
-		_autonomous_task.start(finalTargets, true, radius=16, std::nullopt);
+		_autonomous_task.start(finalTargets, circleMode, radius, type);
 	}
 }
 
