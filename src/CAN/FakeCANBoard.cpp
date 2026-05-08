@@ -87,11 +87,14 @@ int main() {
 				std::cout << "got " << device.deviceUUID << std::endl;
 				can::motor::setMotorMode(device, mode == 0 ? motormode_t::vel : motormode_t::pos);
 			} else if (testMode == TestMode::State) {
-				int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-				CANDevice_t device;
-				device.deviceUUID = uuid;
+				uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
+				CANDevice_t device = CANDevice_t{1, 1, 1, uuid};
 
-				int state = prompt("Enter desired motor state");
+				std::stringstream state_msg("Enter desired motor state:\n");
+				state_msg << static_cast<uint32_t>(motorstate_t::idle) << " idle\n";
+				state_msg << static_cast<uint32_t>(motorstate_t::control) << " control\n";
+
+				int state = prompt(state_msg.str().c_str());
 				can::motor::motorstate_t motorState = static_cast<motorstate_t>(state);
 				can::motor::setMotorState(device, motorState);
 			} else if (testMode == TestMode::Vel) {

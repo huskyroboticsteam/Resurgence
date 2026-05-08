@@ -54,12 +54,13 @@ namespace can {
 namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
+constexpr std::chrono::milliseconds ACK_TIMEOUT(50);
 // CAN26 11-bit ID layout: [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
 // Match on UUID field to filter for packets addressed to this device
 constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
 
 // Heartbeats should come in every 500ms, have some leniency
-constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(550);
+constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(1000);
 
 // map each device seen to a watchdog
 std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeatWatchdogMap;
@@ -72,6 +73,9 @@ std::shared_ptr<util::PeriodicScheduler<>> telemScheduler;
 std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>,
 				   util::PeriodicScheduler<>::eventid_t>
 	telemEventIDMap;
+
+std::shared_ptr<util::PeriodicScheduler<>> ackScheduler;
+std::unordered_map<CANDeviceUUID_t, util::PeriodicScheduler<>::eventid_t> ackMap;
 
 using telemetrycode_t = uint8_t;
 
@@ -215,6 +219,23 @@ void handleLimitSwitchAlert(CANPacket_t& packet) {
 				   DataPoint<telemetry_t>(static_cast<telemetry_t>(decoded.switchStatus)));
 }
 
+void handleAck(CANPacket_t& packet) {
+	printCANPacket(packet);
+	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
+	if (decoded.failure) {
+		LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.receiver.deviceUUID);
+	} else {
+		LOG_F(INFO, "Ack received from 0x%x: ok", decoded.receiver.deviceUUID);
+	}
+
+	auto it = ackMap.find(decoded.sender.deviceUUID);
+	if (it != ackMap.end()) {
+		auto eventID = it->second;
+		ackMap.erase(it);
+		ackScheduler->removeEvent(eventID);
+	}
+}
+
 // Heartbeat monitoring handler: create watchdog on first heartbeat and feed it on subsequent heartbeats
 void handleHeartbeatPacket(CANPacket_t& packet) {
 	{
@@ -226,7 +247,7 @@ void handleHeartbeatPacket(CANPacket_t& packet) {
 			heartbeatWatchdogMap.emplace(
 				uuid, 
 				std::make_unique<util::Watchdog<>>(HEARTBEAT_TIMEOUT, [uuid]() {
-									//    LOG_F(WARNING, "Heartbeat timeout for device 0x%x", uuid);	   
+					LOG_F(WARNING, "Heartbeat timeout for device 0x%x", uuid);
 				})
 			);
 		} else {
@@ -303,20 +324,24 @@ void receiveThreadFn() {
 		if (received) {
 			// dispatch on CAN26 command ID
 			switch (packet.command) {
-				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
-					handleEncoderEstimates(packet);
+				case CAN_COMMAND_ID__E_STOP:
+					LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
 					break;
-
-				case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
-					handleLimitSwitchAlert(packet);
+				
+				case CAN_COMMAND_ID__ACKNOWLEDGE:
+					handleAck(packet);
 					break;
 
 				case CAN_COMMAND_ID__HEARTBEAT:
 					handleHeartbeatPacket(packet);
 					break;
 
-				case CAN_COMMAND_ID__E_STOP:
-					LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
+				case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
+					handleLimitSwitchAlert(packet);
+					break;
+
+				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
+					handleEncoderEstimates(packet);
 					break;
 				
 				default:
@@ -350,37 +375,62 @@ void initHeartbeatWatchdog() {
 
 void sendCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
+	CANDeviceUUID_t uuid = packet.device.deviceUUID;
 	canfd_frame frame;
 	std::memset(&frame, 0, sizeof(frame));
 	frame.can_id = CANGetPacketHeader(&mutablePacket);
 	frame.len = CANGetDlc(&mutablePacket);
 	std::memcpy(frame.data, CANGetData(&mutablePacket), frame.len);
-	bool success;
-	{
-		std::lock_guard lock(socketMutex);
-		// note that frame is a canfd_frame but we're using sizeof(can_frame)
-		// not sure why this is required to work
-		success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
-		tcdrain(can_fd);
+
+	if (packet.command & 0x80) {
+		if (!ackScheduler) {
+			ackScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_AckSched");
+		}
+
+		auto it = ackMap.find(uuid);
+		if (it != ackMap.end()) {
+			LOG_F(WARNING, "0x%x already has an outgoing packet! Ignoring..", uuid);
+			return;
+		}
+
+		auto eventID = ackScheduler->scheduleEvent(ACK_TIMEOUT, [=]() {
+			LOG_F(ERROR, "0x%x ACK TIMED OUT, RESENDING", uuid);
+			sendCANFrame(frame);
+		});
+
+		ackMap.insert_or_assign(uuid, eventID);
 	}
 
+	bool success = sendCANFrame(frame);
+
 	if (!success) {
-		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", getUUIDFromPacket(packet),
+		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", uuid,
 			  std::strerror(errno));
 	}
+}
+
+bool sendCANFrame(const canfd_frame& frame) {
+	std::lock_guard lock(socketMutex);
+	// note that frame is a canfd_frame but we're using sizeof(can_frame)
+	// not sure why this is required to work
+	bool success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
+	tcdrain(can_fd);
+	return success;
 }
 
 void printCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // same as sendCANPacket
 	std::stringstream ss;
-	ss << "CAN: p" << std::hex << ((CANGetPacketHeader(&mutablePacket) >> 10) & 0x1);
-	ss << " uuid" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x03F8) >> 3);
-	ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x0007));
-	ss << " pid" << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[0]);
-	ss << " data:";
+	ss << "CAN: ";
+	ss << std::hex << (packet.senderUUID) << "->";
+	ss << std::hex << (packet.device.deviceUUID);
+	// ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x0007));
+	ss << " " << std::hex << static_cast<uint>(packet.command);
+	ss << " [";
 	for (int i = 1; i < CANGetDlc(&mutablePacket); i++) {
 		ss << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[i]) << " ";
 	}
+	ss << "]";
 
 	LOG_F(INFO, ss.str().c_str());
 }
