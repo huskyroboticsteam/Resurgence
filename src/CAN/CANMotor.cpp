@@ -7,6 +7,8 @@
 #include <cmath>
 #include <thread>
 
+#include <loguru.hpp>
+
 extern "C" {
 // new
 #include <CANDevices.h>
@@ -206,8 +208,6 @@ void setMotorMode(CANDevice_t device, motormode_t mode) {
 }
 
 void setMotorPower(CANDevice_t device, double power) {
-	// Clamp power to [-1.0, 1.0]
-	power = std::min(std::max(power, -1.0), 1.0);
 
 	// Use BLDC velocity control: convert power [-1, 1] to velocity in rev/s
 	// adjust as needed
