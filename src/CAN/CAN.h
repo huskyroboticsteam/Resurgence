@@ -6,6 +6,7 @@
 #include "../Constants.h"
 #include <functional>
 #include <optional>
+#include <linux/can.h>
 
 extern "C" {
 #include <CANDevices.h>
@@ -46,6 +47,7 @@ void initCAN();
  * @param packet The CAN packet to send.
  */
 void sendCANPacket(const CANPacket_t& packet);
+bool sendCANFrame(const canfd_frame& frame);
 
 /**
  * @brief Print a CAN packet.
