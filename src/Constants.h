@@ -197,5 +197,4 @@ extern const util::dseconds CLOSE_TO_TARGET_DUR_VAL;
 } // namespace autonomous
 
 extern const double CONTROL_HZ;
-
 } // namespace Constants

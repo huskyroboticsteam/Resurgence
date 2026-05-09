@@ -21,6 +21,24 @@ extern "C" {
  */
 namespace can {
 
+/** @brief ODrive Control Modes */
+enum class control_mode_t {
+	position = BLDC_POSITION_CONTROL,
+	velocity = BLDC_VELOCITY_CONTROL,
+}
+
+/** @brief ODrive Input Modes */
+enum class input_mode_t {
+	passthrough = BLDC_PASSTHROUGH_INPUT,
+}
+
+/** @brief ODrive Axis States */
+enum class axis_state_t {
+	idle = BLDC_AXIS_IDLE,
+	full_calib = BLDC_AXIS_FULL_CALIBRATION_SEQUENCE,
+	motor_calib = BLDC_AXIS_MOTOR_CALIBRATION,
+}
+
 /**
  * @brief An ID for a telemetry callback.
  *
