@@ -21,6 +21,20 @@ using robot::types::motorid_t;
 */
 namespace Constants {
 
+extern const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD;
+extern const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD;
+
+/**
+ * A map that pairs each of the joints to its corresponding motor.
+ * (one-to-one pairs only)
+ */
+constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, motorid_t>(
+	{{jointid_t::armBase, motorid_t::armBase},
+	 {jointid_t::shoulder, motorid_t::shoulder},
+	 {jointid_t::elbow, motorid_t::elbow},
+	 {jointid_t::forearm, motorid_t::forearm},
+	 {jointid_t::hand, motorid_t::hand}});
+
 /**
    @namespace Constants::Arm
    @brief Arm constants
@@ -220,24 +234,5 @@ extern const double DONE_THRESHOLD;
 extern const util::dseconds CLOSE_TO_TARGET_DUR_VAL;
 
 } // namespace Nav
-
-
-/**
- * A map that pairs each of the joints to its corresponding motor.
- * (one-to-one pairs only)
- */
-constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, motorid_t>(
-	{{jointid_t::armBase, motorid_t::armBase},
-	 {jointid_t::shoulder, motorid_t::shoulder},
-	 {jointid_t::elbow, motorid_t::elbow},
-	 {jointid_t::forearm, motorid_t::forearm},
-	 {jointid_t::hand, motorid_t::hand},
-	 {jointid_t::drillActuator, motorid_t::drillActuator},
-	 {jointid_t::drillMotor, motorid_t::drillMotor}});
-
-extern const double CONTROL_HZ;
-
-extern const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD;
-extern const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD;
 
 } // namespace Constants

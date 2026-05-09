@@ -14,7 +14,6 @@ constexpr const char* JOINT_POWER_REQ_TYPE = "jointPowerRequest";
 constexpr const char* JOINT_POSITION_REQ_TYPE = "jointPositionRequest";
 constexpr const char* OPERATION_MODE_REQ_TYPE = "operationModeRequest";
 constexpr const char* SERVO_POSITION_REQ_TYPE = "servoPositionRequest";
-constexpr const char* STEPPER_TURN_ANGLE_REQ_TYPE = "stepperTurnAngleRequest";
 constexpr const char* WAYPOINT_NAV_REQ_TYPE = "waypointNavRequest";
 
 // report keys

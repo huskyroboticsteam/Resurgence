@@ -3,8 +3,6 @@
 #include "kinematics/DiffDriveKinematics.h"
 
 namespace Constants {
-const double CONTROL_HZ = 10.0;
-
 const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 

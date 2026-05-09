@@ -297,29 +297,6 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	motor_ptr->setMotorVel(targetVel);
 }
 
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
-  auto servo_num = servoid_to_servo_num.find(servo);
-  if (servo_num != servoid_to_servo_num.end()) {
-  	servo_board->setServoPos(servo_num->second, position);
-  }
-}
-
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-  std::shared_ptr<robot::base_motor> stepper_board = getMotor(motorid_t::scienceStepperBoard);
-  auto stepper_num = stepperid_to_stepper_num.find(stepper);
-  if (stepper_num != stepperid_to_stepper_num.end()) {
-    stepper_board->setStepperTurnAngle(stepper_num->second, angle);
-  }
-}
-
-void setActuator(uint8_t value) {
-  can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
-}
-
-// TODO: implement
-void setIndicator(indication_t signal) {}
-
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,
 	const std::function<void(robot::types::motorid_t motor,

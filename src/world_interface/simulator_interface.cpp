@@ -37,11 +37,7 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::forearm, "forearm"},
 	{motorid_t::wristDiffLeft, "wristDiffLeft"},
 	{motorid_t::wristDiffRight, "wristDiffRight"},
-	{motorid_t::hand, "hand"},
-	{motorid_t::drillActuator, "drillActuator"},
-	{motorid_t::drillMotor, "drillMotor"},
-	{motorid_t::fourbar1, "fourbar1"},
-	{motorid_t::fourbar2, "fourbar2"}};
+	{motorid_t::hand, "hand"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 
@@ -399,18 +395,6 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
-}
-
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-	// Implement when Servos are added to Simulator
-}
-
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-	// Implement when Steppers are added to Simulator
-}
-
-void setActuator(uint8_t value) {
-	// Implement when Actuators are added to Simulator
 }
 
 callbackid_t addLimitSwitchCallback(
