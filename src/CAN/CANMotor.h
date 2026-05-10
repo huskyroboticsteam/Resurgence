@@ -63,7 +63,7 @@ private:
     inline static std::mutex schedulerMutex;
 
     void ensureMotorMode(motormode_t mode);
-    void ensureMotorMode(motormode_t mode, motorstate_t state);
+    void ensureMotorMode(motormode_t mode, can::motor::axis_state_t state);
     void constructVelController();
 };
 
@@ -98,7 +98,7 @@ void initEncoder();
  */
 void initMotor(CANDevice_t device);
 
-void setMotorState(CANDevice_t device, motorstate_t state);
+void setMotorState(CANDevice_t device, can::motor::axis_state_t state);
 
 /**
  * @brief Set the motor mode using CAN26 protocol.

@@ -45,12 +45,12 @@ CANBoard::CANBoard(robot::types::boardid_t board, bool hasPosSensor, CANDevice_t
 	}
 }
 
-void CANBoard::ensureMotorMode(can::motor::motormode_t mode, can::motor::motorstate_t state) {
+void CANBoard::ensureMotorMode(can::motor::motormode_t mode, can::motor::axis_state_t state) {
 	ensureMotorMode(mode);
-	if (!motor_state || motor_state.value() != state) {
-		motor_state.emplace(state);
-		can::motor::setMotorState(device, state);
-	}
+	// if (!motor_state || motor_state.value() != state) {
+	// 	motor_state.emplace(state);
+	can::motor::setMotorState(device, state);
+	// }
 }
 
 void CANBoard::ensureMotorMode(can::motor::motormode_t mode) {
@@ -91,11 +91,13 @@ void CANBoard::setMotorPower(double power) {
 	double scale = power < 0 ? negative_scale : positive_scale;
 	power *= scale;
 
-	ensureMotorMode(can::motor::motormode_t::vel, can::motor::motorstate_t::control);
+	ensureMotorMode(can::motor::motormode_t::vel, can::motor::axis_state_t::closed_loop_control);
 	can::motor::setMotorPower(device, power);
 
 	if (power == 0.0 && static_cast<int>(board_id) < 4) { // hack
-		ensureMotorMode(can::motor::motormode_t::vel, can::motor::motorstate_t::idle);
+		ensureMotorMode(can::motor::motormode_t::vel, can::motor::axis_state_t::idle);
+	} else if (power == 0.0 && static_cast<int>(board_id) < 7) {
+		can::motor::setMotorState(this->device, can::motor::axis_state_t::lockin_spin);
 	}
 }
 
@@ -188,7 +190,7 @@ void initMotor(CANDevice_t device) {
 	std::this_thread::sleep_for(1000us);
 }
 
-void setMotorState(CANDevice_t device, motorstate_t state) {
+void setMotorState(CANDevice_t device, can::motor::axis_state_t state) {
 	uint32_t axisState = static_cast<uint32_t>(state);
 	CANPacket_t p = CANMotorPacket_BLDC_SetAxisState(Constants::JETSON_DEVICE, device, axisState);
 	sendCANPacket(p);

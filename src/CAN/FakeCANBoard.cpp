@@ -1,40 +1,13 @@
-#include "../control/JacobianVelController.h"
-#include "../navtypes.h"
-#include "../utils/core.h"
-#include "../utils/scheduler.h"
-#include "../world_interface/data.h"
 #include "CAN.h"
-#include "CANMotor.h"
-#include "CANUtils.h"
+#include "CANBoard.h"
 
 #include <algorithm>
-#include <chrono>
-#include <exception>
 #include <iostream>
-#include <mutex>
-#include <thread>
-#include <unordered_set>
-#include <vector>
-
-extern "C" {
-#include <CANCommandIDs.h>
-#include <CANPacket.h>
-
-#include <HindsightCAN/CANPower.h>
-#include <HindsightCAN/CANScience.h>
-#include <Packets/Universal.h>
-}
-
-using namespace std::chrono_literals;
-
-using can::motor::motormode_t;
-using can::motor::motorstate_t;
-using namespace robot::types;
 
 enum class TestMode {
-	ModeSet,
 	State,
-	Vel,
+	Power,
+	Read,
 	RawCAN,
 	NUM_MODES
 };
@@ -62,9 +35,9 @@ int main() {
 	can::initCAN();
 
 	std::stringstream ss("What are you testing?\n");
-	ss << static_cast<int>(TestMode::ModeSet) << " for MODE SET\n";
 	ss << static_cast<int>(TestMode::State) << " for SET STATE\n";
-	ss << static_cast<int>(TestMode::Vel) << " for VELOCITY CONTROL\n";
+	ss << static_cast<int>(TestMode::Power) << " for POWER CONTROL\n";
+	ss << static_cast<int>(TestMode::Read) << " for DIRECT READ\n";
 	ss << static_cast<int>(TestMode::RawCAN) << " for CAN\n";
 
 	while (true) {
@@ -76,37 +49,28 @@ int main() {
 		}
 
 		TestMode testMode = static_cast<TestMode>(test_type);
+		uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
+		// TODO: Assuming motor domain for now
+		CANDevice_t device = CANDevice_t{0, 1, 0, uuid};
+		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
 
 		while (true) {
-			if (testMode == TestMode::ModeSet) {
-				int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-				int mode = prompt("Enter mode (0 for PWM, 1 for PID)");
-
-				CANDevice_t device;
-				device.deviceUUID = uuid;
-				std::cout << "got " << device.deviceUUID << std::endl;
-				can::motor::setMotorMode(device, mode == 0 ? motormode_t::vel : motormode_t::pos);
-			} else if (testMode == TestMode::State) {
-				uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-				CANDevice_t device = CANDevice_t{1, 1, 1, uuid};
-
+			if (testMode == TestMode::State) {
 				std::stringstream state_msg("Enter desired motor state:\n");
-				state_msg << static_cast<uint32_t>(motorstate_t::idle) << " idle\n";
-				state_msg << static_cast<uint32_t>(motorstate_t::control) << " control\n";
+				state_msg << static_cast<uint32_t>(can::motor::axis_state_t::idle) << " idle\n";
+				state_msg << static_cast<uint32_t>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
 
 				int state = prompt(state_msg.str().c_str());
-				can::motor::motorstate_t motorState = static_cast<motorstate_t>(state);
-				can::motor::setMotorState(device, motorState);
-			} else if (testMode == TestMode::Vel) {
-				int uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-				CANDevice_t device;
-				device.deviceUUID = uuid;
+				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
+				board->setMotorState(motor_state);
+			} else if (testMode == TestMode::Power) {
+				board->setMotorState(can::motor::axis_state_t::closed_loop_control);
 
-				can::motor::setMotorMode(device, motormode_t::vel);
-				can::motor::setMotorState(device, motorstate_t::control);
-
-				double vel = static_cast<double>(prompt("Enter velocity"));
-				can::motor::setMotorPower(device, vel);
+				double power = static_cast<double>(prompt("Enter power"));
+				board->setMotorPower(power);
+			} else if (testMode == TestMode::Read) {
+				uint16_t endpoint = static_cast<uint16_t>(prompt("Enter endpoint ID"));
+				board->read(endpoint);
 
 			// } else if (testMode == TestMode::Telemetry) {
 			// 	if (!mode_has_been_set) {
@@ -141,31 +105,32 @@ int main() {
 			// 		mode_has_been_set = true;
 			// 	}
 			// 	std::this_thread::sleep_for(1s);
+
 			} else if (testMode == TestMode::RawCAN) {
-				uint8_t pr = prompt("priority");
-				uint8_t uuid = prompt("uuid");
-				uint8_t command = prompt("command");
-				uint8_t dlc = prompt("add'l. data bits");
-				uint8_t data[dlc + 1];
-				data[0] = command;
+				// uint8_t pr = prompt("priority");
+				// uint8_t uuid = prompt("uuid");
+				// uint8_t command = prompt("command");
+				// uint8_t dlc = prompt("add'l. data bits");
+				// uint8_t data[dlc + 1];
+				// data[0] = command;
 
-				for (int i = 1; i <= dlc; i++) {
-					data[i] = prompt("bit");
-				}
+				// for (int i = 1; i <= dlc; i++) {
+				// 	data[i] = prompt("bit");
+				// }
 
-				// manual construction of a generic packet
-				CANPacket_t p = {};
-				p.device.deviceUUID = uuid;
-				p.priority = static_cast<CANPriority_t>(pr);
-				p.command = command;
-				p.senderUUID = CAN_UUID_JETSON;
-				p.contentsLength = dlc;
-				for (int i = 0; i < p.contentsLength && i < 6; i++) {
-					p.contents[i] = data[i + 1];
-				}
+				// // manual construction of a generic packet
+				// CANPacket_t p = {};
+				// p.device.deviceUUID = uuid;
+				// p.priority = static_cast<CANPriority_t>(pr);
+				// p.command = command;
+				// p.senderUUID = CAN_UUID_JETSON;
+				// p.contentsLength = dlc;
+				// for (int i = 0; i < p.contentsLength && i < 6; i++) {
+				// 	p.contents[i] = data[i + 1];
+				// }
 
-				can::sendCANPacket(p);
-				can::printCANPacket(p);
+				// can::sendCANPacket(p);
+				// can::printCANPacket(p);
 			}
 		}
 	}

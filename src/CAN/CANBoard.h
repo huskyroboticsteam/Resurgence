@@ -9,7 +9,12 @@ class CANBoard {
   public:
     CANBoard(robot::types::boardid_t board_id, CANDevice_t device);
 
+    // Motor
     void setMotorPower(double power);
+    void setMotorState(can::motor::axis_state_t state);
+
+    // Universal
+    void read(uint16_t endpoint);
 
   private:
     robot::types::boardid_t board_id;

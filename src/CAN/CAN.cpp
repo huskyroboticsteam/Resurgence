@@ -257,6 +257,20 @@ void handleHeartbeatPacket(CANPacket_t& packet) {
 	}
 }
 
+void handleDirectRead(CANPacket_t& packet) {
+	auto decoded = CANMotorPacket_BLDC_DirectReadResult_Decode(&packet);
+
+	LOG_F(INFO, "Direct Read from 0x%x of %u: %u", decoded.sender.deviceUUID, decoded.endpointID, decoded.value);
+
+	// Acknowledge the read request
+	auto it = ackMap.find(decoded.sender.deviceUUID);
+	if (it != ackMap.end()) {
+		auto eventID = it->second;
+		ackMap.erase(it);
+		ackScheduler->removeEvent(eventID);
+	}
+}
+
 // returns a file descriptor, or -1 on failure
 int createCANSocket(std::optional<CANDevice_t> device) {
 	int fd;
@@ -338,6 +352,10 @@ void receiveThreadFn() {
 
 				case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
 					handleLimitSwitchAlert(packet);
+					break;
+
+				case CAN_COMMAND_ID__BLDC_DIRECT_READ_RESULT:
+					handleDirectRead(packet);
 					break;
 
 				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:

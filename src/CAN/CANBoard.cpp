@@ -1,4 +1,4 @@
-#include "CANMotor.h"
+#include "CANBoard.h"
 
 namespace can {
 
@@ -8,9 +8,9 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         // Set default modes
         CANPacket_t p = CANMotorPacket_BLDC_SetInputMode(
             Constants::JETSON_DEVICE, device,
-            control_mode_t::velocity,
-            input_mode_t::vel_ramp
-        )
+            static_cast<uint8_t>(can::motor::control_mode_t::velocity),
+            static_cast<uint8_t>(can::motor::input_mode_t::vel_ramp)
+        );
         sendCANPacket(p);
 
         // Ping motor for configs (max vel)
@@ -26,7 +26,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
 void CANBoard::setMotorPower(double power) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorPower called for board not in motor domain!")
+        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
         return;
     }
 
@@ -44,6 +44,26 @@ void CANBoard::setMotorPower(double power) {
     );
 
     // Send packet
+    sendCANPacket(p);
+}
+
+void CANBoard::setMotorState(can::motor::axis_state_t state) {
+    if (!this->device.motorDomain) {
+        LOG_F(WARNING, "setMotorState called for board not in motor domain!");
+        return;
+    }
+
+    uint32_t axis_state = static_cast<uint32_t>(state);
+    CANPacket_t p = CANMotorPacket_BLDC_SetAxisState(
+        Constants::JETSON_DEVICE, this->device, axis_state
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::read(uint16_t endpoint) {
+    CANPacket_t p = CANMotorPacket_BLDC_DirectRead(
+        Constants::JETSON_DEVICE, this->device, endpoint
+    );
     sendCANPacket(p);
 }
 

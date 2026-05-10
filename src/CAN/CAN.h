@@ -21,24 +21,42 @@ extern "C" {
  */
 namespace can {
 
+namespace motor {
+
 /** @brief ODrive Control Modes */
-enum class control_mode_t {
+enum class control_mode_t : uint8_t {
 	position = BLDC_POSITION_CONTROL,
 	velocity = BLDC_VELOCITY_CONTROL,
 };
 
 /** @brief ODrive Input Modes */
-enum class input_mode_t {
+enum class input_mode_t : uint8_t {
 	passthrough = BLDC_PASSTHROUGH_INPUT,
 	vel_ramp = BLDC_VEL_RAMP_INPUT,
 };
 
 /** @brief ODrive Axis States */
-enum class axis_state_t {
+enum class axis_state_t : uint32_t {
 	idle = BLDC_AXIS_IDLE,
 	full_calib = BLDC_AXIS_FULL_CALIBRATION_SEQUENCE,
 	motor_calib = BLDC_AXIS_MOTOR_CALIBRATION,
+	encoder_offset_calib = BLDC_AXIS_ENCODER_OFFSET_CALIBRATION,
+	closed_loop_control = BLDC_AXIS_CLOSED_LOOP_CONTROL,
+	lockin_spin = BLDC_AXIS_LOCKIN_SPIN,
 };
+
+/** @brief ODrive endpoints */
+constexpr auto ENDPOINTS = frozen::make_unordered_map<frozen::string, uint16_t>({
+	{"axis0.current_state", 213}, // uint8, r
+	{"axis0.requested_state", 214}, // uint8, rw
+	{"axis0.config.enable_watchdog", 234}, // bool, rw
+	{"axis0.config.general_lockin.vel", 258}, // float, rw
+	{"axis0.controller.config.control_mode", 368}, // uint8, rw
+	{"axis0.controller.confg.input_mode", 369}, // uint8, rw
+	{"axis0.controller.config.vel_limit", 374}, // float, rw
+});
+
+} // namespace motor
 
 /**
  * @brief An ID for a telemetry callback.
