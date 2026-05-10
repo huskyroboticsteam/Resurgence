@@ -396,13 +396,6 @@ if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration
     LimitCalib.cpp)
   target_link_libraries(LimitSwitchCalibration real_world_interface)
-
-  add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID
-    ${rover_libs}
-    can_interface
-  )
-  target_link_libraries(TunePID ${vision_libs})
 endif()
 
 add_compile_options(

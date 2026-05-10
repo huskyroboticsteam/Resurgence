@@ -5,7 +5,14 @@ namespace can {
 CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
     : board_id(board_id), device(device) {
     if (device.motorDomain) {
-        // Motor initialization?
+        // Set default modes
+        CANPacket_t p = CANMotorPacket_BLDC_SetInputMode(
+            Constants::JETSON_DEVICE, device,
+            control_mode_t::velocity,
+            input_mode_t::vel_ramp
+        )
+        sendCANPacket(p);
+
         // Ping motor for configs (max vel)
         this->vel_limit = 10;
 
