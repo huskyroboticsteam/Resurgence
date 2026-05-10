@@ -215,7 +215,7 @@ void setMotorPos(robot::types::boardid_t motor, int32_t targetPos);
  * @param motor The motor to set the target position of.
  * @param targetVel The target velocity, in millidegrees per second.
  */
-void setMotorVel(robot::types::boardid_t motor, int32_t targetVel);
+void setMotorVel(robot::types::boardid_t motor, int8_t targetVel);
 
 /**
  * @brief Get the last reported position of the specified motor.

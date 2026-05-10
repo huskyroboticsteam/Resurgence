@@ -32,19 +32,28 @@ void CANBoard::setMotorPower(double power) {
 
     // Fetch motor states
 
-    // Mapping power to a target velocity
-    int8_t input_vel = static_cast<int8_t>(power * this->vel_limit);
-
     // Ensure motor control mode is velocity
     // Ensure motor state is closed loop control
+    this->setMotorState(can::motor::axis_state_t::closed_loop_control);
 
-    // Make CANPacket_t
-    CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
-        Constants::JETSON_DEVICE, this->device, input_vel, 0.0f
-    );
+    if (power == 0.0) {
+        if (static_cast<uint8_t>(this->board_id) < 5) {   // hack for wheels + base
+            this->setMotorState(can::motor::axis_state_t::idle);
+        } else if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
+            // Set motor general lockin vel to 0
+            this->setMotorState(can::motor::axis_state_t::lockin_spin);
+        }
+    } else {
+        // Mapping power to a target velocity
+        int8_t input_vel = static_cast<int8_t>(power * this->vel_limit);
+        // Make CANPacket_t
+        CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
+            Constants::JETSON_DEVICE, this->device, input_vel, 0.0f
+        );
 
-    // Send packet
-    sendCANPacket(p);
+        // Send packet
+        sendCANPacket(p);
+    }
 }
 
 void CANBoard::setMotorState(can::motor::axis_state_t state) {
@@ -60,7 +69,23 @@ void CANBoard::setMotorState(can::motor::axis_state_t state) {
     sendCANPacket(p);
 }
 
+void CANBoard::setMotorVel(int8_t velocity) {
+    if (!this->device.motorDomain) {
+        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
+        return;
+    }
+
+    // Make CANPacket_t
+    CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
+        Constants::JETSON_DEVICE, this->device, velocity, 0.0f
+    );
+
+    // Send packet
+    sendCANPacket(p);
+}
+
 void CANBoard::read(uint16_t endpoint) {
+    LOG_F(INFO, "read");
     CANPacket_t p = CANMotorPacket_BLDC_DirectRead(
         Constants::JETSON_DEVICE, this->device, endpoint
     );

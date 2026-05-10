@@ -395,7 +395,7 @@ DataPoint<int32_t> getMotorPos(boardid_t motor) {
 	}
 }
 
-void setMotorVel(robot::types::boardid_t motor, int32_t targetVel) {
+void setMotorVel(robot::types::boardid_t motor, int8_t targetVel) {
 	using namespace std::chrono_literals;
 
 	// ensure scheduler exists

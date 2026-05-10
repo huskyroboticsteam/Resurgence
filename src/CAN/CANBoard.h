@@ -12,6 +12,7 @@ class CANBoard {
     // Motor
     void setMotorPower(double power);
     void setMotorState(can::motor::axis_state_t state);
+    void setMotorVel(int8_t velocity);
 
     // Universal
     void read(uint16_t endpoint);
