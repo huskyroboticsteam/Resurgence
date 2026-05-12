@@ -1,3 +1,4 @@
+#include "CAN.h"
 #include "CANBoard.h"
 
 namespace can {
@@ -14,8 +15,13 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         sendCANPacket(p);
 
         // Ping motor for configs (max vel)
-        this->vel_limit = 10;
+        if (auto it = can::motor::ENDPOINTS.find("axis0.controller.config.vel_limit"); it != can::motor::ENDPOINTS.end()) {
+            addDirectReadCallback(this->device, it->second, [this](CANMotorPacket_BLDC_DirectReadResult_Decoded_t p) { this->vel_limit = p.value_float; });
 
+            this->read(it->second);
+        } else {
+            LOG_F(ERROR, "CAN Endpoints does not contain axis0.controller.config.vel_limit!");
+        }
         // Has watchdog?
     }
 

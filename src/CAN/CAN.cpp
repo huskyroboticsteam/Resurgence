@@ -27,11 +27,6 @@ extern "C" {
 #include <CANCommandIDs.h>
 #include <CANPacket.h>
 
-#include <Packets/DecodeMotor.h>
-#include <Packets/DecodePeripheral.h>
-#include <Packets/DecodePower.h>
-#include <Packets/DecodeUniversal.h>
-
 // old
 #include <HindsightCAN/CANCommon.h>
 }
@@ -75,7 +70,9 @@ std::unordered_map<std::pair<CANDeviceUUID_t, telemtype_t>,
 	telemEventIDMap;
 
 std::shared_ptr<util::PeriodicScheduler<>> ackScheduler;
-std::unordered_map<CANDeviceUUID_t, util::PeriodicScheduler<>::eventid_t> ackMap;
+std::unordered_map<
+	std::pair<CANDeviceUUID_t, CANCommand_t>,
+	util::PeriodicScheduler<>::eventid_t> ackMap;
 
 using telemetrycode_t = uint8_t;
 
@@ -115,6 +112,10 @@ std::unordered_map<
 	telemetryCallbackMap;
 uint32_t nextCallbackID = 0;
 std::mutex telemetryCallbackMapMutex; // protects callbackMap and callbackID
+
+std::unordered_map<
+	std::pair<CANDeviceUUID_t, uint16_t>,
+	std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>> directReadCallbackMap;
 
 // not thread-safe wrt file descriptor
 bool receivePacket(int fd, CANPacket_t& packet) {
@@ -228,7 +229,8 @@ void handleAck(CANPacket_t& packet) {
 		LOG_F(INFO, "Ack received from 0x%x: ok", decoded.receiver.deviceUUID);
 	}
 
-	auto it = ackMap.find(decoded.sender.deviceUUID);
+	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.commandID);
+	auto it = ackMap.find(key);
 	if (it != ackMap.end()) {
 		auto eventID = it->second;
 		ackMap.erase(it);
@@ -262,13 +264,13 @@ void handleDirectRead(CANPacket_t& packet) {
 
 	LOG_F(INFO, "Direct Read from 0x%x of %u: %u", decoded.sender.deviceUUID, decoded.endpointID, decoded.value);
 
-	// Acknowledge the read request
-	auto it = ackMap.find(decoded.sender.deviceUUID);
-	if (it != ackMap.end()) {
-		auto eventID = it->second;
-		ackMap.erase(it);
-		ackScheduler->removeEvent(eventID);
+	// Fire off callback, if it exists
+	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
+	auto it = directReadCallbackMap.find(key);
+	if (it != directReadCallbackMap.end()) {
+		it->second(decoded);
 	}
+	directReadCallbackMap.erase(key);
 }
 
 // returns a file descriptor, or -1 on failure
@@ -400,12 +402,13 @@ void sendCANPacket(const CANPacket_t& packet) {
 	frame.len = CANGetDlc(&mutablePacket);
 	std::memcpy(frame.data, CANGetData(&mutablePacket), frame.len);
 
-	if (packet.command & 0x80) {
+	if (packet.command & 0x80 && packet.command != CAN_ACK(CAN_COMMAND_ID__BLDC_DIRECT_READ)) {
 		if (!ackScheduler) {
 			ackScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_AckSched");
 		}
 
-		auto it = ackMap.find(uuid);
+		auto key = std::make_pair(static_cast<uint8_t>(packet.senderUUID), packet.command);
+		auto it = ackMap.find(key);
 		if (it != ackMap.end()) {
 			LOG_F(WARNING, "0x%x already has an outgoing packet! Ignoring..", uuid);
 			return;
@@ -416,7 +419,7 @@ void sendCANPacket(const CANPacket_t& packet) {
 			sendCANFrame(frame);
 		});
 
-		ackMap.insert_or_assign(uuid, eventID);
+		ackMap.insert_or_assign(key, eventID);
 	}
 
 	bool success = sendCANFrame(frame);
@@ -545,6 +548,14 @@ callbackid_t addDeviceTelemetryCallback(
 	telemetryCallbackMap.at(key).insert({callbackIDCode, callback});
 
 	return callbackID;
+}
+
+void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback) {
+	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
+	auto it = directReadCallbackMap.find(key);
+	if (it != directReadCallbackMap.end()) {
+		directReadCallbackMap.insert({key, callback});
+	}
 }
 
 void removeDeviceTelemetryCallback(callbackid_t id) {
