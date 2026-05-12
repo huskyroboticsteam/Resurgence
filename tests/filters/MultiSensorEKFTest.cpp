@@ -9,7 +9,7 @@
 #include "../../src/filters/MultiSensorEKF.h"
 #include "../../src/navtypes.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 using namespace navtypes;
 using namespace filters;

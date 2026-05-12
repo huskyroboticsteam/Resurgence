@@ -2,7 +2,7 @@
 
 #include "StateSpaceUtil.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace filters {
 

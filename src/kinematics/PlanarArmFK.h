@@ -7,7 +7,7 @@
 #include <initializer_list>
 #include <numeric>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace kinematics {
 

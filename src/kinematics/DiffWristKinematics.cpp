@@ -1,6 +1,6 @@
 #include "DiffWristKinematics.h"
 
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 namespace kinematics {
 using Eigen::Matrix2f;
 using Eigen::Vector2f;

@@ -11,7 +11,7 @@
 #include <loguru.hpp>
 #include <optional>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace control {
 

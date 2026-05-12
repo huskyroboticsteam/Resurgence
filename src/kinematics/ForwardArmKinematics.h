@@ -2,7 +2,7 @@
 
 #include "../navtypes.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace kinematics {
 

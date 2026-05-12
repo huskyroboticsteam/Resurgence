@@ -2,7 +2,7 @@
 
 #include "../utils/transform.h"
 
-#include <Eigen/QR>
+#include <eigen3/Eigen/QR>
 namespace kinematics {
 using namespace navtypes;
 using util::toTransformRotateFirst;

@@ -1,6 +1,6 @@
 #include "transform.h"
 
-#include <Eigen/LU>
+#include <eigen3/Eigen/LU>
 
 using namespace navtypes;
 

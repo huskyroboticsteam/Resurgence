@@ -3,8 +3,8 @@
 #include "KalmanFilterBase.h"
 #include "StateSpaceUtil.h"
 
-#include <Eigen/Core>
-#include <Eigen/LU>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/LU>
 
 namespace filters {
 

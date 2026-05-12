@@ -74,14 +74,15 @@ message("========================================")
 # Get the Eigen linear algebra library. Eigen's CMake config includes its headers as user
 # headers instead of system headers by default, so explicitly force them to be system includes
 # here to avoid the compiler spamming warnings at us for stuff in the Eigen headers.
+# set(Eigen3_DIR "/opt/homebrew/share/eigen3/cmake")
 find_package(Eigen3 REQUIRED NO_MODULE)
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Find the WebSocket++ library and Boost (provides the ASIO backend for Websocket++ and also
 # provides the program_options argument parser). Only the `system` component of Boost is
 # currently required.
 find_package(websocketpp REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED)
 
 # Find Frozen, library used for constexpr immutable containers
 find_package(frozen REQUIRED)

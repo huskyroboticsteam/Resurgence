@@ -1,6 +1,6 @@
 #include "../../src/filters/RollingAvgFilter.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <catch2/catch.hpp>
 
 using namespace Catch::literals;

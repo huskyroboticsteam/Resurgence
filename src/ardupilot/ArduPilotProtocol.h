@@ -6,7 +6,7 @@
 
 #include <mutex>
 
-#include <Eigen/Geometry>
+#include <eigen3/Eigen/Geometry>
 
 namespace net {
 namespace ardupilot {

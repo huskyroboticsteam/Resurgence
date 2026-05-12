@@ -2,7 +2,7 @@
 
 #include "../navtypes.h"
 
-#include <Eigen/Geometry>
+#include <eigen3/Eigen/Geometry>
 
 namespace util {
 

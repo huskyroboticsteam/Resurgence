@@ -10,7 +10,7 @@
 #include <loguru.hpp>
 #include <optional>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 /**
  * @brief This class controls the velocity of a multidimensional mechanism

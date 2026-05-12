@@ -1,6 +1,6 @@
 #include "../../src/utils/math.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <catch2/catch.hpp>
 
 TEST_CASE("Test Numerical Jacobian", "[util][math]") {

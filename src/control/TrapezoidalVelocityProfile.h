@@ -9,7 +9,7 @@
 #include <optional>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace control {
 
