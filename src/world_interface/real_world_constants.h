@@ -108,6 +108,27 @@ constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>
 	 {boardid_t::debug2, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG2}}
 	});
 
+constexpr auto boardInversionMap = frozen::make_unordered_map<boardid_t, uint8_t>({
+	 {boardid_t::frontTireLeft, -1},
+	 {boardid_t::frontTireRight, 1},
+	 {boardid_t::rearTireLeft, -1},
+	 {boardid_t::rearTireRight, 1},
+	 {boardid_t::armBase, 1},
+	 {boardid_t::shoulder, 1},
+	 {boardid_t::elbow, 1},
+	 {boardid_t::forearm, 1},
+	 {boardid_t::wristDiffLeft, 1},
+	 {boardid_t::wristDiffRight, 1},
+	
+	 // Telemetry (0x50)
+	 {boardid_t::telemetry, 0},
+	 // Hand (0x60)
+	 {boardid_t::hand, 1},
+	 // DEBUG (0x70, 0x71)
+	 {boardid_t::debug1, 0},
+	 {boardid_t::debug2, 0}
+});
+
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
 	frozen::make_unordered_map<boardid_t, pidcoef_t>({{boardid_t::shoulder, {70, 0, 0}}});

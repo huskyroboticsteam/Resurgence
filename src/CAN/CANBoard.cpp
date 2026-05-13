@@ -1,5 +1,6 @@
 #include "CAN.h"
 #include "CANBoard.h"
+#include "../world_interface/real_world_constants.h"
 
 namespace can {
 
@@ -16,13 +17,21 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
         // Ping motor for configs (max vel)
         if (auto it = can::motor::ENDPOINTS.find("axis0.controller.config.vel_limit"); it != can::motor::ENDPOINTS.end()) {
-            addDirectReadCallback(this->device, it->second, [this](CANMotorPacket_BLDC_DirectReadResult_Decoded_t p) { this->vel_limit = p.value_float; });
+            addDirectReadCallback(this->device, it->second, [this](CANMotorPacket_BLDC_DirectReadResult_Decoded_t p) {
+                this->vel_limit = p.value_float;
+                LOG_F(INFO, "got vel limit %f", p.value_float);
+            });
 
             this->read(it->second);
         } else {
             LOG_F(ERROR, "CAN Endpoints does not contain axis0.controller.config.vel_limit!");
         }
         // Has watchdog?
+
+        // Inversion
+        if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
+            this->inversion_factor = it->second;
+        }
     }
 
     if (device.peripheralDomain) {
@@ -52,6 +61,7 @@ void CANBoard::setMotorPower(double power) {
     } else {
         // Mapping power to a target velocity
         int8_t input_vel = static_cast<int8_t>(power * this->vel_limit);
+        input_vel *= this->inversion_factor;
         // Make CANPacket_t
         CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
             Constants::JETSON_DEVICE, this->device, input_vel, 0.0f
@@ -91,7 +101,6 @@ void CANBoard::setMotorVel(int8_t velocity) {
 }
 
 void CANBoard::read(uint16_t endpoint) {
-    LOG_F(INFO, "read");
     CANPacket_t p = CANMotorPacket_BLDC_DirectRead(
         Constants::JETSON_DEVICE, this->device, endpoint
     );

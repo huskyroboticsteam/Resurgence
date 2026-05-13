@@ -113,6 +113,7 @@ std::unordered_map<
 uint32_t nextCallbackID = 0;
 std::mutex telemetryCallbackMapMutex; // protects callbackMap and callbackID
 
+std::shared_mutex directReadMapMutex;
 std::unordered_map<
 	std::pair<CANDeviceUUID_t, uint16_t>,
 	std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>> directReadCallbackMap;
@@ -262,14 +263,19 @@ void handleHeartbeatPacket(CANPacket_t& packet) {
 void handleDirectRead(CANPacket_t& packet) {
 	auto decoded = CANMotorPacket_BLDC_DirectReadResult_Decode(&packet);
 
-	LOG_F(INFO, "Direct Read from 0x%x of %u: %u", decoded.sender.deviceUUID, decoded.endpointID, decoded.value);
+	// LOG_F(INFO, "Direct Read from 0x%x of %u: %u", decoded.sender.deviceUUID, decoded.endpointID, decoded.value);
 
 	// Fire off callback, if it exists
 	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
+	// Read access
+	std::shared_lock mapReadLock(directReadMapMutex);
 	auto it = directReadCallbackMap.find(key);
 	if (it != directReadCallbackMap.end()) {
 		it->second(decoded);
 	}
+
+	// Write access
+	std::unique_lock mapWriteLock(directReadMapMutex);
 	directReadCallbackMap.erase(key);
 }
 
@@ -552,10 +558,9 @@ callbackid_t addDeviceTelemetryCallback(
 
 void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback) {
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
-	auto it = directReadCallbackMap.find(key);
-	if (it != directReadCallbackMap.end()) {
-		directReadCallbackMap.insert({key, callback});
-	}
+	// Write access
+	std::unique_lock mapLock(directReadMapMutex);
+	directReadCallbackMap.insert({key, callback});
 }
 
 void removeDeviceTelemetryCallback(callbackid_t id) {

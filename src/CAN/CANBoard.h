@@ -21,6 +21,7 @@ class CANBoard {
     robot::types::boardid_t board_id;
     CANDevice_t device;
     uint8_t vel_limit;
+    int8_t inversion_factor;
 };
 
 } // namespace can
