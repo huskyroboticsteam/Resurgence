@@ -129,6 +129,13 @@ constexpr auto boardInversionMap = frozen::make_unordered_map<boardid_t, uint8_t
 	 {boardid_t::debug2, 0}
 });
 
+constexpr auto proBoards = frozen::make_unordered_set<boardid_t>({
+	boardid_t::armBase,
+	boardid_t::shoulder,
+	boardid_t::elbow,
+	boardid_t::debug2,
+});
+
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
 	frozen::make_unordered_map<boardid_t, pidcoef_t>({{boardid_t::shoulder, {70, 0, 0}}});

@@ -52,6 +52,7 @@ int main() {
 		uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 		// TODO: Assuming motor domain for now
 		CANDevice_t device = CANDevice_t{0, 1, 0, uuid};
+		// Change to debug2 for pro endpoints
 		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
 
 		while (true) {
@@ -69,8 +70,43 @@ int main() {
 				double power = static_cast<double>(prompt("Enter power"));
 				board->setMotorPower(power);
 			} else if (testMode == TestMode::Read) {
-				uint16_t endpoint = static_cast<uint16_t>(prompt("Enter endpoint ID"));
-				board->read(endpoint);
+				// uint16_t endpoint = static_cast<uint16_t>(prompt("Enter endpoint name"));
+				std::string input;
+				std::cout << "Enter endpoint name" << " > ";
+				std::getline(std::cin, input);
+
+				if (nlohmann::json endpoint = can::getEndpoint(board->get_boardid(), input); endpoint != nullptr) {
+					uint16_t endpoint_id = endpoint["id"];
+					can::addDirectReadCallback(board->get_device(), endpoint_id, [board, input, endpoint](auto decoded) {
+						std::stringstream rs("");
+						rs << input << " from 0x" << std::hex << board->get_device().deviceUUID << ": ";
+
+						std::string type = endpoint["type"];
+						if (type == "uint32") {
+							rs << decoded.value_uint32;
+						} else if (type == "int32") {
+							rs << decoded.value_int32;
+						} else if (type == "uint16") {
+							rs << decoded.value_uint16;
+						} else if (type == "uint8") {
+							rs << decoded.value_uint8;
+						} else if (type == "float") {
+							rs << decoded.value_float;
+						} else if (type == "bool") {
+							rs << decoded.value_bool;
+						}
+
+						std::cout << rs.str().c_str() << std::endl;
+
+						can::removeDirectReadCallback(board->get_device(), endpoint["id"]);
+					});
+
+					board->read(endpoint_id);
+				} else {
+					std::cout << "Unknown endpoint" << std::endl;
+					continue;
+				}
+
 
 			// } else if (testMode == TestMode::Telemetry) {
 			// 	if (!mode_has_been_set) {

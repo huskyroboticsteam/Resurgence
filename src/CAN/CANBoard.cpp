@@ -2,6 +2,8 @@
 #include "CANBoard.h"
 #include "../world_interface/real_world_constants.h"
 
+#include <nlohmann/json.hpp>
+
 namespace can {
 
 CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
@@ -16,13 +18,17 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         sendCANPacket(p);
 
         // Ping motor for configs (max vel)
-        if (auto it = can::motor::ENDPOINTS.find("axis0.controller.config.vel_limit"); it != can::motor::ENDPOINTS.end()) {
-            addDirectReadCallback(this->device, it->second, [this](CANMotorPacket_BLDC_DirectReadResult_Decoded_t p) {
+        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
+            uint16_t endpoint_id = endpoint["id"];
+            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
                 this->vel_limit = p.value_float;
                 LOG_F(INFO, "got vel limit %f", p.value_float);
+
+                // We only need this once, remove after we get a response
+                removeDirectReadCallback(this->device, endpoint_id);
             });
 
-            this->read(it->second);
+            this->read(endpoint_id);
         } else {
             LOG_F(ERROR, "CAN Endpoints does not contain axis0.controller.config.vel_limit!");
         }

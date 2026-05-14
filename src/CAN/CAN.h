@@ -4,9 +4,11 @@
 #include "../world_interface/data.h"
 #include "CANUtils.h"
 #include "../Constants.h"
+
 #include <functional>
-#include <optional>
 #include <linux/can.h>
+#include <nlohmann/json.hpp>
+#include <optional>
 
 extern "C" {
 #include <CANDevices.h>
@@ -49,19 +51,6 @@ enum class axis_state_t : uint32_t {
 	closed_loop_control = BLDC_AXIS_CLOSED_LOOP_CONTROL,
 	lockin_spin = BLDC_AXIS_LOCKIN_SPIN,
 };
-
-/** @brief ODrive endpoints */
-constexpr auto ENDPOINTS = frozen::make_unordered_map<frozen::string, uint16_t>({
-	{"axis0.current_state", 232}, // uint8, r
-	{"axis0.requested_state", 233}, // uint8, rw
-	{"axis0.config.enable_watchdog", 254}, // bool, rw
-	{"axis0.config.general_lockin.vel", 278}, // float, rw
-	{"axis0.controller.input_vel", 374}, // float, rw
-	{"axis0.controller.config.control_mode", 389}, // uint8, rw
-	{"axis0.controller.confg.input_mode", 390}, // uint8, rw
-	{"axis0.controller.config.vel_limit", 396}, // float, rw
-});
-
 } // namespace motor
 
 /**
@@ -98,9 +87,6 @@ bool sendCANFrame(const canfd_frame& frame);
  * @param packet The CAN packet to print.
  */
 void printCANPacket(const CANPacket_t& packet);
-
-void initHeartbeatWatchdog();
-void handleHeartbeatPacket(CANPacket_t& packet);
 
 /**
  * @brief Get the latest telemetry from a CAN device.
@@ -184,5 +170,8 @@ callbackid_t addDeviceTelemetryCallback(
 void removeDeviceTelemetryCallback(callbackid_t id);
 
 void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback);
+void removeDirectReadCallback(CANDevice_t device, uint16_t endpoint);
+
+nlohmann::json getEndpoint(boardid_t boardid, std::string endpoint);
 
 } // namespace can
