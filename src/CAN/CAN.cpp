@@ -209,6 +209,8 @@ void handleEncoderEstimates(CANPacket_t& packet) {
 	CANDeviceUUID_t uuid = packet.senderUUID;
 	// Convert position from revolutions to millidegrees
 	int32_t positionMdeg = static_cast<int32_t>(decoded.position * Constants::MILLIDEGREES_PER_REV);
+	
+	// LOG_F(INFO, "0x%x: %f mdeg", uuid, decoded.position);
 	telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::angle);
 	storeTelemetry(uuid, telemCode, robot::types::DataPoint<telemetry_t>(positionMdeg));
 }

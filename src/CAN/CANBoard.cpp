@@ -46,6 +46,13 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
             this->inversion_factor = it->second;
         }
+
+        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.pos_estimate"); endpoint != nullptr) {
+            uint16_t endpoint_id = endpoint["id"];
+            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
+                LOG_F(INFO, "0x%x at %f rots", this->device.deviceUUID, p.value_float);
+            });
+        }
     }
 
     if (device.peripheralDomain) {

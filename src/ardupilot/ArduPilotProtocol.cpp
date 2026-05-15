@@ -78,9 +78,9 @@ bool ArduPilotProtocol::validateIMURequest(const json& j) {
 }
 
 void ArduPilotProtocol::handleIMURequest(const json& j) {
-	double roll = j["roll"];
+	double roll = j["yaw"];
 	double pitch = j["pitch"];
-	double yaw = j["yaw"];
+	double yaw = j["roll"];
 	yaw = -yaw;
 	eulerangles_t rpy{roll, pitch, yaw};
 

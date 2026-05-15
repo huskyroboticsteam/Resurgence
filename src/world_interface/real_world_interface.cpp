@@ -264,7 +264,9 @@ void setMotorPos(robot::types::boardid_t board, int32_t targetPos) {
 robot::types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t board) {
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
-		// return board_ptr->getMotorPos();
+		if (nlohmann::json endpoint = can::getEndpoint(board_ptr->get_boardid(), "axis0.pos_estimate"); endpoint != nullptr) {
+			// board_ptr->read(endpoint["id"]);
+		}
 	}
 	return {};
 }
