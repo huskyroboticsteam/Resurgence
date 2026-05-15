@@ -169,28 +169,59 @@ void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const j
 }
 
 static bool validateWaypointNavRequest(const json& j) {
-	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
-	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
-	return (lat_is_unsigned || util::validateKey(j, "latitude", val_t::number_float)) &&
-		   (lon_is_unsigned || util::validateKey(j, "longitude", val_t::number_float)) &&
-		   util::validateKey(j, "isApproximate", val_t::boolean) &&
-		   util::validateKey(j, "isGate", val_t::boolean);
+	bool validPoints = util::validateKey(j, "points", val_t::array);
+	if (!validPoints) return false;
+
+	// bool validCircleMode = util::validateKey(j, "circleMode", val_t::boolean);
+	// if (!validCircleMode) return false;
+
+	// check validity of each point
+	for (const auto& point : j["points"]) {
+		// make sure each point is an array of two values
+		if (!point.is_array() || point.size() != 3) {
+			return false;
+		}
+		bool validPoint = (point[0].is_number_integer() || point[0].is_number_float()) &&
+						  (point[1].is_number_integer() || point[1].is_number_float());
+		if (!validPoint) return false;
+	} 
+	// all points validated at this point
+	return true;
 }
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
-	float latitude = j["latitude"];
-	float longitude = j["longitude"];
-	bool isApproximate = j["isApproximate"];
-	bool isGate = j["isGate"];
-	if (Globals::AUTONOMOUS && !isApproximate && !isGate) {
-		// gpsToMeters will not use altitude
-		navtypes::gpscoords_t coords = {latitude, longitude, 0};
-		auto target = robot::gpsToMeters(coords);
-		if (target) {
-			_autonomous_task.start(target.value());
-		} else {
-			LOG_F(WARNING, "No GPS converter initialized!");
+	if (Globals::AUTONOMOUS) {
+		// std::optional<Constants::autonomous::TaskType> type;
+		// if (j.get<TaskType>() != Constants::autonomous::TaskType::INVALID) {
+		// 	type = j.get<TaskType>();
+		// }
+
+		std::optional<double> radius;
+		if (util::validateKey(j, "radius", val_t::boolean)) {
+			radius = j["radius"];
 		}
+
+		// bool circleMode = j["circleMode"];
+		
+		navtypes::points_t finalTargets;
+
+		for (const auto& point : j["points"]) {
+			navtypes::gpscoords_t coord = {point[0], point[1], 0}; // make point into type gpscoords
+																   // gpsToMeters won't use altitude
+			
+			auto optTarget = robot::gpsToMeters(coord);
+			
+			// check if target was sent back by gpsToMeters
+			if (!optTarget) {
+				LOG_F(WARNING, "No GPS converter initialized!");
+				return;
+			}
+			finalTargets.push_back(*optTarget);
+		}
+		//_autonomous_task.start(finalTargets, circleMode, radius, type);
+
+		// temporary hard coded values
+		_autonomous_task.start(finalTargets, true, radius=16, std::nullopt);
 	}
 }
 
@@ -293,7 +324,7 @@ void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 	: WebSocketProtocol(Constants::MC_PROTOCOL_NAME), _server(server),
 	  _camera_stream_task(server), _telem_report_task(server), _arm_ik_task(server),
-	  _autonomous_task() {
+	  _autonomous_task(server) {
 	// emergency stop and operation mode handlers need the class for context since they must
 	// be able to access the methods to start and stop the power repeater thread
 	this->addMessageHandler(

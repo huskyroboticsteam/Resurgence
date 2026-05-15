@@ -9,57 +9,39 @@ using namespace std::chrono_literals;
 namespace commands {
 
 DriveToWaypointCommand::DriveToWaypointCommand(const point_t& target, double thetaKP,
-											   double driveVel, double slowDriveThresh,
-											   double doneThresh,
-											   util::dseconds closeToTargetDur)
-	: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
-	  slowDriveThresh(slowDriveThresh), doneThresh(doneThresh),
-	  setStateCalledBeforeOutput(false), closeToTargetDur(closeToTargetDur) {}
+											   double driveVel, double doneThresh)
+					: target(target), pose(pose_t::Zero()), thetaKP(thetaKP), driveVel(driveVel),
+					  doneThresh(doneThresh), setStateCalledBeforeOutput(false) {}
 
-void DriveToWaypointCommand::setState(const navtypes::pose_t& pose,
-									  robot::types::datatime_t time) {
+void DriveToWaypointCommand::setState(const navtypes::pose_t& pose) {
 	this->pose = pose;
 	this->setStateCalledBeforeOutput = true;
-	this->lastRecordedTime = time;
 }
 
 command_t DriveToWaypointCommand::getOutput() {
 	if (!this->setStateCalledBeforeOutput) {
-		LOG_F(WARNING, "DriveToWaypointCommand: getOutput() called before getState() call!");
+		LOG_F(WARNING, "DriveToWaypointCommand: getOutput() called before setState() call!");
 	}
 
 	this->setStateCalledBeforeOutput = false;
 	Eigen::Vector2d toTarget = target.topRows<2>() - pose.topRows<2>();
 	double targetAngle = std::atan2(toTarget(1), toTarget(0));
 	double angleDelta = targetAngle - pose(2);
-	double thetaErr = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
-	double thetaVel = thetaKP * thetaErr;
+
+	// p-controller (https://x-engineer.org/proportional-controller/)
+	// wrap angleDelta to [-pi, pi] to prevent 90+ degree turns
+	angleDelta = std::atan2(std::sin(angleDelta), std::cos(angleDelta));
+
+	double thetaVel = thetaKP * angleDelta;
 
 	double dist = (pose.topRows<2>() - target.topRows<2>()).norm();
 	double xVel = driveVel;
-	if (dist <= slowDriveThresh) {
-		xVel *= dist / slowDriveThresh;
-	}
-
 	return {.thetaVel = thetaVel, .xVel = xVel};
 }
 
 bool DriveToWaypointCommand::isDone() {
-	if (!lastRecordedTime.has_value()) {
-		return false;
-	}
-
 	double distance = (pose.topRows<2>() - target.topRows<2>()).norm();
-	if (distance <= doneThresh) {
-		if (!closeToTargetStartTime.has_value()) {
-			closeToTargetStartTime = lastRecordedTime;
-		}
-
-		return lastRecordedTime.value() - closeToTargetStartTime.value() >= closeToTargetDur;
-	} else {
-		closeToTargetStartTime.reset();
-	}
-	return false;
+	return distance <= doneThresh;
 }
 
 } // namespace commands

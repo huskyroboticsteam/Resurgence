@@ -298,7 +298,8 @@ add_library(control SHARED
 target_link_libraries(control utils)
 
 add_library(commands SHARED
-  commands/DriveToWaypointCommand.cpp)
+  commands/DriveToWaypointCommand.cpp
+  commands/PurePursuitCommand.cpp)
 
 add_library(autonomous SHARED
   autonomous/AutonomousTask.cpp)

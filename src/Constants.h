@@ -13,6 +13,8 @@
 
 #include <frozen/unordered_map.h>
 
+#include <nlohmann/json.hpp>
+
 using robot::types::CameraID;
 using robot::types::jointid_t;
 using robot::types::boardid_t;
@@ -188,13 +190,27 @@ constexpr frozen::unordered_map<boardid_t, double, IK_MOTORS.size()> SEGMENT_LEN
 } // namespace arm
 
 namespace autonomous {
-extern const double THETA_KP;
-extern const double DRIVE_VEL;
-extern const double SLOW_DRIVE_THRESHOLD;
-extern const double DONE_THRESHOLD;
-// Duration long enough to confirm we are there, not so long that time is wasted
-extern const util::dseconds CLOSE_TO_TARGET_DUR_VAL;
+enum class TaskType {
+   INVALID = -1,
+   TAG1,
+   TAG2,
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM( TaskType, {
+   {TaskType::INVALID, nullptr},
+   {TaskType::TAG1, "tag1"},
+   {TaskType::TAG2, "tag2"}
+});
 } // namespace autonomous
+
+namespace commands {
+extern const double DRIVE_VEL;
+extern const double DONE_THRESH;
+extern const double SLOW_THRESH;
+
+extern const double DIST_BETWEEN_POINTS;
+extern const double LOOKAHEAD_DIST;
+} // namespace commands
 
 extern const double CONTROL_HZ;
 } // namespace Constants

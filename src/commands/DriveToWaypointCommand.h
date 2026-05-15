@@ -23,23 +23,18 @@ public:
 	 * @param target the position of the target in world coordinates.
 	 * @param thetaKP the scaling factor to use for robot steering proportional control.
 	 * @param driveVel the speed to drive the robot at.
-	 * @param slowDriveThresh the distance at which the robot will start slowing down.
 	 * @param doneThresh the threshold for minimum robot-target distance to complete command.
-	 * @param closeToTargetDurVal the duration within doneThresh after which robot navigation
-	 * 							   is considered done, seconds.
 	 */
 	DriveToWaypointCommand(const navtypes::point_t& target, double thetaKP, double driveVel,
-						   double slowDriveThresh, double doneThresh,
-						   util::dseconds closeToTargetDur);
+						   double doneThresh);
 
 	/**
 	 * Must be called before getOutput() for each iteration. Updates the current pose of the
 	 * robot in the global reference frame used by DriveToWaypointCommand.
 	 *
 	 * @param pose, the current pose of the robot in the global reference frame.
-	 * @param time, the current time from robot::types::dataclock.
 	 */
-	void setState(const navtypes::pose_t& pose, robot::types::datatime_t time);
+	void setState(const navtypes::pose_t& pose);
 
 	/**
 	 * Gets the angular velocity and forward speed to run the robot at in order to navigate
@@ -61,13 +56,9 @@ private:
 	navtypes::point_t target;
 	navtypes::pose_t pose;
 	double thetaKP;
-	double driveVel;
-	double slowDriveThresh;
-	double doneThresh;
+	double driveVel;	
+	double doneThresh;	
 	bool setStateCalledBeforeOutput;
-	util::dseconds closeToTargetDur;
-	std::optional<robot::types::datatime_t> lastRecordedTime;
-	std::optional<robot::types::datatime_t> closeToTargetStartTime;
 };
 
 } // namespace commands
