@@ -17,22 +17,30 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         );
         sendCANPacket(p);
 
-        // Ping motor for configs (max vel)
+        // Ping motor for configs
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
             addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
                 this->vel_limit = p.value_float;
-                LOG_F(INFO, "got vel limit %f", p.value_float);
 
                 // We only need this once, remove after we get a response
                 removeDirectReadCallback(this->device, endpoint_id);
             });
 
             this->read(endpoint_id);
-        } else {
-            LOG_F(ERROR, "CAN Endpoints does not contain axis0.controller.config.vel_limit!");
         }
-        // Has watchdog?
+
+        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.config.enable_watchdog"); endpoint != nullptr) {
+            uint16_t endpoint_id = endpoint["id"];
+            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
+                this->watchdog = p.value_bool;
+
+                // We only need this once, remove after we get a response
+                removeDirectReadCallback(this->device, endpoint_id);
+            });
+
+            this->read(endpoint_id);
+        }
 
         // Inversion
         if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
@@ -66,7 +74,7 @@ void CANBoard::setMotorPower(double power) {
         }
     } else {
         // Mapping power to a target velocity
-        int8_t input_vel = static_cast<int8_t>(power * this->vel_limit);
+        float input_vel = static_cast<float>(power * this->vel_limit);
         input_vel *= this->inversion_factor;
         // Make CANPacket_t
         CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
@@ -75,6 +83,20 @@ void CANBoard::setMotorPower(double power) {
 
         // Send packet
         sendCANPacket(p);
+
+        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
+            uint16_t endpoint_id = endpoint["id"];
+            addDirectReadCallback(this->device, endpoint_id, [input_vel](auto decoded) {
+                if (decoded.value_float != input_vel) {
+                    LOG_F(ERROR, "Expected %f, got %f", input_vel, decoded.value_float);
+                    // send
+                } else {
+                    // remove from map
+                }
+            });
+
+            this->read(endpoint_id);
+        }
     }
 }
 

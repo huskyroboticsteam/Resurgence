@@ -23,8 +23,11 @@ class CANBoard {
   private:
     robot::types::boardid_t board_id;
     CANDevice_t device;
-    uint8_t vel_limit;
     int8_t inversion_factor;
+
+    // Configs read on startup
+    uint8_t vel_limit;
+    bool watchdog;
 };
 
 } // namespace can

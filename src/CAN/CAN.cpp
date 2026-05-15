@@ -270,6 +270,8 @@ void handleDirectRead(CANPacket_t& packet) {
 	// Read access
 	std::shared_lock mapReadLock(directReadMapMutex);
 	auto it = directReadCallbackMap.find(key);
+	// Unlock in case callback wants to modify the map?
+	mapReadLock.unlock();
 	if (it != directReadCallbackMap.end()) {
 		it->second(decoded);
 	}

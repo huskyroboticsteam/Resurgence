@@ -77,6 +77,7 @@ int main() {
 
 				if (nlohmann::json endpoint = can::getEndpoint(board->get_boardid(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
+					// std::cout << "endpoint " << input << " has id=" << endpoint_id << std::endl;
 					can::addDirectReadCallback(board->get_device(), endpoint_id, [board, input, endpoint](auto decoded) {
 						std::stringstream rs("");
 						rs << input << " from 0x" << std::hex << board->get_device().deviceUUID << ": ";
@@ -93,7 +94,7 @@ int main() {
 						} else if (type == "float") {
 							rs << decoded.value_float;
 						} else if (type == "bool") {
-							rs << decoded.value_bool;
+							rs << (decoded.value_bool ? "true" : "false");
 						}
 
 						std::cout << rs.str().c_str() << std::endl;
@@ -102,6 +103,7 @@ int main() {
 					});
 
 					board->read(endpoint_id);
+					std::this_thread::sleep_for(std::chrono::milliseconds(500));
 				} else {
 					std::cout << "Unknown endpoint" << std::endl;
 					continue;
