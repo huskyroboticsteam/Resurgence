@@ -52,22 +52,28 @@ int main() {
 		uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 		// TODO: Assuming motor domain for now
 		CANDevice_t device = CANDevice_t{0, 1, 0, uuid};
-		// Change to debug2 for pro endpoints
-		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
+
+		uint8_t type = static_cast<uint8_t>(prompt("0 for S1, 1 for Pro"));
+		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(
+			type == 0 ? robot::types::boardid_t::debug1 : robot::types::boardid_t::debug2, device);
 
 		while (true) {
 			if (testMode == TestMode::State) {
 				std::stringstream state_msg("Enter desired motor state:\n");
-				state_msg << static_cast<uint32_t>(can::motor::axis_state_t::idle) << " idle\n";
-				state_msg << static_cast<uint32_t>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
+				state_msg << static_cast<uint8_t>(can::motor::axis_state_t::idle) << " idle\n";
+				state_msg << static_cast<uint8_t>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
 
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
 				board->setMotorState(motor_state);
 			} else if (testMode == TestMode::Power) {
-				board->setMotorState(can::motor::axis_state_t::closed_loop_control);
+				// board->setMotorState(can::motor::axis_state_t::closed_loop_control);
 
-				double power = static_cast<double>(prompt("Enter power"));
+				// double power = static_cast<double>(prompt("Enter power"));
+				std::string input;
+				std::cout << "Enter power [-1.0, 1.0]: ";
+				std::getline(std::cin, input);
+				float power = std::stof(input);
 				board->setMotorPower(power);
 			} else if (testMode == TestMode::Read) {
 				// uint16_t endpoint = static_cast<uint16_t>(prompt("Enter endpoint name"));
@@ -80,9 +86,10 @@ int main() {
 					// std::cout << "endpoint " << input << " has id=" << endpoint_id << std::endl;
 					can::addDirectReadCallback(board->get_device(), endpoint_id, [board, input, endpoint](auto decoded) {
 						std::stringstream rs("");
-						rs << input << " from 0x" << std::hex << board->get_device().deviceUUID << ": ";
+						rs << input << " from 0x" << std::hex << board->get_device().deviceUUID << " [";
 
 						std::string type = endpoint["type"];
+						rs << type << "]: ";
 						if (type == "uint32") {
 							rs << decoded.value_uint32;
 						} else if (type == "int32") {
@@ -96,6 +103,7 @@ int main() {
 						} else if (type == "bool") {
 							rs << (decoded.value_bool ? "true" : "false");
 						}
+
 
 						std::cout << rs.str().c_str() << std::endl;
 

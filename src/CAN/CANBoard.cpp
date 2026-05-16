@@ -22,6 +22,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
             uint16_t endpoint_id = endpoint["id"];
             addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
                 this->vel_limit = p.value_float;
+                LOG_F(INFO, "Fetched vel limit for 0x%x: %f", this->device.deviceUUID, this->vel_limit);
 
                 // We only need this once, remove after we get a response
                 removeDirectReadCallback(this->device, endpoint_id);
@@ -47,12 +48,12 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
             this->inversion_factor = it->second;
         }
 
-        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.pos_estimate"); endpoint != nullptr) {
-            uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
-                LOG_F(INFO, "0x%x at %f rots", this->device.deviceUUID, p.value_float);
-            });
-        }
+        // if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.pos_estimate"); endpoint != nullptr) {
+        //     uint16_t endpoint_id = endpoint["id"];
+        //     addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
+        //         LOG_F(INFO, "0x%x at %f rots", this->device.deviceUUID, p.value_float);
+        //     });
+        // }
     }
 
     if (device.peripheralDomain) {
@@ -75,6 +76,25 @@ void CANBoard::setMotorPower(double power) {
     if (power == 0.0) {
         if (static_cast<uint8_t>(this->board_id) < 5) {   // hack for wheels + base
             this->setMotorState(can::motor::axis_state_t::idle);
+
+            // hang until this actually goes idle for funsies
+            this->correct = false;
+            if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.current_state"); endpoint != nullptr) {
+                uint16_t endpoint_id = endpoint["id"];
+                addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto decoded) {
+                    if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
+                        LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT IDLE", this->device.deviceUUID);
+                        this->setMotorState(can::motor::axis_state_t::idle);
+                    } else {
+                        removeDirectReadCallback(this->device, endpoint_id);
+                        correct = true;
+                    }
+                });
+
+                this->read(endpoint_id);
+            }
+
+            while (!this->correct);
         } else if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
             // Set motor general lockin vel to 0
             this->setMotorState(can::motor::axis_state_t::lockin_spin);
@@ -93,12 +113,12 @@ void CANBoard::setMotorPower(double power) {
 
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [input_vel](auto decoded) {
+            addDirectReadCallback(this->device, endpoint_id, [input_vel, p, this, endpoint_id](auto decoded) {
                 if (decoded.value_float != input_vel) {
                     LOG_F(ERROR, "Expected %f, got %f", input_vel, decoded.value_float);
-                    // send
+                    sendCANPacket(p);
                 } else {
-                    // remove from map
+                    removeDirectReadCallback(this->device, endpoint_id);
                 }
             });
 

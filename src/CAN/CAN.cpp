@@ -209,8 +209,7 @@ void handleEncoderEstimates(CANPacket_t& packet) {
 	CANDeviceUUID_t uuid = packet.senderUUID;
 	// Convert position from revolutions to millidegrees
 	int32_t positionMdeg = static_cast<int32_t>(decoded.position * Constants::MILLIDEGREES_PER_REV);
-	
-	// LOG_F(INFO, "0x%x: %f mdeg", uuid, decoded.position);
+
 	telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::angle);
 	storeTelemetry(uuid, telemCode, robot::types::DataPoint<telemetry_t>(positionMdeg));
 }
@@ -581,6 +580,10 @@ void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::fun
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
 	// Write access
 	std::unique_lock mapLock(directReadMapMutex);
+	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
+		LOG_F(WARNING, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint);
+		return;
+	}
 	directReadCallbackMap.insert({key, callback});
 }
 

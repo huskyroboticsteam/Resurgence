@@ -26,8 +26,11 @@ class CANBoard {
     int8_t inversion_factor;
 
     // Configs read on startup
-    uint8_t vel_limit;
+    float vel_limit;
     bool watchdog;
+
+    // debug
+    bool correct = false;
 };
 
 } // namespace can

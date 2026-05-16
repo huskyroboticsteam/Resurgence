@@ -43,7 +43,7 @@ enum class input_mode_t : uint8_t {
 };
 
 /** @brief ODrive Axis States */
-enum class axis_state_t : uint32_t {
+enum class axis_state_t : uint8_t {
 	idle = BLDC_AXIS_IDLE,
 	full_calib = BLDC_AXIS_FULL_CALIBRATION_SEQUENCE,
 	motor_calib = BLDC_AXIS_MOTOR_CALIBRATION,

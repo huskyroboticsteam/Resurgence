@@ -125,8 +125,8 @@ constexpr auto boardInversionMap = frozen::make_unordered_map<boardid_t, uint8_t
 	 // Hand (0x60)
 	 {boardid_t::hand, 1},
 	 // DEBUG (0x70, 0x71)
-	 {boardid_t::debug1, 0},
-	 {boardid_t::debug2, 0}
+	 {boardid_t::debug1, 1},
+	 {boardid_t::debug2, 1}
 });
 
 constexpr auto proBoards = frozen::make_unordered_set<boardid_t>({
