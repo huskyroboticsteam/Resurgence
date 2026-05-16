@@ -196,10 +196,10 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 		// 	type = j.get<TaskType>();
 		// }
 
-		std::optional<double> radius;
-		if (util::validateKey(j, "radius", val_t::boolean)) {
-			radius = j["radius"];
-		}
+		// std::optional<double> radius;
+		// if (util::validateKey(j, "radius", val_t::boolean)) {
+		// 	radius = j["radius"];
+		// }
 
 		// bool circleMode = j["circleMode"];
 		
@@ -220,8 +220,8 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 		}
 		//_autonomous_task.start(finalTargets, circleMode, radius, type);
 
-		// temporary hard coded values
-		_autonomous_task.start(finalTargets, true, radius=16, std::nullopt);
+		// temporary hard coded valuest, st
+		_autonomous_task.start(finalTargets, true, 5, std::nullopt);
 	}
 }
 

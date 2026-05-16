@@ -190,6 +190,7 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 }
 
 bool PurePursuitCommand::isDone() {
+	LOG_F(INFO, "pose: %f", _pose);
 	double distance = dist(_pose, _path.back());
 	if (distance <= c_c::DONE_THRESH && _curr_idx >= _path.size() - 2) {
 		LOG_F(INFO, "distance from goal: %lf", distance);
