@@ -17,8 +17,17 @@ class CANBoard {
     // Universal
     void read(uint16_t endpoint);
 
-    robot::types::boardid_t get_boardid() const { return board_id; }
-    CANDevice_t get_device() const { return device; }
+    robot::types::boardid_t getBoardID() const { return board_id; }
+    CANDevice_t getDevice() const { return device; }
+    robot::types::DataPoint<int32_t> getPosition() const {
+      std::shared_lock lock(board_mutex);
+      return this->position_mdeg;
+    }
+
+    void storePosition(robot::types::DataPoint<int32_t> data) const {
+      std::lock_guard lock(board_mutex);
+      this->position_mdeg = data;
+    }
 
   private:
     robot::types::boardid_t board_id;
@@ -29,10 +38,12 @@ class CANBoard {
     float vel_limit;
     bool watchdog;
 
+    // Estimates received
+    std::mutex board_mutex;
+    robot::types::DataPoint<int32_t> position_mdeg;
+
     // debug
     bool correct = false;
 };
 
 } // namespace can
-
-// Map <CANCommand_t, DirectRead UUID>

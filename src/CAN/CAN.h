@@ -1,14 +1,15 @@
 #pragma once
 
-#include "../utils/scheduler.h"
-#include "../world_interface/data.h"
 #include "CANUtils.h"
 #include "../Constants.h"
+#include "../utils/scheduler.h"
+#include "../world_interface/data.h"
 
 #include <functional>
+#include <optional>
+
 #include <linux/can.h>
 #include <nlohmann/json.hpp>
-#include <optional>
 
 extern "C" {
 #include <CANDevices.h>
@@ -59,7 +60,6 @@ enum class axis_state_t : uint8_t {
  * Users should not construct these themselves.
  */
 using callbackid_t = std::tuple<uuid_t, telemtype_t, uint32_t>;
-// using callbackid_t = std::tuple<deviceid_t, telemtype_t, uint32_t>;
 
 /**
  * @brief Initialize the CAN interface.
@@ -79,7 +79,6 @@ void initCAN();
  * @param packet The CAN packet to send.
  */
 void sendCANPacket(const CANPacket_t& packet);
-bool sendCANFrame(const canfd_frame& frame);
 
 /**
  * @brief Print a CAN packet.
@@ -102,76 +101,35 @@ void printCANPacket(const CANPacket_t& packet);
 robot::types::DataPoint<telemetry_t> getDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
 
 /**
- * @brief Ping the given CAN device to send the given telemetry data.
+ * @brief Add a callback to run when we receive a read result packet corresponding
+ * to the input endpoint. Callbacks persist until they are manually removed using
+ * removeDirectReadCallback()
  *
- * The CAN device will asynchronously send the new data in an unspecified amount of time.
- * Not all CAN devices may support pulling telemetry.
+ * This method is thread-safe.
  *
- * @param id The device group and serial number of the device.
- * @param telemType The type of telemetry to get, as dictated by the specific device specs.
+ * @param device The CAN device associated with this read.
+ * @param endpoint The endpoint to respond to.
+ * @param callback The function to call when we receive data, called with the decoded packet.
  */
-void pullDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
-
-/**
- * @brief Periodically pull the latest telemetry data from the specified CAN device
- * asychronously.
- *
- * This method is NOT thread safe.
- *
- * @param id The device group and serial number of the device.
- * @param telemType The type of telemetry to get, as dictated by the specific device specs.
- * @param period The period to wait in between sending pull requests.
- */
-void scheduleTelemetryPull(uuid_t uuid, telemtype_t telemType,
-						   std::chrono::milliseconds period);
-
-/**
- * @brief Stop pulling the latest telemetry data from the given device.
- *
- * This method is NOT thread safe.
- *
- * @param id The device group and serial number of the device.
- * @param telemType The type of telemetry to get, as dictated by the specific device specs.
- */
-void unscheduleTelemetryPull(uuid_t uuid, telemtype_t telemType);
-
-/**
- * @brief Stop pulling the latest telemetry data from all currently scheduled devices.
- *
- * This method is NOT thread safe.
- */
-void unscheduleAllTelemetryPulls();
-
-/**
- * @brief Add a callback which is invoked when data is recieved.
- *
- * The callback is invoked when telemetry data of the given type is received
- * from the given device.
- *
- * @param id The ID of the device the callback is listening for.
- * @param telemType The type of telemetry the callback is listening for.
- * @param callback The callback that will be invoked with the device ID, telemetry type, and
- * the telemetry data.
- * @return callbackid_t A callback ID, which can be used with removeDeviceTelemetryCallback()
- * to remove a callback.
- */
-callbackid_t addDeviceTelemetryCallback(
-	CANDeviceUUID_t uuid, telemtype_t telemType,
-	const std::function<void(CANDeviceUUID_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
-		callback);
-
-/**
- * @brief Remove a previously registered telemetry callback.
- *
- * The callback associated with the given callback ID is removed.
- *
- * @param id A callback ID which was previously returned by addDeviceTelemetryCallback().
- */
-void removeDeviceTelemetryCallback(callbackid_t id);
-
 void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback);
+
+/**
+ * @brief Removes a callback.
+ *
+ * This method is thread-safe.
+ *
+ * @param device The CAN device associated with the read callback.
+ * @param endpoint The endpoint to remove the callback for.
+ */
 void removeDirectReadCallback(CANDevice_t device, uint16_t endpoint);
 
+/**
+ * @brief Retrieves a JSON that corresponds to the endpoint name input.
+ *
+ * @param boardid The ID of the board to get the endpoint for. This is used
+ * to determine whether to fetch S1 or Pro endpoints.
+ * @param endpoint The name of the endpoint to retrieve.
+ */
 nlohmann::json getEndpoint(boardid_t boardid, std::string endpoint);
 
 } // namespace can

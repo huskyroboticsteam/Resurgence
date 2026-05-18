@@ -83,7 +83,7 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initBoards() {
-	// CAN26: Initialize boards using CANDevice_t from boardUUIDMap
+	// Initialize boards using CANDevice_t from boardUUIDMap
 	for (const auto& [board, device] : boardUUIDMap) {
 		addBoardMapping(board);
 	}
@@ -264,9 +264,7 @@ void setMotorPos(robot::types::boardid_t board, int32_t targetPos) {
 robot::types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t board) {
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
-		if (nlohmann::json endpoint = can::getEndpoint(board_ptr->get_boardid(), "axis0.pos_estimate"); endpoint != nullptr) {
-			// board_ptr->read(endpoint["id"]);
-		}
+		return board_ptr->getPosition();
 	}
 	return {};
 }
