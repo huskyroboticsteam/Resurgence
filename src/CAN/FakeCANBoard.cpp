@@ -61,9 +61,10 @@ int main() {
 
 		while (true) {
 			if (testMode == TestMode::State) {
-				std::stringstream state_msg("Enter desired motor state:\n");
-				state_msg << static_cast<uint8_t>(can::motor::axis_state_t::idle) << " idle\n";
-				state_msg << static_cast<uint8_t>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
+				std::stringstream state_msg("");
+				state_msg << "Enter desired motor state:\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::idle) << " idle\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
 
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
@@ -73,9 +74,10 @@ int main() {
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), "axis0.current_state"); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
 					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded) {
-						if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
-							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d", board->getDevice().deviceUUID, motor_state);
+						if (decoded.value_uint8 != static_cast<uint8_t>(motor_state)) {
+							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d", board->getDevice().deviceUUID, static_cast<uint8_t>(motor_state));
 							board->setMotorState(motor_state);
+							board->read(endpoint_id);
 						} else {
 							can::removeDirectReadCallback(board->getDevice(), endpoint_id);
 							correct = true;

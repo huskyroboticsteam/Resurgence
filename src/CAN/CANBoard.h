@@ -45,9 +45,6 @@ class CANBoard {
     // Estimates received
     std::shared_mutex board_mutex;
     robot::types::DataPoint<int32_t> position_mdeg;
-
-    // debug
-    bool correct = false;
 };
 
 } // namespace can

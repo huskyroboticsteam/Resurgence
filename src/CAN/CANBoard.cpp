@@ -47,6 +47,13 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
             this->inversion_factor = it->second;
         }
+
+        // Wait until configs are grabbed
+        auto start = std::chrono::system_clock::now();
+        while (!this->vel_limit);
+        auto end = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        LOG_F(INFO, "0x%x took %ld ms", this->device.deviceUUID, elapsed.count());
     }
 
     if (device.peripheralDomain) {
@@ -70,24 +77,21 @@ void CANBoard::setMotorPower(double power) {
         if (this->watchdog) {
             this->setMotorState(can::motor::axis_state_t::idle);
 
-            // hang until this actually goes idle for funsies
-            this->correct = false;
             if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.current_state"); endpoint != nullptr) {
                 uint16_t endpoint_id = endpoint["id"];
                 addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto decoded) {
                     if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
                         LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT IDLE", this->device.deviceUUID);
                         this->setMotorState(can::motor::axis_state_t::idle);
+                        this->read(endpoint_id);
                     } else {
                         removeDirectReadCallback(this->device, endpoint_id);
-                        correct = true;
                     }
                 });
 
                 this->read(endpoint_id);
             }
 
-            while (!this->correct);
         } else if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
             // Set motor general lockin vel to 0
             this->setMotorState(can::motor::axis_state_t::lockin_spin);
