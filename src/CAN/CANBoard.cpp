@@ -67,7 +67,7 @@ void CANBoard::setMotorPower(double power) {
     this->setMotorState(can::motor::axis_state_t::closed_loop_control);
 
     if (power == 0.0) {
-        if (static_cast<uint8_t>(this->board_id) < 5) {   // hack for wheels + base
+        if (this->watchdog) {
             this->setMotorState(can::motor::axis_state_t::idle);
 
             // hang until this actually goes idle for funsies
@@ -139,9 +139,11 @@ void CANBoard::setMotorVel(int8_t velocity) {
         return;
     }
 
+    float rot_vel = velocity / Constants::MILLIDEGREES_PER_REV;
+
     // Make CANPacket_t
     CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
-        Constants::JETSON_DEVICE, this->device, velocity, 0.0f
+        Constants::JETSON_DEVICE, this->device, rot_vel, 0.0f
     );
 
     // Send packet

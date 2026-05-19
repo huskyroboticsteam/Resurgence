@@ -1,7 +1,10 @@
 #pragma once
 
-#include "../world_interface/data.h"
 #include "CAN.h"
+#include "../world_interface/data.h"
+
+#include <mutex>
+#include <shared_mutex>
 
 namespace can {
 
@@ -19,13 +22,14 @@ class CANBoard {
 
     robot::types::boardid_t getBoardID() const { return board_id; }
     CANDevice_t getDevice() const { return device; }
-    robot::types::DataPoint<int32_t> getPosition() const {
+
+    robot::types::DataPoint<int32_t> getPosition() {
       std::shared_lock lock(board_mutex);
       return this->position_mdeg;
     }
 
-    void storePosition(robot::types::DataPoint<int32_t> data) const {
-      std::lock_guard lock(board_mutex);
+    void storePosition(const robot::types::DataPoint<int32_t> data) {
+      std::unique_lock lock(board_mutex);
       this->position_mdeg = data;
     }
 
@@ -39,7 +43,7 @@ class CANBoard {
     bool watchdog;
 
     // Estimates received
-    std::mutex board_mutex;
+    std::shared_mutex board_mutex;
     robot::types::DataPoint<int32_t> position_mdeg;
 
     // debug

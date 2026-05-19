@@ -168,14 +168,6 @@ void handleHeartbeatPacket(CANPacket_t& packet) {
 	}
 }
 
-void handleLimitSwitchAlert(CANPacket_t& packet) {
-	auto decoded = CANMotorPacket_LimitSwitchAlert_Decode(&packet);
-	CANDeviceUUID_t uuid = packet.senderUUID;
-	telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::limit_switch);
-	storeTelemetry(uuid, telemCode,
-				   robot::types::DataPoint<telemetry_t>(static_cast<telemetry_t>(decoded.switchStatus)));
-}
-
 // returns a file descriptor, or -1 on failure
 int createCANSocket(std::optional<CANDevice_t> device) {
 	int fd;
@@ -227,6 +219,15 @@ int createCANSocket(std::optional<CANDevice_t> device) {
 	return fd;
 }
 
+bool sendCANFrame(const canfd_frame& frame) {
+	std::lock_guard lock(socketMutex);
+	// note that frame is a canfd_frame but we're using sizeof(can_frame)
+	// not sure why this is required to work
+	bool success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
+	tcdrain(can_fd);
+	return success;
+}
+
 void receiveThreadFn() {
 	loguru::set_thread_name("CAN_Receive");
 	CANPacket_t packet;
@@ -256,7 +257,7 @@ void receiveThreadFn() {
 					break;
 
 				case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
-					handleLimitSwitchAlert(packet);
+					// handleLimitSwitchAlert(packet);
 					break;
 
 				case CAN_COMMAND_ID__BLDC_DIRECT_READ_RESULT:
@@ -336,15 +337,6 @@ void sendCANPacket(const CANPacket_t& packet) {
 	}
 }
 
-bool sendCANFrame(const canfd_frame& frame) {
-	std::lock_guard lock(socketMutex);
-	// note that frame is a canfd_frame but we're using sizeof(can_frame)
-	// not sure why this is required to work
-	bool success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
-	tcdrain(can_fd);
-	return success;
-}
-
 void printCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // same as sendCANPacket
 	std::stringstream ss;
@@ -360,28 +352,6 @@ void printCANPacket(const CANPacket_t& packet) {
 	ss << "]";
 
 	LOG_F(INFO, ss.str().c_str());
-}
-
-robot::types::DataPoint<telemetry_t> getDeviceTelemetry(CANDeviceUUID_t uuid,
-														telemtype_t telemType) {
-	std::shared_lock mapLock(telemMapMutex); // acquire read lock
-	// find entry for device in map
-	auto entry = telemMap.find(uuid);
-	if (entry != telemMap.end()) {
-		auto& devMutex = *entry->second.first;
-		auto& devMap = *entry->second.second;
-		// acquire read lock of device map
-		std::shared_lock deviceLock(devMutex);
-		// find entry for telemetry
-		auto telemEntry = devMap.find(static_cast<telemetrycode_t>(telemType));
-		if (telemEntry != devMap.end()) {
-			return telemEntry->second;
-		} else {
-			return {};
-		}
-	} else {
-		return {};
-	}
 }
 
 void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback) {

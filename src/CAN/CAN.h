@@ -88,19 +88,6 @@ void sendCANPacket(const CANPacket_t& packet);
 void printCANPacket(const CANPacket_t& packet);
 
 /**
- * @brief Get the latest telemetry from a CAN device.
- *
- * This method does NOT query for new data, it just returns the last reported value.
- *
- * @param id The device group and serial number of the device.
- * @param telemType The type of telemetry to get, as dictated by the specific device specs.
- * @return robot::types::DataPoint<telemetry_t> The telemetry value, with the timestamp of when
- * it was received. If no data is available for the given telemetry type, an empty data point
- * is returned.
- */
-robot::types::DataPoint<telemetry_t> getDeviceTelemetry(uuid_t uuid, telemtype_t telemType);
-
-/**
  * @brief Add a callback to run when we receive a read result packet corresponding
  * to the input endpoint. Callbacks persist until they are manually removed using
  * removeDirectReadCallback()

@@ -213,7 +213,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   add_library(can_interface STATIC)
   target_sources(can_interface PRIVATE
     CAN/CANBoard.cpp
-    CAN/CANMotor.cpp
     CAN/CANUtils.cpp
   )
 

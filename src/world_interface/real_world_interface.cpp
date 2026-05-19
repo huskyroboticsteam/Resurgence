@@ -288,6 +288,7 @@ callbackid_t addLimitSwitchCallback(
 	// auto nextID = nextCallbackID++;
 	// callbackIDMap.insert({nextID, id});
 	// return nextID;
+	return 0;
 }
 
 void removeLimitSwitchCallback(callbackid_t id) {
