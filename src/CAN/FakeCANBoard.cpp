@@ -31,6 +31,8 @@ int prompt(std::string_view message) {
 	return val;
 }
 
+bool correct = false;
+
 int main() {
 	can::initCAN();
 
@@ -66,6 +68,24 @@ int main() {
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
 				board->setMotorState(motor_state);
+
+				correct = false;
+				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), "axis0.current_state"); endpoint != nullptr) {
+					uint16_t endpoint_id = endpoint["id"];
+					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded) {
+						if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
+							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d", board->getDevice().deviceUUID, motor_state);
+							board->setMotorState(motor_state);
+						} else {
+							can::removeDirectReadCallback(board->getDevice(), endpoint_id);
+							correct = true;
+						}
+					});
+
+					board->read(endpoint_id);
+				}
+
+				while (!correct);
 			} else if (testMode == TestMode::Power) {
 				std::string input;
 				std::cout << "Enter power [-1.0, 1.0]: ";
