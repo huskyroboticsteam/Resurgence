@@ -23,7 +23,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
             addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
                 std::unique_lock lock(this->board_mutex);
                 this->vel_limit = p.value_float;
-                LOG_F(INFO, "Fetched vel limit for 0x%x: %f", this->device.deviceUUID, this->vel_limit);
+                // LOG_F(INFO, "Fetched vel limit for 0x%x: %f", this->device.deviceUUID, this->vel_limit);
 
                 // We only need this once, remove after we get a response
                 removeDirectReadCallback(this->device, endpoint_id);

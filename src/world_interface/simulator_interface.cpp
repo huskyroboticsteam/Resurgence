@@ -476,6 +476,10 @@ void setIndicator(indication_t signal) {
 	}
 }
 
+void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionMdeg) {
+
+}
+
 } // namespace robot
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {

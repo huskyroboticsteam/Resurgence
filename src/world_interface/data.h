@@ -229,7 +229,7 @@ public:
 	 * @param defaultData The value to return if this data point is not valid.
 	 * @return T The value of this data point, or @p defaultData.
 	 */
-	T getDataOrElse(T defaultData) {
+	T getDataOrElse(T defaultData) const {
 		return isValid() ? getData() : defaultData;
 	}
 

@@ -1,5 +1,6 @@
 #include "CAN.h"
 #include "../world_interface/real_world_constants.h"
+#include "../world_interface/world_interface.h"
 
 #include <chrono>
 #include <cstring>
@@ -54,6 +55,7 @@ constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(1000);
 
 std::shared_mutex bufferMutex;
 std::queue<CANPacket_t> buffer;
+uint32_t buffer_size_max = 0;
 
 // map each device seen to a watchdog
 std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeatWatchdogMap;
@@ -129,7 +131,7 @@ void handleAck(CANPacket_t& packet) {
 
 void handleDirectRead(CANPacket_t& packet) {
 	auto decoded = CANMotorPacket_BLDC_DirectReadResult_Decode(&packet);
-	LOG_F(INFO, "Read for 0x%x of %x", decoded.sender.deviceUUID, decoded.endpointID);
+	// LOG_F(INFO, "Read for 0x%x of %x", decoded.sender.deviceUUID, decoded.endpointID);
 
 	// Fire off callback, if it exists
 	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
@@ -141,7 +143,7 @@ void handleDirectRead(CANPacket_t& packet) {
 	if (it != directReadCallbackMap.end()) {
 		it->second(decoded);
 	} else {
-		LOG_F(INFO, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID, decoded.endpointID);
+		// LOG_F(INFO, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID, decoded.endpointID);
 	}
 }
 
@@ -150,6 +152,10 @@ void handleEncoderEstimates(CANPacket_t& packet) {
 	CANDeviceUUID_t uuid = packet.senderUUID;
 	// Convert position from revolutions to millidegrees
 	int32_t positionMdeg = static_cast<int32_t>(decoded.position * Constants::MILLIDEGREES_PER_REV);
+
+	if(auto it = robot::UUIDBoardMap.find(uuid); it != robot::UUIDBoardMap.end()) {
+		robot::handleMotorEncoderEstimate(it->second, positionMdeg);
+	}
 
 	// telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::angle);
 	// storeTelemetry(uuid, telemCode, robot::types::DataPoint<telemetry_t>(positionMdeg));
@@ -251,9 +257,16 @@ void receiveThreadFn() {
 		bool received = receivePacket(recvFD, packet);
 		if (received) {
 			// Add packet to buffer
-			std::unique_lock lock(bufferMutex);
+			// std::unique_lock lock(bufferMutex);
 			buffer.push(packet);
-			lock.unlock();
+			// if (packet.command == CAN_COMMAND_ID__BLDC_DIRECT_READ_RESULT) {
+			// 	LOG_F(INFO, "Adding result packet for 0x%x to buffer", packet.senderUUID);
+			// }
+			// if (buffer.size() > buffer_size_max) {
+			// 	LOG_F(INFO, "New max buffer size: %d", buffer_size_max);
+			// 	buffer_size_max = buffer.size();
+			// }
+			// lock.unlock();
 		} else {
 			// we had a bus error, so sleep for a bit
 			std::this_thread::sleep_for(READ_ERR_SLEEP);
@@ -271,12 +284,12 @@ void processThreadFn() {
 
 		// Double check required after releasing lock
 		if (buffer.empty()) { continue; }
+		// LOG_F(INFO, "Buffer size = %ld", buffer.size());
 		CANPacket_t packet = buffer.front();
 		buffer.pop();
 		// Done with buffer, unlock to allow more reading
 		write_lock.unlock();
 
-		// auto start = std::chrono::system_clock::now();
 		// dispatch on CAN26 command ID
 		switch (packet.command) {
 			case CAN_COMMAND_ID__E_STOP:
@@ -308,9 +321,6 @@ void processThreadFn() {
 						packet.command, packet.senderUUID);
 				break;
 		}
-		// auto end = std::chrono::system_clock::now();
-		// auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-		// LOG_F(INFO, "Processing %x took %ld ns", packet.command, elapsed.count());
 	}
 }
 } // namespace
@@ -336,6 +346,8 @@ void initCAN() {
 	// start thread for processing CAN packets
 	std::thread processThread(processThreadFn);
 	processThread.detach();
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 void sendCANPacket(const CANPacket_t& packet) {

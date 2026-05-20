@@ -68,7 +68,7 @@ std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 
 	if (itr == board_ptrs.end()) {
 		// board id not in map
-		LOG_F(ERROR, "getBoard_(): Unknown board 0x%x", static_cast<uint8_t>(board));
+		// LOG_F(ERROR, "getBoard_(): Unknown board 0x%x", static_cast<uint8_t>(board));
 		return nullptr;
 	} else {
 		// return board object pointer
@@ -293,6 +293,13 @@ callbackid_t addLimitSwitchCallback(
 
 void removeLimitSwitchCallback(callbackid_t id) {
 	// return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
+}
+
+void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionMdeg) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->storePosition(robot::types::DataPoint<int32_t>(positionMdeg));
+	}
 }
 
 } // namespace robot

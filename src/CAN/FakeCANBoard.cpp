@@ -135,6 +135,12 @@ int main() {
 					continue;
 				}
 			} else if (testMode == TestMode::RawCAN) {
+				std::string input;
+				std::cout << "Enter revs: ";
+				std::getline(std::cin, input);
+				float revs = std::stof(input);
+				CANPacket_t packet = CANMotorPacket_Stepper_DriveRevolutions(Constants::JETSON_DEVICE, device, revs);
+				can::sendCANPacket(packet);
 				// uint8_t pr = prompt("priority");
 				// uint8_t uuid = prompt("uuid");
 				// uint8_t command = prompt("command");
