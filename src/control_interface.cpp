@@ -188,6 +188,9 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
 		setMotorPower(boardid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(boardid_t::wristDiffRight, gearPwr.right);
+	} else if (joint == jointid_t::hand) {
+		// we need a stepper power packet in real_world_interface (by extension in world_interface and simuator_interface)
+		// that we can call here with boardid_t::hand and float revs
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

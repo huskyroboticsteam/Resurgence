@@ -302,4 +302,13 @@ void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionM
 	}
 }
 
+/*
+
+void setStepper(boardid_t board, float revs) {
+	getBoard_(board);
+	board_ptr->runStepper(revs)
+}
+
+*/
+
 } // namespace robot

@@ -169,4 +169,12 @@ void CANBoard::read(uint16_t endpoint) {
     sendCANPacket(p);
 }
 
+/*
+void setStepper(float revs) {
+    CANMotorPacket_Stepper_DriveRevolutions()
+    sendCanPacket
+}
+
+*/
+
 } // namespace can
