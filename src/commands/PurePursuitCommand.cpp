@@ -5,6 +5,8 @@
 
 #include <cmath>
 #include <algorithm>
+#include <fstream>  // temporary for testing!!
+#include <iostream>
 
 using navtypes::point_t;
 using navtypes::points_t;
@@ -30,24 +32,27 @@ static double dist(const Eigen::Vector3d& one, const Eigen::Vector3d& two) {
 
 namespace commands {
 
-PurePursuitCommand::PurePursuitCommand(const points_t& waypoints)
+PurePursuitCommand::PurePursuitCommand(const points_t waypoints)
 	: _pose(pose_t::Zero()) {
+	file.open("logpath.csv", std::ios::trunc);
+	LOG_F(INFO, "pathlog file is open: %d\n", file.is_open());
 	interpolatePoints(waypoints);
-	// LOG_F(INFO, "path size: %ld", _path.size());
+}
+
+PurePursuitCommand::~PurePursuitCommand() {
+	file.close();
 }
 
 void PurePursuitCommand::setState(const pose_t& pose) {
-	LOG_F(INFO, "pose: %f %f, path[1]: %f %f, path[2]: %f %f",
-		_pose[0], _pose[1],
-		_path[1][0], _path[1][1],
-		_path[2][0], _path[2][1]);
 	this->_pose = pose;
 	this->_set_state_called_before_output = true;
 }
 
 command_t PurePursuitCommand::getOutput() {
-	// LOG_F(INFO, "entering get ouput");
-	LOG_F(INFO, "curr idx: %d, path_size: %ld", _curr_idx, _path.size());
+	if (_path.empty()) {
+        LOG_F(ERROR, "getOutput called with empty path");
+        return {.thetaVel = 0.0, .xVel = 0.0};
+    }
 
     if (!this->_set_state_called_before_output) {
 		LOG_F(WARNING, "PurePursuitCommand: getOutput() called before setState() call!");
@@ -73,8 +78,6 @@ command_t PurePursuitCommand::getOutput() {
 		relIntersect = lineToCircleIntersection(_path[_curr_idx], _path[_curr_idx + 1]);
 	}
 
-	LOG_F(INFO, "Intersect: x=%f y=%f", relIntersect[0], relIntersect[1]);
-
 	double curvature = (2 * relIntersect[1]) 
 						/ (relIntersect[0]*relIntersect[0] + relIntersect[1]*relIntersect[1]);
 
@@ -88,6 +91,12 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 	// Transform argument points to robot frame (center = (0,0))
 	point_t p1Robot = util::toTransform(_pose) * p1;
 	point_t p2Robot = util::toTransform(_pose) * p2;
+
+	point_t zero = {0,0,0};
+	if (dist(zero, p1Robot) > dist(zero, p2Robot)) {
+		LOG_F(ERROR, "p1 is further than p2!");
+	}
+	
 	double x1 = p1Robot[0];
 	double y1 = p1Robot[1];
 	double x2 = p2Robot[0];
@@ -104,7 +113,7 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 	//                 is < 0, there are no intersections
 	double disc = _lookahead_dist*_lookahead_dist * dr2 - D*D;
 
-	LOG_F(INFO, "DISC only: %f", disc);
+	// LOG_F(INFO, "DISC only: %f", disc);
 
 	if (disc >= 0) {
 		// There exists at least one intersection.
@@ -131,20 +140,35 @@ point_t PurePursuitCommand::lineToCircleIntersection(point_t& p1, point_t& p2) {
 		bool valid1 = (t1 >= 0 && t1 <= 1);
 		bool valid2 = (t2 >= 0 && t2 <= 1);
 
-		LOG_F(INFO, "valid1: %d, valid2: %d, disc: %f", valid1, valid2, disc);
+		if (valid1 && !valid2) {
+			file << p1[0] << "," << p1[1] << std::endl;
+			return sol1;
+		} 
+		if (valid2 && !valid1) {
+			file << p2[0] << "," << p2[1] << std::endl;
+			return sol2;
+		} 
+		if (valid1 && valid2) { // return (t1 > t2 ? sol1 : sol2); 
+			if (t1 > t2) {
+				file << p1[0] << "," << p1[1] << std::endl;
+			} else {
+				file << p2[0] << "," << p2[1] << std::endl;
+			}
 
-		if (valid1 && !valid2) return sol1;
-		if (valid2 && !valid1) return sol2;
-		if (valid1 && valid2) return (t1 > t2 ? sol1 : sol2);
+			return (t1 > t2 ? sol1 : sol2);
+		}
+
 	}
-
+	file << p2[0] << "," << p2[1] << std::endl;
 	return p2Robot;
 }
 
 void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
-	if (waypoints.empty() || waypoints.size() < 2) {
+	if (waypoints.size() < 2) {
+		_path = waypoints;
 		return;
 	}
+
 	
 	std::vector<double> cumulativeDist(waypoints.size(), 0.0);
 
@@ -156,7 +180,6 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 		cumulativeDist[i] = cumulativeDist[i-1] + dist(waypoints[i-1], waypoints[i]);
 	}
 	double totalLen = cumulativeDist.back();
-	LOG_F(INFO, "cumulative dist: %lf", totalLen);
 	
 	// Find how many points we need (at least 2 for start & end)
 	int numPts = std::max(2, (int) std::ceil(totalLen / _dist_between_points));
@@ -184,9 +207,13 @@ void PurePursuitCommand::interpolatePoints(const points_t& waypoints) {
 }
 
 bool PurePursuitCommand::isDone() {
-	double distance = (_pose.topRows<2>() - _path.back().topRows<2>()).norm();
-	// LOG_F(INFO, "dist to goal %f", distance);
-	if (distance <= _done_thresh && _curr_idx >= _path.size() - 2) {
+	if (_path.empty()) {
+        LOG_F(ERROR, "PurePursuitCommand path is empty");
+        return true;
+    }
+
+	double distance = dist(_pose, _path.back());
+	if (distance <= _done_thresh && _curr_idx >= static_cast<int>(_path.size()) - 2) {
 		LOG_F(INFO, "distance from goal: %lf", distance);
 		LOG_F(INFO, "done +1");
 		_done_count++;
@@ -197,10 +224,13 @@ bool PurePursuitCommand::isDone() {
 
 	// Must be in done thresh for at least 100ms (5 iterations of control loop)
 	// to be considered "done"
-	return _done_count >= 5;
+	return _done_count >= 20;
 }
 
 void PurePursuitCommand::updateCurrentIndex() {
+	if (_path.size() < 2) {
+		return;
+	}
 	double distToNext;
 	while (_curr_idx < _path.size() - 2) {
 		distToNext = (_pose.topRows<2>() - _path[_curr_idx + 1].topRows<2>()).norm();

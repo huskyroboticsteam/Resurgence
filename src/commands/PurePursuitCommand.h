@@ -3,11 +3,15 @@
 #include "../navtypes.h"
 #include "CommandBase.h"
 
+#include <fstream>
+
 namespace commands {
 class PurePursuitCommand : CommandBase {
 public:
 	//
-	PurePursuitCommand(const navtypes::points_t& waypoints);
+	PurePursuitCommand(const navtypes::points_t waypoints);
+
+	~PurePursuitCommand();
 
     void setState(const navtypes::pose_t& pose);
 
@@ -56,14 +60,16 @@ private:
 
 	// set Constants --- ? could move to Constants file
 	double _drive_vel = 3.0;
-	double _slow_thresh = 2.0;
+	double _slow_thresh = 3.0;
 
-	double _done_thresh = 2.0;
+	double _done_thresh = 1.5;
 	int _done_count = 0;
 
 	double _dist_between_points = 1.5;
 	double _lookahead_dist = 3.0;
 
 	bool _set_state_called_before_output = false;
+
+	std::ofstream file;
 };
 } // namespace commands
