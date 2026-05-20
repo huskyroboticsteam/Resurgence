@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <shared_mutex>
 #include <string>
 #include <termios.h>
@@ -51,6 +52,9 @@ constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
 // Heartbeats should come in every 500ms, have some leniency
 constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(1000);
 
+std::shared_mutex bufferMutex;
+std::queue<CANPacket_t> buffer;
+
 // map each device seen to a watchdog
 std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeatWatchdogMap;
 std::mutex heartbeatWatchdogMapMutex;
@@ -67,7 +71,7 @@ std::unordered_map<
 std::shared_mutex directReadMapMutex;
 std::unordered_map<
 	std::pair<CANDeviceUUID_t, uint16_t>,
-	std::pair<std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>, std::thread>> directReadCallbackMap;
+	std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>> directReadCallbackMap;
 
 // Endpoint JSONs
 nlohmann::json pro_endpoints;
@@ -125,6 +129,7 @@ void handleAck(CANPacket_t& packet) {
 
 void handleDirectRead(CANPacket_t& packet) {
 	auto decoded = CANMotorPacket_BLDC_DirectReadResult_Decode(&packet);
+	LOG_F(INFO, "Read for 0x%x of %x", decoded.sender.deviceUUID, decoded.endpointID);
 
 	// Fire off callback, if it exists
 	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
@@ -134,7 +139,9 @@ void handleDirectRead(CANPacket_t& packet) {
 	// Unlock in case callback wants to modify the map?
 	mapReadLock.unlock();
 	if (it != directReadCallbackMap.end()) {
-		it->second.first(decoded);
+		it->second(decoded);
+	} else {
+		LOG_F(INFO, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID, decoded.endpointID);
 	}
 }
 
@@ -243,41 +250,67 @@ void receiveThreadFn() {
 		// no synchronization necessary, since this thread owns the FD
 		bool received = receivePacket(recvFD, packet);
 		if (received) {
-			// dispatch on CAN26 command ID
-			switch (packet.command) {
-				case CAN_COMMAND_ID__E_STOP:
-					LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
-					break;
-				
-				case CAN_COMMAND_ID__ACKNOWLEDGE:
-					handleAck(packet);
-					break;
-
-				case CAN_COMMAND_ID__HEARTBEAT:
-					handleHeartbeatPacket(packet);
-					break;
-
-				case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
-					// handleLimitSwitchAlert(packet);
-					break;
-
-				case CAN_COMMAND_ID__BLDC_DIRECT_READ_RESULT:
-					handleDirectRead(packet);
-					break;
-
-				case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
-					handleEncoderEstimates(packet);
-					break;
-				
-				default:
-					LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x",
-						  packet.command, packet.senderUUID);
-					break;
-			}
+			// Add packet to buffer
+			std::unique_lock lock(bufferMutex);
+			buffer.push(packet);
+			lock.unlock();
 		} else {
 			// we had a bus error, so sleep for a bit
 			std::this_thread::sleep_for(READ_ERR_SLEEP);
 		}
+	}
+}
+
+void processThreadFn() {
+	while (true) {
+		std::shared_lock lock(bufferMutex);
+		if (buffer.empty()) { continue; }
+
+		lock.unlock();
+		std::unique_lock write_lock(bufferMutex);
+
+		// Double check required after releasing lock
+		if (buffer.empty()) { continue; }
+		CANPacket_t packet = buffer.front();
+		buffer.pop();
+		// Done with buffer, unlock to allow more reading
+		write_lock.unlock();
+
+		// auto start = std::chrono::system_clock::now();
+		// dispatch on CAN26 command ID
+		switch (packet.command) {
+			case CAN_COMMAND_ID__E_STOP:
+				LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
+				break;
+
+			case CAN_COMMAND_ID__ACKNOWLEDGE:
+				handleAck(packet);
+				break;
+
+			case CAN_COMMAND_ID__HEARTBEAT:
+				handleHeartbeatPacket(packet);
+				break;
+
+			case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
+				// handleLimitSwitchAlert(packet);
+				break;
+
+			case CAN_COMMAND_ID__BLDC_DIRECT_READ_RESULT:
+				handleDirectRead(packet);
+				break;
+
+			case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
+				handleEncoderEstimates(packet);
+				break;
+			
+			default:
+				LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x",
+						packet.command, packet.senderUUID);
+				break;
+		}
+		// auto end = std::chrono::system_clock::now();
+		// auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+		// LOG_F(INFO, "Processing %x took %ld ns", packet.command, elapsed.count());
 	}
 }
 } // namespace
@@ -299,6 +332,10 @@ void initCAN() {
 	// start thread for recieving CAN packets
 	std::thread receiveThread(receiveThreadFn);
 	receiveThread.detach();
+
+	// start thread for processing CAN packets
+	std::thread processThread(processThreadFn);
+	processThread.detach();
 }
 
 void sendCANPacket(const CANPacket_t& packet) {
@@ -363,17 +400,15 @@ void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::fun
 		LOG_F(WARNING, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint);
 		return;
 	}
-	std::thread timeout([device, endpoint]() {
-		std::this_thread::sleep_for(READ_TIMEOUT);
-		LOG_F(ERROR, "0x%x read of %d timed out!", device.deviceUUID, endpoint);
-	});
-	auto element = std::make_pair<const std::function<void (CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>, std::thread>(callback, timeout);
 
-	// std::unordered_map<
-	// 	std::pair<CANDeviceUUID_t, uint16_t>,
-	// 	std::pair<std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>, std::thread>> directReadCallbackMap;
+	// std::thread timeout([device, endpoint]() {
+	// 	std::this_thread::sleep_for(READ_TIMEOUT);
+		// LOG_F(ERROR, "0x%x read of %d timed out!", device.deviceUUID, endpoint);
+	// });
+	// timeout.detach();
 
-	directReadCallbackMap.insert({key, element});
+	// auto element = std::make_pair(callback, nullptr);//std::move(timeout));
+	directReadCallbackMap.emplace(key, callback);
 }
 
 void removeDirectReadCallback(CANDevice_t device, uint16_t endpoint) {

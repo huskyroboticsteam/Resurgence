@@ -21,6 +21,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
             addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
+                std::unique_lock lock(this->board_mutex);
                 this->vel_limit = p.value_float;
                 LOG_F(INFO, "Fetched vel limit for 0x%x: %f", this->device.deviceUUID, this->vel_limit);
 
@@ -28,6 +29,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
                 removeDirectReadCallback(this->device, endpoint_id);
             });
 
+            // this->vel_limit = 0;
             this->read(endpoint_id);
         }
 
@@ -50,10 +52,16 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
         // Wait until configs are grabbed
         auto start = std::chrono::system_clock::now();
-        while (!this->vel_limit);
+        float read;
+        do {
+            std::shared_lock lock(board_mutex);
+            read = this->vel_limit;
+            lock.unlock();
+        } while (read <= 0);
+        std::shared_lock lock(board_mutex);
         auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        LOG_F(INFO, "0x%x took %ld ms", this->device.deviceUUID, elapsed.count());
+        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        LOG_F(INFO, "0x%x took %ld ns: %f", this->device.deviceUUID, elapsed.count(), this->vel_limit);
     }
 
     if (device.peripheralDomain) {
