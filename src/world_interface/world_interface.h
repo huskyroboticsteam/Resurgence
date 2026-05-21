@@ -229,6 +229,10 @@ types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t motor);
 
 void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionMdeg);
 
+void setStepperRevs(robot::types::boardid_t board, float revs);
+
+
+
 using callbackid_t = unsigned long long;
 
 callbackid_t addLimitSwitchCallback(
