@@ -45,7 +45,7 @@ namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 constexpr std::chrono::milliseconds ACK_TIMEOUT(50);
-constexpr std::chrono::milliseconds READ_TIMEOUT(100);
+constexpr std::chrono::milliseconds READ_TIMEOUT(500);
 // CAN26 11-bit ID layout: [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
 // Match on UUID field to filter for packets addressed to this device
 constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
@@ -70,10 +70,14 @@ std::unordered_map<
 	util::PeriodicScheduler<>::eventid_t> ackMap;
 
 // Holds read callbacks
-std::shared_mutex directReadMapMutex;
+std::shared_mutex directReadCallbackMutex;
 std::unordered_map<
 	std::pair<CANDeviceUUID_t, uint16_t>,
 	std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>> directReadCallbackMap;
+std::shared_mutex directReadStatusMutex;
+std::unordered_map<
+	std::pair<CANDeviceUUID_t, uint16_t>,
+	bool> directReadStatusMap;
 
 // Endpoint JSONs
 nlohmann::json pro_endpoints;
@@ -136,12 +140,16 @@ void handleDirectRead(CANPacket_t& packet) {
 	// Fire off callback, if it exists
 	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
 	// Read access
-	std::shared_lock mapReadLock(directReadMapMutex);
+	std::shared_lock mapReadLock(directReadCallbackMutex);
 	auto it = directReadCallbackMap.find(key);
 	// Unlock in case callback wants to modify the map?
 	mapReadLock.unlock();
 	if (it != directReadCallbackMap.end()) {
 		it->second(decoded);
+		std::unique_lock readStatusLock(directReadStatusMutex);
+		if (auto it_status = directReadStatusMap.find(key); it_status != directReadStatusMap.end()) {
+			directReadStatusMap.insert_or_assign(key, true);
+		}
 	} else {
 		// LOG_F(INFO, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID, decoded.endpointID);
 	}
@@ -407,26 +415,37 @@ void printCANPacket(const CANPacket_t& packet) {
 void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback) {
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
 	// Write access
-	std::unique_lock mapLock(directReadMapMutex);
+	std::unique_lock mapLock(directReadCallbackMutex);
 	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
-		LOG_F(WARNING, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint);
+		// LOG_F(WARNING, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint);
 		return;
 	}
 
-	// std::thread timeout([device, endpoint]() {
-	// 	std::this_thread::sleep_for(READ_TIMEOUT);
-		// LOG_F(ERROR, "0x%x read of %d timed out!", device.deviceUUID, endpoint);
-	// });
-	// timeout.detach();
+	std::thread timeout([device, endpoint, key]() {
+		std::unique_lock statusLock(directReadStatusMutex);
+		directReadStatusMap.emplace(key, false);
+		statusLock.unlock();
+		std::this_thread::sleep_for(READ_TIMEOUT);
 
-	// auto element = std::make_pair(callback, nullptr);//std::move(timeout));
+		statusLock.lock();
+		if (auto it = directReadStatusMap.find(key); it != directReadStatusMap.end()) {
+			if (!it->second) {
+				LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint);
+				std::unique_lock mapLock(directReadCallbackMutex);
+				directReadCallbackMap.erase(key);
+			}
+			directReadStatusMap.erase(key);
+		}
+	});
+	timeout.detach();
+
 	directReadCallbackMap.emplace(key, callback);
 }
 
 void removeDirectReadCallback(CANDevice_t device, uint16_t endpoint) {
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
 	// Write access
-	std::unique_lock mapLock(directReadMapMutex);
+	std::unique_lock mapLock(directReadCallbackMutex);
 	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
 		directReadCallbackMap.erase(it);
 	}

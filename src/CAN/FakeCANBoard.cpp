@@ -79,7 +79,7 @@ int main() {
 					uint16_t endpoint_id = endpoint["id"];
 					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded) {
 						if (decoded.value_uint8 != static_cast<uint8_t>(motor_state)) {
-							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d", board->getDevice().deviceUUID, static_cast<uint8_t>(motor_state));
+							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d AND IS INSTEAD %d", board->getDevice().deviceUUID, static_cast<uint8_t>(motor_state), decoded.value_uint8);
 							board->setMotorState(motor_state);
 							board->read(endpoint_id);
 						} else {

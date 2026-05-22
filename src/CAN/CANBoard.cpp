@@ -23,7 +23,6 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
             addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
                 std::unique_lock lock(this->board_mutex);
                 this->vel_limit = p.value_float;
-                // LOG_F(INFO, "Fetched vel limit for 0x%x: %f", this->device.deviceUUID, this->vel_limit);
 
                 // We only need this once, remove after we get a response
                 removeDirectReadCallback(this->device, endpoint_id);
@@ -49,19 +48,6 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
             this->inversion_factor = it->second;
         }
-
-        // Wait until configs are grabbed
-        // auto start = std::chrono::system_clock::now();
-        float read;
-        do {
-            std::shared_lock lock(board_mutex);
-            read = this->vel_limit;
-            lock.unlock();
-        } while (read <= 0);
-        // std::shared_lock lock(board_mutex);
-        // auto end = std::chrono::system_clock::now();
-        // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        // LOG_F(INFO, "0x%x took %ld ns: %f", this->device.deviceUUID, elapsed.count(), this->vel_limit);
     }
 
     if (device.peripheralDomain) {
@@ -89,7 +75,7 @@ void CANBoard::setMotorPower(double power) {
                 uint16_t endpoint_id = endpoint["id"];
                 addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto decoded) {
                     if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
-                        LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT IDLE", this->device.deviceUUID);
+                        LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT IDLE AND IS INSTEAD %d", this->device.deviceUUID, decoded.value_uint8);
                         this->setMotorState(can::motor::axis_state_t::idle);
                         this->read(endpoint_id);
                     } else {
@@ -99,10 +85,14 @@ void CANBoard::setMotorPower(double power) {
 
                 this->read(endpoint_id);
             }
-
         } else if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
             // Set motor general lockin vel to 0
             this->setMotorState(can::motor::axis_state_t::lockin_spin);
+        }
+
+        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
+            uint16_t endpoint_id = endpoint["id"];
+            removeDirectReadCallback(this->device, endpoint_id);
         }
     } else {
         // Mapping power to a target velocity
@@ -122,8 +112,6 @@ void CANBoard::setMotorPower(double power) {
                 if (decoded.value_float != input_vel) {
                     LOG_F(ERROR, "Expected %f, got %f", input_vel, decoded.value_float);
                     sendCANPacket(p);
-                } else {
-                    removeDirectReadCallback(this->device, endpoint_id);
                 }
             });
 
