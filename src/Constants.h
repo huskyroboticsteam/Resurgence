@@ -149,33 +149,32 @@ extern const double SAFETY_FACTOR;
  * Maximum commanded end-effector velocity, in m/s
  */
 extern const double MAX_EE_VEL;
-extern const double IK_SOLVER_THRESH;
-
-extern const int IK_SOLVER_MAX_ITER;
 
 /**
  * The joints corresponding to the motors used for IK in the arm. The ordering in this array is
  * the canonical ordering of these joints for IK purposes.
  */
-extern const std::array<jointid_t, 2> IK_MOTOR_JOINTS;
+extern const std::array<jointid_t, 3> IK_MOTOR_JOINTS;
 
 /**
  * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
  * element of `IK_MOTOR_JOINTS`
  */
-extern const std::array<motorid_t, 2> IK_MOTORS;
+extern const std::array<motorid_t, 3> IK_MOTORS;
 
 /**
  * Map from motor ids to min and max joint limits in millidegrees
  */
 constexpr frozen::unordered_map<motorid_t, std::pair<int, int>, IK_MOTORS.size()> JOINT_LIMITS{
-	{motorid_t::shoulder, {18200, 152500}}, {motorid_t::elbow, {-169100, 0}}};
+	{motorid_t::shoulder, {18200, 152500}}, 
+   {motorid_t::elbow, {-169100, 0}}, 
+   {motorid_t::armBase, {-180000, 180000}}}; // base limits are placeholders
 
 /**
  * Map from motor ids to segment length in meters
  */
 constexpr frozen::unordered_map<motorid_t, double, IK_MOTORS.size()> SEGMENT_LENGTHS{
-	{motorid_t::shoulder, 0.3848608}, {motorid_t::elbow, 0.461264}};
+	{motorid_t::shoulder, 0.3848608}, {motorid_t::elbow, 0.461264}, {motorid_t::armBase, 0.0}};
 } // namespace arm
 
 namespace autonomous {

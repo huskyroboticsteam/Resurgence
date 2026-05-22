@@ -124,22 +124,19 @@ const double SAFETY_FACTOR = 0.95;
  * Maximum commanded end-effector velocity, in m/s
  */
 const double MAX_EE_VEL = 0.1;
-const double IK_SOLVER_THRESH = 0.001;
-
-const int IK_SOLVER_MAX_ITER = 50;
 
 /**
  * The joints corresponding to the motors used for IK in the arm. The ordering in this array is
  * the canonical ordering of these joints for IK purposes.
  */
-const std::array<robot::types::jointid_t, 2> IK_MOTOR_JOINTS = {
-	robot::types::jointid_t::shoulder, robot::types::jointid_t::elbow};
+const std::array<robot::types::jointid_t, 3> IK_MOTOR_JOINTS = {
+	robot::types::jointid_t::shoulder, robot::types::jointid_t::elbow, robot::types::jointid_t::armBase};
 
 /**
  * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
  * element of `IK_MOTOR_JOINTS`
  */
-const std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() {
+const std::array<robot::types::motorid_t, 3> IK_MOTORS = ([]() {
 	std::array<robot::types::motorid_t, IK_MOTOR_JOINTS.size()> ret{};
 	for (size_t i = 0; i < IK_MOTOR_JOINTS.size(); i++) {
 		ret[i] = JOINT_MOTOR_MAP.at(IK_MOTOR_JOINTS[i]);

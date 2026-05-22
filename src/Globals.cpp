@@ -1,8 +1,8 @@
 #include "Globals.h"
 
 #include "Constants.h"
-#include "kinematics/FabrikSolver.h"
-#include "kinematics/PlanarArmFK.h"
+#include "kinematics/IKSolver2026.h"
+#include "kinematics/ArmFK2026.h"
 #include "world_interface/data.h"
 
 #include <atomic>
@@ -31,12 +31,11 @@ navtypes::Vectord<IK_MOTORS.size()> getJointLimits(bool getLow) {
 	return ret;
 }
 
-kinematics::ArmKinematics<2, Constants::arm::IK_MOTORS.size()> createArmKinematics() {
-	auto fk = std::make_shared<kinematics::PlanarArmFK<2>>(getSegLens(), getJointLimits(true),
-														   getJointLimits(false));
-	auto ik = std::make_shared<kinematics::FabrikSolver2D<2>>(fk, IK_SOLVER_THRESH,
-															  IK_SOLVER_MAX_ITER);
-	return kinematics::ArmKinematics<2, 2>(fk, ik);
+kinematics::ArmKinematics<3, Constants::arm::IK_MOTORS.size()> createArmKinematics() {
+	auto fk = std::make_shared<kinematics::ArmFK2026>(getSegLens(), getJointLimits(true),
+													  getJointLimits(false));
+	auto ik = std::make_shared<kinematics::IKSolver2026>(fk);
+	return kinematics::ArmKinematics<3, 3>(fk, ik);
 }
 } // namespace
 
@@ -47,7 +46,7 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
 const kinematics::DiffWristKinematics wristKinematics;
-control::PlanarArmController<2> planarArmController(createArmKinematics(),
+control::SpatialArmController<3> spatialArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);
 std::atomic<bool> armIKEnabled = false;
 } // namespace Globals

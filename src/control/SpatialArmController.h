@@ -18,49 +18,47 @@
 namespace control {
 
 /**
- * @brief Controller to move planar arm to a target end effector position.
+ * @brief Controller to move a spatial arm to a target 3D end effector position.
  *
  * This class is thread-safe.
  *
  * @tparam N The number of arm joints.
  */
 template <unsigned int N>
-class PlanarArmController {
+class SpatialArmController {
 public:
 	/**
 	 * @brief Construct a new controller object.
 	 *
-	 * @param currJointPos The current joint positions of the arm.
-	 * @param kin_obj ArmKinematics object for the arm (should have the same number of
-	 * arm joints).
-	 * @param safetyFactor the percentage factor to scale maximum arm extension radius by to
-	 *                      prevent singularity lock. Must be in range (0, 1).
+	 * @param kin_obj ArmKinematics object for the arm in 3D space.
+	 * @param safetyFactor the percentage factor to scale maximum arm extension radius.
 	 */
-	PlanarArmController(const kinematics::ArmKinematics<2, N>& kin_obj,
-						const double safetyFactor)
+	SpatialArmController(const kinematics::ArmKinematics<3, N>& kin_obj,
+						 const double safetyFactor)
 		: kin(kin_obj), safetyFactor(safetyFactor) {
 		CHECK_F(safetyFactor > 0.0 && safetyFactor < 1.0);
 
-		for (unsigned int i = 0; i < kin_obj.getNumSegments(); i++) {
+		// Segment 0 (base) can be 0, but other segments should be positive
+		for (unsigned int i = 1; i < kin_obj.getNumSegments(); i++) {
 			CHECK_F(kin_obj.getSegLens()[i] > 0.0);
 		}
 	}
 
 	/**
-	 * @brief Constructs a copy of an existing PlanarArmController object.
+	 * @brief Constructs a copy of an existing SpatialArmController object.
 	 *
-	 * @param other The existing PlanarArmController to copy.
+	 * @param other The existing SpatialArmController to copy.
 	 */
-	PlanarArmController(PlanarArmController&& other)
+	SpatialArmController(SpatialArmController&& other)
 		: kin(std::move(other.kin)), safetyFactor(other.safetyFactor) {
 		std::lock_guard<std::mutex> lock(other.mutex);
 		mutableFields = std::move(other.mutableFields);
 	}
 
 	/**
-	 * @brief Instantiates the PlanarArmController with the current joint positions,
-	 * 		  returning true if the joint positions are valid. If PlanarArmController is
-	 * already initialized, the PlanarArmController is reinitialized with the supplied
+	 * @brief Instantiates the SpatialArmController with the current joint positions,
+	 * 		  returning true if the joint positions are valid. If SpatialArmController is
+	 * already initialized, the SpatialArmController is reinitialized with the supplied
 	 * positions and this function returns true. Otherwise, controller gets uninitialized and
 	 * function returns false.
 	 *
@@ -76,7 +74,7 @@ public:
 				mutableFields.emplace();
 			}
 
-			Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(currJointPos);
+			Eigen::Vector3d newSetPoint = kin.jointPosToEEPos(currJointPos);
 			mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
 			return true;
 		}
@@ -93,7 +91,7 @@ public:
 	 * @return whether the target joint positions are within the arm controller's radius limit.
 	 */
 	static bool is_setpoint_valid(const navtypes::Vectord<N>& targetJointPos,
-								  kinematics::ArmKinematics<2, N> kin_obj,
+								  kinematics::ArmKinematics<3, N> kin_obj,
 								  double safetyFactor) {
 		// Compute the new EE position to determine if it is within
 		// safety factor * length of fully extended arm.
@@ -102,7 +100,7 @@ public:
 		return eeRadius <= maxRadius;
 	}
 
-	const kinematics::ArmKinematics<2, N>& kinematics() const {
+	const kinematics::ArmKinematics<3, N>& kinematics() const {
 		return kin;
 	}
 
@@ -112,7 +110,7 @@ public:
 	 * @param targetJointPos The target joint positions.
 	 */
 	void set_setpoint(const navtypes::Vectord<N>& targetJointPos) {
-		Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(targetJointPos);
+		Eigen::Vector3d newSetPoint = kin.jointPosToEEPos(targetJointPos);
 		std::lock_guard<std::mutex> lock(mutex);
 		mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
 	}
@@ -151,23 +149,7 @@ public:
 	void set_x_vel(robot::types::datatime_t currTime, double targetVel,
 				   const navtypes::Vectord<N>& jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (mutableFields->velTimestamp.has_value()) {
-			// If we recieve a request for 0 velocity and the y velocity is 0, the arm should
-			// stop moving. Set its setpoint to the current joint position to ensure this.
-			if (targetVel == 0.0 && mutableFields->velocity(1) == 0.0) {
-				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
-				mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
-			} else {
-				double dt =
-					util::durationToSec(currTime - mutableFields->velTimestamp.value());
-				// bounds check (new pos + vel vector <= sum of joint lengths)
-				mutableFields->setpoint = normalizeEEWithinRadius(
-					mutableFields->setpoint + mutableFields->velocity * dt);
-			}
-		}
-
-		mutableFields->velocity(0) = targetVel;
-		mutableFields->velTimestamp = currTime;
+		update_velocity_setpoint(currTime, targetVel, 0, jointPos);
 	}
 
 	/**
@@ -181,23 +163,22 @@ public:
 	void set_y_vel(robot::types::datatime_t currTime, double targetVel,
 				   const navtypes::Vectord<N>& jointPos) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (mutableFields->velTimestamp.has_value()) {
-			// If we recieve a request for 0 velocity and the x velocity is 0, the arm should
-			// stop moving. Set its setpoint to the current joint position to ensure this.
-			if (mutableFields->velocity(0) == 0.0 && targetVel == 0.0) {
-				Eigen::Vector2d newSetPoint = kin.jointPosToEEPos(jointPos);
-				mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
-			} else {
-				double dt =
-					util::durationToSec(currTime - mutableFields->velTimestamp.value());
-				// bounds check (new pos + vel vector <= sum of joint lengths)
-				mutableFields->setpoint = normalizeEEWithinRadius(
-					mutableFields->setpoint + mutableFields->velocity * dt);
-			}
-		}
+		update_velocity_setpoint(currTime, targetVel, 1, jointPos);
+	}
 
-		mutableFields->velocity(1) = targetVel;
-		mutableFields->velTimestamp = currTime;
+	/**
+	 * @brief Sets the z velocity for the end effector and returns the new command.
+	 *
+	 * @param currTime The current timestamp.
+	 * @param targetVel The target x velocity.
+	 * @param jointPos The current joint angles of the arm.
+	 * @return The new command, which is the new joint positions.
+	 */
+
+	void set_z_vel(robot::types::datatime_t currTime, double targetVel,
+				   const navtypes::Vectord<N>& jointPos) {
+		std::lock_guard<std::mutex> lock(mutex);
+		update_velocity_setpoint(currTime, targetVel, 2, jointPos);
 	}
 
 	/**
@@ -210,7 +191,7 @@ public:
 	 */
 	navtypes::Vectord<N> getCommand(robot::types::datatime_t currTime,
 									const navtypes::Vectord<N>& currJointPos) {
-		Eigen::Vector2d newPos = get_setpoint(currTime);
+		Eigen::Vector3d newPos = get_setpoint(currTime);
 		// lock after calling get_setpoint since that internally locks the mutex
 		std::lock_guard<std::mutex> lock(mutex);
 
@@ -218,6 +199,7 @@ public:
 		bool success = false;
 		navtypes::Vectord<N> jp = kin.eePosToJointPos(newPos, currJointPos, success);
 		mutableFields->velTimestamp = currTime;
+		
 		if (!success) {
 			LOG_F(WARNING, "IK Failure!");
 			mutableFields->velocity.setZero();
@@ -229,15 +211,41 @@ public:
 
 private:
 	struct MutableFields {
-		Eigen::Vector2d setpoint;
-		Eigen::Vector2d velocity;
+		Eigen::Vector3d setpoint;
+		Eigen::Vector3d velocity;
 		std::optional<robot::types::datatime_t> velTimestamp;
+		
+		MutableFields() {
+		    setpoint.setZero();
+		    velocity.setZero();
+		}
 	};
 
 	std::optional<MutableFields> mutableFields;
 	std::mutex mutex;
-	const kinematics::ArmKinematics<2, N> kin;
+	const kinematics::ArmKinematics<3, N> kin;
 	const double safetyFactor;
+
+	void update_velocity_setpoint(robot::types::datatime_t currTime, double targetVel, 
+	                              int axisIndex, const navtypes::Vectord<N>& jointPos) {
+		if (mutableFields->velTimestamp.has_value()) {
+		    // If all target velocities drop to 0, stop moving immediately
+			if (targetVel == 0.0 && 
+			    ((axisIndex == 0 && mutableFields->velocity(1) == 0.0 && mutableFields->velocity(2) == 0.0) ||
+			     (axisIndex == 1 && mutableFields->velocity(0) == 0.0 && mutableFields->velocity(2) == 0.0) ||
+			     (axisIndex == 2 && mutableFields->velocity(0) == 0.0 && mutableFields->velocity(1) == 0.0))) {
+				
+				Eigen::Vector3d newSetPoint = kin.jointPosToEEPos(jointPos);
+				mutableFields->setpoint = normalizeEEWithinRadius(newSetPoint);
+			} else {
+				double dt = util::durationToSec(currTime - mutableFields->velTimestamp.value());
+				mutableFields->setpoint = normalizeEEWithinRadius(
+					mutableFields->setpoint + mutableFields->velocity * dt);
+			}
+		}
+		mutableFields->velocity(axisIndex) = targetVel;
+		mutableFields->velTimestamp = currTime;
+	}
 
 	/**
 	 * @brief Normalize the input vector (end-effector position) to have a set radius,
@@ -245,7 +253,7 @@ private:
 	 *
 	 * @param eePos The end-effector position to normalize.
 	 */
-	Eigen::Vector2d normalizeEEWithinRadius(Eigen::Vector2d eePos) {
+	Eigen::Vector3d normalizeEEWithinRadius(Eigen::Vector3d eePos) {
 		double radius = kin.getSegLens().sum() * safetyFactor;
 		if (eePos.norm() > (radius + 1e-4)) {
 			// new position is outside of bounds. Set new EE setpoint so it will follow the
@@ -260,6 +268,7 @@ private:
 				std::pow(diffDotProd, 2) -
 				differenceNorm * (mutableFields->setpoint.squaredNorm() - std::pow(radius, 2));
 			double a = (-diffDotProd + std::sqrt(discriminant)) / differenceNorm;
+			
 			// new constrained eePos = (1 - a) * (ee inside circle) + a * (ee outside circle)
 			eePos = (1 - a) * mutableFields->setpoint + a * eePos;
 		}

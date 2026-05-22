@@ -1,6 +1,6 @@
 #pragma once
 
-#include "control/PlanarArmController.h"
+#include "control/SpatialArmController.h"
 #include "kinematics/ArmKinematics.h"
 #include "kinematics/DiffWristKinematics.h"
 #include "network/websocket/WebSocketServer.h"
@@ -28,7 +28,7 @@ extern RoverState curr_state;
 extern net::websocket::SingleClientWSServer websocketServer;
 extern std::atomic<bool> AUTONOMOUS;
 extern robot::types::mountedperipheral_t mountedPeripheral;
-extern control::PlanarArmController<2> planarArmController;
+extern control::SpatialArmController<3> spatialArmController;
 extern const kinematics::DiffWristKinematics wristKinematics;
 extern std::atomic<bool> armIKEnabled;
 } // namespace Globals
