@@ -8,6 +8,7 @@ enum class TestMode {
 	State,
 	Power,
 	Read,
+	Stepper,
 	RawCAN,
 	NUM_MODES
 };
@@ -40,7 +41,8 @@ int main() {
 	ss << static_cast<int>(TestMode::State) << " for SET STATE\n";
 	ss << static_cast<int>(TestMode::Power) << " for POWER CONTROL\n";
 	ss << static_cast<int>(TestMode::Read) << " for DIRECT READ\n";
-	ss << static_cast<int>(TestMode::RawCAN) << " for CAN\n";
+	ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
+	ss << static_cast<int>(TestMode::RawCAN) << " for RAW CAN\n";
 
 	while (true) {
 		int test_type = prompt(ss.str().c_str());
@@ -55,9 +57,11 @@ int main() {
 		// TODO: Assuming motor domain for now
 		CANDevice_t device = CANDevice_t{0, 1, 0, uuid};
 
-		uint8_t type = static_cast<uint8_t>(prompt("0 for S1, 1 for Pro"));
-		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(
-			type == 0 ? robot::types::boardid_t::debug1 : robot::types::boardid_t::debug2, device);
+		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
+
+		if (testMode == TestMode::Read && static_cast<uint8_t>(prompt("0 for S1, 1 for Pro")) == 1) {
+			board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug2, device);
+		}
 
 		while (true) {
 			if (testMode == TestMode::State) {
@@ -134,37 +138,42 @@ int main() {
 					std::cout << "Unknown endpoint" << std::endl;
 					continue;
 				}
-			} else if (testMode == TestMode::RawCAN) {
+			} else if (testMode == TestMode::Stepper) {
 				std::string input;
 				std::cout << "Enter revs: ";
 				std::getline(std::cin, input);
 				float revs = std::stof(input);
 				CANPacket_t packet = CANMotorPacket_Stepper_DriveRevolutions(Constants::JETSON_DEVICE, device, revs);
+				can::printCANPacket(packet);
 				can::sendCANPacket(packet);
-				// uint8_t pr = prompt("priority");
-				// uint8_t uuid = prompt("uuid");
-				// uint8_t command = prompt("command");
-				// uint8_t dlc = prompt("add'l. data bits");
-				// uint8_t data[dlc + 1];
-				// data[0] = command;
+			} else if (testMode == TestMode::RawCAN) {
+				uint8_t pr = prompt("priority");
+				uint8_t command = prompt("command");
+				uint8_t dlc = prompt("add'l. data bits");
+				if (dlc > 5) {
+					std::cout << "Too many data bits" << std::endl;
+					continue;
+				}
+				uint8_t data[dlc + 1];
+				data[0] = command;
 
-				// for (int i = 1; i <= dlc; i++) {
-				// 	data[i] = prompt("bit");
-				// }
+				for (int i = 1; i <= dlc; i++) {
+					data[i] = prompt("bit " + std::to_string(i));
+				}
 
 				// // manual construction of a generic packet
-				// CANPacket_t p = {};
-				// p.device.deviceUUID = uuid;
-				// p.priority = static_cast<CANPriority_t>(pr);
-				// p.command = command;
-				// p.senderUUID = CAN_UUID_JETSON;
-				// p.contentsLength = dlc;
-				// for (int i = 0; i < p.contentsLength && i < 6; i++) {
-				// 	p.contents[i] = data[i + 1];
-				// }
+				CANPacket_t p = {};
+				p.device = device;
+				p.priority = static_cast<CANPriority_t>(pr);
+				p.command = command;
+				p.senderUUID = CAN_UUID_JETSON;
+				p.contentsLength = dlc;
+				for (int i = 0; i < p.contentsLength && i < 6; i++) {
+					p.contents[i] = data[i + 1];
+				}
 
-				// can::sendCANPacket(p);
-				// can::printCANPacket(p);
+				can::printCANPacket(p);
+				can::sendCANPacket(p);
 			}
 		}
 	}

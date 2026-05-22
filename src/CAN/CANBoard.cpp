@@ -51,17 +51,17 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         }
 
         // Wait until configs are grabbed
-        auto start = std::chrono::system_clock::now();
+        // auto start = std::chrono::system_clock::now();
         float read;
         do {
             std::shared_lock lock(board_mutex);
             read = this->vel_limit;
             lock.unlock();
         } while (read <= 0);
-        std::shared_lock lock(board_mutex);
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        LOG_F(INFO, "0x%x took %ld ns: %f", this->device.deviceUUID, elapsed.count(), this->vel_limit);
+        // std::shared_lock lock(board_mutex);
+        // auto end = std::chrono::system_clock::now();
+        // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        // LOG_F(INFO, "0x%x took %ld ns: %f", this->device.deviceUUID, elapsed.count(), this->vel_limit);
     }
 
     if (device.peripheralDomain) {
