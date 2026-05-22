@@ -16,9 +16,7 @@ class CANBoard {
     void setMotorPower(double power);
     void setMotorState(can::motor::axis_state_t state);
     void setMotorVel(int8_t velocity);
-
-    // Motor/Peripheral
-    void setStepper(float revs);
+    void setStepperRevs(float revs);
 
     // Universal
     void read(uint16_t endpoint);

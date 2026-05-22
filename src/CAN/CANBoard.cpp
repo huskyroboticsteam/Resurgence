@@ -162,19 +162,23 @@ void CANBoard::setMotorVel(int8_t velocity) {
     sendCANPacket(p);
 }
 
+void CANBoard::setStepperRevs(float revs) {
+    if (!this->device.motorDomain) {
+        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
+        return;
+    }
+
+    CANPacket_t p = CANMotorPacket_Stepper_DriveRevolutions(
+        Constants::JETSON_DEVICE, this->device, revs
+    );
+    sendCANPacket(p);
+}
+
 void CANBoard::read(uint16_t endpoint) {
     CANPacket_t p = CANMotorPacket_BLDC_DirectRead(
         Constants::JETSON_DEVICE, this->device, endpoint
     );
     sendCANPacket(p);
 }
-
-/*
-void setStepper(float revs) {
-    CANMotorPacket_Stepper_DriveRevolutions()
-    sendCanPacket
-}
-
-*/
 
 } // namespace can

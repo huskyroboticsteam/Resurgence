@@ -302,6 +302,13 @@ void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionM
 	}
 }
 
+void setStepperRevs(robot::types::boardid_t board, float revs) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->setStepperRevs(revs);
+	}
+}
+
 /*
 
 void setStepper(boardid_t board, float revs) {
