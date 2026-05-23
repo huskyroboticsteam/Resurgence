@@ -30,6 +30,7 @@ AutonomousTask::~AutonomousTask() {
 
 void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool circleMode,
 						   const std::optional<double> radius, const std::optional<TaskType> type) {
+	LOG_F(INFO, "circlemode: %d, radius: %f, type: %s", circleMode, *radius, Constants::autonomous::toString(*type));						
 	if (_autonomous_task_thread.joinable()) {
 		kill();
 	}
@@ -132,10 +133,12 @@ void AutonomousTask::circleNavigation(const double radius, const std::optional<d
 	while (!_target_found && !_kill_called) {
 		cmd1.reset();
 		navigate(cmd1);
+		LOG_F(INFO, "	1. circle r=%f", radius);
 		if (_target_found || _kill_called) break;
 
 		if (cmd2) {
 			cmd2->reset();
+			LOG_F(INFO, "	2. circle r=%f", radius);
 			navigate(*cmd2);
 		}
 	}
