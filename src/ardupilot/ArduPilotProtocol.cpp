@@ -80,7 +80,7 @@ bool ArduPilotProtocol::validateIMURequest(const json& j) {
 void ArduPilotProtocol::handleIMURequest(const json& j) {
 	// Accounting for pixhawk's vertical orientation
 	double roll = j["yaw"];
-	double pitch = j["pitch"] + 90;
+	double pitch = j["pitch"] - 90;
 	double yaw = -j["roll"];
 	
 	eulerangles_t rpy{roll, pitch, yaw};

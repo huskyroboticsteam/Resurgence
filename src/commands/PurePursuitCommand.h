@@ -8,17 +8,10 @@
 namespace commands {
 class PurePursuitCommand : CommandBase {
 public:
-<<<<<<< HEAD
-	/**
-	 * @brief Constructor
-	 */ 
-	PurePursuitCommand(const navtypes::points_t& waypoints);
-=======
 	//
 	PurePursuitCommand(const navtypes::points_t waypoints);
 
 	~PurePursuitCommand();
->>>>>>> pure-pursuit-fix
 
 	/**
 	 * @brief Updates pose.
