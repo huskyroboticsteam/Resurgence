@@ -78,10 +78,11 @@ bool ArduPilotProtocol::validateIMURequest(const json& j) {
 }
 
 void ArduPilotProtocol::handleIMURequest(const json& j) {
-	double roll = j["roll"];
-	double pitch = j["pitch"];
-	double yaw = j["yaw"];
-	yaw = -yaw;
+	// Accounting for pixhawk's vertical orientation
+	double roll = j["yaw"];
+	double pitch = j["pitch"] + 90;
+	double yaw = -j["roll"];
+	
 	eulerangles_t rpy{roll, pitch, yaw};
 
 	std::lock_guard lock(_lastOrientationMutex);
