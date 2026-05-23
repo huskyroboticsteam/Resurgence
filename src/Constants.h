@@ -190,6 +190,12 @@ constexpr frozen::unordered_map<boardid_t, double, IK_MOTORS.size()> SEGMENT_LEN
 } // namespace arm
 
 namespace autonomous {
+<<<<<<< HEAD
+=======
+extern const double THETA_KP;
+extern const double DRIVE_VEL;
+extern const double DONE_THRESHOLD;
+>>>>>>> pure-pursuit-fix
 enum class TaskType {
    INVALID = -1,
    TAG1,
@@ -197,10 +203,25 @@ enum class TaskType {
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM( TaskType, {
+<<<<<<< HEAD
    {TaskType::INVALID, nullptr},
    {TaskType::TAG1, "tag1"},
    {TaskType::TAG2, "tag2"}
 });
+=======
+   {TaskType::INVALID, ""},
+   {TaskType::TAG1, "tag 1"},
+   {TaskType::TAG2, "tag 2"}
+});
+
+inline const char* toString(TaskType t) {
+    switch (t) {
+        case TaskType::TAG1: return "TAG1";
+        case TaskType::TAG2: return "TAG2";
+        default: return "INVALID";
+    }
+}
+>>>>>>> pure-pursuit-fix
 } // namespace autonomous
 
 namespace commands {

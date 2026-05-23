@@ -172,13 +172,13 @@ static bool validateWaypointNavRequest(const json& j) {
 	bool validPoints = util::validateKey(j, "points", val_t::array);
 	if (!validPoints) return false;
 
-	// bool validCircleMode = util::validateKey(j, "circleMode", val_t::boolean);
-	// if (!validCircleMode) return false;
+	bool validCircleMode = util::validateKey(j, "circleMode", val_t::boolean);
+	if (!validCircleMode) return false;
 
 	// check validity of each point
 	for (const auto& point : j["points"]) {
 		// make sure each point is an array of two values
-		if (!point.is_array() || point.size() != 3) {
+		if (!point.is_array() || point.size() != 2) {
 			return false;
 		}
 		bool validPoint = (point[0].is_number_integer() || point[0].is_number_float()) &&
@@ -191,18 +191,19 @@ static bool validateWaypointNavRequest(const json& j) {
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	if (Globals::AUTONOMOUS) {
-		// std::optional<Constants::autonomous::TaskType> type;
-		// if (j.get<TaskType>() != Constants::autonomous::TaskType::INVALID) {
-		// 	type = j.get<TaskType>();
-		// }
+		std::optional<Constants::autonomous::TaskType> taskType;
+		auto rawType = j["tag"].get<Constants::autonomous::TaskType>();
+		if (rawType != Constants::autonomous::TaskType::INVALID) {
+			taskType = rawType;
+		}
 
-		// std::optional<double> radius;
-		// if (util::validateKey(j, "radius", val_t::boolean)) {
-		// 	radius = j["radius"];
-		// }
+		std::optional<double> radius;
+		if (j.contains("radius") && j["radius"].is_number()) {
+			radius = j["radius"].get<double>();
+		}
 
-		// bool circleMode = j["circleMode"];
-		
+		bool circleMode = j["circleMode"];
+
 		navtypes::points_t finalTargets;
 
 		for (const auto& point : j["points"]) {
@@ -212,16 +213,13 @@ void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 			auto optTarget = robot::gpsToMeters(coord);
 			
 			// check if target was sent back by gpsToMeters
-			if (!optTarget) {
+			if (!optTarget) {	
 				LOG_F(WARNING, "No GPS converter initialized!");
 				return;
 			}
 			finalTargets.push_back(*optTarget);
 		}
-		//_autonomous_task.start(finalTargets, circleMode, radius, type);
-
-		// temporary hard coded valuest, st
-		_autonomous_task.start(finalTargets, true, 5, std::nullopt);
+		_autonomous_task.start(finalTargets, circleMode, radius, taskType);
 	}
 }
 
