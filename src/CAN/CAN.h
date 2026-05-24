@@ -16,6 +16,7 @@ extern "C" {
 #include <CANPacket.h>
 
 #include <Packets/Motor.h>
+#include <Packets/Peripheral.h>
 
 #include <Packets/DecodeMotor.h>
 #include <Packets/DecodePeripheral.h>

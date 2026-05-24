@@ -129,6 +129,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
+	} else if (joint == jointid_t::hand) {
+		return {};
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
@@ -189,6 +191,7 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		setMotorPower(boardid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(boardid_t::wristDiffRight, gearPwr.right);
 	} else if (joint == jointid_t::hand) {
+		LOG_F(INFO, "Hand stepper");
 		setStepperRevs(boardid_t::hand, static_cast<float>(power));
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",

@@ -309,13 +309,4 @@ void setStepperRevs(robot::types::boardid_t board, float revs) {
 	}
 }
 
-/*
-
-void setStepper(boardid_t board, float revs) {
-	getBoard_(board);
-	board_ptr->runStepper(revs)
-}
-
-*/
-
 } // namespace robot

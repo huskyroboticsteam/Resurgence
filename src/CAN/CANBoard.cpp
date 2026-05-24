@@ -9,6 +9,15 @@ namespace can {
 CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
     : board_id(board_id), device(device) {
     if (device.motorDomain) {
+        if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
+            this->inversion_factor = it->second;
+        }
+
+        if (board_id == robot::types::boardid_t::hand) {
+            // Skip ODrive config stuff
+            return;
+        }
+
         // Set default modes
         CANPacket_t p = CANMotorPacket_BLDC_SetInputMode(
             Constants::JETSON_DEVICE, device,
@@ -43,11 +52,6 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
             this->read(endpoint_id);
         }
-
-        // Inversion
-        if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
-            this->inversion_factor = it->second;
-        }
     }
 
     if (device.peripheralDomain) {
@@ -57,7 +61,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
 void CANBoard::setMotorPower(double power) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
+        LOG_F(WARNING, "setMotorPower called for board 0x%x not in motor domain!", this->device.deviceUUID);
         return;
     }
 
@@ -122,7 +126,7 @@ void CANBoard::setMotorPower(double power) {
 
 void CANBoard::setMotorState(can::motor::axis_state_t state) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorState called for board not in motor domain!");
+        LOG_F(WARNING, "setMotorState called for board 0x%x not in motor domain!", this->device.deviceUUID);
         return;
     }
 
@@ -135,7 +139,7 @@ void CANBoard::setMotorState(can::motor::axis_state_t state) {
 
 void CANBoard::setMotorVel(int8_t velocity) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
+        LOG_F(WARNING, "setMotorVel called for board 0x%x not in motor domain!", this->device.deviceUUID);
         return;
     }
 
@@ -152,7 +156,7 @@ void CANBoard::setMotorVel(int8_t velocity) {
 
 void CANBoard::setStepperRevs(float revs) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
+        LOG_F(WARNING, "setStepperRevs called for board 0x%x not in motor domain!", this->device.deviceUUID);
         return;
     }
 

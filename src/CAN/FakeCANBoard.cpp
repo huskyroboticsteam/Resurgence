@@ -147,33 +147,42 @@ int main() {
 				can::printCANPacket(packet);
 				can::sendCANPacket(packet);
 			} else if (testMode == TestMode::RawCAN) {
-				uint8_t pr = prompt("priority");
-				uint8_t command = prompt("command");
-				uint8_t dlc = prompt("add'l. data bits");
-				if (dlc > 5) {
-					std::cout << "Too many data bits" << std::endl;
-					continue;
-				}
-				uint8_t data[dlc + 1];
-				data[0] = command;
+				uint8_t periphID = prompt("peripheral ID");
+				std::string input;
+				std::cout << "Enter pwm duty cycle: ";
+				std::getline(std::cin, input);
+				float dutyCycle = std::stof(input);
+				CANPacket_t packet = CANPeripheralPacket_SetPWMDutyCycle(Constants::JETSON_DEVICE, device, periphID, dutyCycle);
+				packet.command = CAN_ACK(packet.command);
+				can::printCANPacket(packet);
+				can::sendCANPacket(packet);
+				// uint8_t pr = prompt("priority");
+				// uint8_t command = prompt("command");
+				// uint8_t dlc = prompt("add'l. data bits");
+				// if (dlc > 5) {
+				// 	std::cout << "Too many data bits" << std::endl;
+				// 	continue;
+				// }
+				// uint8_t data[dlc + 1];
+				// data[0] = command;
 
-				for (int i = 1; i <= dlc; i++) {
-					data[i] = prompt("bit " + std::to_string(i));
-				}
+				// for (int i = 1; i <= dlc; i++) {
+				// 	data[i] = prompt("bit " + std::to_string(i));
+				// }
 
-				// // manual construction of a generic packet
-				CANPacket_t p = {};
-				p.device = device;
-				p.priority = static_cast<CANPriority_t>(pr);
-				p.command = command;
-				p.senderUUID = CAN_UUID_JETSON;
-				p.contentsLength = dlc;
-				for (int i = 0; i < p.contentsLength && i < 6; i++) {
-					p.contents[i] = data[i + 1];
-				}
+				// // // manual construction of a generic packet
+				// CANPacket_t p = {};
+				// p.device = device;
+				// p.priority = static_cast<CANPriority_t>(pr);
+				// p.command = command;
+				// p.senderUUID = CAN_UUID_JETSON;
+				// p.contentsLength = dlc;
+				// for (int i = 0; i < p.contentsLength && i < 6; i++) {
+				// 	p.contents[i] = data[i + 1];
+				// }
 
-				can::printCANPacket(p);
-				can::sendCANPacket(p);
+				// can::printCANPacket(p);
+				// can::sendCANPacket(p);
 			}
 		}
 	}

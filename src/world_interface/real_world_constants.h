@@ -102,7 +102,7 @@ constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>
 	 // Telemetry (0x50)
 	 {boardid_t::telemetry, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}},
 	 // Hand (0x60)
-	 {boardid_t::hand, CANDevice_t{0, 0, 0, CAN_UUID_HAND}}, // hand not on motor domain (?)
+	 {boardid_t::hand, CANDevice_t{0, 1, 0, CAN_UUID_HAND}},
 	 // DEBUG (0x70, 0x71)
 	 {boardid_t::debug1, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG1}},
 	 {boardid_t::debug2, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG2}}
