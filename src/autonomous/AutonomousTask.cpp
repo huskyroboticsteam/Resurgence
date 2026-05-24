@@ -22,6 +22,7 @@ namespace autonomous {
 AutonomousTask::AutonomousTask(net::websocket::SingleClientWSServer& server): _server(server) {};
 
 AutonomousTask::~AutonomousTask() {
+	LOG_F(INFO, "destructing auton task obj");
 	if (_debug) _logFile.close();
 	if (_autonomous_task_thread.joinable()) {
 		_autonomous_task_thread.join();
@@ -205,10 +206,10 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
 			robot::setCmdVel(scaledVels(2), scaledVels(0));			
 
-			// if (_debug) {
-			// 	_logFile << gpsPosData.x() << "," << gpsPosData.y() << std::endl;
-			// 	_logFile.flush();
-			// }				
+			if (_debug) {
+				_logFile << gpsPosData.x() << "," << gpsPosData.y() << std::endl;
+				_logFile.flush();
+			}				
 		}
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
