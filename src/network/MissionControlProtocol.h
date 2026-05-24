@@ -49,6 +49,7 @@ private:
 
 	void handleEmergencyStopRequest(const json& j);
 	void handleOperationModeRequest(const json& j);
+	void handleMotorsDisableRequest(const json& j);
 	void handleTankDriveRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);

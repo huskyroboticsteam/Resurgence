@@ -72,7 +72,20 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		_autonomous_task.kill();
 		// if we have left autonomous mode, we need to start the power repeater again.
 		_power_repeat_task.start();
-	}
+	} 
+}
+
+static bool validateMotorsDisableRequest(const json& j) {
+	return util::validateKey(j, "motors", val_t::boolean);
+}
+
+void MissionControlProtocol::handleMotorsDisableRequest(const json& j) {
+	bool motors = j["motors"];
+
+	if (!motors) {
+		LOG_F(INFO, "Disabling motors...");
+		this->stopAndShutdownPowerRepeat(true);
+	}	
 }
 
 static bool validateDriveRequest(const json& j) {
@@ -314,6 +327,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateOperationModeRequest);
 	// drive and joint power handlers need the class for context since they must modify
 	// _last_joint_power and _last_cmd_vel (for the repeater thread)
+	this->addMessageHandler(
+		"disableMotors",
+		std::bind(&MissionControlProtocol::handleMotorsDisableRequest, this, _1),
+		validateMotorsDisableRequest);
 	this->addMessageHandler(
 		DRIVE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
