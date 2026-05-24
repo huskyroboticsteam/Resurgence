@@ -115,6 +115,17 @@ if(WORLD_INTERFACE STREQUAL "REAL")
     )
   endif()
   FetchContent_MakeAvailable(HindsightCAN)
+
+  # CAN26 library - new CAN protocol definitions
+  FetchContent_Declare(
+    CAN26
+    GIT_REPOSITORY https://github.com/huskyroboticsteam/CAN26.git
+    GIT_TAG "main"
+  )
+  FetchContent_MakeAvailable(CAN26)
+
+  add_library(CAN26 STATIC ${can26_SOURCE_DIR}/CANPacket.c)
+  target_include_directories(CAN26 SYSTEM PUBLIC ${can26_SOURCE_DIR})
 endif()
 
 # Check if offline mode flag waas passed in
@@ -166,6 +177,10 @@ add_library(camera SHARED
   camera/CameraConfig.cpp
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
+if(WORLD_INTERFACE STREQUAL "REAL")
+  target_link_libraries(camera PUBLIC CAN26 HindsightCAN)
+  target_compile_definitions(camera PRIVATE REAL_WORLD_INTERFACE)
+endif()
 
 # shared library for utility code
 add_library(utils SHARED
@@ -197,18 +212,18 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   # No clue why but CAN I/O goes to shit. Don't do it.
   add_library(can_interface STATIC)
   target_sources(can_interface PRIVATE
-    CAN/CANMotor.cpp
+    CAN/CANBoard.cpp
     CAN/CANUtils.cpp
   )
 
-  # Hardware specific source files
-  target_sources(can_interface PRIVATE
-    CAN/CAN.cpp)
+  target_sources(can_interface PRIVATE CAN/CAN.cpp)
   target_link_libraries(can_interface PUBLIC
+    CAN26
     HindsightCAN
     Threads::Threads
     utils
   )
+  target_compile_definitions(can_interface PUBLIC REAL_WORLD_INTERFACE)
 endif()
 
 ## GPS Implementations
@@ -235,7 +250,6 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
@@ -246,14 +260,12 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 
   add_library(real_world_interface STATIC
     world_interface/real_world_interface.cpp
-    world_interface/motor/can_motor.cpp
   )
   target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
   add_library(world_interface ALIAS real_world_interface)
 elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
   add_library(simulator_interface STATIC
     world_interface/simulator_interface.cpp
-    world_interface/motor/sim_motor.cpp
   )
   target_link_libraries(simulator_interface world_interface_core)
   add_library(world_interface ALIAS simulator_interface)
@@ -292,6 +304,10 @@ add_library(autonomous SHARED
 target_link_libraries(autonomous commands world_interface)
 
 add_library(constants SHARED Constants.cpp)
+if(WORLD_INTERFACE STREQUAL "REAL")
+  target_link_libraries(constants PUBLIC CAN26 HindsightCAN)
+  target_compile_definitions(constants PUBLIC REAL_WORLD_INTERFACE)
+endif()
 link_libraries(constants)
 
 add_executable(Rover Rover.cpp)
@@ -380,19 +396,13 @@ if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(LimitSwitchCalibration
     LimitCalib.cpp)
   target_link_libraries(LimitSwitchCalibration real_world_interface)
-
-  add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID
-    ${rover_libs}
-    can_interface
-  )
-  target_link_libraries(TunePID ${vision_libs})
 endif()
 
 add_compile_options(
   -Wall
   -Wextra
   -Werror
+  -Wno-psabi
 )
 
 add_subdirectory(ar)

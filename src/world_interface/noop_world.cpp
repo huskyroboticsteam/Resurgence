@@ -25,7 +25,7 @@ void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initMotorsOnly) {}
 
-std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
+std::shared_ptr<robot::base_motor> getMotor(robot::types::boardid_t motor) {
 	return nullptr;
 }
 
@@ -47,21 +47,19 @@ DataPoint<pose_t> getTruePose() {
 	return {};
 }
 
-void setMotorPower(motorid_t motor, double normalizedPWM) {}
+void setMotorPower(boardid_t motor, double normalizedPWM) {}
 
-void setMotorPos(motorid_t motor, int32_t targetPos) {}
+void setMotorPos(boardid_t motor, int32_t targetPos) {}
 
-types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
+types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t motor) {
 	return {};
 }
-
-void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {}
 
 void setIndicator(indication_t signal) {}
 
 callbackid_t addLimitSwitchCallback(
-	robot::types::motorid_t motor,
-	const std::function<void(robot::types::motorid_t motor,
+	robot::types::boardid_t motor,
+	const std::function<void(robot::types::boardid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
 	return 0;

@@ -1,12 +1,14 @@
 #include "CAN.h"
-
-#include "CANUtils.h"
+#include "../world_interface/real_world_constants.h"
+#include "../world_interface/world_interface.h"
 
 #include <chrono>
 #include <cstring>
-#include <loguru.hpp>
+#include <fstream>
+#include <iostream>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <shared_mutex>
 #include <string>
 #include <termios.h>
@@ -15,18 +17,16 @@
 #include <unordered_map>
 #include <utility>
 
-#include <linux/can.h>
 #include <linux/can/raw.h>
+#include <loguru.hpp>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
 extern "C" {
-#include <HindsightCAN/CANCommon.h>
+#include <CANCommandIDs.h>
 }
-
-using robot::types::DataPoint;
 
 // template specialization for hashing pairs
 template <typename T1, typename T2>
@@ -44,63 +44,70 @@ namespace can {
 namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
-// receive all messages on the given group
-constexpr uint32_t CAN_MASK = (0 << 10) | (0b1111 << 6) | 0;
+constexpr std::chrono::milliseconds ACK_TIMEOUT(50);
+constexpr std::chrono::milliseconds READ_TIMEOUT(500);
+// CAN26 11-bit ID layout: [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
+// Match on UUID field to filter for packets addressed to this device
+constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
+
+// Heartbeats should come in every 500ms, have some leniency
+constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(1000);
+
+std::shared_mutex bufferMutex;
+std::queue<CANPacket_t> buffer;
+uint32_t buffer_size_max = 0;
+
+// map each device seen to a watchdog
+std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeatWatchdogMap;
+std::mutex heartbeatWatchdogMapMutex;
 
 int can_fd;				// file descriptor of outbound can connection
 std::mutex socketMutex; // protects can_fd
 
-std::shared_ptr<util::PeriodicScheduler<>> telemScheduler;
-std::unordered_map<std::pair<deviceid_t, telemtype_t>, util::PeriodicScheduler<>::eventid_t>
-	telemEventIDMap;
-
-using telemetrycode_t = uint8_t;
-
-const std::unordered_map<telemetrycode_t, telemtype_t> telemCodeToTypeMap = {
-	{PACKET_TELEMETRY_VOLTAGE, telemtype_t::voltage},
-	{PACKET_TELEMETRY_CURRENT, telemtype_t::current},
-	{PACKET_TELEMETRY_PWR_RAIL_STATE, telemtype_t::pwr_rail},
-	{PACKET_TELEMETRY_TEMPERATURE, telemtype_t::temp},
-	{PACKET_TELEMETRY_ANG_POSITION, telemtype_t::angle},
-	{PACKET_TELEMETRY_GPS_LAT, telemtype_t::gps_lat},
-	{PACKET_TELEMETRY_GPS_LON, telemtype_t::gps_lon},
-	{PACKET_TELEMETRY_MAG_DIR, telemtype_t::mag_dir},
-	{PACKET_TELEMETRY_ACCEL_X, telemtype_t::accel_x},
-	{PACKET_TELEMETRY_ACCEL_Y, telemtype_t::accel_y},
-	{PACKET_TELEMETRY_ACCEL_Z, telemtype_t::accel_z},
-	{PACKET_TELEMETRY_GYRO_X, telemtype_t::gyro_x},
-	{PACKET_TELEMETRY_GYRO_Y, telemtype_t::gyro_y},
-	{PACKET_TELEMETRY_GYRO_Z, telemtype_t::gyro_z},
-	{PACKET_TELEMETRY_LIM_SW_STATE, telemtype_t::limit_switch},
-	{PACKET_TELEMETRY_ADC_RAW, telemtype_t::adc_raw}};
-
-// the telemetry map will store telemetry code instead of telem enum
-// this means unrecognized telemetry types won't cause UB
-using devicemap_t =
-	std::pair<std::shared_ptr<std::shared_mutex>,
-			  std::shared_ptr<std::unordered_map<telemetrycode_t, DataPoint<telemetry_t>>>>;
-
-// holds telemetry data for each device
-std::unordered_map<deviceid_t, devicemap_t> telemMap;
-std::shared_mutex telemMapMutex;
-
+std::shared_ptr<util::PeriodicScheduler<>> ackScheduler;
 std::unordered_map<
-	std::pair<deviceid_t, telemetrycode_t>,
-	std::unordered_map<uint32_t, std::function<void(deviceid_t, telemtype_t,
-													robot::types::DataPoint<telemetry_t>)>>>
-	telemetryCallbackMap;
-uint32_t nextCallbackID = 0;
-std::mutex telemetryCallbackMapMutex; // protects callbackMap and callbackID
+	std::pair<CANDeviceUUID_t, CANCommand_t>,
+	util::PeriodicScheduler<>::eventid_t> ackMap;
+
+// Holds read callbacks
+std::shared_mutex directReadCallbackMutex;
+std::unordered_map<
+	std::pair<CANDeviceUUID_t, uint16_t>,
+	std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>> directReadCallbackMap;
+std::shared_mutex directReadStatusMutex;
+std::unordered_map<
+	std::pair<CANDeviceUUID_t, uint16_t>,
+	bool> directReadStatusMap;
+
+// Endpoint JSONs
+nlohmann::json pro_endpoints;
+nlohmann::json s1_endpoints;
 
 // not thread-safe wrt file descriptor
-bool receivePacket(int fd, CANPacket& packet) {
+bool receivePacket(int fd, CANPacket_t& packet) {
 	int ret;
 	can_frame frame;
 	ret = read(fd, &frame, sizeof(can_frame));
 	if (ret >= 0) {
-		packet.id = frame.can_id;
-		packet.dlc = frame.can_dlc;
-		std::memcpy(packet.data, frame.data, frame.can_dlc);
+		// Parse 11-bit CAN ID into CANDevice_t + priority
+		// [priority:1][deviceUUID:7][peripheral:1][power:1][motor:1]
+		uint16_t canID = frame.can_id & 0x7FF; // extract the 11-bit CAN ID from frame
+		uint16_t deviceBits = canID & 0x3FF;   // extract lower 10 bits (device info)
+		std::memcpy(&packet.device, &deviceBits, sizeof(uint16_t));
+		packet.priority = (canID & 0x400) ? CAN_PRIORITY_LOW : CAN_PRIORITY_HIGH;
+
+		// Parse 8-byte CAN data
+		// [command:1][senderUUID:1][contents:0-6]
+		if (frame.can_dlc >= 2) {
+			packet.command = frame.data[0];
+			packet.senderUUID = frame.data[1];
+			packet.contentsLength = frame.can_dlc - 2;
+			std::memcpy(packet.contents, frame.data + 2, packet.contentsLength);
+		} else {
+			packet.command = 0;
+			packet.senderUUID = 0;
+			packet.contentsLength = 0;
+		}
 		return true;
 	} else {
 		LOG_F(ERROR, "Failed to receive CAN packet: %s", std::strerror(errno));
@@ -108,65 +115,83 @@ bool receivePacket(int fd, CANPacket& packet) {
 	}
 }
 
-template <typename K, typename V>
-bool mapHasKey(std::shared_mutex& mutex, const std::unordered_map<K, V>& map, const K& key) {
-	std::shared_lock lock(mutex);
-	return map.find(key) != map.end();
+void handleAck(CANPacket_t& packet) {
+	printCANPacket(packet);
+	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
+	if (decoded.failure) {
+		LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.receiver.deviceUUID);
+	} else {
+		LOG_F(INFO, "Ack received from 0x%x: ok", decoded.receiver.deviceUUID);
+	}
+
+	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.commandID);
+	auto it = ackMap.find(key);
+	if (it != ackMap.end()) {
+		auto eventID = it->second;
+		ackMap.erase(it);
+		ackScheduler->removeEvent(eventID);
+	}
 }
 
-void invokeTelemCallback(deviceid_t id, telemetrycode_t telemCode,
-						 DataPoint<telemetry_t> data) {
-	// first convert the telemetry code into a telemetry type
-	auto telemTypeEntry = telemCodeToTypeMap.find(telemCode);
-	if (telemTypeEntry != telemCodeToTypeMap.end()) {
-		telemtype_t telemType = telemTypeEntry->second;
-		std::lock_guard lock(telemetryCallbackMapMutex);
-		// get callback (checking if it exists)
-		auto entry = telemetryCallbackMap.find(std::make_pair(id, telemCode));
-		if (entry != telemetryCallbackMap.end()) {
-			// invoke all callbacks
-			for (auto callbackEntry : entry->second) {
-				callbackEntry.second(id, telemType, data);
-			}
+void handleDirectRead(CANPacket_t& packet) {
+	auto decoded = CANMotorPacket_BLDC_DirectReadResult_Decode(&packet);
+	// LOG_F(INFO, "Read for 0x%x of %x", decoded.sender.deviceUUID, decoded.endpointID);
+
+	// Fire off callback, if it exists
+	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
+	// Read access
+	std::shared_lock mapReadLock(directReadCallbackMutex);
+	auto it = directReadCallbackMap.find(key);
+	// Unlock in case callback wants to modify the map?
+	mapReadLock.unlock();
+	if (it != directReadCallbackMap.end()) {
+		it->second(decoded);
+		std::unique_lock readStatusLock(directReadStatusMutex);
+		if (auto it_status = directReadStatusMap.find(key); it_status != directReadStatusMap.end()) {
+			directReadStatusMap.insert_or_assign(key, true);
+		}
+	} else {
+		// LOG_F(INFO, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID, decoded.endpointID);
+	}
+}
+
+void handleEncoderEstimates(CANPacket_t& packet) {
+	auto decoded = CANMotorPacket_BLDC_EncoderEstimates_Decode(&packet);
+	CANDeviceUUID_t uuid = packet.senderUUID;
+	// Convert position from revolutions to millidegrees
+	int32_t positionMdeg = static_cast<int32_t>(decoded.position * Constants::MILLIDEGREES_PER_REV);
+
+	if(auto it = robot::UUIDBoardMap.find(uuid); it != robot::UUIDBoardMap.end()) {
+		robot::handleMotorEncoderEstimate(it->second, positionMdeg);
+	}
+
+	// telemetrycode_t telemCode = static_cast<telemetrycode_t>(telemtype_t::angle);
+	// storeTelemetry(uuid, telemCode, robot::types::DataPoint<telemetry_t>(positionMdeg));
+}
+
+// Heartbeat monitoring handler: create watchdog on first heartbeat and feed it on subsequent heartbeats
+void handleHeartbeatPacket(CANPacket_t& packet) {
+	{
+		std::lock_guard lock(heartbeatWatchdogMapMutex);
+		CANDeviceUUID_t uuid = packet.senderUUID;
+		auto it = heartbeatWatchdogMap.find(uuid);
+		// if the watchdog expires, log a warning.
+		if (it == heartbeatWatchdogMap.end()) {
+			heartbeatWatchdogMap.emplace(
+				uuid, 
+				std::make_unique<util::Watchdog<>>(HEARTBEAT_TIMEOUT, [uuid]() {
+					LOG_F(WARNING, "Heartbeat timeout for device 0x%x", uuid);
+				})
+			);
+		} else {
+			// feed the watchdog to reset timer
+			it->second->feed();
 		}
 	}
 }
 
-void handleTelemetryPacket(CANPacket& packet) {
-	// extract necessary information
-	deviceid_t id = getSenderDeviceGroupAndSerial(packet);
-	telemetrycode_t telemCode = DecodeTelemetryType(&packet);
-	telemetry_t telemData = DecodeTelemetryDataSigned(&packet);
-	DataPoint<telemetry_t> data(telemData);
-
-	// check if telemetry data is already in map
-	if (mapHasKey(telemMapMutex, telemMap, id)) {
-		// acquire read lock of entire map
-		std::shared_lock mapLock(telemMapMutex);
-		auto& pair = telemMap.at(id);
-		std::shared_mutex& deviceMutex = *pair.first;
-		auto& deviceMap = *pair.second;
-		// acquire write lock of the map for this device
-		std::unique_lock deviceLock(deviceMutex);
-		// insert telemetry data
-		deviceMap.insert_or_assign(telemCode, data);
-	} else {
-		// this device has no existing data, so insert a new device map
-		auto mutexPtr = std::make_shared<std::shared_mutex>();
-		auto deviceMapPtr =
-			std::make_shared<std::unordered_map<telemetrycode_t, DataPoint<telemetry_t>>>();
-		deviceMapPtr->emplace(telemCode, data);
-		// acquire write lock of the entire map to insert a new device map
-		std::unique_lock mapLock(telemMapMutex);
-		telemMap.emplace(id, std::make_pair(mutexPtr, deviceMapPtr));
-	}
-
-	// now fire off callback, if it exists
-	invokeTelemCallback(id, telemCode, data);
-}
-
 // returns a file descriptor, or -1 on failure
-int createCANSocket(std::optional<can::deviceid_t> id) {
+int createCANSocket(std::optional<CANDevice_t> device) {
 	int fd;
 	if ((fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
 		LOG_F(ERROR, "Failed to initialize CAN bus: %s", std::strerror(errno));
@@ -196,9 +221,13 @@ int createCANSocket(std::optional<can::deviceid_t> id) {
 		return -1;
 	}
 
-	// enable reception at the given id, if provided
-	if (id) {
-		int canID = ConstructCANID(0, static_cast<uint8_t>(id->first), id->second);
+	// enable reception at the given device, if provided
+	if (device) {
+		// Build CAN ID from CANDevice_t using CAN26's packet header format
+		CANPacket_t dummy = {};
+		dummy.device = *device;
+		dummy.priority = CAN_PRIORITY_LOW;
+		uint16_t canID = CANGetPacketHeader(&dummy);
 		can_filter filters[1];
 		filters[0].can_id = canID;
 		filters[0].can_mask = CAN_MASK;
@@ -212,40 +241,93 @@ int createCANSocket(std::optional<can::deviceid_t> id) {
 	return fd;
 }
 
+bool sendCANFrame(const canfd_frame& frame) {
+	std::lock_guard lock(socketMutex);
+	// note that frame is a canfd_frame but we're using sizeof(can_frame)
+	// not sure why this is required to work
+	bool success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
+	tcdrain(can_fd);
+	return success;
+}
+
 void receiveThreadFn() {
 	loguru::set_thread_name("CAN_Receive");
-	CANPacket packet;
+	CANPacket_t packet;
 	// create dedicated CAN socket for reading
-	int recvFD = createCANSocket({{devicegroup_t::master, DEVICE_SERIAL_JETSON}});
+	int recvFD = createCANSocket(Constants::JETSON_DEVICE);
 	if (recvFD < 0) {
 		LOG_F(ERROR, "Unable to open CAN connection!");
 		return;
 	}
 
 	while (true) {
-		// no sychronization necessary, since this thread owns the FD
+		// no synchronization necessary, since this thread owns the FD
 		bool received = receivePacket(recvFD, packet);
 		if (received) {
-			uint8_t packetType = packet.data[0];
-			switch (packetType) {
-				case packettype_t::telemetry:
-					handleTelemetryPacket(packet);
-					break;
-
-				case packettype_t::limit_alert:
-					invokeTelemCallback(
-						getSenderDeviceGroupAndSerial(packet),
-						static_cast<telemetrycode_t>(telemtype_t::limit_switch),
-						{packet.data[3]});
-					break;
-
-				default:
-					LOG_F(WARNING, "Unrecognized CAN packet type: %x", packetType);
-					break;
-			}
+			// Add packet to buffer
+			// std::unique_lock lock(bufferMutex);
+			buffer.push(packet);
+			// if (packet.command == CAN_COMMAND_ID__BLDC_DIRECT_READ_RESULT) {
+			// 	LOG_F(INFO, "Adding result packet for 0x%x to buffer", packet.senderUUID);
+			// }
+			// if (buffer.size() > buffer_size_max) {
+			// 	LOG_F(INFO, "New max buffer size: %d", buffer_size_max);
+			// 	buffer_size_max = buffer.size();
+			// }
+			// lock.unlock();
 		} else {
 			// we had a bus error, so sleep for a bit
 			std::this_thread::sleep_for(READ_ERR_SLEEP);
+		}
+	}
+}
+
+void processThreadFn() {
+	while (true) {
+		std::shared_lock lock(bufferMutex);
+		if (buffer.empty()) { continue; }
+
+		lock.unlock();
+		std::unique_lock write_lock(bufferMutex);
+
+		// Double check required after releasing lock
+		if (buffer.empty()) { continue; }
+		// LOG_F(INFO, "Buffer size = %ld", buffer.size());
+		CANPacket_t packet = buffer.front();
+		buffer.pop();
+		// Done with buffer, unlock to allow more reading
+		write_lock.unlock();
+
+		// dispatch on CAN26 command ID
+		switch (packet.command) {
+			case CAN_COMMAND_ID__E_STOP:
+				LOG_F(WARNING, "Received E-Stop from UUID 0x%x", packet.senderUUID);
+				break;
+
+			case CAN_COMMAND_ID__ACKNOWLEDGE:
+				handleAck(packet);
+				break;
+
+			case CAN_COMMAND_ID__HEARTBEAT:
+				handleHeartbeatPacket(packet);
+				break;
+
+			case CAN_COMMAND_ID__LIMIT_SWITCH_ALERT:
+				// handleLimitSwitchAlert(packet);
+				break;
+
+			case CAN_COMMAND_ID__BLDC_DIRECT_READ_RESULT:
+				handleDirectRead(packet);
+				break;
+
+			case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
+				handleEncoderEstimates(packet);
+				break;
+			
+			default:
+				LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x",
+						packet.command, packet.senderUUID);
+				break;
 		}
 	}
 }
@@ -258,155 +340,130 @@ void initCAN() {
 		LOG_F(ERROR, "Unable to open CAN connection!");
 	}
 
+	// Load Odrive endpoint jsons (files relative to build/)
+	std::ifstream ifs_pro("../src/CAN/pro_endpoints.json");
+	std::ifstream ifs_s1("../src/CAN/s1_endpoints.json");
+
+	pro_endpoints = nlohmann::json::parse(ifs_pro)["endpoints"];
+	s1_endpoints = nlohmann::json::parse(ifs_s1)["endpoints"];
+
 	// start thread for recieving CAN packets
 	std::thread receiveThread(receiveThreadFn);
 	receiveThread.detach();
+
+	// start thread for processing CAN packets
+	std::thread processThread(processThreadFn);
+	processThread.detach();
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
-void sendCANPacket(const CANPacket& packet) {
+void sendCANPacket(const CANPacket_t& packet) {
+	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
+	CANDeviceUUID_t uuid = packet.device.deviceUUID;
 	canfd_frame frame;
 	std::memset(&frame, 0, sizeof(frame));
-	frame.can_id = packet.id;
-	frame.len = packet.dlc;
-	std::memcpy(frame.data, packet.data, packet.dlc);
-	bool success;
-	{
-		std::lock_guard lock(socketMutex);
-		// note that frame is a canfd_frame but we're using sizeof(can_frame)
-		// not sure why this is required to work
-		success = write(can_fd, &frame, sizeof(struct can_frame)) == sizeof(struct can_frame);
-		tcdrain(can_fd);
+	frame.can_id = CANGetPacketHeader(&mutablePacket);
+	frame.len = CANGetDlc(&mutablePacket);
+	std::memcpy(frame.data, CANGetData(&mutablePacket), frame.len);
+
+	if (packet.command & 0x80 && packet.command != CAN_ACK(CAN_COMMAND_ID__BLDC_DIRECT_READ)) {
+		if (!ackScheduler) {
+			ackScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_AckSched");
+		}
+
+		auto key = std::make_pair(static_cast<uint8_t>(packet.senderUUID), packet.command);
+		auto it = ackMap.find(key);
+		if (it != ackMap.end()) {
+			LOG_F(WARNING, "0x%x already has an outgoing packet! Ignoring..", uuid);
+			return;
+		}
+
+		auto eventID = ackScheduler->scheduleEvent(ACK_TIMEOUT, [=]() {
+			LOG_F(ERROR, "0x%x ACK TIMED OUT, RESENDING", uuid);
+			sendCANFrame(frame);
+		});
+
+		ackMap.insert_or_assign(key, eventID);
 	}
 
+	bool success = sendCANFrame(frame);
+
 	if (!success) {
-		LOG_F(ERROR, "Failed to send CAN packet to group=%x, id=%x: %s",
-			  static_cast<int>(getDeviceGroup(packet)), getDeviceSerial(packet),
+		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", uuid,
 			  std::strerror(errno));
 	}
 }
 
-void printCANPacket(const CANPacket& packet) {
-  std::stringstream ss;
-  ss << "CAN: p" << std::hex << ((packet.id >> 10) & 0x1);
-  ss << " g" << std::hex << ((packet.id & 0x03C0) >> 6);
-  ss << " s" << std::hex << ((packet.id & 0x003F));
-  ss << " pid" << std::hex << static_cast<uint>(packet.data[0]);
-  ss << " data:";
-  for (int i = 1; i < packet.dlc; i++) {
-    ss << std::hex << static_cast<uint>(packet.data[i]) << " ";
-  }
+void printCANPacket(const CANPacket_t& packet) {
+	CANPacket_t mutablePacket = packet; // same as sendCANPacket
+	std::stringstream ss;
+	ss << "CAN: ";
+	ss << std::hex << (packet.senderUUID) << "->";
+	ss << std::hex << (packet.device.deviceUUID);
+	// ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x0007));
+	ss << " " << std::hex << static_cast<uint>(packet.command);
+	ss << " [";
+	for (int i = 1; i < CANGetDlc(&mutablePacket); i++) {
+		ss << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[i]) << " ";
+	}
+	ss << "]";
 
-  LOG_F(INFO, ss.str().c_str());
+	LOG_F(INFO, ss.str().c_str());
 }
 
-robot::types::DataPoint<telemetry_t> getDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
-	std::shared_lock mapLock(telemMapMutex); // acquire read lock
-	// find entry for device in map
-	auto entry = telemMap.find(id);
-	if (entry != telemMap.end()) {
-		auto& devMutex = *entry->second.first;
-		auto& devMap = *entry->second.second;
-		// acquire read lock of device map
-		std::shared_lock deviceLock(devMutex);
-		// find entry for telemetry
-		auto telemEntry = devMap.find(static_cast<telemetrycode_t>(telemType));
-		if (telemEntry != devMap.end()) {
-			return telemEntry->second;
-		} else {
-			return {};
+void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback) {
+	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
+	// Write access
+	std::unique_lock mapLock(directReadCallbackMutex);
+	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
+		// LOG_F(WARNING, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint);
+		return;
+	}
+
+	std::thread timeout([device, endpoint, key]() {
+		std::unique_lock statusLock(directReadStatusMutex);
+		directReadStatusMap.emplace(key, false);
+		statusLock.unlock();
+		std::this_thread::sleep_for(READ_TIMEOUT);
+
+		statusLock.lock();
+		if (auto it = directReadStatusMap.find(key); it != directReadStatusMap.end()) {
+			if (!it->second) {
+				LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint);
+				std::unique_lock mapLock(directReadCallbackMutex);
+				directReadCallbackMap.erase(key);
+			}
+			directReadStatusMap.erase(key);
 		}
+	});
+	timeout.detach();
+
+	directReadCallbackMap.emplace(key, callback);
+}
+
+void removeDirectReadCallback(CANDevice_t device, uint16_t endpoint) {
+	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
+	// Write access
+	std::unique_lock mapLock(directReadCallbackMutex);
+	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
+		directReadCallbackMap.erase(it);
+	}
+}
+
+nlohmann::json getEndpoint(boardid_t boardid, std::string endpoint) {
+	nlohmann::json endpoints;
+	if (auto it = robot::proBoards.find(boardid); it != robot::proBoards.end()) {
+		endpoints = pro_endpoints;
 	} else {
-		return {};
-	}
-}
-
-void pullDeviceTelemetry(deviceid_t id, telemtype_t telemType) {
-	CANPacket p;
-	auto groupCode = static_cast<uint8_t>(id.first);
-	auto serial = static_cast<uint8_t>(id.second);
-	auto telemCode = static_cast<uint8_t>(telemType);
-	AssembleTelemetryPullPacket(&p, groupCode, serial, telemCode);
-	sendCANPacket(p);
-}
-
-void scheduleTelemetryPull(deviceid_t id, telemtype_t telemType,
-						   std::chrono::milliseconds period) {
-	if (!telemScheduler) {
-		telemScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_TelemPullSched");
+		endpoints = s1_endpoints;
 	}
 
-	auto mapKey = std::make_pair(id, telemType);
-	auto it = telemEventIDMap.find(mapKey);
-	if (it != telemEventIDMap.end()) {
-		auto eventID = it->second;
-		telemEventIDMap.erase(it);
-		telemScheduler->removeEvent(eventID);
+	if (!endpoints.contains(endpoint)) {
+		LOG_F(ERROR, "Request for endpoint %s does not exist!", endpoint.c_str());
+		return nullptr;
 	}
-
-	auto eventID =
-		telemScheduler->scheduleEvent(period, [=]() { pullDeviceTelemetry(id, telemType); });
-	telemEventIDMap.insert_or_assign(mapKey, eventID);
-
-	// pull immediately since scheduling does not send right now
-	pullDeviceTelemetry(id, telemType);
-}
-
-void unscheduleTelemetryPull(deviceid_t id, telemtype_t telemType) {
-	if (!telemScheduler) {
-		return;
-	}
-
-	auto mapKey = std::make_pair(id, telemType);
-	auto it = telemEventIDMap.find(mapKey);
-	if (it != telemEventIDMap.end()) {
-		auto eventID = it->second;
-		telemEventIDMap.erase(it);
-		telemScheduler->removeEvent(eventID);
-	}
-}
-
-void unscheduleAllTelemetryPulls() {
-	if (!telemScheduler) {
-		return;
-	}
-
-	telemScheduler->clear();
-	telemEventIDMap.clear();
-}
-
-callbackid_t addDeviceTelemetryCallback(
-	deviceid_t id, telemtype_t telemType,
-	const std::function<void(deviceid_t, telemtype_t, robot::types::DataPoint<telemetry_t>)>&
-		callback) {
-	telemetrycode_t code = static_cast<telemetrycode_t>(telemType);
-	auto key = std::make_pair(id, code);
-
-	std::lock_guard lock(telemetryCallbackMapMutex);
-	uint32_t callbackIDCode = nextCallbackID++;
-	callbackid_t callbackID = {id, telemType, callbackIDCode};
-
-	telemetryCallbackMap.insert({key, {}});
-	telemetryCallbackMap.at(key).insert({callbackIDCode, callback});
-
-	return callbackID;
-}
-
-void removeDeviceTelemetryCallback(callbackid_t id) {
-	deviceid_t deviceID = std::get<0>(id);
-	telemetrycode_t telemCode = static_cast<telemetrycode_t>(std::get<1>(id));
-	uint32_t code = std::get<2>(id);
-	auto key = std::make_pair(deviceID, telemCode);
-
-	std::lock_guard lock(telemetryCallbackMapMutex);
-	auto entry = telemetryCallbackMap.find(key);
-	if (entry != telemetryCallbackMap.end()) {
-		// remove the callback
-		entry->second.erase(code);
-		// if there are no callbacks left for this telemetry type + device, remove the map
-		if (entry->second.empty()) {
-			telemetryCallbackMap.erase(entry);
-		}
-	}
+	return endpoints[endpoint];
 }
 
 } // namespace can

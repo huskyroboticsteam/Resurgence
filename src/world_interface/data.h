@@ -53,24 +53,22 @@ enum class indication_t {
 	arrivedAtDest
 };
 
-/** @brief The motors on the robot. */
-enum class motorid_t {
-	leftTread,
-	rightTread,
+/** @brief The boards on the robot. */
+enum class boardid_t {
+	frontTireLeft,
+	frontTireRight,
+	rearTireLeft,
+	rearTireRight,
 	armBase,
 	shoulder,
 	elbow,
 	forearm,
 	wristDiffRight,
 	wristDiffLeft,
+	telemetry,
 	hand,
-	drillActuator,
-	drillMotor,
-	fourbar1,
-	fourbar2,
-  // Hack, see real_world_interface.cpp for details
-  scienceServoBoard,
-  scienceStepperBoard,
+	debug1,
+	debug2
 };
 
 /** @brief the mounted peripheral on the robot. */
@@ -88,7 +86,7 @@ enum class jointid_t {
 	wristPitch,
 	wristRoll,
 	hand,
-  handActuator,
+	handActuator,
 	ikForward,
 	ikUp,
 	fourBarLinkage,
@@ -98,8 +96,8 @@ enum class jointid_t {
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::handActuator, jointid_t::ikForward,
-   jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor});
+	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand,
+	 jointid_t::ikForward, jointid_t::ikUp});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -109,64 +107,34 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"wristPitch", jointid_t::wristPitch},
 	 {"wristRoll", jointid_t::wristRoll},
 	 {"hand", jointid_t::hand},
-   {"handActuator", jointid_t::handActuator},
 	 {"ikForward", jointid_t::ikForward},
-	 {"ikUp", jointid_t::ikUp},
-	 {"fourBarLinkage", jointid_t::fourBarLinkage},
-	 {"drillActuator", jointid_t::drillActuator},
-	 {"drillMotor", jointid_t::drillMotor}});
+	 {"ikUp", jointid_t::ikUp}});
 
 enum class servoid_t {
-  microscope,
-  syringe,
-  cuvette,
-  filter,
-  soilBox,
+	microscope,
+	syringe,
+	cuvette,
+	filter,
+	soilBox,
 };
 
 constexpr auto all_servoid_t = frozen::make_unordered_set<servoid_t>(
-  {servoid_t::microscope, servoid_t::syringe, servoid_t::soilBox,
-   servoid_t::cuvette, servoid_t::filter});
+	{servoid_t::microscope, servoid_t::syringe, servoid_t::soilBox, servoid_t::cuvette,
+	 servoid_t::filter});
 
 constexpr auto name_to_servoid = frozen::make_unordered_map<frozen::string, servoid_t>(
-  {{"microscope", servoid_t::microscope},
-   {"syringe", servoid_t::syringe},
-   {"cuvette", servoid_t::cuvette},
-   {"filter", servoid_t::filter},
-   {"soilBox", servoid_t::soilBox}});
+	{{"microscope", servoid_t::microscope},
+	 {"syringe", servoid_t::syringe},
+	 {"cuvette", servoid_t::cuvette},
+	 {"filter", servoid_t::filter},
+	 {"soilBox", servoid_t::soilBox}});
 
-constexpr auto servoid_to_servo_num = frozen::make_unordered_map<servoid_t, int>(
-  {{servoid_t::microscope, 7},
-   {servoid_t::syringe, 9},
-   {servoid_t::cuvette, 5},
-   {servoid_t::filter, 8},
-   {servoid_t::soilBox, 6}});
-
-enum class stepperid_t {
-  plunger,
-  judges,
-  mast,
-  lock,
-  lazySusan,
-};
-
-constexpr auto all_stepperid_t = frozen::make_unordered_set<stepperid_t>(
-  {stepperid_t::plunger, stepperid_t::judges, stepperid_t::mast,
-   stepperid_t::lock, stepperid_t::lazySusan});
-
-constexpr auto name_to_stepperid = frozen::make_unordered_map<frozen::string, stepperid_t>(
-  {{"plunger", stepperid_t::plunger},
-   {"judges", stepperid_t::judges},
-   {"mast", stepperid_t::mast},
-   {"lock", stepperid_t::lock},
-   {"lazySusan", stepperid_t::lazySusan}});
-
-constexpr auto stepperid_to_stepper_num = frozen::make_unordered_map<stepperid_t, uint8_t>(
-  {{stepperid_t::plunger, 4},
-   {stepperid_t::judges, 5},
-   {stepperid_t::mast, 2},
-   {stepperid_t::lock, 1},
-   {stepperid_t::lazySusan, 6}});
+constexpr auto servoid_to_servo_num =
+	frozen::make_unordered_map<servoid_t, int>({{servoid_t::microscope, 7},
+												{servoid_t::syringe, 9},
+												{servoid_t::cuvette, 5},
+												{servoid_t::filter, 8},
+												{servoid_t::soilBox, 6}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:
@@ -261,7 +229,7 @@ public:
 	 * @param defaultData The value to return if this data point is not valid.
 	 * @return T The value of this data point, or @p defaultData.
 	 */
-	T getDataOrElse(T defaultData) {
+	T getDataOrElse(T defaultData) const {
 		return isValid() ? getData() : defaultData;
 	}
 

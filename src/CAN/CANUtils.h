@@ -1,6 +1,9 @@
 #pragma once
 
 extern "C" {
+#include <CANDevices.h>
+#include <CANPacket.h>
+
 #include <HindsightCAN/CANCommon.h>
 #include <HindsightCAN/CANMotorUnit.h>
 #include <HindsightCAN/CANPacket.h>
@@ -11,6 +14,40 @@ extern "C" {
 #include <utility>
 
 namespace can {
+// ===========
+// UPDATED:
+// ===========
+
+/**
+ * @brief Use CAN26's CANDevice_t directly for device information
+ */
+using deviceinfo_t = CANDevice_t;
+
+/**
+ * @brief Use CAN26's CANDeviceUUID_t for device UUIDs
+ */
+using uuid_t = CANDeviceUUID_t;
+
+/**
+ * @brief Get UUID from a packet ID
+ *
+ * @param packet The packet to extract the UUID from.
+ * @return uuid_t The UUID of the sender.
+ */
+uuid_t getUUIDFromPacket(const CANPacket_t& packet);
+
+/**
+ * @brief Get the sender UUID of the given packet.
+ *
+ * @param packet The packet to extract the sender UUID from.
+ * @return uuid_t The device UUID.
+ */
+uuid_t getSenderUUID(const CANPacket_t& packet);
+
+
+// ===========
+// DEPRECATED:
+// ===========
 
 /**
  * @brief The possible device group codes.
@@ -67,7 +104,7 @@ struct packettype_t {
 using deviceserial_t = uint8_t;
 
 /** @brief The type of telemetry data. */
-using telemetry_t = int32_t;
+// using telemetry_t = int32_t;
 
 /**
  * @brief A unique identifier for a CAN device.

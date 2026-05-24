@@ -23,7 +23,7 @@ using val_t = nlohmann::json::value_t;
 using net::websocket::connhandler_t;
 using net::websocket::msghandler_t;
 using net::websocket::validator_t;
-using robot::types::motorid_t;
+using robot::types::boardid_t;
 using std::placeholders::_1;
 
 namespace net::mc {
@@ -181,32 +181,6 @@ void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const j
 	// setMotorPos(motor, position_mdeg);
 }
 
-static bool validateServoPositionRequest(const json& j) {
-  return util::validateKey(j, "servo", val_t::string) && util::validateKey(j, "position", val_t::number_integer);
-}
-
-void MissionControlProtocol::handleServoPositionRequest(const json& j) {
-  std::string servoName = j["servo"];
-  int32_t position = j["position"];
-  auto servo = name_to_servoid.find(util::freezeStr(servoName));
-  if (servo != name_to_servoid.end()) {
-	  robot::setServoPos(servo->second, position);
-  }
-}
-
-static bool validateStepperTurnAngleRequest(const json& j) {
-  return util::validateKey(j, "stepper", val_t::string) && util::validateKey(j, "angle", val_t::number_integer);
-}
-
-void MissionControlProtocol::handleStepperTurnAngleRequest(const json& j) {
-  std::string stepperName = j["stepper"];
-  int16_t angle = j["angle"];
-  auto stepper = name_to_stepperid.find(util::freezeStr(stepperName));
-  if (stepper != name_to_stepperid.end()) {
-    robot::setRequestedStepperTurnAngle(stepper->second, angle);
-  }
-}
-
 static bool validateWaypointNavRequest(const json& j) {
 	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
 	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);
@@ -256,15 +230,33 @@ static bool validateCameraFrameRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
+	auto gps = gps::readGPSCoords();
+	auto imu = robot::readIMU();
 	CameraID cam = j["camera"];
-    auto camDP = robot::readCamera(cam);
-    if (camDP) {
-      auto data = camDP.getData();
-      cv::Mat frame = data.first;
-      std::string b64_data = base64::encodeMat(frame, ".jpg");
-      json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}};
-      _server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-    }
+	auto camDP = robot::readCamera(cam);
+
+	Eigen::Quaterniond quat = imu.getData();
+	double lon = 0, lat = 0, alt = 0;
+	double w = 0, x = 0, y = 0, z = 0;
+	if (gps.isValid()) {
+		lon = gps.getData().lon;
+		lat = gps.getData().lat;
+		alt = gps.getData().alt;
+    	w = quat.w();
+    	x = quat.x();
+    	y = quat.y();
+    	z = quat.z();
+	}
+
+	if (camDP) {
+		auto data = camDP.getData();
+		cv::Mat frame = data.first;
+		std::string b64_data = base64::encodeMat(frame, ".jpg");
+		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}, 
+		{"orientW", w}, {"orientX", x}, {"orientY", y}, {"orientZ", z},
+		{"lon", lon}, {"lat", lat}, {"alt", alt}};
+		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+	}
 }
 
 void MissionControlProtocol::sendArmIKEnabledReport(bool enabled) {
@@ -367,14 +359,6 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		WAYPOINT_NAV_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
 		validateWaypointNavRequest);
-	this->addMessageHandler(
-    		SERVO_POSITION_REQ_TYPE,
-    		std::bind(&MissionControlProtocol::handleServoPositionRequest, this, _1),
-    		validateServoPositionRequest);
-	this->addMessageHandler(
-    		STEPPER_TURN_ANGLE_REQ_TYPE,
-    		std::bind(&MissionControlProtocol::handleStepperTurnAngleRequest, this, _1),
-    		validateStepperTurnAngleRequest);
 
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 

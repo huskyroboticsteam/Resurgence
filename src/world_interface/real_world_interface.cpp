@@ -1,19 +1,21 @@
 #include "../CAN/CAN.h"
-#include "../CAN/CANMotor.h"
+#include "../CAN/CANBoard.h"
 #include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
+#include "../control/JacobianVelController.h"
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
-#include "motor/can_motor.h"
+#include "../utils/scheduler.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
 
 #include <future>
 #include <iostream>
 #include <loguru.hpp>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -21,91 +23,69 @@
 
 using nlohmann::json;
 using namespace navtypes;
-using namespace robot::types;
-using can::motor::motormode_t;
+using namespace std::chrono_literals;
 
 namespace robot {
 
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
-// A mapping of (motor_id, shared pointer to object of the motor)
-std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
-
 namespace {
+
+// A mapping of (board_id, shared pointer to board)
+std::unordered_map<robot::types::boardid_t, std::shared_ptr<can::CANBoard>> board_ptrs;
+
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
-void addMotorMapping(motorid_t motor, bool hasPosSensor) {
-  double posScale = 0;
-  double negScale = 0;
+void addBoardMapping(robot::types::boardid_t board) {
+	// double posScale = 0;
+	// double negScale = 0;
 
 	// get scales for motor
-  try {
-    posScale = positive_pwm_scales.at(motor);
-    negScale = negative_pwm_scales.at(motor);
-  } catch (const std::out_of_range& err) {
-    LOG_F(ERROR, "Couldn't find PWM scales for motor 0x%x", static_cast<uint8_t>(motor));
-  }
+	// try {
+	// 	posScale = positive_pwm_scales.at(motor);
+	// 	negScale = negative_pwm_scales.at(motor);
+	// } catch (const std::out_of_range& err) {
+	// 	LOG_F(ERROR, "Couldn't find PWM scales for motor 0x%x", static_cast<uint8_t>(motor));
+	// }
+
+	// Get CANDevice_t from boardUUIDMap
+	CANDevice_t device;
+	try {
+		device = boardUUIDMap.at(board);
+	} catch (const std::out_of_range& err) {
+		LOG_F(ERROR, "Couldn't find UUID mapping for board 0x%x", static_cast<uint8_t>(board));
+		return;
+	}
 
 	// create ptr and insert in map
-	std::shared_ptr<robot::base_motor> ptr =
-		std::make_shared<can_motor>(motor, hasPosSensor, motorSerialIDMap.at(motor),
-									motorGroupMap.at(motor), posScale, negScale);
-	motor_ptrs.insert({motor, ptr});
-}
-} // namespace
-
-const kinematics::DiffDriveKinematics& driveKinematics() {
-	return drive_kinematics;
+	std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, device);
+	board_ptrs.insert({board, ptr});
 }
 
-namespace {
+std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
+	auto itr = board_ptrs.find(board);
+
+	if (itr == board_ptrs.end()) {
+		// board id not in map
+		// LOG_F(ERROR, "getBoard_(): Unknown board 0x%x", static_cast<uint8_t>(board));
+		return nullptr;
+	} else {
+		// return board object pointer
+		return itr->second;
+	}
+}
+
 // map that associates camera id to the camera object
 std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 
 callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
-void initMotors() {
-	for (const auto& it : motorSerialIDMap) {
-		motorid_t motor = it.first;
-		auto group = motorGroupMap.at(motor);
-		can::motor::initMotor(group, it.second);
-		bool hasPosSensor = robot::potMotors.find(motor) != robot::potMotors.end() ||
-							robot::encMotors.find(motor) != robot::encMotors.end();
-		addMotorMapping(motor, hasPosSensor);
-	}
-
-	for (const auto& pot_motor_pair : robot::potMotors) {
-		motorid_t motor_id = pot_motor_pair.first;
-		potparams_t pot_params = pot_motor_pair.second;
-
-		can::devicegroup_t group = motorGroupMap.at(motor_id);
-		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
-
-		can::motor::initPotentiometer(group, serial, pot_params.mdeg_lo, pot_params.mdeg_hi,
-									  pot_params.adc_lo, pot_params.adc_hi, TELEM_PERIOD);
-	}
-
-	for (const auto& enc_motor_pair : robot::encMotors) {
-		motorid_t motor_id = enc_motor_pair.first;
-		encparams_t enc_params = enc_motor_pair.second;
-
-		can::devicegroup_t group = motorGroupMap.at(motor_id);
-		can::deviceserial_t serial = motorSerialIDMap.at(motor_id);
-
-		can::motor::initEncoder(group, serial, enc_params.isInverted, true, enc_params.ppjr,
-								TELEM_PERIOD);
-		can::motor::setLimitSwitchLimits(group, serial, enc_params.limitSwitchLow,
-										 enc_params.limitSwitchHigh);
-	}
-
-	for (const auto& pair : robot::motorPIDMap) {
-		motorid_t motor = pair.first;
-		can::devicegroup_t group = motorGroupMap.at(motor);
-		can::deviceserial_t serial = motorSerialIDMap.at(motor);
-		pidcoef_t pid = motorPIDMap.at(motor);
-		can::motor::setMotorPIDConstants(group, serial, pid.kP, pid.kI, pid.kD);
+void initBoards() {
+	// Initialize boards using CANDevice_t from boardUUIDMap
+	for (const auto& [board, device] : boardUUIDMap) {
+		addBoardMapping(board);
 	}
 }
 
@@ -113,7 +93,9 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 	auto it = cameraMap.find(camID);
 	if (it != cameraMap.end()) {
 		auto cam = it->second.lock();
-		if (cam) { return cam; }
+		if (cam) {
+			return cam;
+		}
 	}
 	try {
 		auto cam = std::make_shared<cam::Camera>();
@@ -132,6 +114,10 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 }
 } // namespace
 
+const kinematics::DiffDriveKinematics& driveKinematics() {
+	return drive_kinematics;
+}
+
 void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors) {
@@ -141,11 +127,7 @@ void world_interface_init(
 		}
 	}
 	can::initCAN();
-	initMotors();
-
-  // Initialize Science Servo Board
-
-  // For now, we can consider the board as a motor and just use it for its serial
+	initBoards();
 }
 
 std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
@@ -153,21 +135,8 @@ std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
 	return cam ? std::make_shared<types::CameraHandle>(cam) : nullptr;
 }
 
-std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
-	auto itr = motor_ptrs.find(motor);
-
-	if (itr == motor_ptrs.end()) {
-		// motor id not in map
-		LOG_F(ERROR, "getMotor(): Unknown motor %d", static_cast<int>(motor));
-		return nullptr;
-	} else {
-		// return motor object pointer
-		return itr->second;
-	}
-}
-
 void emergencyStop() {
-	can::motor::emergencyStopMotors();
+	// can::motor::emergencyStopMotors();
 	is_emergency_stopped = true;
 }
 
@@ -196,26 +165,26 @@ bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	}
 }
 
-DataPoint<CameraFrame> readCamera(CameraID cameraID) {
+robot::types::DataPoint<robot::types::CameraFrame> readCamera(CameraID cameraID) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
 		auto cam = itr->second.lock();
 		if (!cam) {
 			LOG_F(WARNING, "Cam %s not available", cameraID.c_str());
-			return DataPoint<CameraFrame>{};
+			return robot::types::DataPoint<robot::types::CameraFrame>{};
 		}
 		cv::Mat mat;
 		uint32_t frameNum;
-		datatime_t time;
+		robot::types::datatime_t time;
 		bool success = cam->next(mat, frameNum, time);
 		if (success) {
-			return DataPoint<CameraFrame>{time, {mat, frameNum}};
+			return robot::types::DataPoint<robot::types::CameraFrame>{time, {mat, frameNum}};
 		} else {
-			return DataPoint<CameraFrame>{};
+			return robot::types::DataPoint<robot::types::CameraFrame>{};
 		}
 	} else {
 		LOG_F(WARNING, "Invalid camera id: %s", cameraID.c_str());
-		return DataPoint<CameraFrame>{};
+		return robot::types::DataPoint<robot::types::CameraFrame>{};
 	}
 }
 
@@ -264,11 +233,11 @@ constexpr double PWM_FOR_1RAD_PER_SEC = 5000; // Eyeballed
 // This is a bit on the conservative side, but we heard an ominous popping sound at 20000.
 constexpr double MAX_PWM = 20000;
 
-DataPoint<pose_t> getTruePose() {
+robot::types::DataPoint<pose_t> getTruePose() {
 	return {};
 }
 
-landmarks_t readLandmarks() {
+robot::types::landmarks_t readLandmarks() {
 	return {};
 }
 
@@ -278,65 +247,66 @@ int getIndex(const std::vector<T>& vec, const T& val) {
 	return itr == vec.end() ? -1 : itr - vec.begin();
 }
 
-void setMotorPower(robot::types::motorid_t motor, double power) {
-	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
-	motor_ptr->setMotorPower(power);
+void setMotorPower(robot::types::boardid_t board, double power) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->setMotorPower(power);
+	}
 }
 
-void setMotorPos(robot::types::motorid_t motor, int32_t targetPos) {
-	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
-	motor_ptr->setMotorPos(targetPos);
+void setMotorPos(robot::types::boardid_t board, int32_t targetPos) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		// board_ptr->setMotorPos(targetPos);
+	}
 }
 
-types::DataPoint<int32_t> getMotorPos(robot::types::motorid_t motor) {
-	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
-	return motor_ptr->getMotorPos();
+robot::types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t board) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		return board_ptr->getPosition();
+	}
+	return {};
 }
 
-void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
-	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
-	motor_ptr->setMotorVel(targetVel);
+void setMotorVel(robot::types::boardid_t board, int8_t targetVel) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->setMotorVel(targetVel);
+	}
 }
-
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
-  auto servo_num = servoid_to_servo_num.find(servo);
-  if (servo_num != servoid_to_servo_num.end()) {
-  	servo_board->setServoPos(servo_num->second, position);
-  }
-}
-
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-  std::shared_ptr<robot::base_motor> stepper_board = getMotor(motorid_t::scienceStepperBoard);
-  auto stepper_num = stepperid_to_stepper_num.find(stepper);
-  if (stepper_num != stepperid_to_stepper_num.end()) {
-    stepper_board->setStepperTurnAngle(stepper_num->second, angle);
-  }
-}
-
-void setActuator(uint8_t value) {
-  can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
-}
-
-// TODO: implement
-void setIndicator(indication_t signal) {}
 
 callbackid_t addLimitSwitchCallback(
-	robot::types::motorid_t motor,
-	const std::function<void(robot::types::motorid_t motor,
-							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
+	robot::types::boardid_t board,
+	const std::function<void(robot::types::boardid_t board,
+								robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>&
 		callback) {
-	auto func = [=](can::devicegroup_t group, can::deviceserial_t serial,
-					DataPoint<LimitSwitchData> data) { callback(motor, data); };
-	auto id = can::motor::addLimitSwitchCallback(motorGroupMap.at(motor),
-												 motorSerialIDMap.at(motor), func);
-	auto nextID = nextCallbackID++;
-	callbackIDMap.insert({nextID, id});
-	return nextID;
+	// CAN26: Use CANDevice_t for limit switch callbacks
+	// CANDevice_t device = boardUUIDMap.at(board);
+	// auto func = [=](CANDevice_t, robot::types::DataPoint<robot::types::LimitSwitchData> data) { callback(board, data); };
+	// auto id = can::motor::addLimitSwitchCallback(device, func);
+	// auto nextID = nextCallbackID++;
+	// callbackIDMap.insert({nextID, id});
+	// return nextID;
+	return 0;
 }
 
 void removeLimitSwitchCallback(callbackid_t id) {
-	return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
+	// return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
+}
+
+void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionMdeg) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->storePosition(robot::types::DataPoint<int32_t>(positionMdeg));
+	}
+}
+
+void setStepperRevs(robot::types::boardid_t board, float revs) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->setStepperRevs(revs);
+	}
 }
 
 } // namespace robot

@@ -47,8 +47,11 @@ double setCmdVel(double dtheta, double dx) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::leftTread, lPWM);
-	setMotorPower(motorid_t::rightTread, rPWM);
+	setMotorPower(boardid_t::frontTireLeft, lPWM);
+	setMotorPower(boardid_t::frontTireRight, rPWM);
+	setMotorPower(boardid_t::rearTireLeft, lPWM);
+	setMotorPower(boardid_t::rearTireRight, rPWM);
+
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
@@ -67,8 +70,10 @@ double setTankCmdVel(double left, double right) {
 		rPWM /= maxAbsPWM;
 	}
 
-	setMotorPower(motorid_t::leftTread, lPWM);
-	setMotorPower(motorid_t::rightTread, rPWM);
+	setMotorPower(boardid_t::frontTireLeft, lPWM);
+	setMotorPower(boardid_t::frontTireRight, rPWM);
+	setMotorPower(boardid_t::rearTireLeft, lPWM);
+	setMotorPower(boardid_t::rearTireRight, rPWM);
 
 	return maxAbsPWM > 1 ? maxAbsPWM : 1.0;
 }
@@ -113,8 +118,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		}
 	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
 		auto mdegToRad = [](int32_t mdeg) { return (mdeg / 1000.0) * (M_PI / 180.0); };
-		auto lPos = getMotorPos(motorid_t::wristDiffLeft).transform(mdegToRad);
-		auto rPos = getMotorPos(motorid_t::wristDiffRight).transform(mdegToRad);
+		auto lPos = getMotorPos(boardid_t::wristDiffLeft).transform(mdegToRad);
+		auto rPos = getMotorPos(boardid_t::wristDiffRight).transform(mdegToRad);
 		if (lPos.isValid() && rPos.isValid()) {
 			kinematics::gearpos_t gearPos(lPos.getData(), rPos.getData());
 			auto jointPos = Globals::wristKinematics.gearPosToJointPos(gearPos);
@@ -124,9 +129,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
-	} else if (joint == jointid_t::fourBarLinkage) {
-		return getMotorPos(motorid_t::fourbar1);
-  } else if (joint == jointid_t::handActuator) {
+	} else if (joint == jointid_t::hand) {
+		return {};
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
@@ -184,29 +188,11 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 										getJointPowerValue(jointid_t::wristPitch));
 		kinematics::gearpos_t gearPwr =
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
-		setMotorPower(motorid_t::wristDiffLeft, gearPwr.left);
-		setMotorPower(motorid_t::wristDiffRight, gearPwr.right);
-	} else if (joint == jointid_t::fourBarLinkage) {
-		auto dp = getJointPos(jointid_t::fourBarLinkage);
-		if (dp.isValid()) {
-			int currAngle = dp.getData();
-			currAngle = currAngle / 1000;
-			if (currAngle > 320 || currAngle < 50) {
-				setMotorPower(motorid_t::fourbar1, power * 0.7);
-				setMotorPower(motorid_t::fourbar2, power * 0.7);
-			} else if (currAngle < 265 && power < 0) {
-				setMotorPower(motorid_t::fourbar1, -power);
-				setMotorPower(motorid_t::fourbar2, -power);
-			} else {
-				setMotorPower(motorid_t::fourbar1, power);
-				setMotorPower(motorid_t::fourbar2, power);
-			}
-		} else {
-			setMotorPower(motorid_t::fourbar1, power);
-			setMotorPower(motorid_t::fourbar2, power);
-		}
-  } else if (joint == jointid_t::handActuator) {
-    robot::setActuator(power);
+		setMotorPower(boardid_t::wristDiffLeft, gearPwr.left);
+		setMotorPower(boardid_t::wristDiffRight, gearPwr.right);
+	} else if (joint == jointid_t::hand) {
+		LOG_F(INFO, "Hand stepper");
+		setStepperRevs(boardid_t::hand, static_cast<float>(power));
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

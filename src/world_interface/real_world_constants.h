@@ -1,9 +1,11 @@
 #pragma once
 
+// new
 #include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "data.h"
 
+#include <CANDevices.h>
 #include <chrono>
 #include <cstdint>
 #include <unordered_map>
@@ -14,7 +16,7 @@
 
 namespace robot {
 
-using types::motorid_t;
+using types::boardid_t;
 
 /** @brief A struct containing a set of PID coefficients. */
 struct pidcoef_t {
@@ -57,12 +59,12 @@ struct encparams_t {
 };
 
 // clang-format off
-constexpr auto encMotors = frozen::make_unordered_map<motorid_t, encparams_t>({
-	{motorid_t::shoulder,
+constexpr auto encMotors = frozen::make_unordered_map<boardid_t, encparams_t>({
+	{boardid_t::shoulder,
 		{.isInverted = true,
 		.ppjr = 4590 * 1024 * 4,
-		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).first,
-		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::motorid_t::shoulder).second,
+		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::boardid_t::shoulder).first,
+		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::boardid_t::shoulder).second,
 		.zeroCalibrationPower = 0.4}},
 });
 
@@ -70,94 +72,117 @@ constexpr double FOURBAR_GEAR_RATIO = 71.71875;
 // clang-format on
 
 // TODO: find appropriate bounds
-constexpr auto potMotors = frozen::make_unordered_map<motorid_t, potparams_t>({
-	{motorid_t::forearm,
+constexpr auto potMotors = frozen::make_unordered_map<boardid_t, potparams_t>({
+	{boardid_t::forearm,
 	 {.adc_lo = 1208, .mdeg_lo = -180 * 1000, .adc_hi = 841, .mdeg_hi = 180 * 1000}},
-	{motorid_t::wristDiffLeft,
+	{boardid_t::wristDiffLeft,
 	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
-	{motorid_t::wristDiffRight,
-	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
-	{motorid_t::fourbar1, {.adc_lo = 8, .mdeg_lo = 75200, .adc_hi = 8, .mdeg_hi = 267500}},
+	{boardid_t::wristDiffRight,
+	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}}
 });
 
-/** @brief A mapping of motorids to their corresponding serial number. */
-constexpr auto motorSerialIDMap = frozen::make_unordered_map<motorid_t, can::deviceserial_t>(
-	{{motorid_t::leftTread, DEVICE_SERIAL_TREAD_LEFT},
-	 {motorid_t::rightTread, DEVICE_SERIAL_TREAD_RIGHT},
-	 {motorid_t::armBase, DEVICE_SERIAL_MOTOR_BASE},
-	 {motorid_t::shoulder, DEVICE_SERIAL_MOTOR_SHOULDER},
-	 {motorid_t::elbow, DEVICE_SERIAL_MOTOR_ELBOW},
-	 {motorid_t::forearm, DEVICE_SERIAL_MOTOR_FOREARM},
-	 {motorid_t::wristDiffLeft, DEVICE_SERIAL_MOTOR_WRIST_DIFF_LEFT},
-	 {motorid_t::wristDiffRight, DEVICE_SERIAL_MOTOR_WRIST_DIFF_RIGHT},
-	 {motorid_t::hand, DEVICE_SERIAL_MOTOR_HAND},
-	 {motorid_t::drillActuator, DEVICE_SERIAL_DRILL_ACTUATOR},
-	 {motorid_t::drillMotor, DEVICE_SERIAL_DRILL_MOTOR},
-	 {motorid_t::fourbar1, DEVICE_SERIAL_FOUR_BAR_LINKAGE_1},
-	 {motorid_t::fourbar2, DEVICE_SERIAL_FOUR_BAR_LINKAGE_2},
-   {motorid_t::scienceServoBoard, DEVICE_SERIAL_SCIENCE_SERVO},
-   {motorid_t::scienceStepperBoard, DEVICE_SERIAL_SCIENCE_STEPPER}});
+/** @brief A mapping of board UUID (boardid_t) to their corresponding uuid. */
+constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>(
+	{// BLDC Motors - Use BLDC commands
+	 /*
+	 {boardid_t::leftTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
+	 {boardid_t::rightTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
+	 */
+	 {boardid_t::frontTireLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
+	 {boardid_t::frontTireRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
+	 {boardid_t::rearTireLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_REAR_TIRE_LEFT}},
+	 {boardid_t::rearTireRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_REAR_TIRE_RIGHT}},
+	 {boardid_t::armBase, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_BASE}},
+	 {boardid_t::shoulder, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_SHOULDER}},
+	 {boardid_t::elbow, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_ELBOW}},
+	 {boardid_t::forearm, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FOREARM}},
+	 {boardid_t::wristDiffLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_LEFT}},
+	 {boardid_t::wristDiffRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_WRIST_RIGHT}},
+	
+	 // Telemetry (0x50)
+	 {boardid_t::telemetry, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}},
+	 // Hand (0x60)
+	 {boardid_t::hand, CANDevice_t{0, 1, 0, CAN_UUID_HAND}},
+	 // DEBUG (0x70, 0x71)
+	 {boardid_t::debug1, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG1}},
+	 {boardid_t::debug2, CANDevice_t{1, 0, 0, CAN_UUID_DEBUG2}}
+	});
 
-constexpr auto motorGroupMap = frozen::make_unordered_map<motorid_t, can::devicegroup_t>(
-	{{motorid_t::leftTread, can::devicegroup_t::motor},
-	 {motorid_t::rightTread, can::devicegroup_t::motor},
-	 {motorid_t::armBase, can::devicegroup_t::motor},
-	 {motorid_t::shoulder, can::devicegroup_t::motor},
-	 {motorid_t::elbow, can::devicegroup_t::motor},
-	 {motorid_t::forearm, can::devicegroup_t::motor},
-	 {motorid_t::wristDiffLeft, can::devicegroup_t::motor},
-	 {motorid_t::wristDiffRight, can::devicegroup_t::motor},
-	 {motorid_t::hand, can::devicegroup_t::motor},
-	 {motorid_t::drillActuator, can::devicegroup_t::science},
-	 {motorid_t::drillMotor, can::devicegroup_t::science},
-	 {motorid_t::fourbar1, can::devicegroup_t::science},
-	 {motorid_t::fourbar2, can::devicegroup_t::science},
-   {motorid_t::scienceServoBoard, can::devicegroup_t::science},
-   {motorid_t::scienceStepperBoard, can::devicegroup_t::science}});
+constexpr auto UUIDBoardMap = frozen::make_unordered_map<CANDeviceUUID_t, boardid_t>(
+	{
+	 {CAN_UUID_BLDC_FRONT_TIRE_LEFT, boardid_t::frontTireLeft},
+	 {CAN_UUID_BLDC_FRONT_TIRE_RIGHT, boardid_t::frontTireRight},
+	 {CAN_UUID_BLDC_REAR_TIRE_LEFT, boardid_t::rearTireLeft},
+	 {CAN_UUID_BLDC_REAR_TIRE_RIGHT, boardid_t::rearTireRight},
+	 {CAN_UUID_BLDC_BASE, boardid_t::armBase},
+	 {CAN_UUID_BLDC_SHOULDER, boardid_t::shoulder},
+	 {CAN_UUID_BLDC_ELBOW, boardid_t::elbow},
+	 {CAN_UUID_BLDC_FOREARM, boardid_t::forearm},
+	});
+
+constexpr auto boardInversionMap = frozen::make_unordered_map<boardid_t, uint8_t>({
+	 {boardid_t::frontTireLeft, -1},
+	 {boardid_t::frontTireRight, 1},
+	 {boardid_t::rearTireLeft, -1},
+	 {boardid_t::rearTireRight, 1},
+	 {boardid_t::armBase, 1},
+	 {boardid_t::shoulder, 1},
+	 {boardid_t::elbow, 1},
+	 {boardid_t::forearm, 1},
+	 {boardid_t::wristDiffLeft, 1},
+	 {boardid_t::wristDiffRight, 1},
+	
+	 // Telemetry (0x50)
+	 {boardid_t::telemetry, 0},
+	 // Hand (0x60)
+	 {boardid_t::hand, 1},
+	 // DEBUG (0x70, 0x71)
+	 {boardid_t::debug1, 1},
+	 {boardid_t::debug2, 1}
+});
+
+constexpr auto proBoards = frozen::make_unordered_set<boardid_t>({
+	boardid_t::armBase,
+	boardid_t::shoulder,
+	boardid_t::elbow,
+	boardid_t::debug2,
+});
 
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
-	frozen::make_unordered_map<motorid_t, pidcoef_t>({{motorid_t::shoulder, {70, 0, 0}}});
+	frozen::make_unordered_map<boardid_t, pidcoef_t>({{boardid_t::shoulder, {70, 0, 0}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.
  * Negative values mean that the motor is inverted.
  */
 constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
-												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
-												   {motorid_t::forearm, -0.2},
-												   {motorid_t::wristDiffLeft, -0.1},
-												   {motorid_t::wristDiffRight, 0.1},
-												   {motorid_t::leftTread, 0.7},
-												   {motorid_t::rightTread, -0.7},
-												   {motorid_t::hand, -0.75},
-												   {motorid_t::drillActuator, -0.5},
-												   {motorid_t::drillMotor, -1.0},
-												   {motorid_t::fourbar1, 0.3},
-												   {motorid_t::fourbar2, 0.3},
-                           {motorid_t::scienceServoBoard, 0},
-                           {motorid_t::scienceStepperBoard, 0}});
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 10},
+												   {boardid_t::shoulder, -1},
+												   {boardid_t::elbow, -1},
+												   {boardid_t::forearm, -0.1},
+												   {boardid_t::wristDiffLeft, -0.1},
+												   {boardid_t::wristDiffRight, 0.1},
+												   {boardid_t::frontTireLeft, -3},
+												   {boardid_t::frontTireRight, 3},
+												   {boardid_t::rearTireLeft, -3},
+												   {boardid_t::rearTireRight, 3},
+												   {boardid_t::hand, -0.75}});
 /**
  * @brief A mapping of motorids to power scale factors when commanded with negative power.
  * Negative values mean that the motor is inverted.
  */
 constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<motorid_t, double>({{motorid_t::armBase, -0.25},
-												   {motorid_t::shoulder, -1},
-												   {motorid_t::elbow, -1},
-												   {motorid_t::forearm, -0.2},
-												   {motorid_t::wristDiffLeft, -0.1},
-												   {motorid_t::wristDiffRight, 0.1},
-												   {motorid_t::leftTread, 0.7},
-												   {motorid_t::rightTread, -0.7},
-												   {motorid_t::hand, -0.75},
-												   {motorid_t::drillActuator, -0.5},
-												   {motorid_t::drillMotor, -1.0},
-												   {motorid_t::fourbar1, 0.15},
-												   {motorid_t::fourbar2, 0.15},
-                           {motorid_t::scienceServoBoard, 0},
-                           {motorid_t::scienceStepperBoard, 0}});
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 10},
+												   {boardid_t::shoulder, -1},
+												   {boardid_t::elbow, -1},
+												   {boardid_t::forearm, -0.1},
+												   {boardid_t::wristDiffLeft, -0.1},
+												   {boardid_t::wristDiffRight, 0.1},
+												   {boardid_t::frontTireLeft, -3},
+												   {boardid_t::frontTireRight, 3},
+												   {boardid_t::rearTireLeft, -3},
+												   {boardid_t::rearTireRight, 3},
+												   {boardid_t::hand, -0.75}});
 
 } // namespace robot

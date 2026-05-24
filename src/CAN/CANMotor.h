@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../world_interface/data.h"
+#include "../control/JacobianVelController.h"
 #include "CAN.h"
 #include "CANUtils.h"
 
 #include <chrono>
+#include <mutex>
 #include <optional>
 
 /**
@@ -17,8 +19,52 @@ namespace can::motor {
 
 /** @brief The possible motor modes. */
 enum class motormode_t {
+	vel = BLDC_VELOCITY_CONTROL,
+	pos = BLDC_POSITION_CONTROL
+};
+/*
+enum class motormode_t {
 	pwm = MOTOR_UNIT_MODE_PWM,
 	pid = MOTOR_UNIT_MODE_PID
+};
+*/
+
+enum class motorstate_t {
+    idle = BLDC_AXIS_IDLE,
+    control = BLDC_AXIS_CLOSED_LOOP_CONTROL,
+};
+
+class CANBoard {
+public:
+    CANBoard(robot::types::boardid_t motor, bool hasPosSensor, CANDevice_t device,
+             double pos_pwm_scale, double neg_pwm_scale);
+
+    void setMotorPower(double power);
+    void setMotorPos(int32_t targetPos);
+    robot::types::DataPoint<int32_t> getMotorPos() const;
+    void setMotorVel(int32_t targetVel);
+    void unscheduleVelocityEvent();
+
+    can::uuid_t getMotorUUID() const;
+    robot::types::boardid_t getBoardID() const;
+
+private:
+    robot::types::boardid_t board_id;
+    bool has_pos_sensor;
+    CANDevice_t device;
+    std::optional<motormode_t> motor_mode;
+    std::optional<motorstate_t> motor_state;
+    double positive_scale;
+    double negative_scale;
+    std::optional<util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t> velEventID;
+    std::optional<JacobianVelController<1, 1>> velController;
+
+    inline static std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
+    inline static std::mutex schedulerMutex;
+
+    void ensureMotorMode(motormode_t mode);
+    void ensureMotorMode(motormode_t mode, can::motor::axis_state_t state);
+    void constructVelController();
 };
 
 /** @brief The supported motor position sensors. */
@@ -37,169 +83,73 @@ struct sensor_t {
 void emergencyStopMotors();
 
 /**
- * @brief Initialize a motor.
- *
- * This does not initialize any sensor or controller.
- *
- * @param serial The CAN serial number of the motor to initialize.
- */
-void initMotor(devicegroup_t group, deviceserial_t serial);
-
-/**
- * @brief Initialize an encoder attached to the given motor.
- *
- * For potentiometers, use initPotentiometer().
- *
- * @param serial The CAN serial number of the motor board.
- * @param invertEncoder If true, invert the encoder direction. Use this to correct sensor
- * phase.
- * @param zeroEncoder If true, reset the encoder position to zero.
- * @param pulsesPerJointRev The number of encoder pulses per revolution of the physical joint.
- * Measure/calculate this using the gear ratios and encoder specs.
- * @param telemetryPeriod An optional parameter specifying the telemetry period.
- * The telemetry will be fetched at this period automatically. An empty optional disables this
- * behavior, in which case the motor position must be explicitly pulled.
- */
-void initEncoder(devicegroup_t group, deviceserial_t serial, bool invertEncoder,
-				 bool zeroEncoder, int32_t pulsesPerJointRev,
-				 std::optional<std::chrono::milliseconds> telemetryPeriod);
-
-/**
- * @brief Set the limits of the limit switch on a motor board.
- *
- * When the corresponding limit switch is triggered, the encoder value is set to this value.
- * Use this method for motorboard with both encoders and limit switches
- *
- * @param serial The CAN serial number of the motor board.
- * @param lo The joint position in millidegrees of the low limit switch.
- * @param hi The joint position in millidegrees of the high limit switch.
- */
-void setLimitSwitchLimits(devicegroup_t group, deviceserial_t serial, int32_t lo, int32_t hi);
-
-/**
- * @brief Initialize a potentiometer attached to the given motor.
- *
- * @param serial The CAN serial number of the motor board.
- * @param posLo The joint position that corresponds to @p adcLo
- * @param posHi The joint position that corresponds to @p adcHi
- * @param adcLo The ADC value when the joint is at @p posLo
- * @param adcHi The ADC value when the joint is at @p posHi
- * @param telemetryPeriod An optional parameter specifying the telemetry period.
- * The telemetry will be fetched at this period automatically. An empty optional disables this
- * behavior, in which case the motor position must be explicitly pulled.
- */
-void initPotentiometer(devicegroup_t group, deviceserial_t serial, int32_t posLo,
-					   int32_t posHi, uint16_t adcLo, uint16_t adcHi,
-					   std::optional<std::chrono::milliseconds> telemetryPeriod);
-
-/**
- * @brief Set the PID constants for a motor board.
- *
- * Note that the PID constants are specified in units of 10000, so a 1 is interpreted as a
- * 10000. This is because the controller operates on millidegrees.
- *
- * @param serial The CAN serial number of the motor board.
- * @param kP The P coefficient.
- * @param kI The I coefficient.
- * @param kD The D coefficient.
- */
-void setMotorPIDConstants(devicegroup_t group, deviceserial_t serial, int32_t kP, int32_t kI,
-						  int32_t kD);
-
-/**
- * @brief Set the mode of a motor board.
- *
- * @param serial The CAN serial number of the motor board.
- * @param mode The mode to set.
- */
-void setMotorMode(devicegroup_t group, deviceserial_t serial, motormode_t mode);
-
-/**
- * @brief Set the power output of a motor board.
- *
- * @param serial The CAN serial number of the motor board.
- * @param power Percent power, in the range [-1,1].
- */
-void setMotorPower(devicegroup_t group, deviceserial_t serial, double power);
-
-/**
- * @brief Set the power output of a motor board.
- *
- * The motor mode should have been set to motormode_t::pwm.
- *
- * @param serial The CAN serial number of the motor board.
- * @param power The power to set. Any signed 16-bit integer is valid.
- */
-void setMotorPower(devicegroup_t group, deviceserial_t serial, int16_t power);
-
-/**
- * @brief Set the position PID target of a motor board.
- *
- * The motor mode should have been set to motormode_t::pid.
- * Additionally, both the sensor and the PID coefficients must have been initialized.
- *
- * @param serial The CAN serial number of the motor board.
- * @param target The position in millidegrees to track with the PID controller.
- */
-void setMotorPIDTarget(devicegroup_t group, deviceserial_t serial, int32_t target);
-
-/**
- * @brief Set the angle of a servo
- *
- * @param group The CAN device group of the servo board.
- * @param serial The CAN serial number of the servo board.
- * @param servoNum the servo number.
- * @param position the position of the servo in degrees.
- */
-void setServoPos(devicegroup_t group, deviceserial_t serial, uint8_t servoNum, int32_t angle);
-
-void setStepperTurnAngle(devicegroup_t group, deviceserial_t serial, uint8_t stepper, int16_t angle);
-
-void setLED(devicegroup_t group, deviceserial_t serial, uint8_t LED, uint8_t value);
-
-void setActuator(devicegroup_t group, deviceserial_t serial, uint8_t value);
-
-/**
- * @brief Get the last reported position of a motor.
- *
- * This only reports the cached position, it does not poll the motor board for new data.
- *
- * @param serial The serial number of the motor board.
- * @return robot::types::DataPoint<int32_t> The position data of the given motor, in
- * millidegrees. If no position data has been received, returns an empty data point.
- */
-robot::types::DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceserial_t serial);
-
-/**
- * @brief Poll the position data from a motor board.
- *
- * This may not be supported by every motor board implementation.
- *
- * @param serial The CAN serial number of the motor board.
- */
-void pullMotorPosition(devicegroup_t group, deviceserial_t serial);
-
-/**
- * @brief Add a callback that is invoked when the limit switch is triggered for a motor board.
- *
- * The event is only triggered when the limit switch is clicked, not released.
- *
- * @param serial The CAN serial number of the motor board.
- * @param callback The callback to invoke when the limit switch is triggered.
- * @return callbackid_t An ID that refers to this callback.
- * This can be passed to removeLimitSwitchCallback() to remove this callback.
- */
-callbackid_t addLimitSwitchCallback(
-	devicegroup_t group, deviceserial_t serial,
-	const std::function<void(
-		devicegroup_t group, deviceserial_t serial,
-		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
-
-/**
  * @brief Remove a previously registered limit switch callback.
  *
  * @param id The callback ID that was returned when the callback was registered with
  * addLimitSwitchCallback().
  */
 void removeLimitSwitchCallback(callbackid_t id);
+
+void initEncoder();
+
+/**
+ * @brief Initialize a motor using CAN26 protocol.
+ * @param device The target CAN device.
+ */
+void initMotor(CANDevice_t device);
+
+void setMotorState(CANDevice_t device, can::motor::axis_state_t state);
+
+/**
+ * @brief Set the motor mode using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param mode The motor mode to set.
+ */
+void setMotorMode(CANDevice_t device, motormode_t mode);
+
+/**
+ * @brief Set motor power using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param power Power level in range [-1.0, 1.0].
+ */
+void setMotorPower(CANDevice_t device, double power);
+
+/**
+ * @brief Set motor power using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param power Power level as int16_t.
+ */
+void setMotorPower(CANDevice_t device, int16_t power);
+
+/**
+ * @brief Set PID position target using CAN26 protocol.
+ * @param device The target CAN device.
+ * @param target Target position in millidegrees.
+ */
+void setMotorPIDTarget(CANDevice_t device, int32_t target);
+
+/**
+ * @brief Get the last reported motor position.
+ * @param device The target CAN device.
+ * @return The cached position data, or empty if not available.
+ */
+robot::types::DataPoint<int32_t> getMotorPosition(CANDevice_t device);
+
+/**
+ * @brief Request encoder position from a motor.
+ * @param device The target CAN device.
+ */
+void pullMotorPosition(CANDevice_t device);
+
+/**
+ * @brief Add a callback for limit switch events.
+ * @param device The target CAN device.
+ * @param callback The callback function.
+ * @return Callback ID for removal.
+ */
+callbackid_t addLimitSwitchCallback(
+	CANDevice_t device,
+	const std::function<void(
+		CANDevice_t device,
+		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback);
 } // namespace can::motor
