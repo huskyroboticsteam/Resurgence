@@ -333,6 +333,7 @@ private:
 } // namespace robot::types
 
 namespace util {
+std::string to_string(robot::types::boardid_t board);
 std::string to_string(robot::types::jointid_t joint);
 std::string to_string(const robot::types::CameraID& id);
 std::string to_string(robot::types::mountedperipheral_t peripheral);

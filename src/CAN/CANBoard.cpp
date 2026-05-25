@@ -61,7 +61,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
 void CANBoard::setMotorPower(double power) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorPower called for board 0x%x not in motor domain!", this->device.deviceUUID);
+        LOG_F(WARNING, "setMotorPower called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
         return;
     }
 
@@ -72,6 +72,11 @@ void CANBoard::setMotorPower(double power) {
     this->setMotorState(can::motor::axis_state_t::closed_loop_control);
 
     if (power == 0.0) {
+        if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
+            // Set brake
+            this->setBrake(BRAKE_ON);
+        }
+
         if (this->watchdog) {
             this->setMotorState(can::motor::axis_state_t::idle);
 
@@ -79,7 +84,7 @@ void CANBoard::setMotorPower(double power) {
                 uint16_t endpoint_id = endpoint["id"];
                 addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto decoded) {
                     if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
-                        LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT IDLE AND IS INSTEAD %d", this->device.deviceUUID, decoded.value_uint8);
+                        LOG_F(ERROR, "0x%x (%s) DID NOT LISTEN AND IS NOT IDLE AND IS INSTEAD %d, re-attempting...", this->device.deviceUUID, util::to_string(this->board_id).c_str(), decoded.value_uint8);
                         this->setMotorState(can::motor::axis_state_t::idle);
                         this->read(endpoint_id);
                     } else {
@@ -89,19 +94,18 @@ void CANBoard::setMotorPower(double power) {
 
                 this->read(endpoint_id);
             }
-        } else if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
-            // Set motor general lockin vel to 0
-            this->setMotorState(can::motor::axis_state_t::lockin_spin);
-        }
-
-        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
-            uint16_t endpoint_id = endpoint["id"];
-            removeDirectReadCallback(this->device, endpoint_id);
         }
     } else {
         // Mapping power to a target velocity
-        float input_vel = static_cast<float>(power * this->vel_limit);
+        float input_vel = static_cast<float>(power * this->vel_limit) * 0.4;    // hard-coded 40%
         input_vel *= this->inversion_factor;
+
+        // LOG_F(INFO, "True input velocity %f, ", input_vel);
+
+        if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
+            this->setBrake(BRAKE_OFF);
+        }
+
         // Make CANPacket_t
         CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
             Constants::JETSON_DEVICE, this->device, input_vel, 0.0f
@@ -116,6 +120,8 @@ void CANBoard::setMotorPower(double power) {
                 if (decoded.value_float != input_vel) {
                     LOG_F(ERROR, "Expected %f, got %f", input_vel, decoded.value_float);
                     sendCANPacket(p);
+                } else {
+                    LOG_F(INFO, "Got %f vel_limit :)", decoded.value_float);
                 }
             });
 
@@ -126,7 +132,7 @@ void CANBoard::setMotorPower(double power) {
 
 void CANBoard::setMotorState(can::motor::axis_state_t state) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorState called for board 0x%x not in motor domain!", this->device.deviceUUID);
+        LOG_F(WARNING, "setMotorState called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
         return;
     }
 
@@ -139,7 +145,7 @@ void CANBoard::setMotorState(can::motor::axis_state_t state) {
 
 void CANBoard::setMotorVel(int8_t velocity) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorVel called for board 0x%x not in motor domain!", this->device.deviceUUID);
+        LOG_F(WARNING, "setMotorVel called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
         return;
     }
 
@@ -156,12 +162,26 @@ void CANBoard::setMotorVel(int8_t velocity) {
 
 void CANBoard::setStepperRevs(float revs) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setStepperRevs called for board 0x%x not in motor domain!", this->device.deviceUUID);
+        LOG_F(WARNING, "setStepperRevs called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
         return;
     }
 
     CANPacket_t p = CANMotorPacket_Stepper_DriveRevolutions(
         Constants::JETSON_DEVICE, this->device, revs
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::setBrake(uint8_t state) {
+    auto it = robot::boardBrakeIDMap.find(this->board_id);
+    if (it == robot::boardBrakeIDMap.end()) {
+        LOG_F(WARNING, "setBrake called for %s that does not have a brake!", util::to_string(this->board_id).c_str());
+        return;
+    }
+
+    // hack, but we only have one braking board sooo    
+    CANPacket_t p = CANPeripheralPacket_SetBrakes(
+        Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, it->second, state
     );
     sendCANPacket(p);
 }

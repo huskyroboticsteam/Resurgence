@@ -116,12 +116,11 @@ bool receivePacket(int fd, CANPacket_t& packet) {
 }
 
 void handleAck(CANPacket_t& packet) {
-	printCANPacket(packet);
 	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
 	if (decoded.failure) {
-		LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.receiver.deviceUUID);
+		LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.sender.deviceUUID);
 	} else {
-		LOG_F(INFO, "Ack received from 0x%x: ok", decoded.receiver.deviceUUID);
+		// LOG_F(INFO, "Ack received from 0x%x: ok", decoded.sender.deviceUUID);
 	}
 
 	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.commandID);
@@ -135,7 +134,6 @@ void handleAck(CANPacket_t& packet) {
 
 void handleDirectRead(CANPacket_t& packet) {
 	auto decoded = CANMotorPacket_BLDC_DirectReadResult_Decode(&packet);
-	// LOG_F(INFO, "Read for 0x%x of %x", decoded.sender.deviceUUID, decoded.endpointID);
 
 	// Fire off callback, if it exists
 	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
@@ -292,7 +290,6 @@ void processThreadFn() {
 
 		// Double check required after releasing lock
 		if (buffer.empty()) { continue; }
-		// LOG_F(INFO, "Buffer size = %ld", buffer.size());
 		CANPacket_t packet = buffer.front();
 		buffer.pop();
 		// Done with buffer, unlock to allow more reading
@@ -360,6 +357,7 @@ void initCAN() {
 
 void sendCANPacket(const CANPacket_t& packet) {
 	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
+	mutablePacket.command = CAN_ACK(packet.command);
 	CANDeviceUUID_t uuid = packet.device.deviceUUID;
 	canfd_frame frame;
 	std::memset(&frame, 0, sizeof(frame));

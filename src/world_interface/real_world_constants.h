@@ -5,7 +5,6 @@
 #include "../Constants.h"
 #include "data.h"
 
-#include <CANDevices.h>
 #include <chrono>
 #include <cstdint>
 #include <unordered_map>
@@ -120,7 +119,7 @@ constexpr auto UUIDBoardMap = frozen::make_unordered_map<CANDeviceUUID_t, boardi
 	 {CAN_UUID_BLDC_FOREARM, boardid_t::forearm},
 	});
 
-constexpr auto boardInversionMap = frozen::make_unordered_map<boardid_t, uint8_t>({
+constexpr auto boardInversionMap = frozen::make_unordered_map<boardid_t, int8_t>({
 	 {boardid_t::frontTireLeft, -1},
 	 {boardid_t::frontTireRight, 1},
 	 {boardid_t::rearTireLeft, -1},
@@ -148,6 +147,12 @@ constexpr auto proBoards = frozen::make_unordered_set<boardid_t>({
 	boardid_t::debug2,
 });
 
+constexpr auto boardBrakeIDMap = frozen::make_unordered_map<boardid_t, uint8_t>({
+	{boardid_t::armBase, 5},
+	{boardid_t::shoulder, 2},
+	{boardid_t::elbow, 1}
+});
+
 /** @brief A mapping of PID controlled motors to their pid coefficients. */
 constexpr auto motorPIDMap =
 	frozen::make_unordered_map<boardid_t, pidcoef_t>({{boardid_t::shoulder, {70, 0, 0}}});
@@ -157,10 +162,10 @@ constexpr auto motorPIDMap =
  * Negative values mean that the motor is inverted.
  */
 constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 10},
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 1},
 												   {boardid_t::shoulder, -1},
 												   {boardid_t::elbow, -1},
-												   {boardid_t::forearm, -0.1},
+												   {boardid_t::forearm, -0.01},
 												   {boardid_t::wristDiffLeft, -0.1},
 												   {boardid_t::wristDiffRight, 0.1},
 												   {boardid_t::frontTireLeft, -3},
@@ -173,13 +178,13 @@ constexpr auto positive_pwm_scales =
  * Negative values mean that the motor is inverted.
  */
 constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 10},
+	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -1},
 												   {boardid_t::shoulder, -1},
 												   {boardid_t::elbow, -1},
-												   {boardid_t::forearm, -0.1},
+												   {boardid_t::forearm, -0.01},
 												   {boardid_t::wristDiffLeft, -0.1},
 												   {boardid_t::wristDiffRight, 0.1},
-												   {boardid_t::frontTireLeft, -3},
+												   {	boardid_t::frontTireLeft, -3},
 												   {boardid_t::frontTireRight, 3},
 												   {boardid_t::rearTireLeft, -3},
 												   {boardid_t::rearTireRight, 3},

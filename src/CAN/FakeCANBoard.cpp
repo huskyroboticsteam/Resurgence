@@ -9,7 +9,9 @@ enum class TestMode {
 	Power,
 	Read,
 	Stepper,
+	Peripheral,
 	RawCAN,
+	Debug,
 	NUM_MODES
 };
 
@@ -42,6 +44,7 @@ int main() {
 	ss << static_cast<int>(TestMode::Power) << " for POWER CONTROL\n";
 	ss << static_cast<int>(TestMode::Read) << " for DIRECT READ\n";
 	ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
+	ss << static_cast<int>(TestMode::Peripheral) << " for PERIPHERAL\n";
 	ss << static_cast<int>(TestMode::RawCAN) << " for RAW CAN\n";
 
 	while (true) {
@@ -146,7 +149,7 @@ int main() {
 				CANPacket_t packet = CANMotorPacket_Stepper_DriveRevolutions(Constants::JETSON_DEVICE, device, revs);
 				can::printCANPacket(packet);
 				can::sendCANPacket(packet);
-			} else if (testMode == TestMode::RawCAN) {
+			} else if (testMode == TestMode::Peripheral) {
 				uint8_t periphID = prompt("peripheral ID");
 				std::string input;
 				std::cout << "Enter pwm duty cycle: ";
@@ -154,35 +157,41 @@ int main() {
 				float dutyCycle = std::stof(input);
 				CANPacket_t packet = CANPeripheralPacket_SetPWMDutyCycle(Constants::JETSON_DEVICE, device, periphID, dutyCycle);
 				packet.command = CAN_ACK(packet.command);
+			} else if (testMode == TestMode::RawCAN) {
+				uint8_t pr = prompt("priority");
+				uint8_t command = prompt("command");
+				uint8_t dlc = prompt("add'l. data bits");
+				if (dlc > 5) {
+					std::cout << "Too many data bits" << std::endl;
+					continue;
+				}
+				uint8_t data[dlc + 1];
+				data[0] = command;
+
+				for (int i = 1; i <= dlc; i++) {
+					data[i] = prompt("bit " + std::to_string(i));
+				}
+
+				// // manual construction of a generic packet
+				CANPacket_t p = {};
+				p.device = device;
+				p.priority = static_cast<CANPriority_t>(pr);
+				p.command = command;
+				p.senderUUID = CAN_UUID_JETSON;
+				p.contentsLength = dlc;
+				for (int i = 0; i < p.contentsLength && i < 6; i++) {
+					p.contents[i] = data[i + 1];
+				}
+
+				can::printCANPacket(p);
+				can::sendCANPacket(p);
+			} else if (testMode == TestMode::Debug) {
+				uint8_t brakeID = prompt("brake ID");
+				uint8_t state = prompt("state");
+				CANPacket_t packet = CANPeripheralPacket_SetBrakes(Constants::JETSON_DEVICE, device, brakeID, state);
+
 				can::printCANPacket(packet);
 				can::sendCANPacket(packet);
-				// uint8_t pr = prompt("priority");
-				// uint8_t command = prompt("command");
-				// uint8_t dlc = prompt("add'l. data bits");
-				// if (dlc > 5) {
-				// 	std::cout << "Too many data bits" << std::endl;
-				// 	continue;
-				// }
-				// uint8_t data[dlc + 1];
-				// data[0] = command;
-
-				// for (int i = 1; i <= dlc; i++) {
-				// 	data[i] = prompt("bit " + std::to_string(i));
-				// }
-
-				// // // manual construction of a generic packet
-				// CANPacket_t p = {};
-				// p.device = device;
-				// p.priority = static_cast<CANPriority_t>(pr);
-				// p.command = command;
-				// p.senderUUID = CAN_UUID_JETSON;
-				// p.contentsLength = dlc;
-				// for (int i = 0; i < p.contentsLength && i < 6; i++) {
-				// 	p.contents[i] = data[i + 1];
-				// }
-
-				// can::printCANPacket(p);
-				// can::sendCANPacket(p);
 			}
 		}
 	}

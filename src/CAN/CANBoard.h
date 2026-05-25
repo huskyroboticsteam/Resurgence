@@ -6,6 +6,9 @@
 #include <mutex>
 #include <shared_mutex>
 
+#define BRAKE_ON 0
+#define BRAKE_OFF 1
+
 namespace can {
 
 class CANBoard {
@@ -17,6 +20,9 @@ class CANBoard {
     void setMotorState(can::motor::axis_state_t state);
     void setMotorVel(int8_t velocity);
     void setStepperRevs(float revs);
+
+    // Peripheral
+    void setBrake(uint8_t state);
 
     // Universal
     void read(uint16_t endpoint);
