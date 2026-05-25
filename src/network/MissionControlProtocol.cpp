@@ -235,17 +235,19 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 	CameraID cam = j["camera"];
 	auto camDP = robot::readCamera(cam);
 
-	Eigen::Quaterniond quat = imu.getData();
+	// Eigen::Quaterniond quat = imu.getData();
 	double lon = 0, lat = 0, alt = 0;
 	double w = 0, x = 0, y = 0, z = 0;
-	if (gps.isValid()) {
-		lon = gps.getData().lon;
-		lat = gps.getData().lat;
-		alt = gps.getData().alt;
-    	w = quat.w();
-    	x = quat.x();
-    	y = quat.y();
-    	z = quat.z();
+	if (gps.isValid() && imu.isValid()) {
+		auto gps_data = gps.getData();
+		auto imu_data = imu.getData();
+		lon = gps_data.lon;
+		lat = gps_data.lat;
+		alt = gps_data.alt;
+    	w = imu_data.w();
+    	x = imu_data.x();
+    	y = imu_data.y();
+    	z = imu_data.z();
 	}
 
 	if (camDP) {
