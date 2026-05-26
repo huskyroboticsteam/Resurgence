@@ -48,6 +48,7 @@ class CANBoard {
     robot::types::boardid_t board_id;
     CANDevice_t device;
     int8_t inversion_factor;
+    float input_vel;
 
     // Configs read on startup
     float vel_limit;

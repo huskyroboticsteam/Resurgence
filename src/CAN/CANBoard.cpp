@@ -65,41 +65,35 @@ void CANBoard::setMotorPower(double power) {
         return;
     }
 
-    // Fetch motor states
-
-    // Ensure motor control mode is velocity
-    // Ensure motor state is closed loop control
-    this->setMotorState(can::motor::axis_state_t::closed_loop_control);
-
     if (power == 0.0) {
         if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
             // Set brake
             this->setBrake(BRAKE_ON);
         }
 
-        if (this->watchdog) {
-            this->setMotorState(can::motor::axis_state_t::idle);
+        this->setMotorState(can::motor::axis_state_t::idle);
 
-            if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.current_state"); endpoint != nullptr) {
-                uint16_t endpoint_id = endpoint["id"];
-                addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto decoded) {
-                    if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
-                        LOG_F(ERROR, "0x%x (%s) DID NOT LISTEN AND IS NOT IDLE AND IS INSTEAD %d, re-attempting...", this->device.deviceUUID, util::to_string(this->board_id).c_str(), decoded.value_uint8);
-                        this->setMotorState(can::motor::axis_state_t::idle);
-                        this->read(endpoint_id);
-                    } else {
-                        removeDirectReadCallback(this->device, endpoint_id);
-                    }
-                });
+        // if (this->watchdog) {
+        //     if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.current_state"); endpoint != nullptr) {
+        //         uint16_t endpoint_id = endpoint["id"];
+        //         addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto decoded) {
+        //             if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
+        //                 LOG_F(ERROR, "0x%x (%s) DID NOT LISTEN AND IS NOT IDLE AND IS INSTEAD %d, re-attempting...", this->device.deviceUUID, util::to_string(this->board_id).c_str(), decoded.value_uint8);
+        //                 this->setMotorState(can::motor::axis_state_t::idle);
+        //                 this->read(endpoint_id);
+        //             } else {
+        //                 removeDirectReadCallback(this->device, endpoint_id);
+        //             }
+        //         });
 
-                this->read(endpoint_id);
-            }
-        }
+        //         this->read(endpoint_id);
+        //     }
+        // }
     } else {
+        // Ensure motor state is closed loop control
+        this->setMotorState(can::motor::axis_state_t::closed_loop_control);
         // Mapping power to a target velocity
-        float input_vel = static_cast<float>(power * this->vel_limit) * 0.4;    // hard-coded 40%
-        input_vel *= this->inversion_factor;
-
+        this->input_vel = static_cast<float>(power * this->vel_limit) * 0.4 * this->inversion_factor;    // hard-coded 40%
         // LOG_F(INFO, "True input velocity %f, ", input_vel);
 
         if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
@@ -116,12 +110,12 @@ void CANBoard::setMotorPower(double power) {
 
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [input_vel, p, this, endpoint_id](auto decoded) {
+            addDirectReadCallback(this->device, endpoint_id, [p, this, endpoint_id](auto decoded) {
                 if (decoded.value_float != input_vel) {
-                    LOG_F(ERROR, "Expected %f, got %f", input_vel, decoded.value_float);
-                    sendCANPacket(p);
+                    LOG_F(ERROR, "Expected %f, got %f", this->input_vel, decoded.value_float);
+                    // sendCANPacket(p);
                 } else {
-                    LOG_F(INFO, "Got %f vel_limit :)", decoded.value_float);
+                    // LOG_F(INFO, "Got %f vel_limit :)", decoded.value_float);
                 }
             });
 

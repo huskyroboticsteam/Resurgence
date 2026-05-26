@@ -117,6 +117,10 @@ bool receivePacket(int fd, CANPacket_t& packet) {
 
 void handleAck(CANPacket_t& packet) {
 	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
+	if (decoded.sender.deviceUUID == 16) {
+		// 0x10
+		return;
+	}
 	if (decoded.failure) {
 		LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.sender.deviceUUID);
 	} else {
