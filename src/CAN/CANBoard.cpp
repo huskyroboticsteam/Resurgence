@@ -73,22 +73,13 @@ void CANBoard::setMotorPower(double power) {
 
         this->setMotorState(can::motor::axis_state_t::idle);
 
-        // if (this->watchdog) {
-        //     if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.current_state"); endpoint != nullptr) {
-        //         uint16_t endpoint_id = endpoint["id"];
-        //         addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto decoded) {
-        //             if (decoded.value_uint8 != static_cast<uint8_t>(can::motor::axis_state_t::idle)) {
-        //                 LOG_F(ERROR, "0x%x (%s) DID NOT LISTEN AND IS NOT IDLE AND IS INSTEAD %d, re-attempting...", this->device.deviceUUID, util::to_string(this->board_id).c_str(), decoded.value_uint8);
-        //                 this->setMotorState(can::motor::axis_state_t::idle);
-        //                 this->read(endpoint_id);
-        //             } else {
-        //                 removeDirectReadCallback(this->device, endpoint_id);
-        //             }
-        //         });
+        // Make CANPacket_t
+        CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
+            Constants::JETSON_DEVICE, this->device, 0.0f, 0.0f
+        );
 
-        //         this->read(endpoint_id);
-        //     }
-        // }
+        // Send packet
+        sendCANPacket(p);
     } else {
         // Ensure motor state is closed loop control
         this->setMotorState(can::motor::axis_state_t::closed_loop_control);
