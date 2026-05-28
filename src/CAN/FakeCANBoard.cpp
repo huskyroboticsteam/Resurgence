@@ -157,6 +157,7 @@ int main() {
 				float dutyCycle = std::stof(input);
 				CANPacket_t packet = CANPeripheralPacket_SetPWMDutyCycle(Constants::JETSON_DEVICE, device, periphID, dutyCycle);
 				packet.command = CAN_ACK(packet.command);
+				can::sendCANPacket(packet);
 			} else if (testMode == TestMode::RawCAN) {
 				uint8_t pr = prompt("priority");
 				uint8_t command = prompt("command");
@@ -186,18 +187,23 @@ int main() {
 				can::printCANPacket(p);
 				can::sendCANPacket(p);
 			} else if (testMode == TestMode::Debug) {
-				uint8_t brakeID = prompt("brake ID");
+				uint16_t angle = prompt("angle");
+
+				board->setServoAngle(angle);
+
+
+				// uint8_t brakeID = prompt("brake ID");
 				// uint8_t state = prompt("state");
 
-				CANPacket_t on = CANPeripheralPacket_SetBrakes(Constants::JETSON_DEVICE, device, brakeID, 0);
-				CANPacket_t off = CANPeripheralPacket_SetBrakes(Constants::JETSON_DEVICE, device, brakeID, 1);
+				// CANPacket_t on = CANPeripheralPacket_SetBrakes(Constants::JETSON_DEVICE, device, brakeID, 0);
+				// CANPacket_t off = CANPeripheralPacket_SetBrakes(Constants::JETSON_DEVICE, device, brakeID, 1);
 
-				while (true) {
-					can::sendCANPacket(on);
-					std::this_thread::sleep_for(std::chrono::seconds(5));
-					can::sendCANPacket(off);
-					std::this_thread::sleep_for(std::chrono::seconds(5));
-				}
+				// while (true) {
+				// 	can::sendCANPacket(on);
+				// 	std::this_thread::sleep_for(std::chrono::seconds(5));
+				// 	can::sendCANPacket(off);
+				// 	std::this_thread::sleep_for(std::chrono::seconds(5));
+				// }
 
 			}
 		}

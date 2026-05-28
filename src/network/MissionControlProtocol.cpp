@@ -181,6 +181,10 @@ void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const j
 	// setMotorPos(motor, position_mdeg);
 }
 
+// void MissionControlProtocol::handleServoPositionRequest(const json& j) {
+	
+// }
+
 static bool validateWaypointNavRequest(const json& j) {
 	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
 	bool lon_is_unsigned = util::validateKey(j, "longitude", val_t::number_unsigned);

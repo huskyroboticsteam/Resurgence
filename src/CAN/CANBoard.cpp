@@ -171,6 +171,20 @@ void CANBoard::setBrake(uint8_t state) {
     sendCANPacket(p);
 }
 
+void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
+    CANPacket_t p = CANPeripheralPacket_SetPWMDutyCycle(
+        Constants::JETSON_DEVICE, CANDevice_t{1, 1, 0, CAN_UUID_HAND}, peripheralID, dutyCycle
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::setServoAngle(uint16_t angle) {
+    CANPacket_t p = CANPeripheralPacket_SetServoAngle(
+        Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, 4, angle
+    );
+    sendCANPacket(p);
+}
+
 void CANBoard::read(uint16_t endpoint) {
     CANPacket_t p = CANMotorPacket_BLDC_DirectRead(
         Constants::JETSON_DEVICE, this->device, endpoint
