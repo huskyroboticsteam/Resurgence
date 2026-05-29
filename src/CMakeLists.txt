@@ -120,7 +120,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   FetchContent_Declare(
     CAN26
     GIT_REPOSITORY https://github.com/huskyroboticsteam/CAN26.git
-    GIT_TAG "main"
+    GIT_TAG 0aee8a7b4de9c09b57fc47f48bf4d0837d12f340 
   )
   FetchContent_MakeAvailable(CAN26)
 

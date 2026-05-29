@@ -87,17 +87,13 @@ enum class jointid_t {
 	wristRoll,
 	hand,
 	handActuator,
-	ikForward,
-	ikUp,
-	fourBarLinkage,
-	drillActuator,
-	drillMotor
+	laser,
 };
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand,
-	 jointid_t::ikForward, jointid_t::ikUp});
+	 jointid_t::handActuator, jointid_t::laser});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -107,8 +103,8 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"wristPitch", jointid_t::wristPitch},
 	 {"wristRoll", jointid_t::wristRoll},
 	 {"hand", jointid_t::hand},
-	 {"ikForward", jointid_t::ikForward},
-	 {"ikUp", jointid_t::ikUp}});
+	 {"handActuator", jointid_t::handActuator},
+	 {"laser", jointid_t::laser}});
 
 enum class servoid_t {
 	microscope,

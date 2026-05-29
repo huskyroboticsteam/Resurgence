@@ -480,6 +480,10 @@ void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionM
 
 void setStepperRevs(robot::types::boardid_t board, float revs) {}
 
+void setActuator(int8_t out) {}
+
+void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {}
+
 } // namespace robot
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {

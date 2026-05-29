@@ -309,4 +309,18 @@ void setStepperRevs(robot::types::boardid_t board, float revs) {
 	}
 }
 
+void setActuator(int8_t out) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(robot::types::boardid_t::hand);
+	if (board_ptr) {
+		board_ptr->setActuator(out);
+	}
+}
+
+void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(robot::types::boardid_t::hand);
+	if (board_ptr) {
+		board_ptr->setPWMDutyCycle(peripheralID, dutyCycle);
+	}
+}
+
 } // namespace robot

@@ -58,7 +58,7 @@ int main() {
 		TestMode testMode = static_cast<TestMode>(test_type);
 		uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 		// TODO: Assuming motor domain for now
-		CANDevice_t device = CANDevice_t{0, 1, 0, uuid};
+		CANDevice_t device = CANDevice_t{1, 1, 1, uuid};
 
 		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
 
@@ -70,8 +70,8 @@ int main() {
 			if (testMode == TestMode::State) {
 				std::stringstream state_msg("");
 				state_msg << "Enter desired motor state:\n";
-				state_msg << static_cast<int>(can::motor::axis_state_t::idle) << " idle\n";
-				state_msg << static_cast<int>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::full_calib) << " idle\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::encoder_offset_calib) << " closed loop control\n";
 
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
@@ -156,7 +156,7 @@ int main() {
 				std::getline(std::cin, input);
 				float dutyCycle = std::stof(input);
 				CANPacket_t packet = CANPeripheralPacket_SetPWMDutyCycle(Constants::JETSON_DEVICE, device, periphID, dutyCycle);
-				packet.command = CAN_ACK(packet.command);
+				// packet.command = CAN_ACK(packet.command);
 				can::sendCANPacket(packet);
 			} else if (testMode == TestMode::RawCAN) {
 				uint8_t pr = prompt("priority");
@@ -190,7 +190,6 @@ int main() {
 				uint16_t angle = prompt("angle");
 
 				board->setServoAngle(angle);
-
 
 				// uint8_t brakeID = prompt("brake ID");
 				// uint8_t state = prompt("state");

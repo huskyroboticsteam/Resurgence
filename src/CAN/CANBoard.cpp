@@ -157,6 +157,18 @@ void CANBoard::setStepperRevs(float revs) {
     sendCANPacket(p);
 }
 
+void CANBoard::setActuator(int8_t out) {
+    if (!this->device.peripheralDomain) {
+        LOG_F(WARNING, "setActuator called for %s board not in peripheral domain!", util::to_string(this->board_id).c_str());
+        return;
+    }
+
+    CANPacket_t p = CANPeripheralPacket_SetLinearActuator(
+        Constants::JETSON_DEVICE, this->device, 2, out
+    );
+    sendCANPacket(p);
+}
+
 void CANBoard::setBrake(uint8_t state) {
     auto it = robot::boardBrakeIDMap.find(this->board_id);
     if (it == robot::boardBrakeIDMap.end()) {
@@ -175,6 +187,7 @@ void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
     CANPacket_t p = CANPeripheralPacket_SetPWMDutyCycle(
         Constants::JETSON_DEVICE, CANDevice_t{1, 1, 0, CAN_UUID_HAND}, peripheralID, dutyCycle
     );
+    LOG_F(INFO, "%f", dutyCycle);
     sendCANPacket(p);
 }
 

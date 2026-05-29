@@ -59,24 +59,16 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "elbow";
 		case jointid_t::forearm:
 			return "forearm";
-		case jointid_t::hand:
-			return "hand";
-		case jointid_t::handActuator:
-			return "handActuator";
 		case jointid_t::wristPitch:
 			return "wristPitch";
 		case jointid_t::wristRoll:
 			return "wristRoll";
-		case jointid_t::ikUp:
-			return "ikUp";
-		case jointid_t::ikForward:
-			return "ikForward";
-		case jointid_t::fourBarLinkage:
-			return "fourBarLinkage";
-		case jointid_t::drillActuator:
-			return "drillActuator";
-		case jointid_t::drillMotor:
-			return "drillMotor";
+		case jointid_t::hand:
+			return "hand";
+		case jointid_t::handActuator:
+			return "handActuator";
+		case jointid_t::laser:
+			return "laser";
 		default:
 			// should never happen
 			return "<unknown>";
