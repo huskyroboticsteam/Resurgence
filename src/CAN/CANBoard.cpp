@@ -9,6 +9,15 @@ namespace can {
 CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
     : board_id(board_id), device(device) {
     if (device.motorDomain) {
+        if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
+            this->inversion_factor = it->second;
+        }
+
+        if (board_id == robot::types::boardid_t::hand) {
+            // Skip ODrive config stuff
+            return;
+        }
+
         // Set default modes
         CANPacket_t p = CANMotorPacket_BLDC_SetInputMode(
             Constants::JETSON_DEVICE, device,
@@ -21,12 +30,14 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
             addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
+                std::unique_lock lock(this->board_mutex);
                 this->vel_limit = p.value_float;
 
                 // We only need this once, remove after we get a response
                 removeDirectReadCallback(this->device, endpoint_id);
             });
 
+            // this->vel_limit = 0;
             this->read(endpoint_id);
         }
 
@@ -41,18 +52,6 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
             this->read(endpoint_id);
         }
-
-        // Inversion
-        if (auto it = robot::boardInversionMap.find(board_id); it != robot::boardInversionMap.end()) {
-            this->inversion_factor = it->second;
-        }
-
-        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.pos_estimate"); endpoint != nullptr) {
-            uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
-                LOG_F(INFO, "0x%x at %f rots", this->device.deviceUUID, p.value_float);
-            });
-        }
     }
 
     if (device.peripheralDomain) {
@@ -62,27 +61,36 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
 void CANBoard::setMotorPower(double power) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
+        LOG_F(WARNING, "setMotorPower called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
         return;
     }
 
-    // Fetch motor states
-
-    // Ensure motor control mode is velocity
-    // Ensure motor state is closed loop control
-    this->setMotorState(can::motor::axis_state_t::closed_loop_control);
-
     if (power == 0.0) {
-        if (static_cast<uint8_t>(this->board_id) < 5) {   // hack for wheels + base
-            this->setMotorState(can::motor::axis_state_t::idle);
-        } else if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
-            // Set motor general lockin vel to 0
-            this->setMotorState(can::motor::axis_state_t::lockin_spin);
+        if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
+            // Set brake
+            this->setBrake(BRAKE_ON);
         }
+
+        this->setMotorState(can::motor::axis_state_t::idle);
+
+        // Make CANPacket_t
+        CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
+            Constants::JETSON_DEVICE, this->device, 0.0f, 0.0f
+        );
+
+        // Send packet
+        sendCANPacket(p);
     } else {
+        // Ensure motor state is closed loop control
+        this->setMotorState(can::motor::axis_state_t::closed_loop_control);
         // Mapping power to a target velocity
-        float input_vel = static_cast<float>(power * this->vel_limit);
-        input_vel *= this->inversion_factor;
+        this->input_vel = static_cast<float>(power * this->vel_limit) * 0.4 * this->inversion_factor;    // hard-coded 40%
+        // LOG_F(INFO, "True input velocity %f, ", input_vel);
+
+        if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
+            this->setBrake(BRAKE_OFF);
+        }
+
         // Make CANPacket_t
         CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
             Constants::JETSON_DEVICE, this->device, input_vel, 0.0f
@@ -93,12 +101,12 @@ void CANBoard::setMotorPower(double power) {
 
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [input_vel](auto decoded) {
+            addDirectReadCallback(this->device, endpoint_id, [p, this, endpoint_id](auto decoded) {
                 if (decoded.value_float != input_vel) {
-                    LOG_F(ERROR, "Expected %f, got %f", input_vel, decoded.value_float);
-                    // send
+                    LOG_F(ERROR, "Expected %f, got %f", this->input_vel, decoded.value_float);
+                    // sendCANPacket(p);
                 } else {
-                    // remove from map
+                    // LOG_F(INFO, "Got %f vel_limit :)", decoded.value_float);
                 }
             });
 
@@ -109,7 +117,7 @@ void CANBoard::setMotorPower(double power) {
 
 void CANBoard::setMotorState(can::motor::axis_state_t state) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorState called for board not in motor domain!");
+        LOG_F(WARNING, "setMotorState called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
         return;
     }
 
@@ -122,16 +130,70 @@ void CANBoard::setMotorState(can::motor::axis_state_t state) {
 
 void CANBoard::setMotorVel(int8_t velocity) {
     if (!this->device.motorDomain) {
-        LOG_F(WARNING, "setMotorPower called for board not in motor domain!");
+        LOG_F(WARNING, "setMotorVel called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
         return;
     }
 
+    float rot_vel = velocity / Constants::MILLIDEGREES_PER_REV;
+
     // Make CANPacket_t
     CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
-        Constants::JETSON_DEVICE, this->device, velocity, 0.0f
+        Constants::JETSON_DEVICE, this->device, rot_vel, 0.0f
     );
 
     // Send packet
+    sendCANPacket(p);
+}
+
+void CANBoard::setStepperRevs(float revs) {
+    if (!this->device.motorDomain) {
+        LOG_F(WARNING, "setStepperRevs called for %s board not in motor domain!", util::to_string(this->board_id).c_str());
+        return;
+    }
+
+    CANPacket_t p = CANMotorPacket_Stepper_DriveRevolutions(
+        Constants::JETSON_DEVICE, this->device, revs
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::setActuator(int8_t out) {
+    if (!this->device.peripheralDomain) {
+        LOG_F(WARNING, "setActuator called for %s board not in peripheral domain!", util::to_string(this->board_id).c_str());
+        return;
+    }
+
+    CANPacket_t p = CANPeripheralPacket_SetLinearActuator(
+        Constants::JETSON_DEVICE, this->device, 2, out
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::setBrake(uint8_t state) {
+    auto it = robot::boardBrakeIDMap.find(this->board_id);
+    if (it == robot::boardBrakeIDMap.end()) {
+        LOG_F(WARNING, "setBrake called for %s that does not have a brake!", util::to_string(this->board_id).c_str());
+        return;
+    }
+
+    // hack, but we only have one braking board sooo    
+    CANPacket_t p = CANPeripheralPacket_SetBrakes(
+        Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, it->second, state
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
+    CANPacket_t p = CANPeripheralPacket_SetPWMDutyCycle(
+        Constants::JETSON_DEVICE, CANDevice_t{1, 1, 0, CAN_UUID_HAND}, peripheralID, dutyCycle
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::setServoAngle(float angle) {
+    CANPacket_t p = CANPeripheralPacket_SetServoAngle(
+        Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, 4, angle
+    );
     sendCANPacket(p);
 }
 

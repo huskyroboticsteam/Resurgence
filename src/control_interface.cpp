@@ -103,19 +103,19 @@ void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {
 types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 	if (Constants::JOINT_MOTOR_MAP.find(joint) != Constants::JOINT_MOTOR_MAP.end()) {
 		return getMotorPos(Constants::JOINT_MOTOR_MAP.at(joint));
-	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-		DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
-			robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-		if (armJointPositions.isValid()) {
-			Eigen::Vector2d eePos = Globals::planarArmController.kinematics().jointPosToEEPos(
-				armJointPositions.getData());
-			Eigen::Vector2i eePosInt = (1000 * eePos).array().round().cast<int>();
-			return DataPoint<int32_t>(armJointPositions.getTime(),
-									  joint == jointid_t::ikForward ? eePosInt.x()
-																	: eePosInt.y());
-		} else {
-			return {};
-		}
+	// } else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
+	// 	DataPoint<navtypes::Vectord<Constants::arm::IK_MOTORS.size()>> armJointPositions =
+	// 		robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+	// 	if (armJointPositions.isValid()) {
+	// 		Eigen::Vector2d eePos = Globals::planarArmController.kinematics().jointPosToEEPos(
+	// 			armJointPositions.getData());
+	// 		Eigen::Vector2i eePosInt = (1000 * eePos).array().round().cast<int>();
+	// 		return DataPoint<int32_t>(armJointPositions.getTime(),
+	// 								  joint == jointid_t::ikForward ? eePosInt.x()
+	// 																: eePosInt.y());
+	// 	} else {
+	// 		return {};
+	// 	}
 	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
 		auto mdegToRad = [](int32_t mdeg) { return (mdeg / 1000.0) * (M_PI / 180.0); };
 		auto lPos = getMotorPos(boardid_t::wristDiffLeft).transform(mdegToRad);
@@ -129,6 +129,8 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
+	} else if (joint == jointid_t::hand || joint == jointid_t::handActuator || joint == jointid_t::laser) {
+		return {};
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
 		LOG_F(WARNING, "getJointPos called for currently unsupported joint %s",
@@ -165,21 +167,21 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		if (!Globals::armIKEnabled || !isIKMotor) {
 			setMotorPower(Constants::JOINT_MOTOR_MAP.at(joint), power);
 		}
-	} else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
-		if (Globals::armIKEnabled) {
-			auto ikMotorPos = robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
-			if (ikMotorPos.isValid()) {
-				if (joint == jointid_t::ikForward) {
-					Globals::planarArmController.set_x_vel(dataclock::now(),
-														   power * Constants::arm::MAX_EE_VEL,
-														   ikMotorPos.getData());
-				} else {
-					Globals::planarArmController.set_y_vel(dataclock::now(),
-														   power * Constants::arm::MAX_EE_VEL,
-														   ikMotorPos.getData());
-				}
-			}
-		}
+	// } else if (joint == jointid_t::ikForward || joint == jointid_t::ikUp) {
+	// 	if (Globals::armIKEnabled) {
+	// 		auto ikMotorPos = robot::getMotorPositionsRad(Constants::arm::IK_MOTORS);
+	// 		if (ikMotorPos.isValid()) {
+	// 			if (joint == jointid_t::ikForward) {
+	// 				Globals::planarArmController.set_x_vel(dataclock::now(),
+	// 													   power * Constants::arm::MAX_EE_VEL,
+	// 													   ikMotorPos.getData());
+	// 			} else {
+	// 				Globals::planarArmController.set_y_vel(dataclock::now(),
+	// 													   power * Constants::arm::MAX_EE_VEL,
+	// 													   ikMotorPos.getData());
+	// 			}
+	// 		}
+	// 	}
 	} else if (joint == jointid_t::wristPitch || joint == jointid_t::wristRoll) {
 		setJointPowerValue(joint, power);
 		kinematics::jointpos_t jointPwr(getJointPowerValue(jointid_t::wristRoll),
@@ -188,6 +190,17 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 			Globals::wristKinematics.jointPowerToGearPower(jointPwr);
 		setMotorPower(boardid_t::wristDiffLeft, gearPwr.left);
 		setMotorPower(boardid_t::wristDiffRight, gearPwr.right);
+	} else if (joint == jointid_t::hand) {
+		setStepperRevs(boardid_t::hand, static_cast<float>(power));
+	} else if (joint == jointid_t::handActuator) {
+		setActuator(static_cast<int8_t>(power));
+	} else if (joint == jointid_t::laser) {
+		if (power > 0) {
+			power = 1023.0;
+		} else {
+			power = 0.0;
+		}
+		setPeripheralPWM(1, power);
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

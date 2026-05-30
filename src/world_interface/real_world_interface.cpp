@@ -68,7 +68,7 @@ std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 
 	if (itr == board_ptrs.end()) {
 		// board id not in map
-		LOG_F(ERROR, "getBoard_(): Unknown board 0x%x", static_cast<uint8_t>(board));
+		// LOG_F(ERROR, "getBoard_(): Unknown board 0x%x", static_cast<uint8_t>(board));
 		return nullptr;
 	} else {
 		// return board object pointer
@@ -83,7 +83,7 @@ callbackid_t nextCallbackID = 0;
 std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initBoards() {
-	// CAN26: Initialize boards using CANDevice_t from boardUUIDMap
+	// Initialize boards using CANDevice_t from boardUUIDMap
 	for (const auto& [board, device] : boardUUIDMap) {
 		addBoardMapping(board);
 	}
@@ -264,9 +264,7 @@ void setMotorPos(robot::types::boardid_t board, int32_t targetPos) {
 robot::types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t board) {
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
-		if (nlohmann::json endpoint = can::getEndpoint(board_ptr->get_boardid(), "axis0.pos_estimate"); endpoint != nullptr) {
-			// board_ptr->read(endpoint["id"]);
-		}
+		return board_ptr->getPosition();
 	}
 	return {};
 }
@@ -290,10 +288,44 @@ callbackid_t addLimitSwitchCallback(
 	// auto nextID = nextCallbackID++;
 	// callbackIDMap.insert({nextID, id});
 	// return nextID;
+	return 0;
 }
 
 void removeLimitSwitchCallback(callbackid_t id) {
 	// return can::motor::removeLimitSwitchCallback(callbackIDMap.at(id));
+}
+
+void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionMdeg) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->storePosition(robot::types::DataPoint<int32_t>(positionMdeg));
+	}
+}
+
+void setStepperRevs(robot::types::boardid_t board, float revs) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
+	if (board_ptr) {
+		board_ptr->setStepperRevs(revs);
+	}
+}
+
+void setActuator(int8_t out) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(robot::types::boardid_t::hand);
+	if (board_ptr) {
+		board_ptr->setActuator(out);
+	}
+}
+
+void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {
+	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(robot::types::boardid_t::hand);
+	if (board_ptr) {
+		board_ptr->setPWMDutyCycle(peripheralID, dutyCycle);
+	}
+}
+
+void setLED(uint8_t color) {
+	can::led_t led = static_cast<can::led_t>(color);
+	can::setLED(led);
 }
 
 } // namespace robot

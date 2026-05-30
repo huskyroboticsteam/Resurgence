@@ -104,7 +104,7 @@ struct packettype_t {
 using deviceserial_t = uint8_t;
 
 /** @brief The type of telemetry data. */
-using telemetry_t = int32_t;
+// using telemetry_t = int32_t;
 
 /**
  * @brief A unique identifier for a CAN device.

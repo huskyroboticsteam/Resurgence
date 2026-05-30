@@ -236,6 +236,16 @@ void setMotorVel(robot::types::boardid_t motor, int8_t targetVel);
  */
 types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t motor);
 
+void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionMdeg);
+
+void setStepperRevs(robot::types::boardid_t board, float revs);
+
+void setActuator(int8_t out);
+
+void setPeripheralPWM(uint8_t peripheralID, float dutyCycle);
+
+void setLED(uint8_t color);
+
 using callbackid_t = unsigned long long;
 
 callbackid_t addLimitSwitchCallback(

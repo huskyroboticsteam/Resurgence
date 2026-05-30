@@ -146,8 +146,7 @@ constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, boardid_t
 	{{jointid_t::armBase, boardid_t::armBase},
 	 {jointid_t::shoulder, boardid_t::shoulder},
 	 {jointid_t::elbow, boardid_t::elbow},
-	 {jointid_t::forearm, boardid_t::forearm},
-	 {jointid_t::hand, boardid_t::hand}});
+	 {jointid_t::forearm, boardid_t::forearm}});
 
 // Arm inverse kinematics
 namespace arm {

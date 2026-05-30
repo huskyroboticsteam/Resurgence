@@ -72,7 +72,20 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		_autonomous_task.kill();
 		// if we have left autonomous mode, we need to start the power repeater again.
 		_power_repeat_task.start();
-	}
+	} 
+}
+
+static bool validateMotorsDisableRequest(const json& j) {
+	return util::validateKey(j, "motors", val_t::boolean);
+}
+
+void MissionControlProtocol::handleMotorsDisableRequest(const json& j) {
+	bool motors = j["motors"];
+
+	if (!motors) {
+		LOG_F(INFO, "Disabling motors...");
+		this->stopAndShutdownPowerRepeat(true);
+	}	
 }
 
 static bool validateDriveRequest(const json& j) {
@@ -168,6 +181,10 @@ void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const j
 	// setMotorPos(motor, position_mdeg);
 }
 
+// void MissionControlProtocol::handleServoPositionRequest(const json& j) {
+	
+// }
+
 static bool validateWaypointNavRequest(const json& j) {
 	bool validPoints = util::validateKey(j, "points", val_t::array);
 	if (!validPoints) return false;
@@ -251,17 +268,19 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 	CameraID cam = j["camera"];
 	auto camDP = robot::readCamera(cam);
 
-	Eigen::Quaterniond quat = imu.getData();
+	// Eigen::Quaterniond quat = imu.getData();
 	double lon = 0, lat = 0, alt = 0;
 	double w = 0, x = 0, y = 0, z = 0;
-	if (gps.isValid()) {
-		lon = gps.getData().lon;
-		lat = gps.getData().lat;
-		alt = gps.getData().alt;
-    	w = quat.w();
-    	x = quat.x();
-    	y = quat.y();
-    	z = quat.z();
+	if (gps.isValid() && imu.isValid()) {
+		auto gps_data = gps.getData();
+		auto imu_data = imu.getData();
+		lon = gps_data.lon;
+		lat = gps_data.lat;
+		alt = gps_data.alt;
+    	w = imu_data.w();
+    	x = imu_data.x();
+    	y = imu_data.y();
+    	z = imu_data.z();
 	}
 
 	if (camDP) {
@@ -335,6 +354,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		validateOperationModeRequest);
 	// drive and joint power handlers need the class for context since they must modify
 	// _last_joint_power and _last_cmd_vel (for the repeater thread)
+	this->addMessageHandler(
+		"disableMotors",
+		std::bind(&MissionControlProtocol::handleMotorsDisableRequest, this, _1),
+		validateMotorsDisableRequest);
 	this->addMessageHandler(
 		DRIVE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),

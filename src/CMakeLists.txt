@@ -120,7 +120,7 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   FetchContent_Declare(
     CAN26
     GIT_REPOSITORY https://github.com/huskyroboticsteam/CAN26.git
-    GIT_TAG "main"
+    GIT_TAG 0aee8a7b4de9c09b57fc47f48bf4d0837d12f340 
   )
   FetchContent_MakeAvailable(CAN26)
 
@@ -213,7 +213,6 @@ if(WORLD_INTERFACE STREQUAL "REAL")
   add_library(can_interface STATIC)
   target_sources(can_interface PRIVATE
     CAN/CANBoard.cpp
-    CAN/CANMotor.cpp
     CAN/CANUtils.cpp
   )
 
