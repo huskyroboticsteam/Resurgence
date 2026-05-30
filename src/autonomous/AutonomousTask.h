@@ -82,14 +82,14 @@ private:
 
 	navtypes::point_t _circle_center;
 	navtypes::points_t _waypoint_coords_list;
-	bool _target_found = false;
+	std::atomic<bool> _target_found = false;
 
 	std::mutex _autonomous_task_mutex;
 	std::thread _autonomous_task_thread;
 	std::condition_variable _autonomous_task_cv;
 	bool _kill_called;
 
-	bool _debug = true; // toggle debugging logs
+	bool _debug = false; // toggle debugging logs
 	/*
 	 *  if _debug is true, a _logFile called "log.csv" is created in the build directory
 	 *	and populated with the actual rover path.

@@ -78,7 +78,10 @@ command_t PurePursuitCommand::getOutput() {
         return {.thetaVel = 0.0, .xVel = 0.0};
     }
 
+<<<<<<< HEAD
 	// Try to update index
+=======
+>>>>>>> pure-pursuit-fix
 	updateCurrentIndex();
 	point_t relIntersect;
 	if (_curr_idx >= _path.size() - 1) {
@@ -94,7 +97,7 @@ command_t PurePursuitCommand::getOutput() {
 
 	double thetaVel = driveVel * curvature; // curvature times drive vel = theta vel
 
-	// LOG_F(INFO, "%f, %f", thetaVel, driveVel);
+	LOG_F(INFO, "%f, %f", thetaVel, driveVel);
 	return {.thetaVel = thetaVel, .xVel = driveVel};
 }
 
@@ -123,8 +126,6 @@ point_t PurePursuitCommand::lineToCircleIntersection(const point_t& p1, const po
 	//                 is > 0, there are 2 intersections
 	//                 is < 0, there are no intersections
 	double disc = c_c::LOOKAHEAD_DIST*c_c::LOOKAHEAD_DIST * dr2 - D*D;
-
-	// LOG_F(INFO, "DISC only: %f", disc);
 
 	if (disc >= 0) {
 		// There exists at least one intersection.
@@ -231,16 +232,15 @@ bool PurePursuitCommand::isDone() {
 
 	double distance = dist(_pose, _path.back());
 	if (distance <= _done_thresh && _curr_idx >= static_cast<int>(_path.size()) - 2) {
-		LOG_F(INFO, "distance from goal: %lf", distance);
-		LOG_F(INFO, "done +1");
 		_done_count++;
+		LOG_F(INFO, "%d. distance from goal: %lf", _done_count, distance);
 	} else {
 		// If we've left the done threshold, reset done count
 		_done_count = 0;
 	}
 
 	// Must be in done thresh for at least 100ms (5 iterations of control loop)
-	// to be considered "done"
+	// to be considered "done"	
 	return _done_count >= 20;
 }
 
