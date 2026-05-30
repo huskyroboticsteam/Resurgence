@@ -31,6 +31,8 @@ int prompt(std::string_view message) {
 	return val;
 }
 
+bool correct = false;
+
 int main() {
 	can::initCAN();
 
@@ -52,37 +54,61 @@ int main() {
 		uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
 		// TODO: Assuming motor domain for now
 		CANDevice_t device = CANDevice_t{0, 1, 0, uuid};
-		// Change to debug2 for pro endpoints
-		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
+
+		uint8_t type = static_cast<uint8_t>(prompt("0 for S1, 1 for Pro"));
+		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(
+			type == 0 ? robot::types::boardid_t::debug1 : robot::types::boardid_t::debug2, device);
 
 		while (true) {
 			if (testMode == TestMode::State) {
-				std::stringstream state_msg("Enter desired motor state:\n");
-				state_msg << static_cast<uint32_t>(can::motor::axis_state_t::idle) << " idle\n";
-				state_msg << static_cast<uint32_t>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
+				std::stringstream state_msg("");
+				state_msg << "Enter desired motor state:\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::idle) << " idle\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
 
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
 				board->setMotorState(motor_state);
-			} else if (testMode == TestMode::Power) {
-				board->setMotorState(can::motor::axis_state_t::closed_loop_control);
 
-				double power = static_cast<double>(prompt("Enter power"));
+				correct = false;
+				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), "axis0.current_state"); endpoint != nullptr) {
+					uint16_t endpoint_id = endpoint["id"];
+					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded) {
+						if (decoded.value_uint8 != static_cast<uint8_t>(motor_state)) {
+							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d", board->getDevice().deviceUUID, static_cast<uint8_t>(motor_state));
+							board->setMotorState(motor_state);
+							board->read(endpoint_id);
+						} else {
+							can::removeDirectReadCallback(board->getDevice(), endpoint_id);
+							correct = true;
+						}
+					});
+
+					board->read(endpoint_id);
+				}
+
+				while (!correct);
+			} else if (testMode == TestMode::Power) {
+				std::string input;
+				std::cout << "Enter power [-1.0, 1.0]: ";
+				std::getline(std::cin, input);
+				float power = std::stof(input);
+
 				board->setMotorPower(power);
 			} else if (testMode == TestMode::Read) {
-				// uint16_t endpoint = static_cast<uint16_t>(prompt("Enter endpoint name"));
 				std::string input;
 				std::cout << "Enter endpoint name" << " > ";
 				std::getline(std::cin, input);
 
-				if (nlohmann::json endpoint = can::getEndpoint(board->get_boardid(), input); endpoint != nullptr) {
+				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
 					// std::cout << "endpoint " << input << " has id=" << endpoint_id << std::endl;
-					can::addDirectReadCallback(board->get_device(), endpoint_id, [board, input, endpoint](auto decoded) {
+					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded) {
 						std::stringstream rs("");
-						rs << input << " from 0x" << std::hex << board->get_device().deviceUUID << ": ";
+						rs << input << " from 0x" << std::hex << board->getDevice().deviceUUID << " [";
 
 						std::string type = endpoint["type"];
+						rs << type << "]: ";
 						if (type == "uint32") {
 							rs << decoded.value_uint32;
 						} else if (type == "int32") {
@@ -99,7 +125,7 @@ int main() {
 
 						std::cout << rs.str().c_str() << std::endl;
 
-						can::removeDirectReadCallback(board->get_device(), endpoint["id"]);
+						can::removeDirectReadCallback(board->getDevice(), endpoint["id"]);
 					});
 
 					board->read(endpoint_id);
@@ -108,43 +134,13 @@ int main() {
 					std::cout << "Unknown endpoint" << std::endl;
 					continue;
 				}
-
-
-			// } else if (testMode == TestMode::Telemetry) {
-			// 	if (!mode_has_been_set) {
-			// 		CANDeviceUUID_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-			// 		auto telemType = static_cast<can::telemtype_t>(prompt("Enter telemetry type"));
-			// 		can::addDeviceTelemetryCallback(
-			// 			uuid, telemType,
-			// 			[](can::uuid_t uuid, can::telemtype_t telemType,
-			// 			DataPoint<can::telemetry_t> data) {
-			// 				std::cout << "Telemetry: uuid=" << static_cast<int>(uuid)
-			// 						<< ", type=" << static_cast<int>(telemType)
-			// 						<< static_cast<int>(telemType) << ", data=" << std::dec
-			// 						<< data.getDataOrElse(0) << std::endl;
-			// 			});
-			// 		int telemPeriod = prompt("Telemetry timing (ms)");
-			// 		bool useTimingPacket =
-			// 			static_cast<bool>(prompt("What telemetry method?\n0 for pull packets\n1 "
-			// 									"for telemetry timing packet"));
-			// 		if (useTimingPacket) {
-			// 			/* TO DO: Telemetry Packets
-
-			// 			CANPacket packet;
-			// 			AssembleTelemetryTimingPacket(
-			// 				&packet, static_cast<uint8_t>(deviceID.first), deviceID.second,
-			// 				static_cast<uint8_t>(telemType), telemPeriod);
-			// 			can::sendCANPacket(packet);
-			// 			*/
-			// 		} else {
-			// 			can::scheduleTelemetryPull(uuid, telemType,
-			// 									std::chrono::milliseconds(telemPeriod));
-			// 		}
-			// 		mode_has_been_set = true;
-			// 	}
-			// 	std::this_thread::sleep_for(1s);
-
 			} else if (testMode == TestMode::RawCAN) {
+				std::string input;
+				std::cout << "Enter revs: ";
+				std::getline(std::cin, input);
+				float revs = std::stof(input);
+				CANPacket_t packet = CANMotorPacket_Stepper_DriveRevolutions(Constants::JETSON_DEVICE, device, revs);
+				can::sendCANPacket(packet);
 				// uint8_t pr = prompt("priority");
 				// uint8_t uuid = prompt("uuid");
 				// uint8_t command = prompt("command");
