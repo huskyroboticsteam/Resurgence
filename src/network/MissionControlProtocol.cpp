@@ -15,6 +15,7 @@
 #include <functional>
 #include <loguru.hpp>
 #include <unordered_set>
+#include "../CAN/CAN.h"
 
 using namespace robot::types;
 using namespace std::chrono_literals;
@@ -208,6 +209,7 @@ static bool validateWaypointNavRequest(const json& j) {
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	if (Globals::AUTONOMOUS) {
+		can::setLED(can::led_t::red);
 		std::optional<Constants::autonomous::TaskType> taskType;
 		auto rawType = j["tag"].get<Constants::autonomous::TaskType>();
 		if (rawType != Constants::autonomous::TaskType::INVALID) {

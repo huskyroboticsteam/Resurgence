@@ -300,6 +300,8 @@ add_library(commands SHARED
   commands/DriveToWaypointCommand.cpp
   commands/PurePursuitCommand.cpp)
 
+target_link_libraries(commands PUBLIC CAN26 HindsightCAN)
+
 add_library(autonomous SHARED
   autonomous/AutonomousTask.cpp)
 target_link_libraries(autonomous commands world_interface)

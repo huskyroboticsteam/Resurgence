@@ -3,6 +3,7 @@
 #include "navtypes.h"
 #include "network/MissionControlProtocol.h"
 #include "world_interface/world_interface.h"
+#include "CAN/CAN.h"
 
 #include <array>
 #include <chrono>
@@ -154,6 +155,8 @@ int main(int argc, char** argv) {
 	Globals::websocketServer.addProtocol(std::move(mcProto));
 	// Ctrl+C doesn't stop the simulation without this line
 	signal(SIGINT, closeRover);
+
+	can::setLED(can::led_t::blue);
 
 	while (true) {
 		std::this_thread::sleep_for(std::chrono::seconds(60));
