@@ -484,6 +484,8 @@ void setActuator(int8_t out) {}
 
 void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {}
 
+void setLED(uint8_t color) {}
+
 } // namespace robot
 
 DataPoint<gpscoords_t> gps::readGPSCoords() {

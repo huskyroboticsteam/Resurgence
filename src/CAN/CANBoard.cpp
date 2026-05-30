@@ -187,7 +187,6 @@ void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
     CANPacket_t p = CANPeripheralPacket_SetPWMDutyCycle(
         Constants::JETSON_DEVICE, CANDevice_t{1, 1, 0, CAN_UUID_HAND}, peripheralID, dutyCycle
     );
-    LOG_F(INFO, "%f", dutyCycle);
     sendCANPacket(p);
 }
 

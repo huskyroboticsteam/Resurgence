@@ -323,4 +323,9 @@ void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {
 	}
 }
 
+void setLED(uint8_t color) {
+	can::led_t led = static_cast<can::led_t>(color);
+	can::setLED(led);
+}
+
 } // namespace robot

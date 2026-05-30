@@ -55,6 +55,12 @@ enum class axis_state_t : uint8_t {
 };
 } // namespace motor
 
+enum class led_t : uint8_t {
+	red,
+	green,
+	blue,
+};
+
 /**
  * @brief An ID for a telemetry callback.
  *
@@ -119,5 +125,7 @@ void removeDirectReadCallback(CANDevice_t device, uint16_t endpoint);
  * @param endpoint The name of the endpoint to retrieve.
  */
 nlohmann::json getEndpoint(boardid_t boardid, std::string endpoint);
+
+void setLED(led_t led);
 
 } // namespace can

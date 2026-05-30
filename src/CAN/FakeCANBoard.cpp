@@ -70,8 +70,9 @@ int main() {
 			if (testMode == TestMode::State) {
 				std::stringstream state_msg("");
 				state_msg << "Enter desired motor state:\n";
-				state_msg << static_cast<int>(can::motor::axis_state_t::full_calib) << " idle\n";
-				state_msg << static_cast<int>(can::motor::axis_state_t::encoder_offset_calib) << " closed loop control\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::idle) << " idle\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::full_calib) << " full calibration\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
 
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
@@ -187,9 +188,8 @@ int main() {
 				can::printCANPacket(p);
 				can::sendCANPacket(p);
 			} else if (testMode == TestMode::Debug) {
-				float angle = prompt("angle");
-
-				board->setServoAngle(angle);
+				can::led_t led = static_cast<can::led_t>(prompt("led color (rgb)"));
+				can::setLED(led);
 
 				// uint8_t brakeID = prompt("brake ID");
 				// uint8_t state = prompt("state");

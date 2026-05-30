@@ -51,7 +51,7 @@ constexpr std::chrono::milliseconds READ_TIMEOUT(500);
 constexpr uint32_t CAN_MASK = 0x3F8; // UUID field
 
 // Heartbeats should come in every 500ms, have some leniency
-constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(1000);
+constexpr auto HEARTBEAT_TIMEOUT = std::chrono::milliseconds(2000);
 
 std::shared_mutex bufferMutex;
 std::queue<CANPacket_t> buffer;
@@ -122,7 +122,7 @@ void handleAck(CANPacket_t& packet) {
 		return;
 	}
 	if (decoded.failure) {
-		LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.sender.deviceUUID);
+		// LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.sender.deviceUUID);
 	} else {
 		// LOG_F(INFO, "Ack received from 0x%x: ok", decoded.sender.deviceUUID);
 	}
@@ -466,6 +466,23 @@ nlohmann::json getEndpoint(boardid_t boardid, std::string endpoint) {
 		return nullptr;
 	}
 	return endpoints[endpoint];
+}
+
+void setLED(led_t led) {
+	CANPacket_t p;
+	switch (led) {
+		case led_t::red:
+			p = CANPeripheralPacket_SetRoverLEDRed(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
+			break;
+		case led_t::green:
+			p = CANPeripheralPacket_SetRoverFlashLEDGreen(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
+			break;
+		case led_t::blue:
+			p = CANPeripheralPacket_SetRoverLEDBlue(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
+			break;
+	}
+
+	sendCANPacket(p);
 }
 
 } // namespace can
