@@ -78,10 +78,7 @@ command_t PurePursuitCommand::getOutput() {
         return {.thetaVel = 0.0, .xVel = 0.0};
     }
 
-<<<<<<< HEAD
 	// Try to update index
-=======
->>>>>>> pure-pursuit-fix
 	updateCurrentIndex();
 	point_t relIntersect;
 	if (_curr_idx >= _path.size() - 1) {

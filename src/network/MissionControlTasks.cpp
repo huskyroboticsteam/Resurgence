@@ -6,10 +6,15 @@
 #include "../utils/core.h"
 #include "../world_interface/world_interface.h"
 #include "MissionControlMessages.h"
+#include "../ar/read_landmarks.h"
+#include "../ar/MarkerSet.h"
 
 #include <loguru.hpp>
+#include <map>
 
 #include <nlohmann/json.hpp>
+#include <opencv2/aruco.hpp>
+#include <opencv2/calib3d.hpp>
 
 using namespace robot::types;
 using namespace std::chrono_literals;
@@ -19,7 +24,12 @@ using nlohmann::json;
 namespace net::mc::tasks {
 namespace {
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
+
+// Reusable ArUco detector parameters and marker set
+cv::Ptr<cv::aruco::DetectorParameters> aruco_detector_params = cv::aruco::DetectorParameters::create();
+std::shared_ptr<AR::MarkerSet> aruco_marker_set = AR::Markers::URC_MARKERS();
 }
+
 
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
@@ -129,6 +139,56 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						// update the previous frame number
 						stream_data.frame_num = new_frame_num;
 						const auto& encoder = stream_data.encoder;
+
+						// Detect and log AR markers if AR detection is initialized AND enabled
+						if (AR::isLandmarkDetectionInitialized() && Globals::arucoDetectionEnabled.load()) {
+							// Get camera parameters for projection
+							auto intrinsics = robot::getCameraIntrinsicParams(cam);
+							if (intrinsics) {
+								// Detect markers using configured marker set
+								std::vector<std::vector<cv::Point2f>> corners, rejectedPoints;
+								std::vector<int> ids;
+								cv::aruco::detectMarkers(frame, aruco_marker_set->getDict(), 
+								                         corners, ids, aruco_detector_params, rejectedPoints);
+								
+								if (!ids.empty()) {
+									// Use a map to store only the first occurrence of each marker ID
+									std::map<int, cv::Vec3d> uniqueMarkers;
+									float markerSize = aruco_marker_set->getPhysicalSize();
+									
+									for (size_t i = 0; i < ids.size(); i++) {
+										// Only process if we haven't seen this marker ID yet
+										if (uniqueMarkers.find(ids[i]) == uniqueMarkers.end()) {
+											// Compute pose using solvePnP
+											std::vector<cv::Point3f> objPoints;
+											objPoints.push_back(cv::Point3f(-markerSize/2.f, markerSize/2.f, 0));
+											objPoints.push_back(cv::Point3f(markerSize/2.f, markerSize/2.f, 0));
+											objPoints.push_back(cv::Point3f(markerSize/2.f, -markerSize/2.f, 0));
+											objPoints.push_back(cv::Point3f(-markerSize/2.f, -markerSize/2.f, 0));
+											
+											cv::Vec3d rvec, tvec;
+											cv::solvePnP(objPoints, corners[i], intrinsics.value().getCameraMatrix(),
+											             intrinsics.value().getDistCoeff(), rvec, tvec);
+											
+											uniqueMarkers[ids[i]] = tvec;
+										}
+									}
+									
+									// Log each unique detected marker
+									for (const auto& pair : uniqueMarkers) {
+										int id = pair.first;
+										const cv::Vec3d& tvec = pair.second;
+										double distance = cv::norm(tvec);
+										
+										LOG_F(INFO, "Detected ArUco marker on camera %s:", cam.c_str());
+										LOG_F(INFO, "  Marker ID: %d", id);
+										LOG_F(INFO, "  Distance: %.2f m (%.0f cm)", distance, distance * 100.0);
+										LOG_F(INFO, "  Position (camera frame): X=%+.3f m, Y=%+.3f m, Z=%+.3f m", 
+										      tvec[0], tvec[1], tvec[2]);
+									}
+								}
+							}
+						}
 
 						// convert frame to encoded data and send it
 						auto data_vector = encoder->encode_frame(frame);
