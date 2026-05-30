@@ -113,6 +113,19 @@ bool hasNewCameraFrame(types::CameraID camera, uint32_t oldFrameNum);
 types::DataPoint<types::CameraFrame> readCamera(types::CameraID camera);
 
 /**
+ * @brief Read depth frame from the given camera (if available).
+ * 
+ * This is used for RealSense-like depth cameras. In simulator mode,
+ * the simulator must send depth_data in the camera frame message.
+ *
+ * @param camera The ID of the camera to read from.
+ * @param[out] depth_frame The depth image (CV_16UC1, values in millimeters)
+ * @param[out] depth_scale Conversion factor: meters = raw_value * depth_scale
+ * @return true if depth data is available, false otherwise
+ */
+bool readDepthFrame(types::CameraID camera, cv::Mat& depth_frame, float& depth_scale);
+
+/**
  * @brief Get the intrinsic params of the specified camera, if it exists.
  *
  * @param camera The ID of the camera for which to get the intrinsic params.

@@ -53,6 +53,35 @@ cd Resurgence
 ./easy_install.sh
 ```
 
+## Optional: Object Detection with LibTorch
+
+Object detection is an optional feature that requires LibTorch. If LibTorch is not installed, the project will build without object detection support.
+
+To enable object detection, download and install LibTorch:
+
+1. Download LibTorch (C++ distribution) from [PyTorch website](https://pytorch.org/get-started/locally/)
+   - Select: Linux, LibTorch, C++/Java, CUDA 11.8 (or your CUDA version)
+   - Download the cxx11 ABI version
+
+2. Extract to your preferred location:
+   ```bash
+   wget https://download.pytorch.org/libtorch/cu118/libtorch-cxx11-abi-shared-with-deps-2.1.0%2Bcu118.zip
+   unzip libtorch-cxx11-abi-shared-with-deps-2.1.0+cu118.zip -d ~/
+   ```
+
+3. Set the LibTorch path (add to `~/.bashrc` for persistence):
+   ```bash
+   export LIBTORCH_PATH=~/libtorch
+   ```
+
+4. When building, CMake will automatically detect LibTorch:
+   ```bash
+   cd build
+   cmake ../src
+   ```
+
+If LibTorch is not found, you'll see a warning message but the build will continue without object detection.
+
 Done! Continue on to the "IDE Setup" section.
 
 # IDE Setup

@@ -78,10 +78,6 @@ command_t PurePursuitCommand::getOutput() {
         return {.thetaVel = 0.0, .xVel = 0.0};
     }
 
-<<<<<<< HEAD
-	// Try to update index
-=======
->>>>>>> pure-pursuit-fix
 	updateCurrentIndex();
 	point_t relIntersect;
 	if (_curr_idx >= _path.size() - 1) {
@@ -155,27 +151,7 @@ point_t PurePursuitCommand::lineToCircleIntersection(const point_t& p1, const po
 		if (valid1 && !valid2) return sol1;
 		if (valid2 && !valid1) return sol2;
 		if (valid1 && valid2) return (t1 > t2 ? sol1 : sol2);
-
-		// debugging version
-		// if (valid1 && !valid2) {
-		// 	file << p1[0] << "," << p1[1] << std::endl;
-		// 	return sol1;
-		// } 
-		// if (valid2 && !valid1) {
-		// 	file << p2[0] << "," << p2[1] << std::endl;
-		// 	return sol2;
-		// } 
-		// if (valid1 && valid2) { // return (t1 > t2 ? sol1 : sol2); 
-		// 	if (t1 > t2) {
-		// 		file << p1[0] << "," << p1[1] << std::endl;
-		// 	} else {
-		// 		file << p2[0] << "," << p2[1] << std::endl;
-		// 	}
-
-		// 	return (t1 > t2 ? sol1 : sol2);
-		// }
 	}
-	// file << p2[0] << "," << p2[1] << std::endl;
 	return p2Robot;
 }
 

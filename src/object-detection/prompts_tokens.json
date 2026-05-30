@@ -1,0 +1,274 @@
+{
+  "tasks": {
+    "orange_hammer": {
+      "display_name": "orange hammer",
+      "prompt": "orange hammer",
+      "class_names": [
+        "no object",
+        "orange hammer"
+      ],
+      "display_names": [
+        "no object",
+        "orange hammer"
+      ],
+      "input_ids": [
+        [
+          49406,
+          871,
+          14115,
+          49407,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          49406,
+          4287,
+          9401,
+          49407,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "attention_mask": [
+        [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "height_meters": 0.35,
+      "width_meters": 0.1
+    },
+    "rock_pick": {
+      "display_name": "rock pick",
+      "prompt": "rock hammer",
+      "class_names": [
+        "no object",
+        "rock hammer"
+      ],
+      "display_names": [
+        "no object",
+        "rock pick"
+      ],
+      "input_ids": [
+        [
+          49406,
+          871,
+          14115,
+          49407,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          49406,
+          2172,
+          9401,
+          49407,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "attention_mask": [
+        [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "height_meters": 0.3,
+      "width_meters": 0.08
+    },
+    "water_bottle": {
+      "display_name": "water bottle",
+      "prompt": "plastic water bottle",
+      "class_names": [
+        "no object",
+        "plastic water bottle"
+      ],
+      "display_names": [
+        "no object",
+        "water bottle"
+      ],
+      "input_ids": [
+        [
+          49406,
+          871,
+          14115,
+          49407,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          49406,
+          6102,
+          1573,
+          5392,
+          49407,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "attention_mask": [
+        [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "height_meters": 0.2,
+      "width_meters": 0.065
+    }
+  }
+}

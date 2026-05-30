@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../utils/scheduler.h"
+#include "../camera/H264PassthroughSource.h"
+#include "../object-detection/ObjectDetector.h"
 #include "../video/H264Encoder.h"
 #include "../world_interface/data.h"
 #include "../world_interface/world_interface.h"
@@ -11,6 +13,7 @@
 #include <optional>
 #include <unordered_map>
 #include <utility>
+#include <variant>
 
 namespace net::mc::tasks {
 
@@ -81,20 +84,28 @@ protected:
 	void task(std::unique_lock<std::mutex>& lock) override;
 
 private:
-	struct stream_data_t {
+	struct decoded_stream_t {
 		std::shared_ptr<video::H264Encoder> encoder;
 		std::shared_ptr<robot::types::CameraHandle> cam_handle;
-		uint32_t frame_num;
-
-		stream_data_t(std::shared_ptr<video::H264Encoder> encoder,
-					  std::shared_ptr<robot::types::CameraHandle> cam_handle)
-			: encoder(encoder), cam_handle(cam_handle), frame_num(0) {}
 	};
 
+	struct passthrough_stream_t {
+		std::unique_ptr<cam::H264PassthroughSource> source;
+	};
+
+	struct stream_data_t {
+		std::variant<decoded_stream_t, passthrough_stream_t> stream;
+		uint32_t frame_num = 0;
+
+		explicit stream_data_t(decoded_stream_t decoded) : stream(std::move(decoded)) {}
+		explicit stream_data_t(passthrough_stream_t passthrough)
+			: stream(std::move(passthrough)) {}
+	};
 
 	websocket::SingleClientWSServer& _server;
 	std::mutex _mutex;
 	std::unordered_map<robot::types::CameraID, stream_data_t> _open_streams;
+	std::unordered_map<robot::types::CameraID, std::shared_ptr<ObjDet::ObjectDetector>> _detectors;
 };
 
 /**

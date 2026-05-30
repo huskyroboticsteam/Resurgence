@@ -2,14 +2,24 @@
 
 #include "../Constants.h"
 #include "../Globals.h"
+#include "../camera/CameraConfig.h"
 #include "../control_interface.h"
 #include "../utils/core.h"
 #include "../world_interface/world_interface.h"
 #include "MissionControlMessages.h"
+#include "../ar/read_landmarks.h"
+#include "../ar/MarkerSet.h"
 
+#include <algorithm>
+#include <cctype>
 #include <loguru.hpp>
+#include <vector>
+#include <map>
 
 #include <nlohmann/json.hpp>
+#include <opencv2/aruco.hpp>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/imgproc.hpp>
 
 using namespace robot::types;
 using namespace std::chrono_literals;
@@ -19,7 +29,17 @@ using nlohmann::json;
 namespace net::mc::tasks {
 namespace {
 const std::chrono::milliseconds TELEM_REPORT_PERIOD = 100ms;
-}
+
+template <class... Ts> struct overloaded : Ts... {
+	using Ts::operator()...;
+};
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+} // namespace
+
+// Reusable ArUco detector parameters and marker set
+cv::Ptr<cv::aruco::DetectorParameters> aruco_detector_params = cv::aruco::DetectorParameters::create();
+std::shared_ptr<AR::MarkerSet> aruco_marker_set = AR::Markers::URC_MARKERS();
+
 
 PowerRepeatTask::PowerRepeatTask()
 	: util::PeriodicTask<>(Constants::JOINT_POWER_REPEAT_PERIOD,
@@ -91,12 +111,95 @@ void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 	if (_open_streams.find(cam) == _open_streams.end()) {
 		std::thread([this, cam, fps]() {
 			std::lock_guard lock(_mutex);
-			auto it = Constants::video::STREAM_RFS.find(cam);
-			int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second : Constants::video::H264_RF_CONSTANT;
-			auto enc = std::make_shared<video::H264Encoder>(fps, rf);
-			auto cam_handle = robot::openCamera(cam);
-			if (cam_handle) {
-				_open_streams.insert_or_assign(cam, stream_data_t(enc, cam_handle));
+			auto cfgIt = Constants::CAMERA_CONFIG_PATHS.find(cam);
+			// check if we have a config for this camera
+			if (cfgIt == Constants::CAMERA_CONFIG_PATHS.end()) {
+				LOG_F(WARNING, "No camera configuration found for %s", cam.c_str());
+				return;
+			}
+
+			// load the config file
+			cv::FileStorage configFs(cfgIt->second, cv::FileStorage::READ);
+			if (!configFs.isOpened()) {
+				LOG_F(ERROR, "Failed to open camera config file %s", cfgIt->second.c_str());
+				return;
+			}
+
+			bool openCVEnabled = false;
+			// check if OpenCV processing is enabled
+			if (!configFs[cam::KEY_OPENCV_ENABLED].empty()) {
+				openCVEnabled = static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == 0;
+			}
+
+			LOG_F(INFO, "Camera %s OpenCV enabled: %s", cam.c_str(), static_cast<int>(configFs[cam::KEY_OPENCV_ENABLED]) == 0 ? "true" : "false");
+
+			bool opened = false;
+			if (!openCVEnabled) {
+				if (!configFs[cam::KEY_CAMERA_ID].empty() && !configFs[cam::KEY_FORMAT].empty() &&
+					!configFs[cam::KEY_IMAGE_WIDTH].empty() && !configFs[cam::KEY_IMAGE_HEIGHT].empty() &&
+					!configFs[cam::KEY_FRAMERATE].empty()) {
+					std::string format = static_cast<std::string>(configFs[cam::KEY_FORMAT]);
+					std::transform(format.begin(), format.end(), format.begin(),
+								   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+					// creates passthrough source only if format is H264
+					if (format.find("264") != std::string::npos) {
+						cam::CameraStreamProperties streamProps{
+							.cameraId = static_cast<int>(configFs[cam::KEY_CAMERA_ID]),
+							.format = format,
+							.width = static_cast<int>(configFs[cam::KEY_IMAGE_WIDTH]),
+							.height = static_cast<int>(configFs[cam::KEY_IMAGE_HEIGHT]),
+							.framerate = static_cast<int>(configFs[cam::KEY_FRAMERATE]),
+						};
+						// try to create H264 passthrough source
+						try {
+							auto passthrough =
+								std::make_unique<cam::H264PassthroughSource>(streamProps);
+							_open_streams.insert_or_assign(
+								cam, stream_data_t(passthrough_stream_t{std::move(passthrough)}));
+							LOG_F(INFO, "Opened H264 pass-through stream for %s", cam.c_str());
+							opened = true;
+						} catch (const std::exception& e) {
+							LOG_F(ERROR, "Failed to initialize H264 pass-through for %s: %s",
+								  cam.c_str(), e.what());
+						}
+					} else {
+						LOG_F(INFO,
+							  "Camera %s format %s does not provide H264, falling back to CPU "
+							  "encoding",
+							  cam.c_str(), format.c_str());
+					}
+				} else {
+					LOG_F(WARNING,
+						  "Camera %s config missing stream properties; falling back to CPU encoding",
+						  cam.c_str());
+				}
+			} else {
+				auto config = cam::readConfigFromFile(cfgIt->second);
+				if (config.intrinsicParams && !config.intrinsicParams->empty()) {
+					auto detector = std::make_shared<ObjDet::ObjectDetector>(
+						"../src/object-detection/owlvit-cpp.pt",
+						0.8f,
+						config.intrinsicParams.value()
+					);
+					detector->toggleTask(ObjDet::DetectionTask::ORANGE_HAMMER);
+					_detectors.insert_or_assign(cam, detector);
+				}
+			}
+			// if passthrough source was not opened, fall back to CPU encoding
+			if (!opened) {
+				auto it = Constants::video::STREAM_RFS.find(cam);
+				int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second
+																   : Constants::video::H264_RF_CONSTANT;
+				auto enc = std::make_shared<video::H264Encoder>(fps, rf);
+				auto cam_handle = robot::openCamera(cam);
+				if (cam_handle) {
+					_open_streams.insert_or_assign(
+						cam, stream_data_t(decoded_stream_t{enc, cam_handle}));
+					LOG_F(INFO, "Opened CPU-encoded stream for %s", cam.c_str());
+				} else {
+					LOG_F(ERROR, "Failed to open %s camera for CPU encoding", cam.c_str());
+				}
+				
 			}
 		}).detach();
 	}
@@ -114,30 +217,147 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 		{
 			std::lock_guard lg(_mutex);
 			// for all open streams, check if there is a new frame
-			for (auto& stream : _open_streams) {
-				const CameraID& cam = stream.first;
-				stream_data_t& stream_data = stream.second;
-				uint32_t frame_num = stream_data.frame_num;
-				if (robot::hasNewCameraFrame(cam, frame_num)) {
-					// if there is a new frame, grab it
-					auto camDP = robot::readCamera(cam);
+			for (auto& [cam, stream_data] : _open_streams) {
+				std::visit(
+					overloaded{
+						[this, &stream_data, &cam](decoded_stream_t& decoded) {
+							uint32_t frame_num = stream_data.frame_num;
+							if (robot::hasNewCameraFrame(cam, frame_num)) {
+								auto camDP = robot::readCamera(cam);
+								if (camDP) {
+									auto data = camDP.getData();
+									uint32_t& new_frame_num = data.second;
+									cv::Mat frame = data.first;
+									stream_data.frame_num = new_frame_num;
+									const auto& encoder = decoded.encoder;
 
-					if (camDP) {
-						auto data = camDP.getData();
-						uint32_t& new_frame_num = data.second;
-						cv::Mat frame = data.first;
-						// update the previous frame number
-						stream_data.frame_num = new_frame_num;
-						const auto& encoder = stream_data.encoder;
+									// Detect and log AR markers if AR detection is initialized AND enabled
+									if (AR::isLandmarkDetectionInitialized() && Globals::arucoDetectionEnabled.load()) {
+										// Get camera parameters for projection
+										auto intrinsics = robot::getCameraIntrinsicParams(cam);
+										if (intrinsics) {
+											// Detect markers using configured marker set
+											std::vector<std::vector<cv::Point2f>> corners, rejectedPoints;
+											std::vector<int> ids;
+											cv::aruco::detectMarkers(frame, aruco_marker_set->getDict(), 
+																	corners, ids, aruco_detector_params, rejectedPoints);
+											
+											if (!ids.empty()) {
+												// Use a map to store only the first occurrence of each marker ID
+												std::map<int, cv::Vec3d> uniqueMarkers;
+												float markerSize = aruco_marker_set->getPhysicalSize();
+												
+												for (size_t i = 0; i < ids.size(); i++) {
+													// Only process if we haven't seen this marker ID yet
+													if (uniqueMarkers.find(ids[i]) == uniqueMarkers.end()) {
+														// Compute pose using solvePnP
+														std::vector<cv::Point3f> objPoints;
+														objPoints.push_back(cv::Point3f(-markerSize/2.f, markerSize/2.f, 0));
+														objPoints.push_back(cv::Point3f(markerSize/2.f, markerSize/2.f, 0));
+														objPoints.push_back(cv::Point3f(markerSize/2.f, -markerSize/2.f, 0));
+														objPoints.push_back(cv::Point3f(-markerSize/2.f, -markerSize/2.f, 0));
+														
+														cv::Vec3d rvec, tvec;
+														cv::solvePnP(objPoints, corners[i], intrinsics.value().getCameraMatrix(),
+																	intrinsics.value().getDistCoeff(), rvec, tvec);
+														
+														uniqueMarkers[ids[i]] = tvec;
+													}
+												}
 
-						// convert frame to encoded data and send it
-						auto data_vector = encoder->encode_frame(frame);
-						json msg = {{"type", CAMERA_STREAM_REP_TYPE},
-									{"camera", cam},
-									{"data", data_vector}};
-						_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
-					}
-				}
+												// Draw corners
+												cv::aruco::drawDetectedMarkers(frame, corners, ids);
+												
+												// Log each unique detected marker
+												for (const auto& pair : uniqueMarkers) {
+													int id = pair.first;
+													const cv::Vec3d& tvec = pair.second;
+													double distance = cv::norm(tvec);
+													
+													LOG_F(INFO, "Detected ArUco marker on camera %s:", cam.c_str());
+													LOG_F(INFO, "  Marker ID: %d", id);
+													LOG_F(INFO, "  Distance: %.2f m (%.0f cm)", distance, distance * 100.0);
+													LOG_F(INFO, "  Position (camera frame): X=%+.3f m, Y=%+.3f m, Z=%+.3f m", 
+														tvec[0], tvec[1], tvec[2]);
+												}
+											}
+										}
+									}
+									if (Globals::objectDetectionEnabled) {
+										auto it = _detectors.find(cam);
+										if (it != _detectors.end()) {
+											auto detector = it->second;
+											ObjDet::DetectionTask current_task = detector->getActiveTask();
+											if (current_task != ObjDet::DetectionTask::NONE) {
+												std::vector<ObjDet::DetectionResult> detections = detector->detect(frame, false, true);  // undistort=false, estimate_distance=true
+
+												// Draw detections
+												if (!detections.empty()) {
+													for (const auto& det : detections) {
+														// Draw bounding box
+														cv::rectangle(frame, det.bounding_box, cv::Scalar(0, 255, 0), 2);
+													
+														// Prepare label with distance
+														std::stringstream label_stream;
+														label_stream << det.class_name << " " 
+																<< std::fixed << std::setprecision(1) 
+																<< (det.confidence * 100) << "%";
+														
+														// Add distance if available
+														if (det.actual_distance_meters >= 0.0f) {
+															label_stream << " [" << std::setprecision(2) 
+																		<< det.actual_distance_meters << "m]";
+														}
+														std::string label = label_stream.str();
+													
+														// Draw label background
+														int baseline = 0;
+														cv::Size text_size = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.6, 2, &baseline);
+														
+														cv::Point text_origin(det.bounding_box.x, det.bounding_box.y - 8);
+														if (text_origin.y < text_size.height) {
+															text_origin.y = det.bounding_box.y + text_size.height + 8;
+														}
+														
+														cv::rectangle(frame,
+																	cv::Point(text_origin.x - 2, text_origin.y - text_size.height - 4),
+																	cv::Point(text_origin.x + text_size.width + 2, text_origin.y + 4),
+																	cv::Scalar(0, 255, 0),
+																	cv::FILLED);
+														
+														// Draw label text
+														cv::putText(frame, label, text_origin,
+																cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 0, 0), 2);
+													}
+												}
+											}
+										}
+									}
+
+									auto data_vector = encoder->encode_frame(frame);
+									json msg = {{"type", CAMERA_STREAM_REP_TYPE},
+												{"camera", cam},
+												{"data", data_vector}};
+									_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+								}
+							}
+						},
+						[this, &stream_data, &cam](passthrough_stream_t& passthrough) {
+							if (!passthrough.source) {
+								return;
+							}
+							std::vector<std::basic_string<uint8_t>> data_vector;
+							uint32_t new_frame_num = stream_data.frame_num;
+							if (passthrough.source->next(data_vector, new_frame_num) &&
+								!data_vector.empty()) {
+								stream_data.frame_num = new_frame_num;
+								json msg = {{"type", CAMERA_STREAM_REP_TYPE},
+											{"camera", cam},
+											{"data", data_vector}};
+								_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+							}
+						}},
+					stream_data.stream);
 			}
 		}
 		std::this_thread::yield();

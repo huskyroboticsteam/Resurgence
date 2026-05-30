@@ -4,7 +4,11 @@
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
+<<<<<<< HEAD
 #include "../control/JacobianVelController.h"
+=======
+#include "../camera/CameraConfig.h"
+>>>>>>> origin/ojb-det-master
 #include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
@@ -98,8 +102,14 @@ std::shared_ptr<cam::Camera> openCamera_(CameraID camID) {
 		}
 	}
 	try {
+		// Load camera configuration to get intrinsic and extrinsic parameters
+		auto config = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(camID));
+		
 		auto cam = std::make_shared<cam::Camera>();
-		bool success = cam->open(camID);
+		// Extract values from optional before passing to open()
+		cam::CameraParams intrinsics = config.intrinsicParams.value_or(cam::CameraParams());
+		cv::Mat extrinsics = config.extrinsicParams.value_or(cv::Mat());
+		bool success = cam->open(camID, intrinsics, extrinsics);
 		if (success) {
 			cameraMap[camID] = cam;
 			return cam;
@@ -186,6 +196,14 @@ robot::types::DataPoint<robot::types::CameraFrame> readCamera(CameraID cameraID)
 		LOG_F(WARNING, "Invalid camera id: %s", cameraID.c_str());
 		return robot::types::DataPoint<robot::types::CameraFrame>{};
 	}
+}
+
+std::optional<std::pair<cv::Mat, float>> readDepthFrame(CameraID cameraID) {
+	// TODO: Integrate with RealSenseCamera for real depth data
+	// For now, return nullopt (depth not available in basic camera interface)
+	// To use depth in real world, use RealSenseCamera directly in detection code
+	LOG_F(INFO, "readDepthFrame: Depth not available for camera %s in real_world_interface. Use RealSenseCamera directly.", cameraID.c_str());
+	return std::nullopt;
 }
 
 std::optional<cam::CameraParams> getCameraIntrinsicParams(CameraID cameraID) {

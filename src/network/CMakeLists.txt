@@ -9,6 +9,9 @@ target_link_libraries(websocket_utils
 add_library(mission_control_interface STATIC
   MissionControlProtocol.cpp
   MissionControlTasks.cpp)
-target_link_libraries(mission_control_interface utils video autonomous rover_common control)
+target_link_libraries(mission_control_interface utils video camera autonomous rover_common control)
+if(ENABLE_OBJECT_DETECTION)
+  target_link_libraries(mission_control_interface object_detection)
+endif()
 set_target_properties(mission_control_interface PROPERTIES POSITION_INDEPENDENT_CODE ON)
 

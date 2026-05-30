@@ -58,6 +58,10 @@ const std::string KEY_FRAMERATE = "framerate";
    Config file key for camera format.
 */
 const std::string KEY_FORMAT = "format";
+/**
+   Config file key for enabling OpenCV processing.
+ */
+const std::string KEY_OPENCV_ENABLED = "opencv_enabled";
 /**@}*/
 
 /**
@@ -116,6 +120,11 @@ struct CameraConfig {
 	 * @brief If specified, gives the text description of the camera.
 	 */
 	std::optional<std::string> description;
+
+	/**
+	 * @brief Whether this camera should be opened for OpenCV processing.
+	 */
+	bool openCVEnabled = true;
 };
 
 /**
