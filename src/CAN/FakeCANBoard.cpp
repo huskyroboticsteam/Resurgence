@@ -187,7 +187,7 @@ int main() {
 				can::printCANPacket(p);
 				can::sendCANPacket(p);
 			} else if (testMode == TestMode::Debug) {
-				uint16_t angle = prompt("angle");
+				float angle = prompt("angle");
 
 				board->setServoAngle(angle);
 

@@ -191,7 +191,7 @@ void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
     sendCANPacket(p);
 }
 
-void CANBoard::setServoAngle(uint16_t angle) {
+void CANBoard::setServoAngle(float angle) {
     CANPacket_t p = CANPeripheralPacket_SetServoAngle(
         Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, 4, angle
     );

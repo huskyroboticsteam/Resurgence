@@ -25,7 +25,7 @@ class CANBoard {
     void setActuator(int8_t out);
     void setBrake(uint8_t state);
     void setPWMDutyCycle(uint8_t peripheralID, float dutyCycle);
-    void setServoAngle(uint16_t angle);
+    void setServoAngle(float angle);
 
     // Universal
     void read(uint16_t endpoint);
