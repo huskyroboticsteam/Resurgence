@@ -78,10 +78,9 @@ bool ArduPilotProtocol::validateIMURequest(const json& j) {
 }
 
 void ArduPilotProtocol::handleIMURequest(const json& j) {
-	double roll = j["yaw"];
+	double roll = j["roll"];
 	double pitch = j["pitch"];
-	double yaw = j["roll"];
-	yaw = -yaw;
+	double yaw = j["yaw"];
 	eulerangles_t rpy{roll, pitch, yaw};
 
 	std::lock_guard lock(_lastOrientationMutex);
