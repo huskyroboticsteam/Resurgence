@@ -22,7 +22,6 @@ namespace autonomous {
 AutonomousTask::AutonomousTask(net::websocket::SingleClientWSServer& server): _server(server) {};
 
 AutonomousTask::~AutonomousTask() {
-	LOG_F(INFO, "destructing auton task obj");
 	if (_debug) _logFile.close();
 	if (_autonomous_task_thread.joinable()) {
 		_autonomous_task_thread.join();
@@ -46,10 +45,6 @@ void AutonomousTask::start(const navtypes::points_t& waypointCoords, const bool 
 	}
 	_kill_called = false;
 
-	// for (auto& point : waypointCoords) {
-	// 	_logFile << point[0] << "," << point[1] << std::endl;
-	// }
-	
 	if (circleMode) {
 		if (waypointCoords.size() > 1) {
 			_waypoint_coords_list = 
@@ -153,19 +148,13 @@ navtypes::points_t AutonomousTask::generateCirclePoints(const double radius) {
  
 	auto latestGPS = robot::readGPS();
 	auto gpsPosData = latestGPS.getData();
-	// _logFile << gpsPosData.x() << "," << gpsPosData.y() << std::endl;
 	double startAngle = std::atan2(gpsPosData.y() - _circle_center[1],
 								   gpsPosData.x() - _circle_center[0]);
-
-								//  ***  round up to nearest multiple of angleIncrement  ***
-
-	LOG_F(INFO, "start angle: %f", startAngle);
 	for (int i = 0; i <= numPoints; i++) {
 		double angle = startAngle + i * angleIncrement;
 		double x = _circle_center[0] + radius * cos(angle);
 		double y = _circle_center[1] + radius * sin(angle);
 		circlePoints.push_back({x, y, 1});
-		_logFile << x << "," << y << std::endl;
 	}
 	return circlePoints;
 }
