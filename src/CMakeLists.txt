@@ -279,7 +279,7 @@ target_link_libraries(camera PUBLIC ${OpenCV_LIBS} ${GSTREAMER_LIBRARIES})
 #    target_link_libraries(camera PUBLIC ${REALSENSE2_LIBRARIES})
 #  endif()
 #  target_compile_definitions(camera PUBLIC WITH_REALSENSE)
-#endif()
+endif()
 
 # shared library for utility code
 add_library(utils SHARED
