@@ -79,8 +79,8 @@ std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 // map that associates camera id to the camera object
 std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 
-callbackid_t nextCallbackID = 0;
-std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
+// callbackid_t nextCallbackID = 0;
+// std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
 
 void initBoards() {
 	// Initialize boards using CANDevice_t from boardUUIDMap

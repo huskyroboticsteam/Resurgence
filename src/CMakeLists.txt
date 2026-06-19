@@ -406,6 +406,5 @@ add_compile_options(
 )
 
 add_subdirectory(ar)
-add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)

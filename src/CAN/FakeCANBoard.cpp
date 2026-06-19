@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <shared_mutex>
 
 enum class TestMode {
 	State,
@@ -81,7 +82,7 @@ int main() {
 				correct = false;
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), "axis0.current_state"); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
-					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded) {
+					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
 						if (decoded.value_uint8 != static_cast<uint8_t>(motor_state)) {
 							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d AND IS INSTEAD %d", board->getDevice().deviceUUID, static_cast<uint8_t>(motor_state), decoded.value_uint8);
 							board->setMotorState(motor_state);
@@ -111,7 +112,7 @@ int main() {
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
 					// std::cout << "endpoint " << input << " has id=" << endpoint_id << std::endl;
-					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded) {
+					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
 						std::stringstream rs("");
 						rs << input << " from 0x" << std::hex << board->getDevice().deviceUUID << " [";
 

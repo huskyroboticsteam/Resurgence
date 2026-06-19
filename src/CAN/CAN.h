@@ -6,7 +6,9 @@
 #include "../world_interface/data.h"
 
 #include <functional>
+#include <shared_mutex>
 #include <optional>
+
 
 #include <linux/can.h>
 #include <nlohmann/json.hpp>
@@ -102,7 +104,7 @@ void printCANPacket(const CANPacket_t& packet);
  * @param endpoint The endpoint to respond to.
  * @param callback The function to call when we receive data, called with the decoded packet.
  */
-void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock)>& callback);
+void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, [[maybe_unused]] std::unique_lock<std::shared_mutex>)>& callback);
 
 /**
  * @brief Removes a callback.

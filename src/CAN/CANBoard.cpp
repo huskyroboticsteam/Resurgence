@@ -29,7 +29,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         // Ping motor for configs
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
             endpointid_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p, std::unique_lock lock) {
+            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p, std::unique_lock<std::shared_mutex> lock) {
                 this->vel_limit = p.value_float;
 
                 // We only need this once, remove after we get a response
@@ -41,7 +41,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.config.enable_watchdog"); endpoint != nullptr) {
             endpointid_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p, std::unique_lock lock) {
+            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p, std::unique_lock<std::shared_mutex> lock) {
                 this->watchdog = p.value_bool;
 
                 // We only need this once, remove after we get a response
@@ -99,7 +99,7 @@ void CANBoard::setMotorPower(double power) {
         // Double-check velocity set correctly
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [p, this, endpoint_id](auto decoded, std::unique_lock lock) {
+            addDirectReadCallback(this->device, endpoint_id, [p, this, endpoint_id](auto decoded, std::unique_lock<std::shared_mutex> lock) {
                 if (decoded.value_float != input_vel) {
                     LOG_F(ERROR, "Expected %f, got %f", this->input_vel, decoded.value_float);
                     // sendCANPacket(p);

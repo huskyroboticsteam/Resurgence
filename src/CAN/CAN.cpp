@@ -9,7 +9,6 @@
 #include <memory>
 #include <mutex>
 #include <queue>
-#include <shared_mutex>
 #include <string>
 #include <termios.h>
 #include <thread>
@@ -78,7 +77,7 @@ std::shared_ptr<util::PeriodicScheduler<>> readScheduler;
 std::unordered_map<
 	std::pair<CANDeviceUUID_t, endpointid_t>,
 	std::pair<
-		std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock)>
+		std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>,
 		util::PeriodicScheduler<>::eventid_t>> directReadCallbackMap;
 std::shared_mutex directReadCallbackMutex;
 
@@ -404,7 +403,7 @@ void printCANPacket(const CANPacket_t& packet) {
 	LOG_F(INFO, ss.str().c_str());
 }
 
-void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock)>& callback) {
+void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, [[maybe_unused]] std::unique_lock<std::shared_mutex>)>& callback) {
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
 	// Write access
 	std::unique_lock lock(directReadCallbackMutex);
@@ -417,7 +416,8 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint, const std:
 		readScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_ReadSched");
 	}
 
-	auto eventID = readScheduler->scheduleEvent(READ_TIMEOUT, [lock = std::move(lock)]() {
+	auto eventID = readScheduler->scheduleEvent(READ_TIMEOUT, [device, endpoint, key]() {
+		std::unique_lock lock(directReadCallbackMutex);
 		LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint);
 		directReadCallbackMap.erase(key);
 	});
