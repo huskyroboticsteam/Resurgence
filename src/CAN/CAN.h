@@ -53,6 +53,7 @@ enum class axis_state_t : uint8_t {
 	closed_loop_control = BLDC_AXIS_CLOSED_LOOP_CONTROL,
 	lockin_spin = BLDC_AXIS_LOCKIN_SPIN,
 };
+
 } // namespace motor
 
 enum class led_t : uint8_t {
@@ -61,12 +62,8 @@ enum class led_t : uint8_t {
 	blue,
 };
 
-/**
- * @brief An ID for a telemetry callback.
- *
- * Users should not construct these themselves.
- */
-using callbackid_t = std::tuple<uuid_t, telemtype_t, uint32_t>;
+/** @brief ODrive endpoint ID */
+using endpointid_t = uint16_t;
 
 /**
  * @brief Initialize the CAN interface.
@@ -105,17 +102,18 @@ void printCANPacket(const CANPacket_t& packet);
  * @param endpoint The endpoint to respond to.
  * @param callback The function to call when we receive data, called with the decoded packet.
  */
-void addDirectReadCallback(CANDevice_t device, uint16_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t)>& callback);
+void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock)>& callback);
 
 /**
  * @brief Removes a callback.
+ * Does nothing if callback does not exist.
  *
  * This method is thread-safe.
  *
  * @param device The CAN device associated with the read callback.
  * @param endpoint The endpoint to remove the callback for.
  */
-void removeDirectReadCallback(CANDevice_t device, uint16_t endpoint);
+void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint);
 
 /**
  * @brief Retrieves a JSON that corresponds to the endpoint name input.

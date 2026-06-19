@@ -40,10 +40,6 @@ class CANBoard {
 
     void storePosition(const robot::types::DataPoint<int32_t> data) {
       std::unique_lock lock(board_mutex);
-      // int32_t mdeg = data.getDataOrElse(0);
-      // if (mdeg != 0) {
-      //   LOG_F(INFO, "0x%x @ %d mdeg", this->device.deviceUUID, mdeg);
-      // }
       this->position_mdeg = data;
     }
 

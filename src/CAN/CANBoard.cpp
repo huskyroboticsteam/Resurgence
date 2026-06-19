@@ -28,22 +28,20 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 
         // Ping motor for configs
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
-            uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
-                std::unique_lock lock(this->board_mutex);
+            endpointid_t endpoint_id = endpoint["id"];
+            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p, std::unique_lock lock) {
                 this->vel_limit = p.value_float;
 
                 // We only need this once, remove after we get a response
                 removeDirectReadCallback(this->device, endpoint_id);
             });
 
-            // this->vel_limit = 0;
             this->read(endpoint_id);
         }
 
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.config.enable_watchdog"); endpoint != nullptr) {
-            uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p) {
+            endpointid_t endpoint_id = endpoint["id"];
+            addDirectReadCallback(this->device, endpoint_id, [this, endpoint_id](auto p, std::unique_lock lock) {
                 this->watchdog = p.value_bool;
 
                 // We only need this once, remove after we get a response
@@ -84,8 +82,7 @@ void CANBoard::setMotorPower(double power) {
         // Ensure motor state is closed loop control
         this->setMotorState(can::motor::axis_state_t::closed_loop_control);
         // Mapping power to a target velocity
-        this->input_vel = static_cast<float>(power * this->vel_limit) * 0.4 * this->inversion_factor;    // hard-coded 40%
-        // LOG_F(INFO, "True input velocity %f, ", input_vel);
+        this->input_vel = static_cast<float>(power * this->vel_limit) * this->inversion_factor;
 
         if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
             this->setBrake(BRAKE_OFF);
@@ -99,14 +96,13 @@ void CANBoard::setMotorPower(double power) {
         // Send packet
         sendCANPacket(p);
 
+        // Double-check velocity set correctly
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
             uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [p, this, endpoint_id](auto decoded) {
+            addDirectReadCallback(this->device, endpoint_id, [p, this, endpoint_id](auto decoded, std::unique_lock lock) {
                 if (decoded.value_float != input_vel) {
                     LOG_F(ERROR, "Expected %f, got %f", this->input_vel, decoded.value_float);
                     // sendCANPacket(p);
-                } else {
-                    // LOG_F(INFO, "Got %f vel_limit :)", decoded.value_float);
                 }
             });
 
@@ -163,6 +159,7 @@ void CANBoard::setActuator(int8_t out) {
         return;
     }
 
+    // hard-coded peripheral ID
     CANPacket_t p = CANPeripheralPacket_SetLinearActuator(
         Constants::JETSON_DEVICE, this->device, 2, out
     );
@@ -183,6 +180,7 @@ void CANBoard::setBrake(uint8_t state) {
     sendCANPacket(p);
 }
 
+// hard coded
 void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
     CANPacket_t p = CANPeripheralPacket_SetPWMDutyCycle(
         Constants::JETSON_DEVICE, CANDevice_t{1, 1, 0, CAN_UUID_HAND}, peripheralID, dutyCycle
@@ -190,6 +188,7 @@ void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
     sendCANPacket(p);
 }
 
+// hard coded
 void CANBoard::setServoAngle(float angle) {
     CANPacket_t p = CANPeripheralPacket_SetServoAngle(
         Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, 4, angle
@@ -197,7 +196,7 @@ void CANBoard::setServoAngle(float angle) {
     sendCANPacket(p);
 }
 
-void CANBoard::read(uint16_t endpoint) {
+void CANBoard::read(endpointid_t endpoint) {
     CANPacket_t p = CANMotorPacket_BLDC_DirectRead(
         Constants::JETSON_DEVICE, this->device, endpoint
     );
