@@ -11,8 +11,6 @@ using namespace robot::types;
 
 namespace robot {
 
-extern const WorldInterface WORLD_INTERFACE = WorldInterface::noop;
-
 namespace {
 DiffDriveKinematics drive_kinematics(1); // doesn't really matter what we set this to
 } // namespace

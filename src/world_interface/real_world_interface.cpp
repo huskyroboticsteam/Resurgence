@@ -1,6 +1,4 @@
-#include "../CAN/CAN.h"
 #include "../CAN/CANBoard.h"
-#include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
@@ -13,21 +11,17 @@
 #include "world_interface.h"
 
 #include <future>
-#include <iostream>
-#include <loguru.hpp>
 #include <mutex>
 #include <unordered_map>
 #include <vector>
 
+#include <loguru.hpp>
 #include <opencv2/calib3d.hpp>
 
-using nlohmann::json;
 using namespace navtypes;
 using namespace std::chrono_literals;
 
 namespace robot {
-
-extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 
 namespace {
 
@@ -38,29 +32,14 @@ kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
 void addBoardMapping(robot::types::boardid_t board) {
-	// double posScale = 0;
-	// double negScale = 0;
-
-	// get scales for motor
-	// try {
-	// 	posScale = positive_pwm_scales.at(motor);
-	// 	negScale = negative_pwm_scales.at(motor);
-	// } catch (const std::out_of_range& err) {
-	// 	LOG_F(ERROR, "Couldn't find PWM scales for motor 0x%x", static_cast<uint8_t>(motor));
-	// }
-
-	// Get CANDevice_t from boardUUIDMap
-	CANDevice_t device;
-	try {
-		device = boardUUIDMap.at(board);
-	} catch (const std::out_of_range& err) {
+	if (auto it = boardDeviceMap.find(board); it != boardDeviceMap.end()) {
+		// create ptr and insert in map
+		std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, it->second);
+		board_ptrs.insert({board, ptr});
+	} else {
 		LOG_F(ERROR, "Couldn't find UUID mapping for board 0x%x", static_cast<uint8_t>(board));
 		return;
 	}
-
-	// create ptr and insert in map
-	std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, device);
-	board_ptrs.insert({board, ptr});
 }
 
 std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
@@ -68,7 +47,7 @@ std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 
 	if (itr == board_ptrs.end()) {
 		// board id not in map
-		// LOG_F(ERROR, "getBoard_(): Unknown board 0x%x", static_cast<uint8_t>(board));
+		LOG_F(ERROR, "Unknown board 0x%x", static_cast<uint8_t>(board));
 		return nullptr;
 	} else {
 		// return board object pointer
@@ -79,12 +58,9 @@ std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 // map that associates camera id to the camera object
 std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 
-// callbackid_t nextCallbackID = 0;
-// std::unordered_map<callbackid_t, can::callbackid_t> callbackIDMap;
-
 void initBoards() {
-	// Initialize boards using CANDevice_t from boardUUIDMap
-	for (const auto& [board, device] : boardUUIDMap) {
+	// Initialize boards using CANDevice_t from boardDeviceMap
+	for (const auto& [board, device] : boardDeviceMap) {
 		addBoardMapping(board);
 	}
 }
@@ -136,7 +112,7 @@ std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
 }
 
 void emergencyStop() {
-	// can::motor::emergencyStopMotors();
+	can::emergencyStop();
 	is_emergency_stopped = true;
 }
 
@@ -151,7 +127,6 @@ std::unordered_set<CameraID> getCameras() {
 bool hasNewCameraFrame(CameraID cameraID, uint32_t oldFrameNum) {
 	auto itr = cameraMap.find(cameraID);
 	if (itr != cameraMap.end()) {
-		// return itr->second->hasNext(oldFrameNum);
 		auto cam = itr->second.lock();
 		if (cam) {
 			return cam->hasNext(oldFrameNum);
@@ -257,6 +232,7 @@ void setMotorPower(robot::types::boardid_t board, double power) {
 void setMotorPos(robot::types::boardid_t board, int32_t targetPos) {
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
+		// TODO: Implement
 		// board_ptr->setMotorPos(targetPos);
 	}
 }
@@ -282,7 +258,7 @@ callbackid_t addLimitSwitchCallback(
 								robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>&
 		callback) {
 	// CAN26: Use CANDevice_t for limit switch callbacks
-	// CANDevice_t device = boardUUIDMap.at(board);
+	// CANDevice_t device = boardDeviceMap.at(board);
 	// auto func = [=](CANDevice_t, robot::types::DataPoint<robot::types::LimitSwitchData> data) { callback(board, data); };
 	// auto id = can::motor::addLimitSwitchCallback(device, func);
 	// auto nextID = nextCallbackID++;

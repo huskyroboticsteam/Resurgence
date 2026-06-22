@@ -1,4 +1,3 @@
-#include "CAN.h"
 #include "CANBoard.h"
 #include "../world_interface/real_world_constants.h"
 
@@ -98,11 +97,10 @@ void CANBoard::setMotorPower(double power) {
 
         // Double-check velocity set correctly
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
-            uint16_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [p, this, endpoint_id](auto decoded, std::unique_lock<std::shared_mutex> lock) {
+            endpointid_t endpoint_id = endpoint["id"];
+            addDirectReadCallback(this->device, endpoint_id, [=](auto decoded, std::unique_lock<std::shared_mutex> lock) {
                 if (decoded.value_float != input_vel) {
                     LOG_F(ERROR, "Expected %f, got %f", this->input_vel, decoded.value_float);
-                    // sendCANPacket(p);
                 }
             });
 
@@ -159,7 +157,7 @@ void CANBoard::setActuator(int8_t out) {
         return;
     }
 
-    // hard-coded peripheral ID
+    // TODO: hard-coded peripheral ID
     CANPacket_t p = CANPeripheralPacket_SetLinearActuator(
         Constants::JETSON_DEVICE, this->device, 2, out
     );
@@ -173,14 +171,14 @@ void CANBoard::setBrake(uint8_t state) {
         return;
     }
 
-    // hack, but we only have one braking board sooo    
+    // TODO: hack, but we only have one braking board sooo    
     CANPacket_t p = CANPeripheralPacket_SetBrakes(
         Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, it->second, state
     );
     sendCANPacket(p);
 }
 
-// hard coded
+// TODO: hard coded
 void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
     CANPacket_t p = CANPeripheralPacket_SetPWMDutyCycle(
         Constants::JETSON_DEVICE, CANDevice_t{1, 1, 0, CAN_UUID_HAND}, peripheralID, dutyCycle
@@ -188,7 +186,7 @@ void CANBoard::setPWMDutyCycle(uint8_t peripheralID, float dutyCycle) {
     sendCANPacket(p);
 }
 
-// hard coded
+// TODO: hard coded
 void CANBoard::setServoAngle(float angle) {
     CANPacket_t p = CANPeripheralPacket_SetServoAngle(
         Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, 4, angle

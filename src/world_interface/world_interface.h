@@ -7,6 +7,7 @@
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketServer.h"
 #include "data.h"
+
 #include <array>
 #include <optional>
 #include <unordered_set>
@@ -28,21 +29,6 @@ private:
 	std::shared_ptr<cam::Camera> camera;
 };
 } // namespace types
-
-/**
- * @brief An enum which defines the possible types of world interfaces.
- *
- * @see WORLD_INTERFACE
- */
-enum class WorldInterface {
-	real,
-	sim2d,
-	sim3d,
-	noop
-};
-
-/** @brief The current world interface being used. */
-extern const WorldInterface WORLD_INTERFACE;
 
 // TODO: add documentation
 const kinematics::DiffDriveKinematics& driveKinematics();

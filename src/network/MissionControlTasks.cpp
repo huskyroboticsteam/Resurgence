@@ -160,7 +160,6 @@ void TelemReportTask::sendTelemetry() {
 			json msg = {{"type", JOINT_POSITION_REP_TYPE},
 						{"joint", jointNameStdStr},
 						{"position", static_cast<double>(jpos.getData()) / 1000.0}};
-			// LOG_F(INFO, "Sending telem for %s", jointNameStdStr.c_str());
 			this->_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 		}
 	}

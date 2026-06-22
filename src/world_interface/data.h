@@ -107,30 +107,17 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"laser", jointid_t::laser}});
 
 enum class servoid_t {
-	microscope,
-	syringe,
-	cuvette,
-	filter,
-	soilBox,
+	mast
 };
 
 constexpr auto all_servoid_t = frozen::make_unordered_set<servoid_t>(
-	{servoid_t::microscope, servoid_t::syringe, servoid_t::soilBox, servoid_t::cuvette,
-	 servoid_t::filter});
+	{servoid_t::mast});
 
 constexpr auto name_to_servoid = frozen::make_unordered_map<frozen::string, servoid_t>(
-	{{"microscope", servoid_t::microscope},
-	 {"syringe", servoid_t::syringe},
-	 {"cuvette", servoid_t::cuvette},
-	 {"filter", servoid_t::filter},
-	 {"soilBox", servoid_t::soilBox}});
+	{{"mast", servoid_t::mast}});
 
 constexpr auto servoid_to_servo_num =
-	frozen::make_unordered_map<servoid_t, int>({{servoid_t::microscope, 7},
-												{servoid_t::syringe, 9},
-												{servoid_t::cuvette, 5},
-												{servoid_t::filter, 8},
-												{servoid_t::soilBox, 6}});
+	frozen::make_unordered_map<servoid_t, int>({{servoid_t::mast, 4}});
 
 class bad_datapoint_access : public std::runtime_error {
 public:

@@ -3,7 +3,6 @@
 #include "../world_interface/data.h"
 #include "../control/JacobianVelController.h"
 #include "CAN.h"
-#include "CANUtils.h"
 
 #include <chrono>
 #include <mutex>

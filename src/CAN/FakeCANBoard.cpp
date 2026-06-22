@@ -35,8 +35,6 @@ int prompt(std::string_view message) {
 	return val;
 }
 
-bool correct = false;
-
 int main() {
 	can::initCAN();
 
@@ -58,7 +56,6 @@ int main() {
 
 		TestMode testMode = static_cast<TestMode>(test_type);
 		uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-		// TODO: Assuming motor domain for now
 		CANDevice_t device = CANDevice_t{1, 1, 1, uuid};
 
 		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
@@ -79,7 +76,6 @@ int main() {
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
 				board->setMotorState(motor_state);
 
-				correct = false;
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), "axis0.current_state"); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
 					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
@@ -89,15 +85,13 @@ int main() {
 							board->read(endpoint_id);
 						} else {
 							can::removeDirectReadCallback(board->getDevice(), endpoint_id);
-							correct = true;
 						}
 					});
 
 					board->read(endpoint_id);
 				}
-
-				while (!correct);
 			} else if (testMode == TestMode::Power) {
+				// TODO: float function
 				std::string input;
 				std::cout << "Enter power [-1.0, 1.0]: ";
 				std::getline(std::cin, input);
@@ -111,7 +105,6 @@ int main() {
 
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
-					// std::cout << "endpoint " << input << " has id=" << endpoint_id << std::endl;
 					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
 						std::stringstream rs("");
 						rs << input << " from 0x" << std::hex << board->getDevice().deviceUUID << " [";
@@ -158,7 +151,6 @@ int main() {
 				std::getline(std::cin, input);
 				float dutyCycle = std::stof(input);
 				CANPacket_t packet = CANPeripheralPacket_SetPWMDutyCycle(Constants::JETSON_DEVICE, device, periphID, dutyCycle);
-				// packet.command = CAN_ACK(packet.command);
 				can::sendCANPacket(packet);
 			} else if (testMode == TestMode::RawCAN) {
 				uint8_t pr = prompt("priority");
@@ -191,20 +183,6 @@ int main() {
 			} else if (testMode == TestMode::Debug) {
 				can::led_t led = static_cast<can::led_t>(prompt("led color (rgb)"));
 				can::setLED(led);
-
-				// uint8_t brakeID = prompt("brake ID");
-				// uint8_t state = prompt("state");
-
-				// CANPacket_t on = CANPeripheralPacket_SetBrakes(Constants::JETSON_DEVICE, device, brakeID, 0);
-				// CANPacket_t off = CANPeripheralPacket_SetBrakes(Constants::JETSON_DEVICE, device, brakeID, 1);
-
-				// while (true) {
-				// 	can::sendCANPacket(on);
-				// 	std::this_thread::sleep_for(std::chrono::seconds(5));
-				// 	can::sendCANPacket(off);
-				// 	std::this_thread::sleep_for(std::chrono::seconds(5));
-				// }
-
 			}
 		}
 	}

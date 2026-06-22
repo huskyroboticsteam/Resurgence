@@ -1,7 +1,5 @@
 #pragma once
 
-// new
-#include "../CAN/CANUtils.h"
 #include "../Constants.h"
 #include "data.h"
 
@@ -57,36 +55,10 @@ struct encparams_t {
 	double zeroCalibrationPower;
 };
 
-// clang-format off
-constexpr auto encMotors = frozen::make_unordered_map<boardid_t, encparams_t>({
-	{boardid_t::shoulder,
-		{.isInverted = true,
-		.ppjr = 4590 * 1024 * 4,
-		.limitSwitchLow = Constants::arm::JOINT_LIMITS.at(robot::types::boardid_t::shoulder).first,
-		.limitSwitchHigh = Constants::arm::JOINT_LIMITS.at(robot::types::boardid_t::shoulder).second,
-		.zeroCalibrationPower = 0.4}},
-});
-
-constexpr double FOURBAR_GEAR_RATIO = 71.71875;
-// clang-format on
-
-// TODO: find appropriate bounds
-constexpr auto potMotors = frozen::make_unordered_map<boardid_t, potparams_t>({
-	{boardid_t::forearm,
-	 {.adc_lo = 1208, .mdeg_lo = -180 * 1000, .adc_hi = 841, .mdeg_hi = 180 * 1000}},
-	{boardid_t::wristDiffLeft,
-	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}},
-	{boardid_t::wristDiffRight,
-	 {.adc_lo = 0, .mdeg_lo = -100 * 0, .adc_hi = 0, .mdeg_hi = 100 * 0}}
-});
-
-/** @brief A mapping of board UUID (boardid_t) to their corresponding uuid. */
-constexpr auto boardUUIDMap = frozen::make_unordered_map<boardid_t, CANDevice_t>(
-	{// BLDC Motors - Use BLDC commands
-	 /*
-	 {boardid_t::leftTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
-	 {boardid_t::rightTread, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
-	 */
+/** @brief A mapping of board UUID (boardid_t) to their corresponding CAN Device. */
+constexpr auto boardDeviceMap = frozen::make_unordered_map<boardid_t, CANDevice_t>(
+	{
+	 // Motor (0x30-0x39)
 	 {boardid_t::frontTireLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_LEFT}},
 	 {boardid_t::frontTireRight, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_FRONT_TIRE_RIGHT}},
 	 {boardid_t::rearTireLeft, CANDevice_t{0, 1, 0, CAN_UUID_BLDC_REAR_TIRE_LEFT}},
@@ -120,6 +92,7 @@ constexpr auto UUIDBoardMap = frozen::make_unordered_map<CANDeviceUUID_t, boardi
 	});
 
 constexpr auto boardInversionMap = frozen::make_unordered_map<boardid_t, int8_t>({
+	 // Motor (0x30-0x39)
 	 {boardid_t::frontTireLeft, -1},
 	 {boardid_t::frontTireRight, 1},
 	 {boardid_t::rearTireLeft, -1},
@@ -152,10 +125,6 @@ constexpr auto boardBrakeIDMap = frozen::make_unordered_map<boardid_t, uint8_t>(
 	{boardid_t::shoulder, 2},
 	{boardid_t::elbow, 3}
 });
-
-/** @brief A mapping of PID controlled motors to their pid coefficients. */
-constexpr auto motorPIDMap =
-	frozen::make_unordered_map<boardid_t, pidcoef_t>({{boardid_t::shoulder, {70, 0, 0}}});
 
 /**
  * @brief A mapping of motorids to power scale factors when commanded with positive power.

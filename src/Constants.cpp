@@ -6,6 +6,7 @@ namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 const double SHOULDER_LENGTH = 0.6; // placeholder(m)
 const double ELBOW_LENGTH = 0.7;	// placeholder(m)
+const double FOURBAR_GEAR_RATIO = 71.71875;
 
 /**
    Number of millidegrees per degree

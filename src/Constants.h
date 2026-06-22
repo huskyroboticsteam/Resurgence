@@ -3,8 +3,11 @@
 #include "utils/time.h"
 #include "world_interface/data.h"
 #ifdef REAL_WORLD_INTERFACE
-#include "CAN/CANUtils.h"
+extern "C" {
+#include <CAN26.h>
+}
 #endif
+
 #include <array>
 #include <chrono>
 #include <cmath>
@@ -18,7 +21,6 @@ using robot::types::jointid_t;
 using robot::types::boardid_t;
 
 namespace Constants {
-// TODO: make sure these are still accurate with the new arm.
 extern const double SHOULDER_LENGTH;
 extern const double ELBOW_LENGTH;
 
@@ -27,7 +29,6 @@ extern const double ELBOW_LENGTH;
  */
 extern const float MDEG_PER_DEG;
 
-// TODO: tune these drive extern constants
 extern const double ROBOT_LENGTH;
 extern const double ROBOT_WIDTH;
 /**
@@ -58,8 +59,6 @@ extern const double MAX_WHEEL_VEL;
  */
 extern const double MAX_DTHETA;
 
-// TODO: We need to recalibrate the camera, since we replaced it with a different one.
-// TODO: rename cameras (in MC as well) as appropriate
 extern const CameraID MAST_CAMERA_ID;
 extern const CameraID WRIST_CAMERA_ID;
 extern const CameraID HAND_CAMERA_ID;

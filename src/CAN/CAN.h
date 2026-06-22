@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CANUtils.h"
 #include "../Constants.h"
 #include "../utils/scheduler.h"
 #include "../world_interface/data.h"
@@ -9,21 +8,11 @@
 #include <shared_mutex>
 #include <optional>
 
-
 #include <linux/can.h>
 #include <nlohmann/json.hpp>
 
 extern "C" {
-#include <CANDevices.h>
-#include <CANPacket.h>
-
-#include <Packets/Motor.h>
-#include <Packets/Peripheral.h>
-
-#include <Packets/DecodeMotor.h>
-#include <Packets/DecodePeripheral.h>
-#include <Packets/DecodePower.h>
-#include <Packets/DecodeUniversal.h>
+#include <CAN26.h>
 }
 
 /**
@@ -94,6 +83,11 @@ void sendCANPacket(const CANPacket_t& packet);
 void printCANPacket(const CANPacket_t& packet);
 
 /**
+ * @brief Broadcasts an emergency stop packet.
+ */
+void emergencyStop();
+
+/**
  * @brief Add a callback to run when we receive a read result packet corresponding
  * to the input endpoint. Callbacks persist until they are manually removed using
  * removeDirectReadCallback()
@@ -104,7 +98,7 @@ void printCANPacket(const CANPacket_t& packet);
  * @param endpoint The endpoint to respond to.
  * @param callback The function to call when we receive data, called with the decoded packet.
  */
-void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, [[maybe_unused]] std::unique_lock<std::shared_mutex>)>& callback);
+void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>& callback);
 
 /**
  * @brief Removes a callback.
@@ -124,7 +118,7 @@ void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint);
  * to determine whether to fetch S1 or Pro endpoints.
  * @param endpoint The name of the endpoint to retrieve.
  */
-nlohmann::json getEndpoint(boardid_t boardid, std::string endpoint);
+nlohmann::json getEndpoint(robot::types::boardid_t boardid, std::string endpoint);
 
 void setLED(led_t led);
 

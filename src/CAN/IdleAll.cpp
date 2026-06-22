@@ -7,7 +7,7 @@ int main() {
 
     std::unordered_map<robot::types::boardid_t, std::shared_ptr<can::CANBoard>> board_ptrs;
 
-    for (const auto& [board, device] : robot::boardUUIDMap) {
+    for (const auto& [board, device] : robot::boardDeviceMap) {
         if (!device.motorDomain) { continue; }
         std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, device);
         board_ptrs.insert({board, ptr});

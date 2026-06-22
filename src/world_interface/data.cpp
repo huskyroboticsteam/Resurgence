@@ -98,16 +98,8 @@ std::string to_string(robot::types::servoid_t servo) {
 	using robot::types::servoid_t;
 
 	switch (servo) {
-		case servoid_t::microscope:
-			return "microscope";
-		case servoid_t::syringe:
-			return "syringe";
-		case servoid_t::cuvette:
-			return "cuvette";
-		case servoid_t::filter:
-			return "filter";
-		case servoid_t::soilBox:
-			return "soilBox";
+		case servoid_t::mast:
+			return "mast";
 		default:
 			return "<unknown>";
 	}

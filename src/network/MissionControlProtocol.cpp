@@ -29,6 +29,13 @@ using std::placeholders::_1;
 namespace net::mc {
 namespace {
 const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 30000ms;
+
+static bool validateJoint(const json& j) {
+	return util::validateKey(j, "joint", val_t::string) &&
+		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
+			   return j["joint"].get<std::string>() == util::to_string(joint);
+		   });
+}
 } // namespace
 
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
@@ -94,7 +101,7 @@ static bool validateDriveRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
+	if (Globals::AUTONOMOUS) { return; }
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
@@ -102,7 +109,7 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	double norm = std::hypot(straight, steer);
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
-	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
+	LOG_F(INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
 		  dx);
 	this->setRequestedCmdVel(dtheta, dx);
 }
@@ -156,14 +163,13 @@ static bool validateJointPowerRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleJointPowerRequest(const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
-	using robot::types::jointid_t;
-	using robot::types::name_to_jointid;
+	if (Globals::AUTONOMOUS) { return; }
+
 	std::string joint = j["joint"];
 	double power = j["power"];
-	auto it = name_to_jointid.find(util::freezeStr(joint));
-	if (it != name_to_jointid.end()) {
-		jointid_t joint_id = it->second;
+	auto it = robot::types::name_to_jointid.find(util::freezeStr(joint));
+	if (it != robot::types::name_to_jointid.end()) {
+		robot::types::jointid_t joint_id = it->second;
 		setRequestedJointPower(joint_id, power);
 	}
 }
@@ -173,17 +179,14 @@ static bool validateJointPositionRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
+	if (Globals::AUTONOMOUS) { return; }
+
 	// std::string motor = j["joint"];
 	// double position_deg = j["position"];
 	// int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO: actually implement joint position requests
 	// setMotorPos(motor, position_mdeg);
 }
-
-// void MissionControlProtocol::handleServoPositionRequest(const json& j) {
-	
-// }
 
 static bool validateWaypointNavRequest(const json& j) {
 	bool lat_is_unsigned = util::validateKey(j, "latitude", val_t::number_unsigned);
@@ -239,7 +242,6 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 	CameraID cam = j["camera"];
 	auto camDP = robot::readCamera(cam);
 
-	// Eigen::Quaterniond quat = imu.getData();
 	double lon = 0, lat = 0, alt = 0;
 	double w = 0, x = 0, y = 0, z = 0;
 	if (gps.isValid() && imu.isValid()) {
@@ -410,13 +412,6 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 	_power_repeat_task.setTankCmdVel(left, right);
 	robot::setTankCmdVel(left, right);
-}
-
-static bool validateJoint(const json& j) {
-	return util::validateKey(j, "joint", val_t::string) &&
-		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
-			   return j["joint"].get<std::string>() == util::to_string(joint);
-		   });
 }
 
 static void stopAllJoints() {

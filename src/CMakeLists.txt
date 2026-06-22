@@ -98,29 +98,12 @@ find_package(argparse REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  if(OFFLINE_MODE STREQUAL "FALSE")
-    # Find the CAN library; contains packet and protocol definitions and does not
-    # actually require physical CAN to be present.
-    FetchContent_Declare(
-      HindsightCAN
-      GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-      GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
-    )
-  else()
-    message("-- Offline mode enabled, using cached hindsight CAN")
-    # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
-    FetchContent_Declare(
-        HindsightCAN
-        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
-    )
-  endif()
-  FetchContent_MakeAvailable(HindsightCAN)
-
   # CAN26 library - new CAN protocol definitions
   FetchContent_Declare(
     CAN26
     GIT_REPOSITORY https://github.com/huskyroboticsteam/CAN26.git
-    GIT_TAG 0aee8a7b4de9c09b57fc47f48bf4d0837d12f340 
+    # Specifying tag so that we can control when updates propagate
+    GIT_TAG 0aee8a7b4de9c09b57fc47f48bf4d0837d12f340
   )
   FetchContent_MakeAvailable(CAN26)
 
@@ -132,7 +115,8 @@ endif()
 if(OFFLINE_MODE STREQUAL "FALSE")
   FetchContent_Declare(LoguruGitRepo
     GIT_REPOSITORY "https://github.com/emilk/loguru"
-    GIT_TAG        "master"
+    # Specifying tag so that we can control when updates propagate
+    GIT_TAG 4adaa185883e3c04da25913579c451d3c32cfac1
   )
 else()
   message("-- Offline mode enabled, using cached loguru")
@@ -178,8 +162,8 @@ add_library(camera SHARED
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
 if(WORLD_INTERFACE STREQUAL "REAL")
-  target_link_libraries(camera PUBLIC CAN26 HindsightCAN)
-  target_compile_definitions(camera PRIVATE REAL_WORLD_INTERFACE)
+  target_link_libraries(camera PUBLIC CAN26)
+  target_compile_definitions(camera PRIVATE REAL_WORLD_INTERFACE=1)
 endif()
 
 # shared library for utility code
@@ -200,30 +184,21 @@ add_library(utils SHARED
 target_link_libraries(utils ${OpenCV_LIBS})
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  ## ====== CAN Interfaces =======
-  # Stub CAN interface is used for the tests (and for the Rover if
-  # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
-  # enabled.
-
-  # Common CAN source files
-
   # **DON'T MAKE THIS SHARED**
   # Making this library shared causes some memory fuckery
   # No clue why but CAN I/O goes to shit. Don't do it.
   add_library(can_interface STATIC)
   target_sources(can_interface PRIVATE
     CAN/CANBoard.cpp
-    CAN/CANUtils.cpp
+    CAN/CAN.cpp
   )
 
-  target_sources(can_interface PRIVATE CAN/CAN.cpp)
   target_link_libraries(can_interface PUBLIC
     CAN26
-    HindsightCAN
     Threads::Threads
     utils
   )
-  target_compile_definitions(can_interface PUBLIC REAL_WORLD_INTERFACE)
+  target_compile_definitions(can_interface PUBLIC REAL_WORLD_INTERFACE=1)
 endif()
 
 ## GPS Implementations
@@ -305,8 +280,8 @@ target_link_libraries(autonomous commands world_interface)
 
 add_library(constants SHARED Constants.cpp)
 if(WORLD_INTERFACE STREQUAL "REAL")
-  target_link_libraries(constants PUBLIC CAN26 HindsightCAN)
-  target_compile_definitions(constants PUBLIC REAL_WORLD_INTERFACE)
+  target_link_libraries(constants PUBLIC CAN26)
+  target_compile_definitions(constants PUBLIC REAL_WORLD_INTERFACE=1)
 endif()
 link_libraries(constants)
 
@@ -392,11 +367,11 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
-if (WORLD_INTERFACE STREQUAL "REAL")
-  add_executable(LimitSwitchCalibration
-    LimitCalib.cpp)
-  target_link_libraries(LimitSwitchCalibration real_world_interface)
-endif()
+# if (WORLD_INTERFACE STREQUAL "REAL")
+#   add_executable(LimitSwitchCalibration
+#     LimitCalib.cpp)
+#   target_link_libraries(LimitSwitchCalibration real_world_interface)
+# endif()
 
 add_compile_options(
   -Wall

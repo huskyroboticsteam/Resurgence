@@ -28,7 +28,7 @@ class CANBoard {
     void setServoAngle(float angle);
 
     // Universal
-    void read(uint16_t endpoint);
+    void read(endpointid_t endpoint);
 
     robot::types::boardid_t getBoardID() const { return board_id; }
     CANDevice_t getDevice() const { return device; }

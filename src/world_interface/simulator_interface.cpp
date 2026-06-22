@@ -250,8 +250,6 @@ const kinematics::DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
 }
 
-extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
-
 void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors) {
