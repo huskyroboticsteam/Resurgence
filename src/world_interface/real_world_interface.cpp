@@ -11,11 +11,11 @@
 #include "world_interface.h"
 
 #include <future>
+#include <loguru.hpp>
 #include <mutex>
 #include <unordered_map>
 #include <vector>
 
-#include <loguru.hpp>
 #include <opencv2/calib3d.hpp>
 
 using namespace navtypes;
@@ -34,7 +34,8 @@ bool is_emergency_stopped = false;
 void addBoardMapping(robot::types::boardid_t board) {
 	if (auto it = boardDeviceMap.find(board); it != boardDeviceMap.end()) {
 		// create ptr and insert in map
-		std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, it->second);
+		std::shared_ptr<can::CANBoard> ptr =
+			std::make_shared<can::CANBoard>(board, it->second);
 		board_ptrs.insert({board, ptr});
 	} else {
 		LOG_F(ERROR, "Couldn't find UUID mapping for board 0x%x", static_cast<uint8_t>(board));
@@ -254,16 +255,15 @@ void setMotorVel(robot::types::boardid_t board, int8_t targetVel) {
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::boardid_t board,
-	const std::function<void(robot::types::boardid_t board,
-								robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>&
-		callback) {
+	const std::function<void(
+		robot::types::boardid_t board,
+		robot::types::DataPoint<robot::types::LimitSwitchData> limitSwitchData)>& callback) {
 	// CAN26: Use CANDevice_t for limit switch callbacks
 	// CANDevice_t device = boardDeviceMap.at(board);
-	// auto func = [=](CANDevice_t, robot::types::DataPoint<robot::types::LimitSwitchData> data) { callback(board, data); };
-	// auto id = can::motor::addLimitSwitchCallback(device, func);
-	// auto nextID = nextCallbackID++;
-	// callbackIDMap.insert({nextID, id});
-	// return nextID;
+	// auto func = [=](CANDevice_t, robot::types::DataPoint<robot::types::LimitSwitchData>
+	// data) { callback(board, data); }; auto id = can::motor::addLimitSwitchCallback(device,
+	// func); auto nextID = nextCallbackID++; callbackIDMap.insert({nextID, id}); return
+	// nextID;
 	return 0;
 }
 

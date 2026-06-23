@@ -30,21 +30,36 @@ namespace util {
 std::string to_string(robot::types::boardid_t board) {
 	using robot::types::boardid_t;
 	switch (board) {
-		case boardid_t::frontTireLeft: return "frontTireLeft";
-		case boardid_t::frontTireRight: return "frontTireRight";
-		case boardid_t::rearTireLeft: return "rearTireLeft";
-		case boardid_t::rearTireRight: return "rearTireRight";
-		case boardid_t::armBase: return "armBase";
-		case boardid_t::shoulder: return "shoulder";
-		case boardid_t::elbow: return "elbow";
-		case boardid_t::forearm: return "forearm";
-		case boardid_t::wristDiffLeft: return "wristDiffLeft";
-		case boardid_t::wristDiffRight: return "wristDiffRight";
-		case boardid_t::telemetry: return "telemetry";
-		case boardid_t::hand: return "hand";
-		case boardid_t::debug1: return "debug1";
-		case boardid_t::debug2: return "debug2";
-		default: return "<unknown>";
+		case boardid_t::frontTireLeft:
+			return "frontTireLeft";
+		case boardid_t::frontTireRight:
+			return "frontTireRight";
+		case boardid_t::rearTireLeft:
+			return "rearTireLeft";
+		case boardid_t::rearTireRight:
+			return "rearTireRight";
+		case boardid_t::armBase:
+			return "armBase";
+		case boardid_t::shoulder:
+			return "shoulder";
+		case boardid_t::elbow:
+			return "elbow";
+		case boardid_t::forearm:
+			return "forearm";
+		case boardid_t::wristDiffLeft:
+			return "wristDiffLeft";
+		case boardid_t::wristDiffRight:
+			return "wristDiffRight";
+		case boardid_t::telemetry:
+			return "telemetry";
+		case boardid_t::hand:
+			return "hand";
+		case boardid_t::debug1:
+			return "debug1";
+		case boardid_t::debug2:
+			return "debug2";
+		default:
+			return "<unknown>";
 	}
 }
 

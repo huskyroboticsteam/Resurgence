@@ -13,4 +13,4 @@ public:
 	virtual bool isDone() = 0;
 };
 
-}
+} // namespace commands

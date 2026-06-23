@@ -16,9 +16,9 @@ extern "C" {
 
 #include <frozen/unordered_map.h>
 
+using robot::types::boardid_t;
 using robot::types::CameraID;
 using robot::types::jointid_t;
-using robot::types::boardid_t;
 
 // Additional Loguru Levels
 #define VERBOSE 1

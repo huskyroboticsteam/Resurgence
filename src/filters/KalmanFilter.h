@@ -154,12 +154,12 @@ public:
 	}
 
 private:
-	Eigen::Matrix<double, stateDim, stateDim> A; // system matrix
-	Eigen::Matrix<double, stateDim, inputDim> B; // input matrix
-	Eigen::Matrix<double, outputDim, stateDim> C; // output matrix
-	Eigen::Matrix<double, stateDim, stateDim> Q; // system noise covariance matrix
+	Eigen::Matrix<double, stateDim, stateDim> A;   // system matrix
+	Eigen::Matrix<double, stateDim, inputDim> B;   // input matrix
+	Eigen::Matrix<double, outputDim, stateDim> C;  // output matrix
+	Eigen::Matrix<double, stateDim, stateDim> Q;   // system noise covariance matrix
 	Eigen::Matrix<double, outputDim, outputDim> R; // output noise covariance matrix
-	Eigen::Matrix<double, stateDim, outputDim> K; // asymptotic kalman gain
+	Eigen::Matrix<double, stateDim, outputDim> K;  // asymptotic kalman gain
 
 	// Assumes all discrete matrices
 	KalmanFilter(const Eigen::Matrix<double, stateDim, stateDim>& A,

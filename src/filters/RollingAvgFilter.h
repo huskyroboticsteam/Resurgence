@@ -12,15 +12,15 @@ namespace filters {
  * @tparam T The data type to filter. Must support commutative addition as well as scalar
  * division.
  */
-template <typename T> class RollingAvgFilter {
+template <typename T>
+class RollingAvgFilter {
 public:
 	/**
 	 * @brief Construct a new rolling average filter.
 	 *
 	 * @param numPoints The maximum number of points that can be stored in the buffer.
 	 */
-	explicit RollingAvgFilter(size_t numPoints)
-		: numPoints(numPoints), data() {}
+	explicit RollingAvgFilter(size_t numPoints) : numPoints(numPoints), data() {}
 
 	/**
 	 * @brief Get the output of the filter.

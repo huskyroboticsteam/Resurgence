@@ -50,7 +50,12 @@ TEST_CASE("Adding and retrieving ID mappings works", TAG) {
 	}
 
 	SECTION("Mappings can be retrieved as a compatible type") {
-		enum TestType { A, B, C, D };
+		enum TestType {
+			A,
+			B,
+			C,
+			D
+		};
 
 		ms.addIDMapping(0, 0);
 		ms.addIDMapping(1, 1);

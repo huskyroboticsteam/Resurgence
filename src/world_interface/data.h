@@ -92,8 +92,8 @@ enum class jointid_t {
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
-	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand,
-	 jointid_t::handActuator, jointid_t::laser});
+	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::handActuator,
+	 jointid_t::laser});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -110,11 +110,10 @@ enum class servoid_t {
 	mast
 };
 
-constexpr auto all_servoid_t = frozen::make_unordered_set<servoid_t>(
-	{servoid_t::mast});
+constexpr auto all_servoid_t = frozen::make_unordered_set<servoid_t>({servoid_t::mast});
 
-constexpr auto name_to_servoid = frozen::make_unordered_map<frozen::string, servoid_t>(
-	{{"mast", servoid_t::mast}});
+constexpr auto name_to_servoid =
+	frozen::make_unordered_map<frozen::string, servoid_t>({{"mast", servoid_t::mast}});
 
 constexpr auto servoid_to_servo_num =
 	frozen::make_unordered_map<servoid_t, int>({{servoid_t::mast, 4}});

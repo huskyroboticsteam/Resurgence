@@ -81,18 +81,20 @@ CameraStreamTask::CameraStreamTask(websocket::SingleClientWSServer& server)
 	: util::AsyncTask<>("MCP_Stream"), _server(server) {}
 
 void CameraStreamTask::openStream(const CameraID& cam, int fps) {
-//	std::lock_guard lock(_mutex);
-//	_open_streams[cam] = 0;
-//	auto it = Constants::video::STREAM_RFS.find(cam);
-//	int rf = it != Constants::video::STREAM_RFS.end() ? it->second
-//													  : Constants::video::H264_RF_CONSTANT;
-//	_camera_encoders[cam] = std::make_shared<video::H264Encoder>(fps, rf);
+	//	std::lock_guard lock(_mutex);
+	//	_open_streams[cam] = 0;
+	//	auto it = Constants::video::STREAM_RFS.find(cam);
+	//	int rf = it != Constants::video::STREAM_RFS.end() ? it->second
+	//													  : Constants::video::H264_RF_CONSTANT;
+	//	_camera_encoders[cam] = std::make_shared<video::H264Encoder>(fps, rf);
 
 	if (_open_streams.find(cam) == _open_streams.end()) {
 		std::thread([this, cam, fps]() {
 			std::lock_guard lock(_mutex);
 			auto it = Constants::video::STREAM_RFS.find(cam);
-			int rf = (it != Constants::video::STREAM_RFS.end()) ? it->second : Constants::video::H264_RF_CONSTANT;
+			int rf = (it != Constants::video::STREAM_RFS.end())
+						 ? it->second
+						 : Constants::video::H264_RF_CONSTANT;
 			auto enc = std::make_shared<video::H264Encoder>(fps, rf);
 			auto cam_handle = robot::openCamera(cam);
 			if (cam_handle) {
@@ -151,7 +153,7 @@ TelemReportTask::TelemReportTask(websocket::SingleClientWSServer& server)
 
 void TelemReportTask::sendTelemetry() {
 	// send joint positions
-	
+
 	for (const auto& cur : robot::types::name_to_jointid) {
 		robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur.second);
 		if (jpos.isValid()) {

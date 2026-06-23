@@ -47,10 +47,11 @@ public:
 	 * @param outputNoise The output noise covariance matrix for this system.
 	 * @param dt The time in seconds between updates.
 	 */
-	ExtendedKalmanFilter(const statefunc_t& stateFunc, const outputfunc_t& outputFunc,
-						 const statespace::NoiseCovMat<stateDim, processNoiseDim, inputDim>& processNoise,
-						 const statespace::NoiseCovMat<stateDim, outputNoiseDim, outputDim>& outputNoise,
-						 double dt)
+	ExtendedKalmanFilter(
+		const statefunc_t& stateFunc, const outputfunc_t& outputFunc,
+		const statespace::NoiseCovMat<stateDim, processNoiseDim, inputDim>& processNoise,
+		const statespace::NoiseCovMat<stateDim, outputNoiseDim, outputDim>& outputNoise,
+		double dt)
 		: stateFunc(stateFunc), outputFunc(outputFunc), Q(processNoise), R(outputNoise),
 		  dt(dt) {}
 

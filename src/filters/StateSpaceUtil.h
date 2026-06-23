@@ -225,7 +225,7 @@ DARE(const Eigen::Matrix<double, numStates, numStates>& A,
 		currP = lastP + lastA.transpose() * lastP * (I + lastG * lastP).inverse() * lastA;
 
 		double error = (currP - lastP).norm() / currP.norm();
-		if (error > tolerance){
+		if (error > tolerance) {
 			break;
 		}
 	}
@@ -246,7 +246,8 @@ DARE(const Eigen::Matrix<double, numStates, numStates>& A,
  * @tparam paramSize The dimension of the vector accepted by get() in addition to a state
  * vector.
  */
-template <int stateDim, int size, int paramSize> class NoiseCovMat {
+template <int stateDim, int size, int paramSize>
+class NoiseCovMat {
 public:
 	using state_t = Eigen::Matrix<double, stateDim, 1>;
 	using param_t = Eigen::Matrix<double, paramSize, 1>;
@@ -254,8 +255,8 @@ public:
 	static_assert(stateDim > 0 && size > 0 && paramSize > 0, "Positive sizes are required!");
 
 	/**
-	 * @brief Create a time-invariant noise covariance matrix modelling independent noise with the
-	 * given standard deviations.
+	 * @brief Create a time-invariant noise covariance matrix modelling independent noise with
+	 * the given standard deviations.
 	 *
 	 * @param stdDevs The standard deviations of each element.
 	 */
@@ -285,7 +286,8 @@ public:
 		: func(func) {}
 
 	/**
-	 * @brief Gets the noise covariance matrix, given the current state and additonal parameter.
+	 * @brief Gets the noise covariance matrix, given the current state and additonal
+	 * parameter.
 	 *
 	 * The matrix may be time-invariant, which case the values of x and param do not matter.
 	 *

@@ -7,15 +7,15 @@
 // CLOOCKWISE IS WITHOUT r CLI PARAMETER
 
 // husky robotics imports
-#include "Camera.h"
-#include "CameraParams.h"
-#include "CameraConfig.h"
 #include "../CAN/CAN.h"
 #include "../CAN/CANMotor.h"
 #include "../CAN/CANUtils.h"
+#include "Camera.h"
+#include "CameraConfig.h"
+#include "CameraParams.h"
 
 extern "C" {
-    #include <HindsightCAN/CANScience.h>
+#include <HindsightCAN/CANScience.h>
 }
 
 // opencv imports
@@ -25,24 +25,24 @@ extern "C" {
 #include <opencv2/stitching/detail/matchers.hpp>
 
 // standard library imports
-#include <iostream>
-#include <vector>
-#include <thread>
 #include <cmath>
+#include <iostream>
+#include <thread>
+#include <vector>
 
 // CONSTANTS
-#define PANO_THRESHOLD 1.0f  // panoramic confidence threshold, 1.0 is default (.1)
-#define MATCH_CONFIDENCE 0.3f  // match confidence, 0.3 is default (.5)
-#define ASSUMED_FOV 30  // TODO: tune this value
+#define PANO_THRESHOLD 1.0f	  // panoramic confidence threshold, 1.0 is default (.1)
+#define MATCH_CONFIDENCE 0.3f // match confidence, 0.3 is default (.5)
+#define ASSUMED_FOV 30		  // TODO: tune this value
 #define CAMERA_FOV 78
 #define NUMBER_OF_CAPS 9
-#define CAPTURE_ANGLE ASSUMED_FOV * NUMBER_OF_CAPS
+#define CAPTURE_ANGLE ASSUMED_FOV* NUMBER_OF_CAPS
 #define STEPPER_ID 1
-#define HOME_DIRECTORY "/home/husky/"  // for the rover
+#define HOME_DIRECTORY "/home/husky/" // for the rover
 // #define HOME_DIRECTORY "/home/huskyrobotics/"  // for the laptops
 #define DEFAULT_CONFIG_PATH HOME_DIRECTORY "Resurgence/camera-config/MastCameraCalibration.yml"
 #define SAVED_FILE_NAME HOME_DIRECTORY "panoramic.bmp"
-#define DIRECTIONS_SIZE 2.0  // the size of the text for the cardinal directions
+#define DIRECTIONS_SIZE 2.0 // the size of the text for the cardinal directions
 
 using namespace std::chrono_literals;
 
@@ -130,16 +130,18 @@ void rotate_camera(int angle);
  *      ./panoramic heading distance [r/l] [image_1 image_2 ...]
  */
 
-int main(int argc, char* argv[]) {    
+int main(int argc, char* argv[]) {
 	// parse command line arguments
 	std::string config_path = DEFAULT_CONFIG_PATH;
 	if (argc < 3) {
-		std::cout << "ERROR: You must provide the heading AND distance of the rover." << std::endl
-		  		  << "Usage: " << std::endl
-				  << "\t" << argv[0] << " heading distance [r/l] [image_1 image_2 ...]" << std::endl;
+		std::cout << "ERROR: You must provide the heading AND distance of the rover."
+				  << std::endl
+				  << "Usage: " << std::endl
+				  << "\t" << argv[0] << " heading distance [r/l] [image_1 image_2 ...]"
+				  << std::endl;
 		return EXIT_FAILURE;
 	}
-	
+
 	double heading;
 	try {
 		heading = std::stod(argv[1]);
@@ -155,18 +157,19 @@ int main(int argc, char* argv[]) {
 		std::cout << "ERROR: Unable to parse int for distance" << std::endl;
 		return EXIT_FAILURE;
 	}
-	
+
 	bool use_cam = true;
 	bool reverse = false;
 	std::vector<cv::Mat> frames;
-	
+
 	if (argc > 3) {
 		if (argv[3][0] == 'r') {
 			reverse = true;
 			std::cout << "WARNING: Running the camera motor in reverse!" << std::endl;
 		} else if (argv[3][0] == 'l') {
 			if (argc < 4) {
-				std::cout << "ERROR: You must specify at least one image to stitch with." << std::endl;
+				std::cout << "ERROR: You must specify at least one image to stitch with."
+						  << std::endl;
 				return EXIT_FAILURE;
 			}
 			use_cam = false;
@@ -177,13 +180,15 @@ int main(int argc, char* argv[]) {
 
 				cv::Mat image = cv::imread(image_path, cv::IMREAD_COLOR);
 				if (image.empty()) {
-					std::cout << "WARNING: This image could not be read, skipping." << std::endl;
+					std::cout << "WARNING: This image could not be read, skipping."
+							  << std::endl;
 					return EXIT_FAILURE;
 				}
 				frames.push_back(image);
 			}
 		} else {
-			std::cout << "ERROR: Unrecognized command line argument \"" << argv[3] << "\"" << std::endl;
+			std::cout << "ERROR: Unrecognized command line argument \"" << argv[3] << "\""
+					  << std::endl;
 			return EXIT_FAILURE;
 		}
 	}
@@ -202,7 +207,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "Taking photos." << std::endl;
 		if (!capture_frames(cap, reverse, frames)) {
 			return EXIT_FAILURE;
-		}	
+		}
 	}
 
 	// save individual photos to disk
@@ -251,7 +256,7 @@ inline int pos_mod(int dividend, int divisor) {
 
 bool set_up_camera(cv::VideoCapture& cap, const std::string& config_path) {
 	cam::CameraParams PARAMS;
-		
+
 	// set up parameters from file
 	cv::FileStorage cam_config(config_path, cv::FileStorage::READ);
 	if (!cam_config.isOpened()) {
@@ -265,8 +270,9 @@ bool set_up_camera(cv::VideoCapture& cap, const std::string& config_path) {
 
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, w);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, h);
-	cap.set(cv::CAP_PROP_BUFFERSIZE, 1);  // should keep only one frame in the buffer, not respected
-	cap.set(cv::CAP_PROP_FPS, 2);  // lower framerate, also is not being respected
+	cap.set(cv::CAP_PROP_BUFFERSIZE,
+			1);					  // should keep only one frame in the buffer, not respected
+	cap.set(cv::CAP_PROP_FPS, 2); // lower framerate, also is not being respected
 
 	if (!cap.open(camera_id, cv::CAP_V4L2)) {
 		std::cout << "Failed to open camera!" << std::endl;
@@ -285,14 +291,15 @@ bool capture_frames(cv::VideoCapture& cap, bool reverse, std::vector<cv::Mat>& f
 			return false;
 		}
 		frames.push_back(frame);
-		
+
 		if (i != NUMBER_OF_CAPS - 1) {
 			if (reverse) {
 				rotate_camera(-ASSUMED_FOV);
 			} else {
 				rotate_camera(ASSUMED_FOV);
 			}
-			// std::this_thread::sleep_for(50ms * ASSUMED_FOV);  // make sure it's done spinning
+			// std::this_thread::sleep_for(50ms * ASSUMED_FOV);  // make sure it's done
+			// spinning
 		}
 	}
 	return true;
@@ -307,8 +314,9 @@ bool save_frame(const cv::Mat& frame, const std::string& filename) {
 }
 
 bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched) {
-	auto stitcher = cv::Stitcher::create();  // default mode is panoramic
-	cv::Ptr<cv::detail::FeaturesMatcher> matcher = cv::makePtr<cv::detail::BestOf2NearestRangeMatcher>(1, true, MATCH_CONFIDENCE);
+	auto stitcher = cv::Stitcher::create(); // default mode is panoramic
+	cv::Ptr<cv::detail::FeaturesMatcher> matcher =
+		cv::makePtr<cv::detail::BestOf2NearestRangeMatcher>(1, true, MATCH_CONFIDENCE);
 	stitcher->setFeaturesMatcher(matcher);
 	stitcher->setPanoConfidenceThresh(PANO_THRESHOLD);
 	cv::Stitcher::Status status = stitcher->stitch(frames, stitched);
@@ -322,7 +330,7 @@ bool stitch_frames(const std::vector<cv::Mat>& frames, cv::Mat& stitched) {
 		case cv::Stitcher::ERR_CAMERA_PARAMS_ADJUST_FAIL:
 			std::cout << "ERROR: Camera params adjust fail" << std::endl;
 			break;
-		default: ;
+		default:;
 	}
 	return status == cv::Stitcher::OK;
 }
@@ -331,7 +339,7 @@ bool add_directions(cv::Mat& panoramic, double heading, int cam_width) {
 	const int pixels_per_degree = panoramic.cols / CAPTURE_ANGLE;
 	const int starting_point = cam_width / 2;
 
-	int north, south, east, west;  // degrees relative to heading
+	int north, south, east, west; // degrees relative to heading
 	north = heading;
 	east = heading + 90;
 	south = heading + 180;
@@ -344,38 +352,49 @@ bool add_directions(cv::Mat& panoramic, double heading, int cam_width) {
 	std::cout << "N: " << north << " "
 			  << "E: " << east << " "
 			  << "S: " << south << " "
-			  << "W: " << west << " "
-			  << std::endl;
+			  << "W: " << west << " " << std::endl;
 
 	const int height = 30 * DIRECTIONS_SIZE;
 
 	if (north > 0 && north < panoramic.cols) {
-		cv::putText(panoramic, "N", cv::Point(north, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
+		cv::putText(panoramic, "N", cv::Point(north, height),
+					cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0),
+					3);
 	}
 
 	if (east > 0 && east < panoramic.cols) {
-		cv::putText(panoramic, "E", cv::Point(east, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
+		cv::putText(panoramic, "E", cv::Point(east, height),
+					cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0),
+					3);
 	}
 
 	if (south > 0 && south < panoramic.cols) {
-		cv::putText(panoramic, "S", cv::Point(south, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
+		cv::putText(panoramic, "S", cv::Point(south, height),
+					cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0),
+					3);
 	}
-	
+
 	if (west > 0 && west < panoramic.cols) {
-		cv::putText(panoramic, "W", cv::Point(west, height), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0), 3);
+		cv::putText(panoramic, "W", cv::Point(west, height),
+					cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, DIRECTIONS_SIZE, CV_RGB(255, 0, 0),
+					3);
 	}
-	
+
 	return true;
 }
 
 bool add_scale(cv::Mat& panoramic, int distance, int cam_width) {
 	double meters_per_pixel = (2.0 * std::tan(CAMERA_FOV / 2.0) * distance) / cam_width;
-	int scale_width = 200;  // TODO: Have the scale width equal to a power of 10
+	int scale_width = 200; // TODO: Have the scale width equal to a power of 10
 	int scale_distance = static_cast<int>(meters_per_pixel * scale_width);
 	const int scale_offset = 25;
-	std::cout << "MPP: " << meters_per_pixel << " scale_distance: " << scale_distance << std::endl;
-	cv::line(panoramic, cv::Point(scale_offset, scale_offset), cv::Point(scale_offset + scale_width, scale_offset), CV_RGB(0, 255, 0), 2);
-	cv::putText(panoramic, std::to_string(scale_distance) + " meters", cv::Point(scale_offset, scale_offset + 25), cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(0, 255, 0), 2);
+	std::cout << "MPP: " << meters_per_pixel << " scale_distance: " << scale_distance
+			  << std::endl;
+	cv::line(panoramic, cv::Point(scale_offset, scale_offset),
+			 cv::Point(scale_offset + scale_width, scale_offset), CV_RGB(0, 255, 0), 2);
+	cv::putText(panoramic, std::to_string(scale_distance) + " meters",
+				cv::Point(scale_offset, scale_offset + 25),
+				cv::HersheyFonts::FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(0, 255, 0), 2);
 
 	return true;
 }
@@ -389,8 +408,8 @@ bool capture_frame(cv::VideoCapture& cap, cv::Mat& frame) {
 }
 
 void rotate_camera(int angle) {
-    CANPacket p;
-    uint8_t science_group = static_cast<int>(can::devicegroup_t::science);
+	CANPacket p;
+	uint8_t science_group = static_cast<int>(can::devicegroup_t::science);
 	AssembleScienceStepperTurnAnglePacket(&p, science_group, 0x4, STEPPER_ID, angle, 0x3);
-    can::sendCANPacket(p);
+	can::sendCANPacket(p);
 }

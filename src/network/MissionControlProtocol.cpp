@@ -79,7 +79,7 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		_autonomous_task.kill();
 		// if we have left autonomous mode, we need to start the power repeater again.
 		_power_repeat_task.start();
-	} 
+	}
 }
 
 static bool validateMotorsDisableRequest(const json& j) {
@@ -92,16 +92,17 @@ void MissionControlProtocol::handleMotorsDisableRequest(const json& j) {
 	if (!motors) {
 		LOG_F(INFO, "Disabling motors...");
 		this->stopAndShutdownPowerRepeat(true);
-	}	
+	}
 }
 
 static bool validateDriveRequest(const json& j) {
-	return util::validateRange(j, "straight", -1, 1) &&
-		   util::validateRange(j, "steer", -1, 1);
+	return util::validateRange(j, "straight", -1, 1) && util::validateRange(j, "steer", -1, 1);
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
-	if (Globals::AUTONOMOUS) { return; }
+	if (Globals::AUTONOMOUS) {
+		return;
+	}
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
@@ -109,14 +110,13 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	double norm = std::hypot(straight, steer);
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
-	LOG_F(INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
-		  dx);
+	LOG_F(INFO, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer,
+		  dtheta, dx);
 	this->setRequestedCmdVel(dtheta, dx);
 }
 
 static bool validateTankDriveRequest(const json& j) {
-	return util::validateRange(j, "left", -1, 1) &&
-		   util::validateRange(j, "right", -1, 1);
+	return util::validateRange(j, "left", -1, 1) && util::validateRange(j, "right", -1, 1);
 }
 
 void MissionControlProtocol::handleTankDriveRequest(const json& j) {
@@ -128,7 +128,6 @@ void MissionControlProtocol::handleTankDriveRequest(const json& j) {
 		  rightVel);
 	this->setRequestedTankCmdVel(leftVel, rightVel);
 }
-
 
 static bool validateArmIKEnable(const json& j) {
 	return util::validateKey(j, "enabled", val_t::boolean);
@@ -163,7 +162,9 @@ static bool validateJointPowerRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleJointPowerRequest(const json& j) {
-	if (Globals::AUTONOMOUS) { return; }
+	if (Globals::AUTONOMOUS) {
+		return;
+	}
 
 	std::string joint = j["joint"];
 	double power = j["power"];
@@ -179,7 +180,9 @@ static bool validateJointPositionRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const json& j) {
-	if (Globals::AUTONOMOUS) { return; }
+	if (Globals::AUTONOMOUS) {
+		return;
+	}
 
 	// std::string motor = j["joint"];
 	// double position_deg = j["position"];
@@ -229,7 +232,7 @@ static bool validateCameraStreamCloseRequest(const json& j) {
 
 void MissionControlProtocol::handleCameraStreamCloseRequest(const json& j) {
 	CameraID cam = j["camera"];
-  	_camera_stream_task.closeStream(cam);
+	_camera_stream_task.closeStream(cam);
 }
 
 static bool validateCameraFrameRequest(const json& j) {
@@ -250,19 +253,26 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 		lon = gps_data.lon;
 		lat = gps_data.lat;
 		alt = gps_data.alt;
-    	w = imu_data.w();
-    	x = imu_data.x();
-    	y = imu_data.y();
-    	z = imu_data.z();
+		w = imu_data.w();
+		x = imu_data.x();
+		y = imu_data.y();
+		z = imu_data.z();
 	}
 
 	if (camDP) {
 		auto data = camDP.getData();
 		cv::Mat frame = data.first;
 		std::string b64_data = base64::encodeMat(frame, ".jpg");
-		json msg = {{"type", CAMERA_FRAME_REP_TYPE}, {"camera", cam}, {"data", b64_data}, 
-		{"orientW", w}, {"orientX", x}, {"orientY", y}, {"orientZ", z},
-		{"lon", lon}, {"lat", lat}, {"alt", alt}};
+		json msg = {{"type", CAMERA_FRAME_REP_TYPE},
+					{"camera", cam},
+					{"data", b64_data},
+					{"orientW", w},
+					{"orientX", x},
+					{"orientY", y},
+					{"orientZ", z},
+					{"lon", lon},
+					{"lat", lat},
+					{"alt", alt}};
 		_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
 	}
 }
@@ -331,10 +341,9 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		"disableMotors",
 		std::bind(&MissionControlProtocol::handleMotorsDisableRequest, this, _1),
 		validateMotorsDisableRequest);
-	this->addMessageHandler(
-		DRIVE_REQ_TYPE,
-		std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
-		validateDriveRequest);
+	this->addMessageHandler(DRIVE_REQ_TYPE,
+							std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
+							validateDriveRequest);
 	this->addMessageHandler(
 		DRIVE_TANK_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleTankDriveRequest, this, _1),

@@ -12,7 +12,8 @@ namespace filters {
  * @tparam stateDim The dimension of the state vector.
  * @tparam inputDim The dimension of the input vector, or system actions.
  */
-template <int stateDim, int inputDim> class KalmanFilterBase {
+template <int stateDim, int inputDim>
+class KalmanFilterBase {
 public:
 	KalmanFilterBase()
 		: P(Eigen::Matrix<double, stateDim, stateDim>::Identity() * 1e5),

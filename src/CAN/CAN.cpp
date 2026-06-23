@@ -1,4 +1,5 @@
 #include "CAN.h"
+
 #include "../world_interface/real_world_constants.h"
 #include "../world_interface/world_interface.h"
 
@@ -6,6 +7,7 @@
 #include <cstring>
 #include <fstream>
 #include <future>
+#include <loguru.hpp>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -17,7 +19,6 @@
 #include <utility>
 
 #include <linux/can/raw.h>
-#include <loguru.hpp>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -59,9 +60,9 @@ uint32_t buffer_size_max = 0;
 
 // Holds acknowledgement timeout callbacks
 std::shared_ptr<util::PeriodicScheduler<>> ackScheduler;
-std::unordered_map<
-	std::pair<CANDeviceUUID_t, CANCommand_t>,
-	util::PeriodicScheduler<>::eventid_t> ackMap;
+std::unordered_map<std::pair<CANDeviceUUID_t, CANCommand_t>,
+				   util::PeriodicScheduler<>::eventid_t>
+	ackMap;
 std::mutex ackMapMutex;
 
 // Maps each device seen to a watchdog
@@ -69,11 +70,11 @@ std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeat
 std::mutex heartbeatWatchdogMapMutex;
 
 // Holds read callbacks
-std::unordered_map<
-	std::pair<CANDeviceUUID_t, endpointid_t>,
-	std::pair<
-		std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>,
-		std::shared_ptr<std::atomic<bool>>>> directReadCallbackMap;
+std::unordered_map<std::pair<CANDeviceUUID_t, endpointid_t>,
+				   std::pair<std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t,
+												std::unique_lock<std::shared_mutex>)>,
+							 std::shared_ptr<std::atomic<bool>>>>
+	directReadCallbackMap;
 std::shared_mutex directReadCallbackMutex;
 
 // Endpoint JSONs
@@ -124,7 +125,8 @@ void handleAck(CANPacket_t& packet) {
 		LOG_F(WARNING, "Ack received from 0x%x: FAIL", decoded.sender.deviceUUID);
 	}
 
-	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.commandID);
+	auto key =
+		std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.commandID);
 	// Write access
 	std::unique_lock lock(ackMapMutex);
 	auto it = ackMap.find(key);
@@ -139,7 +141,8 @@ void handleDirectRead(CANPacket_t& packet) {
 	auto decoded = CANMotorPacket_BLDC_DirectReadResult_Decode(&packet);
 
 	// Fire off callback, if it exists
-	auto key = std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
+	auto key =
+		std::make_pair(static_cast<uint8_t>(decoded.sender.deviceUUID), decoded.endpointID);
 	// Write access
 	std::unique_lock lock(directReadCallbackMutex);
 	auto it = directReadCallbackMap.find(key);
@@ -149,7 +152,8 @@ void handleDirectRead(CANPacket_t& packet) {
 		// Signal the read was successful
 		it->second.second->store(true);
 	} else {
-		LOG_F(WARNING, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID, decoded.endpointID);
+		LOG_F(WARNING, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID,
+			  decoded.endpointID);
 	}
 }
 
@@ -157,7 +161,8 @@ void handleEncoderEstimates(CANPacket_t& packet) {
 	auto decoded = CANMotorPacket_BLDC_EncoderEstimates_Decode(&packet);
 	CANDeviceUUID_t uuid = packet.senderUUID;
 	// Convert position from revolutions to millidegrees
-	int32_t positionMdeg = static_cast<int32_t>(decoded.position * Constants::MILLIDEGREES_PER_REV);
+	int32_t positionMdeg =
+		static_cast<int32_t>(decoded.position * Constants::MILLIDEGREES_PER_REV);
 
 	if (auto it = robot::UUIDBoardMap.find(uuid); it != robot::UUIDBoardMap.end()) {
 		// Going back to interface since that's where we store board references
@@ -165,7 +170,8 @@ void handleEncoderEstimates(CANPacket_t& packet) {
 	}
 }
 
-// Heartbeat monitoring handler: create watchdog on first heartbeat and feed it on subsequent heartbeats
+// Heartbeat monitoring handler: create watchdog on first heartbeat and feed it on subsequent
+// heartbeats
 void handleHeartbeatPacket(CANPacket_t& packet) {
 	CANDeviceUUID_t uuid = packet.senderUUID;
 	std::unique_lock lock(heartbeatWatchdogMapMutex);
@@ -173,11 +179,10 @@ void handleHeartbeatPacket(CANPacket_t& packet) {
 		// feed the watchdog to reset timer
 		it->second->feed();
 	} else if (auto it = robot::UUIDBoardMap.find(uuid); it != robot::UUIDBoardMap.end()) {
-		heartbeatWatchdogMap.emplace(uuid,
-			std::make_unique<util::Watchdog<>>(HEARTBEAT_TIMEOUT, [uuid]() {
+		heartbeatWatchdogMap.emplace(
+			uuid, std::make_unique<util::Watchdog<>>(HEARTBEAT_TIMEOUT, [uuid]() {
 				LOG_F(WARNING, "Heartbeat timeout for device 0x%x", uuid);
-			})
-		);
+			}));
 	}
 }
 
@@ -268,13 +273,17 @@ void receiveThreadFn() {
 void processThreadFn() {
 	while (true) {
 		std::shared_lock lock(bufferMutex);
-		if (buffer.empty()) { continue; }
+		if (buffer.empty()) {
+			continue;
+		}
 
 		lock.unlock();
 		std::unique_lock write_lock(bufferMutex);
 
 		// Double check required after releasing lock
-		if (buffer.empty()) { continue; }
+		if (buffer.empty()) {
+			continue;
+		}
 		CANPacket_t packet = buffer.front();
 		buffer.pop();
 		// Done with buffer, unlock to allow more reading
@@ -305,10 +314,10 @@ void processThreadFn() {
 			case CAN_COMMAND_ID__BLDC_ENCODER_ESTIMATE:
 				handleEncoderEstimates(packet);
 				break;
-			
+
 			default:
-				LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x",
-						packet.command, packet.senderUUID);
+				LOG_F(WARNING, "Unrecognized CAN command: 0x%x from UUID 0x%x", packet.command,
+					  packet.senderUUID);
 				break;
 		}
 	}
@@ -341,7 +350,7 @@ void initCAN() {
 }
 
 void sendCANPacket(const CANPacket_t& packet) {
-	CANPacket_t mutablePacket = packet; // to pass, we make a mutable copy
+	CANPacket_t mutablePacket = packet;				 // to pass, we make a mutable copy
 	mutablePacket.command = CAN_ACK(packet.command); // request acks for all
 	CANDeviceUUID_t uuid = packet.device.deviceUUID;
 	canfd_frame frame;
@@ -354,8 +363,7 @@ void sendCANPacket(const CANPacket_t& packet) {
 	bool success = sendCANFrame(frame);
 
 	if (!success) {
-		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", uuid,
-			  std::strerror(errno));
+		LOG_F(ERROR, "Failed to send CAN packet to uuid=%x: %s", uuid, std::strerror(errno));
 		return;
 	}
 
@@ -405,12 +413,16 @@ void emergencyStop() {
 	can::sendCANPacket(p);
 }
 
-void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>& callback) {
+void addDirectReadCallback(
+	CANDevice_t device, endpointid_t endpoint_id,
+	const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t,
+							 std::unique_lock<std::shared_mutex>)>& callback) {
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint_id);
 	// Write access
 	std::unique_lock lock(directReadCallbackMutex);
 	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
-		VLOG_F(VERBOSE, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint_id);
+		VLOG_F(VERBOSE, "Callback already exists for 0x%x endpoint %d! Ignoring..",
+			   device.deviceUUID, endpoint_id);
 		return;
 	}
 
@@ -421,7 +433,8 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const s
 
 		std::unique_lock lock(directReadCallbackMutex);
 		if (!completed->load()) {
-			LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint_id);
+			LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID,
+				  endpoint_id);
 			directReadCallbackMap.erase(key);
 		}
 	}).detach();
@@ -457,13 +470,16 @@ void setLED(led_t led) {
 	CANPacket_t p;
 	switch (led) {
 		case led_t::red:
-			p = CANPeripheralPacket_SetRoverLEDRed(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
+			p = CANPeripheralPacket_SetRoverLEDRed(Constants::JETSON_DEVICE,
+												   CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
 			break;
 		case led_t::green:
-			p = CANPeripheralPacket_SetRoverFlashLEDGreen(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
+			p = CANPeripheralPacket_SetRoverFlashLEDGreen(
+				Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
 			break;
 		case led_t::blue:
-			p = CANPeripheralPacket_SetRoverLEDBlue(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
+			p = CANPeripheralPacket_SetRoverLEDBlue(Constants::JETSON_DEVICE,
+													CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
 			break;
 	}
 
