@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstring>
 #include <fstream>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -68,12 +69,11 @@ std::unordered_map<CANDeviceUUID_t, std::unique_ptr<util::Watchdog<>>> heartbeat
 std::mutex heartbeatWatchdogMapMutex;
 
 // Holds read callbacks
-std::shared_ptr<util::PeriodicScheduler<>> readScheduler;
 std::unordered_map<
 	std::pair<CANDeviceUUID_t, endpointid_t>,
 	std::pair<
 		std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>,
-		util::PeriodicScheduler<>::eventid_t>> directReadCallbackMap;
+		std::shared_ptr<std::atomic<bool>>>> directReadCallbackMap;
 std::shared_mutex directReadCallbackMutex;
 
 // Endpoint JSONs
@@ -146,7 +146,8 @@ void handleDirectRead(CANPacket_t& packet) {
 	if (it != directReadCallbackMap.end()) {
 		// Pass lock onto callback
 		it->second.first(decoded, std::move(lock));
-		readScheduler->removeEvent(it->second.second);
+		// Signal the read was successful
+		it->second.second->store(true);
 	} else {
 		LOG_F(WARNING, "No callback associated with read 0x%x %d", decoded.sender.deviceUUID, decoded.endpointID);
 	}
@@ -367,12 +368,12 @@ void sendCANPacket(const CANPacket_t& packet) {
 		auto key = std::make_pair(static_cast<uint8_t>(packet.senderUUID), packet.command);
 		std::unique_lock lock(ackMapMutex);
 		if (auto it = ackMap.find(key); it != ackMap.end()) {
-			LOG_F(WARNING, "0x%x already has an outgoing packet! Ignoring..", uuid);
+			VLOG_F(VERBOSE, "0x%x already has an outgoing packet! Ignoring..", uuid);
 			return;
 		}
 
 		auto eventID = ackScheduler->scheduleEvent(ACK_TIMEOUT, [=]() {
-			LOG_F(ERROR, "0x%x ACK TIMED OUT, RESENDING", uuid);
+			LOG_F(WARNING, "0x%x ACK TIMED OUT, RESENDING", uuid);
 			sendCANFrame(frame);
 		});
 
@@ -409,20 +410,23 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const s
 	// Write access
 	std::unique_lock lock(directReadCallbackMutex);
 	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
-		// LOG_F(WARNING, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint);
+		VLOG_F(VERBOSE, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint_id);
 		return;
 	}
 
-	if (!readScheduler) {
-		readScheduler = std::make_shared<util::PeriodicScheduler<>>("CAN_ReadSched");
-	}
+	// Start timeout thread
+	std::shared_ptr<std::atomic<bool>> completed = std::make_shared<std::atomic<bool>>(false);
+	std::thread([completed, device, endpoint_id, key]() {
+		std::this_thread::sleep_for(READ_TIMEOUT);
 
-	auto eventID = readScheduler->scheduleEvent(READ_TIMEOUT, [device, endpoint_id, key]() {
-		LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint_id);
-		directReadCallbackMap.erase(key);
-	});
+		std::unique_lock lock(directReadCallbackMutex);
+		if (!completed->load()) {
+			LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint_id);
+			directReadCallbackMap.erase(key);
+		}
+	}).detach();
 
-	directReadCallbackMap.emplace(key, std::make_pair(callback, eventID));
+	directReadCallbackMap.emplace(key, std::make_pair(callback, completed));
 }
 
 void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint) {

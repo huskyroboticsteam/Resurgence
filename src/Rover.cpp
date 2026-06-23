@@ -61,9 +61,9 @@ void parseCommandLine(int argc, char** argv) {
 				{"LOG_ERROR", loguru::Verbosity_ERROR},
 				{"LOG_WARN", loguru::Verbosity_WARNING},
 				{"LOG_INFO", loguru::Verbosity_INFO},
-				{"LOG_VERBOSE", 1},
-				{"LOG_TRACE", 2},
-				{"LOG_DEBUG", 3},
+				{"LOG_VERBOSE", VERBOSE},
+				{"LOG_TRACE", TRACE},
+				{"LOG_DEBUG", DEBUG},
 			};
 
 			if (allowed.find(value) != allowed.end()) {

@@ -20,6 +20,11 @@ using robot::types::CameraID;
 using robot::types::jointid_t;
 using robot::types::boardid_t;
 
+// Additional Loguru Levels
+#define VERBOSE 1
+#define TRACE 2
+#define DEBUG 3
+
 namespace Constants {
 extern const double SHOULDER_LENGTH;
 extern const double ELBOW_LENGTH;
