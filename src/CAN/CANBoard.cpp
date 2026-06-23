@@ -42,7 +42,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
 			this->read(endpoint_id);
 		}
 
-		nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.config.enable_watchdog");
+		endpoint = getEndpoint(this->board_id, "axis0.config.enable_watchdog");
 		if (endpoint != nullptr) {
 			endpointid_t endpoint_id = endpoint["id"];
 			auto callback = [=](auto p, std::unique_lock<std::shared_mutex> lock) {
