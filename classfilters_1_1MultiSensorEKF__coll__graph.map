@@ -1,9 +1,9 @@
 <map id="filters::MultiSensorEKF&lt; stateDim, inputDim, processNoiseDim, numOutputs &gt;" name="filters::MultiSensorEKF&lt; stateDim, inputDim, processNoiseDim, numOutputs &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="898,48,1114,103"/>
-<area shape="rect" id="Node000002" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="687,55,848,96"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="864,73,897,73,897,78,864,78"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="903,49,1119,104"/>
+<area shape="rect" id="Node000002" href="$classfilters_1_1KalmanFilterBase.html" title="Base class for Kalman Filters." alt="" coords="692,56,853,97"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="869,74,902,74,902,79,869,79"/>
 <area shape="rect" id="Node000003" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1Matrix.html" title=" " alt="" coords="462,23,609,64"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="624,53,687,62,686,67,624,58"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="625,53,692,63,691,68,624,58"/>
 <area shape="rect" id="Node000004" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1PlainObjectBase.html" title=" " alt="" coords="202,5,412,76"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="428,39,461,40,461,45,428,45"/>
 <area shape="rect" id="Node000005" href="/github/workspace/doxygen-tags/Eigen.doxytags$structEigen_1_1doxygen_1_1dense__xpr__base__dispatcher.html" title=" " alt="" coords="5,54,153,110"/>
@@ -11,6 +11,6 @@
 <area shape="rect" id="Node000007" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1PlainObjectBase.html" title=" " alt="" coords="229,100,385,141"/>
 <area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="168,94,229,105,228,110,168,100"/>
 <area shape="rect" id="Node000006" href="/github/workspace/doxygen-tags/Eigen.doxytags$classEigen_1_1Matrix.html" title=" " alt="" coords="462,90,609,130"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="624,94,686,85,687,90,624,99"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="624,95,691,85,692,91,625,100"/>
 <area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="401,114,461,111,461,116,401,119"/>
 </map>

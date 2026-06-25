@@ -25,6 +25,7 @@ var searchData=
   ['robust_20independent_20elementary_20features_22',['BRIEF (Binary Robust Independent Elementary Features)',['https://docs.opencv.org/4.2.0/dc/d7d/tutorial_py_brief.html',1,'']]],
   ['rotated_20boxes_20and_20ellipses_20for_20contours_23',['Creating Bounding rotated boxes and ellipses for contours',['https://docs.opencv.org/4.2.0/de/d62/tutorial_bounding_rotated_ellipses.html',1,'']]],
   ['rotated_20brief_24',['ORB (Oriented FAST and Rotated BRIEF)',['https://docs.opencv.org/4.2.0/d1/d89/tutorial_py_orb.html',1,'']]],
-  ['run_20deep_20networks_20in_20browser_25',['How to run deep networks in browser',['https://docs.opencv.org/4.2.0/d5/d86/tutorial_dnn_javascript.html',1,'']]],
-  ['run_20deep_20networks_20on_20android_20device_26',['How to run deep networks on Android device',['https://docs.opencv.org/4.2.0/d0/d6c/tutorial_dnn_android.html',1,'']]]
+  ['rules_25',['Style Rules',['../md_StyleGuide.html#autotoc_md1',1,'']]],
+  ['run_20deep_20networks_20in_20browser_26',['How to run deep networks in browser',['https://docs.opencv.org/4.2.0/d5/d86/tutorial_dnn_javascript.html',1,'']]],
+  ['run_20deep_20networks_20on_20android_20device_27',['How to run deep networks on Android device',['https://docs.opencv.org/4.2.0/d0/d6c/tutorial_dnn_android.html',1,'']]]
 ];

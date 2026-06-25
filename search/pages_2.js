@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['3_209_201_0',['Tesseract (master) installation by using git-bash (version&gt;=2.14.1) and cmake (version &gt;=3.9.1)',['https://docs.opencv.org/4.2.0/db/d4c/tutorial_install_tesseract.html',1,'']]],
+  ['3_209_201_0',['Tesseract (master) installation by using git-bash (version&amp;gt;=2.14.1) and cmake (version &amp;gt;=3.9.1)',['https://docs.opencv.org/4.2.0/db/d4c/tutorial_install_tesseract.html',1,'']]],
   ['3_20_3a_202d_20histograms_1',['Histograms - 3 : 2D Histograms',['https://docs.opencv.org/4.2.0/dd/d0d/tutorial_py_2d_histogram.html',1,'']]],
   ['3_20_3a_20histogram_20backprojection_2',['Histogram - 3 : Histogram Backprojection',['https://docs.opencv.org/4.2.0/dd/d4d/tutorial_js_histogram_backprojection.html',1,'']]],
   ['3d_20histogram_3',['Creating a 3D histogram',['https://docs.opencv.org/4.2.0/d1/d1d/tutorial_histo3D.html',1,'']]],

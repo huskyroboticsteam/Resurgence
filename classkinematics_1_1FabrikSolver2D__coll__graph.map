@@ -1,7 +1,7 @@
 <map id="kinematics::FabrikSolver2D&lt; N &gt;" name="kinematics::FabrikSolver2D&lt; N &gt;">
-<area shape="rect" id="Node000001" title="Implementation of the FABRIK algorithm, in the special case of 2 dimensions." alt="" coords="35,214,205,255"/>
-<area shape="rect" id="Node000002" href="$classkinematics_1_1InverseArmKinematics.html" title=" " alt="" coords="9,124,231,165"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,180,123,214,117,214,117,180"/>
+<area shape="rect" id="Node000001" title="Implementation of the FABRIK algorithm, in the special case of 2 dimensions." alt="" coords="35,222,205,263"/>
+<area shape="rect" id="Node000002" href="$classkinematics_1_1InverseArmKinematics.html" title=" " alt="" coords="9,132,231,173"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,188,123,222,117,222,117,188"/>
 <area shape="rect" id="Node000003" href="/github/workspace/doxygen-tags/libstdc++.tag$a06899.html" title=" " alt="" coords="5,5,235,61"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,76,123,124,117,124,117,76"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,77,123,131,117,131,117,77"/>
 </map>

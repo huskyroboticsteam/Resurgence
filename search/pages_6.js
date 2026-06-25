@@ -47,7 +47,7 @@ var searchData=
   ['and_20charuco_44',['Calibration with ArUco and ChArUco',['https://docs.opencv.org/4.2.0/da/d13/tutorial_aruco_calibration.html',1,'']]],
   ['and_20circles_20for_20contours_45',['Creating Bounding boxes and circles for contours',['https://docs.opencv.org/4.2.0/da/d0c/tutorial_bounding_rects_circles.html',1,'']]],
   ['and_20cmake_46',['Using OpenCV with gcc and CMake',['https://docs.opencv.org/4.2.0/db/df5/tutorial_linux_gcc_cmake.html',1,'']]],
-  ['and_20cmake_20version_203_209_201_47',['Tesseract (master) installation by using git-bash (version&gt;=2.14.1) and cmake (version &gt;=3.9.1)',['https://docs.opencv.org/4.2.0/db/d4c/tutorial_install_tesseract.html',1,'']]],
+  ['and_20cmake_20version_203_209_201_47',['Tesseract (master) installation by using git-bash (version&amp;gt;=2.14.1) and cmake (version &amp;gt;=3.9.1)',['https://docs.opencv.org/4.2.0/db/d4c/tutorial_install_tesseract.html',1,'']]],
   ['and_20description_48',['Feature Detection and Description',['https://docs.opencv.org/4.2.0/db/d27/tutorial_py_table_of_contents_feature2d.html',1,'']]],
   ['and_20dilating_49',['Eroding and Dilating',['https://docs.opencv.org/4.2.0/db/df6/tutorial_erosion_dilatation.html',1,'']]],
   ['and_20display_20an_20image_50',['Load and Display an Image',['https://docs.opencv.org/4.2.0/db/deb/tutorial_display_image.html',1,'']]],
@@ -105,5 +105,6 @@ var searchData=
   ['as_20the_20color_20palette_102',['Trackbar as the Color Palette',['https://docs.opencv.org/4.2.0/d9/dc8/tutorial_py_trackbar.html',1,'']]],
   ['asked_20questions_103',['Frequently Asked Questions',['https://docs.opencv.org/4.2.0/d3/d2d/faq.html',1,'']]],
   ['assertions_104',['Assertions',['https://eigen.tuxfamily.org/dox/TopicAssertions.html',1,'']]],
-  ['attributes_105',['Reading and Writing Attributes',['https://docs.opencv.org/4.2.0/d5/d10/tutorial_hdf_read_write_attributes.html',1,'']]]
+  ['attributes_105',['Reading and Writing Attributes',['https://docs.opencv.org/4.2.0/d5/d10/tutorial_hdf_read_write_attributes.html',1,'']]],
+  ['automatic_20formatting_20with_20clang_20format_106',['Automatic formatting with &lt;span class=&quot;tt&quot;&gt;clang-format&lt;/span&gt;',['../md_StyleGuide.html#autotoc_md4',1,'']]]
 ];

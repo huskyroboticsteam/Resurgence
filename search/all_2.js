@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['2_2014_201_20and_20cmake_20version_203_209_201_0',['Tesseract (master) installation by using git-bash (version&gt;=2.14.1) and cmake (version &gt;=3.9.1)',['https://docs.opencv.org/4.2.0/db/d4c/tutorial_install_tesseract.html',1,'']]],
+  ['2_2014_201_20and_20cmake_20version_203_209_201_0',['Tesseract (master) installation by using git-bash (version&amp;gt;=2.14.1) and cmake (version &amp;gt;=3.9.1)',['https://docs.opencv.org/4.2.0/db/d4c/tutorial_install_tesseract.html',1,'']]],
   ['20_2dkernel_2dapi_2emarkdown_1',['20-kernel-api.markdown',['https://docs.opencv.org/4.2.0/d9/d2a/20-kernel-api_8markdown.html',1,'']]],
   ['2_3a_20histogram_20equalization_2',['2: Histogram Equalization',['https://docs.opencv.org/4.2.0/d5/daf/tutorial_py_histogram_equalization.html',1,'Histograms - 2: Histogram Equalization'],['https://docs.opencv.org/4.2.0/d2/d74/tutorial_js_histogram_equalization.html',1,'Histograms - 2: Histogram Equalization']]],
   ['2d_20features_20algorithms_3',['2D Features Algorithms',['https://docs.opencv.org/4.2.0/d7/d7a/group__xfeatures2d__experiment.html',1,'Experimental 2D Features Algorithms'],['https://docs.opencv.org/4.2.0/d2/dca/group__xfeatures2d__nonfree.html',1,'Non-free 2D Features Algorithms']]],

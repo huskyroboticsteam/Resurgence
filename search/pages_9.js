@@ -43,7 +43,7 @@ var searchData=
   ['detector_40',['Canny Edge Detector',['https://docs.opencv.org/4.2.0/da/d5c/tutorial_canny_detector.html',1,'']]],
   ['detector_41',['detector',['https://docs.opencv.org/4.2.0/d9/dbc/tutorial_generic_corner_detector.html',1,'Creating your own corner detector'],['https://docs.opencv.org/4.2.0/d4/d7d/tutorial_harris_detector.html',1,'Harris corner detector'],['https://docs.opencv.org/4.2.0/d8/dd8/tutorial_good_features_to_track.html',1,'Shi-Tomasi corner detector']]],
   ['detector_20api_42',['Tutorial on Facial Landmark Detector API',['https://docs.opencv.org/4.2.0/d5/d47/tutorial_table_of_content_facemark.html',1,'']]],
-  ['detector_20good_20features_20to_20track_43',['Shi-Tomasi Corner Detector &amp; Good Features to Track',['https://docs.opencv.org/4.2.0/d4/d8c/tutorial_py_shi_tomasi.html',1,'']]],
+  ['detector_20good_20features_20to_20track_43',['Shi-Tomasi Corner Detector &amp;amp; Good Features to Track',['https://docs.opencv.org/4.2.0/d4/d8c/tutorial_py_shi_tomasi.html',1,'']]],
   ['development_44',['Development',['https://docs.opencv.org/4.2.0/d9/d3f/tutorial_android_dev_intro.html',1,'Introduction into Android Development'],['https://docs.opencv.org/4.2.0/d9/d52/tutorial_java_dev_intro.html',1,'Introduction to Java Development']]],
   ['development_20with_20clojure_45',['Introduction to OpenCV Development with Clojure',['https://docs.opencv.org/4.2.0/d7/d1e/tutorial_clojure_dev_intro.html',1,'']]],
   ['development_20with_20opencv_46',['Android Development with OpenCV',['https://docs.opencv.org/4.2.0/d5/df8/tutorial_dev_with_OCV_on_Android.html',1,'']]],
