@@ -1,7 +1,9 @@
 #include "read_landmarks.h"
 
 #include "../Constants.h"
+#include "../Globals.h"
 #include "../camera/Camera.h"
+#include "../camera/CameraConfig.h"
 #include "../world_interface/world_interface.h"
 #include "Detector.h"
 
@@ -33,7 +35,33 @@ void detectLandmarksLoop() {
 	loguru::set_thread_name("LandmarkDetection");
 	cv::Mat frame;
 	uint32_t last_frame_no = 0;
+	bool was_enabled = false;
+	
 	while (true) {
+		// Check if detection is enabled
+		bool is_enabled = Globals::arucoDetectionEnabled.load();
+		
+		// Log state changes
+		if (is_enabled != was_enabled) {
+			if (is_enabled) {
+				LOG_F(INFO, "ArUco detection loop: STARTED");
+			} else {
+				LOG_F(INFO, "ArUco detection loop: STOPPED");
+				// Clear old landmarks when disabling
+				landmark_lock.lock();
+				current_landmarks = zero_landmarks;
+				fresh_data = false;
+				landmark_lock.unlock();
+			}
+			was_enabled = is_enabled;
+		}
+		
+		// Skip processing if disabled
+		if (!is_enabled) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			continue;
+		}
+		
 		if (robot::hasNewCameraFrame(Constants::MAST_CAMERA_ID, last_frame_no)) {
 			auto camData = robot::readCamera(Constants::MAST_CAMERA_ID);
 			if (!camData)
@@ -100,19 +128,27 @@ void detectLandmarksLoop() {
 }
 
 bool initializeLandmarkDetection() {
-	auto intrinsic = robot::getCameraIntrinsicParams(Constants::MAST_CAMERA_ID);
-	if (intrinsic) {
-		ar_detector = Detector(Markers::URC_MARKERS(), intrinsic.value());
+	// Load camera intrinsic parameters directly from config file
+	// This avoids opening the camera just to get its parameters
+	try {
+		auto config = cam::readConfigFromFile(Constants::CAMERA_CONFIG_PATHS.at(Constants::MAST_CAMERA_ID));
+		if (!config.intrinsicParams || config.intrinsicParams->empty()) {
+			LOG_F(ERROR, "Camera configuration does not have intrinsic parameters! "
+						 "AR tag detection cannot be performed.");
+			return false;
+		}
+		ar_detector = Detector(Markers::URC_MARKERS(), config.intrinsicParams.value());
 		landmark_thread = std::thread(&detectLandmarksLoop);
-	} else {
-		LOG_F(ERROR, "Camera does not have intrinsic parameters! AR tag detection "
-					 "cannot be performed.");
+		
+		if (!config.extrinsicParams || config.extrinsicParams->empty()) {
+			LOG_F(WARNING, "Camera configuration does not have extrinsic parameters! "
+						   "Coordinates returned for AR tags will be relative to camera");
+		}
+	} catch (const std::exception& e) {
+		LOG_F(ERROR, "Failed to load camera configuration: %s", e.what());
 		return false;
 	}
-	if (!robot::getCameraExtrinsicParams(Constants::MAST_CAMERA_ID)) {
-		LOG_F(WARNING, "Camera does not have extrinsic parameters! Coordinates returned "
-					   "for AR tags will be relative to camera");
-	}
+	
 	initialized = true;
 	return true;
 }
@@ -122,6 +158,11 @@ bool isLandmarkDetectionInitialized() {
 }
 
 landmarks_t readLandmarks() {
+	// Return empty landmarks if detection is disabled
+	if (!Globals::arucoDetectionEnabled.load()) {
+		return zero_landmarks;
+	}
+	
 	if (isLandmarkDetectionInitialized()) {
 		if (fresh_data) {
 			landmarks_t output;

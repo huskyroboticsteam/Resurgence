@@ -9,33 +9,33 @@ image_width: 1280
 image_height: 720
 framerate: 30
 
-# calib_info:
-#    calibration_time: "Sat 01 May 2021 01:54:16 PM PDT"
-#    board_width: 11
-#    board_height: 8
-#    square_size: 20.
-#    flags: 0
-#    avg_reprojection_error: 4.5744250014767379e-01
-# intrinsic_params:
-#    image_width: 640
-#    image_height: 480
-#    camera_matrix: !!opencv-matrix
-#       rows: 3
-#       cols: 3
-#       dt: d
-#       data: [ 6.4936764773277400e+02, 0., 3.3546152305967058e+02, 0.,
-#           6.4776804982533793e+02, 2.4785660889077488e+02, 0., 0., 1. ]
-#    distortion_coefficients: !!opencv-matrix
-#       rows: 5
-#       cols: 1
-#       dt: d
-#       data: [ -4.5670452858419575e-01, 2.1512832208218641e-01,
-#           -1.1179480533495888e-03, -5.7450430930239835e-04, 0. ]
-# extrinsic_params: !!opencv-matrix
-#   rows: 4
-#   cols: 4
-#   dt: d
-#   data: [ 0., 0., 1., -.50,
-#          -1., 0., 0., -.25,
-#           0., 0., 0., 1.,
-#           0., 0., 0., 0.]
+calib_info:
+   calibration_time: "Sat 01 May 2021 01:54:16 PM PDT"
+   board_width: 11
+   board_height: 8
+   square_size: 20.
+   flags: 0
+   avg_reprojection_error: 4.5744250014767379e-01
+intrinsic_params:
+   image_width: 640
+   image_height: 480
+   camera_matrix: !!opencv-matrix
+      rows: 3
+      cols: 3
+      dt: d
+      data: [ 6.4936764773277400e+02, 0., 3.3546152305967058e+02, 0.,
+          6.4776804982533793e+02, 2.4785660889077488e+02, 0., 0., 1. ]
+   distortion_coefficients: !!opencv-matrix
+      rows: 5
+      cols: 1
+      dt: d
+      data: [ -4.5670452858419575e-01, 2.1512832208218641e-01,
+          -1.1179480533495888e-03, -5.7450430930239835e-04, 0. ]
+extrinsic_params: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: d
+  data: [ 0., 0., 1., -.50,
+         -1., 0., 0., -.25,
+          0., 0., 0., 1.,
+          0., 0., 0., 0.]

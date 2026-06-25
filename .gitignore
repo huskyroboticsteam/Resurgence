@@ -12,3 +12,19 @@ CMakeFiles
 *.swp
 .DS_Store
 /docs/
+
+# Object detection large files
+src/object-detection/*.pt
+src/object-detection/*.jpg
+src/object-detection/*.png
+
+# Model finetune generated data/artifacts
+src/model-finetune/datasets/
+src/model-finetune/runs/
+src/model-finetune/exports/
+src/model-finetune/example/
+src/model-finetune/test_results/
+src/model-finetune/captured_images/
+__pycache__/
+*.pyc
+settings.json

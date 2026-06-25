@@ -22,6 +22,7 @@ private:
 	cam::CameraParams camera_params_;
 	cv::Ptr<cv::aruco::DetectorParameters> detector_params_;
 	cv::Mat map1_, map2_;
+	bool enabled_;
 	std::vector<Tag> _detectTagsImpl(const cv::Mat& input,
 									 std::vector<std::vector<cv::Point2f>>* rejected,
 									 bool undistort);
@@ -37,6 +38,8 @@ public:
 	std::vector<Tag> detectTags(const cv::Mat& input, bool undistort = true);
 	cv::aruco::DetectorParameters getDetectorParams();
 	void setDetectorParams(cv::aruco::DetectorParameters params);
+	void setEnabled(bool enabled);
+	bool isEnabled() const;
 	bool empty() const;
 };
 /** @} */
