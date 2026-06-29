@@ -75,21 +75,6 @@ int main() {
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
 				board->setMotorState(motor_state);
-
-				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), "axis0.current_state"); endpoint != nullptr) {
-					uint16_t endpoint_id = endpoint["id"];
-					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, motor_state, endpoint_id](auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
-						if (decoded.value_uint8 != static_cast<uint8_t>(motor_state)) {
-							LOG_F(ERROR, "0x%x DID NOT LISTEN AND IS NOT STATE %d AND IS INSTEAD %d", board->getDevice().deviceUUID, static_cast<uint8_t>(motor_state), decoded.value_uint8);
-							board->setMotorState(motor_state);
-							board->read(endpoint_id);
-						} else {
-							can::removeDirectReadCallback(board->getDevice(), endpoint_id);
-						}
-					});
-
-					board->read(endpoint_id);
-				}
 			} else if (testMode == TestMode::Power) {
 				// TODO: float function
 				std::string input;
@@ -105,7 +90,7 @@ int main() {
 
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
-					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
+					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded, std::unique_lock<std::shared_mutex> lock) {
 						std::stringstream rs("");
 						rs << input << " from 0x" << std::hex << board->getDevice().deviceUUID << " [";
 
@@ -127,7 +112,7 @@ int main() {
 
 						std::cout << rs.str().c_str() << std::endl;
 
-						can::removeDirectReadCallback(board->getDevice(), endpoint["id"]);
+						can::removeDirectReadCallback(board->getDevice(), endpoint["id"], std::move(lock));
 					});
 
 					board->read(endpoint_id);

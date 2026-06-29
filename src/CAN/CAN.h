@@ -104,12 +104,12 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const s
  * @brief Removes a callback.
  * Does nothing if callback does not exist.
  *
- * This method is thread-safe.
- *
  * @param device The CAN device associated with the read callback.
  * @param endpoint The endpoint to remove the callback for.
+ * @param lock The lock to the callback map. We need this to remove the callback, and this
+ * method should only be called from a thread that already has a lock on the callback map.
  */
-void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint);
+void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint, std::unique_lock<std::shared_mutex> lock);
 
 /**
  * @brief Retrieves a JSON that corresponds to the endpoint name input.

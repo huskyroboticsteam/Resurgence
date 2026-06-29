@@ -251,6 +251,9 @@ void receiveThreadFn() {
 		return;
 	}
 
+	// Sleep to wait for the world interface to initialize
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
 	while (true) {
 		// no synchronization necessary, since this thread owns the FD
 		if (receivePacket(recvFD, packet)) {
@@ -429,10 +432,9 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const s
 	directReadCallbackMap.emplace(key, std::make_pair(callback, completed));
 }
 
-void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint) {
+void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint, std::unique_lock<std::shared_mutex> lock) {
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint);
-	// Write access
-	std::unique_lock mapLock(directReadCallbackMutex);
+
 	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
 		directReadCallbackMap.erase(it);
 	}

@@ -51,7 +51,6 @@ class CANBoard {
 
     // Configs read on startup
     float vel_limit;
-    bool watchdog;
 
     // Estimates received
     std::shared_mutex board_mutex;

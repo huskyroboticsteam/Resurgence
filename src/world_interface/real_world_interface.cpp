@@ -31,17 +31,6 @@ std::unordered_map<robot::types::boardid_t, std::shared_ptr<can::CANBoard>> boar
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
-void addBoardMapping(robot::types::boardid_t board) {
-	if (auto it = boardDeviceMap.find(board); it != boardDeviceMap.end()) {
-		// create ptr and insert in map
-		std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, it->second);
-		board_ptrs.insert({board, ptr});
-	} else {
-		LOG_F(ERROR, "Couldn't find UUID mapping for board 0x%x", static_cast<uint8_t>(board));
-		return;
-	}
-}
-
 std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 	auto itr = board_ptrs.find(board);
 
@@ -61,7 +50,14 @@ std::unordered_map<CameraID, std::weak_ptr<cam::Camera>> cameraMap;
 void initBoards() {
 	// Initialize boards using CANDevice_t from boardDeviceMap
 	for (const auto& [board, device] : boardDeviceMap) {
-		addBoardMapping(board);
+		if (auto it = boardDeviceMap.find(board); it != boardDeviceMap.end()) {
+			// create ptr and insert in map
+			std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, it->second);
+			board_ptrs.insert({board, ptr});
+		} else {
+			LOG_F(ERROR, "Couldn't find UUID mapping for board 0x%x", static_cast<uint8_t>(board));
+			return;
+		}
 	}
 }
 

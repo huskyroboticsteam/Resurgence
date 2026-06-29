@@ -32,19 +32,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
                 this->vel_limit = p.value_float;
 
                 // We only need this once, remove after we get a response
-                removeDirectReadCallback(this->device, endpoint_id);
-            });
-
-            this->read(endpoint_id);
-        }
-
-        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.config.enable_watchdog"); endpoint != nullptr) {
-            endpointid_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [=](auto p, std::unique_lock<std::shared_mutex> lock) {
-                this->watchdog = p.value_bool;
-
-                // We only need this once, remove after we get a response
-                removeDirectReadCallback(this->device, endpoint_id);
+                removeDirectReadCallback(this->device, endpoint_id, std::move(lock));
             });
 
             this->read(endpoint_id);
