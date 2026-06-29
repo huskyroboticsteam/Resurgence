@@ -84,7 +84,7 @@ void CANBoard::setMotorPower(double power) {
         // Ensure motor state is closed loop control
         this->setMotorState(can::motor::axis_state_t::closed_loop_control);
         // Mapping power to a target velocity
-        this->input_vel = static_cast<float>(power * this->vel_limit) * 0.4 * this->inversion_factor;    // hard-coded 40%
+        this->input_vel = static_cast<float>(power * this->vel_limit) * 0.5 * this->inversion_factor;    // hard-coded 40%
         // LOG_F(INFO, "True input velocity %f, ", input_vel);
 
         if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {

@@ -5,8 +5,8 @@ description: "Camera located on the mast of the rover."
 # Make sure that this camera_id matches the one defined in the udev rules.
 camera_id: 40
 format: "video/x-raw,format=YUY2"
-image_width: 1280
-image_height: 720
+image_width: 424
+image_height: 240
 framerate: 15
 
 # calib_info:

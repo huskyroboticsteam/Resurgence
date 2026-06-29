@@ -66,8 +66,10 @@ static bool validateOperationModeRequest(const json& j) {
 void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	std::string mode = j["mode"];
 	Globals::AUTONOMOUS = (mode == "autonomous");
+
 	if (Globals::AUTONOMOUS) {
 		// if we have entered autonomous mode, we need to stop all the power repeater stuff.
+		can::setLED(can::led_t::red);
 		this->stopAndShutdownPowerRepeat(true);
 	} else {
 		_autonomous_task.kill();
@@ -209,7 +211,7 @@ static bool validateWaypointNavRequest(const json& j) {
 
 void MissionControlProtocol::handleWaypointNavRequest(const json& j) {
 	if (Globals::AUTONOMOUS) {
-		can::setLED(can::led_t::red);
+		// can::setLED(can::led_t::red);
 		std::optional<Constants::autonomous::TaskType> taskType;
 		auto rawType = j["tag"].get<Constants::autonomous::TaskType>();
 		if (rawType != Constants::autonomous::TaskType::INVALID) {

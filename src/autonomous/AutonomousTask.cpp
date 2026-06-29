@@ -202,17 +202,21 @@ void AutonomousTask::navigate(commands::PurePursuitCommand& cmd) {
 		}
 
 		std::unique_lock autonomousTaskLock(_autonomous_task_mutex);
-		sleepUntil += 20ms;
+		sleepUntil += 100ms;
 
 		// Wait 20ms or return if kill called
 		if (_autonomous_task_cv.wait_until(autonomousTaskLock, sleepUntil,
 										   [&] { return _kill_called; })) {
 			return;
 		}
-	}
+}
 
 	// If navigation is done, send 0 velocity command.
-	robot::setCmdVel(0.0, 0.0);
+	robot::setMotorPower(robot::types::boardid_t::frontTireLeft, 0);
+	robot::setMotorPower(robot::types::boardid_t::frontTireRight, 0);
+	robot::setMotorPower(robot::types::boardid_t::rearTireLeft, 0);
+	robot::setMotorPower(robot::types::boardid_t::rearTireRight, 0);
+
 }
 
 void AutonomousTask::kill() {
