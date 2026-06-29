@@ -2,6 +2,7 @@
 #include "CANBoard.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <shared_mutex>
 
@@ -38,6 +39,11 @@ int prompt(std::string_view message) {
 int main() {
 	can::initCAN();
 
+	uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
+	CANDevice_t device = CANDevice_t{1, 1, 1, uuid};
+
+	std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
+
 	std::stringstream ss("What are you testing?\n");
 	ss << static_cast<int>(TestMode::State) << " for SET STATE\n";
 	ss << static_cast<int>(TestMode::Power) << " for POWER CONTROL\n";
@@ -55,11 +61,6 @@ int main() {
 		}
 
 		TestMode testMode = static_cast<TestMode>(test_type);
-		uint16_t uuid = static_cast<uint16_t>(prompt("Enter device uuid"));
-		CANDevice_t device = CANDevice_t{1, 1, 1, uuid};
-
-		std::shared_ptr<can::CANBoard> board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug1, device);
-
 		if (testMode == TestMode::Read && static_cast<uint8_t>(prompt("0 for S1, 1 for Pro")) == 1) {
 			board = std::make_shared<can::CANBoard>(robot::types::boardid_t::debug2, device);
 		}
@@ -91,29 +92,24 @@ int main() {
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
 					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded, std::unique_lock<std::shared_mutex> lock) {
-						std::stringstream rs("");
-						rs << input << " from 0x" << std::hex << board->getDevice().deviceUUID << " [";
-
 						std::string type = endpoint["type"];
-						rs << type << "]: ";
+						printf("%s from 0x%02X [%s]: ", input.c_str(), board->getDevice().deviceUUID, type.c_str());
 						if (type == "uint32") {
-							rs << decoded.value_uint32;
+							printf("%u\n", decoded.value_uint32);
 						} else if (type == "int32") {
-							rs << decoded.value_int32;
+							printf("%i\n", decoded.value_int32);
 						} else if (type == "uint16") {
-							rs << decoded.value_uint16;
+							printf("%u\n", decoded.value_uint16);
 						} else if (type == "uint8") {
-							rs << decoded.value_uint8;
+							printf("%u\n", decoded.value_uint8);
 						} else if (type == "float") {
-							rs << decoded.value_float;
+							printf("%f\n", decoded.value_float);
 						} else if (type == "bool") {
-							rs << (decoded.value_bool ? "true" : "false");
+							printf("%s\n", decoded.value_bool ? "true" : "false");
 						}
 
-						std::cout << rs.str().c_str() << std::endl;
-
 						can::removeDirectReadCallback(board->getDevice(), endpoint["id"], std::move(lock));
-					});
+					}, true);
 
 					board->read(endpoint_id);
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -166,8 +162,31 @@ int main() {
 				can::printCANPacket(p);
 				can::sendCANPacket(p);
 			} else if (testMode == TestMode::Debug) {
-				can::led_t led = static_cast<can::led_t>(prompt("led color (rgb)"));
-				can::setLED(led);
+				double avg = 0;
+				double worst = 0;
+				auto last = std::chrono::steady_clock::now();
+				int n = 1;
+
+				can::addDirectReadCallback(board->getDevice(), 374, [&board, &avg, &worst, &last, &n]([[maybe_unused]] auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
+					auto recv = std::chrono::steady_clock::now();
+					double diff = std::chrono::duration<double, std::milli>(recv - last).count();
+					diff = std::fmod(diff, 50);
+					avg += (diff - avg) / n;
+					if (diff > worst) {
+						worst = diff;
+						printf("%d: %.3f ms, avg: %.3f ms, worst: %.3f ms\n", n, diff, avg, worst);
+					} else if (n % 1000 == 0) {
+						printf("%d: %.3f ms, avg: %.3f ms, worst: %.3f ms\n", n, diff, avg, worst);
+					}
+
+					last = recv;
+					n += 1;
+
+					board->read(374);
+				}, true);
+
+				board->read(374);
+				while(true);
 			}
 		}
 	}

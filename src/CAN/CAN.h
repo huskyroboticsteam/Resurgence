@@ -97,8 +97,10 @@ void emergencyStop();
  * @param device The CAN device associated with this read.
  * @param endpoint The endpoint to respond to.
  * @param callback The function to call when we receive data, called with the decoded packet.
+ * @param timeout Whether to check if a read has timed out or not. Defaults to false
  */
 void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>& callback);
+void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>& callback, bool timeout);
 
 /**
  * @brief Removes a callback.

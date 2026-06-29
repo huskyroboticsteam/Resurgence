@@ -42,7 +42,8 @@ namespace {
 // time to sleep after getting a CAN read error
 constexpr std::chrono::milliseconds READ_ERR_SLEEP(100);
 constexpr std::chrono::milliseconds ACK_TIMEOUT(50);
-constexpr std::chrono::milliseconds READ_TIMEOUT(500);
+// worst timing was ~27ms from testing
+constexpr std::chrono::milliseconds READ_TIMEOUT(50);
 // Heartbeats should come in every 500ms, have some leniency
 constexpr std::chrono::milliseconds HEARTBEAT_TIMEOUT(2000);
 
@@ -161,6 +162,7 @@ void handleEncoderEstimates(CANPacket_t& packet) {
 
 	if (auto it = robot::UUIDBoardMap.find(uuid); it != robot::UUIDBoardMap.end()) {
 		// Going back to interface since that's where we store board references
+		// TODO: we only accept estimates if Rover is running (so like not under FakeCANBoard)
 		robot::handleMotorEncoderEstimate(it->second, positionMdeg);
 	}
 }
@@ -250,9 +252,6 @@ void receiveThreadFn() {
 		LOG_F(ERROR, "Unable to open CAN connection!");
 		return;
 	}
-
-	// Sleep to wait for the world interface to initialize
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 	while (true) {
 		// no synchronization necessary, since this thread owns the FD
@@ -384,22 +383,18 @@ void sendCANPacket(const CANPacket_t& packet) {
 	}
 }
 
-// TODO: this doesn't work
 void printCANPacket(const CANPacket_t& packet) {
-	CANPacket_t mutablePacket = packet; // same as sendCANPacket
-	std::stringstream ss;
-	ss << "CAN: ";
-	ss << std::hex << (packet.senderUUID) << "->";
-	ss << std::hex << (packet.device.deviceUUID);
-	// ss << " domain" << std::hex << ((CANGetPacketHeader(&mutablePacket) & 0x0007));
-	ss << " " << std::hex << static_cast<uint>(packet.command);
-	ss << " [";
-	for (int i = 1; i < CANGetDlc(&mutablePacket); i++) {
-		ss << std::hex << static_cast<uint>(CANGetData(&mutablePacket)[i]) << " ";
-	}
-	ss << "]";
-
-	LOG_F(INFO, ss.str().c_str());
+	LOG_F(INFO, "CAN: %02X->%02X %02X: %02X %02X %02X %02X %02X %02X\n",
+		packet.senderUUID,
+		packet.device.deviceUUID,
+		packet.command,
+		packet.contents[0],
+		packet.contents[1],
+		packet.contents[2],
+		packet.contents[3],
+		packet.contents[4],
+		packet.contents[5]
+	);
 }
 
 void emergencyStop() {
@@ -409,6 +404,10 @@ void emergencyStop() {
 }
 
 void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>& callback) {
+	addDirectReadCallback(device, endpoint_id, callback, false);
+}
+
+void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const std::function<void(CANMotorPacket_BLDC_DirectReadResult_Decoded_t, std::unique_lock<std::shared_mutex>)>& callback, bool timeout) {
 	auto key = std::make_pair(static_cast<uint8_t>(device.deviceUUID), endpoint_id);
 	// Write access
 	std::unique_lock lock(directReadCallbackMutex);
@@ -419,15 +418,17 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const s
 
 	// Start timeout thread
 	std::shared_ptr<std::atomic<bool>> completed = std::make_shared<std::atomic<bool>>(false);
-	std::thread([completed, device, endpoint_id, key]() {
-		std::this_thread::sleep_for(READ_TIMEOUT);
+	if (timeout) {
+		std::thread([completed, device, endpoint_id, key]() {
+			std::this_thread::sleep_for(READ_TIMEOUT);
 
-		std::unique_lock lock(directReadCallbackMutex);
-		if (!completed->load()) {
-			LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint_id);
-			directReadCallbackMap.erase(key);
-		}
-	}).detach();
+			std::unique_lock lock(directReadCallbackMutex);
+			if (!completed->load()) {
+				LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint_id);
+				directReadCallbackMap.erase(key);
+			}
+		}).detach();
+	}
 
 	directReadCallbackMap.emplace(key, std::make_pair(callback, completed));
 }

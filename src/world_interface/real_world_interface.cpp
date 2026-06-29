@@ -35,8 +35,11 @@ std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 	auto itr = board_ptrs.find(board);
 
 	if (itr == board_ptrs.end()) {
-		// board id not in map
-		LOG_F(ERROR, "Unknown board 0x%x", static_cast<uint8_t>(board));
+		// board id not in map, check if just not initialized yet
+		if (auto it = boardDeviceMap.find(board); it == boardDeviceMap.end()) {
+			// board does not exist, log error
+			LOG_F(ERROR, "Unknown board 0x%x", static_cast<uint8_t>(board));
+		}
 		return nullptr;
 	} else {
 		// return board object pointer
