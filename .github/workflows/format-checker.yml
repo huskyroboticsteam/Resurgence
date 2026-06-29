@@ -20,6 +20,8 @@ jobs:
         sudo apt install -y git clang-format-14
         sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-14 100
         sudo update-alternatives --set clang-format /usr/bin/clang-format-14
+    - name: Grab master
+      run: git fetch origin master:master
     - name: Check Formatting
       run: |
         cd ${{ github.workspace }}
