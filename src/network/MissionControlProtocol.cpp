@@ -53,8 +53,8 @@ static bool validateEmergencyStopRequest(const json& j) {
 void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
-		this->stopAndShutdownPowerRepeat(true);
 		robot::emergencyStop();
+		this->stopAndShutdownPowerRepeat(true);
 		LOG_F(ERROR, "Emergency stop!");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
@@ -82,17 +82,17 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 	} 
 }
 
-static bool validateMotorsDisableRequest(const json& j) {
-	return util::validateKey(j, "motors", val_t::boolean);
+static bool validateEnableMotorsRequest(const json& j) {
+	return util::validateKey(j, "enabled", val_t::boolean);
 }
 
-void MissionControlProtocol::handleMotorsDisableRequest(const json& j) {
-	bool motors = j["motors"];
+void MissionControlProtocol::handleEnableMotorsRequest(const json& j) {
+	bool enabled = j["enabled"];
 
-	if (!motors) {
-		LOG_F(INFO, "Disabling motors...");
+	if (!enabled) {
+		robot::emergencyStop();
 		this->stopAndShutdownPowerRepeat(true);
-	}	
+	}
 }
 
 static bool validateDriveRequest(const json& j) {
@@ -301,10 +301,6 @@ void MissionControlProtocol::handleHeartbeatTimedOut() {
 void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 	if (_power_repeat_task.isRunning()) {
 		_power_repeat_task.stop();
-		// explicitly set all joints to zero
-		stopAllJoints();
-		// explicitly stop chassis
-		robot::setCmdVel(0, 0);
 	}
 	// Turn off inverse kinematics so that IK state will be in sync with mission control
 	this->setArmIKEnabled(false, sendDisableIK);
@@ -324,12 +320,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		OPERATION_MODE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
 		validateOperationModeRequest);
-	// drive and joint power handlers need the class for context since they must modify
-	// _last_joint_power and _last_cmd_vel (for the repeater thread)
 	this->addMessageHandler(
-		"disableMotors",
-		std::bind(&MissionControlProtocol::handleMotorsDisableRequest, this, _1),
-		validateMotorsDisableRequest);
+		ENABLE_MOTORS_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleEnableMotorsRequest, this, _1),
+		validateEnableMotorsRequest);
 	this->addMessageHandler(
 		DRIVE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
@@ -411,12 +405,6 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 	_power_repeat_task.setTankCmdVel(left, right);
 	robot::setTankCmdVel(left, right);
-}
-
-static void stopAllJoints() {
-	for (jointid_t current : robot::types::all_jointid_t) {
-		robot::setJointPower(current, 0.0);
-	}
 }
 
 } // namespace net::mc

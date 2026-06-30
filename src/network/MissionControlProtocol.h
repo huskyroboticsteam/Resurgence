@@ -26,9 +26,6 @@ using robot::types::jointid_t;
 using websocket::SingleClientWSServer;
 using websocket::WebSocketProtocol;
 
-/** @brief Set power for all joints to zero. */
-static void stopAllJoints();
-
 class MissionControlProtocol : public WebSocketProtocol { // TODO: add documentation
 public:
 	MissionControlProtocol(SingleClientWSServer& server);
@@ -46,7 +43,7 @@ private:
 
 	void handleEmergencyStopRequest(const json& j);
 	void handleOperationModeRequest(const json& j);
-	void handleMotorsDisableRequest(const json& j);
+	void handleEnableMotorsRequest(const json& j);
 	void handleTankDriveRequest(const json& j);
 	void handleCameraStreamOpenRequest(const json& j);
 	void handleCameraStreamCloseRequest(const json& j);
@@ -56,7 +53,6 @@ private:
 	void handleWaypointNavRequest(const json& j);
 	void handleDriveRequest(const json& j);
 	void handleRequestArmIKEnabled(const json& j);
-	void handleServoPositionRequest(const json& j);
 	void sendArmIKEnabledReport(bool enabled);
 	void handleConnection();
 	void handleHeartbeatTimedOut();

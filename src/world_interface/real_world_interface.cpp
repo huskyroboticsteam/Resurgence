@@ -112,6 +112,13 @@ std::shared_ptr<types::CameraHandle> openCamera(CameraID cameraID) {
 
 void emergencyStop() {
 	can::emergencyStop();
+
+	for (const auto& [board, ptr] : board_ptrs) {
+		if (ptr->getDevice().motorDomain) {
+			ptr->setMotorState(can::motor::axis_state_t::idle);
+		}
+	}
+
 	is_emergency_stopped = true;
 }
 
