@@ -71,7 +71,7 @@ Camera::Camera(const Camera& other)
 	  _extrinsic_params(other._extrinsic_params), _running(other._running) {}
 
 std::string Camera::getGSTPipe(CameraID camera_id) {
-	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
+	cv::FileStorage fs(Constants::Camera::CAMERA_CONFIG_PATHS.at(camera_id), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
 		throw std::invalid_argument("Configuration file for Camera ID" + camera_id + " does not exist");
 	}

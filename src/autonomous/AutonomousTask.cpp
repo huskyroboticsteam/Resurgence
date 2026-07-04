@@ -9,7 +9,7 @@
 #include <loguru.hpp>
 
 using namespace std::chrono_literals;
-using namespace Constants::autonomous;
+using namespace Constants::Nav;
 
 namespace autonomous {
 
@@ -36,7 +36,7 @@ void AutonomousTask::navigate() {
 										 SLOW_DRIVE_THRESHOLD, DONE_THRESHOLD,
 										 CLOSE_TO_TARGET_DUR_VAL);
 
-	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::EFF_WHEEL_BASE);
+	kinematics::DiffDriveKinematics diffDriveKinematics(Constants::Drive::EFF_WHEEL_BASE);
 
 	auto sleepUntil = std::chrono::steady_clock().now();
 	while (!cmd.isDone()) {
@@ -51,7 +51,7 @@ void AutonomousTask::navigate() {
 			commands::command_t output = cmd.getOutput();
 			auto scaledVels = diffDriveKinematics.ensureWithinWheelSpeedLimit(
 				kinematics::DiffDriveKinematics::PreferredVelPreservation::PreferThetaVel,
-				output.xVel, output.thetaVel, Constants::MAX_WHEEL_VEL);
+				output.xVel, output.thetaVel, Constants::Drive::MAX_WHEEL_VEL);
 			navtypes::point_t relTarget = util::toTransform(latestPos) * _waypoint_coords;
 			LOG_F(INFO, "Relative Target: (%lf, %lf)", relTarget(0), relTarget(1));
 			LOG_F(INFO, "thetaVel: %lf", scaledVels(2));

@@ -76,7 +76,7 @@ void WebSocketProtocol::processMessage(const json& obj) const {
 		auto validatorEntry = validatorMap.find(messageType);
 		if (validatorEntry != validatorMap.end()) {
 			if (validatorEntry->second(obj)) {
-				if (protocolPath == Constants::MC_PROTOCOL_NAME) {
+				if (protocolPath == Constants::Network::MC_PROTOCOL_NAME) {
 					LOG_F(INFO, "MC->R: %s", obj.dump().c_str());
 				}
 				handlerMap.at(messageType)(obj);

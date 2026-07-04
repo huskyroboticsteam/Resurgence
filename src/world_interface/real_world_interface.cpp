@@ -4,7 +4,6 @@
 #include "../Constants.h"
 #include "../ardupilot/ArduPilotInterface.h"
 #include "../camera/Camera.h"
-#include "../gps/usb_gps/read_usb_gps.h"
 #include "../navtypes.h"
 #include "../utils/core.h"
 #include "motor/can_motor.h"
@@ -32,7 +31,7 @@ extern const WorldInterface WORLD_INTERFACE = WorldInterface::real;
 std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
 
 namespace {
-kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+kinematics::DiffDriveKinematics drive_kinematics(Constants::Drive::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
 
 void addMotorMapping(motorid_t motor, bool hasPosSensor) {
@@ -297,29 +296,6 @@ void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
 }
-
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-  std::shared_ptr<robot::base_motor> servo_board = getMotor(motorid_t::scienceServoBoard);
-  auto servo_num = servoid_to_servo_num.find(servo);
-  if (servo_num != servoid_to_servo_num.end()) {
-  	servo_board->setServoPos(servo_num->second, position);
-  }
-}
-
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-  std::shared_ptr<robot::base_motor> stepper_board = getMotor(motorid_t::scienceStepperBoard);
-  auto stepper_num = stepperid_to_stepper_num.find(stepper);
-  if (stepper_num != stepperid_to_stepper_num.end()) {
-    stepper_board->setStepperTurnAngle(stepper_num->second, angle);
-  }
-}
-
-void setActuator(uint8_t value) {
-  can::motor::setActuator(can::devicegroup_t::motor, 0x6, value);
-}
-
-// TODO: implement
-void setIndicator(indication_t signal) {}
 
 callbackid_t addLimitSwitchCallback(
 	robot::types::motorid_t motor,

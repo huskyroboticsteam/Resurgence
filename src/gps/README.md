@@ -1,5 +1,5 @@
 
-# Overview
+# Overview (Outdated)
 
 To get GPS data, you need to (install and) run the gpsd daemon. This runs in the background as a separate process, after which you can query for GPS data using a C++ interface.
 

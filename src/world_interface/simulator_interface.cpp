@@ -37,11 +37,7 @@ const std::map<motorid_t, std::string> motorNameMap = {
 	{motorid_t::forearm, "forearm"},
 	{motorid_t::wristDiffLeft, "wristDiffLeft"},
 	{motorid_t::wristDiffRight, "wristDiffRight"},
-	{motorid_t::hand, "hand"},
-	{motorid_t::drillActuator, "drillActuator"},
-	{motorid_t::drillMotor, "drillMotor"},
-	{motorid_t::fourbar1, "fourbar1"},
-	{motorid_t::fourbar2, "fourbar2"}};
+	{motorid_t::hand, "hand"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 
@@ -240,7 +236,7 @@ void initSimServer(net::websocket::SingleClientWSServer& ws) {
 namespace robot {
 
 namespace {
-kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
+kinematics::DiffDriveKinematics drive_kinematics(Constants::Drive::EFF_WHEEL_BASE);
 } // namespace
 
 const kinematics::DiffDriveKinematics& driveKinematics() {
@@ -286,7 +282,7 @@ std::unordered_set<CameraID> getCameras() {
 }
 
 std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
-	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
+	cv::FileStorage fs(Constants::Camera::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
 		throw std::invalid_argument("Configuration file for Camera ID" + cam + " does not exist");
 	}
@@ -399,18 +395,6 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
 	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
 	motor_ptr->setMotorVel(targetVel);
-}
-
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-	// Implement when Servos are added to Simulator
-}
-
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-	// Implement when Steppers are added to Simulator
-}
-
-void setActuator(uint8_t value) {
-	// Implement when Actuators are added to Simulator
 }
 
 callbackid_t addLimitSwitchCallback(

@@ -1,12 +1,10 @@
-IndentWidth: 4
-TabWidth: 4
-ColumnLimit: 95
-UseTab: Always
-BreakBeforeBraces: Attach
-AllowShortEnumsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Empty
 AccessModifierOffset: -4
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeBraces: Attach
+ColumnLimit: 95
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:	"\".+\""
@@ -16,5 +14,9 @@ IncludeCategories:
   - Regex:	"<.+(?:\\.h|\\.hpp)>"
     Priority:	3
 IndentCaseLabels: true
+IndentWidth: 4
 PointerAlignment: Left
-AlwaysBreakTemplateDeclarations: Yes
+SortIncludes: CaseSensitive
+SortUsingDeclarations: true
+TabWidth: 4
+UseTab: Always

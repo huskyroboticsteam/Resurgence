@@ -35,7 +35,7 @@ TEST_CASE("Test Planar Arm Controller Double Init", "[control][planararmcontroll
 	auto fk = std::make_shared<kinematics::PlanarArmFK<2>>(segLens, minAngles, maxAngles);
 	auto ik = std::make_shared<kinematics::FabrikSolver2D<2>>(fk, 0.0, 0);
 	kinematics::ArmKinematics<2, 2> kin_obj(fk, ik);
-	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
+	PlanarArmController<2> foo(kin_obj, Constants::Arm::SAFETY_FACTOR);
 	REQUIRE(foo.tryInitController({0, M_PI_2}));
 	REQUIRE(foo.tryInitController({0, M_PI_2}));
 	REQUIRE(foo.tryInitController({M_PI_4, M_PI_2}));
@@ -54,7 +54,7 @@ TEST_CASE("Test Planar Arm Safety Factor Violation", "[control][planararmcontrol
 	auto fk = std::make_shared<kinematics::PlanarArmFK<2>>(segLens, minAngles, maxAngles);
 	auto ik = std::make_shared<kinematics::FabrikSolver2D<2>>(fk, 0.0, 0);
 	kinematics::ArmKinematics<2, 2> kin_obj(fk, ik);
-	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
+	PlanarArmController<2> foo(kin_obj, Constants::Arm::SAFETY_FACTOR);
 	REQUIRE_FALSE(foo.tryInitController({0, 0}));
 }
 
@@ -68,7 +68,7 @@ TEST_CASE("Test Planar Arm Safety Factor", "[control][planararmcontroller]") {
 	kinematics::ArmKinematics<2, 2> kin_obj(fk, ik);
 
 	// Instantiate PlanarArmController.
-	PlanarArmController<2> foo(kin_obj, Constants::arm::SAFETY_FACTOR);
+	PlanarArmController<2> foo(kin_obj, Constants::Arm::SAFETY_FACTOR);
 	REQUIRE(foo.tryInitController({0, M_PI_2}));
 
 	// Attempt to straighten out end-effector all the way, exceeding max length.
