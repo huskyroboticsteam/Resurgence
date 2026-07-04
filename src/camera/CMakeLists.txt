@@ -1,24 +1,33 @@
 find_package(OpenCV REQUIRED)
 find_package(Threads REQUIRED)
-
-# FetchContent_Declare(
-#     HindsightCAN
-#     GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-#     GIT_TAG cae6622cf6e37889a75dd3fd63676a91a1eef98e
-# )
-
-# FetchContent_MakeAvailable(HindsightCAN)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-app-1.0)
 
 add_executable(calibration
-  calibration.cpp)
+  calibration.cpp
+)
 
-target_link_libraries(calibration ${OpenCV_LIBS})
+target_link_libraries(calibration
+  ${OpenCV_LIBS}
+)
 
-if(WORLD_INTERFACE STREQUAL "REAL")
+if (WORLD_INTERFACE STREQUAL "REAL")
   add_executable(panoramic
-    ./CameraParams.cpp
-    ./Camera.cpp
-    ./CameraConfig.cpp
-    PanoramicCamera.cpp)
-  target_link_libraries(panoramic ${OpenCV_LIBS} can_interface real_world_interface)
-endif()
+    CameraParams.cpp
+    Camera.cpp
+    CameraConfig.cpp
+    H264PassthroughSource.cpp
+    PanoramicCamera.cpp
+  )
+
+  target_include_directories(panoramic PRIVATE
+    ${GSTREAMER_INCLUDE_DIRS}
+  )
+
+  target_link_libraries(panoramic
+    ${OpenCV_LIBS}
+    ${GSTREAMER_LIBRARIES}
+    can_interface
+    real_world_interface
+  )
+endif ()

@@ -56,6 +56,11 @@ CameraConfig readConfigFromFile(const std::string& filename) {
 									" must be present");
 	}
 
+	// read OpenCV enable flag (default true)
+	if (!fs[KEY_OPENCV_ENABLED].empty()) {
+		cfg.openCVEnabled = static_cast<int>(fs[KEY_OPENCV_ENABLED]) != 0;
+	}
+
 	return cfg;
 }
 
