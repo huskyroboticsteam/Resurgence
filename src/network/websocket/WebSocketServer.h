@@ -65,6 +65,13 @@ public:
 	void stop();
 
 	/**
+	 * @brief Get reference to endpoint
+	 *
+	 * @return returns endpoint as TCP endpoint
+	 */
+	std::string getClientAddress();
+
+	/**
 	 * @brief Register a protocol with this server. It will create an endpoint at a protocol
 	 * path which clients can connect to. The protocol and message handlers are defined by the
 	 * protocol object. If a protocol already exists at the given protocol path, do nothing.
@@ -106,6 +113,7 @@ private:
 	};
 
 	std::string serverName;
+	std::string clientAddress;
 	uint16_t port;
 	websocketpp::server<websocketpp::config::asio> server;
 	bool isRunning;

@@ -1,5 +1,9 @@
 #include "MissionControlTasks.h"
 
+#ifndef MY_IP
+#define MY_IP "127.0.0.1"	// Loopback ip if not defined
+#endif
+
 #include "../Constants.h"
 #include "../Globals.h"
 #include "../control_interface.h"
@@ -78,7 +82,22 @@ void PowerRepeatTask::periodicTask() {
 }
 
 CameraStreamTask::CameraStreamTask(websocket::SingleClientWSServer& server)
-	: util::AsyncTask<>("MCP_Stream"), _server(server) {}
+	: util::AsyncTask<>("MCP_Stream"), _server(server), servaddr(), sockfd(-1) {
+		std::string endpoint = server.getClientAddress();
+
+		if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+			perror("socket creation failed"); 
+			exit(EXIT_FAILURE); 
+		}
+
+		servaddr.sin_family = AF_INET;              // IPv4
+		servaddr.sin_port   = htons(3002);          // Server port
+
+		// FOR THIS QUICK SOLUTION YOU MUST CHANGE THE IP TO THE LOCAL NETWORK LOCATION OF THE
+		// MISSION CONTROL
+		std::cout << "IP" << MY_IP << std::endl;
+		servaddr.sin_addr.s_addr = inet_addr(MY_IP); // Server IP
+	}
 
 void CameraStreamTask::openStream(const CameraID& cam, int fps) {
 //	std::lock_guard lock(_mutex);
@@ -135,7 +154,12 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						json msg = {{"type", CAMERA_STREAM_REP_TYPE},
 									{"camera", cam},
 									{"data", data_vector}};
-						_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+						sendto(sockfd, 
+							msg.dump().c_str(), 
+							strlen(msg.dump().c_str()),  
+							0, 
+							(const struct sockaddr *) &servaddr, 
+							sizeof(servaddr)); 
 					}
 				}
 			}
