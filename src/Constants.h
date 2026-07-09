@@ -68,6 +68,8 @@ extern const std::unordered_map<robot::types::CameraID, std::string> CAMERA_CONF
 
 extern const uint16_t WS_SERVER_PORT;
 
+extern const uint16_t WEBRTC_SERVER_PORT;
+
 /**
    WebSocket server endpoint for the mission control protocol.
  */

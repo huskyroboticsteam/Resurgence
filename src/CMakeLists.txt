@@ -123,12 +123,23 @@ if(OFFLINE_MODE STREQUAL "FALSE")
     GIT_REPOSITORY "https://github.com/emilk/loguru"
     GIT_TAG        "master"
   )
+
+  # Fetch WebRTC library (libdatachannel)
+  FetchContent_Declare(libdatachannel
+    GIT_REPOSITORY "https://github.com/paullouisageneau/libdatachannel"
+    GIT_TAG        "master"
+  )
 else()
   message("-- Offline mode enabled, using cached loguru")
   # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
   FetchContent_Declare(
       LoguruGitRepo
       SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/logurugitrepo-src"
+  )
+
+  FetchContent_Declare(
+      libdatachannel
+      SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/libdatachannel-src"
   )
 endif()
 
@@ -137,6 +148,11 @@ set(LOGURU_WITH_STREAMS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 FetchContent_MakeAvailable(LoguruGitRepo) # defines target 'loguru::loguru'
 link_libraries(loguru::loguru -ldl)
+
+# We only want to use certain system libraries (mainly and only nlohmann_json)
+set(USE_SYSTEM_JSON ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(libdatachannel)
+set(USE_SYSTEM_JSON OFF CACHE BOOL "" FORCE)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -238,7 +254,7 @@ add_library(world_interface_core STATIC
   world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
+target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera LibDataChannel::LibDataChannel)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
   # CAN library (above) requires some utilities from this

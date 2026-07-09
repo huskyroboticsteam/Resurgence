@@ -6,6 +6,7 @@
 #include "../world_interface/world_interface.h"
 #include "websocket/WebSocketServer.h"
 
+#include <rtc/rtc.hpp>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -60,7 +61,7 @@ private:
  */
 class CameraStreamTask : public util::AsyncTask<> {
 public:
-	CameraStreamTask(websocket::SingleClientWSServer& server);
+	CameraStreamTask(rtc::PeerConnection& server);
 
 	/**
 	 * @brief Start streaming a new camera to Mission Control.
@@ -92,7 +93,7 @@ private:
 	};
 
 
-	websocket::SingleClientWSServer& _server;
+	rtc::PeerConnection& _server;
 	std::mutex _mutex;
 	std::unordered_map<robot::types::CameraID, stream_data_t> _open_streams;
 };

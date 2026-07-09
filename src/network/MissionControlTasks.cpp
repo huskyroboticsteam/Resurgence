@@ -77,7 +77,7 @@ void PowerRepeatTask::periodicTask() {
 	}
 }
 
-CameraStreamTask::CameraStreamTask(websocket::SingleClientWSServer& server)
+CameraStreamTask::CameraStreamTask(rtc::PeerConnection& server)
 	: util::AsyncTask<>("MCP_Stream"), _server(server) {}
 
 void CameraStreamTask::openStream(const CameraID& cam, int fps) {
@@ -110,22 +110,39 @@ void CameraStreamTask::closeStream(const CameraID& cam) {
 }
 
 void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
+	// Camera stream is now split into two phases, initialization where we try to connect to MC
+	// data stream and the real loop which sends the camera stream over WebRTC
+	std::shared_ptr<rtc::DataChannel> currentDataChannel;
+	_server.onDataChannel([&currentDataChannel](std::shared_ptr<rtc::DataChannel> incoming) {
+		currentDataChannel = incoming;
+		currentDataChannel->send("Hello world!");
+	});
+
+	while (currentDataChannel == nullptr) {
+		// While connecting to camera don't use too many resources to poll
+		std::cout << "waiting for data channel" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+	}
 	while (isRunningInternal()) {
 		{
+			
 			std::lock_guard lg(_mutex);
 			// for all open streams, check if there is a new frame
 			for (auto& stream : _open_streams) {
 				const CameraID& cam = stream.first;
 				stream_data_t& stream_data = stream.second;
 				uint32_t frame_num = stream_data.frame_num;
-				if (robot::hasNewCameraFrame(cam, frame_num)) {
-					// if there is a new frame, grab it
-					auto camDP = robot::readCamera(cam);
 
-					if (camDP) {
-						auto data = camDP.getData();
-						uint32_t& new_frame_num = data.second;
-						cv::Mat frame = data.first;
+				// if there is a new frame, grab it
+				auto camDP = robot::readCamera(cam);
+
+				if (camDP) {
+					auto data = camDP.getData();
+					uint32_t& new_frame_num = data.second;
+					cv::Mat frame = data.first;
+
+					// Verify that frame to be sent is actually new
+					if (new_frame_num > frame_num) {
 						// update the previous frame number
 						stream_data.frame_num = new_frame_num;
 						const auto& encoder = stream_data.encoder;
@@ -135,7 +152,8 @@ void CameraStreamTask::task(std::unique_lock<std::mutex>&) {
 						json msg = {{"type", CAMERA_STREAM_REP_TYPE},
 									{"camera", cam},
 									{"data", data_vector}};
-						_server.sendJSON(Constants::MC_PROTOCOL_NAME, msg);
+						std::cout << "send to mission control" << std::endl;
+						currentDataChannel->send("test");
 					}
 				}
 			}
