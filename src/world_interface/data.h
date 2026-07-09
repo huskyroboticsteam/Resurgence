@@ -101,6 +101,18 @@ constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand, jointid_t::handActuator, jointid_t::ikForward,
    jointid_t::ikUp, jointid_t::fourBarLinkage, jointid_t::drillActuator, jointid_t::drillMotor});
 
+constexpr auto name_to_motorid = frozen::make_unordered_map<frozen::string, motorid_t>(
+	{{"armBase", motorid_t::armBase},
+	 {"shoulder", motorid_t::shoulder},
+	 {"elbow", motorid_t::elbow},
+	 {"forearm", motorid_t::forearm}});
+
+constexpr auto motorid_to_name = frozen::make_unordered_map<motorid_t, frozen::string>(
+	{{motorid_t::armBase, "armBase"},
+	 {motorid_t::shoulder, "shoulder"},
+	 {motorid_t::elbow, "elbow"},
+	 {motorid_t::forearm, "forearm"}});
+
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
 	 {"shoulder", jointid_t::shoulder},

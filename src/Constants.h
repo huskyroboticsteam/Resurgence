@@ -138,6 +138,15 @@ constexpr auto JOINT_MOTOR_MAP = frozen::make_unordered_map<jointid_t, motorid_t
 	 {jointid_t::drillActuator, motorid_t::drillActuator},
 	 {jointid_t::drillMotor, motorid_t::drillMotor}});
 
+constexpr auto MOTOR_JOINT_MAP = frozen::make_unordered_map<motorid_t, jointid_t>(
+	{{motorid_t::armBase, jointid_t::armBase},
+	 {motorid_t::shoulder, jointid_t::shoulder},
+	 {motorid_t::elbow, jointid_t::elbow},
+	 {motorid_t::forearm, jointid_t::forearm},
+	 {motorid_t::hand, jointid_t::hand},
+	 {motorid_t::drillActuator, jointid_t::drillActuator},
+	 {motorid_t::drillMotor, jointid_t::drillMotor}});
+
 // Arm inverse kinematics
 namespace arm {
 /**

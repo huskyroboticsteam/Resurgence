@@ -79,10 +79,37 @@ void setJointPower(robot::types::jointid_t joint, double power) {
 		power /= std::abs(power);
 	}
 
-	// store power value
-	setJointPowerValue(joint, power);
-	// set motor power
-	setJointMotorPower(joint, power);
+	robot::types::motorid_t motorID = Constants::JOINT_MOTOR_MAP.at(joint);
+
+	bool limSwitchTriggered = getMotorLimStatus(motorID);
+
+	std::cout << "mission control goes through here" << std::endl;
+	if (limSwitchTriggered) {
+		// Check what direction it is able to go in the event of hitting that limit switch
+		// For time being direction that it can still go will be hardcoded to avoid extra 
+		// complexity for a system that might only have like 4 limit switches
+		// THIS WILL BE CHANGED TO SWITCH STATEMENT LATER TO MAKE IT CLEANER
+		if (motorID == robot::types::motorid_t::shoulder) {
+			if (power > 0.0) {
+				// store power value
+				setJointPowerValue(joint, power);
+				// set motor power
+				setJointMotorPower(joint, power);
+			}
+			else {
+				LOG_F(WARNING, "Limit switch has been triggered! Preventing movement of motor");
+			}
+		}
+		else {
+			LOG_F(WARNING, "Motor does not have proper power supply handling for case where limit switch has been triggered!");
+		}
+	}
+	else {
+		// store power value
+		setJointPowerValue(joint, power);
+		// set motor power
+		setJointMotorPower(joint, power);
+	}
 }
 
 void setJointPos(robot::types::jointid_t joint, int32_t targetPos) {

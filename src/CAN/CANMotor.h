@@ -180,6 +180,14 @@ robot::types::DataPoint<int32_t> getMotorPosition(devicegroup_t group, deviceser
 void pullMotorPosition(devicegroup_t group, deviceserial_t serial);
 
 /**
+ * @brief Get status of limit switch.
+ * 
+ * @param serial The CAN serial number of the motor board.
+ */
+robot::types::DataPoint<int32_t> getMotorLimits(deviceserial_t serial);
+
+
+/**
  * @brief Add a callback that is invoked when the limit switch is triggered for a motor board.
  *
  * The event is only triggered when the limit switch is clicked, not released.

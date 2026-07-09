@@ -301,6 +301,8 @@ private:
 	}
 };
 
+
+
 /**
  * @brief An abstract class that can be overridden to run long-running tasks and encapsulate
  * task-related data.
