@@ -221,6 +221,13 @@ int getIndex(const std::vector<T>& vec, const T& val) {
 	return itr == vec.end() ? -1 : itr - vec.begin();
 }
 
+// maybe put separate threading here (don't need separate threading for sim)
+// so mission control protocol thread stops here and puts the task on a queue
+// we'll have a diff thread do the CAN sending stuff.
+// but maybe the only blocking task is acquiring the socket mutex when we send a CAN frame,
+// so maybe we put the threading in there? since we alr have multithreading stuff going on over there
+// will have to check that none of these CAN operations will block tho... which some of them probably will
+// so this is like we need a buffer for actions from mc, vs CAN which is buffering messages from the canline
 void setMotorPower(robot::types::boardid_t board, double power) {
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
