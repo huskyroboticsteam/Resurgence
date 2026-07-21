@@ -43,9 +43,6 @@ enum class WorldInterface {
 /** @brief The current world interface being used. */
 extern const WorldInterface WORLD_INTERFACE;
 
-// TODO: add documentation
-const kinematics::DiffDriveKinematics& driveKinematics();
-
 /**
  * @brief Initialize the world interface.
  *

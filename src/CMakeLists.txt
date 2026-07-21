@@ -259,8 +259,8 @@ elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
   add_library(world_interface ALIAS simulator_interface)
 else()
   add_library(stub_world_interface STATIC
-    world_interface/noop_world.cpp)
-  target_link_libraries(stub_world_interface world_interface_core)
+    world_interface/noop_interface.cpp)
+  target_link_libraries(stub_world_interface gps_interface world_interface_core)
   add_library(world_interface ALIAS stub_world_interface)
 endif()
 

@@ -8,7 +8,6 @@
 #include <atomic>
 #include <vector>
 
-using robot::types::motorid_t;
 using namespace Constants::arm;
 
 namespace {
@@ -46,6 +45,7 @@ net::websocket::SingleClientWSServer websocketServer("DefaultServer",
 													 Constants::WS_SERVER_PORT);
 std::atomic<bool> AUTONOMOUS = false;
 robot::types::mountedperipheral_t mountedPeripheral = robot::types::mountedperipheral_t::none;
+const kinematics::DiffDriveKinematics driveKinematics(Constants::EFF_WHEEL_BASE);
 const kinematics::DiffWristKinematics wristKinematics;
 control::PlanarArmController<2> planarArmController(createArmKinematics(),
 													Constants::arm::SAFETY_FACTOR);
