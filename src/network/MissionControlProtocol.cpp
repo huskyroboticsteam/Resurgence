@@ -57,6 +57,15 @@ void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	this->setArmIKEnabled(false);
 }
 
+static bool validateEnableMotorsRequest(const json& j) {
+	return util::validateKey(j, "enabled", val_t::boolean);
+}
+
+void MissionControlProtocol::handleEnableMotorsRequest(const json& j) {
+	bool enabled = j["enabled"];
+	// TODO
+}
+
 static bool validateOperationModeRequest(const json& j) {
 	return util::validateKey(j, "mode", val_t::string) &&
 		   util::validateOneOf(j, "mode", {"teleoperation", "autonomous"});

@@ -47,25 +47,27 @@ private:
 	tasks::ArmIKTask _arm_ik_task;
 	autonomous::AutonomousTask _autonomous_task;
 
-	void handleEmergencyStopRequest(const json& j);
-	void handleOperationModeRequest(const json& j);
-	void handleTankDriveRequest(const json& j);
-	void handleCameraStreamOpenRequest(const json& j);
-	void handleCameraStreamCloseRequest(const json& j);
+	void handleRequestArmIKEnabled(const json& j);
 	void handleCameraFrameRequest(const json& j);
+	void handleCameraStreamCloseRequest(const json& j);
+	void handleCameraStreamOpenRequest(const json& j);
+	void handleDriveRequest(const json& j);
+	void handleTankDriveRequest(const json& j);
+	void handleEmergencyStopRequest(const json& j);
+	void handleEnableMotorsRequest(const json& j);
 	void handleJointPowerRequest(const json& j);
 	void handleJointPositionRequest([[maybe_unused]] const json& j);
-	void handleWaypointNavRequest(const json& j);
-	void handleDriveRequest(const json& j);
-	void handleRequestArmIKEnabled(const json& j);
+	void handleOperationModeRequest(const json& j);
 	void handleServoPositionRequest(const json& j);
 	void handleStepperTurnAngleRequest(const json& j);
-	void sendArmIKEnabledReport(bool enabled);
+	void handleWaypointNavRequest(const json& j);
+
 	void handleConnection();
 	void handleHeartbeatTimedOut();
-	void stopAndShutdownPowerRepeat(bool sendDisableIK);
 
+	void stopAndShutdownPowerRepeat(bool sendDisableIK);
 	void setArmIKEnabled(bool enabled, bool sendReport = true);
+	void sendArmIKEnabledReport(bool enabled);
 	void setRequestedJointPower(jointid_t joint, double power);
 	void setRequestedCmdVel(double dtheta, double dx);
 	void setRequestedTankCmdVel(double left, double right);
