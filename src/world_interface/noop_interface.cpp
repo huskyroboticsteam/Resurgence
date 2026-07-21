@@ -39,13 +39,6 @@ std::optional<cv::Mat> getCameraExtrinsicParams(types::CameraID camera) { return
 
 types::landmarks_t readLandmarks() { return {}; }
 
-// bool gpsHasFix() { return false; }
-// types::DataPoint<navtypes::point_t> readGPS() { return {}; }
-// types::DataPoint<double> readIMUHeading() { return {}; }
 types::DataPoint<Eigen::Quaterniond> readIMU() { return {}; }
 types::DataPoint<navtypes::pose_t> getTruePose() { return {}; }
-
-// namespace gps {
-// robot::types::DataPoint<navtypes::gpscoords_t> readGPSCoords() { return {}; }
-// }
 }
