@@ -105,7 +105,8 @@ public:
 	   (e.g. enums). This method will throw a std::out_of_range exception if the ID mapping
 	   does not exist. See isIDMapped().
 	 */
-	template <class IDMapping_t> IDMapping_t getIDMappingCast(int id) const {
+	template <class IDMapping_t>
+	IDMapping_t getIDMappingCast(int id) const {
 		return static_cast<IDMapping_t>(this->getIDMapping(id));
 	}
 	/**
@@ -177,7 +178,10 @@ enum URCMarkerName {
    which marker IDs are important. Will update when I get more information about that. As of
    right now, all members of this enum are placeholders.
  */
-enum CIRCMarkerName { CIRCMarker1, CIRCMarker2 };
+enum CIRCMarkerName {
+	CIRCMarker1,
+	CIRCMarker2
+};
 
 /**
    Returns the set of markers that will be used in URC.

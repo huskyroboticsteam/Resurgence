@@ -91,7 +91,6 @@ private:
 			: encoder(encoder), cam_handle(cam_handle), frame_num(0) {}
 	};
 
-
 	websocket::SingleClientWSServer& _server;
 	std::mutex _mutex;
 	std::unordered_map<robot::types::CameraID, stream_data_t> _open_streams;

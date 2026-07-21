@@ -12,3 +12,4 @@ CMakeFiles
 *.swp
 .DS_Store
 /docs/
+.cache/

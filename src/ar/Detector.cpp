@@ -14,8 +14,7 @@
 
 namespace AR {
 
-Detector::Detector() {
-}
+Detector::Detector() {}
 
 Detector::Detector(std::shared_ptr<MarkerSet> marker_set, cam::CameraParams camera_params,
 				   cv::Ptr<cv::aruco::DetectorParameters> detector_params)

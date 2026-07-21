@@ -2,12 +2,13 @@
 #include "../base64/base64_img.h"
 #include "../camera/Camera.h"
 #include "../camera/CameraConfig.h"
+#include "../control/JacobianVelController.h"
 #include "../kinematics/DiffDriveKinematics.h"
 #include "../navtypes.h"
 #include "../network/websocket/WebSocketProtocol.h"
 #include "../utils/core.h"
+#include "../utils/scheduler.h"
 #include "../utils/transform.h"
-#include "motor/sim_motor.h"
 #include "world_interface.h"
 
 #include <atomic>
@@ -28,20 +29,18 @@ using namespace cam;
 
 namespace {
 const std::string PROTOCOL_PATH("/simulator");
-const std::map<motorid_t, std::string> motorNameMap = {
-	{motorid_t::leftTread, "leftTread"},
-	{motorid_t::rightTread, "rightTread"},
-	{motorid_t::armBase, "armBase"},
-	{motorid_t::shoulder, "shoulder"},
-	{motorid_t::elbow, "elbow"},
-	{motorid_t::forearm, "forearm"},
-	{motorid_t::wristDiffLeft, "wristDiffLeft"},
-	{motorid_t::wristDiffRight, "wristDiffRight"},
-	{motorid_t::hand, "hand"},
-	{motorid_t::drillActuator, "drillActuator"},
-	{motorid_t::drillMotor, "drillMotor"},
-	{motorid_t::fourbar1, "fourbar1"},
-	{motorid_t::fourbar2, "fourbar2"}};
+const std::map<boardid_t, std::string> motorNameMap = {
+	{boardid_t::frontTireLeft, "frontTireLeft"},
+	{boardid_t::frontTireRight, "frontTireRight"},
+	{boardid_t::rearTireLeft, "rearTireLeft"},
+	{boardid_t::rearTireRight, "rearTireRight"},
+	{boardid_t::armBase, "armBase"},
+	{boardid_t::shoulder, "shoulder"},
+	{boardid_t::elbow, "elbow"},
+	{boardid_t::forearm, "forearm"},
+	{boardid_t::wristDiffLeft, "wristDiffLeft"},
+	{boardid_t::wristDiffRight, "wristDiffRight"},
+	{boardid_t::hand, "hand"}};
 
 std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer;
 
@@ -59,14 +58,18 @@ std::shared_mutex motorPosMapMutex;
 
 bool is_emergency_stopped = false;
 
-// A mapping of (motor_id, shared pointer to object of the motor)
-std::unordered_map<robot::types::motorid_t, std::shared_ptr<robot::base_motor>> motor_ptrs;
+// velocity control state (per motor)
+std::unordered_map<boardid_t, JacobianVelController<1, 1>> velControllers;
+std::unordered_map<boardid_t, util::PeriodicScheduler<std::chrono::steady_clock>::eventid_t>
+	velEventIDs;
+std::optional<util::PeriodicScheduler<std::chrono::steady_clock>> pSched;
+std::mutex schedulerMutex;
 
 using lscallback_t =
 	std::function<void(robot::types::DataPoint<LimitSwitchData> limitSwitchData)>;
 std::map<std::string, std::map<robot::callbackid_t, lscallback_t>> limitSwitchCallbackMap;
 robot::callbackid_t nextCallbackID = 0;
-std::map<robot::callbackid_t, motorid_t> lsCallbackToMotorMap;
+std::map<robot::callbackid_t, boardid_t> lsCallbackToMotorMap;
 std::mutex limitSwitchCallbackMapMutex; // protects both maps and nextCallbackID
 
 // stores the last camera frame for each camera
@@ -83,12 +86,21 @@ std::condition_variable connectionCV;
 std::mutex connectionMutex;
 bool simConnected = false;
 
+void unscheduleVelocityEvent(boardid_t motor) {
+	auto it = velEventIDs.find(motor);
+	if (it != velEventIDs.end()) {
+		pSched->removeEvent(it->second);
+		velEventIDs.erase(it);
+	}
+}
+
 void sendJSON(const json& obj) {
 	wsServer->get().sendJSON(PROTOCOL_PATH, obj);
 }
 
-static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
-					   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
+static std::shared_ptr<robot::types::CameraHandle>
+openCamera(CameraID cam, std::optional<std::vector<double>> list1d = std::nullopt,
+		   uint8_t fps = 20, uint16_t width = 640, uint16_t height = 480) {
 	if (list1d) {
 		json msg = {{"type", "simCameraStreamOpenRequest"},
 					{"camera", cam},
@@ -108,15 +120,6 @@ static std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam, std:
 	}
 
 	return nullptr;
-}
-
-void initMotors() {
-	// initializes map of motor ids and shared ptrs of their objects
-	for (const auto& x : motorNameMap) {
-		std::shared_ptr<robot::base_motor> ptr =
-			std::make_shared<robot::sim_motor>(x.first, true, x.second, PROTOCOL_PATH);
-		motor_ptrs.insert({x.first, ptr});
-	}
 }
 
 void handleGPS(json msg) {
@@ -247,26 +250,10 @@ const kinematics::DiffDriveKinematics& driveKinematics() {
 	return drive_kinematics;
 }
 
-extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
-
 void world_interface_init(
 	std::optional<std::reference_wrapper<net::websocket::SingleClientWSServer>> wsServer,
 	bool initOnlyMotors) {
 	initSimServer(wsServer.value());
-	initMotors();
-}
-
-std::shared_ptr<robot::base_motor> getMotor(robot::types::motorid_t motor) {
-	auto itr = motor_ptrs.find(motor);
-
-	if (itr == motor_ptrs.end()) {
-		// motor id not in map
-		LOG_F(ERROR, "getMotor(): Unknown motor %d", static_cast<int>(motor));
-		return nullptr;
-	} else {
-		// return motor object pointer
-		return itr->second;
-	}
 }
 
 void emergencyStop() {
@@ -288,19 +275,21 @@ std::unordered_set<CameraID> getCameras() {
 std::shared_ptr<robot::types::CameraHandle> openCamera(CameraID cam) {
 	cv::FileStorage fs(Constants::CAMERA_CONFIG_PATHS.at(cam), cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		throw std::invalid_argument("Configuration file for Camera ID" + cam + " does not exist");
+		throw std::invalid_argument("Configuration file for Camera ID" + cam +
+									" does not exist");
 	}
 
-	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() || fs[KEY_FRAMERATE].empty()) {
+	if (fs[KEY_IMAGE_WIDTH].empty() || fs[KEY_IMAGE_HEIGHT].empty() ||
+		fs[KEY_FRAMERATE].empty()) {
 		throw std::invalid_argument("Configuration file missing key(s)");
 	}
 
 	json msg = {{"type", "simCameraStreamOpenRequest"},
-			{"camera", cam},
-			{"fps", static_cast<int>(fs[KEY_FRAMERATE])},
-			{"width", static_cast<int>(fs[KEY_IMAGE_WIDTH])},
-			{"height", static_cast<int>(fs[KEY_IMAGE_HEIGHT])},
-			{"intrinsics", nullptr}};
+				{"camera", cam},
+				{"fps", static_cast<int>(fs[KEY_FRAMERATE])},
+				{"width", static_cast<int>(fs[KEY_IMAGE_WIDTH])},
+				{"height", static_cast<int>(fs[KEY_IMAGE_HEIGHT])},
+				{"intrinsics", nullptr}};
 	sendJSON(msg);
 	auto camObject = std::make_shared<cam::Camera>();
 	// Just need to return a value so that we can append the camera stream
@@ -370,17 +359,25 @@ DataPoint<pose_t> getTruePose() {
 	return lastTruePose;
 }
 
-void setMotorPower(motorid_t motor, double normalizedPWM) {
-	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
-	motor_ptr->setMotorPower(normalizedPWM);
+void setMotorPower(boardid_t motor, double normalizedPWM) {
+	unscheduleVelocityEvent(motor);
+
+	json msg = {{"type", "simMotorPowerRequest"},
+				{"motor", motorNameMap.at(motor)},
+				{"power", normalizedPWM}};
+	sendJSON(msg);
 }
 
-void setMotorPos(motorid_t motor, int32_t targetPos) {
-	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
-	motor_ptr->setMotorPos(targetPos);
+void setMotorPos(boardid_t motor, int32_t targetPos) {
+	unscheduleVelocityEvent(motor);
+
+	json msg = {{"type", "simMotorPositionRequest"},
+				{"motor", motorNameMap.at(motor)},
+				{"position", targetPos}};
+	sendJSON(msg);
 }
 
-DataPoint<int32_t> getMotorPos(motorid_t motor) {
+DataPoint<int32_t> getMotorPos(boardid_t motor) {
 	auto itr = motorNameMap.find(motor);
 	if (itr != motorNameMap.end()) {
 		std::string motorName = itr->second;
@@ -396,26 +393,54 @@ DataPoint<int32_t> getMotorPos(motorid_t motor) {
 	}
 }
 
-void setMotorVel(robot::types::motorid_t motor, int32_t targetVel) {
-	std::shared_ptr<robot::base_motor> motor_ptr = getMotor(motor);
-	motor_ptr->setMotorVel(targetVel);
-}
+void setMotorVel(robot::types::boardid_t motor, int8_t targetVel) {
+	using namespace std::chrono_literals;
 
-void setServoPos(robot::types::servoid_t servo, int32_t position) {
-	// Implement when Servos are added to Simulator
-}
+	// ensure scheduler exists
+	{
+		std::lock_guard<std::mutex> lg(schedulerMutex);
+		if (!pSched) {
+			pSched.emplace("MotorVelSched");
+		}
+	}
 
-void setRequestedStepperTurnAngle(robot::types::stepperid_t stepper, int16_t angle) {
-	// Implement when Steppers are added to Simulator
-}
+	// create velocity controller if needed
+	if (velControllers.find(motor) == velControllers.end()) {
+		constexpr int32_t dim = 1;
+		auto kinematics = [](const navtypes::Vectord<dim>& v) { return v; };
+		auto jacobian = [](const navtypes::Vectord<dim>&) {
+			return navtypes::Matrixd<dim, dim>::Identity();
+		};
+		velControllers.emplace(motor, JacobianVelController<1, 1>(kinematics, jacobian));
+	}
 
-void setActuator(uint8_t value) {
-	// Implement when Actuators are added to Simulator
+	// set velocity target
+	auto& ctrl = velControllers.at(motor);
+	navtypes::Vectord<1> velocityVector{targetVel};
+	ctrl.setTarget(types::dataclock::now(), velocityVector);
+
+	// unschedule existing event for this motor
+	auto it = velEventIDs.find(motor);
+	if (it != velEventIDs.end()) {
+		pSched->removeEvent(it->second);
+		velEventIDs.erase(it);
+	}
+
+	// schedule periodic position updates
+	velEventIDs[motor] = pSched->scheduleEvent(100ms, [motor, &ctrl]() {
+		auto motorPos = robot::getMotorPos(motor);
+		if (motorPos.isValid()) {
+			const navtypes::Vectord<1> currPos{motorPos.getData()};
+			navtypes::Vectord<1> posCommand =
+				ctrl.getCommand(types::dataclock::now(), currPos);
+			robot::setMotorPos(motor, posCommand.coeff(0, 0));
+		}
+	});
 }
 
 callbackid_t addLimitSwitchCallback(
-	robot::types::motorid_t motor,
-	const std::function<void(robot::types::motorid_t motor,
+	robot::types::boardid_t motor,
+	const std::function<void(robot::types::boardid_t motor,
 							 robot::types::DataPoint<LimitSwitchData> limitSwitchData)>&
 		callback) {
 	auto itr = motorNameMap.find(motor);
@@ -448,6 +473,16 @@ void setIndicator(indication_t signal) {
 		LOG_F(INFO, "Robot arrived at destination!");
 	}
 }
+
+void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionMdeg) {}
+
+void setStepperRevs(robot::types::boardid_t board, float revs) {}
+
+void setActuator(int8_t out) {}
+
+void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {}
+
+void setLED(uint8_t color) {}
 
 } // namespace robot
 

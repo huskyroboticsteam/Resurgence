@@ -1,6 +1,8 @@
 #include "CameraConfig.h"
-#include <opencv2/core.hpp>
+
 #include <vector>
+
+#include <opencv2/core.hpp>
 namespace cam {
 
 invalid_camera_config::invalid_camera_config() : _msg("Invalid camera configuration") {}
