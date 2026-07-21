@@ -239,14 +239,6 @@ void initSimServer(net::websocket::SingleClientWSServer& ws) {
 
 namespace robot {
 
-namespace {
-kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
-} // namespace
-
-const kinematics::DiffDriveKinematics& driveKinematics() {
-	return drive_kinematics;
-}
-
 extern const WorldInterface WORLD_INTERFACE = WorldInterface::sim3d;
 
 void world_interface_init(

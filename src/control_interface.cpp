@@ -38,7 +38,7 @@ double setCmdVel(double dtheta, double dx) {
 		return 0;
 	}
 
-	kinematics::wheelvel_t wheelVels = driveKinematics().robotVelToWheelVel(dx, dtheta);
+	kinematics::wheelvel_t wheelVels = Globals::driveKinematics.robotVelToWheelVel(dx, dtheta);
 	double lPWM = wheelVels.lVel / Constants::MAX_WHEEL_VEL;
 	double rPWM = wheelVels.rVel / Constants::MAX_WHEEL_VEL;
 	double maxAbsPWM = std::max(std::abs(lPWM), std::abs(rPWM));
