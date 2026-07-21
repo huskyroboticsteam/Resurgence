@@ -57,6 +57,7 @@ std::map<std::string, DataPoint<int32_t>> motorPosMap;
 std::shared_mutex motorPosMapMutex;
 
 bool is_emergency_stopped = false;
+bool motors_enabled = false;
 
 // velocity control state (per motor)
 std::unordered_map<boardid_t, JacobianVelController<1, 1>> velControllers;
@@ -261,10 +262,18 @@ void emergencyStop() {
 		setMotorPower(motor.first, 0.0);
 	}
 	is_emergency_stopped = true;
+	motors_enabled = false;
 }
 
 bool isEmergencyStopped() {
 	return is_emergency_stopped;
+}
+
+void enableMotors(bool enabled) {
+	motors_enabled = enabled;
+}
+bool areMotorsEnabled() {
+	return motors_enabled;
 }
 
 std::unordered_set<CameraID> getCameras() {

@@ -7,6 +7,7 @@
 #include "../navtypes.h"
 #include "../utils/core.h"
 #include "../utils/scheduler.h"
+#include "data.h"
 #include "real_world_constants.h"
 #include "world_interface.h"
 
@@ -30,6 +31,7 @@ std::unordered_map<robot::types::boardid_t, std::shared_ptr<can::CANBoard>> boar
 
 kinematics::DiffDriveKinematics drive_kinematics(Constants::EFF_WHEEL_BASE);
 bool is_emergency_stopped = false;
+bool motors_enabled = false;
 
 std::shared_ptr<can::CANBoard> getBoard_(robot::types::boardid_t board) {
 	auto itr = board_ptrs.find(board);
@@ -120,10 +122,18 @@ void emergencyStop() {
 	}
 
 	is_emergency_stopped = true;
+	motors_enabled = false;
 }
 
 bool isEmergencyStopped() {
 	return is_emergency_stopped;
+}
+
+void enableMotors(bool enabled) {
+	motors_enabled = enabled;
+}
+bool areMotorsEnabled() {
+	return motors_enabled;
 }
 
 std::unordered_set<CameraID> getCameras() {
@@ -229,6 +239,15 @@ int getIndex(const std::vector<T>& vec, const T& val) {
 }
 
 void setMotorPower(robot::types::boardid_t board, double power) {
+	if (is_emergency_stopped) {
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setMotorPower for %s at %f", util::to_string(board).c_str(), power);
+		return;
+	}
+	if (!motors_enabled) {
+		LOG_F(WARNING, "Motors NOT enabled! Ignoring setMotorPower for %s at %f", util::to_string(board).c_str(), power);
+		return;
+	}
+
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
 		board_ptr->setMotorPower(power);
@@ -236,6 +255,15 @@ void setMotorPower(robot::types::boardid_t board, double power) {
 }
 
 void setMotorPos(robot::types::boardid_t board, int32_t targetPos) {
+	if (is_emergency_stopped) {
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setMotorPos for %s at %d", util::to_string(board).c_str(), targetPos);
+		return;
+	}
+	if (!motors_enabled) {
+		LOG_F(WARNING, "Motors NOT enabled! Ignoring setMotorPos for %s at %d", util::to_string(board).c_str(), targetPos);
+		return;
+	}
+
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
 		// TODO: Implement
@@ -252,6 +280,15 @@ robot::types::DataPoint<int32_t> getMotorPos(robot::types::boardid_t board) {
 }
 
 void setMotorVel(robot::types::boardid_t board, int8_t targetVel) {
+	if (is_emergency_stopped) {
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setMotorVel for %s at %d", util::to_string(board).c_str(), targetVel);
+		return;
+	}
+	if (!motors_enabled) {
+		LOG_F(WARNING, "Motors NOT enabled! Ignoring setMotorVel for %s at %d", util::to_string(board).c_str(), targetVel);
+		return;
+	}
+
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
 		board_ptr->setMotorVel(targetVel);
@@ -285,6 +322,15 @@ void handleMotorEncoderEstimate(robot::types::boardid_t board, int32_t positionM
 }
 
 void setStepperRevs(robot::types::boardid_t board, float revs) {
+	if (is_emergency_stopped) {
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setStepperRevs for %s at %f", util::to_string(board).c_str(), revs);
+		return;
+	}
+	if (!motors_enabled) {
+		LOG_F(WARNING, "Motors NOT enabled! Ignoring setStepperRevs for %s at %f", util::to_string(board).c_str(), revs);
+		return;
+	}
+
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(board);
 	if (board_ptr) {
 		board_ptr->setStepperRevs(revs);
@@ -292,6 +338,15 @@ void setStepperRevs(robot::types::boardid_t board, float revs) {
 }
 
 void setActuator(int8_t out) {
+	if (is_emergency_stopped) {
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setActuator at %d", out);
+		return;
+	}
+	if (!motors_enabled) {
+		LOG_F(WARNING, "Motors NOT enabled! Ignoring setActuator at %d", out);
+		return;
+	}
+
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(robot::types::boardid_t::hand);
 	if (board_ptr) {
 		board_ptr->setActuator(out);
@@ -299,6 +354,15 @@ void setActuator(int8_t out) {
 }
 
 void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {
+	if (is_emergency_stopped) {
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setPeripheralPWM for %d at %f", peripheralID, dutyCycle);
+		return;
+	}
+	if (!motors_enabled) {
+		LOG_F(WARNING, "Motors NOT enabled! Ignoring setPeripheralPWM for %d at %f", peripheralID, dutyCycle);
+		return;
+	}
+
 	std::shared_ptr<can::CANBoard> board_ptr = getBoard_(robot::types::boardid_t::hand);
 	if (board_ptr) {
 		board_ptr->setPWMDutyCycle(peripheralID, dutyCycle);
@@ -306,6 +370,15 @@ void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {
 }
 
 void setLED(uint8_t color) {
+	if (is_emergency_stopped) {
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setLED of %d", color);
+		return;
+	}
+	if (!motors_enabled) {
+		LOG_F(WARNING, "Motors NOT enabled! Ignoring setLED of %d", color);
+		return;
+	}
+
 	can::led_t led = static_cast<can::led_t>(color);
 	can::setLED(led);
 }

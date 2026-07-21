@@ -89,10 +89,7 @@ static bool validateEnableMotorsRequest(const json& j) {
 void MissionControlProtocol::handleEnableMotorsRequest(const json& j) {
 	bool enabled = j["enabled"];
 
-	if (!enabled) {
-		robot::emergencyStop();
-		this->stopAndShutdownPowerRepeat(true);
-	}
+	robot::enableMotors(enabled);
 }
 
 static bool validateDriveRequest(const json& j) {
