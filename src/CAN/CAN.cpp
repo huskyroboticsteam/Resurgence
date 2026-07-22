@@ -6,6 +6,7 @@
 #include <cstring>
 #include <fstream>
 #include <future>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -323,6 +324,7 @@ void initCAN() {
 	can_fd = createCANSocket({});
 	if (can_fd < 0) {
 		LOG_F(ERROR, "Unable to open CAN connection!");
+		std::__throw_runtime_error("Unable to open CAN connection!");
 	}
 
 	// Load Odrive endpoint jsons (files relative to build/)

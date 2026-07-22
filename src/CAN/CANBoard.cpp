@@ -26,20 +26,20 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         sendCANPacket(p);
 
         // Ping motor for configs
-        if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
-            endpointid_t endpoint_id = endpoint["id"];
-            addDirectReadCallback(this->device, endpoint_id, [=](auto p, std::unique_lock<std::shared_mutex> lock) {
-                this->vel_limit = p.value_float;
+        // if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
+        //     endpointid_t endpoint_id = endpoint["id"];
+        //     addDirectReadCallback(this->device, endpoint_id, [=](auto p, std::unique_lock<std::shared_mutex> lock) {
+        //         this->vel_limit = p.value_float;
 
-                // We only need this once, remove after we get a response
-                removeDirectReadCallback(this->device, endpoint_id, std::move(lock));
-            }, true);
+        //         // We only need this once, remove after we get a response
+        //         removeDirectReadCallback(this->device, endpoint_id, std::move(lock));
+        //     }, true);
 
-            this->read(endpoint_id);
-        } else {
-            LOG_F(WARNING, "No velocity limits for %s, disabling!", util::to_string(this->board_id).c_str());
-            this->vel_limit = 0;
-        }
+        //     this->read(endpoint_id);
+        // } else {
+        //     LOG_F(WARNING, "No velocity limits for %s, disabling!", util::to_string(this->board_id).c_str());
+        //     this->vel_limit = 0;
+        // }
 
         // Any time we send a velocity, the translator board will also set the lockin spin velocity as well, in case we need it
         // It does this through a direct write, which is ack'd by the odrive sending back a read result to let us know

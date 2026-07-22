@@ -12,3 +12,5 @@ CMakeFiles
 *.swp
 .DS_Store
 /docs/
+.cache/
+odrive-config/
