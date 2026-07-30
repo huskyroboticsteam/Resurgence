@@ -62,6 +62,9 @@ void emergencyStop();
  */
 bool isEmergencyStopped();
 
+void enableMotors(bool enabled);
+bool areMotorsEnabled();
+
 /**
  * @brief Get the IDs of the currently supported cameras.
  *

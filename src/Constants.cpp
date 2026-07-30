@@ -87,6 +87,8 @@ const char* DGPS_PROTOCOL_NAME = "/dgps";
  */
 const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 
+const char* CAN_NAME = "can1";
+
 const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
