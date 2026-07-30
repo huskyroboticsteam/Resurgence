@@ -192,10 +192,10 @@ int createCANSocket(std::optional<CANDevice_t> device) {
 	}
 
 	struct ifreq ifr;
-	std::strcpy(ifr.ifr_name, "can0");
+	std::strcpy(ifr.ifr_name, Constants::CAN_NAME);
 	if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
 		LOG_F(ERROR, "Failed to get hardware CAN interface index: %s", std::strerror(errno));
-		std::strcpy(ifr.ifr_name, "vcan0");
+		std::strcpy(ifr.ifr_name, (std::string("v") + std::string(Constants::CAN_NAME)).c_str());
 		if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
 			LOG_F(ERROR, "Failed to get virtual CAN interface index: %s",
 				  std::strerror(errno));

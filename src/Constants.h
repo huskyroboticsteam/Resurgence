@@ -91,6 +91,8 @@ extern const char* DGPS_PROTOCOL_NAME;
  */
 extern const char* ARDUPILOT_PROTOCOL_NAME;
 
+extern const char* CAN_NAME;
+
 extern const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD;
 extern const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD;
 
