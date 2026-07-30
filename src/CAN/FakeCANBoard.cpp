@@ -91,7 +91,7 @@ int main() {
 
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
-					can::addDirectReadCallback(board->getDevice(), endpoint_id, [board, input, endpoint](auto decoded, std::unique_lock<std::shared_mutex> lock) {
+					can::addDirectReadCallback(board->getDevice(), endpoint_id, [&](auto decoded, std::unique_lock<std::shared_mutex> lock) {
 						std::string type = endpoint["type"];
 						printf("%s from 0x%02X [%s]: ", input.c_str(), board->getDevice().deviceUUID, type.c_str());
 						if (type == "uint32") {
@@ -109,7 +109,7 @@ int main() {
 						}
 
 						can::removeDirectReadCallback(board->getDevice(), endpoint["id"], std::move(lock));
-					}, true);
+					}); // TODO: does not repeatedly re-read
 
 					board->read(endpoint_id);
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -167,7 +167,7 @@ int main() {
 				auto last = std::chrono::steady_clock::now();
 				int n = 1;
 
-				can::addDirectReadCallback(board->getDevice(), 374, [&board, &avg, &worst, &last, &n]([[maybe_unused]] auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
+				can::addDirectReadCallback(board->getDevice(), 374, [&]([[maybe_unused]] auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
 					auto recv = std::chrono::steady_clock::now();
 					double diff = std::chrono::duration<double, std::milli>(recv - last).count();
 					diff = std::fmod(diff, 50);
@@ -183,7 +183,7 @@ int main() {
 					n += 1;
 
 					board->read(374);
-				}, true);
+				});
 
 				board->read(374);
 				while(true);

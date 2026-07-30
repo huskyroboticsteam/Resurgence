@@ -5,9 +5,13 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <set>
 
 const std::set<const char*> endpoints({
+    "fw_version_major",
+    "fw_version_minor",
+    "fw_version_revision",
     "axis0.controller.config.vel_limit"
 });
 
@@ -23,7 +27,7 @@ int main() {
     std::unordered_map<robot::types::boardid_t, std::shared_ptr<can::CANBoard>> board_ptrs;
 
     for (const auto& [board, device] : robot::boardDeviceMap) {
-        if (!device.motorDomain) { continue; }
+        if (!device.motorDomain || board == robot::types::boardid_t::hand) { continue; }
         std::shared_ptr<can::CANBoard> ptr = std::make_shared<can::CANBoard>(board, device);
 
         std::string name = util::to_string(board);
@@ -40,14 +44,20 @@ int main() {
         std::ofstream wfs(file);
 
         // Go through each endpoint
-        nlohmann::json obj;
+        nlohmann::json obj(nlohmann::json::value_t::object);
         for (const char* endpoint : endpoints) {
             if (nlohmann::json json = can::getEndpoint(board, endpoint); json != nullptr) {
                 can::endpointid_t endpoint_id = json["id"];
-                can::addDirectReadCallback(device, endpoint_id, [&](auto p, std::unique_lock<std::shared_mutex> lock) {
-                    if (prev) {
+                bool finished = false;
+                can::addDirectReadCallback(device, endpoint_id, [&, name=name](auto p, std::unique_lock<std::shared_mutex> lock) {
+                    if (!lock.mutex()) {
+                        finished = true;
+                        return;
+                    }
+
+                    if (prev != nullptr && prev[endpoint] != nullptr) {
                         if (prev[endpoint] != p.value_float) {
-                            std::cout << name << ": " << "prev=" << prev[endpoint] << ",recv=" << p.value_float;
+                            std::cout << name << " " << endpoint << ": " << "prev=" << prev[endpoint] << ",recv=" << p.value_float;
 
                             std::string in;
                             while (true) {
@@ -65,6 +75,8 @@ int main() {
                                     continue;
                                 }
                             }
+                        } else {
+                            obj[endpoint] = prev[endpoint];
                         }
                     } else {
                         obj[endpoint] = p.value_float;
@@ -72,9 +84,14 @@ int main() {
 
                     // We only need this once, remove after we get a response
                     can::removeDirectReadCallback(ptr->getDevice(), endpoint_id, std::move(lock));
+                    finished = true;
                 }, true);
 
                 ptr->read(endpoint_id);
+
+                while (!finished) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
             }
         }
 

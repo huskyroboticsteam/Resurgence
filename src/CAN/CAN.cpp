@@ -6,7 +6,6 @@
 #include <cstring>
 #include <fstream>
 #include <future>
-#include <list>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -426,7 +425,8 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const s
 
 			std::unique_lock lock(directReadCallbackMutex);
 			if (!completed->load()) {
-				LOG_F(ERROR, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint_id);
+				VLOG_F(DEBUG, "0x%x read of %d timed out! Removing callback...", device.deviceUUID, endpoint_id);
+				directReadCallbackMap.find(key)->second.first({}, std::unique_lock<std::shared_mutex>());
 				directReadCallbackMap.erase(key);
 			}
 		}).detach();

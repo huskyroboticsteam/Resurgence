@@ -1,7 +1,10 @@
 #include "CANBoard.h"
 #include "../world_interface/real_world_constants.h"
 
+#include <nlohmann/detail/exceptions.hpp>
 #include <nlohmann/json.hpp>
+
+#include <fstream>
 
 namespace can {
 
@@ -25,21 +28,26 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         );
         sendCANPacket(p);
 
-        // Ping motor for configs
-        // if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
-        //     endpointid_t endpoint_id = endpoint["id"];
-        //     addDirectReadCallback(this->device, endpoint_id, [=](auto p, std::unique_lock<std::shared_mutex> lock) {
-        //         this->vel_limit = p.value_float;
+        if (!this->pullConfigs()) {
+            // Ping motor for configs
+            if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
+                endpointid_t endpoint_id = endpoint["id"];
+                addDirectReadCallback(this->device, endpoint_id, [&](auto p, std::unique_lock<std::shared_mutex> lock) {
+                    // If the lock does not have an associated mutex, then this is a timeout call.
+                    if (!lock.mutex()) {
+                        LOG_F(WARNING, "%s timed out when retrieving velocity limit, disabling!", util::to_string(this->board_id).c_str());
+                        this->vel_limit = 0;
+                    } else {
+                        this->vel_limit = p.value_float;
+                    }
 
-        //         // We only need this once, remove after we get a response
-        //         removeDirectReadCallback(this->device, endpoint_id, std::move(lock));
-        //     }, true);
+                    // We only need this once, remove after we get a response
+                    removeDirectReadCallback(this->device, endpoint_id, std::move(lock));
+                }, true);
 
-        //     this->read(endpoint_id);
-        // } else {
-        //     LOG_F(WARNING, "No velocity limits for %s, disabling!", util::to_string(this->board_id).c_str());
-        //     this->vel_limit = 0;
-        // }
+                this->read(endpoint_id);
+            }
+        }
 
         // Any time we send a velocity, the translator board will also set the lockin spin velocity as well, in case we need it
         // It does this through a direct write, which is ack'd by the odrive sending back a read result to let us know
@@ -49,7 +57,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
         // Call back to double-check velocity set correctly
         if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.input_vel"); endpoint != nullptr) {
             addDirectReadCallback(this->device, endpoint["id"], [=](auto decoded, std::unique_lock<std::shared_mutex> lock) {
-                if (decoded.value_float != input_vel) {
+                if (this->input_vel != decoded.value_float) {
                     LOG_F(ERROR, "Expected %f, got %f", this->input_vel, decoded.value_float);
                 }
             });
@@ -197,6 +205,33 @@ void CANBoard::read(endpointid_t endpoint) {
         Constants::JETSON_DEVICE, this->device, endpoint
     );
     sendCANPacket(p);
+}
+
+// Pull configs from local files, if they exist
+bool CANBoard::pullConfigs() {
+    std::string name = util::to_string(this->board_id);
+    std::string file = "../odrive-config/" + name + ".json";
+    std::ifstream rfs(file);
+
+    if (!rfs.is_open()) {
+        rfs.close();
+        return false;
+    }
+
+    try {
+        nlohmann::json prev = nlohmann::json::parse(rfs);
+        if (prev != nullptr && prev["axis0.controller.config.vel_limit"] != nullptr) {
+            this->vel_limit = prev["axis0.controller.config.vel_limit"];
+            rfs.close();
+            return true;
+        } else {
+            rfs.close();
+            return false;
+        }
+    } catch (nlohmann::json::parse_error) {
+        rfs.close();
+        return false;
+    }
 }
 
 } // namespace can
