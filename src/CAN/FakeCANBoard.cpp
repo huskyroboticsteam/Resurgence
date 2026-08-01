@@ -52,6 +52,8 @@ int main() {
 	ss << static_cast<int>(TestMode::Peripheral) << " for PERIPHERAL\n";
 	ss << static_cast<int>(TestMode::RawCAN) << " for RAW CAN\n";
 
+	int brake = 0;
+
 	while (true) {
 		int test_type = prompt(ss.str().c_str());
 
@@ -72,6 +74,7 @@ int main() {
 				state_msg << static_cast<int>(can::motor::axis_state_t::idle) << " idle\n";
 				state_msg << static_cast<int>(can::motor::axis_state_t::full_calib) << " full calibration\n";
 				state_msg << static_cast<int>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::harmonic_calib) << " harmonic calibration";
 
 				int state = prompt(state_msg.str().c_str());
 				can::motor::axis_state_t motor_state = static_cast<can::motor::axis_state_t>(state);
@@ -162,31 +165,39 @@ int main() {
 				can::printCANPacket(p);
 				can::sendCANPacket(p);
 			} else if (testMode == TestMode::Debug) {
-				double avg = 0;
-				double worst = 0;
-				auto last = std::chrono::steady_clock::now();
-				int n = 1;
+				CANPacket_t p = CANPeripheralPacket_SetBrakes(
+					Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, brake + 1, 0
+				);
+				can::sendCANPacket(p);
 
-				can::addDirectReadCallback(board->getDevice(), 374, [&]([[maybe_unused]] auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
-					auto recv = std::chrono::steady_clock::now();
-					double diff = std::chrono::duration<double, std::milli>(recv - last).count();
-					diff = std::fmod(diff, 50);
-					avg += (diff - avg) / n;
-					if (diff > worst) {
-						worst = diff;
-						printf("%d: %.3f ms, avg: %.3f ms, worst: %.3f ms\n", n, diff, avg, worst);
-					} else if (n % 1000 == 0) {
-						printf("%d: %.3f ms, avg: %.3f ms, worst: %.3f ms\n", n, diff, avg, worst);
-					}
+				brake = (brake + 1) % 6;
 
-					last = recv;
-					n += 1;
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				// double avg = 0;
+				// double worst = 0;
+				// auto last = std::chrono::steady_clock::now();
+				// int n = 1;
 
-					board->read(374);
-				});
+				// can::addDirectReadCallback(board->getDevice(), 374, [&board, &avg, &worst, &last, &n]([[maybe_unused]] auto decoded, [[maybe_unused]] std::unique_lock<std::shared_mutex> lock) {
+				// 	auto recv = std::chrono::steady_clock::now();
+				// 	double diff = std::chrono::duration<double, std::milli>(recv - last).count();
+				// 	diff = std::fmod(diff, 50);
+				// 	avg += (diff - avg) / n;
+				// 	if (diff > worst) {
+				// 		worst = diff;
+				// 		printf("%d: %.3f ms, avg: %.3f ms, worst: %.3f ms\n", n, diff, avg, worst);
+				// 	} else if (n % 1000 == 0) {
+				// 		printf("%d: %.3f ms, avg: %.3f ms, worst: %.3f ms\n", n, diff, avg, worst);
+				// 	}
 
-				board->read(374);
-				while(true);
+				// 	last = recv;
+				// 	n += 1;
+
+				// 	board->read(374);
+				// }, true);
+
+				// board->read(374);
+				// while(true);
 			}
 		}
 	}

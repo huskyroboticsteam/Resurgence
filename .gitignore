@@ -69,3 +69,6 @@ Testing/
 
 # local parameters
 odrive-config/
+
+# vscode
+.vscode/

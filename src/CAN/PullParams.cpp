@@ -55,9 +55,25 @@ int main() {
                         return;
                     }
 
+                    std::string value;
+                    std::string type = json["type"];
+                    if (type == "uint32") {
+                        value = p.value_uint32;
+                    } else if (type == "int32") {
+                        value = p.value_int32;
+                    } else if (type == "uint16") {
+                        value = p.value_uint16;
+                    } else if (type == "uint8") {
+                        value = p.value_uint8;
+                    } else if (type == "float") {
+                        value = p.value_float;
+                    } else if (type == "bool") {
+                        value = p.value_bool;
+                    }
+
                     if (prev != nullptr && prev[endpoint] != nullptr) {
-                        if (prev[endpoint] != p.value_float) {
-                            std::cout << name << " " << endpoint << ": " << "prev=" << prev[endpoint] << ",recv=" << p.value_float;
+                        if (prev[endpoint] != value) {
+                            std::cout << name << " " << endpoint << ": " << "prev=" << prev[endpoint] << ",recv=" << value;
 
                             std::string in;
                             while (true) {
@@ -68,7 +84,7 @@ int main() {
                                     obj[endpoint] = prev[endpoint];
                                     break;
                                 } else if (in == "r" || in == "recv") {
-                                    obj[endpoint] = p.value_float;
+                                    obj[endpoint] = value;
                                     break;
                                 } else {
                                     std::cerr << "unrecognized" << std::endl;
@@ -79,7 +95,7 @@ int main() {
                             obj[endpoint] = prev[endpoint];
                         }
                     } else {
-                        obj[endpoint] = p.value_float;
+                        obj[endpoint] = value;
                     }
 
                     // We only need this once, remove after we get a response

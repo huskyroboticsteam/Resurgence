@@ -43,6 +43,7 @@ enum class axis_state_t : uint8_t {
 	encoder_offset_calib = BLDC_AXIS_ENCODER_OFFSET_CALIBRATION,
 	closed_loop_control = BLDC_AXIS_CLOSED_LOOP_CONTROL,
 	lockin_spin = BLDC_AXIS_LOCKIN_SPIN,
+	harmonic_calib = BLDC_AXIS_HARMONIC_CALIBRATION,
 };
 
 } // namespace motor
