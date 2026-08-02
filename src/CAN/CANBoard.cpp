@@ -32,7 +32,7 @@ CANBoard::CANBoard(robot::types::boardid_t board_id, CANDevice_t device)
             // Ping motor for configs
             if (nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.controller.config.vel_limit"); endpoint != nullptr) {
                 endpointid_t endpoint_id = endpoint["id"];
-                addDirectReadCallback(this->device, endpoint_id, [&](auto p, std::unique_lock<std::shared_mutex> lock) {
+                addDirectReadCallback(this->device, endpoint_id, [=](auto p, std::unique_lock<std::shared_mutex> lock) {
                     // If the lock does not have an associated mutex, then this is a timeout call.
                     if (!lock.mutex()) {
                         LOG_F(WARNING, "%s timed out when retrieving velocity limit, disabling!", util::to_string(this->board_id).c_str());
@@ -221,7 +221,8 @@ bool CANBoard::pullConfigs() {
     try {
         nlohmann::json prev = nlohmann::json::parse(rfs);
         if (prev != nullptr && prev["axis0.controller.config.vel_limit"] != nullptr) {
-            this->vel_limit = prev["axis0.controller.config.vel_limit"];
+            std::string str = prev["axis0.controller.config.vel_limit"];
+            this->vel_limit = std::stof(str);
             rfs.close();
             return true;
         } else {

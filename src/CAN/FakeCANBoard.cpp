@@ -52,8 +52,6 @@ int main() {
 	ss << static_cast<int>(TestMode::Peripheral) << " for PERIPHERAL\n";
 	ss << static_cast<int>(TestMode::RawCAN) << " for RAW CAN\n";
 
-	int brake = 0;
-
 	while (true) {
 		int test_type = prompt(ss.str().c_str());
 
@@ -95,6 +93,8 @@ int main() {
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
 					can::addDirectReadCallback(board->getDevice(), endpoint_id, [&](auto decoded, std::unique_lock<std::shared_mutex> lock) {
+						if (!lock.mutex()) { return; }
+
 						std::string type = endpoint["type"];
 						printf("%s from 0x%02X [%s]: ", input.c_str(), board->getDevice().deviceUUID, type.c_str());
 						if (type == "uint32") {
@@ -112,7 +112,7 @@ int main() {
 						}
 
 						can::removeDirectReadCallback(board->getDevice(), endpoint["id"], std::move(lock));
-					}); // TODO: does not repeatedly re-read
+					}, true);
 
 					board->read(endpoint_id);
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -165,14 +165,28 @@ int main() {
 				can::printCANPacket(p);
 				can::sendCANPacket(p);
 			} else if (testMode == TestMode::Debug) {
-				CANPacket_t p = CANPeripheralPacket_SetBrakes(
-					Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, brake + 1, 0
+				CANPacket_t on = CANPeripheralPacket_SetRoverLEDRed(
+					Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}
 				);
-				can::sendCANPacket(p);
+				CANPacket_t off = CANPeripheralPacket_SetRoverLEDBlue(
+					Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}
+				);
 
-				brake = (brake + 1) % 6;
+				while(true) {
+					can::sendCANPacket(on);
+					std::this_thread::sleep_for(std::chrono::milliseconds(500));
+					can::sendCANPacket(off);
+					std::this_thread::sleep_for(std::chrono::milliseconds(500));
+				}
+				// CANPacket_t p = CANPeripheralPacket_SetBrakes(
+				// 	Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, brake + 1, 0
+				// );
+				// can::sendCANPacket(p);
 
-				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				// brake = (brake + 1) % 6;
+
+				// std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
 				// double avg = 0;
 				// double worst = 0;
 				// auto last = std::chrono::steady_clock::now();

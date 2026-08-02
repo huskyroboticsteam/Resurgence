@@ -9,10 +9,43 @@
 #include <set>
 
 const std::set<const char*> endpoints({
-    "fw_version_major",
-    "fw_version_minor",
-    "fw_version_revision",
-    "axis0.controller.config.vel_limit"
+    "config.dc_bus_undervoltage_trip_level",
+    "config.dc_bus_overvoltage_trip_level",
+    "config.dc_max_positive_current",
+    "config.dc_max_negative_current",
+    "axis0.config.motor.current_soft_max",
+    "axis0.config.motor.current_hard_max",
+
+    "axis0.config.motor.motor_type",                            // TODO: doesn't save correctly
+    "axis0.motor.motor_thermistor.config.enabled",
+    "axis0.config.motor.pole_pairs",
+    "axis0.config.motor.torque_constant",
+
+    "axis0.config.load_encoder",                                // TODO: doesn't save correctly
+    "axis0.controller.config.use_commutation_vel",
+    "axis0.config.commutation_encoder",                         // TODO: doesn't save correctly
+
+    "can.config.baud_rate",
+    "axis0.config.can.node_id",
+    "axis0.config.can.heartbeat_msg_rate_ms",
+    "axis0.config.can.encoder_msg_rate_ms",
+    "axis0.config.can.bus_voltage_msg_rate_ms",
+    "axis0.config.can.iq_msg_rate_ms",
+    "axis0.task_times.can_heartbeat.start_time",
+    "axis0.task_times.can_heartbeat.end_time",
+    "axis0.task_times.can_heartbeat.length",
+    "axis0.task_times.can_heartbeat.max_length",
+    "axis0.config.enable_watchdog",
+    "axis0.config.watchdog_timeout",
+
+    "axis0.config.motor.direction",
+    "axis0.controller.config.vel_limit",
+    "axis0.controller.config.vel_limit_tolerance",
+    "axis0.controller.config.pos_gain",
+    "axis0.controller.config.vel_gain",
+    "axis0.controller.config.vel_integrator_gain",
+    "axis0.controller.config.vel_integrator_limit",
+    "axis0.controller.config.vel_ramp_rate",
 });
 
 int main() {
@@ -32,6 +65,8 @@ int main() {
 
         std::string name = util::to_string(board);
         std::string file = dir + name + ".json";
+
+        std::cout << name << std::endl;
 
         std::ifstream rfs(file);
 
@@ -55,21 +90,24 @@ int main() {
                         return;
                     }
 
-                    std::string value;
+                    std::stringstream valuestream("");
+
                     std::string type = json["type"];
                     if (type == "uint32") {
-                        value = p.value_uint32;
+                        valuestream << p.value_uint32;
                     } else if (type == "int32") {
-                        value = p.value_int32;
+                        valuestream << p.value_int32;
                     } else if (type == "uint16") {
-                        value = p.value_uint16;
+                        valuestream << p.value_uint16;
                     } else if (type == "uint8") {
-                        value = p.value_uint8;
+                        valuestream << p.value_uint8;
                     } else if (type == "float") {
-                        value = p.value_float;
+                        valuestream << p.value_float;
                     } else if (type == "bool") {
-                        value = p.value_bool;
+                        valuestream << p.value_bool;
                     }
+
+                    std::string value = valuestream.str();
 
                     if (prev != nullptr && prev[endpoint] != nullptr) {
                         if (prev[endpoint] != value) {

@@ -413,7 +413,7 @@ void addDirectReadCallback(CANDevice_t device, endpointid_t endpoint_id, const s
 	// Write access
 	std::unique_lock lock(directReadCallbackMutex);
 	if (auto it = directReadCallbackMap.find(key); it != directReadCallbackMap.end()) {
-		VLOG_F(VERBOSE, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint_id);
+		LOG_F(INFO, "Callback already exists for 0x%x endpoint %d! Ignoring..", device.deviceUUID, endpoint_id);
 		return;
 	}
 
