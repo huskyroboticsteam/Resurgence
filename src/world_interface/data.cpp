@@ -69,6 +69,8 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "handActuator";
 		case jointid_t::laser:
 			return "laser";
+		case jointid_t::lights:
+			return "lights";
 		default:
 			// should never happen
 			return "<unknown>";

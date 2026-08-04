@@ -53,6 +53,12 @@ enum class indication_t {
 	arrivedAtDest
 };
 
+enum class led_t : uint8_t {
+	red,
+	green,
+	blue,
+};
+
 /** @brief The boards on the robot. */
 enum class boardid_t {
 	frontTireLeft,
@@ -88,12 +94,13 @@ enum class jointid_t {
 	hand,
 	handActuator,
 	laser,
+	lights,
 };
 
 constexpr auto all_jointid_t = frozen::make_unordered_set<jointid_t>(
 	{jointid_t::armBase, jointid_t::shoulder, jointid_t::elbow, jointid_t::forearm,
 	 jointid_t::wristRoll, jointid_t::wristPitch, jointid_t::hand,
-	 jointid_t::handActuator, jointid_t::laser});
+	 jointid_t::handActuator, jointid_t::laser, jointid_t::lights});
 
 constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, jointid_t>(
 	{{"armBase", jointid_t::armBase},
@@ -104,7 +111,8 @@ constexpr auto name_to_jointid = frozen::make_unordered_map<frozen::string, join
 	 {"wristRoll", jointid_t::wristRoll},
 	 {"hand", jointid_t::hand},
 	 {"handActuator", jointid_t::handActuator},
-	 {"laser", jointid_t::laser}});
+	 {"laser", jointid_t::laser},
+	 {"lights", jointid_t::lights}});
 
 enum class servoid_t {
 	mast

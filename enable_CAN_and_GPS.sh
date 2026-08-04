@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CAN=can1
+CAN=can0
 CAN_BITRATE=125000
 CAN_DBITRATE=125000
 GPS_PATH="/dev/ttyUSB0"

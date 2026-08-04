@@ -48,12 +48,6 @@ enum class axis_state_t : uint8_t {
 
 } // namespace motor
 
-enum class led_t : uint8_t {
-	red,
-	green,
-	blue,
-};
-
 /** @brief ODrive endpoint ID */
 using endpointid_t = uint16_t;
 
@@ -123,6 +117,6 @@ void removeDirectReadCallback(CANDevice_t device, endpointid_t endpoint, std::un
  */
 nlohmann::json getEndpoint(robot::types::boardid_t boardid, std::string endpoint);
 
-void setLED(led_t led);
+void setLED(robot::types::led_t led);
 
 } // namespace can

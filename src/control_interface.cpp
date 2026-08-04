@@ -115,7 +115,7 @@ types::DataPoint<int32_t> getJointPos(robot::types::jointid_t joint) {
 		} else {
 			return {};
 		}
-	} else if (joint == jointid_t::hand || joint == jointid_t::handActuator || joint == jointid_t::laser) {
+	} else if (joint == jointid_t::hand || joint == jointid_t::handActuator || joint == jointid_t::laser || joint == jointid_t::lights) {
 		return {};
 	} else {
 		// This should ideally never happen, but may if we haven't implemented a joint yet.
@@ -173,6 +173,12 @@ void setJointMotorPower(robot::types::jointid_t joint, double power) {
 		}
 		// TODO: hard-coded
 		setPeripheralPWM(1, power);
+	} else if (joint == jointid_t::lights) {
+		if (power == 1) {
+			setLED(robot::types::led_t::red);
+		} else {
+			setLED(robot::types::led_t::blue);
+		}
 	} else {
 		LOG_F(WARNING, "setJointPower called for currently unsupported joint %s",
 			  util::to_string(joint).c_str());

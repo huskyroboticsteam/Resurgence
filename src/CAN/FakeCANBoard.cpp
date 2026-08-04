@@ -52,6 +52,8 @@ int main() {
 	ss << static_cast<int>(TestMode::Peripheral) << " for PERIPHERAL\n";
 	ss << static_cast<int>(TestMode::RawCAN) << " for RAW CAN\n";
 
+	int brake = 0;
+
 	while (true) {
 		int test_type = prompt(ss.str().c_str());
 
@@ -72,6 +74,7 @@ int main() {
 				state_msg << static_cast<int>(can::motor::axis_state_t::idle) << " idle\n";
 				state_msg << static_cast<int>(can::motor::axis_state_t::full_calib) << " full calibration\n";
 				state_msg << static_cast<int>(can::motor::axis_state_t::closed_loop_control) << " closed loop control\n";
+				state_msg << static_cast<int>(can::motor::axis_state_t::lockin_spin) << " lockin spin\n";
 				state_msg << static_cast<int>(can::motor::axis_state_t::harmonic_calib) << " harmonic calibration";
 
 				int state = prompt(state_msg.str().c_str());
@@ -165,27 +168,14 @@ int main() {
 				can::printCANPacket(p);
 				can::sendCANPacket(p);
 			} else if (testMode == TestMode::Debug) {
-				CANPacket_t on = CANPeripheralPacket_SetRoverLEDRed(
-					Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}
+				CANPacket_t p = CANPeripheralPacket_SetBrakes(
+					Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, brake + 1, 0
 				);
-				CANPacket_t off = CANPeripheralPacket_SetRoverLEDBlue(
-					Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}
-				);
+				can::sendCANPacket(p);
 
-				while(true) {
-					can::sendCANPacket(on);
-					std::this_thread::sleep_for(std::chrono::milliseconds(500));
-					can::sendCANPacket(off);
-					std::this_thread::sleep_for(std::chrono::milliseconds(500));
-				}
-				// CANPacket_t p = CANPeripheralPacket_SetBrakes(
-				// 	Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY}, brake + 1, 0
-				// );
-				// can::sendCANPacket(p);
+				brake = (brake + 1) % 6;
 
-				// brake = (brake + 1) % 6;
-
-				// std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 				// double avg = 0;
 				// double worst = 0;

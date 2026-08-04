@@ -29,6 +29,7 @@ class CANBoard {
 
     // Universal
     void read(endpointid_t endpoint);
+    void write(endpointid_t endpoint, uint32_t value);
 
     robot::types::boardid_t getBoardID() const { return board_id; }
     CANDevice_t getDevice() const { return device; }

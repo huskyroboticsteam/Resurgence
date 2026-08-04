@@ -369,18 +369,13 @@ void setPeripheralPWM(uint8_t peripheralID, float dutyCycle) {
 	}
 }
 
-void setLED(uint8_t color) {
+void setLED(robot::types::led_t color) {
 	if (is_emergency_stopped) {
-		LOG_F(ERROR, "Emergency Stopped! Ignoring setLED of %d", color);
-		return;
-	}
-	if (!motors_enabled) {
-		LOG_F(WARNING, "Motors NOT enabled! Ignoring setLED of %d", color);
+		LOG_F(ERROR, "Emergency Stopped! Ignoring setLED of %hhu", color);
 		return;
 	}
 
-	can::led_t led = static_cast<can::led_t>(color);
-	can::setLED(led);
+	can::setLED(color);
 }
 
 } // namespace robot

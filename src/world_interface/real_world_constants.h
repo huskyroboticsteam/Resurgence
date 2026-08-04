@@ -121,42 +121,14 @@ constexpr auto proBoards = frozen::make_unordered_set<boardid_t>({
 });
 
 constexpr auto boardBrakeIDMap = frozen::make_unordered_map<boardid_t, uint8_t>({
-	{boardid_t::armBase, 1},
+	// {boardid_t::armBase, 1},
 	{boardid_t::shoulder, 2},
 	{boardid_t::elbow, 3}
 });
 
-/**
- * @brief A mapping of motorids to power scale factors when commanded with positive power.
- * Negative values mean that the motor is inverted.
- */
-constexpr auto positive_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, 1},
-												   {boardid_t::shoulder, -1},
-												   {boardid_t::elbow, -1},
-												   {boardid_t::forearm, -0.01},
-												   {boardid_t::wristDiffLeft, -0.1},
-												   {boardid_t::wristDiffRight, 0.1},
-												   {boardid_t::frontTireLeft, -3},
-												   {boardid_t::frontTireRight, 3},
-												   {boardid_t::rearTireLeft, -3},
-												   {boardid_t::rearTireRight, 3},
-												   {boardid_t::hand, -0.75}});
-/**
- * @brief A mapping of motorids to power scale factors when commanded with negative power.
- * Negative values mean that the motor is inverted.
- */
-constexpr auto negative_pwm_scales =
-	frozen::make_unordered_map<boardid_t, double>({{boardid_t::armBase, -1},
-												   {boardid_t::shoulder, -1},
-												   {boardid_t::elbow, -1},
-												   {boardid_t::forearm, -0.01},
-												   {boardid_t::wristDiffLeft, -0.1},
-												   {boardid_t::wristDiffRight, 0.1},
-												   {	boardid_t::frontTireLeft, -3},
-												   {boardid_t::frontTireRight, 3},
-												   {boardid_t::rearTireLeft, -3},
-												   {boardid_t::rearTireRight, 3},
-												   {boardid_t::hand, -0.75}});
+constexpr auto lockinSpinBoards = frozen::make_unordered_set<boardid_t>({
+	boardid_t::armBase,
+	boardid_t::debug2,
+});
 
 } // namespace robot

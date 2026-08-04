@@ -115,8 +115,8 @@ bool receivePacket(int fd, CANPacket_t& packet) {
 
 void handleAck(CANPacket_t& packet) {
 	auto decoded = CANUniversalPacket_Acknowledge_Decode(&packet);
-	if (decoded.sender.deviceUUID == 0x10) {
-		// Ignore "acks" being sent from device 0x10 (doesn't mean anything to us)
+	if (decoded.sender.deviceUUID == 0x10 || decoded.sender.deviceUUID == 0x20) {
+		// Ignore "acks" being sent from device 0x10 or 0x20 (doesn't mean anything to us)
 		return;
 	}
 
@@ -458,16 +458,16 @@ nlohmann::json getEndpoint(boardid_t boardid, std::string endpoint) {
 	return endpoints[endpoint];
 }
 
-void setLED(led_t led) {
+void setLED(robot::types::led_t led) {
 	CANPacket_t p;
 	switch (led) {
-		case led_t::red:
+		case robot::types::led_t::red:
 			p = CANPeripheralPacket_SetRoverLEDRed(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
 			break;
-		case led_t::green:
+		case robot::types::led_t::green:
 			p = CANPeripheralPacket_SetRoverFlashLEDGreen(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
 			break;
-		case led_t::blue:
+		case robot::types::led_t::blue:
 			p = CANPeripheralPacket_SetRoverLEDBlue(Constants::JETSON_DEVICE, CANDevice_t{1, 0, 0, CAN_UUID_TELEMETRY});
 			break;
 	}

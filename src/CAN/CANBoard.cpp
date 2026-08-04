@@ -76,25 +76,43 @@ void CANBoard::setMotorPower(double power) {
     }
 
     if (power == 0.0) {
-        if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
+        if (auto it = robot::boardBrakeIDMap.find(this->board_id); it != robot::boardBrakeIDMap.end()) {
             // Set brake
             this->setBrake(BRAKE_ON);
         }
 
-        this->setMotorState(can::motor::axis_state_t::idle);
+        if (auto it = robot::lockinSpinBoards.find(this->board_id); it != robot::lockinSpinBoards.end()) {
+            nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.config.general_lockin.vel");
+            this->write(endpoint["id"], 0);
+        } else {
+            this->setMotorState(can::motor::axis_state_t::idle);
 
-        // Make CANPacket_t
-        CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
-            Constants::JETSON_DEVICE, this->device, 0.0f, 0.0f
-        );
+            // Make CANPacket_t
+            CANPacket_t p = CANMotorPacket_BLDC_SetInputVelocity(
+                Constants::JETSON_DEVICE, this->device, 0.0f, 0.0f
+            );
 
-        // Send packet
-        sendCANPacket(p);
+            // Send packet
+            sendCANPacket(p);
+        }
     } else {
+        // Mapping power to a target velocity
+        float vel = static_cast<float>(power * this->vel_limit) * this->inversion_factor;
+
+        if (auto it = robot::lockinSpinBoards.find(this->board_id); it != robot::lockinSpinBoards.end()) {
+            if (this->input_vel == vel) { return; }
+            this->input_vel = vel;
+            nlohmann::json endpoint = getEndpoint(this->board_id, "axis0.config.general_lockin.vel");
+            uint32_t uvel;
+            std::memcpy(&uvel, &this->input_vel, sizeof(float));
+            this->write(endpoint["id"], uvel);
+            this->setMotorState(can::motor::axis_state_t::lockin_spin);
+            return;
+        }
+
+        this->input_vel = vel;
         // Ensure motor state is closed loop control
         this->setMotorState(can::motor::axis_state_t::closed_loop_control);
-        // Mapping power to a target velocity
-        this->input_vel = static_cast<float>(power * this->vel_limit) * this->inversion_factor;
 
         if (this->board_id == robot::types::boardid_t::shoulder || this->board_id == robot::types::boardid_t::elbow) {
             this->setBrake(BRAKE_OFF);
@@ -203,6 +221,20 @@ void CANBoard::setServoAngle(float angle) {
 void CANBoard::read(endpointid_t endpoint) {
     CANPacket_t p = CANMotorPacket_BLDC_DirectRead(
         Constants::JETSON_DEVICE, this->device, endpoint
+    );
+    sendCANPacket(p);
+}
+
+void CANBoard::write(endpointid_t endpoint, uint32_t value) {
+    addDirectReadCallback(this->device, endpoint, [=](auto decoded, std::unique_lock<std::shared_mutex> lock) {
+        if (value != decoded.value_uint32) {
+            // LOG_F(ERROR, "Write to %u failed! Expected %u, got %u", endpoint, value, decoded.value_uint32);
+        }
+        removeDirectReadCallback(this->device, endpoint, std::move(lock));
+    });
+
+    CANPacket_t p = CANMotorPacket_BLDC_DirectWrite(
+        Constants::JETSON_DEVICE, this->device, endpoint, value
     );
     sendCANPacket(p);
 }
