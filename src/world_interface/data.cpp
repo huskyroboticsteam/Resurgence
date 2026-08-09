@@ -27,6 +27,27 @@ std::bitset<N_LIMIT_SWITCH> LimitSwitchData::diff(const LimitSwitchData& other) 
 
 namespace util {
 
+std::string to_string(robot::types::boardid_t board) {
+	using robot::types::boardid_t;
+	switch (board) {
+		case boardid_t::frontTireLeft: return "frontTireLeft";
+		case boardid_t::frontTireRight: return "frontTireRight";
+		case boardid_t::rearTireLeft: return "rearTireLeft";
+		case boardid_t::rearTireRight: return "rearTireRight";
+		case boardid_t::armBase: return "armBase";
+		case boardid_t::shoulder: return "shoulder";
+		case boardid_t::elbow: return "elbow";
+		case boardid_t::forearm: return "forearm";
+		case boardid_t::wristDiffLeft: return "wristDiffLeft";
+		case boardid_t::wristDiffRight: return "wristDiffRight";
+		case boardid_t::telemetry: return "telemetry";
+		case boardid_t::hand: return "hand";
+		case boardid_t::debug1: return "debug1";
+		case boardid_t::debug2: return "debug2";
+		default: return "<unknown>";
+	}
+}
+
 std::string to_string(robot::types::jointid_t joint) {
 	using robot::types::jointid_t;
 	switch (joint) {
@@ -38,24 +59,18 @@ std::string to_string(robot::types::jointid_t joint) {
 			return "elbow";
 		case jointid_t::forearm:
 			return "forearm";
-		case jointid_t::hand:
-			return "hand";
-    case jointid_t::handActuator:
-      return "handActuator";
 		case jointid_t::wristPitch:
 			return "wristPitch";
 		case jointid_t::wristRoll:
 			return "wristRoll";
-		case jointid_t::ikUp:
-			return "ikUp";
-		case jointid_t::ikForward:
-			return "ikForward";
-		case jointid_t::fourBarLinkage:
-			return "fourBarLinkage";
-		case jointid_t::drillActuator:
-			return "drillActuator";
-		case jointid_t::drillMotor:
-			return "drillMotor";
+		case jointid_t::hand:
+			return "hand";
+		case jointid_t::handActuator:
+			return "handActuator";
+		case jointid_t::laser:
+			return "laser";
+		case jointid_t::lights:
+			return "lights";
 		default:
 			// should never happen
 			return "<unknown>";
@@ -85,16 +100,8 @@ std::string to_string(robot::types::servoid_t servo) {
 	using robot::types::servoid_t;
 
 	switch (servo) {
-		case servoid_t::microscope:
-			return "microscope";
-		case servoid_t::syringe:
-			return "syringe";
-		case servoid_t::cuvette:
-			return "cuvette";
-		case servoid_t::filter:
-			return "filter";
-		case servoid_t::soilBox:
-			return "soilBox";
+		case servoid_t::mast:
+			return "mast";
 		default:
 			return "<unknown>";
 	}

@@ -23,12 +23,19 @@ using val_t = nlohmann::json::value_t;
 using net::websocket::connhandler_t;
 using net::websocket::msghandler_t;
 using net::websocket::validator_t;
-using robot::types::motorid_t;
+using robot::types::boardid_t;
 using std::placeholders::_1;
 
 namespace net::mc {
 namespace {
 const std::chrono::milliseconds HEARTBEAT_TIMEOUT_PERIOD = 30000ms;
+
+static bool validateJoint(const json& j) {
+	return util::validateKey(j, "joint", val_t::string) &&
+		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
+			   return j["joint"].get<std::string>() == util::to_string(joint);
+		   });
+}
 } // namespace
 
 /*///////////////// VALIDATORS/HANDLERS ////////////////////
@@ -46,8 +53,8 @@ static bool validateEmergencyStopRequest(const json& j) {
 void MissionControlProtocol::handleEmergencyStopRequest(const json& j) {
 	bool stop = j["stop"];
 	if (stop) {
-		this->stopAndShutdownPowerRepeat(true);
 		robot::emergencyStop();
+		this->stopAndShutdownPowerRepeat(true);
 		LOG_F(ERROR, "Emergency stop!");
 	} else if (!Globals::AUTONOMOUS) {
 		// if we are leaving e-stop (and NOT in autonomous), restart the power repeater
@@ -72,7 +79,17 @@ void MissionControlProtocol::handleOperationModeRequest(const json& j) {
 		_autonomous_task.kill();
 		// if we have left autonomous mode, we need to start the power repeater again.
 		_power_repeat_task.start();
-	}
+	} 
+}
+
+static bool validateEnableMotorsRequest(const json& j) {
+	return util::validateKey(j, "enabled", val_t::boolean);
+}
+
+void MissionControlProtocol::handleEnableMotorsRequest(const json& j) {
+	bool enabled = j["enabled"];
+
+	robot::enableMotors(enabled);
 }
 
 static bool validateDriveRequest(const json& j) {
@@ -81,7 +98,7 @@ static bool validateDriveRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleDriveRequest(const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
+	if (Globals::AUTONOMOUS) { return; }
 	// fit straight and steer to unit circle; i.e. if |<straight, steer>| > 1, scale each
 	// component such that <straight, steer> is a unit vector.
 	double straight = j["straight"];
@@ -89,8 +106,7 @@ void MissionControlProtocol::handleDriveRequest(const json& j) {
 	double norm = std::hypot(straight, steer);
 	double dx = Constants::MAX_WHEEL_VEL * (norm > 1 ? straight / norm : straight);
 	double dtheta = Constants::MAX_DTHETA * (norm > 1 ? steer / norm : steer);
-	LOG_F(1, "{straight=%.2f, steer=%.2f} -> setCmdVel(%.4f, %.4f)", straight, steer, dtheta,
-		  dx);
+	VLOG_F(TRACE, "{steer=%.2f, straight=%.2f} -> setCmdVel(%.4f, %.4f)", steer, straight, dtheta, dx);
 	this->setRequestedCmdVel(dtheta, dx);
 }
 
@@ -143,14 +159,13 @@ static bool validateJointPowerRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleJointPowerRequest(const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
-	using robot::types::jointid_t;
-	using robot::types::name_to_jointid;
+	if (Globals::AUTONOMOUS) { return; }
+
 	std::string joint = j["joint"];
 	double power = j["power"];
-	auto it = name_to_jointid.find(util::freezeStr(joint));
-	if (it != name_to_jointid.end()) {
-		jointid_t joint_id = it->second;
+	auto it = robot::types::name_to_jointid.find(util::freezeStr(joint));
+	if (it != robot::types::name_to_jointid.end()) {
+		robot::types::jointid_t joint_id = it->second;
 		setRequestedJointPower(joint_id, power);
 	}
 }
@@ -160,38 +175,13 @@ static bool validateJointPositionRequest(const json& j) {
 }
 
 void MissionControlProtocol::handleJointPositionRequest([[maybe_unused]] const json& j) {
-	// TODO: ignore this message if we are in autonomous mode.
+	if (Globals::AUTONOMOUS) { return; }
+
 	// std::string motor = j["joint"];
 	// double position_deg = j["position"];
 	// int32_t position_mdeg = std::round(position_deg * 1000);
 	// TODO: actually implement joint position requests
 	// setMotorPos(motor, position_mdeg);
-}
-
-static bool validateServoPositionRequest(const json& j) {
-  return util::validateKey(j, "servo", val_t::string) && util::validateKey(j, "position", val_t::number_integer);
-}
-
-void MissionControlProtocol::handleServoPositionRequest(const json& j) {
-  std::string servoName = j["servo"];
-  int32_t position = j["position"];
-  auto servo = name_to_servoid.find(util::freezeStr(servoName));
-  if (servo != name_to_servoid.end()) {
-	  robot::setServoPos(servo->second, position);
-  }
-}
-
-static bool validateStepperTurnAngleRequest(const json& j) {
-  return util::validateKey(j, "stepper", val_t::string) && util::validateKey(j, "angle", val_t::number_integer);
-}
-
-void MissionControlProtocol::handleStepperTurnAngleRequest(const json& j) {
-  std::string stepperName = j["stepper"];
-  int16_t angle = j["angle"];
-  auto stepper = name_to_stepperid.find(util::freezeStr(stepperName));
-  if (stepper != name_to_stepperid.end()) {
-    robot::setRequestedStepperTurnAngle(stepper->second, angle);
-  }
 }
 
 static bool validateWaypointNavRequest(const json& j) {
@@ -248,17 +238,18 @@ void MissionControlProtocol::handleCameraFrameRequest(const json& j) {
 	CameraID cam = j["camera"];
 	auto camDP = robot::readCamera(cam);
 
-	Eigen::Quaterniond quat = imu.getData();
 	double lon = 0, lat = 0, alt = 0;
 	double w = 0, x = 0, y = 0, z = 0;
-	if (gps.isValid()) {
-		lon = gps.getData().lon;
-		lat = gps.getData().lat;
-		alt = gps.getData().alt;
-    	w = quat.w();
-    	x = quat.x();
-    	y = quat.y();
-    	z = quat.z();
+	if (gps.isValid() && imu.isValid()) {
+		auto gps_data = gps.getData();
+		auto imu_data = imu.getData();
+		lon = gps_data.lon;
+		lat = gps_data.lat;
+		alt = gps_data.alt;
+    	w = imu_data.w();
+    	x = imu_data.x();
+    	y = imu_data.y();
+    	z = imu_data.z();
 	}
 
 	if (camDP) {
@@ -307,10 +298,6 @@ void MissionControlProtocol::handleHeartbeatTimedOut() {
 void MissionControlProtocol::stopAndShutdownPowerRepeat(bool sendDisableIK) {
 	if (_power_repeat_task.isRunning()) {
 		_power_repeat_task.stop();
-		// explicitly set all joints to zero
-		stopAllJoints();
-		// explicitly stop chassis
-		robot::setCmdVel(0, 0);
 	}
 	// Turn off inverse kinematics so that IK state will be in sync with mission control
 	this->setArmIKEnabled(false, sendDisableIK);
@@ -330,8 +317,10 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		OPERATION_MODE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleOperationModeRequest, this, _1),
 		validateOperationModeRequest);
-	// drive and joint power handlers need the class for context since they must modify
-	// _last_joint_power and _last_cmd_vel (for the repeater thread)
+	this->addMessageHandler(
+		ENABLE_MOTORS_REQ_TYPE,
+		std::bind(&MissionControlProtocol::handleEnableMotorsRequest, this, _1),
+		validateEnableMotorsRequest);
 	this->addMessageHandler(
 		DRIVE_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleDriveRequest, this, _1),
@@ -368,14 +357,6 @@ MissionControlProtocol::MissionControlProtocol(SingleClientWSServer& server)
 		WAYPOINT_NAV_REQ_TYPE,
 		std::bind(&MissionControlProtocol::handleWaypointNavRequest, this, _1),
 		validateWaypointNavRequest);
-	this->addMessageHandler(
-    		SERVO_POSITION_REQ_TYPE,
-    		std::bind(&MissionControlProtocol::handleServoPositionRequest, this, _1),
-    		validateServoPositionRequest);
-	this->addMessageHandler(
-    		STEPPER_TURN_ANGLE_REQ_TYPE,
-    		std::bind(&MissionControlProtocol::handleStepperTurnAngleRequest, this, _1),
-    		validateStepperTurnAngleRequest);
 
 	this->addConnectionHandler(std::bind(&MissionControlProtocol::handleConnection, this));
 
@@ -421,19 +402,6 @@ void MissionControlProtocol::setRequestedCmdVel(double dtheta, double dx) {
 void MissionControlProtocol::setRequestedTankCmdVel(double left, double right) {
 	_power_repeat_task.setTankCmdVel(left, right);
 	robot::setTankCmdVel(left, right);
-}
-
-static bool validateJoint(const json& j) {
-	return util::validateKey(j, "joint", val_t::string) &&
-		   std::any_of(all_jointid_t.begin(), all_jointid_t.end(), [&](const auto& joint) {
-			   return j["joint"].get<std::string>() == util::to_string(joint);
-		   });
-}
-
-static void stopAllJoints() {
-	for (jointid_t current : robot::types::all_jointid_t) {
-		robot::setJointPower(current, 0.0);
-	}
 }
 
 } // namespace net::mc

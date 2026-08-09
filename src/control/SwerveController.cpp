@@ -3,7 +3,7 @@
 #include "../Constants.h"
 
 using namespace control;
-using robot::types::motorid_t;
+using robot::types::boardid_t;
 
 control::SwerveController::SwerveController(double baseWidth, double baseLength, int epsilon)
 	: driveMode(DriveMode::Normal), swerve_kinematics(baseWidth, baseLength),
