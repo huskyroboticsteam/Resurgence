@@ -133,7 +133,7 @@ int main() {
 				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
 					uint16_t endpoint_id = endpoint["id"];
 					uint32_t value = prompt("value");
-					board->write(endpoint, value);
+					board->write(endpoint_id, value);
 				}
 			} else if (testMode == TestMode::Stepper) {
 				std::string input;
