@@ -127,7 +127,11 @@ constexpr auto boardBrakeIDMap = frozen::make_unordered_map<boardid_t, uint8_t>(
 });
 
 constexpr auto lockinSpinBoards = frozen::make_unordered_set<boardid_t>({
-	boardid_t::armBase,
+	// boardid_t::armBase,
+	boardid_t::frontTireLeft,
+	boardid_t::frontTireRight,
+	boardid_t::rearTireLeft,
+	boardid_t::rearTireRight,
 	boardid_t::debug2,
 });
 

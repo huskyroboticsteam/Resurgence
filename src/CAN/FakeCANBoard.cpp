@@ -10,6 +10,7 @@ enum class TestMode {
 	State,
 	Power,
 	Read,
+	Write,
 	Stepper,
 	Peripheral,
 	RawCAN,
@@ -48,6 +49,7 @@ int main() {
 	ss << static_cast<int>(TestMode::State) << " for SET STATE\n";
 	ss << static_cast<int>(TestMode::Power) << " for POWER CONTROL\n";
 	ss << static_cast<int>(TestMode::Read) << " for DIRECT READ\n";
+	ss << static_cast<int>(TestMode::Write) << " for DIRECT WRITE\n";
 	ss << static_cast<int>(TestMode::Stepper) << " for STEPPER\n";
 	ss << static_cast<int>(TestMode::Peripheral) << " for PERIPHERAL\n";
 	ss << static_cast<int>(TestMode::RawCAN) << " for RAW CAN\n";
@@ -122,6 +124,16 @@ int main() {
 				} else {
 					std::cout << "Unknown endpoint" << std::endl;
 					continue;
+				}
+			} else if (testMode == TestMode::Write) {
+				std::string input;
+				std::cout << "Enter endpoint name" << " > ";
+				std::getline(std::cin, input);
+
+				if (nlohmann::json endpoint = can::getEndpoint(board->getBoardID(), input); endpoint != nullptr) {
+					uint16_t endpoint_id = endpoint["id"];
+					uint32_t value = prompt("value");
+					board->write(endpoint, value);
 				}
 			} else if (testMode == TestMode::Stepper) {
 				std::string input;
