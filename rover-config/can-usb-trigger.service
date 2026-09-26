@@ -1,0 +1,6 @@
+[Unit]
+Description=Enable CAN when USB is plugged in
+
+[Service]
+Type=oneshot
+ExecStart=/home/husky/Resurgence/enable_CAN_and_GPS.sh
