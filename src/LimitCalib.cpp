@@ -15,7 +15,7 @@ namespace {
 
 util::latch latch(encMotors.size());
 
-void callback(motorid_t motor, const types::DataPoint<LimitSwitchData>& data) {
+void callback(boardid_t motor, const types::DataPoint<LimitSwitchData>& data) {
 	robot::setMotorPower(motor, 0);
 	// call countdown.
 	latch.count_down();

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+CAN=can0
 CAN_BITRATE=125000
 CAN_DBITRATE=125000
 GPS_PATH="/dev/ttyUSB0"
@@ -8,12 +9,12 @@ sudo modprobe can
 sudo modprobe can_raw
 sudo modprobe mttcan
 
-sudo ip link set can0 type can bitrate "${CAN_BITRATE}" dbitrate "${CAN_DBITRATE}" \
+sudo ip link set "${CAN}" type can bitrate "${CAN_BITRATE}" dbitrate "${CAN_DBITRATE}" \
      berr-reporting on fd on restart-ms 100
-sudo ip link set up can0
+sudo ip link set up "${CAN}"
 
 if [[ $? != 0 ]]; then
-  echo "Error enabling can0 interface!"
+  echo "Error enabling ${CAN} interface!"
 fi
 
 # For some reason, on the rover, the gpsd that starts on boot does not

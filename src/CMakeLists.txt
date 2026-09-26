@@ -98,30 +98,25 @@ find_package(argparse REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  if(OFFLINE_MODE STREQUAL "FALSE")
-    # Find the CAN library; contains packet and protocol definitions and does not
-    # actually require physical CAN to be present.
-    FetchContent_Declare(
-      HindsightCAN
-      GIT_REPOSITORY https://github.com/huskyroboticsteam/HindsightCAN.git
-      GIT_TAG ce04c1a2dced3eb0e5beaaf39b2fcc436655e790
-    )
-  else()
-    message("-- Offline mode enabled, using cached hindsight CAN")
-    # Note that in the event that cmake is not called from the correct folder or this directory is wrong, cmake will not work
-    FetchContent_Declare(
-        HindsightCAN
-        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../build/_deps/hindsightcan-src"
-    )
-  endif()
-  FetchContent_MakeAvailable(HindsightCAN)
+  # CAN26 library - new CAN protocol definitions
+  FetchContent_Declare(
+    CAN26
+    GIT_REPOSITORY https://github.com/huskyroboticsteam/CAN26.git
+    # Specifying tag so that we can control when updates propagate
+    GIT_TAG 0aee8a7b4de9c09b57fc47f48bf4d0837d12f340
+  )
+  FetchContent_MakeAvailable(CAN26)
+
+  add_library(CAN26 STATIC ${can26_SOURCE_DIR}/CANPacket.c)
+  target_include_directories(CAN26 SYSTEM PUBLIC ${can26_SOURCE_DIR})
 endif()
 
 # Check if offline mode flag waas passed in
 if(OFFLINE_MODE STREQUAL "FALSE")
   FetchContent_Declare(LoguruGitRepo
     GIT_REPOSITORY "https://github.com/emilk/loguru"
-    GIT_TAG        "master"
+    # Specifying tag so that we can control when updates propagate
+    GIT_TAG 4adaa185883e3c04da25913579c451d3c32cfac1
   )
 else()
   message("-- Offline mode enabled, using cached loguru")
@@ -166,6 +161,10 @@ add_library(camera SHARED
   camera/CameraConfig.cpp
 )
 target_link_libraries(camera PUBLIC ${OpenCV_LIBS})
+if(WORLD_INTERFACE STREQUAL "REAL")
+  target_link_libraries(camera PUBLIC CAN26)
+  target_compile_definitions(camera PRIVATE REAL_WORLD_INTERFACE=1)
+endif()
 
 # shared library for utility code
 add_library(utils SHARED
@@ -185,30 +184,21 @@ add_library(utils SHARED
 target_link_libraries(utils ${OpenCV_LIBS})
 
 if(WORLD_INTERFACE STREQUAL "REAL")
-  ## ====== CAN Interfaces =======
-  # Stub CAN interface is used for the tests (and for the Rover if
-  # CAN is disabled) and the real CAN interface is used for the Rover if CAN is
-  # enabled.
-
-  # Common CAN source files
-
   # **DON'T MAKE THIS SHARED**
   # Making this library shared causes some memory fuckery
   # No clue why but CAN I/O goes to shit. Don't do it.
   add_library(can_interface STATIC)
   target_sources(can_interface PRIVATE
-    CAN/CANMotor.cpp
-    CAN/CANUtils.cpp
+    CAN/CANBoard.cpp
+    CAN/CAN.cpp
   )
 
-  # Hardware specific source files
-  target_sources(can_interface PRIVATE
-    CAN/CAN.cpp)
   target_link_libraries(can_interface PUBLIC
-    HindsightCAN
+    CAN26
     Threads::Threads
     utils
   )
+  target_compile_definitions(can_interface PUBLIC REAL_WORLD_INTERFACE=1)
 endif()
 
 ## GPS Implementations
@@ -235,7 +225,6 @@ add_library(world_interface_core STATIC
   ar/MarkerPattern.cpp
   ar/Tag.cpp
   ar/read_landmarks.cpp
-  world_interface/motor/base_motor.cpp
   )
 target_include_directories(world_interface_core SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(world_interface_core PUBLIC ${vision_libs} opencv_aruco ${OpenCV_LIBS} utils camera)
@@ -246,14 +235,12 @@ if(WORLD_INTERFACE STREQUAL "REAL")
 
   add_library(real_world_interface STATIC
     world_interface/real_world_interface.cpp
-    world_interface/motor/can_motor.cpp
   )
   target_link_libraries(real_world_interface gps_interface can_interface world_interface_core)
   add_library(world_interface ALIAS real_world_interface)
 elseif(WORLD_INTERFACE STREQUAL "SIMULATOR")
   add_library(simulator_interface STATIC
     world_interface/simulator_interface.cpp
-    world_interface/motor/sim_motor.cpp
   )
   target_link_libraries(simulator_interface world_interface_core)
   add_library(world_interface ALIAS simulator_interface)
@@ -292,6 +279,10 @@ add_library(autonomous SHARED
 target_link_libraries(autonomous commands world_interface)
 
 add_library(constants SHARED Constants.cpp)
+if(WORLD_INTERFACE STREQUAL "REAL")
+  target_link_libraries(constants PUBLIC CAN26)
+  target_compile_definitions(constants PUBLIC REAL_WORLD_INTERFACE=1)
+endif()
 link_libraries(constants)
 
 add_executable(Rover Rover.cpp)
@@ -376,26 +367,19 @@ add_executable(gpsd_test
   gps/gpsd_test.cpp)
 target_link_libraries(gpsd_test gps)
 
-if (WORLD_INTERFACE STREQUAL "REAL")
-  add_executable(LimitSwitchCalibration
-    LimitCalib.cpp)
-  target_link_libraries(LimitSwitchCalibration real_world_interface)
-
-  add_executable(TunePID TunePID.cpp)
-  target_link_libraries(TunePID
-    ${rover_libs}
-    can_interface
-  )
-  target_link_libraries(TunePID ${vision_libs})
-endif()
+# if (WORLD_INTERFACE STREQUAL "REAL")
+#   add_executable(LimitSwitchCalibration
+#     LimitCalib.cpp)
+#   target_link_libraries(LimitSwitchCalibration real_world_interface)
+# endif()
 
 add_compile_options(
   -Wall
   -Wextra
   -Werror
+  -Wno-psabi
 )
 
 add_subdirectory(ar)
-add_subdirectory(camera)
 add_subdirectory(CAN)
 add_subdirectory(network)

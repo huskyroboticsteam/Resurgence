@@ -6,6 +6,7 @@ namespace Constants {
 // TODO: make sure these are still accurate with the new arm.
 const double SHOULDER_LENGTH = 0.6; // placeholder(m)
 const double ELBOW_LENGTH = 0.7;	// placeholder(m)
+const double FOURBAR_GEAR_RATIO = 71.71875;
 
 /**
    Number of millidegrees per degree
@@ -86,9 +87,16 @@ const char* DGPS_PROTOCOL_NAME = "/dgps";
  */
 const char* ARDUPILOT_PROTOCOL_NAME = "/ardupilot";
 
+const char* CAN_NAME = "can0";
+
 const std::chrono::milliseconds JOINT_POWER_REPEAT_PERIOD(333);
 const std::chrono::milliseconds ARM_IK_UPDATE_PERIOD(50);
 
+#ifdef REAL_WORLD_INTERFACE
+const CANDevice_t JETSON_DEVICE = {0, 0, 0, CAN_UUID_JETSON};
+#endif
+
+const float MILLIDEGREES_PER_REV = 360000.0f;
 namespace Drive {
 const double STEER_EPSILON = 10000;
 }
@@ -139,8 +147,8 @@ const std::array<robot::types::jointid_t, 2> IK_MOTOR_JOINTS = {
  * The motors used in IK. The i-th element in this array corresponds to the joint in the i-th
  * element of `IK_MOTOR_JOINTS`
  */
-const std::array<robot::types::motorid_t, 2> IK_MOTORS = ([]() {
-	std::array<robot::types::motorid_t, IK_MOTOR_JOINTS.size()> ret{};
+const std::array<robot::types::boardid_t, 2> IK_MOTORS = ([]() {
+	std::array<robot::types::boardid_t, IK_MOTOR_JOINTS.size()> ret{};
 	for (size_t i = 0; i < IK_MOTOR_JOINTS.size(); i++) {
 		ret[i] = JOINT_MOTOR_MAP.at(IK_MOTOR_JOINTS[i]);
 	}

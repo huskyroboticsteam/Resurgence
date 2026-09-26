@@ -151,6 +151,7 @@ TelemReportTask::TelemReportTask(websocket::SingleClientWSServer& server)
 
 void TelemReportTask::sendTelemetry() {
 	// send joint positions
+	
 	for (const auto& cur : robot::types::name_to_jointid) {
 		robot::types::DataPoint<int32_t> jpos = robot::getJointPos(cur.second);
 		if (jpos.isValid()) {

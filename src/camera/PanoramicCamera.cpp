@@ -10,7 +10,6 @@
 #include "Camera.h"
 #include "CameraParams.h"
 #include "CameraConfig.h"
-#include "../world_interface/motor/can_motor.h"
 #include "../CAN/CAN.h"
 #include "../CAN/CANMotor.h"
 #include "../CAN/CANUtils.h"
